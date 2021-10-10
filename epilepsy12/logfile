@@ -1,0 +1,8 @@
+2021-10-10 00:43:11.465 BST [83438] LOG:  starting PostgreSQL 14.0 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.3), 64-bit
+2021-10-10 00:43:11.467 BST [83438] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2021-10-10 00:43:11.467 BST [83438] LOG:  listening on IPv6 address "::1", port 5432
+2021-10-10 00:43:11.468 BST [83438] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2021-10-10 00:43:11.478 BST [83439] LOG:  database system was shut down at 2021-10-09 16:16:23 BST
+2021-10-10 00:43:11.483 BST [83438] LOG:  database system is ready to accept connections
+2021-10-10 00:46:25.959 BST [84815] FATAL:  role "mydatabaseuser" does not exist
+2021-10-10 00:56:10.363 BST [87554] FATAL:  role "mydatabaseuser" does not exist
