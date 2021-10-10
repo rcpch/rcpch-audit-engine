@@ -7,7 +7,7 @@ The EPILEPSY12 audit, as a backend, API and client-side
 </p>
 <p align="center">
     <img src="assets/rcpch-logo.jpeg" width='100px'/>
-    <img src="assets/pmpc-logo.png" width='100px'/>
+    <img src="assets/pmpc-logo.jpg" width='100px'/>
 </p>
 
 The project is part of the [Public Money Public Code](https://publicmoneypubliccode.org.uk/) community.
@@ -31,7 +31,7 @@ You will also need [Postgresql](https://www.postgresql.org/)
 Then create a virtual environment:
 
 ```console
-foobar:~foo$ pyenv virtualenv 3.10.0
+foobar:~foo$ pyenv virtualenv 3.10.0 epilepsy12-server
 ```
 
 Clone the repository:
