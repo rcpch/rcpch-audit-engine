@@ -6,8 +6,8 @@ The EPILEPSY12 audit, as a backend, API and client-side
     <img src="assets/epilepsy12-logo.jpg" width='200px'/>
 </p>
 <p align="center">
-    <img src="assets/rcpch-logo.jpeg" width='100px'/>
-    <img src="assets/pmpc-logo.jpg" width='100px'/>
+    <img align="center" src="assets/rcpch-logo.jpg" width='100px'/>
+    <img align="center" src="assets/pmpc-logo.jpg" width='100px'/>
 </p>
 
 The project is part of the [Public Money Public Code](https://publicmoneypubliccode.org.uk/) community.
@@ -38,6 +38,7 @@ Clone the repository:
 
 ```console
 foobar:~foo$ git clone https://github.com/rcpch/epilepsy12-server.git
+```
 
 Then install all the requirements. Note you can't do this without Postgreql already installed.
 
