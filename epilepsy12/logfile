@@ -6,3 +6,15 @@
 2021-10-10 00:43:11.483 BST [83438] LOG:  database system is ready to accept connections
 2021-10-10 00:46:25.959 BST [84815] FATAL:  role "mydatabaseuser" does not exist
 2021-10-10 00:56:10.363 BST [87554] FATAL:  role "mydatabaseuser" does not exist
+2021-10-10 16:26:21.516 BST [4134] FATAL:  database "SimonChapman" does not exist
+2021-10-10 16:26:58.152 BST [4475] FATAL:  database "db-epilepsy12" does not exist
+2021-10-10 16:31:58.686 BST [4900] FATAL:  database "SimonChapman" does not exist
+2021-10-10 17:18:41.420 BST [20379] FATAL:  role "epilepsy12user" does not exist
+2021-10-10 17:28:31.615 BST [24953] FATAL:  role "epilepsy12user" does not exist
+2021-10-10 17:30:56.228 BST [26096] FATAL:  database "SimonChapman" does not exist
+2021-10-10 17:43:23.499 BST [30411] FATAL:  role "epilepsy12user" does not exist
+2021-10-10 17:43:47.703 BST [30658] FATAL:  role "epilepsy12user" does not exist
+2021-10-10 17:50:09.461 BST [83438] LOG:  received smart shutdown request
+2021-10-10 17:50:09.464 BST [83438] LOG:  background worker "logical replication launcher" (PID 83445) exited with exit code 1
+2021-10-10 17:50:09.464 BST [83440] LOG:  shutting down
+2021-10-10 17:50:09.480 BST [83438] LOG:  database system is shut down

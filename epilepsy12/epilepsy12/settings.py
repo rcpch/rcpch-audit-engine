@@ -11,16 +11,19 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%#81pur%14wocf&qatg3&86rm^=sv2zmkl_c5u-*^pan57hxe*'
+SECRET_KEY = os.environ.get("E12_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -76,9 +79,9 @@ WSGI_APPLICATION = 'epilepsy12.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'epilepsy12-db',
-        'USER': 'mydatabaseuser',
-        'PASSWORD': 'mypassword',
+        'NAME': os.environ.get('E12_DATABASE_NAME'),
+        'USER': os.environ.get('E12_USER'),
+        'PASSWORD': os.environ.get('E12_PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
