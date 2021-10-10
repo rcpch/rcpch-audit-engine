@@ -1,0 +1,6 @@
+# standard dependencies
+
+
+# third party dependencies
+Django
+psycopg2-binary
