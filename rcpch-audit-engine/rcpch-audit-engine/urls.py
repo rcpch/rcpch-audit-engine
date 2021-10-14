@@ -19,10 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+from django.views.generic.base import TemplateView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('epilepsy12/', include('epilepsy12.urls')),
-    path('', RedirectView.as_view(url='epilepsy12/', permanent=True))
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # path('', RedirectView.as_view(url='epilepsy12/', permanent=True))
+# ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]

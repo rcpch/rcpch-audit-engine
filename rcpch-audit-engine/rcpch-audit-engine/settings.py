@@ -55,6 +55,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'rcpch-audit-engine.urls'
 
+LOGIN_REDIRECT_URL = "/epilepsy12/"
+LOGOUT_REDIRECT_URL = "/epilepsy12/"
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

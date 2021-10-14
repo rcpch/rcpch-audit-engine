@@ -26,34 +26,40 @@
   </head>
 
   <style>
-        body {
-                color: #0d0d58;
-                font-family: 'montserrat';
-        }
+    body {
+      color: #0d0d58;
+      font-family: 'montserrat';
+    }
   </style>
 
   <body id="root">
         <div class="ui secondary pointing menu">
-                <a class="active item" href={% url 'index' %}>
-                  Home
-                </a>
-                <a class="item" href={% url 'database' %}>
-                  Database Management
-                </a>
-                <a class="item" href={% url 'hospital' %}>
-                  Hospital Clinician
-                </a>
-                <a class="item" href={% url 'eeg' %}>
-                  EEG Department
-                </a>
-                <a class="item" href={% url 'patient' %}>
-                  Patient Access
-                </a>
-                <div class="right menu">
-                  <a class="ui item">
-                    Logout
-                  </a>
-                </div>
+          <a class="active item" href={% url 'index' %}>
+            Home
+          </a>
+          <a class="item" href={% url 'admin:index' %}>
+            Database Management
+          </a>
+          <a class="item" id="link" href={% url 'hospital' %}>
+            Hospital Clinician
+          </a>
+          <a class="item" id="link" href={% url 'eeg' %}>
+            EEG Department
+          </a>
+          <a class="item" id="link" href={% url 'patient' %}>
+            Patient Access
+          </a>
+          <div class="right menu">
+          {% if user.is_authenticated %}
+              <a class="item" href={% url 'logout' %}>
+                Logout {{ user.username }}
+              </a>
+          {% else %}
+            <a class="item" href="{% url 'login' %}">
+              Log In
+            </a>
+          {% endif %}
+          </div>
         </div>
         <div class="ui container">
                 {% block content %}
@@ -62,4 +68,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
   </body>
+  <script>
+    $(document).ready(function(){
+      $('.ui .item').on('click', function() {
+          $('.ui .item').removeClass('active');
+          $(this).addClass('active');
+      });             
+    });
+  </script>
 </html>
