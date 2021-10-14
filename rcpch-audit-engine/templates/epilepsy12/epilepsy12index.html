@@ -1,50 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<style>
-    .card{
-        width:$size !important;
-    }
-    .card .image{
-        background: black !important;
-        width: $size; 
-        height: $size;
-        padding: 40px;
-        &.icon{
-            text-align:center;
-            line-height:$size;
-            i{
-            display: inline-block;
-            vertical-align: middle;
-            horizontal-align: middle; 
-            }
-        }
-        
-        &.portrait img{
-            border-radius: 0 !important;
-            height:$size !important;
-            width:auto !important;
-            margin:auto;
-        }
-        
-        &.landscape img{
-            border-radius: 0 !important;
-            position:absolute;
-            top:0;
-            bottom:0;
-            margin:auto;
-        }
-    }
-    .ui.button {
-        background-color: #11a7f2;
-    }
-    .ui.button:hover {
-        background-color: #3366cc;
-    }
-    .icon {
-        color: #47a7ec;
-    }
-</style>
+
 <div class="ui segment">
     <div class="ui equal width centered middle aligned grid">
         <div class="eight wide left floated left aligned column">
@@ -78,7 +35,9 @@
                 </div>
             </div>
             <div class="extra content">
-                <button class="ui button">Select</button>
+                <a href={% url 'database' %}>
+                    <button class="ui button" on>Select</button>
+                </a>
             </div>
         </div>
       
@@ -96,7 +55,9 @@
                 </div>
             </div>
             <div class="extra content">
-                <button class="ui button">Select</button>
+                <a href={% url 'hospital' %}>
+                    <button class="ui button" >Select</button>
+                </a> 
             </div>
         </div>
 
@@ -114,7 +75,9 @@
                 </div>
             </div>
             <div class="extra content">
-                <button class="ui button">Select</button>
+                <a href={% url 'eeg' %}>
+                    <button class="ui button">Select</button>
+                </a>
             </div>
         </div>
 
@@ -132,7 +95,9 @@
                 </div>
             </div>
             <div class="extra content">
-                <button class="ui button">Select</button>
+                <a href={% url 'patient' %}>
+                    <button class="ui button">Select</button>
+                </a>
             </div>
         </div>
 

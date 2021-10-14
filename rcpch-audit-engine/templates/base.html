@@ -21,7 +21,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
       type="text/css"
     />
-    <link rel="icon" src="{% static 'epilepsy12_logo.ico' %}"
+    <link rel="icon" href="{% static 'epilepsy12_logo.ico' %}"/>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
   </head>
 
   <style>
@@ -33,19 +34,19 @@
 
   <body id="root">
         <div class="ui secondary pointing menu">
-                <a class="active item">
+                <a class="active item" href={% url 'index' %}>
                   Home
                 </a>
-                <a class="item">
+                <a class="item" href={% url 'database' %}>
                   Database Management
                 </a>
-                <a class="item">
+                <a class="item" href={% url 'hospital' %}>
                   Hospital Clinician
                 </a>
-                <a class="item">
+                <a class="item" href={% url 'eeg' %}>
                   EEG Department
                 </a>
-                <a class="item">
+                <a class="item" href={% url 'patient' %}>
                   Patient Access
                 </a>
                 <div class="right menu">
