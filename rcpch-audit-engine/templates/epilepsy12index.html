@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+    .card{
+        width:$size !important;
+    }
+    .card .image{
+        background: black !important;
+        width: $size; 
+        height: $size;
+        padding: 40px;
+        &.icon{
+            text-align:center;
+            line-height:$size;
+            i{
+            display: inline-block;
+            vertical-align: middle;
+            horizontal-align: middle; 
+            }
+        }
+        
+        &.portrait img{
+            border-radius: 0 !important;
+            height:$size !important;
+            width:auto !important;
+            margin:auto;
+        }
+        
+        &.landscape img{
+            border-radius: 0 !important;
+            position:absolute;
+            top:0;
+            bottom:0;
+            margin:auto;
+        }
+    }
+    .ui.button {
+        background-color: #11a7f2;
+    }
+    .ui.button:hover {
+        background-color: #3366cc;
+    }
+    .icon {
+        color: #47a7ec;
+    }
+</style>
+<div class="ui segment">
+    <div class="ui equal width centered middle aligned grid">
+        <div class="eight wide left floated left aligned column">
+            <image src="{% static 'epilepsy12-logo.jpg' %}"/>
+        </div>
+        <div class="eight wide right floated right aligned column">
+            <image src="{% static 'rcpch-logo.jpg' %}"/>
+        </div>
+        <div class="sixteen wide left floated left aligned column">
+            <div class="inline">
+                <h1 class="header">The UK National Audit for Childhood Epilepsy.</h1>
+                <h5 class="header">A platform for clinicians and families, built by the Royal College of Paediatrics and Child Health</h5>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="ui four stackable cards">
+        <div class="ui raised card">
+            
+            <div class="content">
+                <div class="header">Database Management</div>
+                <div class="meta">
+                <span class="category">Administrator Access</span>
+                </div>
+                <div class="description">
+                <p></p>
+                </div>
+                <div class="center aligned image">
+                    <i class="huge database icon"></i>
+                </div>
+            </div>
+            <div class="extra content">
+                <button class="ui button">Select</button>
+            </div>
+        </div>
+      
+        <div class="ui raised card">      
+            <div class="content">
+                <div class="header">Hospital Clinician</div>
+                <div class="meta">
+                <span class="category">Clinician Access</span>
+                </div>
+                <div class="description">
+                <p></p>
+                </div>
+                <div class="center aligned image">
+                    <i class="huge hospital outline icon"></i>
+                </div>
+            </div>
+            <div class="extra content">
+                <button class="ui button">Select</button>
+            </div>
+        </div>
+
+        <div class="ui raised card">
+            <div class="content">
+                <div class="header">EEG Department</div>
+                <div class="meta">
+                <span class="category">Clinician Access</span>
+                </div>
+                <div class="description">
+                <p></p>
+                </div>
+                <div class="center aligned image">
+                    <i class="huge stethoscope icon"></i>
+                </div>
+            </div>
+            <div class="extra content">
+                <button class="ui button">Select</button>
+            </div>
+        </div>
+
+        <div class="ui raised card">
+            <div class="content">
+                <div class="header">Children and Families</div>
+                <div class="meta">
+                <span class="category">Patient Access</span>
+                </div>
+                <div class="description">
+                <p></p>
+                </div>
+                <div class="center aligned image">
+                    <i class="huge child icon"></i>
+                </div>
+            </div>
+            <div class="extra content">
+                <button class="ui button">Select</button>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

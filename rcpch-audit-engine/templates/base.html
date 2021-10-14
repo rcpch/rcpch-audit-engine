@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="The Epilepsy12 National Audit for Childhood Epilepsy."
+    />
+    <meta name="keywords" content="Epilepsy12 RCPCH Audit Childhood Epilepsy" />
+    <meta name="author" content="RCPCH" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Epilepsy12</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+      type="text/css"
+    />
+    <link rel="icon" src="{% static 'epilepsy12_logo.ico' %}"
+  </head>
+
+  <style>
+        body {
+                color: #0d0d58;
+                font-family: 'montserrat';
+        }
+  </style>
+
+  <body id="root">
+        <div class="ui secondary pointing menu">
+                <a class="active item">
+                  Home
+                </a>
+                <a class="item">
+                  Database Management
+                </a>
+                <a class="item">
+                  Hospital Clinician
+                </a>
+                <a class="item">
+                  EEG Department
+                </a>
+                <a class="item">
+                  Patient Access
+                </a>
+                <div class="right menu">
+                  <a class="ui item">
+                    Logout
+                  </a>
+                </div>
+        </div>
+        <div class="ui container">
+                {% block content %}
+                {% endblock %}
+        </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+  </body>
+</html>
