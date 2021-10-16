@@ -1,9 +1,9 @@
 
 .card .image{
     background: black !important;
-    padding: 40px;
+    padding: 40px;;
 }
-    
+
 .icon{
     text-align:center;
 }
@@ -17,3 +17,14 @@
 .icon {
     color: #47a7ec;
 }
+
+@media (min-height: 320px) {
+    .ui.footer.page { /* Increased specificity for SO snippet priority */
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      margin: 0;
+      padding: 10px;
+      text-align: left;
+    }
+  }
