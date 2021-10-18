@@ -1,6 +1,38 @@
 from django.db import models
 from django.db.models.fields import CharField, DateField, IntegerField
 
+"""
+Stated Aims of the Audit
+• Continue to measure and improve care and outcomes for children and young people with
+epilepsies
+• Include all children and young people with a new onset of epilepsy,
+• Enable continuous patient ascertainment,
+• Use a pragmatic and concise dataset,
+• Incorporate NICE Quality Standards alongside metrics about mental health, education and
+transition to adult services,
+• Provide services with local real-time patient- and service-level reporting.
+
+Quality Improvement
+- Supporting regional and national quality improvement activities
+- Epilepsy Quality Improvement Programme (EQIP)
+- Involving children and young people
+
+There are 12 key performance indicators:
+1. Input into care from a paediatrician with expertise in epilepsies,
+2. Input into care from an epilepsy specialist nurse (ESNs),
+3. (a) Appropriate tertiary input into care, and (b) appropriate epilepsy surgery referral
+4. Appropriate first paediatric assessment,
+5. Recorded seizure formulation,
+6. Access to electrocardiogram (ECG),
+7. Access to magnetic resonance imaging (MRI),
+8. Accuracy of diagnosis,
+9. (a) Discussion of the risks where sodium valproate is used in treatment for girls aged 9 and over,
+and (b) girls and young women prescribed sodium valproate
+10. Comprehensive care plan that is updated and agreed with the patient,
+11. Documented evidence of all key elements of care planning content,
+12. Record of a school individual healthcare plan.
+"""
+
 from .constants import *
 class BaseData(models.Model):
     UpdateId= models.CharField(max_length=30)
