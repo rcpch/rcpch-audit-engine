@@ -3,12 +3,12 @@
 The EPILEPSY12 audit, as a backend, API and client-side
 
 <p align="center">
-    <img src="assets/epilepsy12-logo.jpg" width='200px'/>
+    <img src="./rcpch-audit-engine/epilepsy12/static/epilepsy12-logo.jpg" width='200px'/>
     <p align="center">Designed and built by the RCPCH, by clinicians for clinicians.</p>
 </p>
 <p align="center">
-    <img align="center" src="assets/rcpch-logo.jpg" width='100px'/>
-    <img align="center" src="assets/pmpc-logo.jpg" width='100px'/>
+    <img align="center" src="./rcpch-audit-engine/epilepsy12/static/rcpch-logo.jpg" width='100px'/>
+    <img align="center" src="./rcpch-audit-engine/epilepsy12/static/pmpc-logo.jpg" width='100px'/>
 <p align="center">The project is part of the <a href="https://publicmoneypubliccode.org.uk/">Public Money Public Code</a> community.</p>
 </p>
 
