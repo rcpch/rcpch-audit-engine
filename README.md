@@ -8,7 +8,7 @@ The EPILEPSY12 audit, as a backend, API and client-side
 </p>
 <p align="center">
     <img align="center" src="./rcpch-audit-engine/epilepsy12/static/rcpch-logo.jpg" width='100px'/>
-    <img align="center" src="./rcpch-audit-engine/epilepsy12/static/pmpc-logo.jpg" width='100px'/>
+    <img align="center" src="./rcpch-audit-engine/epilepsy12/static/logo-block-outline-sm.png" width='100px'/>
 <p align="center">The project is part of the <a href="https://publicmoneypubliccode.org.uk/">Public Money Public Code</a> community.</p>
 </p>
 
