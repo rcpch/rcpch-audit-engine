@@ -115,4 +115,5 @@ dmypy.json
 logfile
 
 # Snomed
-./start/api-key.txt
+start/api-key.txt
+start/hermes-v0.7.5.jar
