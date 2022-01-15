@@ -16,7 +16,7 @@
 National clinical audits are there to collect diagnosis and care process data on patient cohorts with a diagnosis in common, nationally, to measure standard of care. They are a way to make sure that clinics are meeting centrally-set standards, and give clinics feedback on how they are doing.
 National audits are commissioned by NHS England, and ensure all the data governance is in place, but the actual business of adminstering the audit and storing the data is usually contracted out. There is no standard for the way the data is stored or managed.
 
-rcpch-audit-engine is a (Django)[https://www.djangoproject.com/] project which aims to standards those elements of a national audit that can be standardised. It begins with Epilepsy12, a national audit for Childhood Epilepsies which has been in place since 2009.
+rcpch-audit-engine is a (Django)[https://www.djangoproject.com/] 4.0 project which aims to standards those elements of a national audit that can be standardised. It begins with Epilepsy12, a national audit for Childhood Epilepsies which has been in place since 2009.
 
 ## Epilepsy12
 

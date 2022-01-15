@@ -1,6 +1,8 @@
+
 from django.db import models
-from django.db.models import base
-from django.db.models.fields import CharField, DateField, IntegerField
+from django.db.models import base, indexes
+from django.db.models.deletion import CASCADE
+from django.db.models.fields import BooleanField, CharField, DateField, DateTimeField, IntegerField
 from .constants import *
 
 """
@@ -33,850 +35,641 @@ and (b) girls and young women prescribed sodium valproate
 10. Comprehensive care plan that is updated and agreed with the patient,
 11. Documented evidence of all key elements of care planning content,
 12. Record of a school individual healthcare plan.
+
+Schema
+------
+Main classes
+The Case class records information about each young person
+The Registration class holds a record for each audit.
+The Assessment class holds information on each assessment performed over the audit period.
+The Episode class holds a record on each seizure and its investigations.
+The Site class records information about each site that oversees the epilepsy care of each case.
+
+Other classes
+The HospitalTrust class records hospital trust details. It is used as a look up class for the Site class.
+The EpilepsyContext class records contextual information that defines epilepsy risk.
+The Neurodevelopment class records information about a given neurodevelopmental condition.
+The MentalHealth class records information about a given mental health condition.
+The AntiEpilepsyDrug class records information about antiepilepsy drugs.
+The RescueMedicine class records information on rescue medicines used.
+The ElectroclinicalSydrome class records information on electroclinical syndromes.
+The NonEpilepsy class records information about nonepilepsy features of episode.
+The SeizureType class describes the seizure type.
+The SeizureCause class records the cause of each seizure.
+The EEG class records information about any EEG performed.
+
+
+Relationships
+-------------
+Case to Registration 1:n
+Registration to Assessment 1:n
+Episode to Assessment 1:n
+Case to Episode 1:n
+
+Case to Site 1:n
+EpilepsyContext to Case 1:1 (optional)
+Case to MentalHealth 1:n
+Case to Neurodevelopmental 1:n
+Episode to EEG 1:n
+Episode to ElectroclinicalSyndrom 1:1
+Episode to SeizureCause 1:1
+Episode to SeizureType 1:1
+Nonepilepsy to Episode 1:1
+AntiepilepsyDrug to Episode 1:n
+RescueMedicine to Episode 1:n
+Case to Neurodevelopment 1:n
+Case to MentalHealth 1:n
+NonEpilepsy to Episode 1:1
+SeizureType to Episode 1:1
+SeizureCause to Episode 1:1
+Episode to EEG 1:n
+
+
+HospitalTrust to Site 1:n
+
 """
 
 from .constants import *
-class Registration(base.Model):
-    # SiteName
-    CaseId=models.CharField(max_length=30)
-    SiteCode=models.CharField(max_length=10)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    TransferToActionDateTime=models.DateField()
-    TransferToActionUserName=models.CharField(max_length=256)
-    TransferToDateTime=models.DateField()
-    TransferToSiteCode=models.CharField(max_length=10)
-    TransferToCaseId=models.CharField(max_length=30)
-    TransferFromActionDateTime=models.DateField()
-    TransferFromActionUserName=models.CharField(max_length=256)
-    TransferFromDateTime=models.DateField()
-    TransferFromSiteCode=models.CharField(max_length=10)
-    TransferFromCaseId=models.CharField(max_length=30)
-    OriginalSiteCode=models.CharField(max_length=10)
-    Closed=models.BooleanField("Locked", default=False)
-    S01SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S01NHSPatient=models.CharField(max_length=2, choices=OPT_OUT)
-    S01NHSCHINumber=models.CharField(max_length=10)
-    S01FirstName=models.CharField(max_length=100)
-    S01SurName=models.CharField(max_length=100)
-    S01Gender=models.CharField(max_length=3)
-    S01DOB=models.DateField()
-    S01DOBDateOnly=models.DateField()
-    S01DOBTimeOnly=models.DateTimeField()
-    S01FirstEEG=models.CharField(max_length=2, choices=OPT_OUT)
-    S01FirstEEGDate=models.DateField()
-    S01FirstEEGDateDateOnly=models.DateField()
-    S01FirstEEGDateTimeOnly=models.DateTimeField()
-    S01FirstEEGIndicated=models.CharField(max_length=2, choices=OPT_OUT)
-    S01AssessmentForTheParoxysmalHere=models.CharField(max_length=2, choices=OPT_OUT)
-    S01ReferringHospital=models.CharField(max_length=150)
-    S01ReferringPerson=models.CharField(max_length=150)
-    S01TrustVerify=models.CharField(max_length=3, choices=TRUST_VERIFICATION_STATUS)
-    S01DiagnosticStatus=models.CharField(max_length=2,choices=DIAGNOSTIC_STATUS)
-    S01EEGCaseId=models.CharField(max_length=30)
-    S02ParoxysmalEpisode=models.CharField(max_length=2, choices=OPT_OUT)
-    S02EEGAssessments=models.CharField(max_length=2, choices=OPT_OUT)
-    S02FirstAssessmentsDate=models.DateField()
-    S02FirstAssessmentsDateDateOnly=models.DateField()
-    S02FirstAssessmentsDateTimeOnly=models.DateTimeField()
-    S02HomePostcodeOut=models.CharField(max_length=4)
-    S02HomePostcodeIn=models.CharField(max_length=3)
-    S02GPCode=models.CharField(max_length=10)
-    S02GPPostcodeOut=models.CharField(max_length=4)
-    S02GPPostcodeIn=models.CharField(max_length=3)
-    S02TrustEmailSent=models.CharField(max_length=3)
-    S02Cohort=models.IntegerField(2, choices=CHOICES)
-class Assessment(base.Model):
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    S01SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S01Assessment=models.IntegerField(choices=ASSESSMENT)
-    S01OptOut=models.CharField(max_length=2, choices=OPT_OUT)
-    S01OptOutDate=models.DateField()
-    S01FollowUpEpisodes=models.CharField(max_length=2, choices=OPT_OUT)
-    S01FollowUpEpisodesStatus=models.IntegerField(choices=FOLLOW_UP_EPISODE_STATUS)
-    S01FollowUpEpisodesStatusDate=models.DateField()
-    S01FollowUpEpisodesReason=models.CharField(max_length=250)
-    S01SiteCode=models.CharField(max_length=10)
-    S01Gender=models.CharField(max_length=3)
-    S01FirstAssessmentsDate=models.DateField()
-    S01NeonatalSeizures=models.CharField(max_length=2,choices=OPT_OUT_UNCERTAIN)
-    S01FebrileSeizure=models.CharField(max_length=2,choices=OPT_OUT_UNCERTAIN)
-    S01AcuteSymptomaticSeizure=models.CharField(max_length=2,choices=OPT_OUT_UNCERTAIN)
-    S01DiagnosticStatus=models.CharField(max_length=2,choices=DIAGNOSTIC_STATUS)
-    S01DescribeTheEpisode=models.CharField(max_length=2,choices=EPISODE_DESCRIPTION)
-    S01EPIS=models.CharField(max_length=2)
-    S01Notes=models.CharField(max_length=250)
-    S03SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    # S03CurrentEpilepsyService
-    # S03CurrentEpilepsyServiceDetails
-    # S03SecondaryPaediatricConsultant
-    # S03SecondaryPaediatricConsultantDetails
-    # S03CurrentEsn
-    # S03CurrentEsnDetails
-    S03StatusPaediatricNeurologyFollowUp=models.IntegerField(choices=INPUT_STATUS)
-    # S03TrustsTertiaryPaediatricNeurologyEpilepsy
-    # S03TrustsTertiaryPaediatricNeurologyEpilepsyDetails
-    # S03CurrentPaediatricNeurologist
-    # S03CurrentPaediatricNeurologistDetails
-    S03CurrentStatusOfEpilepsySurgeryService=models.CharField(max_length=2, choices=INPUT_STATUS)
-    # S03CurrentManagingEpilepsySurgeryService
-    # S03CurrentManagingEpilepsySurgeryServiceDetails
-    S04SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S04ServiceChildReferredForFirstAssessment=models.CharField(max_length=2, choices=REFERRAL_SERVICES)
-    S04ServiceChildReferredForFirstAssessmentOther=models.CharField(max_length=250)
-    S04DateOfReferralToPaediatrics=models.DateField()
-    S04DateOfReferralToPaediatrics_NK=models.IntegerField(choices=CHECKED_STATUS)
-    S04FirstPaediatricAssessmentAcuteOrNonAcute=models.CharField(max_length=2, choices=CHRONICITY)
-    S04ADescriptionOfTheEpisodeOrEpisodes=models.CharField(max_length=2, choices=OPT_OUT)
-    S04WhenTheFirstEpilepticEpisodeOccurredApxExcNK=models.CharField(max_length=3, choices=DATE_ACCURACY)
-    S04WhenTheFirstEpilepticEpisodeOccurred=models.DateField()
-    S04FrequencyOrNumberOfEpisodesSinceTheFirstEpisode=models.CharField(max_length=2, choices=OPT_OUT)
-    S04AGeneralExamination=models.CharField(max_length=2, choices=OPT_OUT)
-    S04ANeurologicalExamination=models.CharField(max_length=2, choices=OPT_OUT)
-    S04DevelopmentalLearningOrSchoolingProblems=models.CharField(max_length=2, choices=OPT_OUT)
-    S04BehaviouralOrEmotionalProblems=models.CharField(max_length=2, choices=OPT_OUT)
-    S04Comments=models.CharField(max_length=250)
-    S05SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S05SEIZ=models.IntegerField(0)
-    S05ECLS=models.IntegerField(0)
-    S05CAUS=models.IntegerField(0)
-    S05NUDS=models.IntegerField(0)
-    S05MHPB=models.IntegerField(0)
-    S05WereAnyOfTheEpilepticSeizuresConvulsive=models.CharField(max_length=2, choices=OPT_OUT)
-    S05ProlongedGeneralizedConvulsiveSeizures=models.CharField(max_length=3, choices=OPT_OUT_UNCERTAIN)
-    S05ExperiencedProlongedFocalSeizures=models.CharField(max_length=3, choices=OPT_OUT_UNCERTAIN)
-    S05IsThereAFamilyHistoryOfEpilepsy=models.CharField(max_length=3, choices=OPT_OUT_UNCERTAIN)
-    S05IsThereAFamilyHistoryOfEpilepsyNotes=models.CharField(max_length=250)
-    S06SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S06FirstEeg=models.IntegerField(2, choices=REFERRAL_STATUS)
-    S06FirstEegDate=models.DateField()
-    S06FirstEegReasons=models.CharField(max_length=250)
-    S0612LeadEcg=models.IntegerField(2, choices=REFERRAL_STATUS)
-    S0612LeadEcgDate=models.DateField()
-    S0612LeadEcgReasons=models.CharField(max_length=250)
-    S06IsThereEvidenceThatTheQtcCalculated=models.CharField(max_length=2, choices=OPT_OUT)
-    S06CtHeadScan=models.IntegerField(2, choices=REFERRAL_STATUS)
-    S06CtHeadScanDate=models.DateField()
-    S06CtHeadScanReasons=models.CharField(max_length=250)
-    S06MriBrain=models.IntegerField(2, choices=REFERRAL_STATUS)
-    S06MriBrainDate=models.DateField()
-    S06MriBrainReasons=models.CharField(max_length=250)
-    S06InvestigationSectionNotes=models.CharField(max_length=250)
-    S07SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S07HasAnAedBeenGiven=models.CharField(max_length=2, choices=OPT_OUT)
-    S07AED=models.IntegerField(default=0)
-    S07RescueMedication=models.CharField(max_length=2, choices=OPT_OUT)
-    S07RMED=models.IntegerField()
-    S07DoesTheChildHaveAnyOfTheCESSReferralCriteria=models.CharField(max_length=2, choices=OPT_OUT)
-    S07DoesTheChildHaveAnyOfTheCESSReferralCriteriaNotes=models.CharField(max_length=250)
-    S07FormChecked=models.IntegerField(choices=CHECKED_STATUS)
-    S07AEDSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S07AEDGender=models.CharField(max_length=3)
-    S07AEDType=models.IntegerField(choices=ANTI_EPILEPTIC_DRUG_TYPES)
-    S07AEDOther=models.CharField(max_length=100)
-    S07AEDStartDate=models.DateField()
-    S07AEDStopDate=models.DateField()
-    S07AEDStopDate_NK=models.IntegerField(choices=CHECKED_STATUS)
-    S07AEDRisk=models.CharField(max_length=2, choices=OPT_OUT)
-    S07RMEDSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S07RMEDType=models.CharField(max_length=3,choices=BENZODIAZEPINE_TYPES)
-    S07RMEDOther=models.CharField(max_length=100)
-    S07RMEDStartDate=models.DateField()
-    S07RMEDStopDate=models.DateField()
-    S07RMEDStopDate_NK=models.IntegerField(choices=CHECKED_STATUS)
-    S07RMEDNotes=models.CharField(max_length=250)
-    S08SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S08IndividualisedPlanningOfCare=models.CharField(max_length=2, choices=OPT_OUT)
-    S08IndividualisedPlanningOfCareDetails=models.CharField(max_length=250)
-    S08IndividualisedEpilepsyDocuments=models.CharField(max_length=2, choices=OPT_OUT)
-    S08IndividualisedEpilepsyDocumentsDetails=models.CharField(max_length=250)
-    S08ParentCarerPatientAgreementToThePlanOfCare=models.CharField(max_length=2, choices=OPT_OUT)
-    S08ParentCarerPatientAgreementToThePlanOfCareDetails=models.CharField(max_length=250)
-    S08CarePlanUpdatedEvidence=models.CharField(max_length=2, choices=OPT_OUT)
-    S08CarePlanUpdatedEvidenceDetails=models.CharField(max_length=250)
-    S08CareThatEncompassesServiceContact=models.CharField(max_length=2, choices=OPT_OUT)
-    S08Serv=models.IntegerField()
-    S08CareThatEncompassesFirstAid=models.CharField(max_length=2, choices=OPT_OUT)
-    S08FAID=models.IntegerField()
-    S08CareThatEncompassesAParentalProlongedSeizureCarePlan=models.CharField(max_length=2, choices=OPT_OUT)
-    S08PSCP=models.IntegerField()
-    S08CareThatEncompassesGeneralParticipationAndRisk=models.CharField(max_length=2, choices=OPT_OUT)
-    S08Risk=models.IntegerField()
-    S08CareThatEncompassesWaterSafety=models.CharField(max_length=2, choices=OPT_OUT)
-    S08Watr=models.IntegerField()
-    S08CareThatEncompassesSUDEP=models.CharField(max_length=2, choices=OPT_OUT)
-    S08SUDP=models.IntegerField()
-    S08CareThatEncompassesRoadSafety=models.CharField(max_length=2, choices=OPT_OUT)
-    S08RdSf=models.IntegerField()
-    S08CareThatEncompassesHeights=models.CharField(max_length=2, choices=OPT_OUT)
-    S08Hght=models.IntegerField()
-    S08CareThatEncompassesSleep=models.CharField(max_length=2, choices=OPT_OUT)
-    S08Slep=models.IntegerField()
-    S08CareThatEncompassesPhotosensitivity=models.CharField(max_length=2, choices=OPT_OUT)
-    S08PtSe=models.IntegerField()
-    S08Info=models.IntegerField()
-    S08Teen=models.IntegerField()
-    S08Epil=models.IntegerField()
-    S08SeizureDiary=models.CharField(max_length=2, choices=OPT_OUT)
-    S08SzDi=models.IntegerField()
-    S08IsThereEvidenceOfAIHP=models.IntegerField(choices=IHP_STATUS)
-    S08IsThereEvidenceOfAIHPDate=models.DateField()
-    S08IsThereEvidenceOfAnEHCP=models.IntegerField(choices=EHCP_STATUS)
-    S08IsThereEvidenceOfAnEHCPDate=models.DateField()
-    S08Edu=models.IntegerField()
-    S09SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S09WhenWasTheLastEpilepticSeizureApxExcNK=models.CharField(max_length=3, choices=DATE_ACCURACY)
-    S09WhenWasTheLastEpilepticSeizure=models.DateField()
-    S09WhenWasTheLastEpilepticSeizureUpdated=models.DateField()
-    S10SectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    S10ConsultantPaediatrician=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10ConsultantPaediatricianInputDate=models.DateField()
-    S10ConsultantPaediatricianInputAchieved=models.DateField()
-    S10ConsultantPaediatricianInputReasons=models.CharField(max_length=250)
-    S10Esn=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10EsnInputDate=models.DateField()
-    S10EsnInputAchieved=models.DateField()
-    S10EsnInputReasons=models.CharField(max_length=250)
-    S10PaediatricNeurologist=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10PaediatricNeurologistInputDate=models.DateField()
-    S10PaediatricNeurologistInputAchieved=models.DateField()
-    S10PaediatricNeurologistInputReasons=models.CharField(max_length=250)
-    S10Cess=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10CessInputDate=models.DateField()
-    S10CessInputAchieved=models.DateField()
-    S10CessInputReasons=models.CharField(max_length=250)
-    S10KetognicDietician=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10KetognicDieticianInputDate=models.DateField()
-    S10KetognicDieticianInputAchieved=models.DateField()
-    S10KetognicDieticianInputReasons=models.CharField(max_length=250)
-    S10VnsService=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10VnsServiceInputDate=models.DateField()
-    S10VnsServiceInputAchieved=models.DateField()
-    S10VnsServiceInputReasons=models.CharField(max_length=250)
-    S10GeneticService=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10GeneticServiceInputDate=models.DateField()
-    S10GeneticServiceInputAchieved=models.DateField()
-    S10GeneticServiceInputReasons=models.CharField(max_length=250)
-    S10ClinicalPsychologist=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10ClinicalPsychologistInputDate=models.DateField()
-    S10ClinicalPsychologistInputAchieved=models.DateField()
-    S10ClinicalPsychologistInputReasons=models.CharField(max_length=250)
-    S10EducationalPsychologist=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10EducationalPsychologistInputDate=models.DateField()
-    S10EducationalPsychologistInputAchieved=models.DateField()
-    S10EducationalPsychologistInputReasons=models.CharField(max_length=250)
-    S10Psychiatrist=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10PsychiatristInputDate=models.DateField()
-    S10PsychiatristInputAchieved=models.DateField()
-    S10PsychiatristInputReasons=models.CharField(max_length=250)
-    S10Neuropyschologist=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10NeuropyschologistInputDate=models.DateField()
-    S10NeuropyschologistInputAchieved=models.DateField()
-    S10NeuropyschologistInputReasons=models.CharField(max_length=250)
-    S10CounsellingService=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10CounsellingServiceInputDate=models.DateField()
-    S10CounsellingServiceInputAchieved=models.DateField()
-    S10CounsellingServiceInputReasons=models.CharField(max_length=250)
-    S10OtherMentalHealthProfessional=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10OtherMentalHealthProfessionalInputDate=models.DateField()
-    S10OtherMentalHealthProfessionalInputAchieved=models.DateField()
-    S10OtherMentalHealthProfessionalInputReasons=models.CharField(max_length=250)
-    S10YouthWorker=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10YouthWorkerInputDate=models.DateField()
-    S10YouthWorkerInputAchieved=models.DateField()
-    S10YouthWorkerInputReasons=models.CharField(max_length=250)
-    S10OtherFreeField=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    S10OtherFreeFieldInputDate=models.DateField()
-    S10OtherFreeFieldInputAchieved=models.DateField()
-    S10OtherFreeFieldInputReasons=models.CharField(max_length=250)
-    S10FormalDevelopmentalAssessment=models.CharField(max_length=2, choices=OPT_OUT)
-    S10FDA=models.IntegerField()
-    S10FormalCognitiveAssessment=models.CharField(max_length=2, choices=OPT_OUT)
-    S10FCA=models.IntegerField()
-    S10ReviewByAPaediatrician12Months=models.CharField(max_length=2, choices=OPT_OUT)
-    S10RBAP=models.IntegerField()
-    S10DiagnosisOfEpilepsyWithdrawn=models.CharField(max_length=2, choices=OPT_OUT)
-    S10DOEW=models.IntegerField()
+import uuid
+from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinLengthValidator, MinValueValidator
 
-class AED(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    AEDSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    AEDGender=models.CharField(max_length=3)
-    AEDType=models.IntegerField(choices=ANTI_EPILEPTIC_DRUG_TYPES)
-    AEDOther=models.CharField(max_length=100)
-    AEDStartDate=models.DateField()
-    AEDStopDate=models.DateField()
-    AEDStopDate_NK=models.IntegerField(choices=CHECKED_STATUS)
-    AEDRisk=models.CharField(max_length=2, choices=OPT_OUT)
 
-class ClinicalReview(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    RBAPSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    RBAPDate=models.DateField()
-    RBAPDetails=models.CharField(max_length=250)
+# MIXINS
 
-class Cognitive(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    FCASectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    FCADate=models.DateField()
-    FCADetails=models.CharField(max_length=250)
-class DevelopmentAssessment(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    FDASectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    FDADate=models.DateField()
-    FDADetails=models.CharField(max_length=250)
+class TimeAndUserStampMixin(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=CASCADE)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(User, on_delete=CASCADE)
 
-class Education(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    EDUSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    EDUSiteCode=models.CharField(max_length=10)
-    EDUType=models.IntegerField(choices=EDUCATION_TYPE)
-    EDUTypeOther=models.CharField(max_length=50)
-    EDUDate=models.DateField()
-    # EDUProvidedBy=,"Q. 3","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    EDUProvidedByOther=models.CharField(max_length=100)
-    EDUDetails=models.CharField(max_length=250)
+    class Meta:
+        abstract = True
 
-class ElectroClinicalSyndrome(base.Model):
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    ECLSSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    ECLSDateOfDiagnosisApproxExactNK=models.CharField(max_length=3, choices=DATE_ACCURACY)
-    ECLSDateOfDiagnosis=models.DateField()
-    ECLSElectroclinicalSyndrome=models.IntegerField(choices=ELECTROCLINICAL_SYNDROMES)
-    ECLSElectroclinicalSyndromeOther=models.CharField(max_length=250)
+# TABLES
 
-class EpilepsyDetails(base.Model):
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    EPILSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    EPILSiteCode=models.CharField(max_length=10)
-    EPILType=models.IntegerField(choices=EPIL_TYPE_CHOICES)
-    EPILTypeOther=models.CharField(max_length=50)
-    EPILDate=models.DateField()
-    # EPILProvidedBy=,"Q. 3","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    EPILProvidedByOther=models.CharField(max_length=100)
-    EPILDetails=models.CharField(max_length=250)
+class HospitalTrust(base.Model):
+    """
+    This class details information about hospital trusts.
+    It represents a list of hospital trusts that can be looked up to populate fields in the Site class
+    """
+    hospital_trust_name=models.CharField(
+        max_length=100,
+        verbose_name="hospital trust full name"
+    )
+    # ... any other details about the hospital we need
+    class Meta:
+        indexes=[models.Index(fields=['hospital_trust_name'])]
+        ordering = ['-hospital_trust_name']
+        verbose_name = 'hospital trust'
+        verbose_name_plural = 'hospital trusts'
 
-class FirstAid(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    FAIDSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    FAIDSiteCode=models.CharField(max_length=10)
-    FAIDDate=models.DateField()
-    # FAIDProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    FAIDProvidedByOther=models.CharField(max_length=100)
-    FAIDDetails=models.CharField(max_length=250)
+    def __str__(self) -> str:
+        return self.hospital_trust_name
+class Case(TimeAndUserStampMixin):
+    """
+    This class holds information about each child or young person
+    Each case is unique
+    This class holds patient characteristics including identifiers
+    This class is referenced by the Site class, as each case can be seen in multiple sites
+    This class is referenced by the Neurodevelopmental class as each case can have multiple neurodevelopmental conditions
+    This class is referenced by the MentalHealth class as each case can have multiple mental health conditions
+    This class is referenced by the EpilepsyContext class as each case may optionally have contextual information that may inform the epilepsy history
+    """
+    case_uuid=models.UUIDField(
+        primary_key=True, 
+        default=uuid.uuid4, 
+        editable=False
+    )
+    locked=models.BooleanField( # this determines if the case is locked from editing ? are cases or only registrations locked?
+        "Locked", 
+        default=False
+    )
+    locked_at = models.DateTimeField(auto_now_add=True)
+    locked_by = models.ForeignKey(
+        User, 
+        on_delete=CASCADE
+    )
+    nhs_patient = models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    nhs_chi_number = models.IntegerField( # the Scottish NHS number - is exactly 10 numbers long
+        max_length=10, 
+        validators=[MinLengthValidator(
+            limit_value=10,
+            message="The CHI number must be 10 digits long."
+        )]
+    )
+    nhs_number = models.IntegerField( # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
+        max_length=10,
+        validators=[MinLengthValidator(
+            limit_value=10,
+            message="The NHS number must be 10 digits long."
+        )]
+    )
+    first_name=CharField(max_length=100)
+    surname=CharField(max_length=100)
+    gender=CharField(
+        max_length=2,
+        choices=SEX_TYPE
+    )
+    data_of_birth=DateField() #WHY IS THE TIME OF BIRTH NEEDED? I HAVE LEFT THIS OUT
+    postcode=CharField(max_length=7)
 
-class GeneralRisk(base.Model):
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    RISKSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    RISKSiteCode=models.CharField(max_length=10)
-    RISKPDate=models.DateField()
-    # RISKProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    RISKProvidedByOther=models.CharField(max_length=100)
-    RISKDetails=models.CharField(max_length=250)
+    class Meta:
+        indexes=[models.Index(fields=['case_uuid'])]
+        ordering = ['-surname']
+        verbose_name = 'child or young person'
+        verbose_name_plural = 'children and young people'
 
-class Heights(base.Model):
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    HGHTSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    HGHTSiteCode=models.CharField(max_length=10)
-    HGHTDate=models.DateField()
-    # HGHTProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    HGHTProvidedByOther=models.CharField(max_length=100)
-    HGHTDetails=models.CharField(max_length=250)
+    def __str__(self) -> str:
+        return self.hospital_trust_name
 
+class Site(TimeAndUserStampMixin):
+    """
+    This class records information about each site that oversees the epilepsy care of each case.
+    This class references the HospitalTrust class, as one hospital trust may reference multiple sites
+    This class references the Case class, as each case may have multiple sites.
+    """
+    hospital_trust=models.ForeignKey(
+        HospitalTrust, 
+        on_delete=models.CASCADE,
+        related_name='hospital trusts',
+        related_query_name='hospitals'
+    )
+    site_is_actively_involved_in_care=models.BooleanField(default=False)
+    site_is_primary_centre_of_care=models.BooleanField(default=False)
+    case = models.ForeignKey(
+        Case,
+        on_delete=CASCADE,
+        primary_key=True
+    )
+
+    class Meta:
+        ordering = ['-hospital_trust']
+        verbose_name = 'site'
+        verbose_name_plural = 'sites'
+
+    def __str__(self) -> str:
+        return self.hospital_trust
 class MentalHealth(base.Model):
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    MHPBSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    MHPBDateNeurodevelopmentalProblemApxExcNK=models.CharField(max_length=3, choices=DATE_ACCURACY)
-    MHPBDateNeurodevelopmentalProblem=models.DateField()
-    MHPBMentalHealthProblem=models.CharField(max_length=3,choices=NEUROPSYCHIATRIC)
-    MHPBMentalHealthProblemOther=models.CharField(max_length=250)
-    MHPBMentalHealthProblemEmotional=models.CharField(max_length=3, choices=DEVELOPMENTAL_BEHAVIOURAL)
+    """
+    This class records information about a given mental health condition
+    It references the Case class, as each child might have several mental health conditions
+    """
+    mental_health_problem=models.CharField(
+        max_length=3,
+        choices=NEUROPSYCHIATRIC
+    )
+    mental_health_problem_other=models.CharField(max_length=250)
+    mental_health_problem_snomed_code=models.CharField(max_length=50) # this is a new field
+    emotional_problem=models.CharField(
+        max_length=3, 
+        choices=DEVELOPMENTAL_BEHAVIOURAL
+    )
+    emotional_problem_snomed_code=models.CharField(max_length=50) # this is a new field
+    case = models.ForeignKey(
+        Case,
+        on_delete=CASCADE,
+        primary_key=True
+    )
 
-class Neurodevelopmental(base.Model):
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    NUDSSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    NUDSDateNeurodevelopmentalProblemApxExcNK=models.CharField(max_length=3, choices=DATE_ACCURACY)
-    NUDSDateNeurodevelopmentalProblem=models.DateField()
-    NUDSNeurodevelopmentalProblem=models.CharField(max_length=3, choices=NEURODEVELOPMENTAL)
-    NUDSNeurodevelopmentalProblemOther=models.CharField(max_length=250)
-    NUDSNeurodevelopmentalProblemSeverity=models.CharField(max_length=3,choices=DISORDER_SEVERITY)
+class Neurodevelopment(base.Model):
+    """
+    This class records information about a given neurodevelopmental condition
+    It references the Case class, as each child might have several neurodevelopmental conditions
+    """
+    neurodevelopmental_problem=models.CharField(
+        max_length=3, 
+        choices=NEURODEVELOPMENTAL
+    )
+    neurodevelopmental_problem_other=models.CharField(max_length=250)
+    neurodevelopmental_problem_snomed_code=models.CharField(max_length=50) # this is a new field
+    neurodevelopmental_problem_severity=models.CharField(
+        max_length=3,
+        choices=DISORDER_SEVERITY
+    )
+    case = models.ForeignKey(
+        Case,
+        on_delete=CASCADE,
+        primary_key=True
+    )
 
-class NonEpileptic(base.Model):
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    EPISSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    EPISType=models.IntegerField(choices=EPIS_TYPE)
-    EPISSyncope=models.CharField(max_length=3, choices=NON_EPILEPTIC_SYNCOPES)
-    EPISBehavioral=models.CharField(max_length=3, choices=NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS)
-    EPISSleep=models.CharField(max_length=3, choices=NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS)
-    EPISParoxysmal=models.CharField(max_length=3, choices=NON_EPILEPSY_PAROXYSMS)
-    EPISMigraine=models.CharField(max_length=3, choices=MIGRAINES)
-    EPISMiscellaneous=models.CharField(max_length=3, choices=EPIS_MISC)
-    EPISOther=models.CharField(max_length=250)
+class Registration(TimeAndUserStampMixin):
+    """
+    A record is created in the Registration class every time a case is registered for the audit
+    A case can be registered only once each audit year, but can be registered in multiple years
+    """
+    registration_uuid=models.UUIDField(
+        primary_key=True, 
+        default=uuid.uuid4, 
+        editable=False
+    )
+    case=models.models.ForeignKey(
+        Case, 
+        on_delete=CASCADE,
+        primary_key=True)
+    site=models.ForeignKey(
+        Site, 
+        on_delete=CASCADE,
+        primary_key=True)
+    locked=models.BooleanField( # this determines if the case is locked from editing ? are cases or only registrations locked?
+        "Locked", 
+        default=False
+    )
+    locked_at = models.DateTimeField(auto_now_add=True)
+    locked_by = models.ForeignKey(
+        User, 
+        on_delete=CASCADE
+    )
+    closed=models.BooleanField( # this determines if the case is closed? ARE CASES CLOSED AS WELL AS LOCKED OR REGISTRATIONS?
+        "Closed", 
+        default=False
+    )
+    referring_hospital = models.ForeignKey(
+        HospitalTrust, 
+        on_delete=CASCADE
+    )
+    referring_clinician = models.CharField(max_length=50)
+    diagnostic_status = models.CharField(
+        max_length=1,
+        choices=DIAGNOSTIC_STATUS
+    )
+    cohort = IntegerField(validators= [MinValueValidator(1), MaxValueValidator(10)]) # what is this DO WE NEED IT ?
 
-class Photosensitivity(base.Model):
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    PTSESectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    PTSESiteCode=models.CharField(max_length=10)
-    PTSEDate=models.DateField()
-    # PTSEProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    PTSEProvidedByOther=models.CharField(max_length=100)
-    PTSEDetails=models.CharField(max_length=250)
+class Assessment(TimeAndUserStampMixin):
+    """
+    This class stores information on each assessment performed during the registration period.
+    This class references the Registration class, as each each assessment belongs to a given audit
+    This class is referenced by the Episode class as one assessment can optionally have many episodes
+    """
+    case=models.ForeignKey(
+        Case, 
+        on_delete=True)
+    epilepsy_years=models.CharField(2, choices=ASSESSMENT)
+    opt_out=models.CharField(
+        1, 
+        choices=OPT_OUT)
+    assessment_date=models.DateTimeField()
+    has_an_aed_been_given=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT)
+    rescue_medication=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    does_the_child_have_any_of_the_cess_referral_criteria=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT)
+    does_the_child_have_any_of_the_cess_referral_criteria_notes=models.CharField(max_length=250)
+    twelve_lead_ecg_status=models.IntegerField(
+        2, 
+        choices=REFERRAL_STATUS)
+    ct_head_scan_status=models.IntegerField(
+        2, 
+        choices=REFERRAL_STATUS)
+    mri_brain_date=models.DateField()
+    consultant_paediatrician_involvement_status=models.IntegerField(choices=INPUT_REQUEST_STATUS)
+    consultant_paediatrician_input_date=models.DateField()
+    paediatric_neurologist_involvement_status=models.IntegerField(choices=INPUT_REQUEST_STATUS)
+    paediatric_neurologist_input_date=models.DateField()
+    cess=models.IntegerField(choices=INPUT_REQUEST_STATUS)
+    cess_input_date=models.DateField()
+    registration = models.ForeignKey(
+        Registration,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
 
-class RescueMeds(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    RMEDSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    RMEDType=models.CharField(max_length=3,choices=BENZODIAZEPINE_TYPES)
-    RMEDOther=models.CharField(max_length=100)
-    RMEDStartDate=models.DateField()
-    RMEDStopDate=models.DateField()
-    RMEDStopDate_NK=models.IntegerField(choices=CHECKED_STATUS)
-    RMEDNotes=models.CharField(max_length=250)
+class Episode(base.Model):
+    """
+    This class records information about each seizure episode.
+    This class references the Case class as a case can have multiple episodes.
+    This class references the EEG class as an episode can have multiple EEGs
+    """
+    note=CharField(250)
+    date_of_referral_to_paediatrics=models.DateField()
+    first_paediatric_assessment=models.CharField(
+        max_length=2, 
+        choices=CHRONICITY
+    )
+    description_of_the_episode_or_episodes=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    when_the_first_epileptic_episode_occurred_confidence=models.CharField(
+        max_length=3, 
+        choices=DATE_ACCURACY
+    )
+    when_the_first_epileptic_episode_occurred=models.DateField()
+    frequency_or_number_of_episodes_since_the_first_episode=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    general_examination=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    neurological_examination=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    were_any_of_the_epileptic_seizures_convulsive=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    prolonged_generalized_convulsive_seizures=models.CharField(
+        max_length=3, 
+        choices=OPT_OUT_UNCERTAIN
+    )
+    experienced_prolonged_focal_seizures=models.CharField(
+        max_length=3, 
+        choices=OPT_OUT_UNCERTAIN
+    )
+    has_an_aed_been_given=models.CharField( # this might be part of assessment or relate to episode
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    paroxysmal_episode=models.CharField(
+        max_length=1, 
+        choices=OPT_OUT
+    )
+    case = models.ForeignKey(
+        Case,
+        on_delete=CASCADE,
+        primary_key=True
+    )
+    assessment=models.ForeignKey(
+        Assessment,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
+    eeg_indicated = BooleanField(default=True)
 
-class RoadSafety(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    RDSFSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    RDSFSiteCode=models.CharField(max_length=10)
-    RDSFDate=models.DateField()
-    # RDSFProvidedBy=,"Q. 2","10","","","varchar(10)","Drop down list","uspx_ServiceContractList = FullDetails"
-    RDSFProvidedByOther=models.CharField(max_length=100)
-    RDSFDetails=models.CharField(max_length=250)
+class EEG(base.Model):
+    """
+    This class records information about any EEG performed.
+    It references the Episode class as each episode may have optionally have several EEGs.
+    """
+    eeg_date = models.DateTimeField()
+    episode = models.ForeignKey(
+        Episode,
+        on_delete=CASCADE,
+        primary_key=True
+    )
 
-class SeizureCare(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    PSCPSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    PSCPSiteCode=models.CharField(max_length=10)
-    PSCPDate=models.DateField()
-    # PSCPProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    PSCPProvidedByOther=models.CharField(max_length=100)
-    PSCPDetails=models.CharField(max_length=250)
+class ElectroclinicalSyndrome(base.Model):
+    """
+    This class describes the cause the electroclinical syndrome
+    It references the Episode class as each episode optionally forms part of an electroclinical syndrome.
+    """
+    electroclinical_syndrome=models.IntegerField(choices=ELECTROCLINICAL_SYNDROMES)
+    electroclinical_syndrome_other=models.CharField(max_length=250)
+    episode = models.OneToOneField(
+        Episode,
+        on_delete=CASCADE,
+        primary_key=True
+    )
 
 class SeizureCause(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    CAUSSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    CAUSDateCauseApxExcNK=models.CharField(max_length=3,choices=DATE_ACCURACY)
-    CAUSDateCause=models.DateField()
-    CAUSMain=models.CharField(max_length=3, choices=EPILEPSY_CAUSES)
-    CAUSSubStructural=models.CharField(max_length=3, choices=EPILEPSY_STRUCTURAL_CAUSE_TYPES)
-    CAUSSubGenetic=models.CharField(max_length=3, choices=EPILEPSY_GENETIC_CAUSE_TYPES)
-    CAUSSubGeneticChromoAbno=models.CharField(max_length=200)
-    CAUSSubGeneticGeneAbno=models.CharField(max_length=3, choices=EPILEPSY_GENE_DEFECTS)
-    CAUSSubGeneticGeneAbnoOther=models.CharField(max_length=250)
-    CAUSSubInfectious=models.CharField(max_length=250)
-    CAUSSubMetabolic=models.CharField(max_length=3, choices=METABOLIC_CAUSES)
-    CAUSSubMetabolicOther=models.CharField(max_length=250)
-    CAUSSubImmune=models.CharField(max_length=3, choices=IMMUNE_CAUSES)
-    CAUSSubImmuneAntibody=models.CharField(max_length=3,choices=AUTOANTIBODIES)
-    CAUSSubImmuneAntibodyOther=models.CharField(max_length=250)
-
-class SeizureDiary(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    SZDISectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    SZDISiteCode=models.CharField(max_length=10)
-    SZDIDate=models.DateField()
-    # SZDIProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    SZDIProvidedByOther=models.CharField(max_length=100)
-    SZDIDetails=models.CharField(max_length=250)
-
-class ServiceDetails(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    SERVSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    SERVSiteCode=models.CharField(max_length=10)
-    SERVDate=models.DateField()
-    # SERVProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    SERVProvidedByOther=models.CharField(max_length=100)
-    SERVDetails=models.CharField(max_length=250)
-
-class SleepIssues(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    SLEPSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    SLEPSiteCode=models.CharField(max_length=10)
-    SLEPDate=models.DateField()
-    # SLEPProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    SLEPProvidedByOther=models.CharField(max_length=100)
-    SLEPDetails=models.CharField(max_length=250)
+    """
+    This class records the cause of each seizure.
+    It references the Episode class as each episode optionally has a cause.
+    """
+    seizure_cause_main=models.CharField(
+        max_length=3, 
+        choices=EPILEPSY_CAUSES
+    )
+    seizure_cause_structural=models.CharField(
+        max_length=3, 
+        choices=EPILEPSY_STRUCTURAL_CAUSE_TYPES
+    )
+    seizure_cause_genetic=models.CharField(max_length=3, choices=EPILEPSY_GENETIC_CAUSE_TYPES)
+    seizure_cause_chromosomal_abnormality=models.CharField(max_length=200)
+    seizure_cause_gene_abnormality=models.CharField(
+        max_length=3, 
+        choices=EPILEPSY_GENE_DEFECTS
+    )
+    seizure_cause_gene_abnormality_snomed_code=models.CharField(max_length=50) # this is an extra field
+    seizure_cause_genetic_other=models.CharField(max_length=250)
+    seizure_cause_infectious=models.CharField(max_length=250)
+    seizure_cause_infectious_snomed_code=models.CharField(max_length=250) # this is an extra field
+    seizure_cause_metabolic=models.CharField(
+        max_length=3, 
+        choices=METABOLIC_CAUSES
+    )
+    seizure_cause_metabolic_other=models.CharField(max_length=250)
+    seizure_cause_metabolic_snomed_code=models.CharField(max_length=250) # this is an extra field
+    seizure_cause_immune=models.CharField(
+        max_length=3, 
+        choices=IMMUNE_CAUSES
+    )
+    seizure_cause_immune_antibody=models.CharField(
+        max_length=3,
+        choices=AUTOANTIBODIES
+    )
+    seizure_cause_immune_antibody_other=models.CharField(max_length=250)
+    seizure_cause_immune_snomed_code=models.CharField(max_length=250) # this is an extra field
+    episode = models.OneToOneField(
+        Episode,
+        on_delete=CASCADE,
+        primary_key=True
+    )
 
 class SeizureType(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    SEIZSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    SEIZDateOfOnsetApproxExactNK=models.CharField(max_length=3, choices=DATE_ACCURACY)
-    SEIZDateOfOnset=models.DateField()
-    SEIZDescriptionOfEvent=models.CharField(max_length=250)
-    SEIZEpilepticOrNonEpilepticOrUncertain=models.CharField(max_length=3,choices=EPILEPSY_DIAGNOSIS_STATUS)
-    SEIZEpilepticSeizureType=models.CharField(max_length=3,choices=EPILEPSY_SEIZURE_TYPE)
-    SEIZNonEpilepticSeizureType=models.CharField(max_length=3,choices=NON_EPILEPSY_SEIZURE_TYPE)
-    SEIZEpilepticSeizureTypeFOImpAware=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOAutomatisms=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOAtonic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOClonic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOLeft=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFORight=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOEpilepticSpasms=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOHyperkinetic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOMyoclonic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOTonic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOAutonomic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOBehaviourArrest=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOCognitive=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOEmotional=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOSensory=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOCentroTemporal=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOTemporal=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOFrontal=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOParietal=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOOccipital=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOGelastic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOFocaltoBilateralTonicClonic=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOOther=models.IntegerField(choices=CHECKED_STATUS)
-    SEIZEpilepticSeizureTypeFOOtherDetails=models.CharField(max_length=250)
-    SEIZEpilepticSeizureTypeGeneralisedOnset=models.CharField(max_length=3, choices=GENERALISED_SEIZURE_TYPE)
-    SEIZEpilepticSeizureTypeGeneralisedOnsetOtherDetails=models.CharField(max_length=250)
-    SEIZNonEpilepticSeizureTypeUnknownOnset=models.CharField(max_length=3, choices=NON_EPILEPSY_SEIZURE_ONSET)
-    SEIZNonEpilepticSeizureTypeUnknownOnsetOtherDetails=models.CharField(max_length=250)
-    SEIZNonEpilepticSeizureTypeSyncope=models.CharField(max_length=3,choices=NON_EPILEPTIC_SYNCOPES)
-    SEIZNonEpilepticSeizureTypeBehavioral=models.CharField(max_length=3, choices=NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS)
-    SEIZNonEpilepticSeizureTypeSleep=models.CharField(max_length=3,choices=NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS)
-    SEIZNonEpilepticSeizureTypeParoxysmal=models.CharField(max_length=3,choices=NON_EPILEPSY_PAROXYSMS)
-    SEIZNonEpilepticSeizureTypeMigraine=models.CharField(max_length=3,choices=MIGRAINES)
-    SEIZNonEpilepticSeizureTypeMiscellaneous=models.CharField(max_length=3,choices=EPIS_MISC)
-    SEIZNonEpilepticSeizureTypeOther=models.CharField(max_length=250)
+    """
+    This class records the seizure type.
+    COULD IT BE ORGANISED DIFFERENTLY - IT SEEMS TO BE A LOT OF BOOLEANS
+    This class references the Episode class as each episode optionally has a single episode type
+    """
+    epilepsy_or_nonepilepsy_status=models.CharField(
+        max_length=3,
+        choices=EPILEPSY_DIAGNOSIS_STATUS
+    )
+    epileptic_seizure_type=models.CharField(
+        max_length=3,
+        choices=EPILEPSY_SEIZURE_TYPE
+    )
+    non_epileptic_seizure_type=models.CharField(
+        max_length=3,
+        choices=NON_EPILEPSY_SEIZURE_TYPE
+    )
+    focal_onset_impaired_awareness=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_automatisms=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_atonic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_clonic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_left=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_right=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_epileptic_spasms=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_hyperkinetic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_myoclonic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_tonic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_autonomic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_behavioural_arrest=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_cognitive=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_emotional=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_sensory=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_centrotemporal=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_temporal=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_frontal=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_parietal=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_occipital=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_gelastic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_focal_to_bilateral_tonic_clonic=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_other=models.IntegerField(choices=CHECKED_STATUS)
+    focal_onset_other_details=models.CharField(max_length=250)
+    generalised_onset=models.CharField(
+        max_length=3, 
+        choices=GENERALISED_SEIZURE_TYPE)
+    generalised_onset_other_details=models.CharField(max_length=250)
+    nonepileptic_seizure_unknown_onset=models.CharField(
+        max_length=3, 
+        choices=NON_EPILEPSY_SEIZURE_ONSET)
+    nonepileptic_seizure_unknown_onset_other_details=models.CharField(max_length=250)
+    nonepileptic_seizure_syncope=models.CharField(
+        max_length=3,
+        choices=NON_EPILEPTIC_SYNCOPES)
+    nonepileptic_seizure_behavioural=models.CharField(
+        max_length=3, 
+        choices=NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS)
+    nonepileptic_seizure_sleep=models.CharField(
+        max_length=3,
+        choices=NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS)
+    nonepileptic_seizure_paroxysmal=models.CharField(
+        max_length=3,
+        choices=NON_EPILEPSY_PAROXYSMS)
+    nonepileptic_seizure_migraine=models.CharField(
+        max_length=3,
+        choices=MIGRAINES)
+    nonepileptic_seizure_miscellaneous=models.CharField(
+        max_length=3,
+        choices=EPIS_MISC)
+    nonepileptic_seizure_other=models.CharField(max_length=250)
+    episode = models.OneToOneField(
+        Episode,
+        on_delete=CASCADE,
+        primary_key=True
+    )
 
-class SUDEP(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    SUDPSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    SUDPSiteCode=models.CharField(max_length=10)
-    SUDPDate=models.DateField()
-    # SUDPProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    SUDPProvidedByOther=models.CharField(max_length=100)
-    SUDPDetails=models.CharField(max_length=250)
+class EpilepsyContext(base.Model):
+    """
+    This class records contextual information that defines epilepsy risk.
+    It references the Case class, as each case optionally has a single epilepsy context.
+    """
+    previous_febrile_seizure=models.CharField(
+        max_length=2,
+        choices=OPT_OUT_UNCERTAIN
+    )
+    previous_acute_symptomatic_seizure=models.CharField(
+        max_length=2,
+        choices=OPT_OUT_UNCERTAIN
+    )
+    developmental_learning_or_schooling_problems=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    behavioural_or_emotional_problems=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    is_there_a_family_history_of_epilepsy=models.CharField(
+        max_length=3, 
+        choices=OPT_OUT_UNCERTAIN
+    )
+    previous_neonatal_seizures=models.CharField(
+        max_length=2,
+        choices=OPT_OUT_UNCERTAIN
+    )
+    diagnosis_of_epilepsy_withdrawn=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    )
+    case = models.OneToOneField(
+        Case,
+        on_delete=CASCADE,
+        primary_key=True
+    )
+class NonEpilepsy(base.Model):
+    """
+    This class records information about nonepilepsy features of episode.
+    This class optionally references the Episode class as one episode can have one set of nonepilepsy features.
+    """
+    nonepilepsy_type=models.IntegerField(choices=EPIS_TYPE)
+    nonepilepsy_syncope=models.CharField(
+        max_length=3, 
+        choices=NON_EPILEPTIC_SYNCOPES)
+    nonepilepsy_behavioural=models.CharField(
+        max_length=3, 
+        choices=NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS)
+    nonepilepsy_sleep=models.CharField(
+        max_length=3, 
+        choices=NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS)
+    nonepilepsy_paroxysmal=models.CharField(
+        max_length=3, 
+        choices=NON_EPILEPSY_PAROXYSMS)
+    nonepilepsy_migraine=models.CharField(
+        max_length=3,
+        choices=MIGRAINES)
+    nonepilepsy_miscellaneous=models.CharField(
+        max_length=3, 
+        choices=EPIS_MISC)
+    nonepilepsy_other=models.CharField(max_length=250)
+    episode = models.OneToOneField(
+        Episode,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
 
-class Transition(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    TEENSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    TEENSiteCode=models.CharField(max_length=10)
-    TEENType=models.IntegerField(choices=TRANSITION_TOPICS)
-    TEENTypeOther=models.CharField(max_length=50)
-    TEENDate=models.DateField()
-    # TEENProvidedBy=,"Q. 3","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    TEENProvidedByOther=models.CharField(max_length=100)
-    TEENDetails=models.CharField(max_length=250)
+class AntiEpilepticDrug(base.Model):
+    """
+    This class records information about antiepilepsy drugs. 
+    It references the Episode class, as one episode can involve several antiepilepsy medicines.
+    """
+    anti_epileptic_drug_type=models.IntegerField(choices=ANTI_EPILEPTIC_DRUG_TYPES)
+    anti_epileptic_drug_type_other=models.CharField(50)
+    anti_epileptic_drug_snomed_code=models.CharField(50) # this is a new field
+    anti_epileptic_start_date=models.models.DateField()
+    anti_epileptic_stop_date=models.models.DateField()
+    anti_epilepsy_drug_risk_discussed=models.CharField(
+        max_length=2, 
+        choices=OPT_OUT
+    ) # is this what you mean by risk? that it has been discussed?
+    episode = models.ForeignKey(
+        Episode,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
 
-class Treatements(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    INFOSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    INFOSiteCode=models.CharField(max_length=10)
-    INFOType=models.CharField(max_length=3,choices=INFORMATION_TYPES)
-    INFOTypeOther=models.CharField(max_length=50)
-    INFODate=models.DateField()
-    # INFOProvidedBy=,"Q. 3","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    INFOProvidedByOther=models.CharField(max_length=100)
-    INFODetails=models.CharField(max_length=250)
+class RescueMedicine(base.Model):
+    """
+    This class records information on rescue medicines used.
+    It references the Episode class, since one episode can involve the use of several medicines
+    """
+    rescue_medicine_type=models.CharField(
+        max_length=3,
+        choices=BENZODIAZEPINE_TYPES
+    )
+    rescue_medicine_other=models.CharField(max_length=100)
+    rescue_medicine_start_date=models.DateField()
+    rescue_medicine_stop_date=models.DateField()
+    rescue_medicine_status=models.IntegerField(choices=CHECKED_STATUS)
+    rescue_medicine_notes=models.CharField(max_length=250)
+    episode=models.ForeignKey(
+        Episode,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
 
-class WaterSafety(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    WATRSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    WATRSiteCode=models.CharField(max_length=10)
-    WATRDate=models.DateField()
-    # WATRProvidedBy=,"Q. 2","20","","","varchar(20)","Drop down list","uspx_ServiceContractList = FullDetails"
-    WATRProvidedByOther=models.CharField(max_length=100)
-    WATRDetails=models.CharField(max_length=250)
-
-class Withdrawal(base.Model):
-    OtherId=models.CharField(max_length=30, primary_key=True)
-    UpdateId=models.CharField(max_length=30)
-    CaseId=models.CharField(max_length=30)
-    CreatedDateTime=models.DateField()
-    CreatedUserName=models.CharField(max_length=256)
-    UpdatedDateTime=models.DateField()
-    UpdatedUserName=models.CharField(max_length=256)
-    Locked=models.BooleanField("Locked", default=False)
-    LockedDateTime=models.DateField()
-    LockedUserName=models.CharField(max_length=256)
-    RecordStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    Closed=models.BooleanField("Locked", default=False)
-    DOEWSectionStatus=models.CharField(max_length=2, choices=SECTION_STATUS_CHOICES)
-    DOEWDate=models.DateField()
-    DOEWDetails=models.CharField(max_length=250)
+class ElectroClinicalSyndrome(base.Model):
+    """
+    This class records information on electroclinical syndromes.
+    It references the episode class, since one episode can have features of a single electroclinical syndrome.
+    """
+    electroclinical_syndrome=models.IntegerField(choices=ELECTROCLINICAL_SYNDROMES)
+    electroclinical_sydrome_other=models.CharField(max_length=250)
+    episode = models.OneToOneField(
+        Episode,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
