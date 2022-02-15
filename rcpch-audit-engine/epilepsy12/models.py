@@ -38,51 +38,52 @@ and (b) girls and young women prescribed sodium valproate
 
 Schema
 ------
-Main classes
+*Main classes*
 The Case class records information about each young person
 The Registration class holds a record for each audit.
-The Assessment class holds information on each assessment performed over the audit period.
-The Episode class holds a record on each seizure and its investigations.
-The Site class records information about each site that oversees the epilepsy care of each case.
-
-Other classes
-The HospitalTrust class records hospital trust details. It is used as a look up class for the Site class.
+The Assessment class holds information on cases gathered over the one year audit period.
+The InitialAssessment class is closely linked to Assessment and holds the minimum expected information collected at first assessment.  
+The Investigations class records dates that initial tests were recorded (ECG, EEG, CT and MRI)
 The EpilepsyContext class records contextual information that defines epilepsy risk.
-The Neurodevelopment class records information about a given neurodevelopmental condition.
-The MentalHealth class records information about a given mental health condition.
-The AntiEpilepsyDrug class records information about antiepilepsy drugs.
+The Comorbidity class records information on emotional, behavioural, neurodevelopmental and neuropsychatric comorbidities
+
 The RescueMedicine class records information on rescue medicines used.
-The ElectroclinicalSydrome class records information on electroclinical syndromes.
-The NonEpilepsy class records information about nonepilepsy features of episode.
+The AntiEpilepsyDrug class records information about antiepilepsy drugs.
+
+
 The SeizureType class describes the seizure type.
+The ElectroclinicalSydrome class records information on electroclinical syndromes.
 The SeizureCause class records the cause of each seizure.
-The EEG class records information about any EEG performed.
+The NonEpilepsy class records information about nonepilepsy features of episode.
+
+The Site class records information about each site that oversees the epilepsy care of each case.
+The HospitalTrust class records hospital trust details. It is used as a look up class for the Site class.
 
 
 Relationships
 -------------
-Case to Registration 1:n
-Registration to Assessment 1:n
-Episode to Assessment 1:n
-Case to Episode 1:n
+Case to Registration 1:1
+Case to Site 1:n
+Registration to Assessment 1:1
+InitialAssessment to Assessment 1:1
+EpilepsyContext to Case 1:1
+Comorbidity to Case n:n
+Assessment to Investigations 1:1
+RescueMedicine to Assessment 1:1
+Case to Comorbidity 1:n
+
+RescueMedicine to Assessment 1:n
 
 Case to Site 1:n
-EpilepsyContext to Case 1:1 (optional)
-Case to MentalHealth 1:n
-Case to Neurodevelopmental 1:n
-Episode to EEG 1:n
-Episode to ElectroclinicalSyndrom 1:1
-Episode to SeizureCause 1:1
-Episode to SeizureType 1:1
-Nonepilepsy to Episode 1:1
-AntiepilepsyDrug to Episode 1:n
-RescueMedicine to Episode 1:n
-Case to Neurodevelopment 1:n
-Case to MentalHealth 1:n
-NonEpilepsy to Episode 1:1
-SeizureType to Episode 1:1
-SeizureCause to Episode 1:1
-Episode to EEG 1:n
+
+Assessment to ElectroclinicalSyndrome 1:1
+Assessment to SeizureCause 1:1
+Assessment to SeizureType 1:1
+
+
+NonEpilepsy to Assessment 1:1
+SeizureType to Assessment n:1
+SeizureCause to Assessment n:1
 
 
 HospitalTrust to Site 1:n
