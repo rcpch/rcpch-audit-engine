@@ -1,4 +1,6 @@
 # Epilepsy Causes
+# TODO #17 key value pairs to SNOMED-CT where possible
+
 
 EPILEPSY_CAUSES=(
     ("Str", "Structural"), 
@@ -124,30 +126,5 @@ ELECTROCLINICAL_SYNDROMES=(
     (15, "West syndrome"), 
     (3, 'Unclassified syndrome'), 
     (1, "No epilepsy syndrome stated"), 
-    ("O", "Other")
-)
-NEUROPSYCHIATRIC=(
-    ("MoD", "Mood disorder"), 
-    ("AxD", "Anxiety disorder"), 
-    ("EmB", "Emotional/ behavioural"), 
-    ("SHm", "Self harm"), 
-    ("Oth", "Other")
-)
-
-DEVELOPMENTAL_BEHAVIOURAL=(
-    ("CnD", "Conduct disorder"), 
-    ("ODD", "Oppositional Defiant Disorder (ODD)")
-)
-
-NEURODEVELOPMENTAL=(
-    ("ASD", "Autistic spectrum disorder"), 
-    ("CeP", "Cerebral palsy"), 
-    ("NDC", "Neurodegenerative disease or condition"), 
-    ("ChD", "An identified chromosomal disorder with a neurological or developmental component"), 
-    ("ADH", "Attention deficit hyperactivity disorder"), 
-    ("Int", "intellectual disability/global development delay/'learning disability'"), 
-    ("Dsp", "dyspraxia"), 
-    ("Dsl", "dyslexia"), 
-    ("SDo", "speech disorder"), 
-    ("Oth", "other learning difficulty")
+    (0, "Other")
 )

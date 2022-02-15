@@ -5,3 +5,4 @@ from .management import *
 from .medications import *
 from .pathway_constants import *
 from .semiology import *
+from .comorbidities import *

@@ -97,7 +97,7 @@ from django.core.validators import MaxValueValidator, MinLengthValidator, MinVal
 
 # MIXINS
 
-class TimeAndUserStampMixin(models.Model):
+class TimeAndUserStampMixin(models.Model): #TODO #12 Mixin breaks build currently
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
@@ -135,6 +135,13 @@ class Case(TimeAndUserStampMixin):
     This class is referenced by the Neurodevelopmental class as each case can have multiple neurodevelopmental conditions
     This class is referenced by the MentalHealth class as each case can have multiple mental health conditions
     This class is referenced by the EpilepsyContext class as each case may optionally have contextual information that may inform the epilepsy history
+
+    For a record to be locked:
+    1. all mandatory fields must be complete
+    2. NHS number must be present
+    3. 1 year must have passed
+
+    ?analysis flag
     """
     case_uuid=models.UUIDField(
         primary_key=True, 
@@ -145,39 +152,51 @@ class Case(TimeAndUserStampMixin):
         "Locked", 
         default=False
     )
-    locked_at = models.DateTimeField(auto_now_add=True)
+    locked_at = models.DateTimeField(
+        auto_now_add=True
+    )
     locked_by = models.ForeignKey(
         User, 
-        on_delete=CASCADE
+        on_delete=CASCADE,
+        related_name='case_locked'
     )
     nhs_patient = models.CharField(
         max_length=2, 
         choices=OPT_OUT
     )
-    nhs_chi_number = models.IntegerField( # the Scottish NHS number - is exactly 10 numbers long
-        max_length=10, 
-        validators=[MinLengthValidator(
-            limit_value=10,
-            message="The CHI number must be 10 digits long."
-        )]
-    )
     nhs_number = models.IntegerField( # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
         max_length=10,
-        validators=[MinLengthValidator(
+        validators=[MinLengthValidator( # should be other validation before saving - need to strip out spaces
             limit_value=10,
             message="The NHS number must be 10 digits long."
         )]
+    ) # TODO #13 NHS Number must be hidden - use case_uuid as proxy
+    first_name=CharField(
+        max_length=100
     )
-    first_name=CharField(max_length=100)
-    surname=CharField(max_length=100)
+    surname=CharField(
+        max_length=100
+    )
     gender=CharField(
         max_length=2,
         choices=SEX_TYPE
     )
-    data_of_birth=DateField() #WHY IS THE TIME OF BIRTH NEEDED? I HAVE LEFT THIS OUT
-    postcode=CharField(max_length=7)
+    date_of_birth=DateField()
+    postcode=CharField( # TODO #6 need to validate postcode
+        max_length=7
+    )
+    index_of_multiple_deprivation=CharField( # TODO #5 need to calculate IMD and persist
+        
+    )
+    index_of_multiple_deprivation_quintile=CharField( # TODO #4 need to calculate IMD quintile and persist
 
-    class Meta:
+    )
+    
+    ethnicity=CharField(
+        # TODO #7 There needs to be a standard look up for ethnicities - DM&D
+    )
+
+    class Meta: #TODO #16 add meta classes to all classes
         indexes=[models.Index(fields=['case_uuid'])]
         ordering = ['-surname']
         verbose_name = 'child or young person'
@@ -198,8 +217,11 @@ class Site(TimeAndUserStampMixin):
         related_name='hospital trusts',
         related_query_name='hospitals'
     )
-    site_is_actively_involved_in_care=models.BooleanField(default=False)
-    site_is_primary_centre_of_care=models.BooleanField(default=False)
+    site_is_actively_involved_in_epilepsy_care=models.BooleanField(default=False)
+    site_is_primary_centre_of_epilepsy_care=models.BooleanField(
+        default=False,
+        unique=True
+    )
     case = models.ForeignKey(
         Case,
         on_delete=CASCADE,
@@ -213,43 +235,27 @@ class Site(TimeAndUserStampMixin):
 
     def __str__(self) -> str:
         return self.hospital_trust
-class MentalHealth(base.Model):
-    """
-    This class records information about a given mental health condition
-    It references the Case class, as each child might have several mental health conditions
-    """
-    mental_health_problem=models.CharField(
-        max_length=3,
-        choices=NEUROPSYCHIATRIC
-    )
-    mental_health_problem_other=models.CharField(max_length=250)
-    mental_health_problem_snomed_code=models.CharField(max_length=50) # this is a new field
-    emotional_problem=models.CharField(
-        max_length=3, 
-        choices=DEVELOPMENTAL_BEHAVIOURAL
-    )
-    emotional_problem_snomed_code=models.CharField(max_length=50) # this is a new field
-    case = models.ForeignKey(
-        Case,
-        on_delete=CASCADE,
-        primary_key=True
-    )
 
-class Neurodevelopment(base.Model):
+class Comorbidity(base.Model):
     """
-    This class records information about a given neurodevelopmental condition
-    It references the Case class, as each child might have several neurodevelopmental conditions
+    This class records information on all mental health, behavioural and developmental comorbidities
+    [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]
+    It references the Case class as each child may have several comorbidities
+
+    Detail
+    The date of onset/diagnosis field has been actively removed as not found helpful
     """
-    neurodevelopmental_problem=models.CharField(
-        max_length=3, 
-        choices=NEURODEVELOPMENTAL
-    )
-    neurodevelopmental_problem_other=models.CharField(max_length=250)
-    neurodevelopmental_problem_snomed_code=models.CharField(max_length=50) # this is a new field
-    neurodevelopmental_problem_severity=models.CharField(
+    comorbidity=models.CharField(
         max_length=3,
-        choices=DISORDER_SEVERITY
+        choices=COMORBIDITIES
     )
+    comorbidity_free_text=models.CharField( # this is a free text field for 'other' diagnoses not included in the lists provided
+        max_length=50,
+        default=None
+    )
+    comorbidity_snomed_code=models.CharField( #TODO #11 Need to tag Snomed CT terms to all comorbidites @marcusbaw @colindunkley
+        max_length=50
+    ) # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
     case = models.ForeignKey(
         Case,
         on_delete=CASCADE,
@@ -259,7 +265,7 @@ class Neurodevelopment(base.Model):
 class Registration(TimeAndUserStampMixin):
     """
     A record is created in the Registration class every time a case is registered for the audit
-    A case can be registered only once each audit year, but can be registered in multiple years
+    A case can be registered only once - TODO Merge Registration with Case class
     """
     registration_uuid=models.UUIDField(
         primary_key=True, 
@@ -292,92 +298,45 @@ class Registration(TimeAndUserStampMixin):
         on_delete=CASCADE
     )
     referring_clinician = models.CharField(max_length=50)
-    diagnostic_status = models.CharField(
+    diagnostic_status = models.CharField( # This currently essential - used to exclude nonepilepic kids
         max_length=1,
         choices=DIAGNOSTIC_STATUS
     )
-    cohort = IntegerField(validators= [MinValueValidator(1), MaxValueValidator(10)]) # what is this DO WE NEED IT ?
 
 class Assessment(TimeAndUserStampMixin):
     """
     This class stores information on each assessment performed during the registration period.
-    This class references the Registration class, as each each assessment belongs to a given audit
+    Each Case has only a single initial assessment (the first)
+    This class references the Registration class in a one to one relationship
     This class is referenced by the Episode class as one assessment can optionally have many episodes
-    """
-    case=models.ForeignKey(
-        Case, 
-        on_delete=True)
-    epilepsy_years=models.CharField(2, choices=ASSESSMENT)
-    opt_out=models.CharField(
-        1, 
-        choices=OPT_OUT)
-    assessment_date=models.DateTimeField()
-    has_an_aed_been_given=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT)
-    rescue_medication=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
-    )
-    does_the_child_have_any_of_the_cess_referral_criteria=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT)
-    does_the_child_have_any_of_the_cess_referral_criteria_notes=models.CharField(max_length=250)
-    twelve_lead_ecg_status=models.IntegerField(
-        2, 
-        choices=REFERRAL_STATUS)
-    ct_head_scan_status=models.IntegerField(
-        2, 
-        choices=REFERRAL_STATUS)
-    mri_brain_date=models.DateField()
-    consultant_paediatrician_involvement_status=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    consultant_paediatrician_input_date=models.DateField()
-    paediatric_neurologist_involvement_status=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    paediatric_neurologist_input_date=models.DateField()
-    cess=models.IntegerField(choices=INPUT_REQUEST_STATUS)
-    cess_input_date=models.DateField()
-    registration = models.ForeignKey(
-        Registration,
-        on_delete=models.CASCADE,
-        primary_key=True
-    )
 
-class Episode(base.Model):
+    Detail
+    The cohort number is calculated from the initial date of first paediatric assessment
     """
-    This class records information about each seizure episode.
-    This class references the Case class as a case can have multiple episodes.
-    This class references the EEG class as an episode can have multiple EEGs
-    """
-    note=CharField(250)
-    date_of_referral_to_paediatrics=models.DateField()
-    first_paediatric_assessment=models.CharField(
-        max_length=2, 
-        choices=CHRONICITY
+    case=models.OneToOneField(
+        Case, 
+        on_delete=False)
+    assessment_date=models.DateTimeField()
+    has_an_aed_been_given=models.BooleanField(
+        default=False
     )
-    description_of_the_episode_or_episodes=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
+    rescue_medication_prescribed=models.BooleanField(
+        default=False, 
     )
-    when_the_first_epileptic_episode_occurred_confidence=models.CharField(
-        max_length=3, 
-        choices=DATE_ACCURACY
+    does_the_child_have_any_of_the_childrens_epilepsy_surgical_service_referral_criteria=models.BooleanField(
+        default=False
     )
-    when_the_first_epileptic_episode_occurred=models.DateField()
-    frequency_or_number_of_episodes_since_the_first_episode=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
+    consultant_paediatrician_referral_date=models.DateField() # National guidance is that children should wait nolonger than x weeks - essential field if has been referred
+    consultant_paediatrician_input_date=models.DateField() # National guidance is that children should wait nolonger than x weeks
+    paediatric_neurologist_referral_made=models.BooleanField(
+        default=False
     )
-    general_examination=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
-    )
-    neurological_examination=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
-    )
-    were_any_of_the_epileptic_seizures_convulsive=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
+    paediatric_neurologist_referral_date=models.DateField() # National guidance is that children should wait nolonger than x weeks - essential field if has been referred
+    paediatric_neurologist_input_date=models.DateField() # National guidance is that children should wait nolonger than x weeks
+    childrens_epilepsy_surgical_service_referral_date=models.DateField() # not required field
+    childrens_epilepsy_surgical_service_input_date=models.DateField() # not required field
+    were_any_of_the_epileptic_seizures_convulsive=models.BooleanField(
+        default=False
     )
     prolonged_generalized_convulsive_seizures=models.CharField(
         max_length=3, 
@@ -395,47 +354,112 @@ class Episode(base.Model):
         max_length=1, 
         choices=OPT_OUT
     )
-    case = models.ForeignKey(
-        Case,
-        on_delete=CASCADE,
+    registration = models.OneToOneField(
+        Registration,
+        on_delete=models.DO_NOTHING,
         primary_key=True
     )
-    assessment=models.ForeignKey(
-        Assessment,
-        on_delete=models.CASCADE,
-        primary_key=True
-    )
-    eeg_indicated = BooleanField(default=True)
 
-class EEG(base.Model):
+    #TODO #14 Class function to calculate cohort based on first paediatric assessment date
+    # this creates a cohort number (integer) based on where in the year they are
+
+    # TODO #15 Class function to create calculated field epilepsy_years based on current date and date of first seizure in years
+
+class InitialAssessment(base.Model):
+    """
+    This class records information about each seizure episode.
+    This class references the Case class as a case can have multiple episodes.
+    This class references the EEG class as an episode can have multiple EEGs
+
+    On Episode
+    """
+    
+    date_of_referral_to_general_paediatrics=models.DateField()
+    first_paediatric_assessment_in_acute_or_nonacute_setting=models.CharField(
+        max_length=2, 
+        choices=CHRONICITY
+    )
+    has_description_of_the_episode_or_episodes_been_gathered=models.BooleanField(
+        default=False
+    )
+    when_the_first_epileptic_episode_occurred_confidence=models.CharField(
+        max_length=3, 
+        choices=DATE_ACCURACY
+    )
+    when_the_first_epileptic_episode_occurred=models.DateField()
+    has_frequency_or_number_of_episodes_since_the_first_episode_been_documented=models.BooleanField(
+        default=False
+    )
+    general_examination_performed=models.BooleanField(
+        default=False
+    )
+    neurological_examination_performed=models.BooleanField(
+        default=False
+    )
+    developmental_learning_or_schooling_problems=models.BooleanField(
+        default=False
+    )
+    behavioural_or_emotional_problems=models.BooleanField(
+        default=False
+    )
+    case = models.OneToOneField(
+        Case,
+        on_delete=models.DO_NOTHING,
+        primary_key=True
+    )
+    assessment=models.OneToOneField(
+        Assessment,
+        on_delete=models.DO_NOTHING,
+        primary_key=True
+    )
+
+class Investigations(base.Model):
     """
     This class records information about any EEG performed.
-    It references the Episode class as each episode may have optionally have several EEGs.
+    It references the Assessment class as each episode may have optionally have several EEGs.
     """
-    eeg_date = models.DateTimeField()
-    episode = models.ForeignKey(
-        Episode,
-        on_delete=CASCADE,
+    eeg_indicated = BooleanField(default=True)
+    eeg_request_date = models.DateTimeField()
+    eeg_performed_date = models.DateTimeField()
+    assessment = models.OneToOneField(
+        Assessment,
+        on_delete=models.DO_NOTHING,
         primary_key=True
+    )
+    twelve_lead_ecg_status=models.BooleanField(
+        default=False
+    )
+    ct_head_scan_status=models.BooleanField(
+        default=False
+    )
+    mri_brain_date=models.DateField()
+    consultant_paediatrician_referral_made=models.BooleanField(
+        default=False
     )
 
 class ElectroclinicalSyndrome(base.Model):
     """
     This class describes the cause the electroclinical syndrome
     It references the Episode class as each episode optionally forms part of an electroclinical syndrome.
+
+    Is this class really needed??
+    One Case can have multiple Electroclinical Syndrome
     """
     electroclinical_syndrome=models.IntegerField(choices=ELECTROCLINICAL_SYNDROMES)
-    electroclinical_syndrome_other=models.CharField(max_length=250)
-    episode = models.OneToOneField(
-        Episode,
+    case = models.ForeignKey(
+        Case,
         on_delete=CASCADE,
         primary_key=True
     )
+
+    #TODO this class needs to be referenced by Case
 
 class SeizureCause(base.Model):
     """
     This class records the cause of each seizure.
     It references the Episode class as each episode optionally has a cause.
+
+    One Case can have multiple seizure causes
     """
     seizure_cause_main=models.CharField(
         max_length=3, 
@@ -445,9 +469,14 @@ class SeizureCause(base.Model):
         max_length=3, 
         choices=EPILEPSY_STRUCTURAL_CAUSE_TYPES
     )
-    seizure_cause_genetic=models.CharField(max_length=3, choices=EPILEPSY_GENETIC_CAUSE_TYPES)
-    seizure_cause_chromosomal_abnormality=models.CharField(max_length=200)
-    seizure_cause_gene_abnormality=models.CharField(
+    seizure_cause_genetic=models.CharField(
+        max_length=3, 
+        choices=EPILEPSY_GENETIC_CAUSE_TYPES
+    )
+    seizure_cause_chromosomal_abnormality=models.CharField( # would be good to pull in known chromosomal abnormalities 
+        max_length=200
+    )
+    seizure_cause_gene_abnormality=models.CharField( # would be good to pull in known genetic abnormalities 
         max_length=3, 
         choices=EPILEPSY_GENE_DEFECTS
     )
@@ -471,11 +500,13 @@ class SeizureCause(base.Model):
     )
     seizure_cause_immune_antibody_other=models.CharField(max_length=250)
     seizure_cause_immune_snomed_code=models.CharField(max_length=250) # this is an extra field
-    episode = models.OneToOneField(
-        Episode,
+    case = models.ForeignKey(
+        Case,
         on_delete=CASCADE,
         primary_key=True
     )
+
+    #TODO this class needs to be referenced by Case
 
 class SeizureType(base.Model):
     """
@@ -552,6 +583,8 @@ class SeizureType(base.Model):
         primary_key=True
     )
 
+    #TODO this class needs to be referenced by Case
+
 class EpilepsyContext(base.Model):
     """
     This class records contextual information that defines epilepsy risk.
@@ -564,14 +597,6 @@ class EpilepsyContext(base.Model):
     previous_acute_symptomatic_seizure=models.CharField(
         max_length=2,
         choices=OPT_OUT_UNCERTAIN
-    )
-    developmental_learning_or_schooling_problems=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
-    )
-    behavioural_or_emotional_problems=models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
     )
     is_there_a_family_history_of_epilepsy=models.CharField(
         max_length=3, 
@@ -673,3 +698,54 @@ class ElectroClinicalSyndrome(base.Model):
         on_delete=models.CASCADE,
         primary_key=True
     )
+
+
+
+"""
+COMMENTING OUT THESE TABLES AND REPLACING WITH COMORBIDITIES
+"""
+
+# class MentalHealth(base.Model): 
+#     """
+#     This class records information about a given mental health condition
+#     It references the Case class, as each child might have several mental health conditions
+#     """
+#     mental_health_problem=models.CharField( # TODO #8 Decision to leave mental health problems the same: will need to be SNOMED in future
+#         max_length=3,
+#         choices=NEUROPSYCHIATRIC
+#     )
+#     mental_health_problem_snomed_code=models.CharField(
+#         max_length=50
+#     ) # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
+#     # not practical
+#     emotional_problem=models.CharField(
+#         max_length=3, 
+#         choices=DEVELOPMENTAL_BEHAVIOURAL
+#     )
+#     emotional_problem_snomed_code=models.CharField(max_length=50) # this is a new field
+#     case = models.ForeignKey(
+#         Case,
+#         on_delete=CASCADE,
+#         primary_key=True
+#     )
+
+# class Neurodevelopment(base.Model):
+#     """
+#     This class records information about a given neurodevelopmental condition
+#     It references the Case class, as each child might have several neurodevelopmental conditions
+#     """
+#     neurodevelopmental_problem=models.CharField(
+#         max_length=3, 
+#         choices=NEURODEVELOPMENTAL
+#     )
+#     neurodevelopmental_problem_other=models.CharField(max_length=250)
+#     neurodevelopmental_problem_snomed_code=models.CharField(max_length=50) # this is a new field
+#     neurodevelopmental_problem_severity=models.CharField(
+#         max_length=3,
+#         choices=DISORDER_SEVERITY
+#     )
+#     case = models.ForeignKey(
+#         Case,
+#         on_delete=CASCADE,
+#         primary_key=True
+#     )
