@@ -194,6 +194,8 @@ class Case(TimeAndUserStampMixin):
     
     ethnicity=CharField(
         # TODO #7 There needs to be a standard look up for ethnicities - DM&D
+        max_length=4,
+        choices=ETHNICITIES
     )
 
     class Meta: #TODO #16 add meta classes to all classes
