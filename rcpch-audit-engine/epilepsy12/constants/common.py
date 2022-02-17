@@ -11,19 +11,19 @@ SECTION_STATUS_CHOICES = (
         (70, "TransferredOut"),
 )
 
-ASSESSMENT=(
-        (0, "First paediatric assessment"),
-        (1, "First year of care"),
-        (2, "Second year of care"),
-        (3, "Third year of care"),
-        (4, "4th year of care"),
-        (5, "5th year of care"),
-        (6, "6th year of care"),
-        (7, "7th year of care"),
-        (8, "8th year of care"),
-        (9, "9th year of care"),
-        (10, "10th year of care")
-    )
+# ASSESSMENT=(
+#         (0, "First paediatric assessment"),
+#         (1, "First year of care"),
+#         (2, "Second year of care"),
+#         (3, "Third year of care"),
+#         (4, "4th year of care"),
+#         (5, "5th year of care"),
+#         (6, "6th year of care"),
+#         (7, "7th year of care"),
+#         (8, "8th year of care"),
+#         (9, "9th year of care"),
+#         (10, "10th year of care")
+#     )
 
 OPT_OUT = (
     ("Y","Yes"),
