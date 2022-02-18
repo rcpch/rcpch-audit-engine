@@ -120,3 +120,5 @@ start/hermes-v0.7.5.jar
 
 # VS Ccode
 .code-workspace
+.vscode/
+.vscode/*
