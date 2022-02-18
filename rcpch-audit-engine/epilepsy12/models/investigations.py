@@ -15,11 +15,6 @@ class Investigations(TimeAndUserStampMixin):
     eeg_indicated = BooleanField(default=True)
     eeg_request_date = models.DateTimeField()
     eeg_performed_date = models.DateTimeField()
-    assessment = models.OneToOneField(
-        Assessment,
-        on_delete=models.DO_NOTHING,
-        primary_key=True
-    )
     twelve_lead_ecg_status=models.BooleanField(
         default=False
     )
@@ -27,6 +22,16 @@ class Investigations(TimeAndUserStampMixin):
         default=False
     )
     mri_brain_date=models.DateField()
-    consultant_paediatrician_referral_made=models.BooleanField(
-        default=False
+
+    # relationships
+    assessment = models.OneToOneField(
+        Assessment,
+        on_delete=models.DO_NOTHING,
+        primary_key=True
     )
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'investigations'
+    
+    def __str__(self) -> str:
+        return self.eeg_request_date

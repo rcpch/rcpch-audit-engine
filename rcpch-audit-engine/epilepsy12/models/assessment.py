@@ -37,6 +37,10 @@ class Assessment(TimeAndUserStampMixin):
         "Have the criteria for referral to a children's epilepsy surgery service been met?",
         default=False
     )
+    consultant_paediatrician_referral_made=models.BooleanField(
+        "Has a referral been made to a consultant paediatrician with an interest in epilepsy?",
+        default=False
+    )
     consultant_paediatrician_referral_date=models.DateField(
         "Date of referral to a consultant paediatrician with an interest in epilepsy."
     ) # National guidance is that children should wait nolonger than x weeks - essential field if has been referred
