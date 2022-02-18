@@ -1,4 +1,5 @@
 # standard dependencies
+requests
 
 # third party dependencies
 Django

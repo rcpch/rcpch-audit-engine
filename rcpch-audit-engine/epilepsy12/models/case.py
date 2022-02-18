@@ -2,12 +2,10 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator
 import uuid
 from ..constants import *
 from .time_and_user_mixin import TimeAndUserStampMixin
-
-# other tables
-from .assessment import Assessment
 
 class Case(TimeAndUserStampMixin):
     """
@@ -27,6 +25,7 @@ class Case(TimeAndUserStampMixin):
     ?analysis flag
     """
     case_uuid=models.UUIDField(
+        "Unique case identifier",
         primary_key=True, 
         default=uuid.uuid4, 
         editable=False
@@ -36,18 +35,19 @@ class Case(TimeAndUserStampMixin):
         default=False
     )
     locked_at = models.DateTimeField(
+        "Date record locked",
         auto_now_add=True
     )
     locked_by = models.ForeignKey(
         User, 
         on_delete=CASCADE,
-        related_name='case_locked'
+        verbose_name="locked by"
     )
-    nhs_patient = models.CharField(
-        max_length=2, 
-        choices=OPT_OUT
+    nhs_patient = models.BooleanField(
+        "Is an NHS patient?"
     )
     nhs_number = models.IntegerField( # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
+        "NHS Number",
         max_length=10,
         validators=[MinLengthValidator( # should be other validation before saving - need to strip out spaces
             limit_value=10,
@@ -55,18 +55,25 @@ class Case(TimeAndUserStampMixin):
         )]
     ) # TODO #13 NHS Number must be hidden - use case_uuid as proxy
     first_name=CharField(
+        "first name",
         max_length=100
     )
     surname=CharField(
+        "surname",
         max_length=100
     )
     gender=CharField(
+        "gender",
         max_length=2,
         choices=SEX_TYPE
     )
-    date_of_birth=DateField()
+    date_of_birth=DateField(
+        "date of birth (YYYY-MM-DD)"
+    )
     postcode=CharField( # TODO #6 need to validate postcode
-        max_length=7
+        "postcode",
+        max_length=7,
+        validators=[validate_postcode]
     )
     index_of_multiple_deprivation=CharField( # TODO #5 need to calculate IMD and persist
         

@@ -1,6 +1,6 @@
 # Medications
 
-ANTI_EPILEPTIC_DRUG_TYPES=(
+ANTIEPILEPSY_MEDICINE_TYPES=(
     (1, "Acetazolamide"), 
     (2, "ACTH"), 
     (3, "Carbamazepine"), 
