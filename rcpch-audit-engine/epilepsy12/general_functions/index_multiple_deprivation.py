@@ -29,5 +29,7 @@ def imd_for_postcode(user_postcode: str)->int:
         deprivare_url="http://localhost:8082/v1/uk/lsoa/"+lsoa
 
         deprivation_data=requests.get(url=deprivare_url)
-        print(deprivation_data)
+        
+        quintile = deprivation_data[":uk-composite-imd-2020-mysoc"]["UK_IMD_E_pop_quintile"]
+        return quintile
 

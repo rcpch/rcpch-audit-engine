@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 import uuid
 from ..constants import *
+from ..general_functions import *
 from .time_and_user_mixin import TimeAndUserStampMixin
 
 class Case(TimeAndUserStampMixin):
@@ -70,23 +71,25 @@ class Case(TimeAndUserStampMixin):
     date_of_birth=DateField(
         "date of birth (YYYY-MM-DD)"
     )
-    postcode=CharField( # TODO #6 need to validate postcode
+    postcode=CharField(
         "postcode",
         max_length=7,
         validators=[validate_postcode]
     )
-    index_of_multiple_deprivation=CharField( # TODO #5 need to calculate IMD and persist
-        
-    )
-    index_of_multiple_deprivation_quintile=CharField( # TODO #4 need to calculate IMD quintile and persist
-
-    )
     
     ethnicity=CharField(
-        # TODO #7 There needs to be a standard look up for ethnicities - DM&D
         max_length=4,
         choices=ETHNICITIES
     )
+
+    def _imd_quintile_from_postcode(self)->int:
+        "index of multiple deprivation calculated from MySociety data.",
+        if (self.postcode):
+            postcode=validate_postcode(self.postcode)
+            imd_quintile=imd_for_postcode(postcode)
+            return imd_quintile
+
+    index_of_multiple_deprivation_quintile=property(_imd_quintile_from_postcode)
 
     class Meta: #TODO #16 add meta classes to all classes
         indexes=[models.Index(fields=['case_uuid'])]
