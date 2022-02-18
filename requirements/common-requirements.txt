@@ -1,5 +1,6 @@
 # standard dependencies
 requests
+python-dateutil
 
 # third party dependencies
 Django

@@ -91,7 +91,7 @@ class Case(TimeAndUserStampMixin):
 
     index_of_multiple_deprivation_quintile=property(_imd_quintile_from_postcode)
 
-    class Meta: #TODO #16 add meta classes to all classes
+    class Meta:
         indexes=[models.Index(fields=['case_uuid'])]
         ordering = ['-surname']
         verbose_name = 'child or young person'
