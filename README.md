@@ -7,8 +7,7 @@
 <p align="center">
     <p align="center"></p>
     <p align="center">This project is part of the <a href="https://publicmoneypubliccode.org.uk/">Public Money Public Code</a> community.</p>
-    <p align="center>
-    <img align="center" src="./rcpch-audit-engine/epilepsy12/static/rcpch-logo.jpg" width='100px'/>
+    <p align="center">
     <img align="center" src="./rcpch-audit-engine/epilepsy12/static/logo-block-outline-sm.png" width='100px'/>
     </p>
 </p>
@@ -21,7 +20,7 @@ rcpch-audit-engine is a (Django)[https://www.djangoproject.com/] 4.0 project whi
 ## Epilepsy12
 
 <p align="center">
-    <img src="./rcpch-audit-engine/epilepsy12/static/epilepsy12-logo.jpg" width='200px'/>
+    <img align="center" src="./rcpch-audit-engine/epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
 ### Setup
