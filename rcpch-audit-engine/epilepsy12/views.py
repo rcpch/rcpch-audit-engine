@@ -3,12 +3,12 @@ from django.http import HttpResponse
 from django.template import loader
 from django.views.generic.base import TemplateView
 from django.shortcuts import render
-from .snomed import get_description_by_id
+
+from .models import Case, Assessment, InitialAssessment
 
 
 def index(request):
     template_name = 'epilepsy12/epilepsy12index.html'
-    # get_description_by_id(230437002)
     return render(request, template_name, {})
 
 def database(request):
@@ -16,8 +16,10 @@ def database(request):
     return render(request, template_name, {})
 
 def hospital(request):
+    case_list = Case.objects.order_by('surname')[:10]
+    context = {'case_list': case_list}
     template_name = 'epilepsy12/hospital.html'
-    return render(request, template_name, {})
+    return render(request, template_name, context)
 
 def eeg(request):
     template_name = 'epilepsy12/eeg.html'
