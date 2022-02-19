@@ -6,14 +6,14 @@ from django.db.models.fields import CharField, DateField
 from django.contrib.auth.models import User
 import uuid
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .hospital_trust import HospitalTrust
 from .case import Case
 from .site import Site
 
-class Registration(TimeAndUserStampMixin):
+class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     A record is created in the Registration class every time a case is registered for the audit
     A case can be registered only once - TODO Merge Registration with Case class
@@ -35,19 +35,9 @@ class Registration(TimeAndUserStampMixin):
         "The date and time at which the registration was locked from further data entry.",
         auto_now_add=True
     )
-    locked_by = models.ForeignKey(
-        "The user who locked the registration from further data entry.",
-        User, 
-        on_delete=CASCADE
-    )
     closed=models.BooleanField(
         "Case has been closed and will not participate in audit analysis.", 
         default=False
-    )
-    referring_hospital = models.ForeignKey(
-        HospitalTrust, 
-        on_delete=CASCADE,
-        verbose_name="Name of referring hospital"
     )
     referring_clinician = models.CharField(max_length=50)
     diagnostic_status = models.CharField( # This currently essential - used to exclude nonepilepic kids
@@ -57,16 +47,23 @@ class Registration(TimeAndUserStampMixin):
     )
 
     # relationships
-    case=models.models.ForeignKey(
+    case=models.ForeignKey(
         Case, 
-        on_delete=CASCADE,
-        primary_key=True
+        on_delete=CASCADE
     )
-
+    referring_hospital = models.ForeignKey(
+        HospitalTrust, 
+        on_delete=CASCADE,
+        verbose_name="Name of referring hospital"
+    )
     site=models.ForeignKey(
         Site, 
+        on_delete=CASCADE
+    )
+    locked_by = models.ForeignKey(
+        User, 
         on_delete=CASCADE,
-        primary_key=True
+        verbose_name="The user who locked the registration from further data entry."
     )
 
     @property

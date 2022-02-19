@@ -1,6 +1,6 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .antiepilepsy_medicine import AntiEpilepsyMedicine
@@ -11,7 +11,7 @@ from .registration import Registration
 from .rescue_medicine import RescueMedicine
 from .seizure_cause import SeizureCause
 
-class Assessment(TimeAndUserStampMixin):
+class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class stores information on each assessment performed during the registration period.
     Each Case has only a single initial assessment (the first)
@@ -100,19 +100,16 @@ class Assessment(TimeAndUserStampMixin):
     electroclinical_syndrome=models.OneToOneField(
         ElectroClinicalSyndrome,
         on_delete=models.CASCADE,
-        primary_key=True,
         verbose_name="related electroclinical syndrome"
     )
     investigations=models.OneToOneField(
         Investigations,
         on_delete=models.CASCADE,
-        primary_key=True,
         verbose_name="related investigations"
     )
     registration = models.OneToOneField(
         Registration,
         on_delete=models.DO_NOTHING,
-        primary_key=True,
         verbose_name="related registration"
     )
     rescue_medicines=models.ManyToManyField(
@@ -126,7 +123,6 @@ class Assessment(TimeAndUserStampMixin):
     nonepilepsy=models.OneToOneField(
         NonEpilepsy,
         on_delete=models.CASCADE,
-        primary_key=True,
         verbose_name="related nonepilepsy explanation"
     )
 

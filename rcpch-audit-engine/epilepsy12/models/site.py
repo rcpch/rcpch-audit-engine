@@ -1,13 +1,13 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .case import Case
 from .hospital_trust import HospitalTrust
 
-class Site(TimeAndUserStampMixin):
+class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about each site that oversees the epilepsy care of each case.
     This class references the HospitalTrust class, as one hospital trust may reference multiple sites
@@ -20,8 +20,7 @@ class Site(TimeAndUserStampMixin):
     )
     case = models.ForeignKey(
         Case,
-        on_delete=CASCADE,
-        primary_key=True
+        on_delete=CASCADE
     )
 
     class Meta:
@@ -36,6 +35,6 @@ class Site(TimeAndUserStampMixin):
     hospital_trust=models.ForeignKey(
         HospitalTrust, 
         on_delete=models.CASCADE,
-        related_name='hospital trusts',
+        related_name='hospital_trust',
         related_query_name='hospitals'
     )

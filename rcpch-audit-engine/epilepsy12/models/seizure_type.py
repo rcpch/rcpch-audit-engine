@@ -2,12 +2,12 @@ from operator import mod
 from django.db import models
 from django.db.models.deletion import CASCADE
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .assessment import Assessment
 
-class SeizureType(TimeAndUserStampMixin):
+class SeizureType(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records the seizure type.
     COULD IT BE ORGANISED DIFFERENTLY - IT SEEMS TO BE A LOT OF BOOLEANS
@@ -130,15 +130,14 @@ class SeizureType(TimeAndUserStampMixin):
     # relationships
     assessment=models.ForeignKey(
         Assessment,
-        on_delete=models.CASCADE,
-        primary_key=True
+        on_delete=models.CASCADE
     )
 
     class Meta:
-        ordering = ['seizure_cause_main']
-        verbose_name = 'Main cause of seizure(s)',
-        verbose_name_plural="Main causes of seizure(s)"
+        ordering = ['epileptic_seizure_type']
+        verbose_name = 'Main type of seizure(s)',
+        verbose_name_plural="Main types of seizure(s)"
         
     
     def __str__(self) -> str:
-        return self.seizure_cause_main
+        return self.epileptic_seizure_type

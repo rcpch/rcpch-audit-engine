@@ -1,11 +1,7 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
-
-# other tables
-from .assessment import Assessment
-
-class RescueMedicine(TimeAndUserStampMixin):
+from .time_and_user_abstract_base_classes import *
+class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information on rescue medicines used.
     It references the Episode class, since one episode can involve the use of several medicines
@@ -32,13 +28,6 @@ class RescueMedicine(TimeAndUserStampMixin):
     rescue_medicine_notes=models.CharField(
         "additional notes relating to rescue medication.",
         max_length=250
-    )
-
-    # relationships
-    assessment=models.ForeignKey(
-        Assessment,
-        on_delete=models.CASCADE,
-        primary_key=True
     )
 
     class Meta:

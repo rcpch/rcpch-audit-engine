@@ -6,9 +6,9 @@ from django.core.validators import MinLengthValidator
 import uuid
 from ..constants import *
 from ..general_functions import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
-class Case(TimeAndUserStampMixin):
+class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class holds information about each child or young person
     Each case is unique
@@ -49,7 +49,6 @@ class Case(TimeAndUserStampMixin):
     )
     nhs_number = models.IntegerField( # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
         "NHS Number",
-        max_length=10,
         validators=[MinLengthValidator( # should be other validation before saving - need to strip out spaces
             limit_value=10,
             message="The NHS number must be 10 digits long."

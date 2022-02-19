@@ -1,11 +1,7 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
-
-# other tables
-from .assessment import Assessment
-
-class NonEpilepsy(TimeAndUserStampMixin):
+from .time_and_user_abstract_base_classes import *
+class NonEpilepsy(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about nonepilepsy features of episode.
     This class optionally references the Episode class as one episode can have one set of nonepilepsy features.
@@ -79,13 +75,6 @@ class NonEpilepsy(TimeAndUserStampMixin):
     nonepilepsy_other=models.CharField(
         "Other nonepileptic presentation if not previously specified.",
         max_length=250
-    )
-
-    # relationships
-    assessment = models.OneToOneField(
-        Assessment,
-        on_delete=models.CASCADE,
-        primary_key=True
     )
 
     class Meta:

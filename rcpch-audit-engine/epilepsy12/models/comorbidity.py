@@ -1,12 +1,12 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .case import Case
 
-class Comorbidity(TimeAndUserStampMixin):
+class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information on all mental health, behavioural and developmental comorbidities
     [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]
@@ -29,5 +29,4 @@ class Comorbidity(TimeAndUserStampMixin):
     case = models.ForeignKey(
         Case,
         on_delete=CASCADE,
-        primary_key=True
     )

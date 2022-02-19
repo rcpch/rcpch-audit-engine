@@ -1,12 +1,12 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .case import Case
 
-class SeizureCause(TimeAndUserStampMixin):
+class SeizureCause(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records the cause of each seizure.
     It references the Episode class as each episode optionally has a cause.

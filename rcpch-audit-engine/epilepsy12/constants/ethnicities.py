@@ -11,7 +11,7 @@ ETHNICITIES = (
 	("R", "Chinese"),
 	("H", "Indian or British Indian"),
 	("B", "Irish"),
-	("NULL",	"Not Recorded")
+	("NULL", "Not Recorded"),
 	("Z", "Not Stated"),
 	("J", "Pakistani or British Pakistani"),
 	("F", "White and Asian"),

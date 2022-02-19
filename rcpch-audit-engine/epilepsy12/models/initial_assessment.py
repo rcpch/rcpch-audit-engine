@@ -1,13 +1,13 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .case import Case
 from .assessment import Assessment
 from. epilepsy_context import EpilepsyContext
 
-class InitialAssessment(TimeAndUserStampMixin):
+class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about each seizure episode.
     This class references the Case class as a case can have multiple episodes.
@@ -62,19 +62,16 @@ class InitialAssessment(TimeAndUserStampMixin):
     case = models.OneToOneField(
         Case,
         on_delete=models.DO_NOTHING,
-        primary_key=True,
         verbose_name="related case"
     )
     assessment=models.OneToOneField(
         Assessment,
         on_delete=models.DO_NOTHING,
-        primary_key=True,
         verbose_name="related assessment"
     )
     epilepsy_context=models.OneToOneField( 
         EpilepsyContext,
         on_delete=models.CASCADE,
-        primary_key=True,
         verbose_name="related epilepsy context"
     )
 

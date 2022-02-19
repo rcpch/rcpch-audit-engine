@@ -3,12 +3,12 @@ from datetime import date
 from django.db import models
 from django.db.models.deletion import CASCADE
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .case import Case
 
-class EpilepsyContext(TimeAndUserStampMixin):
+class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records contextual information that defines epilepsy risk.
     It references the InitialAssessment class, as each case optionally has a single epilepsy context.

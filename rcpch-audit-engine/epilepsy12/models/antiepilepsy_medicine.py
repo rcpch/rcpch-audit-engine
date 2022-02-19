@@ -2,9 +2,9 @@ from datetime import date
 from django.db import models
 from django.forms import ValidationError
 from ..constants import *
-from .time_and_user_mixin import TimeAndUserStampMixin
+from .time_and_user_abstract_base_classes import *
 
-class AntiEpilepsyMedicine(TimeAndUserStampMixin):
+class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about antiepilepsy drugs. 
     It references the Episode class, as one episode can involve several antiepilepsy medicines.
@@ -21,10 +21,10 @@ class AntiEpilepsyMedicine(TimeAndUserStampMixin):
         "antiepilepsy medicine SNOMED-CT code",
         max_length=50
     ) # this is a new field
-    antiepilepsy_medicine_start_date=models.models.DateField(
+    antiepilepsy_medicine_start_date=models.DateField(
         "antiepilepsy medicine start date",
     )
-    antiepilepsy_medicine_stop_date=models.models.DateField(
+    antiepilepsy_medicine_stop_date=models.DateField(
         "antiepilepsy medicine start date",
     )
     antiepilepsy_medicine_risk_discussed=models.BooleanField(
