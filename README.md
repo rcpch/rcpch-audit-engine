@@ -26,7 +26,7 @@ rcpch-audit-engine is a (Django)[https://www.djangoproject.com/] 4.0 project whi
 
 ### Setup
 
-If you don't have python 3.10 installed already, you will need it and [pyenv](https://github.com/pyenv/pyenv).
+1. If you don't have python 3.10 installed already, you will need it and [pyenv](https://github.com/pyenv/pyenv).
 
 ```console
 foobar:~foo$ pyenv 3.10.0
@@ -38,21 +38,21 @@ If you have Homebrew, it does not always play well with pyenv and you might need
 foobar:~foo$ brew install openssl readline sqlite3 xz zlib
 ```
 
-You will also need [Postgresql](https://www.postgresql.org/)
+2. You will also need [Postgresql](https://www.postgresql.org/)
 
-Then create a virtual environment:
+3. Then create a virtual environment:
 
 ```console
 foobar:~foo$ pyenv virtualenv 3.10.0 epilepsy12-server
 ```
 
-Clone the repository:
+4. Clone the repository:
 
 ```console
 foobar:~foo$ git clone https://github.com/rcpch/epilepsy12-server.git
 ```
 
-Then install all the requirements. Note you can't do this without Postgreql already installed.
+5. Then install all the requirements. Note you can't do this without Postgreql already installed.
 
 ```console
 foobar:~foo$ pip install -r requirements/development-requirements
@@ -72,10 +72,24 @@ foobar:~foo$ docker build
 foobar:~foo$ createdb epilepsy12-db
 ```
 
+## Prepare the database for use
+
+```console
+foobar:~foo$ start/migrate
+```
+
 ## Running the server
 
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-foobar:~foo$ python manage.py runserver
+foobar:~foo$ start/runserver
+```
+
+or
+
+you may need to allow permissions to run the bash script in that folder first:
+
+```console
+foobar:~foo$ chmod +x ./start/runserver
 ```

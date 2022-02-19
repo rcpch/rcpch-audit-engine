@@ -1,0 +1,2 @@
+#!/bin/bash
+python rcpch-audit-engine/manage.py migrate
