@@ -35,6 +35,13 @@ class DESSCRIBE(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         max_length=50
     )
 
+    class Meta:
+        verbose_name="DESSCRIBE assessment"
+        verbose_name_plural="DESSCRIBE assessments"
+    
+    def __str__(self) -> str:
+        return self.epilepsy_status
+
 
 
 class Impairment(models.base):
@@ -54,3 +61,10 @@ class Impairment(models.base):
         verbose_name="Are there any relevant associated impairments - behavioural, educational or emotional problems?",
         primary_key=True
     )
+
+    class Meta:
+        verbose_name="impairment"
+        verbose_name_plural="impairments"
+    
+    def __str__(self) -> str:
+        return self.impairment

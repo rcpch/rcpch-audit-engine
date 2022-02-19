@@ -31,7 +31,6 @@ class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        ordering = ['rescue_medicine_type']
         verbose_name = 'Rescue Medicine',
         verbose_name_plural="Rescue Medicines"
         

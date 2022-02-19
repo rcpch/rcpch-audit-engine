@@ -26,7 +26,16 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     comorbidity_snomed_code=models.CharField( #TODO #11 Need to tag Snomed CT terms to all comorbidites @marcusbaw @colindunkley
         max_length=50
     ) # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
+
+    # relationships
     case = models.ForeignKey(
         Case,
         on_delete=CASCADE,
     )
+
+    class Meta:
+        verbose_name="comorbidity"
+        verbose_name_plural="comorbidities"
+    
+    def __str__(self) -> str:
+        return self.comorbidity

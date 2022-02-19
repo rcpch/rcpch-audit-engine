@@ -78,8 +78,8 @@ class NonEpilepsy(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        ordering = ['nonepilepsy_type']
         verbose_name = 'Nonepilepsy'
+        verbose_name_plural = 'Nonepilepsies'
         
     
     def __str__(self) -> str:

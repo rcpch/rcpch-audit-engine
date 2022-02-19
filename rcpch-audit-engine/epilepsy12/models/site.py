@@ -23,14 +23,6 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         on_delete=CASCADE
     )
 
-    class Meta:
-        ordering = ['-hospital_trust']
-        verbose_name = 'site'
-        verbose_name_plural = 'sites'
-
-    def __str__(self) -> str:
-        return self.hospital_trust
-    
     # Relationships
     hospital_trust=models.ForeignKey(
         HospitalTrust, 
@@ -38,3 +30,9 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         related_name='hospital_trust',
         related_query_name='hospitals'
     )
+    class Meta:
+        verbose_name = 'site'
+        verbose_name_plural = 'sites'
+
+    def __str__(self) -> str:
+        return self.hospital_trust

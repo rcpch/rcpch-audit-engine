@@ -10,7 +10,6 @@ class ElectroClinicalSyndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseC
     electroclinical_sydrome_other=models.CharField(max_length=250)
 
     class Meta:
-        ordering=['electroclinical_syndrome'],
         verbose_name="electroclinical syndrome",
         verbose_name_plural="electroclinical syndromes"
     

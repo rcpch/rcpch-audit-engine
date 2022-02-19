@@ -51,6 +51,7 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
             return days_between
     class Meta:
         verbose_name = 'epilepsy context'
+        verbose_name_plural = 'epilepsy contexts'
     
     def __str__(self) -> str:
         return self.date_of_first_epileptic_seizure

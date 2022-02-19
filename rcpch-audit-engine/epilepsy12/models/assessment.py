@@ -141,9 +141,11 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
                 return 3
 
     class Meta:
-        ordering=['assessment_date'],
         verbose_name="assessment",
         verbose_name_plural="assessments"
+    
+    def __str__(self) -> str:
+        return self.assessment_date
 
 
     #TODO #14 Class function to calculate cohort based on first paediatric assessment date

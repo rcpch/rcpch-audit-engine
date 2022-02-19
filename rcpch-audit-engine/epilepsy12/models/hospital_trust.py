@@ -14,7 +14,6 @@ class HospitalTrust(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # ... any other details about the hospital we need
     class Meta:
         indexes=[models.Index(fields=['hospital_trust_name'])]
-        ordering = ['-hospital_trust_name']
         verbose_name = 'hospital trust'
         verbose_name_plural = 'hospital trusts'
 

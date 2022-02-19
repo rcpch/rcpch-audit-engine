@@ -39,7 +39,6 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
 
 
     class Meta:
-        ordering=['antiepilepsy_medicine_type', 'antiepilepsy_medicine_type_other'],
         verbose_name="antiepilepsy medicine",
         verbose_name_plural="antiepilepsy medicines"
     

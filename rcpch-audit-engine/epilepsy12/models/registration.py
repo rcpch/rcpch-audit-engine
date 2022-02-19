@@ -78,7 +78,6 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
 
     class Meta:
-        ordering = ['registration_date']
         verbose_name = 'Registration',
         verbose_name_plural="Registrations"
         

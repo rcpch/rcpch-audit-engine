@@ -19,8 +19,8 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
     mri_brain_date=models.DateField()
     class Meta:
-        ordering = ['pk']
         verbose_name = 'investigations'
+        verbose_name_plural='investigations'
     
     def __str__(self) -> str:
         return self.eeg_request_date

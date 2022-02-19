@@ -77,7 +77,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     class Meta:
         indexes=[models.Index(fields=['date_of_initial_assessment'])]
-        ordering = ['-date_of_initial_assessment']
         verbose_name = 'initial assessment'
         verbose_name_plural = 'initial assessments'
 

@@ -92,7 +92,6 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     class Meta:
         indexes=[models.Index(fields=['case_uuid'])]
-        ordering = ['-surname']
         verbose_name = 'child or young person'
         verbose_name_plural = 'children and young people'
 

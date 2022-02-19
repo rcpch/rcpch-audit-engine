@@ -134,7 +134,6 @@ class SeizureType(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        ordering = ['epileptic_seizure_type']
         verbose_name = 'Main type of seizure(s)',
         verbose_name_plural="Main types of seizure(s)"
         

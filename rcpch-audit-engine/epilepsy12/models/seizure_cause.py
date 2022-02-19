@@ -97,7 +97,6 @@ class SeizureCause(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        ordering = ['seizure_cause_main']
         verbose_name = 'Main cause of seizure(s)',
         verbose_name_plural="Main causes of seizure(s)"
         
