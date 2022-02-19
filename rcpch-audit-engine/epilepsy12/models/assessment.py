@@ -33,7 +33,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         "Has a rescue medicine been prescribed?",
         default=False, 
     )
-    does_the_child_have_any_of_the_childrens_epilepsy_surgical_service_referral_criteria=models.BooleanField(
+    childrens_epilepsy_surgical_service_referral_criteria_met=models.BooleanField(
         "Have the criteria for referral to a children's epilepsy surgery service been met?",
         default=False
     )

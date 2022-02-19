@@ -39,7 +39,7 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     when_the_first_epileptic_episode_occurred=models.DateField(
         "what is the date that the first epileptic episode occurred?"
     )
-    has_frequency_or_number_of_episodes_since_the_first_episode_been_documented=models.BooleanField(
+    has_number_of_episodes_since_the_first_been_documented=models.BooleanField(
         "has the frequency of episodes since the first recorded been documented?",
         default=False
     )
