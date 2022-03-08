@@ -96,6 +96,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*live.env
+*development.env
 
 # mypy
 .mypy_cache/
