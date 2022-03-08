@@ -2,7 +2,7 @@
 
 ## National clinical audits, as a backend, API and client-side
 
-### Designed and built by the RCPCH, by clinicians for clinicians.
+### Designed and built by the RCPCH, by clinicians for clinicians
 
 <p align="center">
     <p align="center"></p>
@@ -28,7 +28,7 @@ rcpch-audit-engine is a (Django)[https://www.djangoproject.com/] 4.0 project whi
 1. If you don't have python 3.10 installed already, you will need it and [pyenv](https://github.com/pyenv/pyenv).
 
 ```console
-foobar:~foo$ pyenv 3.10.0
+foobar:~foo$ pyenv install 3.10.0
 ```
 
 If you have Homebrew, it does not always play well with pyenv and you might need first to:
@@ -74,7 +74,7 @@ foobar:~foo$ createdb epilepsy12-db
 ## Prepare the database for use
 
 ```console
-foobar:~foo$ start/migrate
+foobar:~foo$ s/migrate
 ```
 
 ## Running the server
@@ -82,7 +82,7 @@ foobar:~foo$ start/migrate
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-foobar:~foo$ start/runserver
+foobar:~foo$ s/runserver
 ```
 
 or
@@ -90,5 +90,5 @@ or
 you may need to allow permissions to run the bash script in that folder first:
 
 ```console
-foobar:~foo$ chmod +x ./start/runserver
+foobar:~foo$ chmod +x ./s/runserver
 ```
