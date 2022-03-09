@@ -3,13 +3,15 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .case import Case
+from .registration import Registration
 from .assessment import Assessment
 from. epilepsy_context import EpilepsyContext
 
 class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
-    This class records information about each seizure episode.
+    This class records information about the initial assessment.
+    Whilst other information about the child and their epilepsy may be captured across the audit year
+    in the assessment table, this information MUST be collected at the first visit.
     This class references the Case class as a case can have multiple episodes.
     This class references the EEG class as an episode can have multiple EEGs
 
@@ -59,15 +61,12 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         "are there any behaviour or emotional comorbid conditions present?",
         default=False
     )
-    case = models.OneToOneField(
-        Case,
-        on_delete=models.DO_NOTHING,
-        verbose_name="related case"
-    )
-    assessment=models.OneToOneField(
-        Assessment,
-        on_delete=models.DO_NOTHING,
-        verbose_name="related assessment"
+
+    # relationships
+    registration=models.OneToOneField(
+        Registration,
+        on_delete=models.CASCADE,
+        verbose_name="Related Registration"
     )
     epilepsy_context=models.OneToOneField( 
         EpilepsyContext,

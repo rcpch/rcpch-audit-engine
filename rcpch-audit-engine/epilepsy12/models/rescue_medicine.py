@@ -1,6 +1,8 @@
 from django.db import models
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
+
+from .assessment import Assessment
 class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information on rescue medicines used.
@@ -28,6 +30,13 @@ class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     rescue_medicine_notes=models.CharField(
         "additional notes relating to rescue medication.",
         max_length=250
+    )
+
+    # relationships
+    assessment = models.ForeignKey(
+        Assessment,
+        related_name="assessment",
+        on_delete=models.CASCADE
     )
 
     class Meta:

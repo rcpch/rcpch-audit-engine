@@ -3,12 +3,10 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .antiepilepsy_medicine import AntiEpilepsyMedicine
 from .electroclinical_syndrome import ElectroClinicalSyndrome
 from .investigations import Investigations
 from .nonepilepsy import NonEpilepsy
 from .registration import Registration
-from .rescue_medicine import RescueMedicine
 from .seizure_cause import SeizureCause
 
 class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
@@ -93,10 +91,6 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     # relationships
-    antiepilepsy_medicines=models.ManyToManyField(
-        AntiEpilepsyMedicine,
-        verbose_name="list of antiepilepsy medicines"
-    )
     electroclinical_syndrome=models.OneToOneField(
         ElectroClinicalSyndrome,
         on_delete=models.CASCADE,
@@ -109,16 +103,13 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
     registration = models.OneToOneField(
         Registration,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         verbose_name="related registration"
     )
-    rescue_medicines=models.ManyToManyField(
-        RescueMedicine,
-        verbose_name="list of rescue medicines"
-    )
-    seizure_causes=models.ManyToManyField(
+    seizure_causes=models.OneToOneField(
         SeizureCause,
-        verbose_name="list of seizure causes"
+        on_delete=CASCADE,
+        verbose_name="seizure causes"
     )
     nonepilepsy=models.OneToOneField(
         NonEpilepsy,

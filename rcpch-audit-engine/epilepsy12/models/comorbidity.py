@@ -4,7 +4,7 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .case import Case
+from .assessment import Assessment
 
 class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
@@ -28,9 +28,9 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     ) # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
 
     # relationships
-    case = models.ForeignKey(
-        Case,
-        on_delete=CASCADE,
+    assessment = models.ForeignKey(
+        Assessment,
+        on_delete=CASCADE
     )
 
     class Meta:

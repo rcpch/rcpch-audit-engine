@@ -7,7 +7,10 @@ class ElectroClinicalSyndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseC
     It references the episode class, since one episode can have features of a single electroclinical syndrome.
     """
     electroclinical_syndrome=models.IntegerField(choices=ELECTROCLINICAL_SYNDROMES)
-    electroclinical_sydrome_other=models.CharField(max_length=250)
+    electroclinical_sydrome_other=models.CharField(
+        default=None,
+        max_length=250
+    )
 
     class Meta:
         verbose_name="electroclinical syndrome",

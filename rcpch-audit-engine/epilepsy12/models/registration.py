@@ -9,10 +9,7 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .hospital_trust import HospitalTrust
 from .case import Case
-from .site import Site
-
 class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     A record is created in the Registration class every time a case is registered for the audit
@@ -49,18 +46,10 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # relationships
     case=models.ForeignKey(
         Case, 
-        on_delete=CASCADE
-    )
-    referring_hospital = models.ForeignKey(
-        HospitalTrust, 
         on_delete=CASCADE,
-        verbose_name="Name of referring hospital"
+        verbose_name="Related child/young person"
     )
-    site=models.ForeignKey(
-        Site, 
-        on_delete=CASCADE
-    )
-    locked_by = models.ForeignKey(
+    locked_by = models.OneToOneField(
         User, 
         on_delete=CASCADE,
         verbose_name="The user who locked the registration from further data entry."

@@ -4,8 +4,7 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .case import Case
-from .hospital_trust import HospitalTrust
+from .registration import Registration
 
 class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
@@ -18,17 +17,11 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         default=False,
         unique=True
     )
-    case = models.ForeignKey(
-        Case,
-        on_delete=CASCADE
-    )
-
+    
     # Relationships
-    hospital_trust=models.ForeignKey(
-        HospitalTrust, 
-        on_delete=models.CASCADE,
-        related_name='hospital_trust',
-        related_query_name='hospitals'
+    registration = models.ForeignKey(
+        Registration,
+        on_delete=CASCADE
     )
     class Meta:
         verbose_name = 'site'

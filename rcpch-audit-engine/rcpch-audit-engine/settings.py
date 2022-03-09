@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'rcpch-audit-engine.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('E12_DATABASE_NAME'),
-        'USER': os.environ.get('E12_USER'),
-        'PASSWORD': os.environ.get('E12_PASSWORD'),
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
