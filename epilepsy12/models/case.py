@@ -4,9 +4,12 @@ from django.db.models.fields import CharField, DateField
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 import uuid
+
+from django.forms import IntegerField
 from ..constants import *
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
+
 
 class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
@@ -25,14 +28,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     ?analysis flag
     """
-    case_uuid=models.UUIDField(
-        "Unique case identifier",
-        primary_key=True, 
-        default=uuid.uuid4, 
-        editable=False
-    )
-    locked=models.BooleanField( # this determines if the case is locked from editing ? are cases or only registrations locked?
-        "Locked", 
+    # case_uuid=models.UUIDField(
+    #     "Unique case identifier",
+    #     primary_key=True,
+    #     default=uuid.uuid4,
+    #     editable=False
+    # )
+    locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
+        "Locked",
         default=False
     )
     locked_at = models.DateTimeField(
@@ -40,60 +43,61 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         auto_now_add=True
     )
     locked_by = models.ForeignKey(
-        User, 
+        User,
         on_delete=CASCADE,
-        verbose_name="locked by"
+        verbose_name="locked by",
+        default=None
     )
     nhs_patient = models.BooleanField(
         "Is an NHS patient?"
     )
-    nhs_number = models.IntegerField( # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
+    nhs_number = models.IntegerField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
         "NHS Number",
-        validators=[MinLengthValidator( # should be other validation before saving - need to strip out spaces
-            limit_value=10,
-            message="The NHS number must be 10 digits long."
-        )]
-    ) # TODO #13 NHS Number must be hidden - use case_uuid as proxy
-    first_name=CharField(
+        # validators=[MinLengthValidator(  # should be other validation before saving - need to strip out spaces
+        #     limit_value=10,
+        #     message="The NHS number must be 10 digits long."
+        # )]
+    )  # TODO #13 NHS Number must be hidden - use case_uuid as proxy
+    first_name = CharField(
         "first name",
         max_length=100
     )
-    surname=CharField(
+    surname = CharField(
         "surname",
         max_length=100
     )
-    gender=CharField(
-        "gender",
-        max_length=2,
+    gender = models.IntegerField(
         choices=SEX_TYPE
     )
-    date_of_birth=DateField(
+    date_of_birth = DateField(
         "date of birth (YYYY-MM-DD)"
     )
-    postcode=CharField(
+    postcode = CharField(
         "postcode",
         max_length=7,
-        validators=[validate_postcode]
+        # validators=[validate_postcode]
     )
-    
-    ethnicity=CharField(
+
+    ethnicity = CharField(
         max_length=4,
         choices=ETHNICITIES
     )
 
-    def _imd_quintile_from_postcode(self)->int:
-        "index of multiple deprivation calculated from MySociety data.",
-        if (self.postcode):
-            postcode=validate_postcode(self.postcode)
-            imd_quintile=imd_for_postcode(postcode)
-            return imd_quintile
+    # This field requires the deprivare api to be running
+    # def _imd_quintile_from_postcode(self) -> int:
+    #     "index of multiple deprivation calculated from MySociety data.",
+    #     if (self.postcode):
+    #         postcode = valid_postcode(self.postcode)
+    #         imd_quintile = imd_for_postcode(postcode)
+    #         return imd_quintile
 
-    index_of_multiple_deprivation_quintile=property(_imd_quintile_from_postcode)
+    # index_of_multiple_deprivation_quintile = property(
+    #     _imd_quintile_from_postcode)
 
     class Meta:
-        indexes=[models.Index(fields=['case_uuid'])]
-        verbose_name = 'child or young person'
-        verbose_name_plural = 'children and young people'
+        # indexes = [models.Index(fields=['case_uuid'])]
+        verbose_name = 'case'
+        verbose_name_plural = 'cases'
 
     def __str__(self) -> str:
-        return self.hospital_trust_name
+        return self.first_name + " " + self.surname

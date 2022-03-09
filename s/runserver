@@ -2,4 +2,4 @@
 
 # Starts the development audit engine with reload on port 8080
 
-python rcpch-audit-engine/manage.py runserver
+python manage.py runserver

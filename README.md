@@ -59,26 +59,13 @@ foobar:~foo$ pip install -r requirements/development-requirements
 
 ### Running the database
 
-We advise running the postgresql database from within Docker on port 5432, the default for Django
-
 ```command
-foobar:~foo$ docker run --name [container_name] -e POSTGRES_USER=username -e POSTGRES_PASSWORD=[mysecretpassword] -p 5432:5432 -d postgres
-```
-
-## Connect to the docker container
-
-```console
-foobar:~foo$ docker exec -it [container_name] bash
-root@175d895153ab:/#  psql -U [username]
+foobar:~foo$ docker run --name epilepsy12-mongo-docker -p 27017:27017 -d mongo:latest
 ```
 
 ## Create the database
 
 ```console
-psql (14.0 (Debian 14.0-1.pgdg110+1))
-Type "help" for help.
-
-epilepsy12user=# CREATE DATABASE epilepsy12db;
 ```
 
 ## Prepare the database for use
@@ -101,6 +88,12 @@ you may need to allow permissions to run the bash script in that folder first:
 
 ```console
 foobar:~foo$ chmod +x ./s/runserver
+```
+
+## Create superuser to enable logging into admin section
+
+```console
+python manage.py createsuperuser
 ```
 
 ##  Stated Aims of the Audit
