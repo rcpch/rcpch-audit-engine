@@ -96,6 +96,10 @@ foobar:~foo$ chmod +x ./s/runserver
 python manage.py createsuperuser
 ```
 
+Then follow the command line prompts to create the first user
+
+Further users can subsequently be created in the Admin UI
+
 ##  Stated Aims of the Audit
 
 * Continue to measure and improve care and outcomes for children and young people with

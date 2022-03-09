@@ -42,7 +42,8 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     diagnostic_status = models.CharField(  # This currently essential - used to exclude nonepilepic kids
         max_length=1,
         choices=DIAGNOSTIC_STATUS,
-        verbose_name="Status of epilepsy diagnosis. Must have epilepsy or probable epilepsy to be included."
+        verbose_name="Status of epilepsy diagnosis. Must have epilepsy or probable epilepsy to be included.",
+        default=None
     )
 
     # relationships
