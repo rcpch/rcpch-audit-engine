@@ -1,19 +1,39 @@
 {% extends "base.html" %} {% load static %} {% block content %}
-<h1>Hospital Route</h1>
-{% if case_list %}
-<ul>
-  {% for case in case_list %}
-  <li>
-    <a href="{% url 'update' id=case.id%}">Case ID: {{ case.id }}</a>
-    {{case.first_name}} {{case.surname}} {{case.gender}} {{case.date_of_birth}}
-    {{case.nhs_number}}
-  </li>
-  {% endfor %}
-</ul>
-{% else %}
-<p>There are no cases yet</p>
-<div class="ui button">Add a new case</div>
-{% endif %}
+<h1>Hospital or Community Data Entry</h1>
 <hr />
-<a href="{% url 'create'%}">link to create a form</a>
-{% endblock %}
+{% if case_list %}
+<div class="ui raised segment">
+  <table class="ui very basic collapsing celled table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Date of Birth</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>NHS Number</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case in case_list %}
+      <tr>
+        <td>
+          <a href="{% url 'update' id=case.id%}">Case ID: {{ case.id }}</a>
+        </td>
+        <td>{{case.first_name}} {{case.surname}}</td>
+        <td>{{case.date_of_birth}}</td>
+        <td>age</td>
+        <td>{{case.gender}}</td>
+        <td>{{case.nhs_number}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>There are no cases yet</p>
+  <div class="ui button">Add a new case</div>
+  {% endif %}
+  <hr />
+  <a href="{% url 'create'%}">Add a new Child/Young Person</a>
+  {% endblock %}
+</div>
