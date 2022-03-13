@@ -1,10 +1,12 @@
 from dateutil import relativedelta
+from typing import Optional, Iterable
 import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
+from django.forms import IntegerField
 
 from ..constants import *
 from ..general_functions import *
@@ -78,6 +80,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         choices=ETHNICITIES
     )
 
+    index_of_multiple_deprivation_quintile = models.PositiveSmallIntegerField(
+        # this is a calculated field - it relies on the availability of the Deprivare server running
+        # A quintile is calculated on save and persisted in the database
+        "index of multiple deprivation calculated from MySociety data.",
+        blank=True,
+        editable=False
+    )
+
     @property
     def age(self):
         today = date.today()
@@ -132,16 +142,16 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
                         final += 'Happy birthday'
         return final
 
-    # This field requires the deprivare api to be running
-    def imd_quintile_from_postcode(self) -> int:
-        "index of multiple deprivation calculated from MySociety data.",
-        if (self.postcode):
-            # postcode = valid_postcode(self.postcode)
-            imd_quintile = imd_for_postcode(self.postcode)
-            return imd_quintile
+    def save(
+            self,
+            *args, **kwargs) -> None:
+
+        # This field requires the deprivare api to be running
+        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+            self.postcode)
+        return super().save(*args, **kwargs)
 
     class Meta:
-        # indexes = [models.Index(fields=['case_uuid'])]
         verbose_name = 'case'
         verbose_name_plural = 'cases'
 

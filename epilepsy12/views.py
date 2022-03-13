@@ -14,6 +14,7 @@ class CaseListView(ListView):
 
     def get_context_data(self, **kwargs):
         context['case_list'] = Case.objects.all()
+        context['gender'] = Case.get_gender_display()
         return context
 
 

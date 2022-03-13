@@ -1,5 +1,6 @@
 from django import forms
 from .models import Case
+from .constants import *
 
 
 class CaseForm(forms.ModelForm):
@@ -28,14 +29,10 @@ class CaseForm(forms.ModelForm):
             }
         )
     )
-    gender = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "gender",
-                "type": "text"
-            }
-        )
+    gender = forms.ChoiceField(
+        choices=SEX_TYPE,
+        widget=forms.Select(),
+        required=True
     )
     nhs_number = forms.CharField(
         widget=forms.TextInput(
