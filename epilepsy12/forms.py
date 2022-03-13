@@ -46,9 +46,18 @@ class CaseForm(forms.ModelForm):
             }
         )
     )
+    postcode = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Postcode",
+                "type": "text"
+            }
+        )
+    )
 
     class Meta:
         model = Case
         fields = [
-            'first_name', 'surname', 'date_of_birth', 'gender', 'nhs_number'
+            'first_name', 'surname', 'date_of_birth', 'gender', 'nhs_number', 'postcode'
         ]

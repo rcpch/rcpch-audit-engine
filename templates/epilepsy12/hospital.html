@@ -12,6 +12,8 @@
         <th>Age</th>
         <th>Gender</th>
         <th>NHS Number</th>
+        <th>Index of Multiple Deprivation (quintile)</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -25,15 +27,20 @@
         <td>{{case.age}}</td>
         <td>{{case.gender}}</td>
         <td>{{case.nhs_number}}</td>
+        <td>{{case.imd_quintile_from_postcode}}</td>
+        <td>
+          <a href="{% url 'update' id=case.id%}"><button class="ui green icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+          <a href="{% url 'delete' id=case.id%}"><button class="ui red icon button" tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
   <p>There are no cases yet</p>
-  <div class="ui button">Add a new case</div>
+  <div class="ui button" a href="{% url 'create'%}">Add a new case</div>
   {% endif %}
   <hr />
-  <a href="{% url 'create'%}">Add a new Child/Young Person</a>
+  <a href="{% url 'create'%}"><button class="ui green button">Add a new Child/Young Person</button></a>
 </div>
 {% endblock %}

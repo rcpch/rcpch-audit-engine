@@ -69,7 +69,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
     postcode = CharField(
         "postcode",
-        max_length=7,
+        max_length=8,
         # validators=[validate_postcode]
     )
 
@@ -87,7 +87,6 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         years = calculated_age.years
         weeks = calculated_age.weeks
         days = calculated_age.days
-        print(years, months, weeks, days, date.today(), self.date_of_birth)
         final = ''
         if years == 1:
             final += f'{calculated_age.years} year'
@@ -134,11 +133,11 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         return final
 
     # This field requires the deprivare api to be running
-    def _imd_quintile_from_postcode(self) -> int:
+    def imd_quintile_from_postcode(self) -> int:
         "index of multiple deprivation calculated from MySociety data.",
         if (self.postcode):
-            postcode = valid_postcode(self.postcode)
-            imd_quintile = imd_for_postcode(postcode)
+            # postcode = valid_postcode(self.postcode)
+            imd_quintile = imd_for_postcode(self.postcode)
             return imd_quintile
 
     class Meta:

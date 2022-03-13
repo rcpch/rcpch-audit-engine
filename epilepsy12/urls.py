@@ -9,6 +9,7 @@ urlpatterns = [
     path('hospital', views.hospital, name="hospital"),
     path('case/<int:id>', views.update, name="update"),
     path('case/create', views.create, name="create"),
+    path('case/<int:id>/delete', views.delete, name="delete"),
     path('eeg', views.eeg, name="eeg"),
     path('patient', views.patient, name="patient")
 ]

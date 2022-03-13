@@ -35,16 +35,26 @@
         <div class="ui pointing red basic label">{{form.gender.errors}}</div>
         {% endif %}
       </div>
-      <div class="field">
-        <label>NHS Number</label>
-        {{form.nhs_number}} {% if form.nhs_number.errors %}
-        <div class="ui pointing red basic label">
-          {{form.nhs_number.errors}}
+      <div class="two fields">
+        <div class="field">
+          <label>Postcode</label>
+          {{form.postcode}} {% if form.postcode.errors %}
+          <div class="ui pointing red basic label">
+            {{form.postcode.errors}}
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
+        <div class="field">
+          <label>NHS Number</label>
+          {{form.nhs_number}} {% if form.nhs_number.errors %}
+          <div class="ui pointing red basic label">
+            {{form.nhs_number.errors}}
+          </div>
+          {% endif %}
+        </div>
       </div>
-      <button type="submit" class="ui green button">Save</button>
-      <button type="submit" class="ui red button">Delete</button>
+      <button type="submit" class="ui green button" name="update">Save</button>
+      <button type="submit" class="ui red button" name="delete">Delete</button>
       <button type="submit" class="ui blue button">Cancel</button>
     </form>
     {% endblock %}

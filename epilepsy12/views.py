@@ -45,6 +45,7 @@ def hospital(request):
 
 
 def create(request):
+
     form = CaseForm(request.POST or None)
 
     if request.method == "POST":
@@ -62,6 +63,9 @@ def update(request, id):
     form = CaseForm(instance=case)
 
     if request.method == "POST":
+        if ('delete') in request.POST:
+            case.delete()
+            return redirect('hospital')
         form = CaseForm(request.POST, instance=case)
         if form.is_valid:
             form.save()
@@ -72,6 +76,12 @@ def update(request, id):
     }
 
     return render(request=request, template_name='epilepsy12/createcase.html', context=context)
+
+
+def delete(request, id):
+    case = get_object_or_404(Case, id=id)
+    case.delete()
+    return redirect('hospital')
 
 
 def eeg(request):
