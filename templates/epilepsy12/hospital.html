@@ -18,7 +18,7 @@
       {% for case in case_list %}
       <tr>
         <td>
-          <a href="{% url 'update' id=case.id%}">Case ID: {{ case.id }}</a>
+          <a href="{% url 'update' id=case.id%}">{{ case.id }}</a>
         </td>
         <td>{{case.first_name}} {{case.surname}}</td>
         <td>{{case.date_of_birth}}</td>
@@ -35,5 +35,5 @@
   {% endif %}
   <hr />
   <a href="{% url 'create'%}">Add a new Child/Young Person</a>
-  {% endblock %}
 </div>
+{% endblock %}
