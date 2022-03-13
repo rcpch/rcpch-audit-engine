@@ -13,7 +13,7 @@ class CaseListView(ListView):
     context_object_name = 'epilepsy12_cases'
 
     def get_context_data(self, **kwargs):
-        context['cases_list'] = Case.objects.all()
+        context['case_list'] = Case.objects.all()
         return context
 
 
@@ -38,6 +38,7 @@ def database(request):
 
 def hospital(request):
     case_list = Case.objects.order_by('surname')[:10]
+
     context = {'case_list': case_list}
     template_name = 'epilepsy12/hospital.html'
     return render(request, template_name, context)
@@ -71,37 +72,6 @@ def update(request, id):
     }
 
     return render(request=request, template_name='epilepsy12/createcase.html', context=context)
-
-
-# def case(request, id):
-#     case = Case.objects.get(id=id)
-#     context = {
-#         'selected_case': case,
-#         'date_of_birth': case.date_of_birth.strftime('%Y-%m-%d')
-#     }
-#     template_name = 'epilepsy12/case.html'
-
-#     if (request.method == "GET"):
-#         case = Case.objects.get(id=id)
-#         context = {
-#             'selected_case': case,
-#             'date_of_birth': case.date_of_birth.strftime('%Y-%m-%d')
-#         }
-#         template_name = 'epilepsy12/case.html'
-#         return render(request, template_name=template_name, context=context)
-
-#     elif(request.method == "POST"):
-#         if 'update' in request.POST:
-#             # need to update database here
-#             return render(request, template_name=template_name, context=context)
-#         elif 'delete' in request.POST:
-#             # need to delete record here
-#             return render(request, template_name=template_name, context=context)
-#         else:
-#             return
-#     else:
-#         # must be PUT or some other type
-#         return
 
 
 def eeg(request):

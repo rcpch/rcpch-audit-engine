@@ -1,11 +1,11 @@
+from dateutil import relativedelta
+import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
-import uuid
 
-from django.forms import IntegerField
 from ..constants import *
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
@@ -78,16 +78,68 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         choices=ETHNICITIES
     )
 
-    # This field requires the deprivare api to be running
-    # def _imd_quintile_from_postcode(self) -> int:
-    #     "index of multiple deprivation calculated from MySociety data.",
-    #     if (self.postcode):
-    #         postcode = valid_postcode(self.postcode)
-    #         imd_quintile = imd_for_postcode(postcode)
-    #         return imd_quintile
+    @property
+    def age(self):
+        today = date.today()
+        calculated_age = relativedelta.relativedelta(
+            today, self.date_of_birth)
+        months = calculated_age.months
+        years = calculated_age.years
+        weeks = calculated_age.weeks
+        days = calculated_age.days
+        print(years, months, weeks, days, date.today(), self.date_of_birth)
+        final = ''
+        if years == 1:
+            final += f'{calculated_age.years} year'
+            if (months/12) - years == 1:
+                final += f'{months} month'
+            elif (months/12)-years > 1:
+                final += f'{math.floor((months*12)-years)} months'
+            else:
+                return final
 
-    # index_of_multiple_deprivation_quintile = property(
-    #     _imd_quintile_from_postcode)
+        elif years > 1:
+            final += f'{calculated_age.years} years'
+            if (months/12) - years == 1:
+                final += f', {months} month'
+            elif (months/12)-years > 1:
+                final += f', {math.floor((months*12)-years)} months'
+            else:
+                return final
+        else:
+            # under a year of age
+            if months == 1:
+                final += f'{months} month'
+            elif months > 0:
+                final += f'{months} months, '
+                if weeks >= (months*4):
+                    if (weeks-(months*4)) == 1:
+                        final += '1 week'
+                    else:
+                        final += f'{math.floor(weeks-(months*4))} weeks'
+            else:
+                if weeks > 0:
+                    if weeks == 1:
+                        final += f'{math.floor(weeks)} week'
+                    else:
+                        final += f'{math.floor(weeks)} weeks'
+                else:
+                    if days > 0:
+                        if days == 1:
+                            final += f'{math.floor(days)} day'
+                        if days > 1:
+                            final += f'{math.floor(days)} days'
+                    else:
+                        final += 'Happy birthday'
+        return final
+
+    # This field requires the deprivare api to be running
+    def _imd_quintile_from_postcode(self) -> int:
+        "index of multiple deprivation calculated from MySociety data.",
+        if (self.postcode):
+            postcode = valid_postcode(self.postcode)
+            imd_quintile = imd_for_postcode(postcode)
+            return imd_quintile
 
     class Meta:
         # indexes = [models.Index(fields=['case_uuid'])]
