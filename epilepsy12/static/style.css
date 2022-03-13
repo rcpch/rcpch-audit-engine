@@ -1,41 +1,44 @@
-h1, h2, h3 {
-    color: black;
+h1,
+h2,
+h3 {
+  color: black;
 }
 
-.card .image{
-    background: black !important;
-    padding: 40px;
+.card .image {
+  background: black !important;
+  padding: 40px;
 }
 
-.icon{
-    text-align:center;
+.icon {
+  text-align: center;
 }
 
 .ui.button {
-    background-color: #11a7f2;
+  background-color: #11a7f2;
 }
 .ui.button:hover {
-    background-color: #3366cc;
+  background-color: #3366cc;
 }
 .icon {
-    color: #47a7ec;
+  color: #47a7ec;
 }
 
 #logo {
-    color: black;
+  color: black;
 }
 
 .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    margin-top: 0;
-    display: block;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
 }
 
 .ui.footer.segment {
-    margin: 5em 0em 0em;
-    padding: 5em 0em;
-  }
+  margin: 5em 0em 0em;
+  padding: 5em 0em;
+}
+
+.ui.label {
+  list-style: none;
+}

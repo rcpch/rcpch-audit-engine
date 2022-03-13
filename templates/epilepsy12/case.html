@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="ui raised segment">
+  <form class="ui form" method="post">
+    {% csrf_token %}
+    <h4 class="ui dividing header">Child or Young Person</h4>
+    <div class="field">
+      <label>Name</label>
+      <div class="two fields">
+        <div class="field">
+          <label>First Name</label>
+          <input
+            type="text"
+            name="first_name"
+            placeholder="First Name"
+            value="{{selected_case.first_name}}"
+          />
+        </div>
+        <div class="field">
+          <label>Surname</label>
+          <input
+            type="text"
+            name="second_name"
+            placeholder="Surname"
+            value="{{selected_case.surname}}"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="fields">
+        <div class="six wide field">
+          <label>NHS Number</label>
+          <input
+            type="text"
+            name="nhs_number"
+            placeholder="123 456 7890"
+            value="{{selected_case.nhs_number}}"
+          />
+        </div>
+        <div class="four wide field">
+          <label>Date of Birth</label>
+          <input
+            type="date"
+            name="gender"
+            placeholder="Date of Birth"
+            value="{{date_of_birth}}"
+          />
+        </div>
+        <div class="four wide field">
+          <label>Gender</label>
+          <input
+            type="text"
+            name="gender"
+            placeholder="male"
+            value="{{selected_case.gender}}"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="ui container">
+      <button class="ui button blue" name="update" type="submit" value="update">
+        Save
+      </button>
+      <button class="ui button red" name="delete" type="submit">Delete</button>
+      <a href={% url 'hospital' %}><button class="ui button green" name="cancel" value="cancel"></a>
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

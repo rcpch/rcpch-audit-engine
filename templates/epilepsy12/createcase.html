@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="ui raised segment">
+  <div class="ui container">
+    <form class="ui form" method="post">
+      {% csrf_token %}
+      <div class="two fields">
+        <div class="field">
+          <label>First Name</label>
+          <div class="field">{{form.first_name}}</div>
+          {% if form.first_name.errors %}
+          <div class="ui pointing red basic label">
+            {{form.first_name.errors}}
+          </div>
+          {% endif %}
+        </div>
+        <div class="field">
+          <label>Surname</label>
+          <div class="field">{{form.surname}}</div>
+          {% if form.surname.errors %}
+          <div class="ui pointing red basic label">{{form.surname.errors}}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="field">
+        <label>Date of Birth</label>
+        {{form.date_of_birth}} {% if form.date_of_birth.errors %}
+        <div class="ui pointing red basic label">
+          {{form.date_of_birth.errors}}
+        </div>
+        {% endif %}
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        {{form.gender}} {% if form.gender.errors %}
+        <div class="ui pointing red basic label">{{form.gender.errors}}</div>
+        {% endif %}
+      </div>
+      <div class="field">
+        <label>NHS Number</label>
+        {{form.nhs_number}} {% if form.nhs_number.errors %}
+        <div class="ui pointing red basic label">
+          {{form.nhs_number.errors}}
+        </div>
+        {% endif %}
+      </div>
+      <button type="submit" class="ui green button">Save</button>
+      <button type="submit" class="ui red button">Delete</button>
+      <button type="submit" class="ui blue button">Cancel</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

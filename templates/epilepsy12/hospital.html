@@ -1,20 +1,19 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block content %}
 <h1>Hospital Route</h1>
-    {% if case_list %}
-        <ul>
-            {% for case in case_list %}
-                <li>
-                    <a href="{% url 'hospital' case.case_uuid %}">{{case.first_name}} {{case.surname}}</a>
-                        {{case.gender}} {{case.date_of_birth}} {{case.nhs_number}}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>There are no cases yet</p>
-        <div class="ui button">
-            Add a new case
-        </div>
-    {% endif %}
+{% if case_list %}
+<ul>
+  {% for case in case_list %}
+  <li>
+    <a href="{% url 'update' id=case.id%}">Case ID: {{ case.id }}</a>
+    {{case.first_name}} {{case.surname}} {{case.gender}} {{case.date_of_birth}}
+    {{case.nhs_number}}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>There are no cases yet</p>
+<div class="ui button">Add a new case</div>
+{% endif %}
+<hr />
+<a href="{% url 'create'%}">link to create a form</a>
 {% endblock %}

@@ -19,87 +19,88 @@
     </div>
 
 </div>
+
 <div class="ui four stackable cards">
-        <div class="ui raised card">
-            
-            <div class="content">
-                <div class="header">Database Management</div>
-                <div class="meta">
-                <span class="category">Administrator Access</span>
-                </div>
-                <div class="description">
-                <p></p>
-                </div>
-                <div class="center aligned image">
-                    <i class="huge database icon"></i>
-                </div>
+    <div class="ui raised card">
+        
+        <div class="content">
+            <div class="header">Database Management</div>
+            <div class="meta">
+            <span class="category">Administrator Access</span>
             </div>
-            <div class="extra content">
-                <a href={% url 'admin:index' %}>
-                    <button class="ui button" on>Select</button>
-                </a>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge database icon"></i>
             </div>
         </div>
-      
-        <div class="ui raised card">      
-            <div class="content">
-                <div class="header">Community and Hospital Clinicians</div>
-                <div class="meta">
-                <span class="category">Clinician Access</span>
-                </div>
-                <div class="description">
-                <p></p>
-                </div>
-                <div class="center aligned image">
-                    <i class="huge hospital outline icon"></i>
-                </div>
-            </div>
-            <div class="extra content">
-                <a href={% url 'hospital' %}>
-                    <button class="ui button" >Select</button>
-                </a> 
-            </div>
+        <div class="extra content">
+            <a href={% url 'admin:index' %}>
+                <button class="ui button" on>Select</button>
+            </a>
         </div>
-
-        <div class="ui raised card">
-            <div class="content">
-                <div class="header">EEG Department</div>
-                <div class="meta">
-                <span class="category">Clinician Access</span>
-                </div>
-                <div class="description">
-                <p></p>
-                </div>
-                <div class="center aligned image">
-                    <i class="huge stethoscope icon"></i>
-                </div>
-            </div>
-            <div class="extra content">
-                <a href={% url 'eeg' %}>
-                    <button class="ui button">Select</button>
-                </a>
-            </div>
-        </div>
-
-        <div class="ui raised card">
-            <div class="content">
-                <div class="header">Children and Families</div>
-                <div class="meta">
-                <span class="category">Patient Access</span>
-                </div>
-                <div class="description">
-                <p></p>
-                </div>
-                <div class="center aligned image">
-                    <i class="huge child icon"></i>
-                </div>
-            </div>
-            <div class="extra content">
-                <a href={% url 'patient' %}>
-                    <button class="ui button">Select</button>
-                </a>
-            </div>
-        </div>
-
     </div>
+    
+    <div class="ui raised card">      
+        <div class="content">
+            <div class="header">Community & Hospital</div>
+            <div class="meta">
+            <span class="category">Clinician Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge hospital outline icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'hospital' %}>
+                <button class="ui button" >Select</button>
+            </a> 
+        </div>
+    </div>
+
+    <div class="ui raised card">
+        <div class="content">
+            <div class="header">EEG Department</div>
+            <div class="meta">
+            <span class="category">Clinician Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge stethoscope icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'eeg' %}>
+                <button class="ui button">Select</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="ui raised card">
+        <div class="content">
+            <div class="header">Children and Families</div>
+            <div class="meta">
+            <span class="category">Patient Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge child icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'patient' %}>
+                <button class="ui button">Select</button>
+            </a>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

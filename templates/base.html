@@ -30,6 +30,7 @@
       color: #0d0d58;
       font-family: 'montserrat';
     }
+
   </style>
 
   <body id="root">
@@ -65,22 +66,23 @@
         
         {% block content %}
         {% endblock %}
-
+        
         <div class="ui red message">This site is currently under development.</div>
         
-        <div class="footer">
-          <div class="ui equal width centered middle aligned grid">
-            <div class="eight wide left floated left aligned column">
-              <i class="github icon"></i>
-                <a href="https://github.com/rcpch/epilepsy12-server">Follow us on Github</a>
-            </div>
-            <div class="eight wide right floated right aligned column">
-                <i class="copyright icon" id="logo"></i>
-                RCPCH 2021. All Rights Reserved
+        
+          <div class="ui container">
+            <div class="ui equal width centered middle aligned grid">
+              <div class="ui column">
+                <i class="github icon"></i>
+                  <a href="https://github.com/rcpch/epilepsy12-server">Follow us on Github</a>
+              </div>
+              <div class="ui right aligned column">
+                  <i class="copyright icon" id="logo"></i>
+                  RCPCH 2021. All Rights Reserved
+              </div>
             </div>
           </div>
-        </div>
-
+        
     </div>
           
         

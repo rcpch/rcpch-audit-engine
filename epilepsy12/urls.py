@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
     path('hospital', views.hospital, name="hospital"),
+    path('case/<int:id>', views.update, name="update"),
+    path('case/create', views.create, name="create"),
     path('eeg', views.eeg, name="eeg"),
     path('patient', views.patient, name="patient")
 ]

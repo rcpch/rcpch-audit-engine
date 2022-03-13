@@ -28,12 +28,6 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     ?analysis flag
     """
-    # case_uuid=models.UUIDField(
-    #     "Unique case identifier",
-    #     primary_key=True,
-    #     default=uuid.uuid4,
-    #     editable=False
-    # )
     locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
         "Locked",
         default=False
@@ -51,8 +45,9 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     nhs_patient = models.BooleanField(
         "Is an NHS patient?"
     )
-    nhs_number = models.IntegerField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
+    nhs_number = models.CharField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
         "NHS Number",
+        max_length=10
         # validators=[MinLengthValidator(  # should be other validation before saving - need to strip out spaces
         #     limit_value=10,
         #     message="The NHS number must be 10 digits long."
