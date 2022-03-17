@@ -2,6 +2,7 @@ from dateutil.relativedelta import relativedelta
 from django.db import models
 from .case import Case
 from ..constants import *
+from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
 
@@ -39,6 +40,11 @@ class Registration(models.Model):
         default=None
     )
 
+    cohort = models.PositiveSmallIntegerField(
+        default=None,
+        null=True
+    )
+
     # relationships
     case = models.OneToOneField(
         Case,
@@ -52,4 +58,5 @@ class Registration(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         self.registration_close_date = self.registration_date_one_year_on()
+        self.cohort = cohort_number_from_enrolment_date(self.registration_date)
         return super().save(*args, **kwargs)

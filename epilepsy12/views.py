@@ -15,7 +15,7 @@ def database(request):
 
 
 def hospital(request):
-    case_list = Case.objects.all()
+    case_list = Case.objects.all().order_by('surname')
     registered_cases = Registration.objects.all().count()
     case_count = Case.objects.all().count()
     context = {
