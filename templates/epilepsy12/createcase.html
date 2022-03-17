@@ -29,11 +29,22 @@
         </div>
         {% endif %}
       </div>
-      <div class="field">
-        <label>Gender</label>
-        {{form.gender}} {% if form.gender.errors %}
-        <div class="ui pointing red basic label">{{form.gender.errors}}</div>
-        {% endif %}
+      <div class="two fields">
+        <div class="field">
+          <label>Gender</label>
+          {{form.gender}} {% if form.gender.errors %}
+          <div class="ui pointing red basic label">{{form.gender.errors}}</div>
+          {% endif %}
+        </div>
+        <div class="field">
+          <label>Locked</label>
+          {{form.locked}} {% if form.locked.errors %}
+          <div class="ui pointing red basic label">{{form.locked.errors}}</div>
+          {% endif %}
+          {% if form.locked %}
+            <label>{{fom.locked_at}}</label>
+          {% endif %}
+        </div>
       </div>
       <div class="two fields">
         <div class="field">
@@ -52,6 +63,12 @@
           </div>
           {% endif %}
         </div>
+      </div>
+      <div class="field">
+        <label>Ethnicity</label>
+        {{form.ethnicity}} {% if form.ethnicity.errors %}
+        <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
+        {% endif %}
       </div>
       <button type="submit" class="ui green button" name="update">Save</button>
       <button type="submit" class="ui red button" name="delete">Delete</button>

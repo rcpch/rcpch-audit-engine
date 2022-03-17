@@ -1,6 +1,5 @@
-from operator import mod
+
 from django.db import models
-from django.db.models.deletion import CASCADE
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 

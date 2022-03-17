@@ -1,19 +1,17 @@
 from dateutil import relativedelta
-from typing import Optional, Iterable
 import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.contrib.auth.models import User
-from django.core.validators import MinLengthValidator
-from django.forms import IntegerField
+
 
 from ..constants import *
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
 
-class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class Case(models.Model):
     """
     This class holds information about each child or young person
     Each case is unique
@@ -30,23 +28,25 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     ?analysis flag
     """
+    # _id = models.ObjectIdField()
     locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
         "Locked",
         default=False
     )
     locked_at = models.DateTimeField(
         "Date record locked",
-        auto_now_add=True
+        null=True,
+        blank=True
     )
     locked_by = models.ForeignKey(
         User,
         on_delete=CASCADE,
         verbose_name="locked by",
-        default=None
+        null=True
     )
-    nhs_patient = models.BooleanField(
-        "Is an NHS patient?"
-    )
+    # nhs_patient = models.BooleanField(
+    #     "Is an NHS patient?"
+    # )
     nhs_number = models.CharField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
         "NHS Number",
         max_length=10

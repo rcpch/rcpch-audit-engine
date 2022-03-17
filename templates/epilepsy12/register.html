@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="ui raised segment">
+  <div class="ui container">
+    <form class="ui form" method="post">
+      {% csrf_token %}
+      
+        <div class="field">
+          <label>Registration Date</label>
+          <div class="field">{{form.registration_date}}</div>
+          {% if form.registration_date.errors %}
+          <div class="ui pointing red basic label">
+            {{form.registration_date.errors}}
+          </div>
+          {% endif %}
+        </div>
+        <label>{{form.registration_close_date}}</label>
+      
+        <div class="field">
+          <label>Referring Clinician</label>
+          {{form.referring_clinician}} {% if form.referring_clinician.errors %}
+          <div class="ui pointing red basic label">
+            {{form.referring_clinician.errors}}
+          </div>
+          {% endif %}
+        </div>
+      
+      <button type="submit" class="ui green button" name="update">Save</button>
+      <button type="submit" class="ui red button" name="delete">Delete</button>
+      <button type="submit" class="ui blue button">Cancel</button>
+    </form>
+    {% endblock %}
+  </div>
+</div>

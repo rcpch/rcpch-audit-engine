@@ -1,29 +1,11 @@
+body {
+  color: white;
+  font-family: "montserrat";
+}
+
 h1,
 h2,
 h3 {
-  color: black;
-}
-
-.card .image {
-  background: black !important;
-  padding: 40px;
-}
-
-.icon {
-  text-align: center;
-}
-
-.ui.button {
-  background-color: #11a7f2;
-}
-.ui.button:hover {
-  background-color: #3366cc;
-}
-.icon {
-  color: #47a7ec;
-}
-
-#logo {
   color: black;
 }
 
@@ -41,4 +23,8 @@ h3 {
 
 .ui.label {
   list-style: none;
+}
+
+#patient {
+  color: pink;
 }

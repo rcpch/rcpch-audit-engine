@@ -16,6 +16,7 @@ def imd_for_postcode(user_postcode: str) -> int:
 
     # TODO #26 validate the postcode, strip spaces
     postcode = user_postcode.replace(" ", "")
+
     url = "https://api.postcodes.io/postcodes/"+postcode
     response = requests.get(url=url)
 

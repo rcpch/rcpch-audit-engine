@@ -1,0 +1,90 @@
+{% extends "base.html" %}  {% block content %}
+
+
+<h1>Hospital or Community Data Entry</h1>
+<hr />
+<div class="ui raised segment">
+  {% if case_list.all %}
+    <table class="ui very basic celled table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Date of Birth</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Ethnicity</th>
+          <th>NHS Number</th>
+          <th>IMD (quintile)</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for case in case_list %}
+        <tr>
+          <td>
+            <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
+          </td>
+          <td>{{case.first_name}} {{case.surname}}</td>
+          <td>{{case.date_of_birth}}</td>
+          <td>{{case.age}}</td>
+          <td>{{case.get_gender_display}}</td>
+          <td>{{case.get_ethnicity_display}}</td>
+          <td>{{case.nhs_number}}</td>
+          <td>{{case.index_of_multiple_deprivation_quintile}}</td>
+          <td>
+            <div class="ui grid">
+              <div class="ui two wide column">
+                <a href="{% url 'update_case' id=case.id%}"><button class="ui mini green icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+              </div>
+              <div class="ui three wide column">
+                <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini red icon button"  tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
+              </div>
+              <div class="ui eleven wide column">
+                {% if case.registration %}
+                  <a href="{% url 'update_registration' case.id %}"><button class="ui mini blue button" tabindexed="2">Edit Registration</button></a>
+                {% else %}
+                  <a href="{% url 'register' id=case.id %}"><button class="ui mini blue button" tabindexed="2">Register</button></a>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td>
+            {% if case.locked %}<i class="lock icon" />{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>There are no cases yet</p>
+  {% endif %}
+  <hr />
+  <div class="ui grid">
+    <div class="ui twelve wide column">
+      <a href="{% url 'create_case'%}"><button class="ui green button">Add a new Child/Young Person</button></a>
+    </div>
+    <div class="ui four wide column">
+      <div class="ui two mini statistics">
+        <div class="blue statistic">
+          <div class="value">
+            {{total_cases}}
+          </div>
+          <div class="label">
+            Total
+          </div>
+        </div>
+        <div class="blue statistic">
+          <div class="value">
+            {{total_registrations}}
+          </div>
+          <div class="label">
+            Registered
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

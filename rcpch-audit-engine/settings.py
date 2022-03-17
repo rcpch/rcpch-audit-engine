@@ -81,14 +81,22 @@ WSGI_APPLICATION = 'rcpch-audit-engine.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    # 'default': {
 
-        'ENGINE': 'djongo',
-        'NAME': os.environ.get('E12_MONGO_DB_NAME'),
-        'CLIENT': {
-            'host': os.environ.get('E12_MONGO_DB_URL'),
-        },
-    },
+    #     'ENGINE': 'djongo',
+    #     'NAME': os.environ.get('E12_MONGO_DB_NAME'),
+    #     'CLIENT': {
+    #         'host': os.environ.get('E12_MONGO_DB_URL'),
+    #     },
+    # },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
 }
 
 

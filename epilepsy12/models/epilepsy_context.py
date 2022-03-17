@@ -10,6 +10,7 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     This class records contextual information that defines epilepsy risk.
     It references the InitialAssessment class, as each case optionally has a single epilepsy context.
     """
+
     previous_febrile_seizure = models.CharField(
         "has there been a previous febrile seizure?",
         max_length=2,

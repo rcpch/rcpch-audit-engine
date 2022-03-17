@@ -1,30 +1,7 @@
-from multiprocessing import context
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView, DetailView
+from django.shortcuts import render
 
-from epilepsy12.forms import CaseForm
-
-
+from .view_folder import *
 from .models import Case
-
-
-class CaseListView(ListView):
-    model = Case
-    context_object_name = 'epilepsy12_cases'
-
-    def get_context_data(self, **kwargs):
-        context['case_list'] = Case.objects.all()
-        context['gender'] = Case.get_gender_display()
-        return context
-
-
-class CaseDetailView(DetailView):
-
-    queryset = Case.objects.all()
-
-    def get_object(self):
-        # change fields in the record and save them
-        return super().get_object()
 
 
 def index(request):
@@ -38,51 +15,16 @@ def database(request):
 
 
 def hospital(request):
-    case_list = Case.objects.order_by('surname')[:10]
-
-    context = {'case_list': case_list}
-    template_name = 'epilepsy12/hospital.html'
+    case_list = Case.objects.all()
+    registered_cases = Registration.objects.all().count()
+    case_count = Case.objects.all().count()
+    context = {
+        'case_list': case_list,
+        'total_cases': case_count,
+        'total_registrations': registered_cases
+    }
+    template_name = 'epilepsy12/cases.html'
     return render(request, template_name, context)
-
-
-def create(request):
-
-    form = CaseForm(request.POST or None)
-
-    if request.method == "POST":
-        if form.is_valid():
-            form.save()
-            return redirect('hospital')
-    context = {
-        "form": form
-    }
-    return render(request=request, template_name='epilepsy12/createcase.html', context=context)
-
-
-def update(request, id):
-    case = get_object_or_404(Case, id=id)
-    form = CaseForm(instance=case)
-
-    if request.method == "POST":
-        if ('delete') in request.POST:
-            case.delete()
-            return redirect('hospital')
-        form = CaseForm(request.POST, instance=case)
-        if form.is_valid:
-            form.save()
-            return redirect('hospital')
-
-    context = {
-        "form": form
-    }
-
-    return render(request=request, template_name='epilepsy12/createcase.html', context=context)
-
-
-def delete(request, id):
-    case = get_object_or_404(Case, id=id)
-    case.delete()
-    return redirect('hospital')
 
 
 def eeg(request):

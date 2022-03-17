@@ -8,6 +8,7 @@ class ElectroClinicalSyndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseC
     This class records information on electroclinical syndromes.
     It references the episode class, since one episode can have features of a single electroclinical syndrome.
     """
+
     electroclinical_syndrome = models.IntegerField(
         choices=ELECTROCLINICAL_SYNDROMES)
     electroclinical_syndrome_other = models.CharField(

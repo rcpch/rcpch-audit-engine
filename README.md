@@ -57,15 +57,16 @@ foobar:~foo$ git clone https://github.com/rcpch/epilepsy12-server.git
 foobar:~foo$ pip install -r requirements/development-requirements
 ```
 
-### Running the database
+### Create the database
 
 ```command
-foobar:~foo$ docker run --name epilepsy12-mongo-docker -p 27017:27017 -d mongo:latest
+foobar:~foo$ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
-## Create the database
+## Create a super user
 
 ```console
+foobar:~foo$ python manage.py createsuperuser
 ```
 
 ## Prepare the database for use

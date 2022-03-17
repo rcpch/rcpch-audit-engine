@@ -10,6 +10,7 @@ class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     This class records information on rescue medicines used.
     It references the Episode class, since one episode can involve the use of several medicines
     """
+
     rescue_medicine_type = models.CharField(
         "Type of rescue medicine prescribed",
         max_length=3,

@@ -4,7 +4,6 @@ from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .registration import Registration
-from .assessment import Assessment
 from. epilepsy_context import EpilepsyContext
 
 
@@ -19,6 +18,7 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     This whole clase might better belong in the initial assessment
 
     """
+
     date_of_initial_assessment = models.DateField(
         "On what date did the initial assessment occur?"
     )

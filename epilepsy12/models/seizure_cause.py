@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.deletion import CASCADE
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -11,6 +10,7 @@ class SeizureCause(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     One Case can have multiple seizure causes
     """
+
     seizure_cause_main = models.CharField(
         "main identified cause of seizure(s)",
         max_length=3,
