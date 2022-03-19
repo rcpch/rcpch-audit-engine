@@ -12,6 +12,8 @@ urlpatterns = [
          views.register, name='register'),
     path('registration/<int:id>/update',
          views.update_registration, name="update_registration"),
+    path('assessment/<int:id>/create',
+         views.create_intial_assessment, name="initial_assessment"),
     path('eeg', views.eeg, name="eeg"),
     path('patient', views.patient, name="patient"),
 ]

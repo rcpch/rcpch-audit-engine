@@ -22,26 +22,26 @@
       type="text/css"
     />
     <link rel="icon" href="{% static 'epilepsy12_logo_1.ico' %}"/>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'style.css' %}"> {% endcomment %}
   </head>
 
   <body id="root">
     <div class="ui container">
       {% block nav %}
         <div class="ui secondary pointing menu">
-            <a class="item" href={% url 'index' %}>
+            <a {% if request.resolver_match.url_name == 'index' %}class="active item" {% else %} class="item" {% endif %} href={% url 'index' %}>
               Home
             </a>
-          <a class="item" href={% url 'admin:index' %}>
+          <a {% if request.resolver_match.url_name == 'admin:index' %}class="active item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
             Database Management
           </a>
-            <a class="item" id="link" href={% url 'cases' %}>
+            <a {% if request.resolver_match.url_name == 'cases' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'cases' %}>
               Hospital Clinician
             </a>
-            <a class="item" id="link" href={% url 'eeg' %}>
+            <a {% if request.resolver_match.url_name == 'eeg' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'eeg' %}>
               EEG Department
             </a>
-            <a class="item" id="link" href={% url 'patient' %}>
+            <a {% if request.resolver_match.url_name == 'patient' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
               Patient Access
             </a>
           <div class="right menu">

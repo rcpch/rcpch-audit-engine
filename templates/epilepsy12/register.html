@@ -1,6 +1,8 @@
 {% extends "base.html" %} {% load static %} {% block content %}
-<div class="ui raised segment">
-  <div class="ui container">
+<h5 class="ui top attached inverted header">
+  Registration Details
+</h5>
+<div class="ui raised attached segment">
     <form class="ui form" method="post">
       {% csrf_token %}
 
@@ -24,6 +26,7 @@
           </div>
         </div>
       
+        
         <div class="field">
           <label>Referring Clinician</label>
           {{form.referring_clinician}} {% if form.referring_clinician.errors %}
@@ -32,11 +35,60 @@
           </div>
           {% endif %}
         </div>
-      
-      <button type="submit" class="ui green button" name="update">Save</button>
+
+      <button type="submit" class="ui blue button" name="update">Save</button>
       <button type="submit" class="ui red button" name="delete">Delete</button>
-      <button type="submit" class="ui blue button">Cancel</button>
+      <button type="submit" class="ui basic button">Cancel</button>
+
+      <div class="ui blue buttons">
+        <div class="ui button">Assessment</div>
+        <div class="ui floating dropdown icon button">
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <div class="item"><i class="edit icon"></i> Initial Assessment</div>
+            <div class="item"><i class="delete icon"></i> Epilepsy Context</div>
+            <div class="item"><i class="hide icon"></i> Multiaxial Description</div>
+            <div class="item"><i class="hide icon"></i> Investigation/Management</div>
+          </div>
+        </div>
+      </div>
+
     </form>
-  </div>
+
 </div>
+<div class="ui bottom attached warning message">
+  <i class="warning icon"></i>
+  This audit can be completed in stages, and in any order. 
+</div>
+<div class="ui container">
+  <div class="ui ordered steps">
+    <div class="active step">
+      {% comment %} <i class="truck icon"></i> {% endcomment %}
+      <div class="content">
+        <div class="title">Initial Assessment</div>
+        <div class="description">The first visit</div>
+      </div>
+    </div>
+    <div class="step">
+      {% comment %} <i class="payment icon"></i> {% endcomment %}
+      <div class="content">
+        <div class="title">Epilepsy Context</div>
+        <div class="description">Background and Risk Factors</div>
+      </div>
+    </div>
+    <div class="step">
+      {% comment %} <i class="info icon"></i> {% endcomment %}
+      <div class="content">
+        <div class="title">Multiaxial Description</div>
+        <div class="description">DESSCRIBE definition, Electroclinical findings</div>
+      </div>
+    </div>
+    <div class="step">
+      {% comment %} <i class="info icon"></i> {% endcomment %}
+      <div class="content">
+        <div class="title">Investigation & Management</div>
+        <div class="description">Tests, medications and teams</div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
