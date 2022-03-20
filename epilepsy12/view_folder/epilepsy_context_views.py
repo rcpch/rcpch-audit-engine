@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from epilepsy12.models import epilepsy_context
 
 from epilepsy12.models.registration import Registration
 
@@ -10,11 +11,13 @@ from ..models import Case
 @login_required
 def create_epilepsy_context(request, case_id):
     form = EpilepsyContextForm(request.POST or None)
+    registration = Registration.objects.filter(case=case_id).first()
     if request.method == "POST":
         if form.is_valid():
             obj = form.save(commit=False)
-            # case = Case.objects.get(id=id)
-            # obj.case = case
+            obj.registration = registration
+            Registration.objects.filter(case=case_id).update(
+                epilepsy_context_complete=True)
             obj.save()
             return redirect('cases')
         else:
@@ -36,14 +39,16 @@ def create_epilepsy_context(request, case_id):
 
 @login_required
 def update_epilepsy_context(request, case_id):
+    epilepsy_context = epilepsy_context.EpilepsyContext.objects.filter(
+        registration__case=case_id).first()
     registration = Registration.objects.filter(case=case_id).first()
     form = EpilepsyContextForm(instance=registration)
 
     if request.method == "POST":
         if ('delete') in request.POST:
-            # registration.delete()
+            epilepsy_context.delete()
             return redirect('cases')
-        # form = EpilepsyContextForm(request.POST, instance=registration)
+        form = EpilepsyContextForm(request.POST, instance=epilepsy_context)
         if form.is_valid:
             obj = form.save()
             obj.save()

@@ -30,18 +30,6 @@ class RegistrationForm(forms.ModelForm):
     cohort = forms.IntegerField(
         required=False
     )
-    initial_assessment_complete = forms.BooleanField(
-        required=False
-    )
-    epilepsy_context_complete = forms.BooleanField(
-        required=False
-    )
-    multiaxial_description_complete = forms.BooleanField(
-        required=False
-    )
-    investigation_management_complete = forms.BooleanField(
-        required=False
-    )
 
     class Meta:
         model = Registration
@@ -49,9 +37,5 @@ class RegistrationForm(forms.ModelForm):
             'registration_date',
             'referring_clinician',
             'registration_close_date',
-            'cohort',
-            # 'initial_assessment_complete',
-            # 'epilepsy_context_complete',
-            # 'multiaxial_description_complete',
-            # 'investigation_management_complete'
+            'cohort'
         ]
