@@ -5,7 +5,7 @@
 
 <div class="ui top attached inverted clearing segment">
 <h5 class="ui left floated header">
-  {% block audit_section_name %}{% endblock %}
+  {% block audit_section_title %}{% endblock %}
 </h5>
 <h5 class="ui right floated header">
   {{case_name}}
@@ -13,7 +13,6 @@
 </div>
 <div class="ui raised attached segment">
   <form class="ui form" method="post">
-      {% csrf_token %}
       {% block audit_section_form %}{% endblock %}
   </form>
 </div>

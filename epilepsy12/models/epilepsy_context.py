@@ -5,6 +5,8 @@ from django.forms import DecimalField, FloatField
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
+from .registration import Registration
+
 
 class EpilepsyContext(models.Model):
     """
@@ -49,6 +51,14 @@ class EpilepsyContext(models.Model):
         help_text="The number of decimal years calculated from the first seizure to the present day.",
         decimal_places=1,
         max_digits=5
+    )
+
+    # relationships
+    registration = models.OneToOneField(
+        Registration,
+        on_delete=models.CASCADE,
+        verbose_name="Related Registration",
+        null=True
     )
 
     class Meta:

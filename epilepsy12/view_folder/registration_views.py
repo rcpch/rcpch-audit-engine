@@ -54,7 +54,7 @@ def update_registration(request, id):
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
         "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "none"
+        "active_template": "unchosen"
     }
 
     return render(request=request, template_name='epilepsy12/register.html', context=context)

@@ -6,6 +6,7 @@ from epilepsy12.models.registration import Registration
 
 from ..forms_folder.epilepsy_context_form import EpilepsyContextForm
 from ..models import Case
+from ..models import EpilepsyContext
 
 
 @login_required
@@ -39,7 +40,7 @@ def create_epilepsy_context(request, case_id):
 
 @login_required
 def update_epilepsy_context(request, case_id):
-    epilepsy_context = epilepsy_context.EpilepsyContext.objects.filter(
+    epilepsy_context = EpilepsyContext.objects.filter(
         registration__case=case_id).first()
     registration = Registration.objects.filter(case=case_id).first()
     form = EpilepsyContextForm(instance=registration)
