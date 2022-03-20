@@ -3,32 +3,8 @@
 Multiaxial Description
 {% endblock %}
 {% block audit_section_form %}
+{% include './forms/multiaxial_description_form.html' %}
 {% endblock %}
 {% block audit_section_instructions %}
 The classification of epilepsy is multiaxial and can be described in five different ways. Work through the DESSCRIBE tool to classify the episodes.
 {% endblock %}
-{% comment %} 
-{% extends "base.html" %} 
-{% load static %}
-{% block content %}
-<div class="ui top attached inverted clearing segment">
-<h5 class="ui left floated header">
-  Multiaxial Description
-</h5>
-<h5 class="ui right floated header">
-  {{case_name}}
-</h5>
-</div>
-<div class="ui raised attached segment">
-  <form class="ui form" method="post">
-      {% csrf_token %}
-  </form>
-</div>
-<div class="ui container">
-  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
-</div>
-<div class="ui bottom attached warning message">
-  <i class="warning icon"></i>
-  The classification of epilepsy is multiaxial and can be described in five different ways. Work through the DESSCRIBE tool to classify the episodes.
-</div>
-{% endblock %} {% endcomment %}

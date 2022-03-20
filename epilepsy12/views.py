@@ -23,7 +23,7 @@ def hospital(request):
         'total_cases': case_count,
         'total_registrations': registered_cases
     }
-    template_name = 'epilepsy12/cases.html'
+    template_name = 'epilepsy12/cases/cases.html'
     return render(request, template_name, context)
 
 

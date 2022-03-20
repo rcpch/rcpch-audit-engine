@@ -1,65 +1,10 @@
-
-{% extends "base.html" %} 
-{% load static %}
-{% block content %}
-<div class="ui top attached inverted clearing segment">
-<h5 class="ui left floated header">
-  Registration Details
-</h5>
-<h5 class="ui right floated header">
-  {{case_name}}
-</h5>
-</div>
-<div class="ui raised attached segment">
-  <form class="ui form" method="post">
-      {% csrf_token %}
-
-        <div class="three fields">
-          <div class="field">
-            <label>Registration Date</label>
-            <div class="field">{{form.registration_date}}</div>
-            {% if form.registration_date.errors %}
-            <div class="ui pointing red basic label">
-              {{form.registration_date.errors}}
-            </div>
-            {% endif %}
-          </div>
-          <div class="field">
-            <label>Registration Close Date</label>
-            <div class="disabled field" readonly="">{{form.registration_close_date}}</div>
-          </div>
-          <div class="field">
-            <label>Cohort</label>
-            <div class="disabled field" readonly="">{{form.cohort}}</div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Referring Clinician</label>
-          {{form.referring_clinician}} {% if form.referring_clinician.errors %}
-          <div class="ui pointing red basic label">
-            {{form.referring_clinician.errors}}
-          </div>
-          {% endif %}
-        </div>
-      
-    <div class="ui grid">
-      <div class="six wide column">  
-        <div class="ui buttons">
-          <button type="submit" class="ui blue button" name="update">Save</button>
-          <button type="submit" class="ui red button" name="delete">Delete</button>
-          <button type="submit" class="ui basic button">Cancel</button>
-        </div>
-      </div>
-    </div>
-      
-  </form>
-
-</div>
-<div class="ui container">
-  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
-</div>
-<div class="ui bottom attached warning message">
-  <i class="warning icon"></i>
-  This audit can be completed in stages, and in any order. 
-</div>
+{% extends './audit_section.html' %}
+{% block audit_section_title %}
+Registration Details
+{% endblock %}
+{% block audit_section_form %}
+{% include './forms/registration_form.html' %}
+{% endblock %}
+{% block audit_section_instructions %}
+This audit can be completed in stages, and in any order. 
 {% endblock %}

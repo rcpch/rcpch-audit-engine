@@ -1,0 +1,41 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+        <div class="three fields">
+          <div class="field">
+            <label>Registration Date</label>
+            <div class="field">{{form.registration_date}}</div>
+            {% if form.registration_date.errors %}
+            <div class="ui pointing red basic label">
+              {{form.registration_date.errors}}
+            </div>
+            {% endif %}
+          </div>
+          <div class="field">
+            <label>Registration Close Date</label>
+            <div class="disabled field" readonly="">{{form.registration_close_date}}</div>
+          </div>
+          <div class="field">
+            <label>Cohort</label>
+            <div class="disabled field" readonly="">{{form.cohort}}</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Referring Clinician</label>
+          {{form.referring_clinician}} {% if form.referring_clinician.errors %}
+          <div class="ui pointing red basic label">
+            {{form.referring_clinician.errors}}
+          </div>
+          {% endif %}
+        </div>
+      
+    <div class="ui grid">
+      <div class="six wide column">  
+        <div class="ui buttons">
+          <button type="submit" class="ui blue button" name="update">Save</button>
+          <button type="submit" class="ui red button" name="delete">Delete</button>
+          <button type="submit" class="ui basic button">Cancel</button>
+        </div>
+      </div>
+    </div>
+      
+  </form>

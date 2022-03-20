@@ -21,7 +21,7 @@ def create_case(request):
     context = {
         "form": form
     }
-    return render(request=request, template_name='epilepsy12/createcase.html', context=context)
+    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
 @login_required
@@ -52,7 +52,7 @@ def update_case(request, id):
         "form": form
     }
 
-    return render(request=request, template_name='epilepsy12/createcase.html', context=context)
+    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
 @login_required
