@@ -8,7 +8,6 @@ from ..forms_folder import InitialAssessmentForm
 
 @login_required
 def create_initial_assessment(request, case_id):
-    print(case_id)
     form = InitialAssessmentForm(request.POST or None)
     registration = Registration.objects.filter(case=case_id).first()
     if request.method == "POST":

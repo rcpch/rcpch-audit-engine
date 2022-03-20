@@ -1,11 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 
+from epilepsy12.models.registration import Registration
+
 from ..forms_folder.epilepsy_context_form import EpilepsyContextForm
+from ..models import Case
 
 
 @login_required
-def create_epilepsy_context(request, id):
+def create_epilepsy_context(request, case_id):
     form = EpilepsyContextForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
@@ -16,15 +19,24 @@ def create_epilepsy_context(request, id):
             return redirect('cases')
         else:
             print('not valid')
+    case = Case.objects.get(id=case_id)
+    registration = Registration.objects.filter(case=case_id).first()
     context = {
-        "form": form
+        "form": form,
+        "case_id": case_id,
+        "case_name": case.first_name + " " + case.surname,
+        "initial_assessment_complete": registration.initial_assessment_complete,
+        "epilepsy_context_complete": registration.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.multiaxial_description_complete,
+        "investigation_management_complete": registration.investigation_management_complete,
+        "active_template": "epilepsy_context"
     }
     return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
 
 
 @login_required
-def update_epilepsy_context(request, id):
-    # registration = Registration.objects.filter(case=id).first()
+def update_epilepsy_context(request, case_id):
+    registration = Registration.objects.filter(case=case_id).first()
     form = EpilepsyContextForm(instance=registration)
 
     if request.method == "POST":
@@ -38,16 +50,24 @@ def update_epilepsy_context(request, id):
             # messages.success(request, "You successfully updated the post")
             return redirect('cases')
 
+    case = Case.objects.get(id=case_id)
+
     context = {
         "form": form,
-        "case_id": id
+        "case_id": case_id,
+        "case_name": case.first_name + " " + case.surname,
+        "initial_assessment_complete": registration.initial_assessment_complete,
+        "epilepsy_context_complete": registration.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.multiaxial_description_complete,
+        "investigation_management_complete": registration.investigation_management_complete,
+        "active_template": "epilepsy_context"
     }
 
     return render(request=request, template_name='epilepsy12/register.html', context=context)
 
 
 @login_required
-def delete_epilepsy_context(request, id):
-    # registration = get_object_or_404(Registration, id=id)
+def delete_epilepsy_context(request, case_id):
+    registration = get_object_or_404(Registration, id=id)
     registration.delete()
     return redirect('cases')

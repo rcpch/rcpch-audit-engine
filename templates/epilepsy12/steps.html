@@ -12,9 +12,9 @@
     </a>
 
     {% if epilepsy_context_complete %}
-      {% if active %}<a class="active completed step" href="{% url 'update_epilepsy_context' case_id %}">{% else %}<a class="completed step" href="{% url 'update_epilepsy_context' case_id %}">{% endif %}
+      {% if active_template == "epilepsy_context" %}<a class="active completed step" href="{% url 'update_epilepsy_context' case_id %}">{% else %}<a class="completed step" href="{% url 'update_epilepsy_context' case_id %}">{% endif %}
     {% else %}
-        {% if active %}<a href="{% url 'update_epilepsy_context' case_id %}" class="active step">{% else %}<a href="{% url 'create_epilepsy_context' case_id %}" class="step">{% endif %}
+        {% if active_template == "epilepsy_context" %}<a href="{% url 'update_epilepsy_context' case_id %}" class="active step">{% else %}<a href="{% url 'create_epilepsy_context' case_id %}" class="step">{% endif %}
     {% endif %}
       <div class="content">
         <div class="title">Epilepsy Context</div>
@@ -23,9 +23,9 @@
     </a>
     
     {% if multiaxial_description_complete %}
-      {% if active %}<a class="active completed step" href="{% url 'update_multiaxial_description' case_id %}">{% else %}<a class="completed step" href="{% url 'update_multiaxial_description' case_id %}">{% endif %}
+      {% if active_template == "multiaxial_description" %}<a class="active completed step" href="{% url 'update_multiaxial_description' case_id %}">{% else %}<a class="completed step" href="{% url 'update_multiaxial_description' case_id %}">{% endif %}
     {% else %}
-        {% if active %}<a href="{% url 'update_multiaxial_description' case_id %}" class="active step">{% else %}<a href="{% url 'create_multiaxial_description' case_id %}" class="step">{% endif %}
+        {% if active_template == "multiaxial_description" %}<a href="{% url 'update_multiaxial_description' case_id %}" class="active step">{% else %}<a href="{% url 'create_multiaxial_description' case_id %}" class="step">{% endif %}
     {% endif %}
       <div class="content">
         <div class="title">Multiaxial Description</div>
@@ -34,9 +34,9 @@
     </a>
 
     {% if investigation_management_complete %}
-    {% if active %}<a class="active completed step" href="{% url 'update_investigation_management' case_id %}">{% else %}<a class="completed step" href="{% url 'update_investigation_management' case_id %}">{% endif %}
+      {% if active_template == "investigation_management" %}<a class="active completed step" href="{% url 'update_investigation_management' case_id %}">{% else %}<a class="completed step" href="{% url 'update_investigation_management' case_id %}">{% endif %}
     {% else %}
-        {% if active %}<a href="{% url 'update_investigation_management' case_id %}" class="active step">{% else %}<a href="{% url 'create_investigation_management' case_id %}" class="step">{% endif %}
+      {% if active_template == "investigation_management" %}<a href="{% url 'update_investigation_management' case_id %}" class="active step">{% else %}<a href="{% url 'create_investigation_management' case_id %}" class="step">{% endif %}
     {% endif %}
       <div class="content">
         <div class="title">Investigation & Management</div>
