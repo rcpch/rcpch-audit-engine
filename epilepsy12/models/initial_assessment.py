@@ -7,7 +7,7 @@ from .registration import Registration
 from. epilepsy_context import EpilepsyContext
 
 
-class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class InitialAssessment(models.Model):
     """
     This class records information about the initial assessment.
     Whilst other information about the child and their epilepsy may be captured across the audit year
@@ -25,9 +25,8 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     date_of_referral_to_general_paediatrics = models.DateField(
         "date of referral to general paediatrics"
     )
-    first_paediatric_assessment_in_acute_or_nonacute_setting = models.CharField(
+    first_paediatric_assessment_in_acute_or_nonacute_setting = models.IntegerField(
         "Is the first paediatric assessment in an acute or nonacute setting?",
-        max_length=2,
         choices=CHRONICITY
     )
     has_description_of_the_episode_or_episodes_been_gathered = models.BooleanField(
@@ -74,11 +73,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         Registration,
         on_delete=models.CASCADE,
         verbose_name="Related Registration"
-    )
-    epilepsy_context = models.OneToOneField(
-        EpilepsyContext,
-        on_delete=models.CASCADE,
-        verbose_name="related epilepsy context"
     )
 
     class Meta:

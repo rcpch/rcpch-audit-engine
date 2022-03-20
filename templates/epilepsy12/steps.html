@@ -1,0 +1,46 @@
+{% block steps %}
+<div class="ui ordered steps">
+    {% if initial_assessment_complete %}
+        {% if active_template == "initial_assessment" %}<a class="active completed step" href="{% url 'update_initial_assessment' case_id %}">{% else %}<a class="completed step" href="{% url 'update_initial_assessment' case_id %}">{% endif %}
+    {% else %}
+        {% if active_template == "initial_assessment" %}<a href="{% url 'update_initial_assessment' case_id %}" class="active step">{% else %}<a href="{% url 'create_initial_assessment' case_id %}" class="step">{% endif %}
+    {% endif %}
+      <div class="content">
+        <div class="title">Initial Assessment</div>
+        <div class="description">The first visit</div>
+      </div>
+    </a>
+
+    {% if epilepsy_context_complete %}
+      {% if active %}<a class="active completed step" href="{% url 'update_epilepsy_context' case_id %}">{% else %}<a class="completed step" href="{% url 'update_epilepsy_context' case_id %}">{% endif %}
+    {% else %}
+        {% if active %}<a href="{% url 'update_epilepsy_context' case_id %}" class="active step">{% else %}<a href="{% url 'create_epilepsy_context' case_id %}" class="step">{% endif %}
+    {% endif %}
+      <div class="content">
+        <div class="title">Epilepsy Context</div>
+        <div class="description">Background and Risk Factors</div>
+      </div>
+    </a>
+    
+    {% if multiaxial_description_complete %}
+      {% if active %}<a class="active completed step" href="{% url 'update_multiaxial_description' case_id %}">{% else %}<a class="completed step" href="{% url 'update_multiaxial_description' case_id %}">{% endif %}
+    {% else %}
+        {% if active %}<a href="{% url 'update_multiaxial_description' case_id %}" class="active step">{% else %}<a href="{% url 'create_multiaxial_description' case_id %}" class="step">{% endif %}
+    {% endif %}
+      <div class="content">
+        <div class="title">Multiaxial Description</div>
+        <div class="description">DESSCRIBE definition, Electroclinical findings</div>
+      </div>
+    </a>
+
+    {% if investigation_management_complete %}
+    {% if active %}<a class="active completed step" href="{% url 'update_investigation_management' case_id %}">{% else %}<a class="completed step" href="{% url 'update_investigation_management' case_id %}">{% endif %}
+    {% else %}
+        {% if active %}<a href="{% url 'update_investigation_management' case_id %}" class="active step">{% else %}<a href="{% url 'create_investigation_management' case_id %}" class="step">{% endif %}
+    {% endif %}
+      <div class="content">
+        <div class="title">Investigation & Management</div>
+        <div class="description">Tests, medications and teams</div>
+      </div>
+    </a>
+{% endblock steps %}

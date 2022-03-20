@@ -11,15 +11,21 @@ def register(request, id):
     form = RegistrationForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
-            obj = form.save(commit=False)
             case = Case.objects.get(id=id)
+            obj = form.save(commit=False)
             obj.case = case
             obj.save()
             return redirect('cases')
         else:
             print('not valid')
     context = {
-        "form": form
+        "form": form,
+        "case_id": id,
+        "initial_assessment_complete": False,
+        "epilepsy_context_complete": False,
+        "multiaxial_description_complete": False,
+        "investigation_management_complete": False,
+        "active_template": "none"
     }
     return render(request=request, template_name='epilepsy12/register.html', context=context)
 
@@ -39,9 +45,16 @@ def update_registration(request, id):
             obj.save()
             # messages.success(request, "You successfully updated the post")
             return redirect('cases')
-
+    case = Case.objects.get(id=id)
     context = {
-        "form": form
+        "form": form,
+        "case_id": id,
+        "case_name": case.first_name + " " + case.surname,
+        "initial_assessment_complete": registration.initial_assessment_complete,
+        "epilepsy_context_complete": registration.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.multiaxial_description_complete,
+        "investigation_management_complete": registration.investigation_management_complete,
+        "active_template": "none"
     }
 
     return render(request=request, template_name='epilepsy12/register.html', context=context)

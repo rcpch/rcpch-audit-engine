@@ -7,27 +7,39 @@ from ..forms_folder import InitialAssessmentForm
 
 
 @login_required
-def create_intial_assessment(request, id):
+def create_initial_assessment(request, case_id):
+    print(case_id)
     form = InitialAssessmentForm(request.POST or None)
+    registration = Registration.objects.filter(case=case_id).first()
     if request.method == "POST":
+        print(form)
         if form.is_valid():
             obj = form.save(commit=False)
-            registration = Registration.objects.filter(case=id)
             obj.registration = registration
+            Registration.objects.filter(case=case_id).update(
+                initial_assessment_complete=True)
             obj.save()
             return redirect('cases')
         else:
             print('not valid')
+
     context = {
-        "form": form
+        "form": form,
+        "case_id": case_id,
+        "initial_assessment_complete": registration.initial_assessment_complete,
+        "epilepsy_context_complete": registration.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.multiaxial_description_complete,
+        "investigation_management_complete": registration.investigation_management_complete,
+        "active_template": "initial_assessment"
     }
     return render(request=request, template_name='epilepsy12/initial_assessment.html', context=context)
 
 
 @login_required
-def update_initial_assessment(request, id):
+def update_initial_assessment(request, case_id):
     initial_assessment = InitialAssessment.objects.filter(
-        registration__case=id).first()
+        registration__case=case_id).first()
+    registration = Registration.objects.filter(case=case_id).first()
     form = InitialAssessmentForm(instance=initial_assessment)
 
     if request.method == "POST":
@@ -42,7 +54,13 @@ def update_initial_assessment(request, id):
             return redirect('cases')
 
     context = {
-        "form": form
+        "form": form,
+        "case_id": case_id,
+        "initial_assessment_complete": registration.initial_assessment_complete,
+        "epilepsy_context_complete": registration.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.multiaxial_description_complete,
+        "investigation_management_complete": registration.investigation_management_complete,
+        "active_template": "initial_assessment"
     }
 
     return render(request=request, template_name='epilepsy12/initial_assessment.html', context=context)

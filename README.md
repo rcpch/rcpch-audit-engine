@@ -63,16 +63,16 @@ foobar:~foo$ pip install -r requirements/development-requirements
 foobar:~foo$ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
-## Create a super user
-
-```console
-foobar:~foo$ python manage.py createsuperuser
-```
-
 ## Prepare the database for use
 
 ```console
 foobar:~foo$ s/migrate
+```
+
+## Create a super user
+
+```console
+foobar:~foo$ python manage.py createsuperuser
 ```
 
 ## Running the server

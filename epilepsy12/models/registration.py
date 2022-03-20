@@ -45,6 +45,19 @@ class Registration(models.Model):
         null=True
     )
 
+    initial_assessment_complete = models.BooleanField(
+        default=False
+    )
+    epilepsy_context_complete = models.BooleanField(
+        default=False
+    )
+    multiaxial_description_complete = models.BooleanField(
+        default=False
+    )
+    investigation_management_complete = models.BooleanField(
+        default=False
+    )
+
     # relationships
     case = models.OneToOneField(
         Case,

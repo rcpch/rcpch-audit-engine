@@ -49,23 +49,23 @@ class InitialAssessmentForm(forms.ModelForm):
     )
     has_number_of_episodes_since_the_first_been_documented = forms.CheckboxInput(
         # "has the frequency of episodes since the first recorded been documented?",
-        check_test=True
+
     )
     general_examination_performed = forms.CheckboxInput(
         # "has a general clinical examination been performed?"
-        check_test=True
+
     )
     neurological_examination_performed = forms.CheckboxInput(
         # "has a neurological examination been performed?"
-        check_test=True
+
     )
     developmental_learning_or_schooling_problems = forms.CheckboxInput(
         # "has the presence or absence of developmental, learning or school-based problems been recorded?"
-        check_test=True
+
     )
     behavioural_or_emotional_problems = forms.CheckboxInput(
         # "are there any behaviour or emotional comorbid conditions present?"
-        check_test=True
+
     )
     diagnostic_status = forms.ChoiceField(  # This currently essential - used to exclude nonepilepic kids
         choices=DIAGNOSTIC_STATUS,

@@ -3,10 +3,10 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .assessment import Assessment
+from .epilepsy_context import EpilepsyContext
 
 
-class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class Comorbidity(models.Model):
     """
     This class records information on all mental health, behavioural and developmental comorbidities
     [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]
@@ -28,8 +28,8 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )  # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
 
     # relationships
-    assessment = models.ForeignKey(
-        Assessment,
+    epilepsy_context = models.ForeignKey(
+        EpilepsyContext,
         on_delete=models.CASCADE
     )
 

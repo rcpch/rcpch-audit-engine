@@ -3,7 +3,7 @@
     Initial Assessment
 </h5>
 <div class="ui attached raised segment">
-    <form class="ui form" method="post">
+  <form class="ui form" method="post">
       {% csrf_token %}
       <div class="two fields">
         <div class="field">
@@ -118,24 +118,19 @@
         {% endif %}
       </div>
     </div>
-      <div class="field">
-        <label>Diagnostic status?</label>
-        {{form.diagnostic_status}}
-        {% if form.diagnostic_status.errors %}
-            <div class="ui pointing red basic label">
-                {{form.diagnostic_status.errors}}
-            </div>
-        {% endif %}
-      </div>
-      <button type="submit" class="ui blue button" name="update">Save</button>
-      <button type="submit" class="ui red button" name="delete">Delete</button>
-      <button type="submit" class="ui basic button">Cancel</button>
-    </form>
-    {% comment %} </div> {% endcomment %}
-    <div class="ui icon input">
-      <input type="text" class="prompt" placeholder="Search...">
-      <i class="inverted circular search link icon"></i>
+    <div class="field">
+      <label>Diagnostic status?</label>
+      {{form.diagnostic_status}}
+      {% if form.diagnostic_status.errors %}
+          <div class="ui pointing red basic label">
+              {{form.diagnostic_status.errors}}
+          </div>
+      {% endif %}
     </div>
+    <button type="submit" class="ui blue button" name="update">Save</button>
+    <button type="submit" class="ui red button" name="delete">Delete</button>
+    <button type="submit" class="ui basic button">Cancel</button>
+  </form>
     
 </div>
 <div class="ui bottom attached warning message">
@@ -143,5 +138,8 @@
     These items must be completed at the first assessment.
     There are lots of dates gathered here - these are important for calculating timeliness nationally.
     The number of dates collected have been carefully considered and kept to a minimum.
-  </div>
+</div>
+<div class="ui container">
+  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
+</div>
 {% endblock %}

@@ -1,6 +1,7 @@
 
 from datetime import date
 from django.db import models
+from django.forms import DecimalField
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -39,18 +40,26 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     date_of_first_epileptic_seizure = models.DateField(
         "What date was the first reported epileptic seizure?"
     )
+    epilepsy_decimal_years = DecimalField(
+        help_text="The number of decimal years calculated from the first seizure to the present day."
+    )
 
     @property
-    def calculate_epilepsy_years(self):
+    def calculate_epilepsy_decimal_years(self):
         # returns time interval between current date and date of onset of seizures in days
         if (self.date_of_first_epileptic_seizure):
             today = date.today()
             days_between = abs(today-self.date_of_first_epileptic_seizure).days
-            return days_between
+            return days_between/365.25
 
     class Meta:
         verbose_name = 'epilepsy context'
         verbose_name_plural = 'epilepsy contexts'
 
-    def __str__(self) -> str:
-        return self.date_of_first_epileptic_seizure
+    def save(
+            self,
+            *args, **kwargs) -> None:
+
+        self.epilepsy_decimal_years = self.calculate_epilepsy_decimal_years(
+            self.date_of_first_epileptic_seizure)
+        return super().save(*args, **kwargs)
