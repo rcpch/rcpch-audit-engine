@@ -62,7 +62,7 @@ $ pip install -r requirements/development-requirements
 ### Create the database
 
 ```command
-$ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+$ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 ### Prepare the database for use
