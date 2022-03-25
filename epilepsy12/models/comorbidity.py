@@ -30,7 +30,10 @@ class Comorbidity(models.Model):
     # relationships
     epilepsy_context = models.ForeignKey(
         EpilepsyContext,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        related_name='comorbidities'
     )
 
     class Meta:

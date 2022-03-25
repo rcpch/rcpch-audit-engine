@@ -35,7 +35,7 @@
           <a {% if request.resolver_match.url_name == 'admin:index' %}class="active item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
             Database Management
           </a>
-            <a {% if request.resolver_match.url_name == 'cases' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'cases' %}>
+            <a {% if request.resolver_match.url_name == 'hospital_reports' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
               Hospital Clinician
             </a>
             <a {% if request.resolver_match.url_name == 'eeg' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'eeg' %}>

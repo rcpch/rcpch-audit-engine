@@ -1,6 +1,10 @@
+
+from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from epilepsy12.constants import comorbidities
 from epilepsy12.models import epilepsy_context
+from epilepsy12.models.comorbidity import Comorbidity
 
 from epilepsy12.models.registration import Registration
 
@@ -23,12 +27,12 @@ def create_epilepsy_context(request, case_id):
             return redirect('cases')
         else:
             print('not valid')
-    case = Case.objects.get(id=case_id)
-    registration = Registration.objects.filter(case=case_id).first()
+    # case = Case.objects.get(id=case_id)
+    # registration = Registration.objects.filter(case=case_id).first()
     context = {
         "form": form,
         "case_id": case_id,
-        "case_name": case.first_name + " " + case.surname,
+        "case_name": registration.case.first_name + " " + registration.case.surname,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
@@ -43,7 +47,9 @@ def update_epilepsy_context(request, case_id):
     epilepsy_context = EpilepsyContext.objects.filter(
         registration__case=case_id).first()
     registration = Registration.objects.filter(case=case_id).first()
-    form = EpilepsyContextForm(instance=registration)
+    comorbidities = Comorbidity.objects.filter(
+        epilepsy_context=epilepsy_context.id)
+    form = EpilepsyContextForm(instance=epilepsy_context)
 
     if request.method == "POST":
         if ('delete') in request.POST:
@@ -66,10 +72,11 @@ def update_epilepsy_context(request, case_id):
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
         "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "epilepsy_context"
+        "active_template": "epilepsy_context",
+        "comorbidities": comorbidities
     }
 
-    return render(request=request, template_name='epilepsy12/register.html', context=context)
+    return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
 
 
 @login_required

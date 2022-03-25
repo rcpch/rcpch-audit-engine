@@ -8,6 +8,20 @@ from django.contrib import messages
 
 
 @login_required
+def case_list(request):
+    case_list = Case.objects.all().order_by('surname')
+    registered_cases = Registration.objects.all().count()
+    case_count = Case.objects.all().count()
+    context = {
+        'case_list': case_list,
+        'total_cases': case_count,
+        'total_registrations': registered_cases
+    }
+    template_name = 'epilepsy12/cases/cases.html'
+    return render(request, template_name, context)
+
+
+@login_required
 def create_case(request):
     form = CaseForm(request.POST or None)
     if request.method == "POST":

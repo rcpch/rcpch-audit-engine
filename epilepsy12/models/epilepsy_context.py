@@ -47,11 +47,14 @@ class EpilepsyContext(models.Model):
     date_of_first_epileptic_seizure = models.DateField(
         "What date was the first reported epileptic seizure?"
     )
-    epilepsy_decimal_years = DecimalField(
-        help_text="The number of decimal years calculated from the first seizure to the present day.",
-        decimal_places=1,
-        max_digits=5
-    )
+
+    @property
+    def epilepsy_decimal_years(self):
+        if (self.date_of_first_epileptic_seizure):
+            today = date.today()
+            calculated_age = relativedelta.relativedelta(
+                today, self.date_of_first_epileptic_seizure)
+            return round(calculated_age.days/365.25, 1) + " y"
 
     # relationships
     registration = models.OneToOneField(
@@ -74,3 +77,6 @@ class EpilepsyContext(models.Model):
                 today, self.date_of_first_epileptic_seizure)
             self.epilepsy_decimal_years = calculated_age.days/365.25
         return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.date_of_first_epileptic_seizure.strftime("%m/%d/%Y")

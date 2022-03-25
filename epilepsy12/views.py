@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
 from .view_folder import *
-from .models import Case
 
 
 def index(request):
@@ -14,17 +13,9 @@ def database(request):
     return render(request, template_name, {})
 
 
-def hospital(request):
-    case_list = Case.objects.all().order_by('surname')
-    registered_cases = Registration.objects.all().count()
-    case_count = Case.objects.all().count()
-    context = {
-        'case_list': case_list,
-        'total_cases': case_count,
-        'total_registrations': registered_cases
-    }
-    template_name = 'epilepsy12/cases/cases.html'
-    return render(request, template_name, context)
+def hospital_reports(request):
+    template_name = 'epilepsy12/hospital.html'
+    return render(request=request, template_name=template_name, context={})
 
 
 def eeg(request):
