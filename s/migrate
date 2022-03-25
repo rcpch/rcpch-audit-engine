@@ -1,3 +1,4 @@
 #!/bin/bash
-python rcpch-audit-engine/manage.py makemigrations
-python rcpch-audit-engine/manage.py migrate
+
+python manage.py makemigrations
+python manage.py migrate

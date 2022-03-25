@@ -1,0 +1,128 @@
+<form class="ui form" method="post">
+  {% csrf_token %}
+    <div class="two fields">
+      <div class="field">
+      <label>Date of Assessment</label>
+      {{form.date_of_initial_assessment}} {% if form.date_of_initial_assessment.errors %}
+      <div class="ui pointing red basic label">
+          {{form.date_of_initial_assessment.errors}}
+      </div>
+      {% endif %}
+      </div>
+      <div class="field">
+          <label>Where was first paediatric assessment?</label>
+          {{form.first_paediatric_assessment_in_acute_or_nonacute_setting}} 
+        {% if form.first_paediatric_assessment_in_acute_or_nonacute_setting.errors %}
+          <div class="ui pointing red basic label">{{form.first_paediatric_assessment_in_acute_or_nonacute_setting.errors}}</div>
+        {% endif %}
+      </div>
+  </div>
+  <div class="two fields">
+      <div class="field">
+          <label>Confidence in reported date of first episode</label>
+          {{form.when_the_first_epileptic_episode_occurred_confidence}} 
+        {% if form.when_the_first_epileptic_episode_occurred_confidence.errors %}
+          <div class="ui pointing red basic label">
+              {{form.when_the_first_epileptic_episode_occurred_confidence.errors}}
+          </div>
+        {% endif %}
+      </div>
+      <div class="field">
+        <label>Date of first episode</label>
+        {{form.when_the_first_epileptic_episode_occurred}} 
+          {% if form.when_the_first_epileptic_episode_occurred.errors %}
+          <div class="ui pointing red basic label">
+              {{form.when_the_first_epileptic_episode_occurred.errors}}
+          </div>
+          {% endif %}
+      </div>
+    </div>
+  <div class="field">
+    <label>Date of Referral to General Paediatrics</label>
+    <div class="field">{{form.date_of_referral_to_general_paediatrics}}</div>
+    {% if form.date_of_referral_to_general_paediatrics.errors %}
+    <div class="ui pointing red basic label">
+      {{form.date_of_referral_to_general_paediatrics.errors}}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="two fields">
+    <div class="field">
+      <div class="ui toggle checkbox">
+          {{form.has_description_of_the_episode_or_episodes_been_gathered}} 
+          <label>Has description of episode(s) been gathered?</label>
+      </div>
+      {% if form.has_description_of_the_episode_or_episodes_been_gathered.errors %}
+          <div class="ui pointing red basic label">{{form.has_description_of_the_episode_or_episodes_been_gathered.errors}}</div>
+      {% endif %}
+    </div>
+    <div class="field">
+      <div class="ui toggle checkbox">
+          {{form.has_number_of_episodes_since_the_first_been_documented}} 
+          <label>Has the number of episodes been documented?</label>
+      </div>
+      {% if form.has_number_of_episodes_since_the_first_been_documented.errors %}
+          <div class="ui pointing red basic label">{{form.has_number_of_episodes_since_the_first_been_documented.errors}}</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="two fields">
+    <div class="field">
+      <div class="ui toggle checkbox">
+          {{form.general_examination_performed}}
+          <label>Was clinical examination documented?</label>
+      </div>
+      {% if form.general_examination_performed.errors %}
+          <div class="ui pointing red basic label">{{form.general_examination_performed.errors}}</div>
+      {% endif %}
+    </div>
+    <div class="field">
+      <div class="ui toggle checkbox">
+          {{form.neurological_examination_performed}}
+          <label>Has a neurological examination been documented?</label>
+      </div>
+      {% if form.neurological_examination_performed.errors %}
+          <div class="ui pointing red basic label">
+              {{form.neurological_examination_performed.errors}}
+          </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="two fields">
+    <div class="field">
+      <div class="ui toggle checkbox">
+          {{form.developmental_learning_or_schooling_problems}} 
+          <label>Are there any learning, developmental or educational difficulties?</label>
+      </div>
+      {% if form.developmental_learning_or_schooling_problems.errors %}
+          <div class="ui pointing red basic label">
+              {{form.developmental_learning_or_schooling_problems.errors}}
+          </div>
+      {% endif %}
+    </div>
+    <div class="field">
+      <div class="ui toggle checkbox">
+          {{form.behavioural_or_emotional_problems}} 
+          <label>Are there any emotional or behavioural difficulties?</label>
+      </div>
+      {% if form.behavioural_or_emotional_problems.errors %}
+          <div class="ui pointing red basic label">
+              {{form.behavioural_or_emotional_problems.errors}}
+          </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="field">
+    <label>Diagnostic status?</label>
+    {{form.diagnostic_status}}
+    {% if form.diagnostic_status.errors %}
+        <div class="ui pointing red basic label">
+            {{form.diagnostic_status.errors}}
+        </div>
+    {% endif %}
+  </div>
+  <button type="submit" class="ui blue button" name="update">Save</button>
+  <button type="submit" class="ui red button" name="delete">Delete</button>
+  <button type="submit" class="ui basic button">Cancel</button>
+</form>

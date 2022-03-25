@@ -1,0 +1,71 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+        <div class="two fields">
+            <div class="field">
+                <label>Has there been a previous febrile seizure?</label>
+                {{ form.previous_febrile_seizure }}
+                {% if form.previous_febrile_seizure.errors %}
+                    <div class="ui pointing red basic label">
+                        {{form.previous_febrile_seizure.errors}}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <label>Has there been a previous acute symptomatic seizure?</label>
+                {{ form.previous_acute_symptomatic_seizure }}
+                {% if form.previous_acute_symptomatic_seizure.errors %}
+                    <div class="ui pointing red basic label">
+                        {{ form.previous_acute_symptomatic_seizure.errors}}
+                    </div>
+            {% endif %}
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>Is there a family history of epilepsy??</label>
+                    {{ form.is_there_a_family_history_of_epilepsy }}
+                {% if form.is_there_a_family_history_of_epilepsy.errors %}
+                    <div class="ui pointing red basic label">
+                        {{ form.is_there_a_family_history_of_epilepsy.errors}}
+                    </div>
+            {% endif %}
+            </div>
+            <div class="field">
+                <label>Were there seizures in the neonatal period?</label>
+                    {{ form.previous_neonatal_seizures }}
+                {% if form.previous_neonatal_seizures.errors %}
+                    <div class="ui pointing red basic label">
+                        {{ form.previous_neonatal_seizures.errors}}
+                    </div>
+            {% endif %}
+            </div>
+        </div>
+        <div class="field">
+            <label>Has the diagnosis of epilepsy been withdrawn?</label>
+                {{ form.diagnosis_of_epilepsy_withdrawn }}
+            {% if form.diagnosis_of_epilepsy_withdrawn.errors %}
+                <div class="ui pointing red basic label">
+                    {{ form.diagnosis_of_epilepsy_withdrawn.errors}}
+                </div>
+        {% endif %}
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label>What date was the first reported epileptic seizure?</label>
+                <div class="field">{{form.date_of_first_epileptic_seizure}}</div>
+                {% if form.date_of_first_epileptic_seizure.errors %}
+                <div class="ui pointing red basic label">
+                  {{form.date_of_first_epileptic_seizure.errors}}
+                </div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <label>Epilepsy years</label>
+                <div class="disabled field" readonly="">{{form.epilepsy_decimal_years}}</div>
+              </div>
+        </div>
+    
+    <button type="submit" class="ui green button" name="update">Save</button>
+    <button type="submit" class="ui red button" name="delete">Delete</button>
+    <button type="submit" class="ui blue button">Cancel</button>
+</form>

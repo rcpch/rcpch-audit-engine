@@ -4,7 +4,6 @@
 # standard dependencies
 pytest
 autopep8
-django-lint
 
 # third party dependencies
 bump2version

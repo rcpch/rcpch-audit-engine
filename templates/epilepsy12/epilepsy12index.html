@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="ui segment">
+    <div class="ui equal width centered middle aligned grid">
+        <div class="eight wide left floated left aligned column">
+            <a href= "https://www.rcpch.ac.uk/work-we-do/quality-improvement-patient-safety/epilepsy12-audit"><image src="{% static 'epilepsy12-logo.jpg' %}"/></a>
+        </div>
+        <div class="eight wide right floated right aligned column">
+            <a href= "https://www.rcpch.ac.uk/"><image src="{% static 'rcpch-logo.jpg' %}"/></a>
+        </div>
+        <div class="sixteen wide left floated left aligned column">
+            <div class="inline">
+                <h1>The UK National Audit for Childhood Epilepsies.</h1>
+                <h5>A platform for clinicians and families, built by the Royal College of Paediatrics and Child Health</h5>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="ui four stackable cards">
+    <div class="ui raised card">
+        
+        <div class="content">
+            <div class="header">Database Management</div>
+            <div class="meta">
+            <span class="category">Administrator Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge database icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'admin:index' %}>
+                <button class="ui fluid blue button" on>Select</button>
+            </a>
+        </div>
+    </div>
+    
+    <div class="ui raised card">      
+        <div class="content">
+            <div class="header">Community & Hospital</div>
+            <div class="meta">
+            <span class="category">Clinician Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge hospital outline icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'hospital_reports' %}>
+                <button class="ui fluid blue button" >Select</button>
+            </a> 
+        </div>
+    </div>
+
+    <div class="ui raised card">
+        <div class="content">
+            <div class="header">EEG Department</div>
+            <div class="meta">
+            <span class="category">Clinician Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge stethoscope icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'eeg' %}>
+                <button class="ui fluid blue button" on>Select</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="ui raised card">
+        <div class="content">
+            <div class="header">Children and Families</div>
+            <div class="meta">
+            <span class="category">Patient Access</span>
+            </div>
+            <div class="description">
+            <p></p>
+            </div>
+            <div class="center aligned image">
+                <i class="huge child icon"></i>
+            </div>
+        </div>
+        <div class="extra content">
+            <a href={% url 'patient' %}>
+                <button class="ui fluid blue button" on>Select</button>
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}  {% block content %}
+
+<h5 class="ui top attached inverted header">
+  Children and Young People
+</h5>
+<div class="ui raised attached segment">
+  {% if case_list.all %}
+    <table class="ui very basic celled table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Date of Birth</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Ethnicity</th>
+          <th>NHS Number</th>
+          <th>IMD (quintile)</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for case in case_list %}
+        <tr>
+          <td>
+            <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
+          </td>
+          <td>{{case.first_name}} {{case.surname}}</td>
+          <td>{{case.date_of_birth}}</td>
+          <td>{{case.age}}</td>
+          <td>{{case.get_gender_display}}</td>
+          <td>{{case.get_ethnicity_display}}</td>
+          <td>{{case.nhs_number}}</td>
+          <td>{{case.index_of_multiple_deprivation_quintile}}</td>
+          <td>
+            <div class="ui grid">
+              <div class="ui three wide column">
+                <a href="{% url 'update_case' id=case.id%}"><button class="ui mini blue icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+              </div>
+              <div class="ui three wide column">
+                <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini red icon button"  tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
+              </div>
+              <div class="ui ten wide column">
+                {% if case.registration %}
+                  <a href="{% url 'update_registration' case.id %}"><button class="ui mini blue button" tabindexed="2">Begin</button></a>
+                  {% comment %} <a href="{% url 'initial_assessment' case.id %}"><button class="ui mini blue button" tabindexed="3">Begin!</button></a> {% endcomment %}
+                {% else %}
+                  <a href="{% url 'register' id=case.id %}"><button class="ui mini blue button" tabindexed="2">Register</button></a>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td>
+            {% if case.locked %}<i class="lock icon" />{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>There are no cases yet</p>
+  {% endif %}
+  <hr />
+  <div class="ui grid">
+    
+      <div class="twelve wide column">
+          <a href="{% url 'create_case'%}"><button class="ui blue button">Add a new Child/Young Person</button></a>
+          
+          <div class="ui icon input">
+            <input type="text" class="prompt" placeholder="Search...">
+            <i class="inverted circular search link icon"></i>
+          </div>
+          <div class="ui selection dropdown">
+            <input type="hidden" name="selection">
+            <i class="dropdown icon"></i>
+            <div class="default text">Pick column to filter</div>
+            <div class="menu">
+              <div class="item" data-value="1">Date of Birth</div>
+              <div class="item" data-value="2">NHS Number</div>
+              <div class="item" data-value="3">Surname</div>
+            </div>
+          </div>
+          
+      </div>
+      
+      <div class="four wide column">
+          <div class="ui two mini statistics">
+            <div class="blue statistic">
+              <div class="value">
+                {{total_cases}}
+              </div>
+              <div class="label">
+                Total
+              </div>
+            </div>
+            <div class="blue statistic">
+              <div class="value">
+                {{total_registrations}}
+              </div>
+              <div class="label">
+                Registered
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+</div>
+<div class="ui bottom attached warning message">
+  <i class="warning icon"></i>
+  These are all the children and young people registered in all audits since 2022.
+</div>
+{% endblock %}
