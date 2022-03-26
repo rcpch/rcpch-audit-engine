@@ -71,11 +71,15 @@ $ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PA
 $ s/migrate
 ```
 
-### Create a super user
+## Create superuser to enable logging into admin section
 
 ```console
 $ python manage.py createsuperuser
 ```
+
+Then follow the command line prompts to create the first user
+
+Further users can subsequently be created in the Admin UI
 
 ### Running the server
 
@@ -92,16 +96,6 @@ you may need to allow permissions to run the bash script in that folder first:
 ```console
 $ chmod +x ./s/runserver
 ```
-
-### Create superuser to enable logging into admin section
-
-```console
-$ python manage.py createsuperuser
-```
-
-Then follow the command line prompts to create the first user
-
-Further users can subsequently be created in the Admin UI
 
 ## Stated Aims of the Audit
 
@@ -169,18 +163,18 @@ Case to Site 1:n
 Case to Comorbidity n:n
 
 Registration to Assessment 1:1
-InitialAssessment to Assessment 1:1
-InitialAssessment to EpilepsyContext  1:1
+Registration to InitialAssessment 1:1
+Registration to EpilepsyContext  1:1
 
-Comorbidity to Case n:n
+Comorbidity to EpilepsyContext 1:n
 
-Assessment to Investigations n:n
-Assessment to RescueMedicine 1:n
-Assessment to ElectroClinicalSyndrome 1:1
-Assessment to SeizureCause n:n
-Assessment to SeizureType 1:n
-Assessment to AntiEpilepsyDrug n:n
-Assessment to RescueMedicine n:n
-Assessment to NonEpilepsy 1:1
+Registration to Investigations 1:1
+Registration to RescueMedicine 1:1
+Registration to ElectroClinicalSyndrome 1:1
+Registration to SeizureCause 1:1
+Registration to SeizureType 1:1
+Registration to AntiEpilepsyDrug 1:1
+Registration to RescueMedicine 1:1
+Registration to NonEpilepsy 1:1
 
 HospitalTrust to Site 1:n
