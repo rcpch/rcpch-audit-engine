@@ -9,14 +9,21 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-# Standard imports
+
+
+# standard imports
 import os
 from pathlib import Path
 import sys
 import dj_database_url
 
-# Third party Imports
+# third party imports
 from django.core.management.utils import get_random_secret_key
+
+# RCPCH imports
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +40,9 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
                           "127.0.0.1,localhost").split(",")
 
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+# Development mode allows the use of alternate settings when running locally
+# Defaults to False. Set to true in an environment variable if needed.
+DEVELOPMENT_MODE = os.getenv("E12_DEVELOPMENT_MODE", "False") == "True"
 
 # Application definition
 
