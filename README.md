@@ -1,10 +1,4 @@
-# rcpch-audit-engine
-
-A framework for national clinical audits. Built using Django and Semantic UI.
-
-Initiallyt intended as a new platform for the RCPCH's established Epilepsy12 audit, but designed so as to be usable for other audits.
-
-### Designed and built by the RCPCH, by clinicians for clinicians
+# Designed and built by the RCPCH, by clinicians for clinicians
 
 <p align="center">
     <p align="center"></p>
@@ -16,15 +10,21 @@ Initiallyt intended as a new platform for the RCPCH's established Epilepsy12 aud
 
 National clinical audits are there to collect diagnosis and care process data on patient cohorts with a diagnosis in common, nationally, to measure standard of care. They are a way to make sure that clinics are meeting centrally-set standards, and give clinics feedback on how they are doing. National audits are commissioned by NHS England.
 
-`rcpch-audit-engine` is a (Django)[https://www.djangoproject.com/] 4.0 project which aims to standardise those elements of a national audit that can be standardised. It begins with Epilepsy12, a national audit for Childhood Epilepsies which has been in place since 2009.
+`rcpch-audit-engine` is a [Django](https://www.djangoproject.com/) 4.0 project which aims to standardise those elements of a national audit that can be standardised. It begins with Epilepsy12, a national audit for Childhood Epilepsies which has been in place since 2009.
 
-## Epilepsy12
+## rcpch-audit-engine
+
+A framework for national clinical audits. Built using Django and Semantic UI.
+
+Initially intended as a new platform for the RCPCH's established Epilepsy12 audit, but designed so as to be usable for other audits.
+
+### Epilepsy12
 
 <p align="center">
     <img align="center" src="epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
-### Setup
+#### Setup
 
 If you don't have python 3.10 installed already, you will need it. We recommend the use of a tool such as [pyenv](https://github.com/pyenv/pyenv) to assist with managing multiple Python versions and their accompanying Virtualenvs.
 
@@ -57,25 +57,25 @@ Then install all the requirements. Note you can't do this without Postgreql alre
 (rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
 ```
 
-### Create the database
+#### Create the database
 
 ```command
 (rcpch-audit-engine) ➜  ~ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
-### Initialize the environment variables
+#### Initialize the environment variables
 
 ```console
 (rcpch-audit-engine) ➜  ~ source example.env
 ```
 
-### Prepare the database for use
+#### Prepare the database for use
 
 ```console
 (rcpch-audit-engine) ➜  ~ s/migrate
 ```
 
-## Create superuser to enable logging into admin section
+#### Create superuser to enable logging into admin section
 
 ```console
 (rcpch-audit-engine) ➜  ~ python manage.py createsuperuser
@@ -85,7 +85,7 @@ Then follow the command line prompts to create the first user
 
 Further users can subsequently be created in the Admin UI
 
-### Running the server
+#### Running the server
 
 Navigate to the epilepsy12 outer folder and run the server:
 
@@ -101,7 +101,7 @@ you may need to allow permissions to run the bash script in that folder first:
 (rcpch-audit-engine) ➜  ~ chmod +x ./s/runserver
 ```
 
-## Stated Aims of the Audit
+### Stated Aims of the Audit
 
 * Continue to measure and improve care and outcomes for children and young people with
 epilepsies
@@ -112,13 +112,13 @@ epilepsies
 transition to adult services,
 * Provide services with local real-time patient- and service-level reporting.
 
-### Quality Improvement
+#### Quality Improvement
 
 * Supporting regional and national quality improvement activities
 * Epilepsy Quality Improvement Programme (EQIP)
 * Involving children and young people
 
-### There are 12 key performance indicators:
+#### There are 12 key performance indicators
 
 1. Input into care from a paediatrician with expertise in epilepsies,
 2. Input into care from an epilepsy specialist nurse (ESNs),
@@ -136,49 +136,48 @@ and
 11. Documented evidence of all key elements of care planning content,
 12. Record of a school individual healthcare plan.
 
-## Schema
+#### Schema
 
 Main classes - these are all found in the epilepsy12/models folder*
 
-The Case class records information about each young person
-The Registration class holds a record for each audit.
-The Assessment class holds information on cases gathered over the one year audit period.
-The InitialAssessment class is closely linked to Assessment and holds the minimum expected information collected at first assessment.  
-The Investigations class records dates that initial tests were recorded (ECG, EEG, CT and MRI)
-The EpilepsyContext class records contextual information that defines epilepsy risk.
-The Comorbidity class records information on emotional, behavioural, neurodevelopmental and neuropsychatric comorbidities
+* The Case class records information about each young person
+* The Registration class holds a record for each audit.
+* The Assessment class holds information on cases gathered over the one year audit period.
+* The InitialAssessment class is closely linked to Assessment and holds the minimum expected information collected at first assessment.  
+* The Investigations class records dates that initial tests were recorded (ECG, EEG, CT and MRI)
+* The EpilepsyContext class records contextual information that defines epilepsy risk.
+* The Comorbidity class records information on emotional, behavioural, neurodevelopmental and neuropsychatric comorbidities
 
-The RescueMedicine class records information on rescue medicines used.
-The AntiEpilepsyDrug class records information about antiepilepsy drugs.
+* The RescueMedicine class records information on rescue medicines used.
+* The AntiEpilepsyDrug class records information about antiepilepsy drugs.
 
-The SeizureType class describes the seizure type.
-The ElectroClinicalSydrome class records information on electroclinical syndromes.
-The SeizureCause class records the cause of each seizure.
-The NonEpilepsy class records information about nonepilepsy features of episode.
+* The SeizureType class describes the seizure type.
+* The ElectroClinicalSydrome class records information on electroclinical syndromes.
+* The SeizureCause class records the cause of each seizure.
+* The NonEpilepsy class records information about nonepilepsy features of episode.
 
-The Site class records information about each site that oversees the epilepsy care of each case.
-The HospitalTrust class records hospital trust details. It is used as a look up class for the Site class.
+* The Site class records information about each site that oversees the epilepsy care of each case.
+* The HospitalTrust class records hospital trust details. It is used as a look up class for the Site class.
 
+#### Relationships
 
-## Relationships
+* Case to Registration 1:1  
+* Case to Site 1:n  
+* Case to Comorbidity n:n
 
-Case to Registration 1:1
-Case to Site 1:n
-Case to Comorbidity n:n
+* Registration to Assessment 1:1
+* Registration to InitialAssessment 1:1
+* Registration to EpilepsyContext  1:1
 
-Registration to Assessment 1:1
-Registration to InitialAssessment 1:1
-Registration to EpilepsyContext  1:1
+* Comorbidity to EpilepsyContext 1:n
 
-Comorbidity to EpilepsyContext 1:n
+* Registration to Investigations 1:1
+* Registration to RescueMedicine 1:1
+* Registration to ElectroClinicalSyndrome 1:1
+* Registration to SeizureCause 1:1
+* Registration to SeizureType 1:1
+* Registration to AntiEpilepsyDrug 1:1
+* Registration to RescueMedicine 1:1
+* Registration to NonEpilepsy 1:1
 
-Registration to Investigations 1:1
-Registration to RescueMedicine 1:1
-Registration to ElectroClinicalSyndrome 1:1
-Registration to SeizureCause 1:1
-Registration to SeizureType 1:1
-Registration to AntiEpilepsyDrug 1:1
-Registration to RescueMedicine 1:1
-Registration to NonEpilepsy 1:1
-
-HospitalTrust to Site 1:n
+* HospitalTrust to Site 1:n
