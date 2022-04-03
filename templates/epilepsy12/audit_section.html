@@ -12,18 +12,15 @@
 </h5>
 </div>
 <div class="ui raised attached segment">
-  <form class="ui form" method="post">
-      {% block audit_section_form %}{% endblock %}
-  </form>
-</div>
-<div class="ui blue segment">
-  {% block audit_section_list %}{% endblock %}
-</div>
-<div class="ui container">
-  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
+  {% block audit_section_form %}{% endblock %}
+  {% block audit_section_form_2 %}{% endblock %}
 </div>
 <div class="ui bottom attached warning message">
   <i class="warning icon"></i>
   {% block audit_section_instructions %}{% endblock %}
+</div>
+{% block audit_section_list %}{% endblock %}
+<div class="ui container">
+  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete assessment=assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
 </div>
 {% endblock %}

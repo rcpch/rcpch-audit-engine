@@ -1,0 +1,32 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+    <div class="ui form">
+        <div class="fields">
+          <div class="field">
+            <label>Condition</label>
+            <input type="text" placeholder="condition">
+          </div>
+          <div class="field">
+            <label>Middle name</label>
+            <input type="text" placeholder="Middle Name">
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" placeholder="Last Name">
+          </div>
+        </div>
+      </div>
+      <button class="ui button" type="submit">Submit</button?
+</form>
+<script>
+    $( function() {
+        var availableTags = [
+            {% for language in languages %}
+                "{{language.name}}",
+            {% endfor %}
+        ];
+        $( "#tags" ).autocomplete({
+          source: availableTags
+        });
+      } );
+</script>

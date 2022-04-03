@@ -4,12 +4,20 @@ from django.contrib.auth.decorators import login_required
 from epilepsy12.models.case import Case
 
 from ..models import Registration
+from ..general_functions import *
+
+
+@login_required
+def desscribe(request):
+    answer = disease_type_search()
 
 
 @login_required
 def create_multiaxial_description(request, case_id):
     # form = MultiaxialDescriptionForm(request.POST or None)
-    # if request.method == "POST":
+    if request.method == "POST":
+        print(form)
+        disease_type_search()
     #     if form.is_valid():
     #         obj = form.save(commit=False)
     #         # registration = Registration.objects.filter(case=id)
@@ -25,6 +33,7 @@ def create_multiaxial_description(request, case_id):
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
         "initial_assessment_complete": registration.initial_assessment_complete,
+        "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
         "investigation_management_complete": registration.investigation_management_complete,
@@ -58,6 +67,7 @@ def update_multiaxial_description(request, case_id):
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
         "initial_assessment_complete": registration.initial_assessment_complete,
+        "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
         "investigation_management_complete": registration.investigation_management_complete,

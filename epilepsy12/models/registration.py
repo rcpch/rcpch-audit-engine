@@ -48,6 +48,9 @@ class Registration(models.Model):
     initial_assessment_complete = models.BooleanField(
         default=False
     )
+    assessment_complete = models.BooleanField(
+        default=False
+    )
     epilepsy_context_complete = models.BooleanField(
         default=False
     )

@@ -4,26 +4,28 @@
 {% include './forms/epilepsy_context_form.html' %} 
 {% endblock %}
 {% block audit_section_list %}
-<h1>Comorbidities</h1>
-{% for comorbidity in comorbidities %}
-{% if comorbidity %} 
-<table class="ui very basic celled table">
-    <thead>
-        <th>Comorbidity</th>
-        <th>SNOMED-CT code</th>
-        <th></th>
-    </thead>
-    <tbody>
-        <td>{{ comorbidity.get_comorbidity_display }}</td>
-        <td>{{ comorbidity.comorbidity_snomed_code }}</td>
-        <td><button class="ui circular red round icon button"><i class="trash alternate outline icon"></i></button></td>
-    </tbody>
-</table>
-<button class="ui mini blue button">Add Comorbidity</button>
-{% else %}
-<p>There are no reported comorbidities yet.</p>
-{% endif %} 
-{% endfor %}
+    <div class="ui blue segment">
+        <h1>Comorbidities</h1>
+        {% for comorbidity in comorbidities %}
+            {% if comorbidity %} 
+            <table class="ui very basic celled table">
+                <thead>
+                    <th>Comorbidity</th>
+                    <th>SNOMED-CT code</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <td>{{ comorbidity.get_comorbidity_display }}</td>
+                    <td>{{ comorbidity.comorbidity_snomed_code }}</td>
+                    <td><button class="ui circular red round icon button"><i class="trash alternate outline icon"></i></button></td>
+                </tbody>
+            </table>
+            <button class="ui mini blue button">Add Comorbidity</button>
+            {% else %}
+            <p>There are no reported comorbidities yet.</p>
+            {% endif %} 
+        {% endfor %}
+    </div>
 {% endblock audit_section_list %}
 {% block audit_section_instructions %} Please enter all
 information relating to the child or young person's risk factors for epilepsy.

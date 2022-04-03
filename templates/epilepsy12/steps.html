@@ -1,5 +1,5 @@
 {% block steps %}
-<div class="ui ordered steps">
+<div class="ui ordered tiny steps">
     {% if initial_assessment_complete %}
         {% if active_template == "initial_assessment" %}
           <a class="active completed step" href="{% url 'update_initial_assessment' case_id %}">
@@ -63,6 +63,27 @@
       </div>
     </a>
 
+    {% if assessment_complete %}
+        {% if active_template == "assessment" %}
+          <a class="active completed step" href="{% url 'update_assessment' case_id %}">
+        {% else %}
+          <a class="completed step" href="{% url 'update_assessment' case_id %}">
+        {% endif %}
+    {% else %}
+        {% if active_template == "assessment" %}
+          <a href="{% url 'update_assessment' case_id %}" class="active step">
+        {% elif active_template == "none" %}
+          <a href="{% url 'update_assessment' case_id %}" class="disabled step">
+        {% else %}
+          <a href="{% url 'create_assessment' case_id %}" class="step">
+        {% endif %}
+    {% endif %}
+      <div class="content">
+        <div class="title">Milestones</div>
+        <div class="description">Important milestones</div>
+      </div>
+    </a>
+
     {% if investigation_management_complete %}
       {% if active_template == "investigation_management" %}
         <a class="active completed step" href="{% url 'update_investigation_management' case_id %}">
@@ -79,8 +100,9 @@
       {% endif %}
     {% endif %}
       <div class="content">
-        <div class="title">Investigation & Management</div>
+        <div class="title">Tests & Treatment</div>
         <div class="description">Tests, medications and teams</div>
       </div>
     </a>
+  </div>
 {% endblock steps %}

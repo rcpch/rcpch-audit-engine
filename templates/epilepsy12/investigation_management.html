@@ -4,8 +4,11 @@
 Investigations and Management
 {% endblock %}
 {% block audit_section_form %}
-{% include './forms/investigation_management_form.html' %}
+{% include './forms/investigation_form.html' %}
+{% endblock %}
+{% block audit_section_form_2 %}
+{% include './forms/management_form.html' %}
 {% endblock %}
 {% block audit_section_instructions %}
-Please enter all information relating to the investigations and management.
+Please enter all information relating both to investigations performed and rescue medicine prescribed.
 {% endblock %}

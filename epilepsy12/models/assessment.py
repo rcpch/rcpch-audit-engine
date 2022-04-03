@@ -4,10 +4,6 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .electroclinical_syndrome import ElectroClinicalSyndrome
-from .investigations import Investigations
-from .nonepilepsy import NonEpilepsy
-from .seizure_cause import SeizureCause
 from .registration import Registration
 
 
@@ -22,9 +18,6 @@ class Assessment(models.Model):
     The cohort number is calculated from the initial date of first paediatric assessment
     """
 
-    assessment_date = models.DateTimeField(
-        "Date of assessment"
-    )
     has_an_aed_been_given = models.BooleanField(
         "Has an antiepilepsy medicine been prescribed?",
         default=False
@@ -71,74 +64,35 @@ class Assessment(models.Model):
         "Were any of the epileptic seizures convulsive?",
         default=False
     )
-    prolonged_generalized_convulsive_seizures = models.CharField(
+    prolonged_generalized_convulsive_seizures = models.BooleanField(
         "Were there any prolonged generalised epileptic seizures?",
-        max_length=3,
-        choices=OPT_OUT_UNCERTAIN
+        default=False
     )
-    experienced_prolonged_focal_seizures = models.CharField(
+    experienced_prolonged_focal_seizures = models.BooleanField(
         "Were there any prolonged focal seizures?",
-        max_length=3,
-        choices=OPT_OUT_UNCERTAIN
+        default=False
     )
-    has_an_aed_been_given = models.CharField(
+    has_an_aed_been_given = models.BooleanField(
         "Has an antiepilepsy medicine been given?",
-        max_length=2,
-        choices=OPT_OUT
+        default=False
     )
-    paroxysmal_episode = models.CharField(
+    paroxysmal_episode = models.BooleanField(
         "Were any episodes paroxysmal?",
-        max_length=1,
-        choices=OPT_OUT
+        default=False
     )
 
-    # relationships
-    electroclinical_syndrome = models.OneToOneField(
-        ElectroClinicalSyndrome,
-        on_delete=models.CASCADE,
-        verbose_name="related electroclinical syndrome"
-    )
-    investigations = models.OneToOneField(
-        Investigations,
-        on_delete=models.CASCADE,
-        verbose_name="related investigations"
-    )
     registration = models.OneToOneField(
         Registration,
         on_delete=models.CASCADE,
         verbose_name="related registration"
     )
-    seizure_causes = models.OneToOneField(
-        SeizureCause,
-        on_delete=models.CASCADE,
-        verbose_name="seizure causes"
-    )
-    nonepilepsy = models.OneToOneField(
-        NonEpilepsy,
-        on_delete=models.CASCADE,
-        verbose_name="related nonepilepsy explanation"
-    )
-
-    @property
-    def allocate_cohort(self):
-        # returns a cohort number 1-3 based on month of year
-        if (self.assessment_date.strftime('%m')):
-            assessment_month = self.assessment_date.strftime('%m')
-            if (assessment_month < 6):
-                # between January and May
-                return 1
-            elif(assessment_month < 9):
-                # between Juen and August
-                return 2
-            else:
-                return 3
 
     class Meta:
         verbose_name = "assessment",
         verbose_name_plural = "assessments"
 
     def __str__(self) -> str:
-        return self.assessment_date
+        return "assessment"
 
     # TODO #14 Class function to calculate cohort based on first paediatric assessment date
     # this creates a cohort number (integer) based on where in the year they are

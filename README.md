@@ -38,43 +38,47 @@ $ pyenv install 3.10.0
 
 You will also need the [Postgresql](https://www.postgresql.org/) database, which can be installed natively on your development machine, or can be installed using Docker.
 
-
-
 Then create a virtual environment:
 
 ```console
-$ pyenv virtualenv 3.10.0 rcpch-audit-engine
+(python-3.10) ➜  ~ pyenv virtualenv 3.10.0 rcpch-audit-engine
 ```
 
 Clone the repository and `cd` into the directory:
 
 ```console
-$ git clone https://github.com/rcpch/rcpch-audit-engine.git
-$ cd rcpch-audit-engine
+(rcpch-audit-engine) ➜  ~ git clone https://github.com/rcpch/rcpch-audit-engine.git
+(rcpch-audit-engine) ➜  ~ cd rcpch-audit-engine
 ```
 
 Then install all the requirements. Note you can't do this without Postgreql already installed.
 
 ```console
-$ pip install -r requirements/development-requirements
+(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
 ```
 
 ### Create the database
 
 ```command
-$ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+(rcpch-audit-engine) ➜  ~ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+```
+
+### Initialize the environment variables
+
+```console
+(rcpch-audit-engine) ➜  ~ source example.env
 ```
 
 ### Prepare the database for use
 
 ```console
-$ s/migrate
+(rcpch-audit-engine) ➜  ~ s/migrate
 ```
 
 ## Create superuser to enable logging into admin section
 
 ```console
-$ python manage.py createsuperuser
+(rcpch-audit-engine) ➜  ~ python manage.py createsuperuser
 ```
 
 Then follow the command line prompts to create the first user
@@ -86,7 +90,7 @@ Further users can subsequently be created in the Admin UI
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-$ s/runserver
+(rcpch-audit-engine) ➜  ~ s/runserver
 ```
 
 or
@@ -94,7 +98,7 @@ or
 you may need to allow permissions to run the bash script in that folder first:
 
 ```console
-$ chmod +x ./s/runserver
+(rcpch-audit-engine) ➜  ~ chmod +x ./s/runserver
 ```
 
 ## Stated Aims of the Audit
