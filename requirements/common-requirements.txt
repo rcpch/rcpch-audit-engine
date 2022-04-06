@@ -1,8 +1,10 @@
-# standard dependencies
+# standard imports
 requests
 python-dateutil
 
-# third party dependencies
-Django
+# third party imports
+django
 psycopg2-binary
-python-dotenv
+dj_database_url
+
+# RCPCH imports
