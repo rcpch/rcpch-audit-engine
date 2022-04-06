@@ -51,7 +51,7 @@ Clone the repository and `cd` into the directory:
 (rcpch-audit-engine) ➜  ~ cd rcpch-audit-engine
 ```
 
-Then install all the requirements. Note you can't do this without Postgreql already installed.
+Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
 (rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
@@ -60,7 +60,7 @@ Then install all the requirements. Note you can't do this without Postgreql alre
 #### Create the database
 
 ```command
-(rcpch-audit-engine) ➜  ~ docker run --name E12_Container -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12password -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 #### Initialize the environment variables
