@@ -1,4 +1,4 @@
-# Designed and built by the RCPCH, by clinicians for clinicians
+# rcpch-audit-engine
 
 <p align="center">
     <p align="center"></p>
@@ -12,73 +12,82 @@ National clinical audits are there to collect diagnosis and care process data on
 
 `rcpch-audit-engine` is a [Django](https://www.djangoproject.com/) 4.0 project which aims to standardise those elements of a national audit that can be standardised. It begins with Epilepsy12, a national audit for Childhood Epilepsies which has been in place since 2009.
 
-## rcpch-audit-engine
 
-A framework for national clinical audits. Built using Django and Semantic UI.
+A framework for national clinical audits. Built using Django and Semantic UI. Initially intended as a new platform for the RCPCH's established Epilepsy12 audit, but designed so as to be usable for other audits.
 
-Initially intended as a new platform for the RCPCH's established Epilepsy12 audit, but designed so as to be usable for other audits.
-
-### Epilepsy12
+## Epilepsy12
 
 <p align="center">
     <img align="center" src="epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
-#### Setup
+### Development Setup
 
-If you don't have python 3.10 installed already, you will need it. We recommend the use of a tool such as [pyenv](https://github.com/pyenv/pyenv) to assist with managing multiple Python versions and their accompanying Virtualenvs.
+#### Install PostgreSQL and create the database with the correct credentials
+
+You will need the [Postgresql](https://www.postgresql.org/) database, which can be installed natively on your development machine, or (recommended) can be installed using Docker.
+
+Using the command below will create a development database with credentials that match those in our `example.env` file.  
+You will need Docker to be installed on your local machine. (Please search the web for instructions for installation on your operating system and setup)
 
 ```console
-$ pyenv install 3.10.0
+docker run --name epilepsy12postgres \
+    -e POSTGRES_USER=epilepsy12user \
+    -e POSTGRES_PASSWORD=epilepsy12password \
+    -e POSTGRES_DB=epilepsy12db \
+    -p 5432:5432 \
+    -d postgres
+```
+
+#### Install correct Python version
+
+If you don't have python 3.10 installed already, you will need it.
+
+We recommend the use of a tool such as [pyenv](https://github.com/pyenv/pyenv) to assist with managing multiple Python versions and their accompanying virtualenvs.
+
+```console
+pyenv install 3.10.0
 ```
 
 > On some platforms, you will get errors at build-time, which indicates you need to install some dependencies which are required for building the Python binaries locally. Rather than listing these here, where they may become out of date, please refer to the [pyenv wiki](https://github.com/pyenv/pyenv/wiki) which covers this in detail.
 
 
 
-You will also need the [Postgresql](https://www.postgresql.org/) database, which can be installed natively on your development machine, or can be installed using Docker.
-
 Then create a virtual environment:
 
 ```console
-(python-3.10) ➜  ~ pyenv virtualenv 3.10.0 rcpch-audit-engine
+pyenv virtualenv 3.10.0 rcpch-audit-engine
 ```
 
 Clone the repository and `cd` into the directory:
 
 ```console
-(rcpch-audit-engine) ➜  ~ git clone https://github.com/rcpch/rcpch-audit-engine.git
-(rcpch-audit-engine) ➜  ~ cd rcpch-audit-engine
+git clone https://github.com/rcpch/rcpch-audit-engine.git
+cd rcpch-audit-engine
 ```
 
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
-```
-
-#### Create the database
-
-```command
-(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12password -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+pip install -r requirements/development-requirements
 ```
 
 #### Initialize the environment variables
 
 ```console
-(rcpch-audit-engine) ➜  ~ source example.env
+source example.env
 ```
 
 #### Prepare the database for use
 
 ```console
-(rcpch-audit-engine) ➜  ~ s/migrate
+s/migrate
 ```
 
 #### Create superuser to enable logging into admin section
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py createsuperuser
+python manage.py createsuperuser
 ```
 
 Then follow the command line prompts to create the first user
@@ -90,7 +99,7 @@ Further users can subsequently be created in the Admin UI
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-(rcpch-audit-engine) ➜  ~ s/runserver
+s/runserver
 ```
 
 or
@@ -98,7 +107,7 @@ or
 you may need to allow permissions to run the bash script in that folder first:
 
 ```console
-(rcpch-audit-engine) ➜  ~ chmod +x ./s/runserver
+chmod +x ./s/runserver
 ```
 
 ### Stated Aims of the Audit
