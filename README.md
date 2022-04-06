@@ -21,8 +21,6 @@ A framework for national clinical audits. Built using Django and Semantic UI. In
     <img align="center" src="epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
-[![DOI](https://zenodo.org/badge/415328052.svg)](https://zenodo.org/badge/latestdoi/415328052)
-
 ### Development Setup
 
 #### Install PostgreSQL and create the database with the correct credentials
@@ -35,7 +33,7 @@ You will need Docker to be installed on your local machine. (Please search the w
 ```console
 docker run --name epilepsy12postgres \
     -e POSTGRES_USER=epilepsy12user \
-    -e POSTGRES_PASSWORD=epilepsy12 \
+    -e POSTGRES_PASSWORD=epilepsy12password \
     -e POSTGRES_DB=epilepsy12db \
     -p 5432:5432 \
     -d postgres
@@ -53,6 +51,9 @@ pyenv install 3.10.0
 
 > On some platforms, you will get errors at build-time, which indicates you need to install some dependencies which are required for building the Python binaries locally. Rather than listing these here, where they may become out of date, please refer to the [pyenv wiki](https://github.com/pyenv/pyenv/wiki) which covers this in detail.
 
+We recommend the use of a tool such as [pyenv](https://github.com/pyenv/pyenv) to assist with managing multiple Python versions and their accompanying virtualenvs.
+
+
 Then create a virtual environment:
 
 ```console
@@ -69,7 +70,7 @@ cd rcpch-audit-engine
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-pip install -r requirements/development-requirements.txt
+pip install -r requirements/development-requirements
 ```
 
 #### Initialize the environment variables
@@ -108,35 +109,6 @@ you may need to allow permissions to run the bash script in that folder first:
 
 ```console
 chmod +x ./s/runserver
-chmod +x ./s/migrate
-chmod +x ./s/seed
-chmod +x ./s/init
-```
-
-#### Seeding the Database
-
-You will need to see the hospitals table with hospitals from the Constants folder.
-
-```console
-python manage.py seed --mode=seed_hospitals
-```
-
-If you need to delete all the hospitals:
-
-```console
-python manage.py seed --mode=delete_hospitals
-```
-
-To add the semiology keywords to the database:
-
-```console
-python manage.py seed --mode=seed_semiology_keywords
-```
-
-To add the some dummy cases to the database:
-
-```console
-python manage.py seed --mode=seed_dummy_cases
 ```
 
 If you want to seed with all these, there is a short cut in the start folder:
