@@ -49,7 +49,7 @@ def update_epilepsy_context(request, case_id):
         registration__case=case_id).first()
     registration = Registration.objects.filter(case=case_id).first()
     comorbidities = Comorbidity.objects.filter(
-        epilepsy_context=epilepsy_context.id)
+        case=case_id).all()
     form = EpilepsyContextForm(instance=epilepsy_context)
 
     if request.method == "POST":

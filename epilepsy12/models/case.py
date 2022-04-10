@@ -85,7 +85,8 @@ class Case(models.Model):
         # A quintile is calculated on save and persisted in the database
         "index of multiple deprivation calculated from MySociety data.",
         blank=True,
-        editable=False
+        editable=False,
+        null=True
     )
 
     @property
@@ -147,8 +148,9 @@ class Case(models.Model):
             *args, **kwargs) -> None:
 
         # This field requires the deprivare api to be running
-        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-            self.postcode)
+        # commented out for now to allow live demo to function
+        # self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+        #     self.postcode)
         return super().save(*args, **kwargs)
 
     class Meta:

@@ -60,7 +60,7 @@ Then install all the requirements. Note you can't do this without PostgreSQL alr
 #### Create the database
 
 ```command
-(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12password -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 #### Initialize the environment variables

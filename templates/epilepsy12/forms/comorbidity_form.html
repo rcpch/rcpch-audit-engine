@@ -1,0 +1,27 @@
+<form class="ui form" method="post">
+  {% csrf_token %}
+    <div class="field">
+        <label>Comorbidity</label>
+        <div class="field">{{form.comorbidity}}</div>
+        {% if form.comorbidity.errors %}
+            <div class="ui pointing red basic label">{{form.comorbidity.errors}}</div>
+        {% endif %}
+    </div>
+    <div class="field">
+        <label>Comorbidity (details)</label>
+        <div class="field">{{form.comorbidity_free_text}}</div>
+        {% if form.comorbidity_free_text.errors %}
+            <div class="ui pointing red basic label">{{form.comorbidity_free_text.errors}}</div>
+        {% endif %}
+    </div>
+    <div class="field">
+        <label>SNOMED-CT code</label>
+        <div class="field">{{form.comorbidity_snomed_code}}</div>
+        {% if form.comorbidity_snomed_code.errors %}
+            <div class="ui pointing red basic label">{{form.comorbidity_snomed_code.errors}}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="ui green button" name="update">Save</button>
+    <button type="submit" class="ui red button" name="delete">Delete</button>
+    <button type="submit" class="ui blue button">Cancel</button>
+</form>

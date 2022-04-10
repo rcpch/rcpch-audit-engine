@@ -6,8 +6,7 @@
 {% block audit_section_list %}
     <div class="ui blue segment">
         <h1>Comorbidities</h1>
-        {% for comorbidity in comorbidities %}
-            {% if comorbidity %} 
+        {% if comorbidities|length > 0 %}
             <table class="ui very basic celled table">
                 <thead>
                     <th>Comorbidity</th>
@@ -15,16 +14,20 @@
                     <th></th>
                 </thead>
                 <tbody>
-                    <td>{{ comorbidity.get_comorbidity_display }}</td>
-                    <td>{{ comorbidity.comorbidity_snomed_code }}</td>
-                    <td><button class="ui circular red round icon button"><i class="trash alternate outline icon"></i></button></td>
+                    {% for comorbidity in comorbidities %}
+                        <tr>
+                            <td>{{ comorbidity.get_comorbidity_display }}</td>
+                            <td>{{ comorbidity.comorbidity_snomed_code }}</td>
+                            <td><button class="ui circular red round icon button"><i class="trash alternate outline icon"></i></button></td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-            <button class="ui mini blue button">Add Comorbidity</button>
-            {% else %}
+            <a href="{% url 'create_comorbidity' case_id %}"><button class="ui mini blue button" >Add Comorbidity</button></a>
+        {% else %}
             <p>There are no reported comorbidities yet.</p>
-            {% endif %} 
-        {% endfor %}
+            <a href="{% url 'create_comorbidity' case_id %}"><button class="ui mini blue button" >Add Comorbidity</button></a>
+        {% endif %}
     </div>
 {% endblock audit_section_list %}
 {% block audit_section_instructions %} Please enter all

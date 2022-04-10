@@ -3,7 +3,7 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .epilepsy_context import EpilepsyContext
+from .case import Case
 
 
 class Comorbidity(models.Model):
@@ -28,8 +28,8 @@ class Comorbidity(models.Model):
     )  # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
 
     # relationships
-    epilepsy_context = models.ForeignKey(
-        EpilepsyContext,
+    case = models.ForeignKey(
+        Case,
         on_delete=models.CASCADE,
         null=False,
         blank=False,
