@@ -1,14 +1,12 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_abstract_base_classes import *
 
-from .assessment import Assessment
+from .registration import Registration
 
 
-class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class Investigation_Management(models.Model):
     """
     This class records information on rescue medicines used.
-    It references the Episode class, since one episode can involve the use of several medicines
     """
 
     rescue_medicine_type = models.CharField(
@@ -35,16 +33,34 @@ class RescueMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         max_length=250
     )
 
+    eeg_indicated = models.BooleanField(
+        default=True
+    )
+    eeg_request_date = models.DateTimeField()
+
+    eeg_performed_date = models.DateTimeField()
+
+    twelve_lead_ecg_status = models.BooleanField(
+        default=False
+    )
+
+    ct_head_scan_status = models.BooleanField(
+        default=False
+    )
+
+    mri_brain_date = models.DateField()
+
     # relationships
-    assessment = models.ForeignKey(
-        Assessment,
-        related_name="assessment",
-        on_delete=models.CASCADE
+    registration = models.OneToOneField(
+        Registration,
+        on_delete=models.CASCADE,
+        verbose_name="Related Registration",
+        null=True
     )
 
     class Meta:
-        verbose_name = 'Rescue Medicine'
-        verbose_name_plural = 'Rescue Medicines'
+        verbose_name = 'Investigations and Managment'
+        verbose_name_plural = 'Investigations and Managment Milestones'
 
     def __str__(self) -> str:
         return self.rescue_medicine_type

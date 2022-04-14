@@ -1,9 +1,6 @@
 
-from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from epilepsy12.constants import comorbidities
-from epilepsy12.models import epilepsy_context
 from epilepsy12.models.comorbidity import Comorbidity
 
 from epilepsy12.models.registration import Registration
@@ -17,6 +14,8 @@ from ..models import EpilepsyContext
 def create_epilepsy_context(request, case_id):
     form = EpilepsyContextForm(request.POST or None)
     registration = Registration.objects.filter(case=case_id).first()
+    comorbidities = Comorbidity.objects.filter(
+        case=case_id).all()
     if request.method == "POST":
         if form.is_valid():
             obj = form.save(commit=False)
@@ -38,7 +37,8 @@ def create_epilepsy_context(request, case_id):
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
         "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "epilepsy_context"
+        "active_template": "epilepsy_context",
+        "comorbidities": comorbidities
     }
     return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
 

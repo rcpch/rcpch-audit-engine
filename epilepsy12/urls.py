@@ -33,7 +33,7 @@ urlpatterns = [
          views.create_comorbidity, name="create_comorbidity"),
     path('comorbidity/<int:case_id>/update',
          views.update_comorbidity, name="update_comorbidity"),
-    path('investigation_management/<int:case_id>/update',
+    path('investigation_management/<int:case_id>/create',
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
