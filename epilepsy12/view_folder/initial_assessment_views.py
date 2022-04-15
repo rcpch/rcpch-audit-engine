@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from ..models import Registration
 from ..models import InitialAssessment
@@ -17,8 +18,10 @@ def create_initial_assessment(request, case_id):
             obj.registration = registration
             Registration.objects.filter(case=case_id).update(
                 initial_assessment_complete=True)
+            messages.success(
+                request, "You successfully added an initial assessment!")
             obj.save()
-            return redirect('cases')
+            return redirect('update_initial_assessement', case_id)
         else:
             print('not valid')
 
@@ -45,14 +48,20 @@ def update_initial_assessment(request, case_id):
 
     if request.method == "POST":
         if ('delete') in request.POST:
+            Registration.objects.filter(case=case_id).update(
+                initial_assessment_complete=False)
             initial_assessment.delete()
-            return redirect('cases')
+            messages.success(
+                request, "You successfully deleted the initial assessment.")
+            return redirect('create_initial_assessment', case_id)
         form = InitialAssessmentForm(request.POST, instance=initial_assessment)
         if form.is_valid:
             obj = form.save()
             obj.save()
-            # messages.success(request, "You successfully updated the post")
-            return redirect('cases')
+            Registration.objects.filter(case=case_id).update(
+                epilepsy_context_complete=True)
+            messages.success(
+                request, "You successfully updated the initial assessment.")
 
     context = {
         "form": form,
