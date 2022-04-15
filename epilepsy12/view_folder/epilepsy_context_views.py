@@ -26,8 +26,7 @@ def create_epilepsy_context(request, case_id):
             return redirect('cases')
         else:
             print('not valid')
-    # case = Case.objects.get(id=case_id)
-    # registration = Registration.objects.filter(case=case_id).first()
+
     context = {
         "form": form,
         "case_id": case_id,
@@ -69,6 +68,7 @@ def update_epilepsy_context(request, case_id):
         "form": form,
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
+        "epilepsy_decimal_years": epilepsy_context.epilepsy_decimal_years,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
