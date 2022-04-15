@@ -102,4 +102,13 @@ $('.message .close')
       .transition('fade')
     ;
   });
+
+  $('#casecompletionprogress')
+    .progress({
+    label: 'ratio',
+    text: {
+      ratio: '{value} of {total}'
+    }
+  });
+
 </script>

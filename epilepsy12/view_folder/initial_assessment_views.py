@@ -21,7 +21,7 @@ def create_initial_assessment(request, case_id):
             messages.success(
                 request, "You successfully added an initial assessment!")
             obj.save()
-            return redirect('update_initial_assessement', case_id)
+            return redirect('update_initial_assessment', case_id)
         else:
             print('not valid')
 

@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.forms import CaseForm
 from epilepsy12.models.registration import Registration
+from epilepsy12.view_folder.registration_views import register
 from ..models import Case
 from django.contrib import messages
 
