@@ -1,6 +1,7 @@
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from epilepsy12.models.comorbidity import Comorbidity
 
 from epilepsy12.models.registration import Registration
@@ -23,7 +24,9 @@ def create_epilepsy_context(request, case_id):
             Registration.objects.filter(case=case_id).update(
                 epilepsy_context_complete=True)
             obj.save()
-            return redirect('cases')
+            messages.success(
+                request, "You successfully added some epilepsy risk factors!")
+            return redirect('update_epilepsy_context', case_id)
         else:
             print('not valid')
 
@@ -54,13 +57,18 @@ def update_epilepsy_context(request, case_id):
     if request.method == "POST":
         if ('delete') in request.POST:
             epilepsy_context.delete()
+            Registration.objects.filter(case=case_id).update(
+                epilepsy_context_complete=False)
+            messages.success(
+                request, "You successfully deleted the epilepsy risk factors!")
             return redirect('cases')
         form = EpilepsyContextForm(request.POST, instance=epilepsy_context)
         if form.is_valid:
             obj = form.save()
             obj.save()
-            # messages.success(request, "You successfully updated the post")
-            return redirect('cases')
+            messages.success(
+                request, "You successfully updated the epilepsy risk factors!")
+            # return redirect('cases')
 
     case = Case.objects.get(id=case_id)
 
@@ -79,10 +87,3 @@ def update_epilepsy_context(request, case_id):
     }
 
     return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
-
-
-@login_required
-def delete_epilepsy_context(request, case_id):
-    registration = get_object_or_404(Registration, id=id)
-    registration.delete()
-    return redirect('cases')

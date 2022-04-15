@@ -58,6 +58,17 @@
         </div>
       {% endblock %}
         
+        {% if messages %}
+          <div class="ui green message">
+            <i class="close icon"></i>
+            {# <ul class="messages"> #}
+                {% for message in messages %}
+                  <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                {% endfor %}
+            {# </ul> #}
+          </div>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
         
@@ -85,3 +96,12 @@
   </body>
   
 </html>
+<script>
+$('.message .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
+  });
+</script>
