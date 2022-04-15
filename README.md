@@ -101,6 +101,20 @@ you may need to allow permissions to run the bash script in that folder first:
 (rcpch-audit-engine) ➜  ~ chmod +x ./s/runserver
 ```
 
+#### Seeding the Database
+
+You will need to see the hospitals table with hospitals from the Constants folder.
+
+```console
+(rcpch-audit-engine) ➜  ~ python manage.py seed
+```
+
+If you need to delete all the hospitals:
+
+```console
+(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete
+```
+
 ### Stated Aims of the Audit
 
 * Continue to measure and improve care and outcomes for children and young people with
