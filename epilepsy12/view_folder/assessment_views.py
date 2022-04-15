@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from ..models import Registration
 from ..models import Assessment
@@ -18,7 +19,9 @@ def create_assessment(request, case_id):
             Registration.objects.filter(case=case_id).update(
                 assessment_complete=True)
             obj.save()
-            return redirect('cases')
+            messages.success(
+                request, "You successfully added new milestones!")
+            return redirect('update_assessment', case_id)
         else:
             print('not valid')
 
@@ -46,12 +49,19 @@ def update_assessment(request, case_id):
     if request.method == "POST":
         if ('delete') in request.POST:
             assessment.delete()
+            Registration.objects.filter(case=case_id).update(
+                assessment_complete=False)
+            messages.success(
+                request, "You successfully deleted the milestones!")
             return redirect('cases')
         form = AssessmentForm(request.POST, instance=assessment)
         if form.is_valid:
             obj = form.save()
             obj.save()
-            # messages.success(request, "You successfully updated the post")
+            Registration.objects.filter(case=case_id).update(
+                assessment_complete=True)
+            messages.success(
+                request, "You successfully updated the milestones!")
             return redirect('cases')
 
     context = {
@@ -67,10 +77,3 @@ def update_assessment(request, case_id):
     }
 
     return render(request=request, template_name='epilepsy12/assessment.html', context=context)
-
-
-@login_required
-def delete_assessment(request, id):
-    assessment = get_object_or_404(AssessmentForm, id=id)
-    assessment.delete()
-    return redirect('cases')
