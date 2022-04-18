@@ -26,7 +26,6 @@ class Case(models.Model):
     2. NHS number must be present
     3. 1 year must have passed
 
-    ?analysis flag
     """
     # _id = models.ObjectIdField()
     locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
