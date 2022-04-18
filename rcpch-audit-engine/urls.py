@@ -23,6 +23,7 @@ urlpatterns = [
     path("epilepsy12/", include("epilepsy12.urls")),
     path('epilepsy12/', include('django.contrib.auth.urls')),
     path('epilepsy12/', include('epilepsy12.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     # path('', RedirectView.as_view(url='epilepsy12/', permanent=True))
     # ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 ]

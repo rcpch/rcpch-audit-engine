@@ -4,10 +4,12 @@ from django.contrib.auth.admin import UserAdmin
 # Register your models here.
 from .models import *
 
-# from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
+from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
 
 
 class Epilepsy12UserAdmin(UserAdmin):
+    add_form = Epilepsy12UserCreationForm
+    form = Epilepsy12UserChangeForm
     order = ('surname')
     model = Epilepsy12User
     search_fields = ('email', 'username', 'surname',
@@ -65,7 +67,6 @@ class Epilepsy12UserAdmin(UserAdmin):
 
 
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
-
 admin.site.register(AntiEpilepsyMedicine)
 admin.site.register(Assessment)
 admin.site.register(Case)

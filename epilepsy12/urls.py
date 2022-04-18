@@ -41,4 +41,5 @@ urlpatterns = [
     path('eeg', views.eeg, name="eeg"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
+
 ]
