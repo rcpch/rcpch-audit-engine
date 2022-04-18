@@ -1,9 +1,8 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_abstract_base_classes import *
 
 
-class NonEpilepsy(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class NonEpilepsy(models.Model):
     """
     This class records information about nonepilepsy features of episode.
     This class optionally references the Episode class as one episode can have one set of nonepilepsy features.

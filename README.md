@@ -115,6 +115,18 @@ If you need to delete all the hospitals:
 (rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete
 ```
 
+#### Testing (optional step)
+
+We have used the coverage package to test our models.
+
+```console
+(rcpch-audit-engine) ➜  ~ pip install coverage
+(rcpch-audit-engine) ➜  ~ coverage run manage.py test
+(rcpch-audit-engine) ➜  ~ coverage html
+```
+
+If the ```htmlcov/index.html``` is opened in the browser, gaps in outstanding testing of the models can be found.
+
 ### Stated Aims of the Audit
 
 * Continue to measure and improve care and outcomes for children and young people with

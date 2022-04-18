@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import SignUpView
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -38,5 +39,6 @@ urlpatterns = [
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
     path('eeg', views.eeg, name="eeg"),
-    path('patient', views.patient, name="patient")
+    path('patient', views.patient, name="patient"),
+    path("signup/", SignUpView.as_view(), name="signup"),
 ]

@@ -14,3 +14,17 @@ ROLES = (
     (AUDIT_ANALYST, "Audit Analyst"),
     (AUDIT_ADMINISTRATOR, "Audit Administrator")
 )
+
+MR = 1
+MRS = 2
+MS = 3
+DR = 4
+PROFESSOR = 5
+
+TITLES = (
+    (MR, "Mr"),
+    (MRS, "Mrs"),
+    (MS, "Ms"),
+    (DR, "Dr"),
+    (PROFESSOR, "Professor")
+)

@@ -3,7 +3,7 @@ import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 from ..constants import *
@@ -39,7 +39,7 @@ class Case(models.Model):
         blank=True
     )
     locked_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=CASCADE,
         verbose_name="locked by",
         null=True

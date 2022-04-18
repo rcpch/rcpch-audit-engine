@@ -1,13 +1,12 @@
 
 from django.db import models
 from ..constants import *
-from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .assessment import Assessment
 
 
-class SeizureType(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class SeizureType(models.Model):
     """
     This class records the seizure type.
     COULD IT BE ORGANISED DIFFERENTLY - IT SEEMS TO BE A LOT OF BOOLEANS

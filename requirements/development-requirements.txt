@@ -5,6 +5,7 @@
 pytest
 autopep8
 pylint
+coverage
 
 # third party imports
 bump2version
