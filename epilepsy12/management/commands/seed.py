@@ -22,6 +22,7 @@ class Command(BaseCommand):
 def run_seed():
     # this adds all the English hospitals from JSON in the constants folder
     # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
+    added = 0
     for index, hospital in enumerate(ALL_HOSPITALS):
         hospital_trust = HospitalTrust(
             OrganisationID=hospital["OrganisationID"],
@@ -49,10 +50,13 @@ def run_seed():
         )
         try:
             hospital_trust.save()
-        except:
+        except Exception as error:
             print("Exception at "+hospital["OrganisationName"])
-        print(f"New hospital added...{index}")
-    print(f"Hospitals added...{len(ALL_HOSPITALS)}")
+            print(error)
+        added += 1
+        chosen_hospital = hospital["OrganisationName"]
+        print(f"New hospital added...{added}: {chosen_hospital}")
+    print(f"Hospitals added...{added}")
 
 
 def delete_hospitals():

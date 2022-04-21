@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from ..models import Registration
 from ..models import Case
@@ -8,7 +9,7 @@ from ..forms_folder import RegistrationForm
 
 @login_required
 def register(request, id):
-    form = RegistrationForm(request.POST or None)
+    form = RegistrationForm(request.POST or None, id)
     if request.method == "POST":
         if form.is_valid():
             case = Case.objects.get(id=id)
@@ -44,7 +45,8 @@ def update_registration(request, id):
         if form.is_valid:
             obj = form.save()
             obj.save()
-            # messages.success(request, "You successfully updated the post")
+            messages.success(
+                request, "You successfully added some epilepsy risk factors!")
             return redirect('cases')
     case = Case.objects.get(id=id)
     context = {

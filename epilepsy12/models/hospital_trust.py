@@ -12,9 +12,8 @@ class HospitalTrust(models.Model):
 
     OrganisationID = models.CharField(
         max_length=50,
-        null=True,
-        blank=True,
-        default=None
+        unique=True,
+        primary_key=True
     )
     OrganisationCode = models.CharField(
         max_length=50,

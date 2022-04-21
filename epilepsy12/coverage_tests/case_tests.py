@@ -51,3 +51,7 @@ class CaseTests(TestCase):
             str(fyodor),
             "Fyodor Dostoyevsky"
         )
+        self.assertEqual(
+            fyodor.age,
+            "12 years"
+        )

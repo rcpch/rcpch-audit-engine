@@ -21,13 +21,17 @@
         </div>
         <div class="field">
           <label>Referring Clinician</label>
-          {{form.referring_clinician}} {% if form.referring_clinician.errors %}
+          {{form.referring_clinician}} 
+          {% if form.referring_clinician.errors %}
           <div class="ui pointing red basic label">
             {{form.referring_clinician.errors}}
           </div>
           {% endif %}
         </div>
-      
+        <div class="three fields">
+
+        </div>
+
     <div class="ui grid">
       <div class="six wide column">  
         <div class="ui buttons">

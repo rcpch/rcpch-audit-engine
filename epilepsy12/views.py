@@ -3,8 +3,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 
 from .view_folder import *
+
+user = get_user_model()
 
 
 def index(request):
@@ -17,9 +20,12 @@ def database(request):
     return render(request, template_name, {})
 
 
+@login_required
 def hospital_reports(request):
     template_name = 'epilepsy12/hospital.html'
-    return render(request=request, template_name=template_name, context={})
+    return render(request=request, template_name=template_name, context={
+        user: user
+    })
 
 
 def eeg(request):

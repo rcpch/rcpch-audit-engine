@@ -15,11 +15,7 @@ class Case(models.Model):
     """
     This class holds information about each child or young person
     Each case is unique
-    This class holds patient characteristics including identifiers
-    This class is referenced by the Site class, as each case can be seen in multiple sites
-    This class is referenced by the Neurodevelopmental class as each case can have multiple neurodevelopmental conditions
-    This class is referenced by the MentalHealth class as each case can have multiple mental health conditions
-    This class is referenced by the EpilepsyContext class as each case may optionally have contextual information that may inform the epilepsy history
+
 
     For a record to be locked:
     1. all mandatory fields must be complete

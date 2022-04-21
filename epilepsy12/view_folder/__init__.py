@@ -6,3 +6,4 @@ from .epilepsy_context_views import *
 from .multiaxial_description_views import *
 from .investigation_management_views import *
 from .comorbidity_views import *
+from .hospital_trust_autocomplete import *
