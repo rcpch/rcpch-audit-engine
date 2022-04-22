@@ -3,7 +3,7 @@ import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 from ..constants import *
@@ -15,18 +15,13 @@ class Case(models.Model):
     """
     This class holds information about each child or young person
     Each case is unique
-    This class holds patient characteristics including identifiers
-    This class is referenced by the Site class, as each case can be seen in multiple sites
-    This class is referenced by the Neurodevelopmental class as each case can have multiple neurodevelopmental conditions
-    This class is referenced by the MentalHealth class as each case can have multiple mental health conditions
-    This class is referenced by the EpilepsyContext class as each case may optionally have contextual information that may inform the epilepsy history
+
 
     For a record to be locked:
     1. all mandatory fields must be complete
     2. NHS number must be present
     3. 1 year must have passed
 
-    ?analysis flag
     """
     # _id = models.ObjectIdField()
     locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
@@ -39,7 +34,7 @@ class Case(models.Model):
         blank=True
     )
     locked_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=CASCADE,
         verbose_name="locked by",
         null=True
@@ -85,7 +80,8 @@ class Case(models.Model):
         # A quintile is calculated on save and persisted in the database
         "index of multiple deprivation calculated from MySociety data.",
         blank=True,
-        editable=False
+        editable=False,
+        null=True
     )
 
     @property
@@ -147,8 +143,9 @@ class Case(models.Model):
             *args, **kwargs) -> None:
 
         # This field requires the deprivare api to be running
-        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-            self.postcode)
+        # commented out for now to allow live demo to function
+        # self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+        #     self.postcode)
         return super().save(*args, **kwargs)
 
     class Meta:

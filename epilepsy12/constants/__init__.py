@@ -7,3 +7,5 @@ from .pathway_constants import *
 from .semiology import *
 from .comorbidities import *
 from .ethnicities import *
+from .user_types import *
+from .hospital_trusts import *

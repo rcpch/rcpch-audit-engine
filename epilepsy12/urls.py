@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from .view_folder import HospitalAutocomplete
+from .views import SignUpView
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -29,10 +31,17 @@ urlpatterns = [
          views.create_epilepsy_context, name='create_epilepsy_context'),
     path('epilepsy_context/<int:case_id>/update',
          views.update_epilepsy_context, name='update_epilepsy_context'),
+    path('comorbidity/<int:case_id>/create',
+         views.create_comorbidity, name="create_comorbidity"),
+    path('comorbidity/<int:case_id>/update',
+         views.update_comorbidity, name="update_comorbidity"),
     path('investigation_management/<int:case_id>/create',
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
     path('eeg', views.eeg, name="eeg"),
-    path('patient', views.patient, name="patient")
+    path('patient', views.patient, name="patient"),
+    path("signup/", SignUpView.as_view(), name="signup"),
+    #     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
+    #          name='hospital-autocomplete'),
 ]

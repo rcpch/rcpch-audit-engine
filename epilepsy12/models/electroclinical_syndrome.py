@@ -1,9 +1,8 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_abstract_base_classes import *
 
 
-class ElectroClinicalSyndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class ElectroClinicalSyndrome(models.Model):
     """
     This class records information on electroclinical syndromes.
     It references the episode class, since one episode can have features of a single electroclinical syndrome.

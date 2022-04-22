@@ -59,12 +59,3 @@ class EpilepsyContextForm(ModelForm):
             'date_of_first_epileptic_seizure',
             'epilepsy_decimal_years'
         ]
-
-
-class EpilepsyContextComorbiditiesInlineFormSet(BaseInlineFormSet):
-    def clean(self):
-        super().clean()
-        # example custom validation across forms in the formset
-        for form in self.forms:
-            # your custom formset validation
-            print("hello")

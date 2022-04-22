@@ -1,12 +1,10 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_abstract_base_classes import *
-
 # other tables
 from .registration import Registration
 
 
-class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class Site(models.Model):
     """
     This class records information about each site that oversees the epilepsy care of each case.
     This class references the HospitalTrust class, as one hospital trust may reference multiple sites

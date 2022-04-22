@@ -50,11 +50,13 @@ class EpilepsyContext(models.Model):
 
     @property
     def epilepsy_decimal_years(self):
+        # this is a calculated field - it relies on the availability of the date of the first seizure
+        # "Years elapsed since first seizure.",
         if (self.date_of_first_epileptic_seizure):
             today = date.today()
             calculated_age = relativedelta.relativedelta(
                 today, self.date_of_first_epileptic_seizure)
-            return round(calculated_age.days/365.25, 1) + " y"
+            return calculated_age.days/365.25
 
     # relationships
     registration = models.OneToOneField(
@@ -71,11 +73,6 @@ class EpilepsyContext(models.Model):
     def save(
             self,
             *args, **kwargs) -> None:
-        if (self.date_of_first_epileptic_seizure):
-            today = date.today()
-            calculated_age = relativedelta.relativedelta(
-                today, self.date_of_first_epileptic_seizure)
-            self.epilepsy_decimal_years = calculated_age.days/365.25
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:

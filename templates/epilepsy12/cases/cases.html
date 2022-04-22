@@ -1,4 +1,5 @@
 {% extends "base.html" %}  {% block content %}
+{% load epilepsy12_template_tags %}
 
 <h5 class="ui top attached inverted header">
   Children and Young People
@@ -35,20 +36,34 @@
           <td>{{case.index_of_multiple_deprivation_quintile}}</td>
           <td>
             <div class="ui grid">
-              <div class="ui three wide column">
-                <a href="{% url 'update_case' id=case.id%}"><button class="ui mini blue icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+              <div class="row">
+                <div class="ui three wide column">
+                  <a href="{% url 'update_case' id=case.id%}"><button class="ui mini blue icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+                </div>
+                <div class="ui three wide column">
+                  <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini red icon button"  tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
+                </div>
+                <div class="ui ten wide column">
+                  {% if case.registration %}
+                      {% percent_complete case.registration as percentComplete %}
+                      <a href="{% url 'update_registration' case.id %}"><button class="ui mini blue button" tabindexed="2">Enter Data</button></a>
+                  {% else %}
+                    <a href="{% url 'register' id=case.id %}"><button class="ui mini blue button" tabindexed="2">Register</button></a>
+                  {% endif %}
+                </div>
               </div>
-              <div class="ui three wide column">
-                <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini red icon button"  tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
-              </div>
-              <div class="ui ten wide column">
-                {% if case.registration %}
-                  <a href="{% url 'update_registration' case.id %}"><button class="ui mini blue button" tabindexed="2">Begin</button></a>
-                  {% comment %} <a href="{% url 'initial_assessment' case.id %}"><button class="ui mini blue button" tabindexed="3">Begin!</button></a> {% endcomment %}
-                {% else %}
-                  <a href="{% url 'register' id=case.id %}"><button class="ui mini blue button" tabindexed="2">Register</button></a>
-                {% endif %}
-              </div>
+              {% if case.registration %}
+                  <div class="row">
+                    <div class="ui sixteen wide column">
+                      <div class="ui small blue progress" data-value={{percentComplete}} data-total="52" id="casecompletionprogress">
+                        <div class="bar">
+                          <div class="progress"></div>
+                        </div>
+                        <div class="label">{{percentComplete}} of 52 items completed</div>
+                      </div>
+                    </div>
+                  </div>
+              {% endif %}
             </div>
           </td>
           <td>

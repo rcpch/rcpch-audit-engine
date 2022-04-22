@@ -6,5 +6,6 @@ python-dateutil
 django
 psycopg2-binary
 dj_database_url
+django-autocomplete-light
 
 # RCPCH imports

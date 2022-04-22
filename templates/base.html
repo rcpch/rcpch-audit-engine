@@ -21,7 +21,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
       type="text/css"
     />
-    <link rel="icon" href="{% static 'epilepsy12_logo_1.ico' %}"/>
+    <link rel="icon" href="{% static 'favicon.ico' %}"/>
     {% comment %} <link rel="stylesheet" href="{% static 'style.css' %}"> {% endcomment %}
   </head>
 
@@ -58,6 +58,15 @@
         </div>
       {% endblock %}
         
+        {% if messages %}
+          <div class="ui green message">
+            <i class="close icon"></i>
+                {% for message in messages %}
+                  {% if message.tags %} {% endif %}{{ message }}
+                {% endfor %}
+          </div>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
         
@@ -85,3 +94,20 @@
   </body>
   
 </html>
+<script>
+$('.message .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
+  });
+
+  $('#casecompletionprogress')
+    .progress({
+    label: 'ratio',
+    text: {
+      ratio: '{value} of {total}'
+    }
+  });
+</script>

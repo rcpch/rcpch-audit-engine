@@ -23,8 +23,6 @@ from django.core.management.utils import get_random_secret_key
 # RCPCH imports
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,13 +45,15 @@ DEVELOPMENT_MODE = os.getenv("E12_DEVELOPMENT_MODE", "False") == "True"
 # Application definition
 
 INSTALLED_APPS = [
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'epilepsy12.apps.Epilepsy12Config'
+    'epilepsy12.apps.Epilepsy12Config',
 ]
 
 MIDDLEWARE = [
@@ -82,8 +82,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
-        },
+            ]
+        }
     },
 ]
 
@@ -130,6 +130,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'epilepsy12.Epilepsy12User'
 
 
 # Internationalization

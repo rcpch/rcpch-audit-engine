@@ -1,9 +1,8 @@
 from django.db import models
 from ..constants import *
-from .time_and_user_abstract_base_classes import *
 
 
-class SeizureCause(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class SeizureCause(models.Model):
     """
     This class records the cause of each seizure.
     It references the Episode class as each episode optionally has a cause.

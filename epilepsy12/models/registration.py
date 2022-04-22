@@ -1,5 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.db import models
+
+from epilepsy12.models.hospital_trust import HospitalTrust
 from .case import Case
 from ..constants import *
 from ..general_functions import *
@@ -67,6 +69,21 @@ class Registration(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
+    # lead_hospital = models.OneToOneField(
+    #     HospitalTrust,
+    #     related_name="general_paediatric_hospital",
+    #     on_delete=models.CASCADE
+    # )
+    # tertiary_paediatric_neurology_centre = models.OneToOneField(
+    #     HospitalTrust,
+    #     related_name="tertiary_paediatric_neurology_centre",
+    #     on_delete=models.CASCADE
+    # )
+    # epilepsy_surgery_centre = models.OneToOneField(
+    #     HospitalTrust,
+    #     related_name="epilepsy_surgical_centre",
+    #     on_delete=models.CASCADE
+    # )
 
     class Meta:
         verbose_name = 'Registration'

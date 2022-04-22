@@ -69,7 +69,13 @@ cd rcpch-audit-engine
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-pip install -r requirements/development-requirements
+(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
+```
+
+#### Create the database
+
+```command
+(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 #### Initialize the environment variables
@@ -109,6 +115,32 @@ you may need to allow permissions to run the bash script in that folder first:
 ```console
 chmod +x ./s/runserver
 ```
+
+#### Seeding the Database
+
+You will need to see the hospitals table with hospitals from the Constants folder.
+
+```console
+(rcpch-audit-engine) ➜  ~ python manage.py seed
+```
+
+If you need to delete all the hospitals:
+
+```console
+(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete
+```
+
+#### Testing (optional step)
+
+We have used the coverage package to test our models.
+
+```console
+(rcpch-audit-engine) ➜  ~ pip install coverage
+(rcpch-audit-engine) ➜  ~ coverage run manage.py test
+(rcpch-audit-engine) ➜  ~ coverage html
+```
+
+If the ```htmlcov/index.html``` is opened in the browser, gaps in outstanding testing of the models can be found.
 
 ### Stated Aims of the Audit
 

@@ -16,7 +16,6 @@ def desscribe(request):
 def create_multiaxial_description(request, case_id):
     # form = MultiaxialDescriptionForm(request.POST or None)
     if request.method == "POST":
-        print(form)
         disease_type_search()
     #     if form.is_valid():
     #         obj = form.save(commit=False)
