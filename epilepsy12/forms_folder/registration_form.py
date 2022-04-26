@@ -13,17 +13,17 @@ class RegistrationForm(forms.ModelForm):
     registration_date = forms.DateField(
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
-                "placeholder": "registration date",
-                "type": "date"
+                'class': 'form-control',
+                'placeholder': 'registration date',
+                'type': 'date'
             }
         )
     )
     referring_clinician = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
-                "placeholder": "Referring Clinician"
+                'class': 'form-control',
+                'placeholder': 'Referring Clinician'
             }
         )
     )
@@ -36,51 +36,31 @@ class RegistrationForm(forms.ModelForm):
         required=False
     )
 
-    # lead_hospital = forms.CharField(
-    #     widget=autocomplete.ModelSelect2(
-    #         url=reverse_lazy('hospital-autocomplete'),
-    #         attrs={
-    #             'data-placeholder': 'Autocomplete ...',
-    #             # Only trigger autocompletion after 3 characters have been typed
-    #             'data-minimum-input-length': 3,
-    #         },
-    #     )
-    # )
-
-    # tertiary_paediatric_neurology_centre = forms.CharField(
-    #     widget=autocomplete.ModelSelect2(
-    #         url='hospital-autocomplete'),
-    #         attrs={
-    #             'data-placeholder': 'Autocomplete ...',
-    #             # Only trigger autocompletion after 3 characters have been typed
-    #             'data-minimum-input-length': 3,
-    #         },
-    #     )
-    # )
-
-    # epilepsy_surgery_centre=forms.CharField(
-    #     widget = autocomplete.ModelSelect2(
-    #         url='hospital-autocomplete',
-    #         attrs={
-    #             'data-placeholder': 'Autocomplete ...',
-    #             # Only trigger autocompletion after 3 characters have been typed
-    #             'data-minimum-input-length': 3,
-    #         },
-    #     )
-    # )
-
-    # def __init__(self, *args, **kwargs) -> None:
-    #     super(RegistrationForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super(RegistrationForm, self).__init__(*args, **kwargs)
+        self.fields['epilepsy_surgery_centre'].widget.attrs = {
+            'type': 'text',
+            'placeholder': 'Epilepsy Surgery Centre',
+            'class': 'prompt'
+        }
+        self.fields['lead_hospital'].widget.attrs = {
+            'type': 'text',
+            'placeholder': 'Lead Centre',
+            'class': 'prompt'
+        }
+        self.fields['tertiary_paediatric_neurology_centre'].widget.attrs = {
+            'type': 'text',
+            'placeholder': 'Tertiary Paediatric Neurology Centre',
+            'class': 'prompt'
+        }
 
     class Meta():
         model = Registration
         fields = (
             'registration_date',
             'referring_clinician',
-            'registration_close_date'
+            'registration_close_date',
+            'lead_hospital',
+            'tertiary_paediatric_neurology_centre',
+            'epilepsy_surgery_centre'
         )
-        # widgets = {
-        #     'lead_hospital': autocomplete.ModelSelect2(url='hospital-autocomplete'),
-        #     'tertiary_paediatric_neurology_centre': autocomplete.ModelSelect2(url='hospital-autocomplete'),
-        #     'epilepsy_surgery_centre': autocomplete.ModelSelect2(url='hospital-autocomplete'),
-        # }

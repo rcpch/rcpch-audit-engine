@@ -110,4 +110,22 @@ $('.message .close')
       ratio: '{value} of {total}'
     }
   });
+
+  $('.ui.search').search({
+    apiSettings: {
+      url: "http://localhost:8000/epilepsy12/hospital-autocomplete/?q={query}"
+    },
+    fields: {
+      results: 'results',
+      title: 'text'
+    }
+  });
+
+  /*
+  $('.prompt').on("input", function(data){
+    console.log($('prompt').val());
+    $('.text').text($('.prompt').val())
+  })
+  */
+
 </script>

@@ -13,6 +13,7 @@ def register(request, id):
     if request.method == "POST":
         if form.is_valid():
             case = Case.objects.get(id=id)
+            print(form.instance.lead_hospital)
             obj = form.save(commit=False)
             obj.case = case
             obj.save()
@@ -36,7 +37,6 @@ def register(request, id):
 def update_registration(request, id):
     registration = Registration.objects.filter(case=id).first()
     form = RegistrationForm(instance=registration)
-
     if request.method == "POST":
         if ('delete') in request.POST:
             registration.delete()

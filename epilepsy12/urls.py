@@ -42,6 +42,6 @@ urlpatterns = [
     path('eeg', views.eeg, name="eeg"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
-    #     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
-    #          name='hospital-autocomplete'),
+    path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
+         name='hospital-autocomplete'),
 ]

@@ -5,9 +5,9 @@
             <label>Registration Date</label>
             <div class="field">{{form.registration_date}}</div>
             {% if form.registration_date.errors %}
-            <div class="ui pointing red basic label">
-              {{form.registration_date.errors}}
-            </div>
+              <div class="ui pointing red basic label">
+                {{form.registration_date.errors}}
+              </div>
             {% endif %}
           </div>
           <div class="field">
@@ -23,12 +23,45 @@
           <label>Referring Clinician</label>
           {{form.referring_clinician}} 
           {% if form.referring_clinician.errors %}
-          <div class="ui pointing red basic label">
-            {{form.referring_clinician.errors}}
-          </div>
+            <div class="ui pointing red basic label">
+              {{form.referring_clinician.errors}}
+            </div>
           {% endif %}
         </div>
         <div class="three fields">
+          
+          <div class="field">
+            <label>Lead Hospital</label>
+            <div class="ui search">
+              <div class="ui icon input">
+                {{ form.lead_hospital }}
+                <i class="search icon"></i>
+                <span class="text"></span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label>Tertiary Neurology Centre</label>
+            <div class="ui search">
+              <div class="ui icon input">
+                {{ form.tertiary_paediatric_neurology_centre }}
+                <i class="search icon"></i>
+                <span class="text"></span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label>Paediatric Epilepsy Surgery Centre</label>
+            <div class="ui search">
+              <div class="ui icon input">
+                {{ form.epilepsy_surgery_centre }}
+                <i class="search icon"></i>
+                <span class="text"></span>
+              </div>
+            </div>
+          </div>
 
         </div>
 
