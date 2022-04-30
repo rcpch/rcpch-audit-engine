@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from ..forms_folder import MultiaxialDescriptionForm
 
 from epilepsy12.models.case import Case
 
@@ -14,7 +15,7 @@ def desscribe(request):
 
 @login_required
 def create_multiaxial_description(request, case_id):
-    # form = MultiaxialDescriptionForm(request.POST or None)
+    form = MultiaxialDescriptionForm(request.POST or None)
     if request.method == "POST":
         disease_type_search()
     #     if form.is_valid():
@@ -28,7 +29,7 @@ def create_multiaxial_description(request, case_id):
     case = Case.objects.get(id=case_id)
     registration = Registration.objects.filter(case=case_id).first()
     context = {
-        # "form": form,
+        "form": form,
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
         "initial_assessment_complete": registration.initial_assessment_complete,
@@ -44,9 +45,10 @@ def create_multiaxial_description(request, case_id):
 
 @login_required
 def update_multiaxial_description(request, case_id):
-    # multiaxial_description = .objects.filter(registration__case = id).first()
+    multiaxial_description_form = MultiaxialDescriptionForm.objects.filter(
+        registration__case=id).first()
     registration = Registration.objects.filter(case=case_id).first()
-    # form = MultiaxialDescriptionForm(instance=)
+    form = MultiaxialDescriptionForm(instance=multiaxial_description_form)
 
     if request.method == "POST":
         if ('delete') in request.POST:
@@ -62,7 +64,7 @@ def update_multiaxial_description(request, case_id):
     case = Case.objects.get(id=case_id)
 
     context = {
-        # "form": form,
+        "form": form,
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
         "initial_assessment_complete": registration.initial_assessment_complete,

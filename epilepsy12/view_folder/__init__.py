@@ -7,3 +7,4 @@ from .multiaxial_description_views import *
 from .investigation_management_views import *
 from .comorbidity_views import *
 from .hospital_trust_autocomplete import *
+from .semiology_keyword_autocomplete import *

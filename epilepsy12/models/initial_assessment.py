@@ -4,7 +4,6 @@ from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .registration import Registration
-from. epilepsy_context import EpilepsyContext
 
 
 class InitialAssessment(models.Model):
