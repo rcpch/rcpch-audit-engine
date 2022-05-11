@@ -8,10 +8,10 @@
     </p>
     <button unicorn:click="$reset">Clear description</button>
     <p>
-        {% if responses|length > 0 %}
+        {% if collected_keywords|length > 0 %}
         <p>Keywords used in description:</p>
-            {% for response in responses %}
-                <div class="ui label">{{ response.keyword }}</div>
+            {% for keyword in collected_keywords %}
+                <div class="ui label">{{ keyword.0 }}</div>
             {% endfor %}
 
         {% else %}

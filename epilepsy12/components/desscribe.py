@@ -9,7 +9,7 @@ from ..models import Keyword
 # @login_required
 class DesscribeView(UnicornView):
     description: str = ""
-    responses: list = []
+    collected_keywords = []
     choices: list = Keyword.objects.all()
     desscribe = DESSCRIBE.objects.none()
     case_id = ""
@@ -30,11 +30,15 @@ class DesscribeView(UnicornView):
 
     def textUpdated(self):
         # split string into array of words without punctuation
-        all_words = [word.strip(string.punctuation)
-                     for word in self.description.lower().split()]
-        # self.responses = all_words
-        responses = Keyword.objects.filter(keyword__in=all_words)
-        self.responses = responses
+        all_words = self.description.lower().strip(string.punctuation)
+
+        keywords = Keyword.objects.values_list('keyword', 'category')
+        # identify where keywords match
+        for index, word in enumerate(keywords):
+            if word[0] in all_words:
+                self.collected_keywords.append(word)
+        # secondary sort by category
+        self.collected_keywords.sort(key=lambda tup: tup[1])
 
     # def delete_desscribe(self, id):
     #     # try:
