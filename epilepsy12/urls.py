@@ -1,8 +1,8 @@
-from django.urls import path
 from . import views
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
 from .views import SignUpView
+from django.urls import path, include
 
 urlpatterns = [
     path('', views.index, name="index"),

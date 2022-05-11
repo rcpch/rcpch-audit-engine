@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.deletion import CASCADE
 from django.forms import CharField
+
+from epilepsy12.models.registration import Registration
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -44,6 +46,12 @@ class DESSCRIBE(models.Model):
     cause = models.CharField(
         "What is the cause of this epilepsy and what further investigations may be needed to explore this?",
         max_length=50
+    )
+
+    registration = models.OneToOneField(
+        Registration,
+        on_delete=models.CASCADE,
+        related_name='registration'
     )
 
     class Meta:

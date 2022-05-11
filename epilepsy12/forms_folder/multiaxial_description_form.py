@@ -1,4 +1,5 @@
-from django.forms import CharField, CheckboxInput, ModelForm, ChoiceField, DateField, TextInput
+from django.forms import ModelForm
+from django_unicorn.components import UnicornView
 from epilepsy12.models.desscribe import DESSCRIBE
 
 

@@ -1,0 +1,26 @@
+<div>
+    <form unicorn:submit.prevent="add" class="ui form">
+        <input type="text" unicorn:model="description" placeholder="Jack had aphasia..." id="description" unicorn:change="textUpdated"/>
+    </form>
+    
+    <p>
+    {{ description }}
+    </p>
+    <button unicorn:click="$reset">Clear description</button>
+    <p>
+        {% if responses|length > 0 %}
+        <p>Keywords used in description:</p>
+            {% for response in responses %}
+                <div class="ui label">{{ response.keyword }}</div>
+            {% endfor %}
+
+        {% else %}
+        No keywords yet! 🎉
+        {% endif %}
+    </p>
+    <hr>
+    <p>Some keywords to choose from...</p>
+    {% for choice in choices %}
+        <div class="ui label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
+    {% endfor %}
+</div>
