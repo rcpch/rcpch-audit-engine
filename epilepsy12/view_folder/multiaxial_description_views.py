@@ -30,6 +30,7 @@ def create_multiaxial_description(request, case_id):
     context = {
         "desscribe": desscribe,
         # "form": form,
+        "registration": registration,
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
         "initial_assessment_complete": registration.initial_assessment_complete,
