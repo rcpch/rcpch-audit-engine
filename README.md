@@ -54,31 +54,31 @@ Clone the repository and `cd` into the directory:
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
+(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements.txt
 ```
 
 #### Create the database
 
 ```command
-(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 #### Initialize the environment variables
 
 ```console
-(rcpch-audit-engine) ➜  ~ source example.env
+source example.env
 ```
 
 #### Prepare the database for use
 
 ```console
-(rcpch-audit-engine) ➜  ~ s/migrate
+s/migrate
 ```
 
 #### Create superuser to enable logging into admin section
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py createsuperuser
+python manage.py createsuperuser
 ```
 
 Then follow the command line prompts to create the first user
@@ -90,7 +90,7 @@ Further users can subsequently be created in the Admin UI
 Navigate to the epilepsy12 outer folder and run the server:
 
 ```console
-(rcpch-audit-engine) ➜  ~ s/runserver
+s/runserver
 ```
 
 or
@@ -98,7 +98,7 @@ or
 you may need to allow permissions to run the bash script in that folder first:
 
 ```console
-(rcpch-audit-engine) ➜  ~ chmod +x ./s/runserver
+chmod +x ./s/runserver
 ```
 
 #### Seeding the Database
@@ -106,19 +106,25 @@ you may need to allow permissions to run the bash script in that folder first:
 You will need to see the hospitals table with hospitals from the Constants folder.
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed_hospitals
+python manage.py seed_hospitals
 ```
 
 If you need to delete all the hospitals:
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete_hospitals
+python manage.py seed --mode=delete_hospitals
 ```
 
 To add the semiology keywords to the database:
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=seed_semiology_keywords
+python manage.py seed --mode=seed_semiology_keywords
+```
+
+To add the some dummy cases to the database:
+
+```console
+python manage.py seed --mode=seed_dummy_cases
 ```
 
 #### Testing (optional step)
@@ -126,9 +132,9 @@ To add the semiology keywords to the database:
 We have used the coverage package to test our models.
 
 ```console
-(rcpch-audit-engine) ➜  ~ pip install coverage
-(rcpch-audit-engine) ➜  ~ coverage run manage.py test
-(rcpch-audit-engine) ➜  ~ coverage html
+pip install coverage
+coverage run manage.py test
+coverage html
 ```
 
 If the ```htmlcov/index.html``` is opened in the browser, gaps in outstanding testing of the models can be found.

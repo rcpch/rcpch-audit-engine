@@ -1,7 +1,6 @@
 import string
 
 from django_unicorn.components import UnicornView
-from django.contrib.auth.decorators import login_required
 from ..models import DESSCRIBE
 from ..models import Case
 from ..models import Keyword
