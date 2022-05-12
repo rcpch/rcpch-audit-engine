@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'epilepsy12.apps.Epilepsy12Config',
+    'epilepsy12',
+    # third party
+    "django_unicorn",
 ]
 
 MIDDLEWARE = [

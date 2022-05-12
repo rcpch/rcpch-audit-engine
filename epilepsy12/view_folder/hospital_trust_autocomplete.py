@@ -4,7 +4,6 @@ from ..models import HospitalTrust
 
 class HospitalAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        print("I am called")
         if not self.request.user.is_authenticated:
             return HospitalTrust.objects.none()
 

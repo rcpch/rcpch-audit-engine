@@ -47,6 +47,23 @@ class Registration(models.Model):
         null=True
     )
 
+    lead_hospital = models.CharField(
+        "lead_hospital",
+        max_length=100,
+        default=None,
+        null=True
+    )
+    tertiary_paediatric_neurology_centre = models.CharField(
+        "tertiary_paediatric_neurology_centre",
+        max_length=100,
+        default=None
+    )
+    epilepsy_surgery_centre = models.CharField(
+        "epilepsy_surgery_centre",
+        max_length=100,
+        null=True
+    )
+
     initial_assessment_complete = models.BooleanField(
         default=False
     )
@@ -69,21 +86,6 @@ class Registration(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    # lead_hospital = models.OneToOneField(
-    #     HospitalTrust,
-    #     related_name="general_paediatric_hospital",
-    #     on_delete=models.CASCADE
-    # )
-    # tertiary_paediatric_neurology_centre = models.OneToOneField(
-    #     HospitalTrust,
-    #     related_name="tertiary_paediatric_neurology_centre",
-    #     on_delete=models.CASCADE
-    # )
-    # epilepsy_surgery_centre = models.OneToOneField(
-    #     HospitalTrust,
-    #     related_name="epilepsy_surgical_centre",
-    #     on_delete=models.CASCADE
-    # )
 
     class Meta:
         verbose_name = 'Registration'

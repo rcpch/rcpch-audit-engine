@@ -121,13 +121,19 @@ chmod +x ./s/runserver
 You will need to see the hospitals table with hospitals from the Constants folder.
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed
+(rcpch-audit-engine) ➜  ~ python manage.py seed_hospitals
 ```
 
 If you need to delete all the hospitals:
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete
+(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete_hospitals
+```
+
+To add the semiology keywords to the database:
+
+```console
+(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=seed_semiology_keywords
 ```
 
 #### Testing (optional step)

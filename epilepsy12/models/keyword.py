@@ -1,0 +1,25 @@
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
+
+class Keyword(models.Model):
+
+    keyword = models.CharField(
+        help_text="A validated keyword for describing the semiology of a seizure",
+        max_length=100
+    )
+    category = models.CharField(
+        help_text="The semiology category each keyword belongs to.",
+        max_length=100
+    )
+
+    class Meta:
+        verbose_name = _("Keyword")
+        verbose_name_plural = _("Keywords")
+
+    def __str__(self):
+        return self.keyword
+
+    def get_absolute_url(self):
+        return reverse("_detail", kwargs={"pk": self.pk})

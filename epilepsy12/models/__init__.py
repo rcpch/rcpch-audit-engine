@@ -16,3 +16,5 @@ from .seizure_cause import SeizureCause
 from .seizure_type import SeizureType
 from .site import Site
 from .epilepsy12user import Epilepsy12User
+from .keyword import Keyword
+from .desscribe import DESSCRIBE

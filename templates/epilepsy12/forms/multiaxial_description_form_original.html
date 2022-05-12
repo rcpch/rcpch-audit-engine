@@ -2,11 +2,11 @@
     {% load unicorn %}
     {% csrf_token %}
     
+    {% unicorn 'desscribe' description='description' %}
+    
     <header>
         Multiaxial Description Form
     </header>
-
-    
 
     <div class="field">
         <label>What is the episode(s) like and is the description adequate?</label>
@@ -26,7 +26,7 @@
 
     <div class="field">
         <label>Describe the Episode</label>
-        <div class="ui input">
+        <div class="ui textarea">
         {{form.description}}
         </div>
     </div>
