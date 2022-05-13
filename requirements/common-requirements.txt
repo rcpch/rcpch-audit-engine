@@ -8,5 +8,6 @@ psycopg2-binary
 dj_database_url
 django-autocomplete-light
 django_unicorn
+rapidfuzz
 
 # RCPCH imports
