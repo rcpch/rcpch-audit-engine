@@ -17,7 +17,6 @@ def create_multiaxial_description(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()
     desscribe = DESSCRIBE.objects.filter(registration=registration).first()
     if request.method == "POST":
-        disease_type_search()
         if form.is_valid():
             obj = form.save(commit=False)
             registration = Registration.objects.filter(case=id)
