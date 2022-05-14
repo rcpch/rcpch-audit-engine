@@ -1,9 +1,12 @@
+from django import forms
 from django.forms import ModelForm
-from django_unicorn.components import UnicornView
 from epilepsy12.models.desscribe import DESSCRIBE
 
 
 class MultiaxialDescriptionForm(ModelForm):
+
+    relevant_impairments_behavioural_educational = forms.CheckboxInput(
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super(MultiaxialDescriptionForm, self).__init__(*args, **kwargs)
@@ -22,4 +25,5 @@ class MultiaxialDescriptionForm(ModelForm):
             'seizure_type',
             'syndrome',
             'cause',
+            'relevant_impairments_behavioural_educational'
         ]

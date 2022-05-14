@@ -98,7 +98,7 @@ or
 you may need to allow permissions to run the bash script in that folder first:
 
 ```console
-chmod +x ./s/runserver
+chmod +x ./s
 ```
 
 #### Seeding the Database

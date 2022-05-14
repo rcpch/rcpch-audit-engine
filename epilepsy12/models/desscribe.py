@@ -47,6 +47,10 @@ class DESSCRIBE(models.Model):
         "What is the cause of this epilepsy and what further investigations may be needed to explore this?",
         max_length=50
     )
+    relevant_impairments_behavioural_educational = models.BooleanField(
+        "Are there any relevant impairments: behavioural or educational, emotional problems?",
+        max_length=50
+    )
 
     registration = models.OneToOneField(
         Registration,

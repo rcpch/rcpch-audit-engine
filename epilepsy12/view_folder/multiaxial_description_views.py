@@ -12,24 +12,24 @@ from ..general_functions import *
 
 @login_required
 def create_multiaxial_description(request, case_id):
-    # form = MultiaxialDescriptionForm(request.POST or None)
+    form = MultiaxialDescriptionForm(request.POST or None)
     case = Case.objects.get(id=case_id)
     registration = Registration.objects.filter(case=case_id).first()
     desscribe = DESSCRIBE.objects.filter(registration=registration).first()
     if request.method == "POST":
         disease_type_search()
-    #     if form.is_valid():
-    #         obj = form.save(commit=False)
-    #         # registration = Registration.objects.filter(case=id)
-    #         # obj.registration = registration
-    #         obj.save()
-    #         return redirect('cases')
-    #     else:
-    #         print('not valid')
+        if form.is_valid():
+            obj = form.save(commit=False)
+            registration = Registration.objects.filter(case=id)
+            obj.registration = registration
+            obj.save()
+            return redirect('cases')
+        else:
+            print('not valid')
 
     context = {
         "desscribe": desscribe,
-        # "form": form,
+        "form": form,
         "registration": registration,
         "case_id": case_id,
         "case_name": case.first_name + " " + case.surname,
