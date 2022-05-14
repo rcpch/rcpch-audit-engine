@@ -43,20 +43,20 @@ You will also need the [Postgresql](https://www.postgresql.org/) database, which
 Then create a virtual environment:
 
 ```console
-(python-3.10) ➜  ~ pyenv virtualenv 3.10.0 rcpch-audit-engine
+pyenv virtualenv 3.10.0 rcpch-audit-engine
 ```
 
 Clone the repository and `cd` into the directory:
 
 ```console
-(rcpch-audit-engine) ➜  ~ git clone https://github.com/rcpch/rcpch-audit-engine.git
-(rcpch-audit-engine) ➜  ~ cd rcpch-audit-engine
+git clone https://github.com/rcpch/rcpch-audit-engine.git
+cd rcpch-audit-engine
 ```
 
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements.txt
+pip install -r requirements/development-requirements.txt
 ```
 
 #### Create the database
@@ -100,7 +100,8 @@ or
 you may need to allow permissions to run the bash script in that folder first:
 
 ```console
-chmod +x ./s
+chmod +x ./s/runserver
+chmod +x ./s/migrate
 ```
 
 #### Seeding the Database
