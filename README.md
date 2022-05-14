@@ -24,6 +24,8 @@ Initially intended as a new platform for the RCPCH's established Epilepsy12 audi
     <img align="center" src="epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
+[![DOI](https://zenodo.org/badge/415328052.svg)](https://zenodo.org/badge/latestdoi/415328052)
+
 #### Setup
 
 If you don't have python 3.10 installed already, you will need it. We recommend the use of a tool such as [pyenv](https://github.com/pyenv/pyenv) to assist with managing multiple Python versions and their accompanying Virtualenvs.
