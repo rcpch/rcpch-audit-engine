@@ -1,6 +1,13 @@
+import math
+from random import randint, getrandbits, choice
+from datetime import date
 from django.core.management.base import BaseCommand
-from ...models import HospitalTrust, Keyword
-from ...constants import ALL_HOSPITALS, KEYWORDS
+from epilepsy12.constants.ethnicities import ETHNICITIES
+
+from epilepsy12.constants.names import DUMMY_NAMES
+from ...models import HospitalTrust, Keyword, Case
+from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE
+from ...general_functions import random_postcodes
 
 
 class Command(BaseCommand):
@@ -19,6 +26,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_semiology_keywords'):
             self.stdout.write('seeding hospital trust data...')
             run_semiology_keywords_seed()
+        elif (options['mode'] == 'seed_dummy_cases'):
+            self.stdout.write('seeding with dummy case data...')
+            run_dummy_cases_seed()
         else:
             self.stdout.write('No options supplied...')
         self.stdout.write(image())
@@ -89,6 +99,41 @@ def delete_hospitals():
     except:
         print("Unable to delete Hospital table")
     print("...all hospitals deleted.")
+
+
+def run_dummy_cases_seed():
+    added = 0
+    postcode_list = random_postcodes.generate_postcodes(requested_number=51)
+    for index in range(len(DUMMY_NAMES)):
+        random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
+        locked = bool(getrandbits(1))
+        nhs_number = randint(1000000000, 9999999999)
+        first_name = DUMMY_NAMES[index]['name']['firstname']['name']
+        surname = DUMMY_NAMES[index]['name']['lastname']['name']
+        gender = next(iter([x[0] for x in SEX_TYPE if DUMMY_NAMES[index]
+                      ['name']['firstname']['gender_formatted'].capitalize() in x]), None)
+        date_of_birth = random_date
+        postcode = postcode_list[index]
+        ethnicity = choice(ETHNICITIES)[0]
+
+        try:
+            new_case = Case(
+                locked=locked,
+                nhs_number=nhs_number,
+                first_name=first_name,
+                surname=surname,
+                gender=gender,
+                date_of_birth=date_of_birth,
+                postcode=postcode,
+                ethnicity=ethnicity
+            )
+            new_case.save()
+        except Exception as e:
+            print(f"Error: {e}")
+
+        added += 1
+        print(f"Saved {first_name} {surname}...")
+    print(f"Saved {added} cases.")
 
 
 def image():

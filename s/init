@@ -1,3 +1,5 @@
+#!/bin/bash
+
 docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 source example.env
 python manage.py makemigrations
@@ -5,4 +7,5 @@ python manage.py migrate
 python manage.py createsuperuser
 python manage.py seed --mode=seed_hospitals
 python manage.py seed --mode=seed_semiology_keywords
+python manage.py seed --mode=seed_dummy_cases
 python manage.py runserver

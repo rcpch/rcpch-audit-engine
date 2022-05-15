@@ -1,35 +1,37 @@
 <div>
     <form unicorn:submit.prevent="add" class="ui inline form">
-        <div class="ui message">
+        <div class="ui info icon message">
+        <i class="info circle icon"></i>
         Write a freehand description of the episode, using as much detail as you can. Any key words we recognise will automatically be gathered. Remove these from the collection if you feel they are not key words in the context.
         </div>
         <div class="ui field">
             <input type="text" unicorn:model="description" placeholder="{{name}} had aphasia..." id="description" unicorn:change="textUpdated"/>
         </div>
         <div class="ui red icon button" icon="delete" unicorn:click="$reset">Clear description</div>
+        <i class="question circle icon link" id="choicesPopup"></i>
+        <div class="ui flowing popup top left transition hidden">
+            <p>Some examples of keywords to choose from...</p>
+            {% for choice in choices %}
+                <div class="ui label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
+            {% endfor %}
+        </div>
     </form>
 
     <hr>
     <p>Keywords used in description:</p>
-    <div class="ui green message">
+    <div class="ui message">
         {% if collected_keywords|length > 0 %}
                 <div class="ui blue labels">
                     {% for keyword in collected_keywords %}
                         <div class="ui label">
-                            {{ keyword.word }}
-                            <i class="icon close" unicorn:click="remove({{keyword.index}})"></i>
+                            {{keyword.keyword}}
+                            <i class="icon close" unicorn:click="remove_keyword({{element.index}})"></i>
                         </div>
                     {% endfor %}
                 </div>
+                <div class="ui tiny green button">Save</div>
         {% else %}
         No keywords yet! 🎉
         {% endif %}
-    </div>
-    <hr>
-    <div class="ui warning message">
-        <p>Some examples of keywords to choose from...</p>
-        {% for choice in choices %}
-            <div class="ui label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
-        {% endfor %}
     </div>
 </div>

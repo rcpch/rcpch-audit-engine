@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 from epilepsy12.constants.user_types import ROLES, TITLES
-from epilepsy12.models import hospital_trust
 
 
 class Epilepsy12UserManager(BaseUserManager):

@@ -4,12 +4,17 @@
 Multiaxial Description
 {% endblock %}
 {% block audit_section_form %}
-    <div>
-        {% load unicorn %}
-        {% unicorn_scripts %}
-        {% unicorn 'desscribe' case_id=case_id registration=registration %}
+    <div class="ui segment">
+        <h4 class="ui header">D</h4>
+        <div>
+            {% load unicorn %}
+            {% unicorn_scripts %}
+            {% unicorn 'desscribe' case_id=case_id registration=registration %}
+        </div>
     </div>
+    {% include './forms/multiaxial_description_form.html' %} 
 {% endblock %}
 {% block audit_section_instructions %}
 The classification of epilepsy is multiaxial and can be described in five different ways. Work through the DESSCRIBE tool to classify the episodes.
+DESSCRIBE is designed to support the care of children with paroxysmal episodes, particularly where epilepsies are being considered.  Without a good description you have almost nothing, worse you may be mislead!  Use ongoing histories, good video and demo. Use words correctly. Understand what others mean and be sure that they understand what you mean! Some children have several different types of episode, each needing consideration. Consider whether each episode is epileptic and how certain you are. There is skill in winning confidence whilst being reasonably uncertain. Avoid being confidently wrong!  Manage the uncertainty by using time, getting more information, discussing with others.  See diagnosis as ongoing refinement rather than a static label you don’t look beyond.
 {% endblock %}

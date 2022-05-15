@@ -1,4 +1,3 @@
-from cmath import log
 import requests
 # from requests import request
 from .postcode import valid_postcode

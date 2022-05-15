@@ -1,35 +1,70 @@
+
 <form class="ui form" method="post">
-    {% load unicorn %}
     {% csrf_token %}
-    
-    <header>
-        Multiaxial Description Form
-    </header>
-
-    
-
-    <div class="field">
-        <label>What is the episode(s) like and is the description adequate?</label>
-        <div class="ui search desscribeSearch">
-            <div class="ui icon input">
-            {{ form.description_keywords }}
-            <i class="search icon"></i>
-            <span class="text"></span>
-            </div>
-        </div>
-        {% if form.description_keywords.errors %}
-            <div class="ui pointing red basic label">
-                {{ form.description_keywords.errors}}
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="field">
-        <label>Describe the Episode</label>
-        <div class="ui input">
-        {{form.description}}
+    <div class="ui segment">
+        <h4 class="ui header">E</h4>
+        <div class="field">
+            <label>Is the episode epileptic? Is this epilepsy?</label>
+            {{form.epilepsy_status}} 
+            {% if form.epilepsy_status.errors %}
+            <div class="ui pointing red basic label">{{form.epilepsy_status.errors}}</div>
+            {% endif %}
         </div>
     </div>
+    
+    <div class="ui segment">
+        <h4 class="ui header">S</h4>
+        <div class="field">
+            <label>If epileptic, what is the seizure type(s)</label>
+            {{form.seizure_type}} 
+            {% if form.seizure_type.errors %}
+            <div class="ui pointing red basic label">{{form.seizure_type.errors}}</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="ui segment">
+        <h4 class="ui header">S</h4>
+        <div class="field">
+            <label>Is there an identifiable epilepsy syndrome?</label>
+            {{form.syndrome}} 
+            {% if form.syndrome.errors %}
+            <div class="ui pointing red basic label">{{form.syndrome.errors}}</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="ui segment">
+        <h4 class="ui header">C</h4>
+        <div class="field">
+            <label>What is the cause of this epilepsy and what further investigations may be needed to explore this?</label>
+            {{form.cause}} 
+            {% if form.cause.errors %}
+            <div class="ui pointing red basic label">{{form.cause.errors}}</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="ui segment">
+        <h4 class="ui header">RIBE</h4>
+        <div class="field">
+            <div class="ui toggle checkbox">
+                {{form.relevant_impairments_behavioural_educational}} 
+                <label>Are there any relevant <i>i</i>mpairments: <i>b</i>ehavioural or <i>e</i>ducational/<i>e</i>motional problems?</label>
+            </div>
+            {% if form.relevant_impairments_behavioural_educational.errors %}
+                <div class="ui pointing red basic label">{{form.relevant_impairments_behavioural_educational.errors}}</div>
+            {% endif %}
+        </div>
+        <div class="ui bottom attached warning icon message">
+        <i class="info circle icon"></i>
+        <p>
+        Please list these in the Comorbidities section.
+        </p>
+        </div>
+    </div>
+
+        
 
     <button type="submit" class="ui green button" name="update">Save</button>
     <button type="submit" class="ui red button" name="delete">Delete</button>

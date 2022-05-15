@@ -1,17 +1,16 @@
-import string
-
+from random import choices
 from django_unicorn.components import UnicornView
-from django.contrib.auth.decorators import login_required
 from ..models import DESSCRIBE
 from ..models import Case
 from ..models import Keyword
 
+from ..general_functions.fuzzy_matching import scan_for_keywords, fuzzy_scan_for_keywords
 
-# @login_required
+
 class DesscribeView(UnicornView):
     description: str = ""
     collected_keywords = []
-    choices: list = Keyword.objects.all()
+    choices = Keyword.objects.all()
     desscribe = DESSCRIBE.objects.none()
     case_id = ""
     registration = ""
@@ -33,19 +32,14 @@ class DesscribeView(UnicornView):
         self.description = ""
 
     def textUpdated(self):
-        # split string into array of words without punctuation
-        all_words = self.description.lower().strip(string.punctuation)
+        """
+        on input change the user input is scanned for near match keywords
+        and stored in the self.description model
+        """
+        self.collected_keywords = fuzzy_scan_for_keywords(
+            self.description, self.choices)
 
-        keywords = Keyword.objects.values_list('keyword', 'category')
-        # identify where keywords match
-        for index, word in enumerate(keywords):
-            if word[0] in all_words:
-                self.collected_keywords.append(
-                    {'index': index, 'word': word[0], 'category': word[1]})
-        # secondary sort by category
-        self.collected_keywords.sort(key=lambda tup: tup['category'])
-
-    def remove(self, index):
+    def remove_keyword(self, index):
         item = next(
             keyword for keyword in self.collected_keywords if keyword['index'] == index)
         self.collected_keywords.remove(item)

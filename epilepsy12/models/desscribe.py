@@ -26,9 +26,8 @@ class DESSCRIBE(models.Model):
         blank=True,
         null=True
     )
-    epilepsy_status = models.CharField(
+    epilepsy_status = models.IntegerField(
         "Is the episode(s) epileptic? Is this epilepsy?",
-        max_length=1,
         choices=(
             (0, "epilepsy"),
             (1, "nonepilepsy"),
@@ -37,14 +36,20 @@ class DESSCRIBE(models.Model):
     )
     seizure_type = models.CharField(
         "If epileptic, what is the seizure type (s)?",
-        max_length=50
+        max_length=3,
+        choices=EPILEPSY_SEIZURE_TYPE
     )
+
     syndrome = models.CharField(
         "Is there an identifiable epilepsy syndrome?",
         max_length=50
     )
     cause = models.CharField(
         "What is the cause of this epilepsy and what further investigations may be needed to explore this?",
+        max_length=50
+    )
+    relevant_impairments_behavioural_educational = models.BooleanField(
+        "Are there any relevant impairments: behavioural or educational, emotional problems?",
         max_length=50
     )
 

@@ -21,6 +21,8 @@ A framework for national clinical audits. Built using Django and Semantic UI. In
     <img align="center" src="epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
+[![DOI](https://zenodo.org/badge/415328052.svg)](https://zenodo.org/badge/latestdoi/415328052)
+
 ### Development Setup
 
 #### Install PostgreSQL and create the database with the correct credentials
@@ -69,13 +71,13 @@ cd rcpch-audit-engine
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-(rcpch-audit-engine) ➜  ~ pip install -r requirements/development-requirements
+pip install -r requirements/development-requirements.txt
 ```
 
 #### Create the database
 
 ```command
-(rcpch-audit-engine) ➜  ~ docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
+docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 #### Initialize the environment variables
@@ -114,6 +116,7 @@ you may need to allow permissions to run the bash script in that folder first:
 
 ```console
 chmod +x ./s/runserver
+chmod +x ./s/migrate
 ```
 
 #### Seeding the Database
@@ -121,19 +124,25 @@ chmod +x ./s/runserver
 You will need to see the hospitals table with hospitals from the Constants folder.
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed_hospitals
+python manage.py seed_hospitals
 ```
 
 If you need to delete all the hospitals:
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=delete_hospitals
+python manage.py seed --mode=delete_hospitals
 ```
 
 To add the semiology keywords to the database:
 
 ```console
-(rcpch-audit-engine) ➜  ~ python manage.py seed --mode=seed_semiology_keywords
+python manage.py seed --mode=seed_semiology_keywords
+```
+
+To add the some dummy cases to the database:
+
+```console
+python manage.py seed --mode=seed_dummy_cases
 ```
 
 #### Testing (optional step)
@@ -141,9 +150,9 @@ To add the semiology keywords to the database:
 We have used the coverage package to test our models.
 
 ```console
-(rcpch-audit-engine) ➜  ~ pip install coverage
-(rcpch-audit-engine) ➜  ~ coverage run manage.py test
-(rcpch-audit-engine) ➜  ~ coverage html
+pip install coverage
+coverage run manage.py test
+coverage html
 ```
 
 If the ```htmlcov/index.html``` is opened in the browser, gaps in outstanding testing of the models can be found.
