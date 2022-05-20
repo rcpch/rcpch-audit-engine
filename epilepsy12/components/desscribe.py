@@ -1,5 +1,7 @@
 from random import choices
 from django_unicorn.components import UnicornView
+
+from epilepsy12.general_functions import desscribe
 from ..models import DESSCRIBE
 from ..models import Case
 from ..models import Keyword
@@ -25,10 +27,9 @@ class DesscribeView(UnicornView):
     def add(self):
         if self.description != "":
             if self.description.endswith(' '):
-                print("last value typed is a space")
-            desscribe = DESSCRIBE(description=self.description)
-            desscribe.save()
-            print(self.description)
+                desscribe = DESSCRIBE(description=self.description)
+                # desscribe.save()
+                print(self.description)
         self.description = ""
 
     def textUpdated(self):
@@ -38,6 +39,9 @@ class DesscribeView(UnicornView):
         """
         self.collected_keywords = fuzzy_scan_for_keywords(
             self.description, self.choices)
+        desscribe = DESSCRIBE(description=self.description,
+                              description_keywords=self.collected_keywords, registration=self.registration)
+        # desscribe.save()
 
     def remove_keyword(self, index):
         item = next(
