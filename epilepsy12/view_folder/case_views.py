@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import hospital_trust
 from epilepsy12.models.registration import Registration
+from epilepsy12.models.hospital_trust import HospitalTrust
 from epilepsy12.view_folder.registration_views import register
 from ..models import Case
 from django.contrib import messages
@@ -33,7 +34,7 @@ def case_list(request):
     context = {
         'case_list': case_list,
         'total_cases': case_count,
-        'total_registrations': registered_count
+        'total_registrations': registered_count,
     }
     template_name = 'epilepsy12/cases/cases.html'
     return render(request, template_name, context)
