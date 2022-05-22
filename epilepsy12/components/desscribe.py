@@ -17,26 +17,24 @@ class DesscribeView(UnicornView):
     case_id = ""
     registration = ""
     name = ""
+    character_count = 0
 
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)  # calling super is required
         self.case_id = kwargs.get("case_id")
         self.registration = kwargs.get("registration")
         self.name = Case.objects.get(pk=self.case_id)
+
         try:
             self.desscribe = DESSCRIBE.objects.get(
                 registration=self.registration)
-            self.collected_keywords = self.desscribe.description_keywords
+            self.description = self.desscribe.description
+            self.character_count = len(self.description)
+            description_keywords = self.desscribe.description_keywords
+            self.collected_keywords = Keyword.objects.filter(
+                keyword__in=description_keywords)
         except:
             self.desscribe = None
-
-    def add(self):
-        if self.description != "":
-            if self.description.endswith(' '):
-                desscribe = DESSCRIBE.objects.update_or_create(
-                    description=self.description, defaults={'registration': self.registration})
-
-        self.description = ""
 
     def textUpdated(self):
         """
@@ -45,14 +43,22 @@ class DesscribeView(UnicornView):
         """
         self.collected_keywords = fuzzy_scan_for_keywords(
             self.description, self.choices)
-        print(self.collected_keywords)
-        # desscribe = DESSCRIBE.objects.update_or_create(
-        #     description=self.description, description_keywords=self.collected_keywords, defaults={'registration': self.registration})
+        self.character_count = len(self.description)
+        DESSCRIBE.objects.update_or_create(
+            registration=self.registration, defaults={
+                'description': self.description,
+                'description_keywords': self.collected_keywords
+            })
 
     def remove_keyword(self, index):
-        item = next(
-            keyword for keyword in self.collected_keywords if keyword['pk'] == index)
-        self.collected_keywords.remove(item)
+        self.collected_keywords = self.collected_keywords.exclude(
+            pk=index).only('keyword')
+        filtered_keywords = []
+        for item in enumerate(self.collected_keywords):
+            filtered_keywords.append(item[1].keyword)
+        obj = DESSCRIBE.objects.get(registration=self.registration)
+        obj.description_keywords = filtered_keywords
+        obj.save()
 
     """
     DUMMY TEXT
