@@ -42,122 +42,181 @@ class DESSCRIBE(models.Model):
     non_epileptic_seizure_type = models.CharField(
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_TYPE,
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_impaired_awareness = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_automatisms = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_atonic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_clonic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_left = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_right = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_epileptic_spasms = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_hyperkinetic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_myoclonic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_tonic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_autonomic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_behavioural_arrest = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_cognitive = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_emotional = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_sensory = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_centrotemporal = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_temporal = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_frontal = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_parietal = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_occipital = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_gelastic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_focal_to_bilateral_tonic_clonic = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
     focal_onset_other = models.BooleanField(
-        default=None
+        default=None,
+        blank=True
     )
-    focal_onset_other_details = models.CharField(max_length=250)
+    focal_onset_other_details = models.CharField(
+        max_length=250,
+        null=True,
+        default=None,
+        blank=True
+    )
     generalised_onset = models.CharField(
         max_length=3,
         choices=GENERALISED_SEIZURE_TYPE,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
-    generalised_onset_other_details = models.CharField(max_length=250)
+    generalised_onset_other_details = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True
+    )
     nonepileptic_seizure_unknown_onset = models.CharField(
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_ONSET,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
     nonepileptic_seizure_unknown_onset_other_details = models.CharField(
-        max_length=250)
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True
+    )
     nonepileptic_seizure_syncope = models.CharField(
         max_length=3,
         choices=NON_EPILEPTIC_SYNCOPES,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
     nonepileptic_seizure_behavioural = models.CharField(
         max_length=3,
         choices=NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
     nonepileptic_seizure_sleep = models.CharField(
         max_length=3,
         choices=NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
     nonepileptic_seizure_paroxysmal = models.CharField(
         max_length=3,
         choices=NON_EPILEPSY_PAROXYSMS,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
     nonepileptic_seizure_migraine = models.CharField(
         max_length=3,
         choices=MIGRAINES,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
     nonepileptic_seizure_miscellaneous = models.CharField(
         max_length=3,
         choices=EPIS_MISC,
-        default=None
+        default=None,
+        null=True,
+        blank=True
     )
-    nonepileptic_seizure_other = models.CharField(max_length=250)
+    nonepileptic_seizure_other = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True
+    )
 
     # Syndrome
 
@@ -211,61 +270,72 @@ class DESSCRIBE(models.Model):
     seizure_cause_gene_abnormality_snomed_code = models.CharField(
         "SNOMED-CT code for main identified genetic cause of seizure(s)",
         max_length=50,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_chromosomal_abnormality = models.CharField(  # would be good to pull in known chromosomal abnormalities
         "main identified chromosomal cause of seizure(s)",
         max_length=200,
-        default=None
+        default=None,
+        blank=True
     )
 
     seizure_cause_infectious = models.CharField(
         "main identified infectious cause of seizure(s)",
         max_length=250,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_infectious_snomed_code = models.CharField(
         "SNOMED-CT code for main identified infectious cause of seizure(s)",
         max_length=250,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_metabolic = models.CharField(
         "main identified metabolic cause of seizure(s)",
         max_length=3,
         choices=METABOLIC_CAUSES,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_metabolic_other = models.CharField(
         "other identified metabolic cause of seizure(s) not previously specified.",
         max_length=250,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_metabolic_snomed_code = models.CharField(
         "SNOMED-CT code for other identified metabolic cause of seizure(s) not previously specified.",
         max_length=250,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_immune = models.CharField(
         "main identified immune cause of seizure(s).",
         max_length=3,
         choices=IMMUNE_CAUSES,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_immune_antibody = models.CharField(
         "autoantibody identified as cause of seizure(s).",
         max_length=3,
         choices=AUTOANTIBODIES,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_immune_antibody_other = models.CharField(
         "other identified antibody not previously specified causing seizure(s).",
         max_length=250,
-        default=None
+        default=None,
+        blank=True
     )
     seizure_cause_immune_snomed_code = models.CharField(
         "SNOMED-CT code for main identified immune cause of seizure(s).",
         max_length=250,
-        default=None
+        default=None,
+        blank=True
     )
 
 # IBE

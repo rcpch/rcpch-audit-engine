@@ -1,0 +1,131 @@
+{% csrf_token %}
+<div class="field">
+        <label>How best describes the <i>onset</i> of the nonepileptic seizure?</label>
+        <select unicorn:model="selected_nonepileptic_seizure_onset_type" class="ui dropdown">
+                {% for nonepileptic_seizure_onset_type in nonepileptic_seizure_onset_types %}
+                    <option value="{{nonepileptic_seizure_onset_type.0}}">{{nonepileptic_seizure_onset_type.1}}</option>
+                {% endfor %}
+        </select>
+</div>
+
+<div class="field">
+    <label>Are there any other relevant details?</label>
+    {{form.nonepileptic_seizure_unknown_onset_other_details}} 
+    {% if form.nonepileptic_seizure_unknown_onset_other_details.errors %}
+        <div class="ui pointing red basic label">{{form.nonepileptic_seizure_unknown_onset_other_details.errors}}</div>
+    {% endif %}
+</div>
+
+
+<div class="field">
+    <label>What type of nonepileptic seizure was it?</label>
+    <select unicorn:model="selected_nonepileptic_seizure_type">
+        {% for nonepileptic_seizure_type in nonepileptic_seizure_types %}
+            <option value="{{nonepileptic_seizure_type.0}}">{{nonepileptic_seizure_type.1}}</option>
+        {% endfor %}
+    </select>
+</div>
+
+{% if selected_nonepileptic_seizure_type == 'SAS'%}
+
+    <div class="field">
+        <label>How best describes the <i>nature</i> of the syncope?</label>
+        <select unicorn:model="selected_nonepileptic_syncope" class="ui dropdown">
+                {% for nonepileptic_syncope in nonepileptic_syncopes %}
+                    {% if selected_epileptic_seizure_onset_type == epileptic_seizure_onset_type.0 %}
+                        <option value="{{nonepileptic_syncope.0}}" selected>{{nonepileptic_syncope.1}}</option>
+                    {% else %}
+                        <option value="{{nonepileptic_syncope.0}}">{{nonepileptic_syncope.1}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+    </div>
+
+{% elif selected_nonepileptic_seizure_type == 'BPP'%}
+
+    <div class="field">
+        <label>How best describes the <i>nature</i> of the behavioural/psychological symptoms?</label>
+        <select unicorn:model="selected_nonepileptic_behavioural_psychological_symptom" class="ui dropdown">
+                {% for nonepileptic_behavioural_psychological_symptom in nonepileptic_behavioural_psychological_symptoms %}
+                    {% if selected_nonepileptic_behavioural_psychological_symptom == nonepileptic_behavioural_psychological_symptom.0 %}
+                        <option value="{{nonepileptic_behavioural_psychological_symptom.0}}" selected>{{nonepileptic_behavioural_psychological_symptom.1}}</option>
+                    {% else %}
+                        <option value="{{nonepileptic_behavioural_psychological_symptom.0}}" selected>{{nonepileptic_behavioural_psychological_symptom.1}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+    </div>
+    
+{% elif selected_nonepileptic_seizure_type == 'SRC'%}
+
+    <div class="field">
+        <label>How best describes the <i>nature</i> of the sleep-related symptoms?</label>
+        <select unicorn:model="selected_nonepileptic_sleep_symptom" class="ui dropdown">
+            {% for nonepileptic_sleep_symptom in nonepileptic_sleep_symptoms %}
+                {% if selected_nonepileptic_sleep_symptom == nonepileptic_sleep_symptom.0 %}
+                    <option value="{{nonepileptic_sleep_symptom.0}}" selected>{{nonepileptic_sleep_symptom.1}}</option>
+                {% else %}
+                    <option value="{{nonepileptic_sleep_symptom.0}}">{{nonepileptic_sleep_symptom.1}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+
+{% elif selected_nonepileptic_seizure_type == 'PMD'%}
+
+    <div class="field">
+        <label>How best describes the <i>nature</i> of the paroxysmal symptoms?</label>
+        <select unicorn:model="selected_nonepileptic_paroxysm" class="ui dropdown">
+                {% for nonepileptic_paroxysm in nonepileptic_paroxysms %}
+                    {% if selected_nonepileptic_paroxysm == nonepileptic_paroxysm.0 %}
+                        <option value="{{nonepileptic_paroxysm.0}}" selected>{{nonepileptic_paroxysm.1}}</option>
+                    {% else %}
+                        <option value="{{nonepileptic_paroxysm.0}}">{{nonepileptic_paroxysm.1}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+    </div>
+    
+{% elif selected_nonepileptic_seizure_type == 'MAD'%}
+
+    <div class="field">
+        <label>How best describes the <i>nature</i> of the migraines?</label>
+        <select unicorn:model="selected_nonepileptic_migraine" class="ui dropdown">
+                {% for nonepileptic_migraine in nonepileptic_migraines %}
+                    {% if selected_nonepileptic_migraine == nonepileptic_migraine.0 %}
+                        <option value="{{nonepileptic_migraine.0}}" selected>{{nonepileptic_migraine.1}}</option>
+                    {% else %}
+                        <option value="{{nonepileptic_migraine.0}}">{{nonepileptic_migraine.1}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+    </div>
+    <div class="field">
+    
+{% elif selected_nonepileptic_seizure_type == 'ME'%}
+
+    <div class="field">
+        <label>Could the episodes be described in any of these ways?</label>
+        <select unicorn:model="selected_miscellaneous_nonepilepsy" class="ui dropdown">
+                {% for miscellaneous_nonepilepsy in miscellaneous_nonepilepsies %}
+                    {% if selected_miscellaneous_nonepilepsy == miscellaneous_nonepilepsy.0 %}
+                        <option value="{{miscellaneous_nonepilepsy.0}}" selected>{{miscellaneous_nonepilepsy.1}}</option>
+                    {% else %}
+                        <option value="{{miscellaneous_nonepilepsy.0}}">{{miscellaneous_nonepilepsy.1}}</option>
+                    {% endif %}
+                {% endfor %}
+        </select>
+    </div>
+    <div class="field">
+    
+{% else %}
+
+    <div class="field">
+        <label>Anything else to add?</label>
+        {{form.nonepileptic_seizure_other}} 
+        {% if form.nonepileptic_seizure_other.errors %}
+            <div class="ui pointing red basic label">{{form.nonepileptic_seizure_other.errors}}</div>
+        {% endif %}
+    </div>
+
+{% endif %}

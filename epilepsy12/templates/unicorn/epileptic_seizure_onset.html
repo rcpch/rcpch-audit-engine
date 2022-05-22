@@ -1,0 +1,274 @@
+    {% csrf_token %}
+<div>
+    <div class="field">
+        <label>How best describes the <i>onset</i> of the epileptic seizure?</label>
+        <select unicorn:model="selected_epileptic_seizure_onset_type">
+            {% for epileptic_seizure_onset_type in epileptic_seizure_onset_types %}
+                {% if selected_epileptic_seizure_onset_type == epileptic_seizure_onset_type.0 %}
+                    <option value="{{epileptic_seizure_onset_type.0}}" selected>{{epileptic_seizure_onset_type.1}}</option>
+                {% else %}
+                    <option value="{{epileptic_seizure_onset_type.0}}">{{epileptic_seizure_onset_type.1}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+
+        {% if form.epileptic_seizure_type.errors %}
+            <div class="ui pointing red basic label">{{form.epileptic_seizure_type.errors}}</div>
+        {% endif %}
+    </div>
+
+    {% if selected_epileptic_seizure_onset_type == "FO" %}
+        <h5 class="header">Which feature(s) best describe the focality of onset?</h5>
+        <div class="fields">
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_impaired_awareness}} 
+                    <label>Impaired Awareness</label>
+                </div>
+                {% if form.focal_onset_impaired_awareness.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_impaired_awareness.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_automatisms}} 
+                    <label>Automatisms</label>
+                </div>
+                {% if form.focal_onset_automatisms.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_automatisms.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_atonic}} 
+                    <label>Atonic</label>
+                </div>
+                {% if form.focal_onset_atonic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_atonic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_clonic}} 
+                    <label>Clonic</label>
+                </div>
+                {% if form.focal_onset_clonic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_clonic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_left}} 
+                    <label>Left</label>
+                </div>
+                {% if form.focal_onset_left.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_left.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_right}} 
+                    <label>Right</label>
+                </div>
+                {% if form.focal_onset_right.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_right.errors}}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_epileptic_spasms}} 
+                    <label>Spasms</label>
+                </div>
+                {% if form.focal_onset_epileptic_spasms.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_epileptic_spasms.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_hyperkinetic}} 
+                    <label>Hyperkinetic</label>
+                </div>
+                {% if form.focal_onset_hyperkinetic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_hyperkinetic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_myoclonic}} 
+                    <label>Myoclonic</label>
+                </div>
+                {% if form.focal_onset_myoclonic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_myoclonic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_tonic}} 
+                    <label>Tonic</label>
+                </div>
+                {% if form.focal_onset_tonic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_tonic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_autonomic}} 
+                    <label>Autonomic</label>
+                </div>
+                {% if form.focal_onset_autonomic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_autonomic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_behavioural_arrest}} 
+                    <label>Behavioural Arrest</label>
+                </div>
+                {% if form.focal_onset_behavioural_arrest.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_behavioural_arrest.errors}}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_cognitive}} 
+                    <label>Cognitive</label>
+                </div>
+                {% if form.focal_onset_cognitive.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_cognitive.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_emotional}} 
+                    <label>Emotional</label>
+                </div>
+                {% if form.focal_onset_emotional.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_emotional.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_sensory}} 
+                    <label>Sensory</label>
+                </div>
+                {% if form.focal_onset_sensory.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_sensory.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_centrotemporal}} 
+                    <label>Centrotemporal</label>
+                </div>
+                {% if form.focal_onset_centrotemporal.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_centrotemporal.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_temporal}} 
+                    <label>Temporal</label>
+                </div>
+                {% if form.focal_onset_temporal.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_temporal.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_frontal}} 
+                    <label>Frontal</label>
+                </div>
+                {% if form.focal_onset_frontal.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_frontal.errors}}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_parietal}} 
+                    <label>Parietal</label>
+                </div>
+                {% if form.focal_onset_parietal.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_parietal.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_occipital}} 
+                    <label>Occipital</label>
+                </div>
+                {% if form.focal_onset_occipital.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_occipital.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_gelastic}} 
+                    <label>Gelastic</label>
+                </div>
+                {% if form.focal_onset_gelastic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_gelastic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_focal_to_bilateral_tonic_clonic}} 
+                    <label>Focal to Bilateral Tonic Clonic</label>
+                </div>
+                {% if form.focal_onset_focal_to_bilateral_tonic_clonic.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_focal_to_bilateral_tonic_clonic.errors}}</div>
+                {% endif %}
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {{form.focal_onset_other}} 
+                    <label>Other</label>
+                </div>
+                {% if form.focal_onset_other.errors %}
+                    <div class="ui pointing red basic label">{{form.focal_onset_other.errors}}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="field">
+            <label>Other Details</label>
+            {{form.focal_onset_other_details}} 
+            {% if form.focal_onset_other_details.errors %}
+                <div class="ui pointing red basic label">{{form.focal_onset_other_details.errors}}</div>
+            {% endif %}
+        </div>
+
+    {% elif selected_epileptic_seizure_onset_type == "GO" %}
+        <div class="field">
+                <label>How best describes the <i>type</i> of generalised epileptic seizure?</label>
+                <select unicorn:change="selectedEpilepticSeizureGeneralisedOnset($event.target.value)">
+                    {% for epileptic_generalised_onset_type in epileptic_generalised_onset_types %}
+                        <option value="{{epileptic_generalised_onset_type.0}}">{{epileptic_generalised_onset_type.1}}</option>
+                    {% endfor %}
+                </select>
+            {% if form.generalised_onset.errors %}
+                <div class="ui pointing red basic label">{{form.generalised_onset.errors}}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label>Please add details if relevant</label>
+            {{form.generalised_onset_other_details}} 
+            {% if form.generalised_onset_other_details.errors %}
+                <div class="ui pointing red basic label">{{form.generalised_onset_other_details.errors}}</div>
+            {% endif %}
+        </div>
+
+    {% elif selected_epileptic_seizure_onset_type == "UO" %}
+        <div class="ui message">
+        Unknown Onset: No further information about seizure type gathered
+        </div>
+    {% else %}
+        <div class="ui message">
+        Unclassified: No further information about seizure type gathered
+        </div>
+    {% endif %}
+</div>

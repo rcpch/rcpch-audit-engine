@@ -1,0 +1,49 @@
+<div class="ui form">
+    {% csrf_token %}
+    <div class="ui blue segment">
+
+        <div class="ui header">
+            <div class="ui blue circular label">E</div>
+        </div>
+
+        <div class="field">
+            <label>Is the episode epileptic? Is this epilepsy?</label>
+            <select class="ui dropdown" unicorn:change="selectedStatus($event.target.value)">
+                <div class="default text">Epilepsy Status</div>
+                {% for epilepsy_status in epilepsyChoices %}
+                    {% if selected_epilepsy_status == epilepsy_status.0 %}
+                        <option value="{{epilepsy_status.0}}" selected>{{epilepsy_status.1}}</option>
+                    {% else %}
+                        <option value="{{epilepsy_status.0}}">{{epilepsy_status.1}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+
+    <div class="ui blue segment">
+
+        <div class="ui header">
+            <div class="ui blue circular label">S</div>
+        </div>
+
+        {% if selected_epilepsy_status == "E" %}
+            {% load unicorn %}
+            {% unicorn_scripts %}
+            {% unicorn 'epileptic_seizure_onset' parent=view %}
+
+        {% elif selected_epilepsy_status == "NE" %}
+            
+            {% load unicorn %}
+            {% unicorn_scripts %}
+            {% unicorn 'nonepileptic_seizure_onset' parent=view %}
+
+        {% else %}
+            <div class="ui message">
+                Uncertain
+            </div>
+        {% endif %}
+    </div>
+
+</div>

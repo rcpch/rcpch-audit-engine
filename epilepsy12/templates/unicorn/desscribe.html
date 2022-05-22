@@ -5,7 +5,7 @@
         Write a freehand description of the episode, using as much detail as you can. Any key words we recognise will automatically be gathered. Remove these from the collection if you feel they are not key words in the context.
         </div>
         <div class="ui field">
-            <input type="text" unicorn:model="description" placeholder="{{name}} had aphasia..." id="description" unicorn:change="textUpdated"/>
+            <textarea type="text" rows="8" unicorn:model="description" placeholder="{{name}} had aphasia..." id="description" unicorn:change="textUpdated"/>
         </div>
         <div class="ui red icon button" icon="delete" unicorn:click="$reset">Clear description</div>
         <i class="question circle icon link" id="choicesPopup"></i>
@@ -25,7 +25,7 @@
                     {% for keyword in collected_keywords %}
                         <div class="ui label">
                             {{keyword.keyword}}
-                            <i class="icon close" unicorn:click="remove_keyword({{element.index}})"></i>
+                            <i class="icon close" unicorn:click="remove_keyword({{keyword.pk}})"></i>
                         </div>
                     {% endfor %}
                 </div>
