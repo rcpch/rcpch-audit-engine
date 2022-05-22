@@ -46,9 +46,17 @@
                 <div class="ui ten wide column">
                   {% if case.registration %}
                       {% percent_complete case.registration as percentComplete %}
-                      <a href="{% url 'update_registration' case.id %}"><button class="ui mini blue button" tabindexed="2">Enter Data</button></a>
+                      {% if case.locked %}
+                        <button class="ui mini blue button" tabindexed="2" disabled onclick="location.href={% url 'update_registration' case.id %}">Enter Data</button>
+                      {% else %}
+                        <button class="ui mini blue button" tabindexed="2" onclick="location.href={% url 'update_registration' case.id %}">Enter Data</button>
+                      {% endif %}
                   {% else %}
-                    <a href="{% url 'register' id=case.id %}"><button class="ui mini blue button" tabindexed="2">Register</button></a>
+                    {% if case.locked %}
+                      <button class="ui mini blue button" tabindexed="2" disabled onclick="location.href={% url 'register' id=case.id %}">Register</button>
+                    {% else %}
+                      <button class="ui mini blue button" tabindexed="2" onclick="location.href={% url 'register' id=case.id %}">Register</button>
+                    {% endif %}
                   {% endif %}
                 </div>
               </div>
