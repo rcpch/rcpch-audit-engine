@@ -14,7 +14,7 @@ Multiaxial Description
             {% unicorn 'desscribe' case_id=case_id registration=registration %}
         </div>
     </div>
-    {% unicorn 'is_epilepsy' %}
+    {% unicorn 'is_epilepsy' registration=registration case_id=case_id %}
     {% include './forms/multiaxial_description_form.html' %} 
 {% endblock %}
 {% block audit_section_instructions %}

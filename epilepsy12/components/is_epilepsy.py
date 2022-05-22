@@ -2,7 +2,7 @@ from django_unicorn.components import UnicornView
 
 from epilepsy12.models import nonepilepsy
 from ..forms_folder.multiaxial_description_form import MultiaxialDescriptionForm
-from ..models import DESSCRIBE
+from ..models import DESSCRIBE, Registration
 from ..constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, GENERALISED_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, MIGRAINES, EPIS_MISC
 
@@ -10,7 +10,7 @@ from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, GENERALISED_SE
 class IsEpilepsyView(UnicornView):
     desscribe = DESSCRIBE.objects.none()
     case_id = ""
-    registration = ""
+    registration = Registration.objects.none()
 
     # form = MultiaxialDescriptionForm(request.POST or None)
     epilepsyChoices = EPILEPSY_DIAGNOSIS_STATUS
@@ -55,16 +55,28 @@ class IsEpilepsyView(UnicornView):
     miscellaneous_nonepilepsies = EPIS_MISC
     selected_miscellaneous_nonepilepsy = miscellaneous_nonepilepsies[0][0]
 
+    def mount(self):
+        return super().mount()
+
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)  # calling super is required
         self.case_id = kwargs.get("case_id")
         self.registration = kwargs.get("registration")
 
+        try:
+            self.desscribe = DESSCRIBE.objects.filter(
+                registration=self.registration).first()
+            self.selected_epilepsy_status = self.desscribe.epilepsy_or_nonepilepsy_status
+        except:
+            self.desscribe = None
+
     def selectedStatus(self, selectedVal):
+        self.desscribe = DESSCRIBE.objects.update_or_create(registration=self.registration, defaults={
+            'epilepsy_or_nonepilepsy_status': selectedVal
+        })
         self.selected_epilepsy_status = selectedVal
 
     def changedEpilepticSeizureOnsetType(self, selectedVal):
-        print(selectedVal)
         self.selected_epileptic_seizure_onset_type = selectedVal
 
     def selectedEpilepticSeizureGeneralisedOnset(self, selectedVal):
@@ -72,9 +84,6 @@ class IsEpilepsyView(UnicornView):
 
     def changedSyncopalNonepilepsy(self, selectedVal):
         self.selected_nonepileptic_syncope = selectedVal
-
-    # def test(self):
-    #     print("hello")
 
     # class Meta:
     #     javascript_exclude = ('epilepsyChoices', 'epileptic_seizure_types', 'epileptic_generalised_onset_types',
