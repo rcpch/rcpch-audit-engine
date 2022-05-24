@@ -11,3 +11,4 @@ from .user_types import *
 from .hospital_trusts import *
 from .keywords import *
 from .names import *
+from .syndromes import *
