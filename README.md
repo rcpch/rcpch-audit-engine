@@ -53,8 +53,6 @@ pyenv install 3.10.0
 
 > On some platforms, you will get errors at build-time, which indicates you need to install some dependencies which are required for building the Python binaries locally. Rather than listing these here, where they may become out of date, please refer to the [pyenv wiki](https://github.com/pyenv/pyenv/wiki) which covers this in detail.
 
-
-
 Then create a virtual environment:
 
 ```console
