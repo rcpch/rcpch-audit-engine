@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from epilepsy12.forms_folder.comorbidity_form import ComorbidityForm
 
 from epilepsy12.models.desscribe import DESSCRIBE
 from ..forms_folder import MultiaxialDescriptionForm
@@ -13,7 +14,7 @@ from ..general_functions import *
 @login_required
 def create_multiaxial_description(request, case_id):
     form = MultiaxialDescriptionForm(request.POST or None)
-    case = Case.objects.get(id=case_id)
+    case = Case.objects.get(pk=case_id)
     registration = Registration.objects.filter(case=case_id).first()
     desscribe = DESSCRIBE.objects.filter(registration=registration).first()
     if request.method == "POST":
