@@ -124,7 +124,7 @@ chmod +x ./s/migrate
 You will need to see the hospitals table with hospitals from the Constants folder.
 
 ```console
-python manage.py seed_hospitals
+python manage.py seed --mode=seed_hospitals
 ```
 
 If you need to delete all the hospitals:
