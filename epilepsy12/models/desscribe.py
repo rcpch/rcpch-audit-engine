@@ -38,148 +38,150 @@ class DESSCRIBE(models.Model):
     )
 
     # type
-    epileptic_seizure_type = models.CharField(
+    epileptic_seizure_onset_type = models.CharField(
         "If epileptic, what is the seizure type (s)?",
         max_length=3,
         choices=EPILEPSY_SEIZURE_TYPE,
         default=EPILEPSY_SEIZURE_TYPE[0][0]
     )
-    non_epileptic_seizure_type = models.CharField(
+    nonepileptic_seizure_type = models.CharField(
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_TYPE,
         default=None,
         blank=True,
         null=True
     )
+
+    # focal onset
     focal_onset_impaired_awareness = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_automatisms = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_atonic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_clonic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_left = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_right = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_epileptic_spasms = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_hyperkinetic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_myoclonic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_tonic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_autonomic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_behavioural_arrest = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_cognitive = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_emotional = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_sensory = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_centrotemporal = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_temporal = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_frontal = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_parietal = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_occipital = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_gelastic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_focal_to_bilateral_tonic_clonic = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_other = models.BooleanField(
-        default=None,
+        default=False,
         blank=True,
         null=True
     )
     focal_onset_other_details = models.CharField(
         max_length=250,
         null=True,
-        default=None,
+        default="",
         blank=True,
     )
-    generalised_onset = models.CharField(
+    epileptic_generalised_onset = models.CharField(
         max_length=3,
         choices=GENERALISED_SEIZURE_TYPE,
         default=None,
         null=True,
         blank=True,
     )
-    generalised_onset_other_details = models.CharField(
+    epileptic_generalised_onset_other_details = models.CharField(
         max_length=250,
         default=None,
         null=True,

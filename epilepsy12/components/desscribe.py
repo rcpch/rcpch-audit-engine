@@ -1,7 +1,5 @@
 from django_unicorn.components import UnicornView
 
-
-from epilepsy12.general_functions import desscribe
 from ..models import DESSCRIBE
 from ..models import Case
 from ..models import Keyword

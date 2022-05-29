@@ -6,7 +6,6 @@ def disease_type_search(condition: str):
     url = f'http://localhost:8082/v1/snomed/search?s={condition}\&constraint=<64572001'
     response = requests.get(url=url)
     serialised = response.json()
-    print(serialised)
     return serialised
 
 

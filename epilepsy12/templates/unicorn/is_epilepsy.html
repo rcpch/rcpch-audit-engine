@@ -23,22 +23,18 @@
     </div>
 
     <div class="ui blue segment">
+        
+        {% load unicorn %}
+        {% unicorn_scripts %}
 
         <div class="ui header">
             <div class="ui blue circular label">S</div>
         </div>
 
         {% if selected_epilepsy_status == "E" %}
-            {% load unicorn %}
-            {% unicorn_scripts %}
-            {% unicorn 'epileptic_seizure_onset' parent=view %}
-
+            {% unicorn 'epileptic_seizure_onset' registration=registration %}
         {% elif selected_epilepsy_status == "NE" %}
-            
-            {% load unicorn %}
-            {% unicorn_scripts %}
-            {% unicorn 'nonepileptic_seizure_onset' parent=view %}
-
+            {% unicorn 'nonepileptic_seizure_onset' registration=registration %}
         {% else %}
             <div class="ui message">
                 Uncertain
