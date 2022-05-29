@@ -109,6 +109,33 @@ you may need to allow permissions to run the bash script in that folder first:
 
 ```console
 chmod +x ./s/runserver
+chmod +x ./s/migrate
+```
+
+#### Seeding the Database
+
+You will need to see the hospitals table with hospitals from the Constants folder.
+
+```console
+python manage.py seed --mode=seed_hospitals
+```
+
+If you need to delete all the hospitals:
+
+```console
+python manage.py seed --mode=delete_hospitals
+```
+
+To add the semiology keywords to the database:
+
+```console
+python manage.py seed --mode=seed_semiology_keywords
+```
+
+To add the some dummy cases to the database:
+
+```console
+python manage.py seed --mode=seed_dummy_cases
 ```
 
 If you want to seed with all these, there is a short cut in the start folder:
