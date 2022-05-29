@@ -251,9 +251,9 @@ class DESSCRIBE(models.Model):
 
     # Syndrome
 
-    syndrome = models.CharField(
+    syndrome = models.IntegerField(
         "Is there an identifiable epilepsy syndrome?",
-        max_length=50,
+        choices=SYNDROMES,
         null=True,
         blank=True,
         default=None

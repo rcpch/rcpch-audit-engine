@@ -45,9 +45,6 @@ class IsEpilepsyView(UnicornView):
     # misc
     miscellaneous_nonepilepsies = EPIS_MISC
 
-    # def mount(self):
-    #     return super().mount()
-
     def __init__(self, *args, **kwargs):
         super().__init__(**kwargs)  # calling super is required
         self.case_id = kwargs.get("case_id")
