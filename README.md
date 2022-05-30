@@ -35,7 +35,7 @@ You will need Docker to be installed on your local machine. (Please search the w
 ```console
 docker run --name epilepsy12postgres \
     -e POSTGRES_USER=epilepsy12user \
-    -e POSTGRES_PASSWORD=epilepsy12password \
+    -e POSTGRES_PASSWORD=epilepsy12 \
     -e POSTGRES_DB=epilepsy12db \
     -p 5432:5432 \
     -d postgres
@@ -70,12 +70,6 @@ Then install all the requirements. Note you can't do this without PostgreSQL alr
 
 ```console
 pip install -r requirements/development-requirements.txt
-```
-
-#### Create the database
-
-```command
-docker run --name epilepsy12postgres -e POSTGRES_USER=epilepsy12user -e POSTGRES_PASSWORD=epilepsy12 -e POSTGRES_DB=epilepsy12db -p 5432:5432 -d postgres
 ```
 
 #### Initialize the environment variables
@@ -115,6 +109,8 @@ you may need to allow permissions to run the bash script in that folder first:
 ```console
 chmod +x ./s/runserver
 chmod +x ./s/migrate
+chmod +x ./s/seed
+chmod +x ./s/init
 ```
 
 #### Seeding the Database
@@ -141,6 +137,12 @@ To add the some dummy cases to the database:
 
 ```console
 python manage.py seed --mode=seed_dummy_cases
+```
+
+If you want to seed with all these, there is a short cut in the start folder:
+
+```console
+s/seed
 ```
 
 #### Testing (optional step)
