@@ -33,7 +33,7 @@ You will need Docker to be installed on your local machine. (Please search the w
 ```console
 docker run --name epilepsy12postgres \
     -e POSTGRES_USER=epilepsy12user \
-    -e POSTGRES_PASSWORD=epilepsy12password \
+    -e POSTGRES_PASSWORD=epilepsy12 \
     -e POSTGRES_DB=epilepsy12db \
     -p 5432:5432 \
     -d postgres
@@ -70,7 +70,7 @@ cd rcpch-audit-engine
 Then install all the requirements. Note you can't do this without PostgreSQL already installed.
 
 ```console
-pip install -r requirements/development-requirements
+pip install -r requirements/development-requirements.txt
 ```
 
 #### Initialize the environment variables
@@ -110,6 +110,8 @@ you may need to allow permissions to run the bash script in that folder first:
 ```console
 chmod +x ./s/runserver
 chmod +x ./s/migrate
+chmod +x ./s/seed
+chmod +x ./s/init
 ```
 
 #### Seeding the Database
