@@ -2,7 +2,7 @@ from . import views
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
 from .views import SignUpView
-from django.urls import path, include
+from django.urls import path
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -47,4 +47,6 @@ urlpatterns = [
          name='hospital-autocomplete'),
     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
          name='semiology-keyword-autocomplete'),
+    path('htmx/description/<int:desscribe_id>',
+         views.edit_description, name='edit_description'),
 ]

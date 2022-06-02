@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'epilepsy12',
     # third party
-    "django_unicorn",
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [

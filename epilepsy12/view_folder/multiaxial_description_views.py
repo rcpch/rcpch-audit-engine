@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.forms_folder.comorbidity_form import ComorbidityForm
@@ -9,6 +10,16 @@ from epilepsy12.models.case import Case
 
 from ..models import Registration
 from ..general_functions import *
+
+
+@login_required
+def edit_description(request, desscribe_id):
+    description = request.POST.get('description', desscribe_id)
+    update_field = {
+        'description': description
+    }
+    DESSCRIBE.objects.update_or_create(desscribe_id, defaults=update_field)
+    return HttpResponse(f"Updated Description: {request.POST.get('description')}!")
 
 
 @login_required

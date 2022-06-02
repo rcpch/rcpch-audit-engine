@@ -1,6 +1,19 @@
 
 <form class="ui form" method="post">
     {% csrf_token %}
+
+    <div class="ui blue segment">
+        <div class="ui header">
+            <div class="ui blue circular label">D</div>
+        </div>
+        <div class="field">
+            <label>Describe the episode?</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="ui pointing red basic label">{{form.description.errors}}</div>
+            {% endif %}
+        </div>
+    </div>
     
     <div class="ui blue segment">
         <div class="ui header">

@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm, ChoiceField
+from epilepsy12.models import desscribe
 from epilepsy12.models.desscribe import DESSCRIBE
 from ..constants import *
 
@@ -15,6 +16,8 @@ class MultiaxialDescriptionForm(ModelForm):
     class Meta:
         model = DESSCRIBE
         fields = [
+            'id',
+            'description',
             'syndrome',
             'seizure_cause_main',
             'relevant_impairments_behavioural_educational'

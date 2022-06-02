@@ -1,0 +1,6 @@
+<form id="description" class="ui form">
+    {% csrf_token %}
+    <h2>I am a description</h2>
+    <input class="ui input" hx-post="{% url 'edit_description' desscribe_id %}" hx-trigger="keyup" hx-target="#description_results" hx-swap="outerHTML"/>
+    <div id="description_results"></div>
+</form>
