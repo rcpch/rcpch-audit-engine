@@ -44,17 +44,17 @@
     
     {% if multiaxial_description_complete %}
       {% if active_template == "multiaxial_description" %}
-        <a class="active completed step" href="{% url 'update_multiaxial_description' case_id %}">
+        <a class="active completed step" href="{% url 'multiaxial_description' case_id %}">
       {% else %}
-        <a class="completed step" href="{% url 'update_multiaxial_description' case_id %}">
+        <a class="completed step" href="{% url 'multiaxial_description' case_id %}">
       {% endif %}
     {% else %}
         {% if active_template == "multiaxial_description" %}
-          <a href="{% url 'update_multiaxial_description' case_id %}" class="active step">
+          <a href="{% url 'multiaxial_description' case_id %}" class="active step">
         {% elif active_template == "none" %}
-          <a href="{% url 'update_multiaxial_description' case_id %}" class="disabled step">
+          <a href="{% url 'multiaxial_description' case_id %}" class="disabled step">
         {% else %}
-          <a href="{% url 'create_multiaxial_description' case_id %}" class="step">
+          <a href="{% url 'multiaxial_description' case_id %}" class="step">
         {% endif %}
     {% endif %}
       <div class="content">

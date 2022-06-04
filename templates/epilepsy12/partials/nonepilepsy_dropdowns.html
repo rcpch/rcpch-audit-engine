@@ -1,0 +1,18 @@
+<div class=fields>
+    <div class="six wide field" class="ui dropdown">
+        <label>How best describes the generalised nature of the nonepileptic episode(s)?</label>
+        <select>
+            {% for item in nonepilepsy_generalised_onset_types %}
+                <option value={{item.0}}>{{item.1}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="six wide field" class="ui dropdown">
+        <label>How best describes the <i>onset</i> of the nonepileptic episode(s)?</label>
+        <select>
+            {% for item in nonepilepsy_onset_types %}
+                <option value={{item.0}}>{{item.1}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

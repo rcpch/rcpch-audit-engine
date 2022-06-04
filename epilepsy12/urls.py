@@ -24,10 +24,8 @@ urlpatterns = [
          views.create_assessment, name="create_assessment"),
     path('assessment/<int:case_id>/update',
          views.update_assessment, name="update_assessment"),
-    path('multiaxial_description/<int:case_id>/create',
-         views.create_multiaxial_description, name='create_multiaxial_description'),
-    path('multiaxial_description/<int:case_id>/update',
-         views.update_multiaxial_description, name='update_multiaxial_description'),
+    path('multiaxial_description/<int:case_id>',
+         views.multiaxial_description, name='multiaxial_description'),
     path('epilepsy_context/<int:case_id>/create',
          views.create_epilepsy_context, name='create_epilepsy_context'),
     path('epilepsy_context/<int:case_id>/update',
@@ -47,6 +45,21 @@ urlpatterns = [
          name='hospital-autocomplete'),
     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
          name='semiology-keyword-autocomplete'),
-    path('htmx/description/<int:desscribe_id>',
-         views.edit_description, name='edit_description'),
 ]
+
+htmx_paths = [
+    path('htmx/<int:desscribe_id>/description',
+         views.edit_description, name='edit_description'),
+    path('htmx/<int:desscribe_id>/description_keyword/<int:description_keyword_id>/delete',
+         views.delete_description_keyword, name='delete_description_keyword'),
+    path('htmx/<int:desscribe_id>/epilepsy_or_nonepilepsy_status_changed',
+         views.epilepsy_or_nonepilepsy_status_changed, name='epilepsy_or_nonepilepsy_status_changed'),
+    path('htmx/<int:desscribe_id>/epilepsy_onset_changed',
+         views.epilepsy_onset_changed, name='epilepsy_onset_changed'),
+    path('htmx/<int:desscribe_id>/focal_onset_epilepsy_checked_changed',
+         views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
+    path('htmx/seizure_cause_main',
+         views.seizure_cause_main, name='seizure_cause_main')
+]
+
+urlpatterns += htmx_paths

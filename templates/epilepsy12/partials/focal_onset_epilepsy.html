@@ -1,0 +1,272 @@
+{% load widget_tweaks %}
+<div class="ui message">
+    <form class="ui form" name="focal_epilepsy_form">
+        {% csrf_token %}
+        
+        <h5 class='header'>
+        Motor Manifestations
+        </h5>
+
+        <div class="five fields">
+            
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {% if desscribe.focal_onset_atonic %}
+                        <input type="checkbox" name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
+                    {% else %}
+                        <input type="checkbox" checked name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
+                    {% endif %}
+                    <label>Atonic</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_clonic %}
+                    <input type="checkbox" name='focal_onset_clonic' checked>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_clonic'>
+                {% endif %}
+                    <label>Clonic</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_left %}
+                    <input type="checkbox" checked name='focal_onset_left'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_left'>
+                {% endif %}
+                    <label>Left</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_right %}
+                    <input type="checkbox" checked name='focal_onset_right'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_right'>
+                {% endif %}
+                    <label>Right</label>
+                </div>
+            </div>
+        </div>
+        <div class="fields">
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_epileptic_spasms %}
+                    <input type="checkbox" checked name='focal_onset_epileptic_spasms'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_epileptic_spasms'>
+                {% endif %}
+                    <label>Spasms</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_hyperkinetic %}
+                    <input type="checkbox" checked name='focal_onset_hyperkinetic'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_hyperkinetic'>
+                {% endif %}
+                    <label>Hyperkinetic</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_myoclonic %}
+                    <input type="checkbox" checked name='focal_onset_myoclonic'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_myoclonic'>
+                {% endif %}
+                    <label>Myoclonic</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_tonic %}
+                    <input type="checkbox" checked name='focal_onset_tonic'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_tonic'>
+                {% endif %}
+                    <label>Tonic</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_focal_to_bilateral_tonic_clonic %}
+                    <input type="checkbox" checked name='focal_onset_focal_to_bilateral_tonic_clonic'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_focal_to_bilateral_tonic_clonic'>
+                {% endif %}
+                    <label>Tonic-Clonic</label>
+                </div>
+            </div>
+
+        </div>
+
+        <h5 class="header">
+        Non-Motor Manifestations
+        </h5>
+        <div class="five fields">
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_automatisms %}
+                    <input type="checkbox" checked name='focal_onset_automatisms'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_automatisms'>
+                {% endif %}
+                    <label>Automatisms</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_impaired_awareness %}
+                    <input type="checkbox" checked name='focal_onset_impaired_awareness'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_impaired_awareness'>
+                {% endif %}
+                    <label>Impaired Awareness</label>
+                </div>
+            </div>
+            
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_gelastic %}
+                    <input type="checkbox" checked name='focal_onset_gelastic'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_gelastic'>
+                {% endif %}
+                    <label>Gelastic</label>
+                </div>
+            </div>
+            
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_autonomic %}
+                    <input type="checkbox" checked name='focal_onset_autonomic'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_autonomic'>
+                {% endif %}
+                    <label>Autonomic</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_behavioural_arrest %}
+                    <input type="checkbox" checked name='focal_onset_behavioural_arrest'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_behavioural_arrest'>
+                {% endif %}
+                    <label>Behavioural Arrest</label>
+                </div>
+            </div>
+            
+        </div>
+        <div class='five fields'>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_cognitive %}
+                    <input type="checkbox" checked name='focal_onset_cognitive'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_cognitive'>
+                {% endif %}
+                    <label>Cognitive</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_emotional %}
+                    <input type="checkbox" name='focal_onset_emotional'>
+                {% else %}
+                    <input type="checkbox" checked name='focal_onset_emotional'>
+                {% endif %}
+                    <label>Emotional</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_sensory %}
+                    <input type="checkbox" checked name='focal_onset_sensory'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_sensory'>
+                {% endif %}
+                    <label>Sensory</label>
+                </div>
+            </div>
+
+        </div>
+        
+        <h5 class="header">
+        EEG Manifestations
+        </h5>
+
+        <div class="five fields">
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                    {% if desscribe.focal_onset_centrotemporal %}
+                        <input type="checkbox" checked name='focal_onset_centrotemporal'>
+                    {% else %}
+                        <input type="checkbox" name='focal_onset_centrotemporal'>
+                    {% endif %}
+                    <label>Centrotemporal</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_temporal %}
+                    <input type="checkbox" checked name='focal_onset_temporal'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_temporal'>
+                {% endif %}
+                    <label>Temporal</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_frontal %}
+                    <input type="checkbox" checked name='focal_onset_frontal'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_frontal'>
+                {% endif %}
+                    <label>Frontal</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_parietal %}
+                    <input type="checkbox" checked name='focal_onset_parietal'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_parietal'>
+                {% endif %}
+                    <label>Parietal</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                {% if desscribe.focal_onset_occipital %}
+                    <input type="checkbox" checked name='focal_onset_occipital'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_occipital'>
+                {% endif %}
+                    <label>Occipital</label>
+                </div>
+            </div>
+
+        </div>
+        <div class="ui green button" hx-post="{% url 'focal_onset_epilepsy_checked_changed' desscribe_id=desscribe.id %}" hx-trigger="click" id="focal_button">Save</div>
+    </form>
+    
+</div>

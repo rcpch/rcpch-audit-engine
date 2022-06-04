@@ -9,5 +9,6 @@ dj_database_url
 django-autocomplete-light
 rapidfuzz
 django-widget-tweaks
+django-htmx
 
 # RCPCH imports

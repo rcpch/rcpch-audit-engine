@@ -1,3 +1,4 @@
+{% load widget_tweaks %}
 
 <form class="ui form" method="post">
     {% csrf_token %}
@@ -6,25 +7,23 @@
         <div class="ui header">
             <div class="ui blue circular label">D</div>
         </div>
-        <div class="field">
-            <label>Describe the episode?</label>
-            {{ form.description }}
-            {% if form.description.errors %}
-            <div class="ui pointing red basic label">{{form.description.errors}}</div>
-            {% endif %}
+        {% include 'epilepsy12/partials/description.html' with desscribe_id=desscribe.id choices=choices %}
+    </div>
+    
+    <div class="ui blue segment">
+        <div class="ui header">
+            <div class="ui blue circular label">E</div>
         </div>
+        {% include 'epilepsy12/partials/epilepsy_nonepilepsy_status_dropdown.html' with desscribe_id=desscribe.id epilepsy_or_nonepilepsy_status_field=multiaxial_description_form.epilepsy_or_nonepilepsy_status %}
     </div>
     
     <div class="ui blue segment">
         <div class="ui header">
             <div class="ui blue circular label">S</div>
         </div>
-        <div class="field">
-            <label>Is there an identifiable epilepsy syndrome?</label>
-            {{form.syndrome}} 
-            {% if form.syndrome.errors %}
-            <div class="ui pointing red basic label">{{form.syndrome.errors}}</div>
-            {% endif %}
+        <label>Is there an identifiable epilepsy syndrome? {{desscribe.id}}</label>
+        <div>
+            {{multiaxial_description_form.syndrome}}
         </div>
     </div>
     
@@ -33,12 +32,14 @@
             <div class="ui blue circular label">C</div>
         </div>
         <div class="field">
-            <label>What is the cause of this epilepsy and what further investigations may be needed to explore this?</label>
-            {{form.seizure_cause_main}} 
-            {% if form.seizure_cause_main.errors %}
-            <div class="ui pointing red basic label">{{form.seizure_cause_main.errors}}</div>
-            {% endif %}
+            <label>What is the cause of this epilepsy?</label>
         </div>
+        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            {% render_field multiaxial_description_form.seizure_cause_main class+="ui dropdown" hx-trigger="change" name="multiaxial_description_form" hx-target="#dropdown-result" hx-swap="innerHTML" %} 
+            <div class="ui field" id="dropdown-result"></div>
+        </div>
+        
+        
     </div>
     
     <div class="ui blue segment">

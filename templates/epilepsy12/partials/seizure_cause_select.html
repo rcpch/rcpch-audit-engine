@@ -1,0 +1,27 @@
+<div class="ui message">
+    {% if added_select|length > 0 %}
+    <div class="fields">
+        <div class="six wide field">
+            <select class="ui dropdown">
+                {% for item in select_list %}
+                    <option value={{item.0}}>{{item.1}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="six wide field">
+            <select class="ui dropdown">
+                {% for added_item in added_select %}
+                    <option value={{added_item.0}}>{{added_item.1}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    {% else %}
+        <div class="twelve wide field">
+            <select class="ui dropdown">
+                {% for item in select_list %}
+                    <option value={{item.0}}>{{item.1}}</option>
+                {% endfor %}
+            </select>
+        </div>    
+    {% endif %}
+</div>
