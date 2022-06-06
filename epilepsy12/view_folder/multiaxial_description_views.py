@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from epilepsy12.constants.causes import EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES
-from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE
+from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.forms_folder import multiaxial_description_form
 from epilepsy12.forms_folder.multiaxial_description_form import MultiaxialDescriptionForm
 
@@ -123,13 +123,10 @@ def epilepsy_or_nonepilepsy_status_changed(request, desscribe_id):
         DESSCRIBE.objects.filter(pk=desscribe_id).update(
             epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status
         )
-
-    template = ""
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+        desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
     if epilepsy_or_nonepilepsy_status == 'E':
 
-        selection = desscribe.epileptic_seizure_onset_type[0]
         # return epilepsy dropdowns
         template = 'epilepsy12/partials/epilepsy_dropdowns.html'
         context = {
@@ -141,14 +138,12 @@ def epilepsy_or_nonepilepsy_status_changed(request, desscribe_id):
         template = 'epilepsy12/partials/nonepilepsy_dropdowns.html'
         context = {
             'nonepilepsy_generalised_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-            'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_TYPE
+            'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_TYPE,
+            'desscribe': desscribe
         }
     else:
         # not known
-        context = {
-
-        }
-        template = None
+        return HttpResponse("The diagnosis of epilepsy is uncertain.")
 
     return render(request, template, context)
 
@@ -203,6 +198,116 @@ def focal_onset_epilepsy_checked_changed(request, desscribe_id):
     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
 
     return HttpResponse("Saved!")
+
+
+@login_required
+def nonepilepsy_generalised_onset(request, desscribe_id):
+
+    nonepilepsy_generalised_onset = request.POST.get(
+        'nonepilepsy_generalised_onset')
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset)
+    desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+    if nonepilepsy_generalised_onset == "Oth":
+        context = {
+            'desscribe': desscribe
+        }
+        return render(request, 'epilepsy12/partials/nonepileptic_seizure_unknown_onset.html', context)
+    else:
+        return HttpResponse("")
+
+
+@login_required
+def nonepilepsy_generalised_onset_edit(request, desscribe_id):
+    nonepilepsy_generalised_onset_edit_text = request.POST.get(
+        'nonepilepsy_generalised_onset_edit')
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        nonepileptic_seizure_unknown_onset_other_details=nonepilepsy_generalised_onset_edit_text)
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    return HttpResponse(desscribe.nonepileptic_seizure_unknown_onset_other_details)
+
+
+@login_required
+def nonepilepsy_subtypes(request, desscribe_id):
+    """
+    Function triggered by a change or load in the nonepilepsy subtype dropdown leading to a post request.
+    The desscribe_id is also passed in allowing update of the model.
+    """
+    nonepilepsy_subtypes = request.POST.get('nonepilepsy_subtypes')
+
+    # persist the result
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        nonepileptic_seizure_type=nonepilepsy_subtypes)
+
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    return_list = []
+    subtype = ""
+    if nonepilepsy_subtypes == "SAS":
+        return_list = NON_EPILEPTIC_SYNCOPES
+        subtype = "syncope/anoxic seizure"
+    if nonepilepsy_subtypes == "BPP":
+        return_list = NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS
+        subtype = "behavioural/psychological or psychiatric"
+    if nonepilepsy_subtypes == "SRC":
+        return_list = NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS
+        subtype = "sleep-related"
+    if nonepilepsy_subtypes == "PMD":
+        return_list = NON_EPILEPSY_PAROXYSMS
+        subtype = "paroxysmal movement disorder"
+    if nonepilepsy_subtypes == "MAD":
+        return_list = MIGRAINES
+        subtype = "migraine"
+    if nonepilepsy_subtypes == "ME":
+        return_list = EPIS_MISC
+        subtype = "miscellaneous"
+    if nonepilepsy_subtypes == "Oth":
+        return HttpResponse("Other")
+
+    context = {
+        'nonepilepsy_subtype_list': return_list,
+        'nonepilepsy_selected_subtype': subtype,
+        'nonepilepsy_selected_subtype_code': nonepilepsy_subtypes,
+        'desscribe': desscribe
+    }
+
+    return render(request, 'epilepsy12/partials/nonepilepsy_subtypes.html', context)
+
+
+@login_required
+def nonepilepsy_subtype_selection(request, desscribe_id, nonepilepsy_selected_subtype_code):
+    # POST request receiving selection of nonepilepsy subtype and persisting the result
+
+    nonepilepsy_subtype_selection = request.POST.get(
+        "nonepilepsy_subtype_selection")
+
+    try:
+        if nonepilepsy_selected_subtype_code == "SAS":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_syncope=nonepilepsy_subtype_selection)
+        if nonepilepsy_selected_subtype_code == "BPP":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_behavioural=nonepilepsy_subtype_selection)
+        if nonepilepsy_selected_subtype_code == "SRC":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_sleep=nonepilepsy_subtype_selection)
+        if nonepilepsy_selected_subtype_code == "PMD":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_paroxysmal=nonepilepsy_subtype_selection)
+        if nonepilepsy_selected_subtype_code == "MAD":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_migraine=nonepilepsy_subtype_selection)
+        if nonepilepsy_selected_subtype_code == "ME":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_miscellaneous=nonepilepsy_subtype_selection)
+        if nonepilepsy_selected_subtype_code == "Oth":
+            DESSCRIBE.objects.filter(pk=desscribe_id).update(
+                nonepileptic_seizure_other=nonepilepsy_subtype_selection)
+    except Exception as error:
+        return HttpResponse(error)
+    else:
+        return HttpResponse("Success")
 
 
 @ login_required

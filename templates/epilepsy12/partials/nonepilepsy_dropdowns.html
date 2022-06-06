@@ -1,18 +1,37 @@
-<div class=fields>
-    <div class="six wide field" class="ui dropdown">
-        <label>How best describes the generalised nature of the nonepileptic episode(s)?</label>
-        <select>
-            {% for item in nonepilepsy_generalised_onset_types %}
-                <option value={{item.0}}>{{item.1}}</option>
-            {% endfor %}
-        </select>
+
+<form class="ui form">
+    <div class=fields>
+        <div class="eight wide field" class="ui dropdown">
+            <label>How best describes the generalised nature of the nonepileptic episode(s)?</label>
+            <select name="nonepilepsy_generalised_onset" hx-post="{% url 'nonepilepsy_generalised_onset' desscribe_id=desscribe.id %}" hx-trigger="load, change" hx-target="#nonepileptic_seizure_unknown_onset_result">
+                {% for item in nonepilepsy_generalised_onset_types %}
+                    {% if desscribe.nonepileptic_seizure_unknown_onset == item.0 %}
+                        <option selected value={{item.0}}>{{item.1}}</option>
+                    {% else %}
+                        <option value={{item.0}}>{{item.1}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="nonepileptic_seizure_unknown_onset_result"></div> {# unknown onset input box only shows if Oth selected #}
+       
     </div>
-    <div class="six wide field" class="ui dropdown">
-        <label>How best describes the <i>onset</i> of the nonepileptic episode(s)?</label>
-        <select>
-            {% for item in nonepilepsy_onset_types %}
-                <option value={{item.0}}>{{item.1}}</option>
-            {% endfor %}
-        </select>
+    <div class="fields">
+        <div class="eight wide field" class="ui dropdown">
+            <label>How best describes the <i>onset</i> of the nonepileptic episode(s)?</label>
+            <select hx-target="#nonepilepsy_subtypes" name="nonepilepsy_subtypes" hx-post="{% url 'nonepilepsy_subtypes' desscribe_id=desscribe.id %}" hx-trigger="load, change">
+                {% for item in nonepilepsy_onset_types %}
+                    {% if desscribe.nonepileptic_seizure_type == item.0 %}
+                        <option selected value={{item.0}}>{{item.1}}</option>
+                    {% else %}
+                        <option value={{item.0}}>{{item.1}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="eight wide field">
+            <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' id="nonepilepsy_subtypes"></div>
+        </div>
     </div>
-</div>
+</form

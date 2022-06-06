@@ -58,6 +58,14 @@ htmx_paths = [
          views.epilepsy_onset_changed, name='epilepsy_onset_changed'),
     path('htmx/<int:desscribe_id>/focal_onset_epilepsy_checked_changed',
          views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
+         views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset_edit',
+         views.nonepilepsy_generalised_onset_edit, name='nonepilepsy_generalised_onset_edit'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_subtypes',
+         views.nonepilepsy_subtypes, name='nonepilepsy_subtypes'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_subtype_selection/<str:nonepilepsy_selected_subtype_code>',
+         views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
     path('htmx/seizure_cause_main',
          views.seizure_cause_main, name='seizure_cause_main')
 ]
