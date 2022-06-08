@@ -21,45 +21,49 @@
         <div class="ui header">
             <div class="ui blue circular label">S</div>
         </div>
-        <label>Is there an identifiable epilepsy syndrome? {{desscribe.id}}</label>
-        <div>
-            {{multiaxial_description_form.syndrome}}
+        <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            <div class="field">
+                <label>Is there an identifiable epilepsy syndrome?</label>
+            </div>
+            {% url 'syndrome_select' desscribe_id=desscribe.id as URL %}
+            {% render_field multiaxial_description_form.syndrome class+="sixteen wide field" name="syndrome_select" hx-post=URL hx-trigger="load, change" hx-target="#syndrome_result" %}
         </div>
+        <div hidden id="syndrome_result"></div>
     </div>
     
     <div class="ui blue segment">
         <div class="ui header">
             <div class="ui blue circular label">C</div>
         </div>
-        <div class="field">
-            <label>What is the cause of this epilepsy?</label>
+        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="ui form">
+            <div class="field">
+                <label>What is the cause of this epilepsy?</label>
+            </div>
+            {% url 'seizure_cause_main' desscribe_id=desscribe.id as SEIZURE_CAUSE_URL %}
+            {% render_field multiaxial_description_form.seizure_cause_main class+="sixteen wide field" class+="ui dropdown" hx-post=SEIZURE_CAUSE_URL hx-trigger="load, change" name="seizure_cause_main" hx-target="#seizure_cause_main_result" %} 
         </div>
-        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-            {% render_field multiaxial_description_form.seizure_cause_main class+="ui dropdown" hx-trigger="change" name="multiaxial_description_form" hx-target="#dropdown-result" hx-swap="innerHTML" %} 
-            <div class="ui field" id="dropdown-result"></div>
+        <div class="ui message">
+            <div id="seizure_cause_main_result"></div>
         </div>
-        
-        
     </div>
     
     <div class="ui blue segment">
         <div class="ui header">
             <div class="ui blue circular label">RIBE</div>
         </div>
-        <div class="field">
-            <div class="ui toggle checkbox">
-                {{form.relevant_impairments_behavioural_educational}} 
-                <label>Are there any relevant <b><i>i</b></i>mpairments: <i><b>b</b></i>ehavioural or <i><b>e</b></i>ducational/<i><b>e</b></i>motional problems?</label>
+        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="ui form">
+            
+            <div class="field">
+                <div class="ui toggle checkbox" >
+                {% if desscribe.relevant_impairments_behavioural_educational %}
+                    <input type="checkbox" checked name={{desscribe}} hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" name="ribe" hx-target="#ribe_result" hx-trigger="load, change">
+                {% else %}
+                    <input type="checkbox" name={{desscribe}} hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" name="ribe" hx-target="#ribe_result" hx-trigger="load, change">
+                {% endif %}
+                    <label>Are there any <b><i>r</i></b>elevant <b><i>i</b></i>mpairments: <i><b>b</b></i>ehavioural or <i><b>e</b></i>ducational/<i><b>e</b></i>motional problems?</label>
+                </div>
             </div>
-            {% if form.relevant_impairments_behavioural_educational.errors %}
-                <div class="ui pointing red basic label">{{form.relevant_impairments_behavioural_educational.errors}}</div>
-            {% endif %}
-        </div>
-        <div class="ui bottom attached warning icon message">
-        <i class="info circle icon"></i>
-        <p>
-        Please list these in the Comorbidities section.
-        </p>
+            <div id="ribe_result"></div>
         </div>
     </div>
 

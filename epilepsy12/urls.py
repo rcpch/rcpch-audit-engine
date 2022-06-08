@@ -66,8 +66,21 @@ htmx_paths = [
          views.nonepilepsy_subtypes, name='nonepilepsy_subtypes'),
     path('htmx/<int:desscribe_id>/nonepilepsy_subtype_selection/<str:nonepilepsy_selected_subtype_code>',
          views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
-    path('htmx/seizure_cause_main',
-         views.seizure_cause_main, name='seizure_cause_main')
+    path('htmx/<int:desscribe_id>/syndrome_select',
+         views.syndrome_select, name='syndrome_select'),
+    path('htmx/<int:desscribe_id>/seizure_cause_main',
+         views.seizure_cause_main, name='seizure_cause_main'),
+    path('htmx/<int:desscribe_id>/seizure_cause_main/<str:seizure_cause_main>',
+         views.seizure_cause_main_choice, name='seizure_cause_main_choice'),
+    path('htmx/<int:desscribe_id>/seizure_cause_infectious',
+         views.seizure_cause_infectious, name='seizure_cause_infectious'),
+    path('htmx/<int:desscribe_id>/genetic_selection',
+         views.seizure_cause_genetic_choice, name='seizure_cause_genetic_choice'),
+    path('htmx/<int:desscribe_id>/autoantibodies',
+         views.autoantibodies, name='autoantibodies'),
+    path('htmx/<int:desscribe_id>/ribe',
+         views.ribe, name='ribe')
+
 ]
 
 urlpatterns += htmx_paths

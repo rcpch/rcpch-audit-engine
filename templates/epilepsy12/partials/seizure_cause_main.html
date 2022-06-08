@@ -1,0 +1,28 @@
+
+    <div class="ui form">
+        <div class="fields">
+        
+            {% if seizure_cause_main == "Inf" %}
+                <div class="sixteen wide field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                    <input class="ui input" value="{{currently_selected}}" placeholder="Infectious causes" hx-post="{% url 'seizure_cause_infectious' desscribe_id=desscribe_id %}" name="seizure_cause_infectious" hx-trigger="keyup" hx-target="#seizure_cause_infectious_result" />
+                </div>
+                <div hidden id="seizure_cause_infectious_result"></div>
+
+            {% else %}
+                <div class="eight wide field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                    <select class="ui dropdown" name="seizure_cause_main_choice" hx-post="{% url 'seizure_cause_main_choice' desscribe_id=desscribe_id seizure_cause_main=seizure_cause_main %}" hx-target="#seizure_cause_main_choice_result" hx-trigger="load, change">
+                        {% for item in select_list %}
+                            {% if item.0 == currently_selected %}
+                                <option selected value={{item.0}}>{{item.1}}</option>
+                            {% else %}
+                                <option value={{item.0}}>{{item.1}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="seizure_cause_main_choice_result"></div>
+
+            {% endif %}
+
+        </div>
+    </div>

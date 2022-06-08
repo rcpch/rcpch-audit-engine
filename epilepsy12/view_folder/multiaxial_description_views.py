@@ -4,22 +4,17 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from epilepsy12.constants.causes import EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
-from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES
+from epilepsy12.constants import comorbidities
+from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
-from epilepsy12.forms_folder import multiaxial_description_form
 from epilepsy12.forms_folder.multiaxial_description_form import MultiaxialDescriptionForm
+from epilepsy12.models.comorbidity import Comorbidity
 
-from epilepsy12.models import desscribe
 from ..general_functions import fuzzy_scan_for_keywords
 
-from epilepsy12.models.desscribe import DESSCRIBE
-from epilepsy12.models.keyword import Keyword
+from ..models import Registration, Keyword, DESSCRIBE, Case
+
 from ..forms_folder import DescriptionForm
-
-from epilepsy12.models.case import Case
-
-from ..models import Registration
 from ..general_functions import *
 
 
@@ -86,29 +81,155 @@ def seizure_cause_main(request, desscribe_id):
 
     selection = request.POST.get('seizure_cause_main')
 
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        seizure_cause_main=selection)
+
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
     added_select = []
+
+    context = {}
 
     if selection == 'Met':
         select_list = METABOLIC_CAUSES
-    if selection == 'Str':
+        currently_selected = desscribe.seizure_cause_metabolic
+        context.update({
+            'select_list': select_list,
+            'currently_selected': currently_selected
+        })
+    elif selection == 'Str':
         select_list = EPILEPSY_STRUCTURAL_CAUSE_TYPES
+        currently_selected = desscribe.seizure_cause_structural
+        context.update({
+            'select_list': select_list,
+            'currently_selected': currently_selected,
+        })
     elif selection == 'Gen':
         select_list = EPILEPSY_GENETIC_CAUSE_TYPES
-        added_select = EPILEPSY_GENE_DEFECTS
+        currently_selected = desscribe.seizure_cause_genetic
+        context.update({
+            'select_list': select_list,
+            'currently_selected': currently_selected,
+        })
     elif selection == 'Imm':
         select_list = IMMUNE_CAUSES
+        currently_selected = desscribe.seizure_cause_immune
+        context.update({
+            'select_list': select_list,
+            'currently_selected': currently_selected,
+        })
+    elif selection == 'Inf':
+        context.update({
+            'currently_selected': desscribe.seizure_cause_infectious
+        })
+
     elif selection == 'NK':
-        select_list = []
+        return HttpResponse("Not Known")
     else:
         # inf - this is a text input
-        return
+        return HttpResponse("No Selection")
 
+    context.update({
+        'seizure_cause_main': selection,
+        'desscribe_id': desscribe_id
+    })
+
+    return render(request, 'epilepsy12/partials/seizure_cause_main.html', context)
+
+
+@login_required
+def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
+    seizure_cause_main_choice = request.POST.get('seizure_cause_main_choice')
+
+    if seizure_cause_main == 'Met':
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            seizure_cause_metabolic=seizure_cause_main_choice)
+
+    elif seizure_cause_main == 'Str':
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            seizure_cause_structural=seizure_cause_main_choice)
+
+    elif seizure_cause_main == 'Imm':
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            seizure_cause_immune=seizure_cause_main_choice)
+
+        if seizure_cause_main_choice == "AnM":
+            desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+            context = {
+                'selected_autoantibody': desscribe.seizure_cause_immune_antibody,
+                'selection': AUTOANTIBODIES,
+                'desscribe_id': desscribe_id
+            }
+            # antibody mediated - offer antibodies select
+            return render(request, "epilepsy12/partials/autoantibodies.html", context)
+        else:
+            return HttpResponse("Success")
+
+    elif seizure_cause_main == 'Gen':
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            seizure_cause_genetic=seizure_cause_main_choice)
+        desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+        context = {
+            'desscribe_id': desscribe_id,
+            'seizure_cause_main': seizure_cause_main,
+            'selected_choice': seizure_cause_main_choice,
+            'selection': EPILEPSY_GENE_DEFECTS,
+            'selected_gene_defect': desscribe.seizure_cause_gene_abnormality
+        }
+        if seizure_cause_main_choice == "GeA":
+            # gene abnormality selected
+            return render(request, "epilepsy12/partials/gene_defect.html", context)
+        else:
+            return HttpResponse("Success")
+    else:
+        return HttpResponse('Error!')
+    return HttpResponse("Selected")
+
+
+@login_required
+def seizure_cause_infectious(request, desscribe_id):
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        seizure_cause_infectious=request.POST.get('seizure_cause_infectious'))
+    return HttpResponse("Success!")
+
+
+@login_required
+def seizure_cause_genetic_choice(request, desscribe_id):
+    gene_abnormality = request.POST.get('seizure_cause_genetic_choice')
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        seizure_cause_gene_abnormality=gene_abnormality)
+    return HttpResponse('Selected')
+
+
+@login_required
+def autoantibodies(request, desscribe_id):
+    autoantibodies = request.POST.get('autoantibodies')
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        seizure_cause_immune_antibody=autoantibodies)
+    return HttpResponse('Selected')
+
+
+@login_required
+def ribe(request, desscribe_id):
+    toggle = request.POST.get('NE')
+    if toggle == 'on':
+        toggle = True
+    else:
+        toggle = False
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        relevant_impairments_behavioural_educational=toggle)
+    registration_field = DESSCRIBE.objects.filter(
+        pk=desscribe_id).select_related('registration').first()
+
+    registration = Registration.objects.filter(
+        id=registration_field.id).first()
+    case = registration.case
+    comorbidities = Comorbidity.objects.filter(case=case)
     context = {
-        'select_list': select_list,
-        'added_select': added_select
+        'comorbidities': comorbidities,
+        'case_id': case.id
     }
-
-    return render(request, 'epilepsy12/partials/seizure_cause_select.html', context)
+    return render(request, "epilepsy12/partials/ribe.html", context)
 
 
 @login_required
@@ -308,6 +429,13 @@ def nonepilepsy_subtype_selection(request, desscribe_id, nonepilepsy_selected_su
         return HttpResponse(error)
     else:
         return HttpResponse("Success")
+
+
+@login_required
+def syndrome_select(request, desscribe_id):
+    syndrome_code = request.POST.get('syndrome')
+    DESSCRIBE.objects.filter(id=desscribe_id).update(syndrome=syndrome_code)
+    return HttpResponse("Success!")
 
 
 @ login_required

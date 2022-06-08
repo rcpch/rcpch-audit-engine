@@ -13,26 +13,15 @@ Each form is broken into different dependent fields to allow HTMX rendering
 
 class MultiaxialDescriptionForm(ModelForm):
 
-    relevant_impairments_behavioural_educational = forms.CheckboxInput(
-    )
-
     focal_onset_atonic = forms.CheckboxInput()
-    focal_onset_clonic = forms.CheckboxInput()
+    relevant_impairments_behavioural_educational = forms.CheckboxInput()
 
     def __init__(self, *args, **kwargs) -> None:
         super(MultiaxialDescriptionForm, self).__init__(*args, **kwargs)
-        url = reverse_lazy('seizure_cause_main')
-
-        self.fields['syndrome'].widget.attrs['class'] = "ui dropdown"
-        self.fields['seizure_cause_main'].widget.attrs['hx-post'] = reverse_lazy(
-            'seizure_cause_main')
 
     class Meta:
         model = DESSCRIBE
         fields = (
-            'focal_onset_atonic',
-            'focal_onset_clonic',
-            'focal_onset_occipital',
             'epilepsy_or_nonepilepsy_status',
             'syndrome',
             'seizure_cause_main',

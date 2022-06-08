@@ -1,0 +1,12 @@
+<div class="sixteen wide field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <select class="ui dropdown" name="autoantibodies" hx-post="{% url 'autoantibodies' desscribe_id=desscribe_id %}" hx-target="#autoantibodies_result" hx-trigger="load, change">
+        {% for added_item in selection %}
+            {% if selected_autoantibody == added_item.0 %}
+                <option selected value={{added_item.0}}>{{added_item.1}}</option>
+            {% else %}
+                <option value={{added_item.0}}>{{added_item.1}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <div hidden id="autoantibodies_result"></div>
+</div>
