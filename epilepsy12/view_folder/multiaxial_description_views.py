@@ -216,8 +216,7 @@ def ribe(request, desscribe_id):
         toggle = True
     else:
         toggle = False
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        relevant_impairments_behavioural_educational=toggle)
+
     registration_field = DESSCRIBE.objects.filter(
         pk=desscribe_id).select_related('registration').first()
 
@@ -225,6 +224,12 @@ def ribe(request, desscribe_id):
         id=registration_field.id).first()
     case = registration.case
     comorbidities = Comorbidity.objects.filter(case=case)
+
+    if comorbidities.count() > 0:
+        toggle = True
+
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        relevant_impairments_behavioural_educational=toggle)
     context = {
         'comorbidities': comorbidities,
         'case_id': case.id
