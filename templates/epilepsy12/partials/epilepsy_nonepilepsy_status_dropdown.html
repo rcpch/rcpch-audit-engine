@@ -1,0 +1,14 @@
+
+<form class="ui form">
+    <div class="field">
+    {% load widget_tweaks %}
+        <label>Is a diagnosis of epilepsy definite, or uncertain?</label>
+        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            {% url 'epilepsy_or_nonepilepsy_status_changed' desscribe_id=desscribe_id as URL %}
+                <div >
+                    {% render_field epilepsy_or_nonepilepsy_status_field class="ui dropdown" hx-trigger='load, change' hx-post=URL hx-target="#epilepsy_nonepilepsy_dropdowns" hx-swap="innerHTML" %}
+                </div>
+        </div>
+    </div>
+    <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' id="epilepsy_nonepilepsy_dropdowns"></div>
+</form>

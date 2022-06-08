@@ -1,30 +1,49 @@
+{% load widget_tweaks %}
 
 <form class="ui form" method="post">
     {% csrf_token %}
+
+    <div class="ui blue segment">
+        <div class="ui header">
+            <div class="ui blue circular label">D</div>
+        </div>
+        {% include 'epilepsy12/partials/description.html' with desscribe_id=desscribe.id choices=choices %}
+    </div>
+    
+    <div class="ui blue segment">
+        <div class="ui header">
+            <div class="ui blue circular label">E</div>
+        </div>
+        {% include 'epilepsy12/partials/epilepsy_nonepilepsy_status_dropdown.html' with desscribe_id=desscribe.id epilepsy_or_nonepilepsy_status_field=multiaxial_description_form.epilepsy_or_nonepilepsy_status %}
+    </div>
     
     <div class="ui blue segment">
         <div class="ui header">
             <div class="ui blue circular label">S</div>
         </div>
-        <div class="field">
-            <label>Is there an identifiable epilepsy syndrome?</label>
-            {{form.syndrome}} 
-            {% if form.syndrome.errors %}
-            <div class="ui pointing red basic label">{{form.syndrome.errors}}</div>
-            {% endif %}
+        <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            <div class="field">
+                <label>Is there an identifiable epilepsy syndrome?</label>
+            </div>
+            {% url 'syndrome_select' desscribe_id=desscribe.id as URL %}
+            {% render_field multiaxial_description_form.syndrome class+="sixteen wide field" name="syndrome_select" hx-post=URL hx-trigger="load, change" hx-target="#syndrome_result" %}
         </div>
+        <div hidden id="syndrome_result"></div>
     </div>
     
     <div class="ui blue segment">
         <div class="ui header">
             <div class="ui blue circular label">C</div>
         </div>
-        <div class="field">
-            <label>What is the cause of this epilepsy and what further investigations may be needed to explore this?</label>
-            {{form.seizure_cause_main}} 
-            {% if form.seizure_cause_main.errors %}
-            <div class="ui pointing red basic label">{{form.seizure_cause_main.errors}}</div>
-            {% endif %}
+        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="ui form">
+            <div class="field">
+                <label>What is the cause of this epilepsy?</label>
+            </div>
+            {% url 'seizure_cause_main' desscribe_id=desscribe.id as SEIZURE_CAUSE_URL %}
+            {% render_field multiaxial_description_form.seizure_cause_main class+="sixteen wide field" class+="ui dropdown" hx-post=SEIZURE_CAUSE_URL hx-trigger="load, change" name="seizure_cause_main" hx-target="#seizure_cause_main_result" %} 
+        </div>
+        <div class="ui message">
+            <div id="seizure_cause_main_result"></div>
         </div>
     </div>
     
@@ -32,20 +51,19 @@
         <div class="ui header">
             <div class="ui blue circular label">RIBE</div>
         </div>
-        <div class="field">
-            <div class="ui toggle checkbox">
-                {{form.relevant_impairments_behavioural_educational}} 
-                <label>Are there any relevant <b><i>i</b></i>mpairments: <i><b>b</b></i>ehavioural or <i><b>e</b></i>ducational/<i><b>e</b></i>motional problems?</label>
+        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="ui form">
+            
+            <div class="field">
+                <div class="ui toggle checkbox" >
+                {% if desscribe.relevant_impairments_behavioural_educational %}
+                    <input type="checkbox" checked name={{desscribe}} hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" name="ribe" hx-target="#ribe_result" hx-trigger="load, change">
+                {% else %}
+                    <input type="checkbox" name={{desscribe}} hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" name="ribe" hx-target="#ribe_result" hx-trigger="load, change">
+                {% endif %}
+                    <label>Are there any <b><i>r</i></b>elevant <b><i>i</b></i>mpairments: <i><b>b</b></i>ehavioural or <i><b>e</b></i>ducational/<i><b>e</b></i>motional problems?</label>
+                </div>
             </div>
-            {% if form.relevant_impairments_behavioural_educational.errors %}
-                <div class="ui pointing red basic label">{{form.relevant_impairments_behavioural_educational.errors}}</div>
-            {% endif %}
-        </div>
-        <div class="ui bottom attached warning icon message">
-        <i class="info circle icon"></i>
-        <p>
-        Please list these in the Comorbidities section.
-        </p>
+            <div id="ribe_result"></div>
         </div>
     </div>
 

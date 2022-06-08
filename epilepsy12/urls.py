@@ -2,7 +2,7 @@ from . import views
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
 from .views import SignUpView
-from django.urls import path, include
+from django.urls import path
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -24,10 +24,8 @@ urlpatterns = [
          views.create_assessment, name="create_assessment"),
     path('assessment/<int:case_id>/update',
          views.update_assessment, name="update_assessment"),
-    path('multiaxial_description/<int:case_id>/create',
-         views.create_multiaxial_description, name='create_multiaxial_description'),
-    path('multiaxial_description/<int:case_id>/update',
-         views.update_multiaxial_description, name='update_multiaxial_description'),
+    path('multiaxial_description/<int:case_id>',
+         views.multiaxial_description, name='multiaxial_description'),
     path('epilepsy_context/<int:case_id>/create',
          views.create_epilepsy_context, name='create_epilepsy_context'),
     path('epilepsy_context/<int:case_id>/update',
@@ -48,3 +46,41 @@ urlpatterns = [
     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
          name='semiology-keyword-autocomplete'),
 ]
+
+htmx_paths = [
+    path('htmx/<int:desscribe_id>/description',
+         views.edit_description, name='edit_description'),
+    path('htmx/<int:desscribe_id>/description_keyword/<int:description_keyword_id>/delete',
+         views.delete_description_keyword, name='delete_description_keyword'),
+    path('htmx/<int:desscribe_id>/epilepsy_or_nonepilepsy_status_changed',
+         views.epilepsy_or_nonepilepsy_status_changed, name='epilepsy_or_nonepilepsy_status_changed'),
+    path('htmx/<int:desscribe_id>/epilepsy_onset_changed',
+         views.epilepsy_onset_changed, name='epilepsy_onset_changed'),
+    path('htmx/<int:desscribe_id>/focal_onset_epilepsy_checked_changed',
+         views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
+         views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset_edit',
+         views.nonepilepsy_generalised_onset_edit, name='nonepilepsy_generalised_onset_edit'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_subtypes',
+         views.nonepilepsy_subtypes, name='nonepilepsy_subtypes'),
+    path('htmx/<int:desscribe_id>/nonepilepsy_subtype_selection/<str:nonepilepsy_selected_subtype_code>',
+         views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
+    path('htmx/<int:desscribe_id>/syndrome_select',
+         views.syndrome_select, name='syndrome_select'),
+    path('htmx/<int:desscribe_id>/seizure_cause_main',
+         views.seizure_cause_main, name='seizure_cause_main'),
+    path('htmx/<int:desscribe_id>/seizure_cause_main/<str:seizure_cause_main>',
+         views.seizure_cause_main_choice, name='seizure_cause_main_choice'),
+    path('htmx/<int:desscribe_id>/seizure_cause_infectious',
+         views.seizure_cause_infectious, name='seizure_cause_infectious'),
+    path('htmx/<int:desscribe_id>/genetic_selection',
+         views.seizure_cause_genetic_choice, name='seizure_cause_genetic_choice'),
+    path('htmx/<int:desscribe_id>/autoantibodies',
+         views.autoantibodies, name='autoantibodies'),
+    path('htmx/<int:desscribe_id>/ribe',
+         views.ribe, name='ribe')
+
+]
+
+urlpatterns += htmx_paths

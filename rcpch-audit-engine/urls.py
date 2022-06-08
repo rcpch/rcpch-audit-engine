@@ -8,6 +8,4 @@ urlpatterns = [
     path('epilepsy12/', include('epilepsy12.urls')),
     path('epilepsy12/', include('django.contrib.auth.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    # reactive 3rd party library
-    path('unicorn/', include('django_unicorn.urls')),
 ]
