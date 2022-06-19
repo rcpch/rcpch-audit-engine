@@ -22,7 +22,8 @@
       type="text/css"
     />
     <link rel="icon" href="{% static 'favicon.ico' %}"/>
-    {% comment %} <link rel="stylesheet" href="{% static 'style.css' %}"> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="{% static 'htmx_1.7/htmx.min.js' %}"></script>
   </head>
 
   <body id="root">
@@ -113,7 +114,7 @@ $('.message .close')
 
   $('div.ui.search.desscribeSearch').search({
     apiSettings: {
-      url: "http://localhost:8000/epilepsy12/semiology-keyword-autocomplete/?q={query}"
+      url: "https://{{request.get_host}}/epilepsy12/semiology-keyword-autocomplete/?q={query}"
     },
     fields: {
       results: 'results',
@@ -123,19 +124,23 @@ $('.message .close')
 
   $('.ui.search.hospitalSearch').search({
     apiSettings: {
-      url: "http://localhost:8000/epilepsy12/hospital-autocomplete/?q={query}"
+      url: "https://{{request.get_host}}/epilepsy12/hospital-autocomplete/?q={query}"
     },
     fields: {
       results: 'results',
       title: 'text'
     }
   });
-
+  $('#choicesPopup').popup();
+  $('#investigationsManagementPopup').popup();
+  $('.question.circle.icon.link').popup();
   /*
   $('.prompt').on("input", function(data){
     console.log($('prompt').val());
     $('.text').text($('.prompt').val())
   })
   */
+  $('.ui.dropdown').dropdown();
+
 
 </script>

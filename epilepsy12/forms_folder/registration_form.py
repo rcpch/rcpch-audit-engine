@@ -62,5 +62,6 @@ class RegistrationForm(forms.ModelForm):
             'registration_close_date',
             'lead_hospital',
             'tertiary_paediatric_neurology_centre',
-            'epilepsy_surgery_centre'
+            'epilepsy_surgery_centre',
+            'cohort'
         )

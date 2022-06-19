@@ -94,4 +94,5 @@ class Registration(models.Model):
     def save(self, *args, **kwargs) -> None:
         self.registration_close_date = self.registration_date_one_year_on()
         self.cohort = cohort_number_from_enrolment_date(self.registration_date)
+        print(self.cohort)
         return super().save(*args, **kwargs)

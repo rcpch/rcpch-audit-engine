@@ -23,8 +23,11 @@ def database(request):
 @login_required
 def hospital_reports(request):
     template_name = 'epilepsy12/hospital.html'
+    hospital_object = HospitalTrust.objects.get(
+        OrganisationName=request.user.hospital_trust)
     return render(request=request, template_name=template_name, context={
-        user: user
+        'user': request.user,
+        'hospital': hospital_object
     })
 
 

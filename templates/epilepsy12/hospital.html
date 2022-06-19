@@ -2,183 +2,181 @@
 {% load static %}
 {% block content %}
 <div class="ui container">
-    <div class="ui placeholder attached blue segment">
-        
-        <h5 class="ui left floated header">
-            Reports for {{ user.hospital_trust }}
-        </h5>
-        <p>
-            This is a placeholder page but would contain a summary of hospital stats
-        </p>
-        <ul class="list">
-            <li>Number of cases</li>
-            <li>number of epilepsy subtypes</li>
-            <li>performance indicators</li>
-            <li>names of lead clinicians</li>
-            <li>yada yada...</li>
-        </ul>
+    <div class="ui attached blue inverted segment">
+        <div class="ui two column grid">
+            <div class="four wide column">
+                <div class="ui card">
+                    <div class="content">
+                        <div class="header">
+                            {{ hospital.OrganisationName }}
+                        </div>
+                        <div class="description">
+                            {{ hospital.Address1 }}<br>
+                            {{ hospital.Address2 }}<br>
+                            {{ hospital.Address3 }}<br>
+                            {{ hospital.City }}<br>
+                            {{ hospital.Postcode }}<br>
+                            <span><i class="phone icon"></i>{{ hospital.Phone }}</span><br>
+                            <span><i class="envelope outline icon"></i>{{ hospital.Email }}</span><br>
+                            <span><i class="internet explorer icon"></i>{{ hospital.Website }}</span><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="twelve wide column">
+                <ul class="list">
+                    <li>Number of cases</li>
+                    <li>number of epilepsy subtypes</li>
+                    <li>performance indicators</li>
+                    <li>names of lead clinicians</li>
+                    <li>yada yada...</li>
+                </ul>
 
-        <div class="ui five statistics">
-            <div class="red statistic">
-                <div class="value">
-                    27%
-                </div>
-                <div class="label">
-                    Very Import Statistic
-                </div>
-            </div>
-            <div class="orange statistic">
-                <div class="value">
-                    8%
-                </div>
-                <div class="label">
-                    Quite Import Statistic
-                </div>
-            </div>
-            <div class="yellow statistic">
-                <div class="value">
-                    9%
-                </div>
-                <div class="label">
-                    More Import Statistic
-                </div>
-            </div>
-            <div class="olive statistic">
-                <div class="value">
-                    7%
-                </div>
-                <div class="label">
-                    Less Import Statistic
-                </div>
-            </div>
-            <div class="green statistic">
-                <div class="value">
-                    14%
-                </div>
-                <div class="label">
-                    Green Statistic
+                <div class="ui four statistics">
+                    <div class="red statistic">
+                        <div class="value">
+                            27%
+                        </div>
+                        <div class="label">
+                            Oh dear oh dear...
+                        </div>
+                    </div>
+                    <div class="orange statistic">
+                        <div class="value">
+                            8%
+                        </div>
+                        <div class="label">
+                            Less worrying...
+                        </div>
+                    </div>
+                    <div class="yellow statistic">
+                        <div class="value">
+                            9%
+                        </div>
+                        <div class="label">
+                            Meh.
+                        </div>
+                    </div>
+                    <div class="olive statistic">
+                        <div class="value">
+                            7%
+                        </div>
+                        <div class="label">
+                            Great News!
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        
     </div>
-    
-    <div class="ui bottom attached message">
+    <div class="ui bottom attached blue message">
         <div>
-            <a href="{% url 'cases' %}"><button class="ui blue button">View all cases</button></a>
+            <a href="{% url 'cases' %}"><button class="ui blue button">{{user.hospital_trust}} Children</button></a>
         </div>
     </div>
 
+    
+        <div class="row">
+            <div class="two columns">
+                <div class="column">
+                    <div class="ui inverted teal segment">
+                        <h5 class="header">
+                            Events
+                        </h5>
 
-    <h5 class="header">
-        Event line
-    </h5>
-    <div class="ui feed">
-        <div class="event">
-        <div class="label">
-            <img src="https://semantic-ui.com/images/avatar/small/elliot.jpg">
-        </div>
-        <div class="content">
-            <div class="summary">
-            <a class="user">
-                Elliot Fu
-            </a> added a new child to the audit
-            <div class="date">
-                1 Hour Ago
+                        <div class="ui feed">
+
+                            <div class="event">
+                                <div class="label">
+                                    <img src="https://semantic-ui.com/images/avatar/small/elliot.jpg">
+                                </div>
+                                <div class="content">
+                                    <div class="summary">
+                                        <a class="user">
+                                            Elliot Fu
+                                        </a> added a new child to the audit
+                                        <div class="date">
+                                            1 Hour Ago
+                                        </div>
+                                    </div>
+                                    <div class="meta">
+                                        <a class="like">
+                                            <i class="like icon"></i> 4 Likes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="event">
+                                <div class="label">
+                                    <img src="https://semantic-ui.com/images/avatar/small/helen.jpg">
+                                </div>
+                                <div class="content">
+                                    <div class="summary">
+                                        <a>Helen Troy</a> updated <a>2 new records</a>
+                                        <div class="date">
+                                            4 days ago
+                                        </div>
+                                    </div>
+                                    <div class="meta">
+                                        <a class="like">
+                                            <i class="like icon"></i> 1 Like
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="event">
+                                <div class="label">
+                                    <img src="https://semantic-ui.com/images/avatar/small/jenny.jpg">
+                                </div>
+                                <div class="content">
+                                    <div class="summary">
+                                        <a class="user">
+                                            Jenny Hess
+                                        </a> deleted epilepsy context for Albert
+                                        <div class="date">
+                                            2 Days Ago
+                                        </div>
+                                    </div>
+                                    <div class="meta">
+                                        <a class="like">
+                                            <i class="like icon"></i> 8 Likes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="event">
+                                <div class="label">
+                                    <img src="https://semantic-ui.com/images/avatar/small/joe.jpg">
+                                </div>
+                                <div class="content">
+                                    <div class="summary">
+                                        <a>Joe Henderson</a> registered Arthur Rimbaud
+                                    <div class="date">
+                                        3 days ago
+                                    </div>
+                                </div>
+                                <div class="extra text">
+                                    Epilepsy12 launch today!
+                                </div>
+                                <div class="meta">
+                                    <a class="like">
+                                        <i class="like icon"></i> 5 Likes
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            </div>
-            <div class="meta">
-            <a class="like">
-                <i class="like icon"></i> 4 Likes
-            </a>
-            </div>
-        </div>
-        </div>
-        <div class="event">
-        <div class="label">
-            <img src="https://semantic-ui.com/images/avatar/small/helen.jpg">
-        </div>
-        <div class="content">
-            <div class="summary">
-            <a>Helen Troy</a> updated <a>2 new records</a>
-            <div class="date">
-                4 days ago
-            </div>
-            </div>
-            <div class="extra images">
-            <a><img src="/images/wireframe/image.png"></a>
-            <a><img src="/images/wireframe/image.png"></a>
-            </div>
-            <div class="meta">
-            <a class="like">
-                <i class="like icon"></i> 1 Like
-            </a>
-            </div>
-        </div>
-        </div>
-        <div class="event">
-        <div class="label">
-            <img src="https://semantic-ui.com/images/avatar/small/jenny.jpg">
-        </div>
-        <div class="content">
-            <div class="summary">
-            <a class="user">
-                Jenny Hess
-            </a> deleted epilepsy context for Albert
-            <div class="date">
-                2 Days Ago
-            </div>
-            </div>
-            <div class="meta">
-            <a class="like">
-                <i class="like icon"></i> 8 Likes
-            </a>
-            </div>
-        </div>
-        </div>
-        <div class="event">
-        <div class="label">
-            <img src="https://semantic-ui.com/images/avatar/small/joe.jpg">
-        </div>
-        <div class="content">
-            <div class="summary">
-            <a>Joe Henderson</a> registered Arthur Rimbaud
-            <div class="date">
-                3 days ago
-            </div>
-            </div>
-            <div class="extra text">
-            Epilepsy12 launch today!
-            </div>
-            <div class="meta">
-            <a class="like">
-                <i class="like icon"></i> 5 Likes
-            </a>
-            </div>
-        </div>
-        </div>
-        <div class="event">
-        <div class="label">
-            <img src="https://semantic-ui.com/images/avatar/small/justen.jpg">
-        </div>
-        <div class="content">
-            <div class="summary">
-            <a>Justen Kitsune</a> added <a>2 new photos</a> of you
-            <div class="date">
-                4 days ago
-            </div>
-            </div>
-            <div class="extra images">
-            <a><img src="/images/wireframe/image.png"></a>
-            <a><img src="/images/wireframe/image.png"></a>
-            </div>
-            <div class="meta">
-            <a class="like">
-                <i class="like icon"></i> 41 Likes
-            </a>
+            <div class="column">
             </div>
         </div>
-        </div>
-    </div>
+    
 </div>
+
 {% endblock content %}
