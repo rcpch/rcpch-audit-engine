@@ -439,8 +439,12 @@ def nonepilepsy_subtype_selection(request, desscribe_id, nonepilepsy_selected_su
 @login_required
 def syndrome_select(request, desscribe_id):
     syndrome_code = request.POST.get('syndrome')
-    DESSCRIBE.objects.filter(id=desscribe_id).update(syndrome=syndrome_code)
-    return HttpResponse("Success!")
+    if syndrome_code:
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            syndrome=syndrome_code)
+        return HttpResponse("Success!")
+    else:
+        return HttpResponse('No dice')
 
 
 @ login_required
