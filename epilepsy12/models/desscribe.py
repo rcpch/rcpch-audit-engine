@@ -418,5 +418,103 @@ class DESSCRIBE(models.Model):
         verbose_name = "DESSCRIBE assessment"
         verbose_name_plural = "DESSCRIBE assessments"
 
+    def save(
+            self,
+            *args, **kwargs) -> None:
+        if self.epilepsy_or_nonepilepsy_status == "E":
+            # epilepsy
+            set_all_nonepilepsy_seizure_onsets_to_none(self)
+
+            if self.focal_onset_left:
+                self.focal_onset_right = False
+            elif self.focal_onset_right:
+                self.focal_onset_left = False
+
+        elif self.epilepsy_or_nonepilepsy_status == "NE":
+            self.epileptic_seizure_onset_type = None
+            set_all_focal_onset_epilepsy_fields_to_none(self)
+            set_all_generalised_onset_fields_to_none(self)
+            set_all_epilepsy_causes_to_none(self)
+            set_all_epilepsy_syndromes_to_none(self)
+
+        elif self.epilepsy_or_nonepilepsy_status == "U":
+            self.epileptic_seizure_onset_type = None
+            set_all_focal_onset_epilepsy_fields_to_none(self)
+            set_all_generalised_onset_fields_to_none(self)
+            set_all_epilepsy_causes_to_none(self)
+            set_all_epilepsy_syndromes_to_none(self)
+            set_all_nonepilepsy_seizure_onsets_to_none(self)
+
+        return super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return self.epilepsy_or_nonepilepsy_status
+
+
+def set_all_focal_onset_epilepsy_fields_to_none(self):
+    self.focal_onset_impaired_awareness = None
+    self.focal_onset_automatisms = None
+    self.focal_onset_atonic = None
+    self.focal_onset_clonic = None
+    self.focal_onset_left = None
+    self.focal_onset_right = None
+    self.focal_onset_epileptic_spasms = None
+    self.focal_onset_hyperkinetic = None
+    self.focal_onset_myoclonic = None
+    self.focal_onset_tonic = None
+    self.focal_onset_autonomic = None
+    self.focal_onset_behavioural_arrest = None
+    self.focal_onset_cognitive = None
+    self.focal_onset_emotional = None
+    self.focal_onset_sensory = None
+    self.focal_onset_centrotemporal = None
+    self.focal_onset_temporal = None
+    self.focal_onset_frontal = None
+    self.focal_onset_parietal = None
+    self.focal_onset_occipital = None
+    self.focal_onset_gelastic = None
+    self.focal_onset_focal_to_bilateral_tonic_clonic = None
+    self.focal_onset_other = None
+    self.focal_onset_other_details = None
+
+
+def set_all_generalised_onset_fields_to_none(self):
+    self.epileptic_generalised_onset = None
+    self.epileptic_generalised_onset_other_details = None
+
+
+def set_all_epilepsy_causes_to_none(self):
+    self.seizure_cause_main = None
+    self.seizure_cause_main_snomed_code = None
+    self.seizure_cause_structural = None
+    self.seizure_cause_structural_snomed_code = None
+    self.seizure_cause_genetic = None
+    self.seizure_cause_gene_abnormality = None
+    self.seizure_cause_genetic_other = None
+    self.seizure_cause_gene_abnormality_snomed_code = None
+    self.seizure_cause_chromosomal_abnormality = None
+    self.seizure_cause_infectious = None
+    self.seizure_cause_infectious_snomed_code = None
+    self.seizure_cause_metabolic = None
+    self.seizure_cause_metabolic_other = None
+    self.seizure_cause_metabolic_snomed_code = None
+    self.seizure_cause_immune = None
+    self.seizure_cause_immune_antibody = None
+    self.seizure_cause_immune_antibody_other = None
+    self.seizure_cause_immune_snomed_code = None
+
+
+def set_all_epilepsy_syndromes_to_none(self):
+    self.syndrome = None
+
+
+def set_all_nonepilepsy_seizure_onsets_to_none(self):
+    self.nonepileptic_seizure_unknown_onset = None
+    self.nonepileptic_seizure_unknown_onset_other_details = None
+    self.nonepileptic_seizure_syncope = None
+    self.nonepileptic_seizure_behavioural = None
+    self.nonepileptic_seizure_sleep = None
+    self.nonepileptic_seizure_paroxysmal = None
+    self.nonepileptic_seizure_migraine = None
+    self.nonepileptic_seizure_miscellaneous = None
+    self.nonepileptic_seizure_other = None
