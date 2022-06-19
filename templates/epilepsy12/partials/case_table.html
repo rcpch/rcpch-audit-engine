@@ -1,0 +1,80 @@
+{% load epilepsy12_template_tags %}
+{% if case_list.all %}
+    <table class="ui very basic celled table" >
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Date of Birth</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Ethnicity</th>
+          <th>NHS Number</th>
+          <th>IMD (quintile)</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for case in case_list %}
+        <tr>
+          <td>
+            <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
+          </td>
+          <td>{{case.first_name}} {{case.surname}}</td>
+          <td>{{case.date_of_birth}}</td>
+          <td>{{case.age}}</td>
+          <td>{{case.get_gender_display}}</td>
+          <td>{{case.get_ethnicity_display}}</td>
+          <td>{{case.nhs_number}}</td>
+          <td>{{case.index_of_multiple_deprivation_quintile}}</td>
+          <td>
+            <div class="ui grid">
+              <div class="row">
+                <div class="ui three wide column">
+                  <a href="{% url 'update_case' id=case.id%}"><button class="ui mini blue icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+                </div>
+                <div class="ui three wide column">
+                  <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini red icon button"  tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
+                </div>
+                <div class="ui ten wide column">
+                  {% if case.registration %}
+                      {% percent_complete case.registration as percentComplete %}
+                      {% if case.locked %}
+                        <button class="ui mini blue button" tabindexed="2" disabled onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                      {% else %}
+                        <button class="ui mini blue button" tabindexed="2" onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                      {% endif %}
+                  {% else %}
+                    {% if case.locked %}
+                      <button class="ui mini blue button" tabindexed="2" disabled onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
+                    {% else %}
+                      <button class="ui mini blue button" tabindexed="2" onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+              {% if case.registration %}
+                  <div class="row">
+                    <div class="ui sixteen wide column">
+                      <div class="ui small blue progress" data-value={{percentComplete}} data-total="52" id="casecompletionprogress">
+                        <div class="bar">
+                          <div class="progress"></div>
+                        </div>
+                        <div class="label">{{percentComplete}} of 52 items completed</div>
+                      </div>
+                    </div>
+                  </div>
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            {% if case.locked %}<i class="lock icon" />{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>There are no cases yet</p>
+  {% endif %}

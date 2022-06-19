@@ -1,6 +1,8 @@
 from datetime import datetime
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import hospital_trust
 from epilepsy12.models.registration import Registration
@@ -38,6 +40,20 @@ def case_list(request):
     }
     template_name = 'epilepsy12/cases/cases.html'
     return render(request, template_name, context)
+
+
+@login_required
+def filter_case_list(request):
+    filter_term = request.GET.get('filtered_case_list')
+    filtered_cases = Case.objects.filter(
+        Q(first_name__icontains=filter_term) |
+        Q(surname__icontains=filter_term) |
+        Q(nhs_number__icontains=filter_term)
+    )
+    context = {
+        'case_list': filtered_cases
+    }
+    return render(request=request, template_name='epilepsy12/partials/case_table.html', context=context)
 
 
 @login_required
