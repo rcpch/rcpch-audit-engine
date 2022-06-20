@@ -5,7 +5,7 @@
 </h5>
 <div class="ui raised attached segment">
   <div id="case_table">
-    {% include '../partials/case_table.html' with case_list=case_list %}
+    {% include '../partials/case_table.html' with case_list=case_list paginated=paginated %}
   </div>
   <hr />
   <div class="ui grid">
@@ -17,6 +17,8 @@
             <input type="text" class="prompt" placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' %}" hx-swap="innerHTML">
             <i class="inverted circular search link icon"></i>
           </div>
+          
+          
       </div>
       
       <div class="four wide column">
