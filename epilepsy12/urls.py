@@ -82,6 +82,8 @@ htmx_paths = [
          views.ribe, name='ribe'),
     path('htmx/filter_case_list', views.case_list,
          name="filter_case_list"),
+    path('htmx/comorbidity_search',
+         views.comorbidity_search, name="comorbidity_search")
 
 ]
 

@@ -31,6 +31,8 @@ def fetch_snomed(sctid, syntax):
 
     ecl_url = f'https://snomed-server-fztgv.ondigitalocean.app/v1/snomed/expand?ecl={VALID_SYNTAX[syntax]}{sctid}'
 
+    search_url = f'https://snomed-server-fztgv.ondigitalocean.app/v1/snomed/search?s={search_string}\&constraint=<64572001'
+
     response = requests.get(ecl_url)
 
     if response.status_code == 404:
@@ -42,3 +44,17 @@ def fetch_snomed(sctid, syntax):
 
     for index, term in enumerate(serialised):
         print(term['term'])
+
+
+def snomed_search(search_term):
+    search_url = f'https://snomed-server-fztgv.ondigitalocean.app/v1/snomed/search?s={search_term}\&constraint=<64572001'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised

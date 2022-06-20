@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.forms import ComorbidityForm
@@ -6,6 +7,7 @@ from epilepsy12.models.registration import Registration
 from ..models import Comorbidity
 from ..models import Case
 from django.contrib import messages
+from ..general_functions import snomed_search
 
 
 @login_required
@@ -79,3 +81,14 @@ def delete_case(request, id):
     comorbidity = get_object_or_404(Comorbidity, id=id)
     comorbidity.delete()
     return redirect('cases')
+
+
+@login_required
+def comorbidity_search(request):
+    comorbidity_search_text = request.GET.get('comorbidity')
+    items = snomed_search(comorbidity_search_text)
+    context = {
+        'items': items
+    }
+
+    return render(request, 'epilepsy12/partials/comorbidity_select.html', context)
