@@ -12,9 +12,9 @@
             <div class="field">
                 <div class="ui toggle checkbox">
                     {% if desscribe.focal_onset_atonic %}
-                        <input type="checkbox" name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
-                    {% else %}
                         <input type="checkbox" checked name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
+                    {% else %}
+                        <input type="checkbox" name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
                     {% endif %}
                     <label>Atonic</label>
                 </div>
@@ -187,9 +187,9 @@
             <div class="field">
                 <div class="ui toggle checkbox">
                 {% if desscribe.focal_onset_emotional %}
-                    <input type="checkbox" name='focal_onset_emotional'>
-                {% else %}
                     <input type="checkbox" checked name='focal_onset_emotional'>
+                {% else %}
+                    <input type="checkbox" name='focal_onset_emotional'>
                 {% endif %}
                     <label>Emotional</label>
                 </div>
