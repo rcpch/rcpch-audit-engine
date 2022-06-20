@@ -10,6 +10,7 @@ from epilepsy12.models.hospital_trust import HospitalTrust
 from epilepsy12.view_folder.registration_views import register
 from ..models import Case
 from django.contrib import messages
+from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
 
 
@@ -41,9 +42,15 @@ def case_list(request):
     registered_cases = Registration.objects.filter(
         lead_hospital=request.user.hospital_trust)
 
+
+#     fetch_snomed(365456003, 'descendentSelfOf')
+
+    case_list = Case.objects.all().order_by('surname')
+
     paginator = Paginator(all_cases, 10)
     page_number = request.GET.get('page', 1)
     case_list = paginator.page(page_number)
+
     case_count = Case.objects.all().count()
     registered_count = registered_cases.count()
     context = {
