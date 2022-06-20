@@ -79,7 +79,9 @@ htmx_paths = [
     path('htmx/<int:desscribe_id>/autoantibodies',
          views.autoantibodies, name='autoantibodies'),
     path('htmx/<int:desscribe_id>/ribe',
-         views.ribe, name='ribe')
+         views.ribe, name='ribe'),
+    path('htmx/filter_case_list', views.case_list,
+         name="filter_case_list"),
 
 ]
 
