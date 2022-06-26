@@ -78,6 +78,11 @@ h3 {
   background-color: #3366cc;
 }
 
+#cases_list_segment_footer {
+  border-radius: 0%;
+  background-color: white;
+}
+
 #table_header {
   background-color: #11a7f2;
   color: white;

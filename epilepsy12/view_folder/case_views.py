@@ -103,7 +103,8 @@ def update_case(request, id):
                     obj.locked_by = None
                     obj.locked_at = None
             obj.save()
-            messages.success(request, "You successfully updated the post")
+            messages.success(
+                request, "You successfully updated the child's details")
             return redirect('cases')
 
     context = {

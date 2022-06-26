@@ -144,8 +144,8 @@ class Case(models.Model):
 
         # This field requires the deprivare api to be running
         # commented out for now to allow live demo to function
-        # self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-        #     self.postcode)
+        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+            self.postcode)
         return super().save(*args, **kwargs)
 
     class Meta:

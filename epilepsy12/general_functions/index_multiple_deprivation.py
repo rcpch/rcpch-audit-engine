@@ -26,9 +26,10 @@ def imd_for_postcode(user_postcode: str) -> int:
     serialised = response.json()
     lsoa = serialised["result"]["codes"]["lsoa"]
 
-    # note for this to work Mark Wardle's Deprivare needs to be running on port 8081
-    # Thank you Mark for this remarkable tool
-    deprivare_url = "http://localhost:8081/v1/uk/lsoa/"+lsoa
+    # note for this to work Mark Wardle's Deprivare needs to be running on port 8080
+    # Thank you Mark for this remarkable tool (https://github.com/wardle/deprivare)
+
+    deprivare_url = "http://rcpch-deprivare.uksouth.azurecontainer.io:8080/v1/uk/lsoa/"+lsoa
 
     deprivare_response = requests.get(
         url=deprivare_url, headers={"Content-Type": 'application/json; charset=utf-8'})
