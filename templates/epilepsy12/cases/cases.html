@@ -1,9 +1,9 @@
 {% extends "base.html" %}  {% block content %}
 
-<h5 class="ui top attached inverted header">
+<h5 class="ui top attached inverted header" id="cases_list_segment_header">
   Children and Young People
 </h5>
-<div class="ui raised attached segment">
+<div class="ui raised attached segment" id="cases_list_segment">
   <div id="case_table">
     {% include '../partials/case_table.html' with case_list=case_list paginated=paginated %}
   </div>
@@ -11,7 +11,7 @@
   <div class="ui grid">
     
       <div class="twelve wide column">
-          <a href="{% url 'create_case'%}"><button class="ui blue button">Add a new Child/Young Person</button></a>
+          <a href="{% url 'create_case'%}"><button class="ui button" id="action_button">Add a new Child/Young Person</button></a>
           
           <div class="ui icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
             <input type="text" class="prompt" placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' %}" hx-swap="innerHTML">
@@ -43,7 +43,7 @@
       </div>
   </div>
 </div>
-<div class="ui bottom attached warning message">
+<div class="ui bottom attached message" id="warning_message">
   <i class="warning icon"></i>
   These are all the children and young people registered in all audits since 2022.
 </div>

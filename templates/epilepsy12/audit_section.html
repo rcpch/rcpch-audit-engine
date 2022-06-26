@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 
-<div class="ui top attached inverted clearing segment">
+<div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
 <h5 class="ui left floated header">
   {% block audit_section_title %}{% endblock %}
 </h5>
@@ -11,11 +11,11 @@
   {{case_name}}
 </h5>
 </div>
-<div class="ui raised attached inverted teal segment">
+<div class="ui raised attached inverted segment" id="audit_body_segment">
   {% block audit_section_form %}{% endblock %}
   {# {% block audit_section_form_2 %}{% endblock %} #}
 </div>
-<div class="ui bottom attached info icon message">
+<div class="ui bottom attached info icon message" id="info_message">
   <i class="info circle icon"></i>
   {% block audit_section_instructions %}{% endblock %}
 </div>

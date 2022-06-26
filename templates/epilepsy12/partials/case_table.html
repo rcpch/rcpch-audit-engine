@@ -1,17 +1,17 @@
 {% load epilepsy12_template_tags %}
 {% if case_list.end_index > 0 %}
-      <table class="ui compact celled table" >
+      <table class="ui compact table" >
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Date of Birth</th>
-            <th>Age</th>
-            <th>Gender</th>
-            <th>Ethnicity</th>
-            <th>NHS Number</th>
-            <th>IMD (quintile)</th>
-            <th colspan="2"></th>
+            <th id="table_header">ID</th>
+            <th id="table_header">Name</th>
+            <th id="table_header">Date of Birth</th>
+            <th id="table_header">Age</th>
+            <th id="table_header">Gender</th>
+            <th id="table_header">Ethnicity</th>
+            <th id="table_header">NHS Number</th>
+            <th id="table_header">IMD (quintile)</th>
+            <th id="table_header" colspan="2"></th>
           </tr>
         </thead>
         <tbody>
@@ -31,24 +31,24 @@
                 <div class="ui grid">
                   <div class="row">
                     <div class="ui three wide column">
-                      <a href="{% url 'update_case' id=case.id%}"><button class="ui mini blue icon button" tabindexed="0"><i class="edit outline icon"></i></button></a>
+                      <a href="{% url 'update_case' id=case.id%}"><button class="ui mini icon button" id="action_button" tabindexed="0"><i class="edit outline icon"></i></button></a>
                     </div>
                     <div class="ui three wide column">
-                      <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini red icon button"  tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
+                      <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini icon button" id="negative_button" tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
                     </div>
                     <div class="ui ten wide column">
                       {% if case.registration %}
                           {% percent_complete case.registration as percentComplete %}
                           {% if case.locked %}
-                            <button class="ui mini blue button" tabindexed="2" disabled onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                            <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
                           {% else %}
-                            <button class="ui mini blue button" tabindexed="2" onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                            <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
                           {% endif %}
                       {% else %}
                         {% if case.locked %}
-                          <button class="ui mini blue button" tabindexed="2" disabled onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
+                          <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
                         {% else %}
-                          <button class="ui mini blue button" tabindexed="2" onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
+                          <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
                         {% endif %}
                       {% endif %}
                     </div>
@@ -77,10 +77,10 @@
             <tr>
               <th colspan="10" class="right aligned">
                   {% if case_list.has_previous %}
-                    <div class="ui tiny green button"hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.previous_page_number}}" hx-swap="innerHTML">Previous 20</div>
+                    <div class="ui tiny button" id="continue_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.previous_page_number}}" hx-swap="innerHTML">Previous 20</div>
                   {% endif %}
                   {% if case_list.has_next %}
-                    <div class="ui tiny green button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.next_page_number}}" hx-swap="innerHTML">Next 20</div>
+                    <div class="ui tiny button" id="continue_button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.next_page_number}}" hx-swap="innerHTML">Next 20</div>
                   {% endif %}
               </th>
             </tr>
