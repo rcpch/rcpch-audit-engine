@@ -87,10 +87,23 @@ h3 {
 /* audit sections */
 #info_message {
   background-color: #00bdaa;
+  color: white;
+  border-radius: 0%;
 }
 
 #warning_message {
   background-color: #00bdaa;
   border-radius: 0%;
   color: white;
+}
+
+#audit_top_attached_segment {
+  border-radius: 0%;
+  background-color: #3366cc;
+  color: white;
+}
+
+#audit_body_segment {
+  border-radius: 0%;
+  background-color: white;
 }

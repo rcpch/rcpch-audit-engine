@@ -17,9 +17,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'create_comorbidity' case_id %}"><button class="ui mini blue button" >Add Comorbidity</button></a>
+        <a href="{% url 'create_comorbidity' case_id %}"><button class="ui mini button" id="action_button">Add Comorbidity</button></a>
     {% else %}
         <p>There are no reported comorbidities yet.</p>
-        <a href="{% url 'create_comorbidity' case_id %}"><button class="ui mini blue button" >Add Comorbidity</button></a>
+        <a href="{% url 'create_comorbidity' case_id %}"><button class="ui mini button" id="action_button">Add Comorbidity</button></a>
     {% endif %}
 </div>
