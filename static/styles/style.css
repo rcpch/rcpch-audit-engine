@@ -29,6 +29,24 @@ h3 {
   color: pink;
 }
 
+/* menu */
+#active_menu_item {
+  color: #3366cc;
+  border-width: 5px;
+  border-color: #3366cc;
+  line-height: 45px;
+}
+
+#nav-rcpch {
+  width: 75px;
+  height: auto;
+  padding: 0;
+}
+
+.ui.secondary.pointing.menu .item {
+  line-height: 50px;
+}
+
 /* epilepsy12 landing */
 
 #hospital_segment {

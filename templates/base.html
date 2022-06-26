@@ -30,19 +30,20 @@
     <div class="ui container">
       {% block nav %}
         <div class="ui secondary pointing menu">
-            <a {% if request.resolver_match.url_name == 'index' %}class="active item" {% else %} class="item" {% endif %} href={% url 'index' %}>
+            <a href= "https://www.rcpch.ac.uk/"><img id="nav-rcpch" src="{% static 'images/rcpch-logo.jpg' %}" class="item"></a>
+            <a {% if request.resolver_match.url_name == 'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
               Home
             </a>
-          <a {% if request.resolver_match.url_name == 'admin:index' %}class="active item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
+          <a {% if request.resolver_match.url_name == 'admin:index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
             Database Management
           </a>
-            <a {% if request.resolver_match.url_name == 'hospital_reports' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
+            <a {% if request.resolver_match.url_name == 'hospital_reports' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
               Hospital Clinician
             </a>
-            <a {% if request.resolver_match.url_name == 'eeg' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'eeg' %}>
+            <a {% if request.resolver_match.url_name == 'eeg' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'eeg' %}>
               EEG Department
             </a>
-            <a {% if request.resolver_match.url_name == 'patient' %}class="active item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
+            <a {% if request.resolver_match.url_name == 'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
               Patient Access
             </a>
           <div class="right menu">
