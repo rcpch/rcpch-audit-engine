@@ -28,3 +28,69 @@ h3 {
 #patient {
   color: pink;
 }
+
+/* epilepsy12 landing */
+
+#hospital_segment {
+  background-color: #11a7f2;
+}
+
+#bottom_attached_message {
+  background-color: white;
+}
+
+#chat {
+  background-color: white;
+}
+
+/* general navigation */
+#continue_button {
+  background-color: #e00087;
+  border-radius: 0%;
+  color: white;
+  font-weight: bold;
+}
+
+#continue_button:hover {
+  background-color: #9E1F66;
+}
+
+#negative_button {
+  border-radius: 0%;
+  color: white;
+  font-weight: bold;
+  background-color: #e60700;
+}
+
+#action_button {
+  background-color: #3366cc;
+  color: white;
+  border-radius: 0%;
+}
+
+/* children */
+#cases_list_segment {
+  background-color: white;
+}
+
+#cases_list_segment_header {
+  border-radius: 0%;
+  background-color: #3366cc;
+}
+
+#table_header {
+  background-color: #11a7f2;
+  color: white;
+  border-radius: 0%;
+}
+
+/* audit sections */
+#info_message {
+  background-color: #00bdaa;
+}
+
+#warning_message {
+  background-color: #00bdaa;
+  border-radius: 0%;
+  color: white;
+}
