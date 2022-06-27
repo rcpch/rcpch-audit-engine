@@ -50,14 +50,33 @@ h3 {
 /* epilepsy12 landing */
 
 #hospital_segment {
-  background-color: #11a7f2;
+  background-color: white;
+  border-color: #d9d9d9;
+}
+
+#piechartContainer {
+  width: 400px;
+  height: auto;
 }
 
 #bottom_attached_message {
-  background-color: white;
+  background-color: #3366cc;
+}
+
+.ui.card {
+  background-color: #11a7f2;
+  border-radius: 0%;
+}
+
+#description {
+  color: white;
 }
 
 #chat {
+  background-color: white;
+}
+
+#stats_box {
   background-color: white;
 }
 

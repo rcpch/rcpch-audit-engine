@@ -7,10 +7,10 @@
             <div class="four wide column">
                 <div class="ui card">
                     <div class="content">
-                        <div class="header">
+                        <div class="header" id="description">
                             {{ hospital.OrganisationName }}
                         </div>
-                        <div class="description">
+                        <div class="description" id="description">
                             {{ hospital.Address1 }}<br>
                             {{ hospital.Address2 }}<br>
                             {{ hospital.Address3 }}<br>
@@ -24,47 +24,8 @@
                 </div>
             </div>
             <div class="twelve wide column">
-                <ul class="list">
-                    <li>Number of cases</li>
-                    <li>number of epilepsy subtypes</li>
-                    <li>performance indicators</li>
-                    <li>names of lead clinicians</li>
-                    <li>yada yada...</li>
-                </ul>
-
-                <div class="ui four statistics">
-                    <div class="red statistic">
-                        <div class="value">
-                            27%
-                        </div>
-                        <div class="label">
-                            Oh dear oh dear...
-                        </div>
-                    </div>
-                    <div class="orange statistic">
-                        <div class="value">
-                            8%
-                        </div>
-                        <div class="label">
-                            Less worrying...
-                        </div>
-                    </div>
-                    <div class="yellow statistic">
-                        <div class="value">
-                            9%
-                        </div>
-                        <div class="label">
-                            Meh.
-                        </div>
-                    </div>
-                    <div class="olive statistic">
-                        <div class="value">
-                            7%
-                        </div>
-                        <div class="label">
-                            Great News!
-                        </div>
-                    </div>
+                <div id="piechartContainer">
+                {% include 'epilepsy12/partials/piechart.html' with cases=cases %}
                 </div>
             </div>
         </div>
