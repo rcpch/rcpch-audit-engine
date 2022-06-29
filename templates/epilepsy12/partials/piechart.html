@@ -1,1 +1,69 @@
 <canvas id="piechart" width="50" height="25"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
+<script>
+            var ctx = document.getElementById('piechart').getContext('2d');
+            var myChart = new Chart(ctx, { 
+                type: 'doughnut',
+                data: {
+                    labels: [{% for data in cases %}'{{ data.ethnicity_display }}',{% endfor %}], //loop through queryset, 
+                    datasets: [{
+                        data: [{% for case in cases %}{{ case.ethnicities }},{% endfor %}],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)', 
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(229, 99, 153, 0.2)',
+                            'rgba(211, 165, 136, 0.2)',
+                            'rgba(236, 226, 208, 0.2)',
+                            'rgba(127, 209, 185, 0.2)',
+                            'rgba(122, 101, 99, 0.2)',
+                            'rgba(222, 231, 231, 0.2)',
+                            'rgba(183, 173, 207, 0.2)',
+                            'rgba(79, 100, 111, 0.2)',
+                            'rgba(83, 86, 87, 0.2)',
+                            'rgba(226, 132, 19, 0.2)',
+                            'rgba(245, 100, 22, 0.2)',
+                            'rgba(221, 75, 26, 0.2)',
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(229, 99, 153, 1)',
+                            'rgba(211, 165, 136, 1)',
+                            'rgba(236, 226, 208, 1)',
+                            'rgba(127, 209, 185, 1)',
+                            'rgba(122, 101, 99, 1)',
+                            'rgba(222, 231, 231, 1)',
+                            'rgba(183, 173, 207, 1)',
+                            'rgba(79, 100, 111, 1)',
+                            'rgba(83, 86, 87, 1)',
+                            'rgba(226, 132, 19, 1)',
+                            'rgba(245, 100, 22, 1)',
+                            'rgba(221, 75, 26, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: "Ethnicity Distribution",
+                        position: 'top',
+                        align: 'start'
+                      },
+                      legend: {
+                        display: true,
+                        position: 'right'
+                      }
+                    },
+                }
+            });
+</script>
