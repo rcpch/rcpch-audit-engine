@@ -93,6 +93,7 @@ def seizure_cause_main(request, desscribe_id):
     if selection == 'Met':
         select_list = METABOLIC_CAUSES
         currently_selected = desscribe.seizure_cause_metabolic
+
         context.update({
             'select_list': select_list,
             'currently_selected': currently_selected
@@ -144,11 +145,23 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
     if seizure_cause_main == 'Met':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
             seizure_cause_metabolic=seizure_cause_main_choice)
+        desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+
+        if seizure_cause_main_choice == "Mit":
+            mitochondrial_selection = fetch_snomed(
+                sctid=240096000, syntax='childSelfOf')
+
+            seizure_cause_mitochondrial_sctid = desscribe.seizure_cause_mitochondrial_sctid
+            context = {
+                'mitochondrial_selection': mitochondrial_selection,
+                'desscribe_id': desscribe_id,
+                'seizure_cause_mitochondrial_sctid': int(seizure_cause_mitochondrial_sctid)
+            }
+            return render(request, 'epilepsy12/partials/mitochondrial_selection_dropdown.html', context)
 
     elif seizure_cause_main == 'Str':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
             seizure_cause_structural=seizure_cause_main_choice)
-
     elif seizure_cause_main == 'Imm':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
             seizure_cause_immune=seizure_cause_main_choice)
@@ -184,6 +197,14 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
     else:
         return HttpResponse('Error!')
     return HttpResponse("Selected")
+
+
+@login_required
+def mitochondrial(request, desscribe_id):
+    mitochondrial_type_sctid = request.POST.get('mitochondrial_type')
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        seizure_cause_mitochondrial_sctid=mitochondrial_type_sctid)
+    return HttpResponse("Saved Mitochondrial")
 
 
 @login_required

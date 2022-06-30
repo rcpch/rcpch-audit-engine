@@ -353,6 +353,15 @@ class DESSCRIBE(models.Model):
         blank=True,
         null=True
     )
+
+    seizure_cause_mitochondrial_sctid = models.CharField(
+        "SNOMED CT identifier of mitochondrial disease type",
+        max_length=50,
+        default=None,
+        blank=True,
+        null=True
+    )
+
     seizure_cause_metabolic_other = models.CharField(
         "other identified metabolic cause of seizure(s) not previously specified.",
         max_length=250,
