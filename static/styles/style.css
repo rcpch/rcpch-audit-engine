@@ -1,19 +1,19 @@
 @font-face {
   font-family: Montserrat-Bold;
   src: local('Montserrat-Bold'),
-    url("../fonts/Montserrat/static/Montserrat-Bold.ttf") format("truetype");
+    url("fonts/Montserrat/static/Montserrat-Bold.ttf") format("truetype");
 }
 
 @font-face {
   font-family: Montserrat-Italic;
   src: local('Montserrat-Italic'),
-    url("..fonts/Montserrat/static/Montserrat-Italic.ttf") format("truetype");
+    url("fonts/Montserrat/static/Montserrat-Italic.ttf") format("truetype");
 }
 
 @font-face {
   font-family: Montserrat-Regular;
   src: local('Montserrat-Regular'),
-    url("../fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
+    url("fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
 }
 
 body {
