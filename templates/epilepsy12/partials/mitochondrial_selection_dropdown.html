@@ -1,0 +1,12 @@
+<div class="sixteen wide field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <select class="ui dropdown" name="mitochondrial_type" hx-post="{% url 'mitochondrial' desscribe_id=desscribe_id %}" hx-target="#mitochondrial_result" hx-trigger="load, change">
+        {% for item in mitochondrial_selection %}
+            {% if item.conceptId == seizure_cause_mitochondrial_sctid  %}
+                <option selected value={{item.conceptId}}>{{item.term}}</option>
+            {% else %}
+                <option value={{item.conceptId}}>{{item.term}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <div hidden id="mitochondrial_result"></div>
+</div>

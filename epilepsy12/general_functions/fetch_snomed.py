@@ -31,8 +31,6 @@ def fetch_snomed(sctid, syntax):
 
     ecl_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/expand?ecl={VALID_SYNTAX[syntax]}{sctid}'
 
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_string}\&constraint=<64572001'
-
     response = requests.get(ecl_url)
 
     if response.status_code == 404:
@@ -40,10 +38,8 @@ def fetch_snomed(sctid, syntax):
         return None
 
     serialised = response.json()
-    print(serialised)
 
-    for index, term in enumerate(serialised):
-        print(term['term'])
+    return serialised
 
 
 def snomed_search(search_term):

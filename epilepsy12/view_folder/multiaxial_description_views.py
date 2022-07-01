@@ -86,13 +86,12 @@ def seizure_cause_main(request, desscribe_id):
 
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    added_select = []
-
     context = {}
 
     if selection == 'Met':
         select_list = METABOLIC_CAUSES
         currently_selected = desscribe.seizure_cause_metabolic
+
         context.update({
             'select_list': select_list,
             'currently_selected': currently_selected
@@ -143,15 +142,77 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
 
     if seizure_cause_main == 'Met':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_metabolic=seizure_cause_main_choice)
+            seizure_cause_metabolic=seizure_cause_main_choice,
+            seizure_cause_immune=None,
+            seizure_cause_immune_antibody=None,
+            seizure_cause_immune_antibody_other=None,
+            seizure_cause_immune_snomed_code=None,
+            seizure_cause_infectious=None,
+            seizure_cause_infectious_snomed_code=None,
+            seizure_cause_gene_abnormality_snomed_code=None,
+            seizure_cause_genetic_other=None,
+            seizure_cause_gene_abnormality=None,
+            seizure_cause_genetic=None,
+            seizure_cause_chromosomal_abnormality=None,
+            seizure_cause_structural=None,
+            seizure_cause_structural_snomed_code=None
+        )
+        desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+
+        if seizure_cause_main_choice == "Mit":
+            mitochondrial_selection = fetch_snomed(
+                sctid=240096000, syntax='childSelfOf')
+
+            if desscribe.seizure_cause_mitochondrial_sctid:
+                seizure_cause_mitochondrial_sctid = int(
+                    desscribe.seizure_cause_mitochondrial_sctid)
+            else:
+                seizure_cause_mitochondrial_sctid = None
+
+            context = {
+                'mitochondrial_selection': mitochondrial_selection,
+                'desscribe_id': desscribe_id,
+                'seizure_cause_mitochondrial_sctid': seizure_cause_mitochondrial_sctid
+            }
+            return render(request, 'epilepsy12/partials/mitochondrial_selection_dropdown.html', context)
 
     elif seizure_cause_main == 'Str':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_structural=seizure_cause_main_choice)
+            seizure_cause_structural=seizure_cause_main_choice,
+            seizure_cause_immune=None,
+            seizure_cause_immune_antibody=None,
+            seizure_cause_immune_antibody_other=None,
+            seizure_cause_immune_snomed_code=None,
+            seizure_cause_infectious=None,
+            seizure_cause_infectious_snomed_code=None,
+            seizure_cause_gene_abnormality_snomed_code=None,
+            seizure_cause_genetic_other=None,
+            seizure_cause_gene_abnormality=None,
+            seizure_cause_genetic=None,
+            seizure_cause_chromosomal_abnormality=None,
+            seizure_cause_metabolic=None,
+            seizure_cause_mitochondrial_sctid=None,
+            seizure_cause_metabolic_other=None,
+            seizure_cause_metabolic_snomed_code=None
+        )
 
     elif seizure_cause_main == 'Imm':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_immune=seizure_cause_main_choice)
+            seizure_cause_immune=seizure_cause_main_choice,
+            seizure_cause_infectious=None,
+            seizure_cause_infectious_snomed_code=None,
+            seizure_cause_gene_abnormality_snomed_code=None,
+            seizure_cause_genetic_other=None,
+            seizure_cause_gene_abnormality=None,
+            seizure_cause_genetic=None,
+            seizure_cause_chromosomal_abnormality=None,
+            seizure_cause_metabolic=None,
+            seizure_cause_mitochondrial_sctid=None,
+            seizure_cause_metabolic_other=None,
+            seizure_cause_metabolic_snomed_code=None,
+            seizure_cause_structural=None,
+            seizure_cause_structural_snomed_code=None
+        )
 
         if seizure_cause_main_choice == "AnM":
             desscribe = DESSCRIBE.objects.get(id=desscribe_id)
@@ -167,7 +228,20 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
 
     elif seizure_cause_main == 'Gen':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_genetic=seizure_cause_main_choice)
+            seizure_cause_genetic=seizure_cause_main_choice,
+            seizure_cause_immune=None,
+            seizure_cause_immune_antibody=None,
+            seizure_cause_immune_antibody_other=None,
+            seizure_cause_immune_snomed_code=None,
+            seizure_cause_infectious=None,
+            seizure_cause_infectious_snomed_code=None,
+            seizure_cause_metabolic=None,
+            seizure_cause_mitochondrial_sctid=None,
+            seizure_cause_metabolic_other=None,
+            seizure_cause_metabolic_snomed_code=None,
+            seizure_cause_structural=None,
+            seizure_cause_structural_snomed_code=None
+        )
         desscribe = DESSCRIBE.objects.get(id=desscribe_id)
         context = {
             'desscribe_id': desscribe_id,
@@ -184,6 +258,14 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
     else:
         return HttpResponse('Error!')
     return HttpResponse("Selected")
+
+
+@login_required
+def mitochondrial(request, desscribe_id):
+    mitochondrial_type_sctid = request.POST.get('mitochondrial_type')
+    DESSCRIBE.objects.filter(id=desscribe_id).update(
+        seizure_cause_mitochondrial_sctid=mitochondrial_type_sctid)
+    return HttpResponse("Saved Mitochondrial")
 
 
 @login_required
@@ -536,3 +618,48 @@ def delete_multiaxial_description(request, id):
     #     MultiaxialDescriptionForm, id=id)
     # multiaxial_description.delete()
     return redirect('cases')
+
+
+def set_all_epilepsy_causes_to_none(except_field):
+    set_to_none = {
+
+    }
+    if except_field is None:
+        set_to_none.update({
+            'seizure_cause_main': None,
+            'seizure_cause_main_snomed_code': None
+        })
+    elif except_field != "Str":
+        set_to_none.update({
+            'seizure_cause_structural': None,
+            'seizure_cause_structural_snomed_code': None
+        })
+    elif except_field != "Gen":
+        set_to_none.update({
+            'seizure_cause_genetic': None,
+            'seizure_cause_gene_abnormality': None,
+            'seizure_cause_genetic_other': None,
+            'seizure_cause_gene_abnormality_snomed_code': None,
+            'seizure_cause_chromosomal_abnormality': None,
+        })
+    elif except_field != "Inf":
+        set_to_none.update({
+            'seizure_cause_infectious': None,
+            'seizure_cause_infectious_snomed_code': None
+        })
+    elif except_field != "Met":
+        set_to_none.update({
+            'seizure_cause_metabolic': None,
+            'seizure_cause_metabolic_other': None,
+            'seizure_cause_metabolic_snomed_code': None
+        })
+    elif except_field != "Imm":
+        set_to_none.update({
+            'seizure_cause_immune': None,
+            'seizure_cause_immune_antibody': None,
+            'seizure_cause_immune_antibody_other': None
+        })
+    elif except_field != "NK":
+        set_to_none.update({'seizure_cause_immune_snomed_code': None})
+
+    return set_to_none

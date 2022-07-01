@@ -78,6 +78,8 @@ htmx_paths = [
          views.seizure_cause_genetic_choice, name='seizure_cause_genetic_choice'),
     path('htmx/<int:desscribe_id>/autoantibodies',
          views.autoantibodies, name='autoantibodies'),
+    path('htmx/<int:desscribe_id>/mitochondrial',
+         views.mitochondrial, name='mitochondrial'),
     path('htmx/<int:desscribe_id>/ribe',
          views.ribe, name='ribe'),
     path('htmx/filter_case_list', views.case_list,

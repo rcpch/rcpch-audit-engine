@@ -1,3 +1,4 @@
+from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.deletion import CASCADE
@@ -176,7 +177,7 @@ class DESSCRIBE(models.Model):
     )
     epileptic_generalised_onset = models.CharField(
         max_length=3,
-        choices=GENERALISED_SEIZURE_TYPE,
+        choices=sorted(GENERALISED_SEIZURE_TYPE),
         default=None,
         null=True,
         blank=True,
@@ -202,42 +203,42 @@ class DESSCRIBE(models.Model):
     )
     nonepileptic_seizure_syncope = models.CharField(
         max_length=3,
-        choices=NON_EPILEPTIC_SYNCOPES,
+        choices=sorted(NON_EPILEPTIC_SYNCOPES),
         default=None,
         null=True,
         blank=True
     )
     nonepileptic_seizure_behavioural = models.CharField(
         max_length=3,
-        choices=NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS,
+        choices=sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS),
         default=None,
         null=True,
         blank=True
     )
     nonepileptic_seizure_sleep = models.CharField(
         max_length=3,
-        choices=NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS,
+        choices=sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS),
         default=None,
         null=True,
         blank=True
     )
     nonepileptic_seizure_paroxysmal = models.CharField(
         max_length=3,
-        choices=NON_EPILEPSY_PAROXYSMS,
+        choices=sorted(NON_EPILEPSY_PAROXYSMS),
         default=None,
         null=True,
         blank=True
     )
     nonepileptic_seizure_migraine = models.CharField(
         max_length=3,
-        choices=MIGRAINES,
+        choices=sorted(MIGRAINES),
         default=None,
         null=True,
         blank=True
     )
     nonepileptic_seizure_miscellaneous = models.CharField(
         max_length=3,
-        choices=EPIS_MISC,
+        choices=sorted(EPIS_MISC),
         default=None,
         null=True,
         blank=True
@@ -253,7 +254,7 @@ class DESSCRIBE(models.Model):
 
     syndrome = models.IntegerField(
         "Is there an identifiable epilepsy syndrome?",
-        choices=SYNDROMES,
+        choices=sorted(SYNDROMES, key=itemgetter(1)),
         null=True,
         blank=True,
         default=None
@@ -280,7 +281,7 @@ class DESSCRIBE(models.Model):
     seizure_cause_structural = models.CharField(
         "main identified structural cause of seizure(s)",
         max_length=3,
-        choices=EPILEPSY_STRUCTURAL_CAUSE_TYPES,
+        choices=sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
         default=None,
         blank=True,
         null=True
@@ -288,7 +289,7 @@ class DESSCRIBE(models.Model):
     seizure_cause_structural_snomed_code = models.CharField(
         "SNOMED-CT code for main identified structural cause of seizure(s)",
         max_length=3,
-        choices=EPILEPSY_STRUCTURAL_CAUSE_TYPES,
+        choices=sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES),
         default=None,
         blank=True,
         null=True
@@ -296,7 +297,7 @@ class DESSCRIBE(models.Model):
     seizure_cause_genetic = models.CharField(
         "main identified genetic cause of seizure(s)",
         max_length=3,
-        choices=EPILEPSY_GENETIC_CAUSE_TYPES,
+        choices=sorted(EPILEPSY_GENETIC_CAUSE_TYPES),
         default=None,
         blank=True,
         null=True
@@ -353,6 +354,15 @@ class DESSCRIBE(models.Model):
         blank=True,
         null=True
     )
+
+    seizure_cause_mitochondrial_sctid = models.CharField(
+        "SNOMED CT identifier of mitochondrial disease type",
+        max_length=50,
+        default=None,
+        blank=True,
+        null=True
+    )
+
     seizure_cause_metabolic_other = models.CharField(
         "other identified metabolic cause of seizure(s) not previously specified.",
         max_length=250,
@@ -378,7 +388,7 @@ class DESSCRIBE(models.Model):
     seizure_cause_immune_antibody = models.CharField(
         "autoantibody identified as cause of seizure(s).",
         max_length=3,
-        choices=AUTOANTIBODIES,
+        choices=sorted(AUTOANTIBODIES),
         default=None,
         blank=True,
         null=True
@@ -445,6 +455,9 @@ class DESSCRIBE(models.Model):
             set_all_epilepsy_syndromes_to_none(self)
             set_all_nonepilepsy_seizure_onsets_to_none(self)
 
+        set_all_epilepsy_causes_to_none(
+            self, except_field=self.seizure_cause_main)
+
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -483,25 +496,33 @@ def set_all_generalised_onset_fields_to_none(self):
     self.epileptic_generalised_onset_other_details = None
 
 
-def set_all_epilepsy_causes_to_none(self):
-    self.seizure_cause_main = None
-    self.seizure_cause_main_snomed_code = None
-    self.seizure_cause_structural = None
-    self.seizure_cause_structural_snomed_code = None
-    self.seizure_cause_genetic = None
-    self.seizure_cause_gene_abnormality = None
-    self.seizure_cause_genetic_other = None
-    self.seizure_cause_gene_abnormality_snomed_code = None
-    self.seizure_cause_chromosomal_abnormality = None
-    self.seizure_cause_infectious = None
-    self.seizure_cause_infectious_snomed_code = None
-    self.seizure_cause_metabolic = None
-    self.seizure_cause_metabolic_other = None
-    self.seizure_cause_metabolic_snomed_code = None
-    self.seizure_cause_immune = None
-    self.seizure_cause_immune_antibody = None
-    self.seizure_cause_immune_antibody_other = None
-    self.seizure_cause_immune_snomed_code = None
+def set_all_epilepsy_causes_to_none(self, except_field=None):
+    if except_field is None:
+        self.seizure_cause_main = None
+        self.seizure_cause_main_snomed_code = None
+    elif except_field != "Str":
+        self.seizure_cause_structural = None
+        self.seizure_cause_structural_snomed_code = None
+    elif except_field != "Gen":
+        self.seizure_cause_genetic = None
+        self.seizure_cause_gene_abnormality = None
+        self.seizure_cause_genetic_other = None
+        self.seizure_cause_gene_abnormality_snomed_code = None
+        self.seizure_cause_chromosomal_abnormality = None
+    elif except_field != "Inf":
+        self.seizure_cause_infectious = None
+        self.seizure_cause_infectious_snomed_code = None
+    elif except_field != "Met":
+        print("metabolic is except field")
+        self.seizure_cause_metabolic = None
+        self.seizure_cause_metabolic_other = None
+        self.seizure_cause_metabolic_snomed_code = None
+    elif except_field != "Imm":
+        self.seizure_cause_immune = None
+        self.seizure_cause_immune_antibody = None
+        self.seizure_cause_immune_antibody_other = None
+    elif except_field != "NK":
+        self.seizure_cause_immune_snomed_code = None
 
 
 def set_all_epilepsy_syndromes_to_none(self):
