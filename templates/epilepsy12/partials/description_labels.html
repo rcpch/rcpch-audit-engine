@@ -1,0 +1,11 @@
+{% load epilepsy12_template_tags %}
+    <div class="ui field">
+            <label>Characters: {% characters_left desscribe.description %} </label>
+    </div>
+        {% if desscribe.description_keywords|length > 0 %}
+            <div class="ui message">
+                {% for keyword in desscribe.description_keywords %}
+                    <div class='ui blue label' style='margin: 5px;'>{{keyword}}<i class='icon close' hx-post='{url}' hx-target='#description_results' hx-trigger='click' hx-swap='innerHTML'></i></div>
+                {% endfor %}
+            </div>
+        {% endif %}

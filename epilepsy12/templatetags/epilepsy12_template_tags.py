@@ -1,4 +1,6 @@
 from django import template
+from django.utils.safestring import mark_safe
+
 register = template.Library()
 
 
@@ -16,3 +18,20 @@ def percent_complete(registration):
     if registration.investigation_management_complete:
         total += 12
     return total
+
+
+@register.simple_tag
+def characters_left(description):
+    length = 500-len(description)
+    colour = 'black'
+    if (length < 10):
+        colour = 'red'
+    safe_text = f'<span style="color:{colour}">{length}</span>'
+    return mark_safe(safe_text)
+
+
+@register.filter
+def custom_filter(text, color):
+    safe_text = '<span style="color:{color}">{text}</span>'.format(
+        color=color, text=text)
+    return mark_safe(safe_text)

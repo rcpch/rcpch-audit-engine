@@ -37,18 +37,24 @@ def edit_description(request, desscribe_id):
         'description': description,
         'description_keywords': matched_keywords
     }
-
-    DESSCRIBE.objects.update_or_create(
-        id=desscribe_id, defaults=update_field)
+    if (len(description) <= 5000):
+        DESSCRIBE.objects.update_or_create(
+            id=desscribe_id, defaults=update_field)
     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
-    stem = f"<div class='ui field'><label>{len(description)} characters</label></div>"
-    for index, keyword in enumerate(desscribe.description_keywords):
-        url = reverse('delete_description_keyword', kwargs={
-                      'desscribe_id': desscribe_id, 'description_keyword_id': index})
-        stem += f"<div class='ui blue label' style='margin: 5px;'>{keyword}<i class='icon close' hx-post='{url}' hx-target='#description_results' hx-trigger='click' hx-swap='innerHTML'></i></div>"
+    context = {
+        'desscribe': desscribe
+    }
 
-    return HttpResponse(stem)
+    # stem = f"<div class='ui field'><label>{len(description)} characters</label></div>"
+    # for index, keyword in enumerate(desscribe.description_keywords):
+    #     url = reverse('delete_description_keyword', kwargs={
+    #                   'desscribe_id': desscribe_id, 'description_keyword_id': index})
+    #     stem += f"<div class='ui blue label' style='margin: 5px;'>{keyword}<i class='icon close' hx-post='{url}' hx-target='#description_results' hx-trigger='click' hx-swap='innerHTML'></i></div>"
+
+    # return HttpResponse(stem)
+
+    return render(request, 'epilepsy12/partials/description_labels.html', context)
 
 
 @login_required
