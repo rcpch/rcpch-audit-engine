@@ -17,6 +17,8 @@ services:
       - 8000:8000
     depends_on:
       - db
+    volumes:
+      - .:/home/app/webapp
     environment:
       - E12_POSTGRES_DB_NAME=epilepsy12db
       - E12_POSTGRES_DB_HOST=db

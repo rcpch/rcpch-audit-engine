@@ -40,10 +40,14 @@ In order to simplify the development environment setup and provide greater consi
 
 > Note that the command changed from `docker-compose` to `docker <space> compose` with more recent Docker versions.
 
-This should create a container for the Django app with the correct Python version, install all dependencies, connect it to a Postgres container, set up the DB connection, migrate and seed the database.
+This should create a container for the Django app with the correct Python version, install all dependencies, connect it to a Postgres container, set up the DB connection, migrate and seed the database. The entire process takes less than 30 seconds.
 
-* View the application in a browser at http://0.0.0.0:8000/
+* View the application in a browser at <http://0.0.0.0:8000/>
+
+Changes you make in your development folder are **automatically synced to inside the Docker container**, and will show up in the application right away. This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
+
 ### Manual Development Setup
+
 #### Install PostgreSQL and create the database with the correct credentials
 
 You will need the [Postgresql](https://www.postgresql.org/) database, which can be installed natively on your development machine, or (recommended) can be installed using Docker.
