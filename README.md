@@ -13,7 +13,7 @@ National clinical audits are there to collect diagnosis and care process data on
 `rcpch-audit-engine` is a [Django](https://www.djangoproject.com/) 4.0 project which aims to standardise those elements of a national audit that can be standardised. It begins with Epilepsy12, a national audit for Childhood Epilepsies which has been in place since 2009.
 
 
-A framework for national clinical audits. Built using Django and Semantic UI. Initially intended as a new platform for the RCPCH's established Epilepsy12 audit, but designed so as to be usable for other audits.
+A framework for national clinical audits. Built using Django and Semantic UI. Initially intended as a new platform for the RCPCH's established **Epilepsy12** audit, but designed so as to be usable for other audits.
 
 ## Epilepsy12
 
@@ -21,7 +21,32 @@ A framework for national clinical audits. Built using Django and Semantic UI. In
     <img align="center" src="epilepsy12/static/epilepsy12-logo-1.png" width='100px'/>
 </p>
 
-### Development Setup
+[![DOI](https://zenodo.org/badge/415328052.svg)](https://zenodo.org/badge/latestdoi/415328052)
+
+### NEW! Development Setup using Docker and Docker Compose
+
+In order to simplify the development environment setup and provide greater consistency between development and production environments, we have packaged the application as a Docker image. This means that you don't need to worry about conflicts of Python versions, Python library versions, or Python virtual environments. Everything is inside the Docker container.
+
+* Install Docker on your development machine. https://docs.docker.com/get-docker/
+  
+* Clone this repository to your code folder:  
+`git clone https://github.com/rcpch/rcpch-audit-engine.git`
+
+* Navigate into the folder  
+`cd rcpch-audit-engine`
+
+* Start the development environment  
+`docker compose up`
+
+> Note that the command changed from `docker-compose` to `docker <space> compose` with more recent Docker versions.
+
+This should create a container for the Django app with the correct Python version, install all dependencies, connect it to a Postgres container, set up the DB connection, migrate and seed the database. The entire process takes less than 30 seconds.
+
+* View the application in a browser at <http://0.0.0.0:8000/>
+
+Changes you make in your development folder are **automatically synced to inside the Docker container**, and will show up in the application right away. This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
+
+### Manual Development Setup
 
 #### Install PostgreSQL and create the database with the correct credentials
 
