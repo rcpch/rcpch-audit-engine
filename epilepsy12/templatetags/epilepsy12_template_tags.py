@@ -22,7 +22,7 @@ def percent_complete(registration):
 
 @register.simple_tag
 def characters_left(description):
-    length = 500-len(description)
+    length = 5000-len(description)
     colour = 'black'
     if (length < 10):
         colour = 'red'

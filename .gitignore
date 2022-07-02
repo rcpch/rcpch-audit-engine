@@ -112,6 +112,7 @@ dmypy.json
 
 # Django
 logfile
+.staticfiles
 
 # Snomed
 start/api-key.txt

@@ -38,7 +38,7 @@ urlpatterns = [
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
-    path('eeg', views.eeg, name="eeg"),
+    path('docs', views.eeg, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),

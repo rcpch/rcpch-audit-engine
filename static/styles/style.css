@@ -71,6 +71,19 @@ h3 {
 
 /* epilepsy12 landing */
 
+#landing_card {
+  border-radius: 0%;
+  background-color: #0d0d58;
+}
+
+#landing_card .content .header {
+  color: white;
+}
+
+#landing_card .meta .category {
+  color: white;
+}
+
 #hospital_segment {
   background-color: white;
   border-color: #d9d9d9;

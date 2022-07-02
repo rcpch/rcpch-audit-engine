@@ -30,21 +30,22 @@
     <div class="ui container">
       {% block nav %}
         <div class="ui secondary pointing menu">
-            <a href= "https://www.rcpch.ac.uk/"><img id="nav-rcpch" src="{% static 'images/rcpch-logo.jpg' %}" class="item"></a>
             <a {% if request.resolver_match.url_name == 'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
-              Home
+              <img id="nav-rcpch" src="{% static 'images/epilepsy12-logo-1.png' %}" class="item">
             </a>
-          <a {% if request.resolver_match.url_name == 'admin:index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
-            Database Management
-          </a>
+            {% if user.is_authenticated %}
+              <a {% if request.resolver_match.url_name == 'admin:index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
+                Database Management
+              </a>
+            {% endif %}
             <a {% if request.resolver_match.url_name == 'hospital_reports' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
               Hospital Clinician
             </a>
-            <a {% if request.resolver_match.url_name == 'eeg' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'eeg' %}>
-              EEG Department
-            </a>
             <a {% if request.resolver_match.url_name == 'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
               Patient Access
+            </a>
+            <a {% if request.resolver_match.url_name == 'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
+              Documentation
             </a>
           <div class="right menu">
           {% if user.is_authenticated %}
