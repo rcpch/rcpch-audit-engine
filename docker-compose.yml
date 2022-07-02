@@ -10,7 +10,7 @@ services:
       sh -c "pip install --upgrade pip &&
              pip install -r requirements/development-requirements.txt &&
              python manage.py collectstatic --noinput &&
-             python manage.py migrate &&
+             ./s/migrate &&
              ./s/seed &&
              python manage.py runserver 0.0.0.0:8000"
     ports:
