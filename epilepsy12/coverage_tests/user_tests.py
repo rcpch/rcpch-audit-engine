@@ -12,7 +12,6 @@ class Epilepsy12UserTests(TestCase):
             username="epilepsy12user",
             password="epilepsy12password",
             first_name="John",
-            role=1,
             hospital_trust="St Elsewhere"
         )
         self.assertEqual(
@@ -26,10 +25,6 @@ class Epilepsy12UserTests(TestCase):
         self.assertEqual(
             superuser.first_name,
             "John"
-        )
-        self.assertEqual(
-            superuser.role,
-            1
         )
         self.assertEqual(
             superuser.hospital_trust,
@@ -56,7 +51,6 @@ class Epilepsy12UserTests(TestCase):
                 username="epilepsy12user",
                 password="epilepsy12password",
                 first_name="John",
-                role="Audit Analyst",
                 hospital_trust="St Elsewhere",
                 is_superuser=False
             )
@@ -68,7 +62,6 @@ class Epilepsy12UserTests(TestCase):
                 username="epilepsy12user",
                 password="epilepsy12password",
                 first_name="John",
-                role=1,
                 hospital_trust="St Elsewhere",
                 is_staff=False
             )
@@ -80,7 +73,6 @@ class Epilepsy12UserTests(TestCase):
                 username="epilepsy12user",
                 password="epilepsy12password",
                 first_name="John",
-                role=1,
                 hospital_trust="St Elsewhere",
                 is_active=False
             )
@@ -96,7 +88,6 @@ class Epilepsy12UserTests(TestCase):
             title=4,
             first_name="Henry",
             surname="Gastaut",
-            role=1,
             hospital_trust="St Elsewhere"
         )
 
@@ -155,7 +146,6 @@ class Epilepsy12UserTests(TestCase):
                 surname="Gastaut",
                 title=4,
                 password="epilepsy12password",
-                role=1,
                 hospital_trust="St Elsewhere"
             )
         with self.assertRaises(ValueError):
@@ -167,7 +157,6 @@ class Epilepsy12UserTests(TestCase):
                 surname="Gastaut",
                 title=4,
                 password="epilepsy12password",
-                role=1,
                 hospital_trust=""
             )
         with self.assertRaises(ValueError):
@@ -179,6 +168,5 @@ class Epilepsy12UserTests(TestCase):
                 surname="Gastaut",
                 title=4,
                 password="epilepsy12password",
-                role=1,
                 hospital_trust="St Elsewhere"
             )

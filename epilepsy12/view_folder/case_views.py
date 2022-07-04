@@ -1,7 +1,7 @@
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import hospital_trust
@@ -14,6 +14,9 @@ from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
 
 
+# @permission_required(["can_view_case_named_centre",
+#                       "can_view_named_centre_audit_items",
+#                       "can_view_users_in_named_centres"], raise_exception=True)
 @login_required
 def case_list(request):
     """

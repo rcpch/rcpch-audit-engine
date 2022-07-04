@@ -13,10 +13,10 @@ class Epilepsy12UserAdmin(UserAdmin):
     order = ('surname')
     model = Epilepsy12User
     search_fields = ('email', 'username', 'surname',
-                     'role', 'hospital_trust', 'is_active',)
+                     'hospital_trust', 'is_active',)
     list_display = ("username", "email", "title", "first_name", "surname",
-                    "is_active", "twitter_handle", "role", "hospital_trust",)
-    list_filter = ("is_active", "role", "hospital_trust",)
+                    "is_active", "twitter_handle", "hospital_trust",)
+    list_filter = ("is_active", "hospital_trust",)
     fieldsets = (
         (
             None, {
@@ -32,7 +32,6 @@ class Epilepsy12UserAdmin(UserAdmin):
             'Epilepsy12 Centre', {
                 'fields': (
                     'hospital_trust',
-                    'role'
                 )
             }
         ),
@@ -49,6 +48,8 @@ class Epilepsy12UserAdmin(UserAdmin):
                 'fields': (
                     'is_active',
                     'is_staff',
+                    'groups',
+                    'user_permissions'
                 )
             }
         ),
@@ -61,7 +62,7 @@ class Epilepsy12UserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'title', 'first_name', 'surname', 'password1', 'password2', 'is_staff', 'is_active', 'role', 'hospital_trust')
+            'fields': ('email', 'username', 'title', 'first_name', 'surname', 'password1', 'password2', 'is_staff', 'is_active', 'hospital_trust')
         }),
     )
 

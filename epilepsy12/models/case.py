@@ -75,6 +75,16 @@ class Case(models.Model):
         choices=ETHNICITIES
     )
 
+    consent_obtained = models.BooleanField(
+        "Has patient consent been obtained?",
+        default=False
+    )
+
+    submission_patient_approved = models.BooleanField(
+        "Has patient approval for final submission been obtained?",
+        default=False
+    )
+
     index_of_multiple_deprivation_quintile = models.PositiveSmallIntegerField(
         # this is a calculated field - it relies on the availability of the Deprivare server running
         # A quintile is calculated on save and persisted in the database

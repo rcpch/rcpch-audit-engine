@@ -7,11 +7,11 @@ class Epilepsy12UserCreationForm(UserCreationForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_trust")
+        fields = ("email", "hospital_trust")
 
 
 class Epilepsy12UserChangeForm(UserChangeForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_trust")
+        fields = ("email", "hospital_trust")

@@ -159,6 +159,12 @@ To add the semiology keywords to the database:
 python manage.py seed --mode=seed_semiology_keywords
 ```
 
+To add create user groups and permissions:
+
+```console
+python manage.py seed --mode=create_groups
+```
+
 To add the some dummy cases to the database:
 
 ```console

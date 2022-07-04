@@ -1,10 +1,11 @@
+import site
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from epilepsy12.constants.user_types import ROLES, TITLES
+from epilepsy12.constants.user_types import PERMISSIONS, TITLES
 
 
 class Epilepsy12UserManager(BaseUserManager):
@@ -13,7 +14,7 @@ class Epilepsy12UserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, email, password, username, first_name, hospital_trust, role, **extra_fields):
+    def create_user(self, email, password, username, first_name, hospital_trust, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
@@ -24,12 +25,9 @@ class Epilepsy12UserManager(BaseUserManager):
         if not hospital_trust:
             raise ValueError(
                 _('You must provide the name of your main hospital trust.'))
-        if not role:
-            raise ValueError(
-                _('You must provide your role in the Epilepsy12 audit.'))
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, first_name=first_name,
-                          role=role, hospital_trust=hospital_trust,  **extra_fields)
+                          hospital_trust=hospital_trust,  **extra_fields)
         user.set_password(password)
         user.save()
         return user
@@ -93,18 +91,14 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         default=False
     )
     is_staff = models.BooleanField(
+        # this refers to members of the RCPCH audit team.
         default=False
     )
     date_joined = models.DateTimeField(
         default=timezone.now
     )
-    role = models.PositiveSmallIntegerField(
-        choices=ROLES,
-        blank=True,
-        null=True
-    )
     hospital_trust = models.CharField(
-        help_text=_("Enter the main hospital trust where you work."),
+        help_text=_("Enter your main hospital trust."),
         max_length=100
     )
     twitter_handle = models.CharField(
@@ -113,7 +107,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
-    REQUIRED_FIELDS = ['role', 'hospital_trust', 'username', 'first_name']
+    REQUIRED_FIELDS = ['hospital_trust', 'username', 'first_name']
     USERNAME_FIELD = 'email'
 
     objects = Epilepsy12UserManager()
@@ -136,3 +130,31 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
+
+    class Meta:
+        permissions = PERMISSIONS
+
+
+"""
+Different Epilepsy12 User groups
+The basic user groups are:
+
+Lead Clinician
+Clinician (not lead)
+Centre Administrator
+Audit Lead Administrator
+Audit Administrator
+Audit Analyst
+Patient
+Parent
+
+Each will have different permissions
+The scope of permissions can be limited to a one or more centres
+The Lead Clinician, Clinician or Centre administrator will have their scope limited to the hospitals they cover
+The Audit Lead Administrator, Audit Administrator, Audit Analyst will have scope to cover all hospitals
+Patients/Parents have their scope limited to their own data
+
+Basic permissions for all groups involve viewing data within their own scope
+Creating/updating/deleting rights are applied depending on group
+Group allocation can only be performed by audit administrators or superusers
+"""

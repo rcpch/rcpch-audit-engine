@@ -1,10 +1,15 @@
 import math
 from random import randint, getrandbits, choice
 from datetime import date
+from unicodedata import name
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from epilepsy12.constants.ethnicities import ETHNICITIES
 
 from epilepsy12.constants.names import DUMMY_NAMES
+from epilepsy12.constants.user_types import GROUPS, Epilepsy12UserGroup
+from epilepsy12.models import epilepsy12user
 from ...models import HospitalTrust, Keyword, Case
 from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE
 from ...general_functions import random_postcodes
@@ -23,6 +28,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_hospitals'):
             self.stdout.write('seeding hospital trust data...')
             run_hospitals_seed()
+        elif (options['mode'] == 'create_groups'):
+            self.stdout.write('creating groups and allocating permissions...')
+            for group in GROUPS:
+                run_create_group(group)
         elif (options['mode'] == 'seed_semiology_keywords'):
             self.stdout.write('seeding hospital trust data...')
             run_semiology_keywords_seed()
@@ -51,6 +60,130 @@ def run_semiology_keywords_seed():
             f"added {semiology_keyword['title']} in category {semiology_keyword['category']}")
     image()
     print(f"Keywords added: {added}")
+
+
+def run_create_group(group_name: str):
+    """
+    Create group
+    Accepts name as a parameter
+    """
+    Group.objects.get_or_create(name=group_name)
+    group = Group.objects.get(name=group_name)
+
+    print(f'...{group_name} created.')
+
+    # set base permissions for each group
+
+    if group_name == Epilepsy12UserGroup.PATIENT or group_name == Epilepsy12UserGroup.PARENT:
+        permission_names = [
+            'can_consent_to_audit_participation',
+            'can_approve_audit_data_submission'
+        ]
+        for name in permission_names:
+            permission = Permission.objects.get(codename=name)
+            group.permissions.add(permission)
+    elif group_name == Epilepsy12UserGroup.LEAD_CLINICIAN or group_name == Epilepsy12UserGroup.CLINICIAN or group_name == Epilepsy12UserGroup.CENTRE_ADMINISTRATOR:
+        permission_names = [
+            "can_view_case_named_centre",
+            "can_view_named_centre_audit_items",
+            "can_view_users_in_named_centres"
+        ]
+        for name in permission_names:
+            permission = Permission.objects.get(codename=name)
+            group.permissions.add(permission)
+
+        if group_name == Epilepsy12UserGroup.CENTRE_ADMINISTRATOR:
+            permission_names = [
+                "can_create_case_named_centre",
+                "can_update_case_named_centre",
+                "can_delete_case_named_centre",
+                "can_lock_case_named_centre",
+                "can_register_case_named_centre",
+                "can_delete_registration_named_centre",
+                "can_edit_named_centre_audit_items",
+                "can_delete_named_centre_audit_items",
+                "can_create_named_centre_audit_items",
+                "can_allocate_named_centre",
+                "can_create_new_user_in_named_centres",
+                "can_delete_user_in_named_centres",
+                "can_update_user_in_named_centres",
+                "can_update_role_in_named_centres",
+                "can_create_new_role_in_named_centres"
+            ]
+        elif group_name == Epilepsy12UserGroup.LEAD_CLINICIAN:
+            permission_names = [
+                "can_update_case_named_centre",
+                "can_delete_case_named_centre",
+                "can_lock_case_named_centre",
+                "can_register_case_named_centre",
+                "can_delete_registration_named_centre",
+                "can_edit_named_centre_audit_items",
+                "can_delete_named_centre_audit_items",
+                "can_create_named_centre_audit_items"
+            ]
+        elif group_name == Epilepsy12UserGroup.CLINICIAN:
+            permission_names = [
+                "can_update_case_named_centre",
+                "can_lock_case_named_centre",
+                "can_edit_named_centre_audit_items",
+                "can_delete_named_centre_audit_items",
+                "can_create_named_centre_audit_items"
+            ]
+        for name in permission_names:
+            permission = Permission.objects.get(codename=name)
+            group.permissions.add(permission)
+    elif group_name == group_name == Epilepsy12UserGroup.AUDIT_LEAD_ADMINISTRATOR or group_name == Epilepsy12UserGroup.AUDIT_ADMINISTRATOR or group_name == Epilepsy12UserGroup.AUDIT_ANALYST:
+        permission_names = [
+            "can_view_case_all_centres",
+            "can_view_all_centre_audit_items",
+            "can_view_users_in_all_centres"
+        ]
+        for name in permission_names:
+            permission = Permission.objects.get(codename=name)
+            group.permissions.add(permission)
+
+        if group_name == Epilepsy12UserGroup.AUDIT_LEAD_ADMINISTRATOR:
+            permission_names = [
+                "can_create_case_all_centres",
+                "can_update_case_all_centres",
+                "can_delete_case_all_centres",
+                "can_lock_case_all_centres",
+                "can_register_case_all_centres",
+                "can_delete_registration_all_centres",
+                "can_edit_all_centre_audit_items",
+                "can_delete_all_centre_audit_items",
+                "can_create_all_centre_audit_items",
+                "can_allocate_all_centres",
+                "can_create_new_user_in_all_centres",
+                "can_delete_user_in_all_centres",
+                "can_update_user_in_all_centres",
+                "can_update_role_in_all_centres",
+                "can_create_new_role_in_all_centres"
+            ]
+        elif group_name == Epilepsy12UserGroup.AUDIT_ADMINISTRATOR:
+            permission_names = [
+                "can_create_case_all_centres",
+                "can_update_case_all_centres",
+                "can_delete_case_all_centres",
+                "can_lock_case_all_centres",
+                "can_register_case_all_centres",
+                "can_delete_registration_all_centres",
+                "can_allocate_all_centres",
+                "can_create_new_user_in_all_centres",
+                "can_update_user_in_all_centres",
+                "can_update_role_in_all_centres"
+            ]
+        elif group_name == Epilepsy12UserGroup.AUDIT_ANALYST:
+            permission_names = [
+                "can_download_data_tables"
+            ]
+        for name in permission_names:
+            permission = Permission.objects.get(codename=name)
+            group.permissions.add(permission)
+    else:
+        raise Exception("Group does not exist to allocate roles to.")
+
+    print(f'...permissions allocated to {group_name}')
 
 
 def run_hospitals_seed():
