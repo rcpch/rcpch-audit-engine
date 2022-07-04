@@ -1,6 +1,10 @@
 {% load epilepsy12_template_tags %}
     <div class="ui field">
+        {% if desscribe.description %}
             <label>Characters: {% characters_left desscribe.description %} </label>
+        {% else %}
+            <label>Characters: 5000 </label>
+        {% endif %}
     </div>
         {% if desscribe.description_keywords|length > 0 %}
             <div class="ui message">
