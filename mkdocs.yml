@@ -64,3 +64,14 @@ extra:
       link: https://twitter.com/rcpchtweets
     - icon: fontawesome/brands/github
       link: https://github.com/rcpch
+      
+nav:
+  - Home: 'index.md'
+  - Clinician User Guide:
+    - 'clinician-users/clinician-user-guide.md'
+  - Admin User Guide:
+    - 'admin-users/admin-user-guide.md'
+  - Development:
+    - 'development/development.md'
+  - Legal:
+    - 'legal/legal.md'
