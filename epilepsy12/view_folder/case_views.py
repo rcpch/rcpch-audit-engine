@@ -1,8 +1,10 @@
 from datetime import datetime
+from django.views.generic import ListView
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
+from django.views import View
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import hospital_trust
 from epilepsy12.models.registration import Registration
@@ -12,6 +14,7 @@ from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 
 # @permission_required(["can_view_case_named_centre",
@@ -122,3 +125,43 @@ def delete_case(request, id):
     case = get_object_or_404(Case, id=id)
     case.delete()
     return redirect('cases')
+
+
+# class CentreCaseListView(ListView):
+
+#     @login_required
+#     def get_queryset(self):
+#         # context_object_name = 'cases_by_centre'
+#         filter_term = self.request.GET.get('filtered_case_list')
+#         if filter_term:
+#             all_cases = Case.objects.filter(
+#                 Q(first_name__icontains=filter_term) |
+#                 Q(surname__icontains=filter_term) |
+#                 Q(nhs_number__icontains=filter_term)
+#             ).order_by('surname').all()
+#         else:
+#             all_cases = Case.objects.all().order_by('surname').all()
+#         registered_cases = Registration.objects.filter(
+#             lead_hospital=self.request.user.hospital_trust)
+
+
+# #     fetch_snomed(365456003, 'descendentSelfOf')
+
+#         case_list = Case.objects.all().order_by('surname')
+
+#         paginator = Paginator(all_cases, 10)
+#         page_number = self.request.GET.get('page', 1)
+#         case_list = paginator.page(page_number)
+
+#         case_count = Case.objects.all().count()
+#         registered_count = registered_cases.count()
+#         context = {
+#             'case_list': case_list,
+#             'total_cases': case_count,
+#             'total_registrations': registered_count
+#         }
+#         if self.request.htmx:
+#             return render(request=self.request, template_name='epilepsy12/partials/case_table.html', context=context)
+
+#         template_name = 'epilepsy12/cases/cases.html'
+#         return render(self.request, template_name, context)
