@@ -5,12 +5,13 @@
           <tr>
             <th id="table_header">ID</th>
             <th id="table_header">Name</th>
-            <th id="table_header">Date of Birth</th>
-            <th id="table_header">Age</th>
             <th id="table_header">Gender</th>
             <th id="table_header">Ethnicity</th>
             <th id="table_header">NHS Number</th>
-            <th id="table_header">IMD (quintile)</th>
+            <th id="table_header">IMD (quintile)
+                <i class="caret square up icon" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
+                <i class="caret square down icon" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
+            </th>
             <th id="table_header" colspan="2"></th>
           </tr>
         </thead>
@@ -21,8 +22,6 @@
                 <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
               </td>
               <td>{{case.first_name}} {{case.surname}}</td>
-              <td>{{case.date_of_birth}}</td>
-              <td>{{case.age}}</td>
               <td>{{case.get_gender_display}}</td>
               <td>{{case.get_ethnicity_display}}</td>
               <td>{{case.nhs_number}}</td>
