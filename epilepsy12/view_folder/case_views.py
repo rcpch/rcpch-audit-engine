@@ -29,6 +29,7 @@ def case_list(request):
     #TODO #32 Audit trail of all viewing or touching the database
 
     """
+
     filter_term = request.GET.get('filtered_case_list')
     if filter_term:
         all_cases = Case.objects.filter(
@@ -37,7 +38,15 @@ def case_list(request):
             Q(nhs_number__icontains=filter_term)
         ).order_by('surname').all()
     else:
-        all_cases = Case.objects.all().order_by('surname').all()
+        if request.htmx.trigger_name == "sort_by_imd_up":
+            # this is to sort on IMD
+            all_cases = Case.objects.all().order_by(
+                'index_of_multiple_deprivation_quintile').all()
+        elif request.htmx.trigger_name == "sort_by_imd_down":
+            all_cases = Case.objects.all().order_by(
+                '-index_of_multiple_deprivation_quintile').all()
+        else:
+            all_cases = Case.objects.all().order_by('surname').all()
 
     registered_cases = Registration.objects.filter(
         lead_hospital=request.user.hospital_trust)
@@ -45,14 +54,13 @@ def case_list(request):
 
 #     fetch_snomed(365456003, 'descendentSelfOf')
 
-    case_list = Case.objects.all().order_by('surname')
-
     paginator = Paginator(all_cases, 10)
     page_number = request.GET.get('page', 1)
     case_list = paginator.page(page_number)
 
     case_count = Case.objects.all().count()
     registered_count = registered_cases.count()
+
     context = {
         'case_list': case_list,
         'total_cases': case_count,

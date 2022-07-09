@@ -84,6 +84,10 @@ htmx_paths = [
          views.ribe, name='ribe'),
     path('htmx/filter_case_list', views.case_list,
          name="filter_case_list"),
+    path('htmx/sort_by_imd_up', views.case_list,
+         name="sort_by_imd_up"),
+    path('htmx/sort_by_imd_down', views.case_list,
+         name="sort_by_imd_down"),
     path('htmx/comorbidity_search',
          views.comorbidity_search, name="comorbidity_search")
 
