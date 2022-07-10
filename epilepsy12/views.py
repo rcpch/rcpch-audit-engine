@@ -52,13 +52,18 @@ def hospital_reports(request):
     })
 
 
-def eeg(request):
-    template_name = 'epilepsy12/docs.html'
+def tsandcs(request):
+    template_name = 'epilepsy12/terms_and_conditions.html'
     return render(request, template_name, {})
 
 
 def patient(request):
     template_name = 'epilepsy12/patient.html'
+    return render(request, template_name, {})
+
+
+def documentation(request):
+    template_name = 'epilepsy12/docs.html'
     return render(request, template_name, {})
 
 

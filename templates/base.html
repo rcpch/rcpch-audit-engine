@@ -47,6 +47,9 @@
             <a {% if request.resolver_match.url_name == 'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
               Documentation
             </a>
+            <a {% if request.resolver_match.url_name == 'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'tsandcs' %}>
+              Terms and Conditions
+            </a>
           <div class="right menu">
           {% if user.is_authenticated %}
               <a class="item" href={% url 'logout' %}>

@@ -7,6 +7,7 @@ from django.urls import path
 urlpatterns = [
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
+    path('tsandcs', views.tsandcs, name="tsandcs"),
     path('hospital', views.hospital_reports, name="hospital_reports"),
     path('cases/', views.case_list, name="cases"),
     path('case/<int:id>/update', views.update_case, name="update_case"),
@@ -38,7 +39,7 @@ urlpatterns = [
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
-    path('docs', views.eeg, name="docs"),
+    path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
