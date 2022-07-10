@@ -176,6 +176,10 @@ h3 {
   text-align: center;
 }
 
+#sort_button:hover {
+  background-color: #e00087;
+}
+
 /* audit sections */
 #info_message {
   background-color: #00bdaa;

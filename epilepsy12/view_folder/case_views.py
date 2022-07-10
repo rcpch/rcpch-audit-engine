@@ -49,6 +49,46 @@ def case_list(request):
             all_cases = Case.objects.all().order_by(
                 '-index_of_multiple_deprivation_quintile').all()
             sort_flag = "sort_by_imd_down"
+        elif request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
+            all_cases = Case.objects.all().order_by(
+                'nhs_number').all()
+            sort_flag = "sort_by_nhs_number_up"
+        elif request.htmx.trigger_name == "sort_by_nhs_number_down" or request.GET.get('sort_flag') == "sort_by_nhs_number_down":
+            all_cases = Case.objects.all().order_by(
+                '-nhs_number').all()
+            sort_flag = "sort_by_nhs_number_down"
+        elif request.htmx.trigger_name == "sort_by_ethnicity_up" or request.GET.get('sort_flag') == "sort_by_ethnicity_up":
+            all_cases = Case.objects.all().order_by(
+                'ethnicity').all()
+            sort_flag = "sort_by_ethnicity_up"
+        elif request.htmx.trigger_name == "sort_by_ethnicity_down" or request.GET.get('sort_flag') == "sort_by_ethnicity_down":
+            all_cases = Case.objects.all().order_by(
+                '-ethnicity').all()
+            sort_flag = "sort_by_ethnicity_down"
+        elif request.htmx.trigger_name == "sort_by_gender_up" or request.GET.get('sort_flag') == "sort_by_gender_up":
+            all_cases = Case.objects.all().order_by(
+                'gender').all()
+            sort_flag = "sort_by_gender_up"
+        elif request.htmx.trigger_name == "sort_by_gender_down" or request.GET.get('sort_flag') == "sort_by_gender_down":
+            all_cases = Case.objects.all().order_by(
+                '-gender').all()
+            sort_flag = "sort_by_gender_down"
+        elif request.htmx.trigger_name == "sort_by_name_up" or request.GET.get('sort_flag') == "sort_by_name_up":
+            all_cases = Case.objects.all().order_by(
+                'surname').all()
+            sort_flag = "sort_by_name_up"
+        elif request.htmx.trigger_name == "sort_by_name_down" or request.GET.get('sort_flag') == "sort_by_name_down":
+            all_cases = Case.objects.all().order_by(
+                '-surname').all()
+            sort_flag = "sort_by_name_down"
+        elif request.htmx.trigger_name == "sort_by_id_up" or request.GET.get('sort_flag') == "sort_by_id_up":
+            all_cases = Case.objects.all().order_by(
+                'id').all()
+            sort_flag = "sort_by_id_up"
+        elif request.htmx.trigger_name == "sort_by_id_down" or request.GET.get('sort_flag') == "sort_by_id_down":
+            all_cases = Case.objects.all().order_by(
+                '-id').all()
+            sort_flag = "sort_by_id_down"
         else:
             all_cases = Case.objects.all().order_by('surname').all()
 

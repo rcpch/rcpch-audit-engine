@@ -1,22 +1,67 @@
 {% load epilepsy12_template_tags %}
 {% if case_list.end_index > 0 %}
-      <table class="ui compact table" >
+      <table class="ui single line table" >
         <thead>
           <tr>
-            <th id="table_header">ID</th>
-            <th id="table_header">Name</th>
-            <th id="table_header">Gender</th>
-            <th id="table_header">Ethnicity</th>
-            <th id="table_header">NHS Number</th>
+            <th id="table_header">ID
+                {% if sort_flag and sort_flag == "sort_by_id_down" %}
+                  <i class="caret square up icon" id="sort_button" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
+                {% elif sort_flag and sort_flag == "sort_by_id_up" %}
+                  <i class="caret square down icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table" hx-get="{% url 'sort_by_id_down' %}" hx-trigger="click"></i>
+                {% else %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
+                  <i class="caret square down icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table" hx-get="{% url 'sort_by_id_down' %}" hx-trigger="click"></i>
+                {% endif %}
+            </th>
+            <th id="table_header">Name
+                {% if sort_flag and sort_flag == "sort_by_name_down" %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table" hx-get="{% url 'sort_by_name_up' %}" hx-trigger="click"></i>
+                {% elif sort_flag and sort_flag == "sort_by_name_up" %}
+                  <i class="caret square down icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table" hx-get="{% url 'sort_by_name_down' %}" hx-trigger="click"></i>
+                {% else %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table" hx-get="{% url 'sort_by_name_up' %}" hx-trigger="click"></i>
+                  <i class="caret square down icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table" hx-get="{% url 'sort_by_name_down' %}" hx-trigger="click"></i>
+                {% endif %}
+            </th>
+            <th id="table_header">Gender
+                {% if sort_flag and sort_flag == "sort_by_gender_down" %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
+                {% elif sort_flag and sort_flag == "sort_by_gender_up" %}
+                  <i class="caret square down icon" id="sort_button" name="sort_by_gender_down" hx-target="#case_table" hx-get="{% url 'sort_by_gender_down' %}" hx-trigger="click"></i>
+                {% else %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
+                  <i class="caret square down icon" id="sort_button" name="sort_by_gender_down" hx-target="#case_table" hx-get="{% url 'sort_by_gender_down' %}" hx-trigger="click"></i>
+                {% endif %}
+            </th>
+            <th id="table_header">Ethnicity
+                {% if sort_flag and sort_flag == "sort_by_ethnicity_down" %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_ethnicity_up" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_up' %}" hx-trigger="click"></i>
+                {% elif sort_flag and sort_flag == "sort_by_ethnicity_up" %}
+                  <i class="caret square down icon" id="sort_button" name="sort_by_ethnicity_down" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_down' %}" hx-trigger="click"></i>
+                {% else %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_ethnicity_up" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_up' %}" hx-trigger="click"></i>
+                  <i class="caret square down icon" id="sort_button" name="sort_by_ethnicity_down" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_down' %}" hx-trigger="click"></i>
+                {% endif %}
+            </th>
+            <th id="table_header">NHS Number
+                {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_up' %}" hx-trigger="click"></i>
+                {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
+                  <i class="caret square down icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_down' %}" hx-trigger="click"></i>
+                {% else %}
+                  <i class="caret square up icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_up' %}" hx-trigger="click"></i>
+                  <i class="caret square down icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_down' %}" hx-trigger="click"></i>
+                {% endif %}
+            </th>
             <th id="table_header">IMD (quintile)
-              {% if sort_flag and sort_flag == "sort_by_imd_down" %}
-                <i class="caret square up icon" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
-              {% elif sort_flag and sort_flag == "sort_by_imd_up" %}
-                <i class="caret square down icon" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
-              {% else %}
-                <i class="caret square up icon" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
-                <i class="caret square down icon" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
-              {% endif %}
+                  {% if sort_flag and sort_flag == "sort_by_imd_down" %}
+                    <i class="caret square up icon" id="sort_button" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
+                  {% elif sort_flag and sort_flag == "sort_by_imd_up" %}
+                    <i class="caret square down icon" id="sort_button" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
+                  {% else %}
+                    <i class="caret square up icon" id="sort_button" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
+                    <i class="caret square down icon" id="sort_button" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
+                  {% endif %}
             </th>
             <th id="table_header" colspan="2"></th>
           </tr>
@@ -93,6 +138,6 @@
   
         </tbody>
       </table>
-    {% else %}
-      <p>There are no cases yet</p>
-    {% endif %}
+{% else %}
+  <p>There are no cases yet</p>
+{% endif %}
