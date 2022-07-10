@@ -1,0 +1,25 @@
+
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div class="three fields">
+        <div class="field">
+            <label>Registration Date</label>
+            {% if registration.registration_date %}
+                <div class="field" hx-post="{% url 'registration_date' case_id=case_id %}" name='registration_date' hx-target="#registration_date_results" hx-swap='innerHtml' hx-trigger="click">
+                    <div class="fluid ui disabled button" id="action_button">Registered {{registration.registration_date}}</div>
+                </div>
+            {% else %}
+                <div class="field" hx-post="{% url 'registration_date' case_id=case_id %}" name='registration_date' hx-target="#registration_date_results" hx-swap='innerHtml' hx-trigger="click">
+                    <div class="fluid ui button" id="action_button">Register Now</div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label>Registration Close Date</label>
+            <input type="text" readonly="" placeholder="{{registration.registration_close_date}}"/>
+        </div>
+        <div class="field">
+            <label>Cohort</label>
+            <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+        </div>
+    </div>
+</div>

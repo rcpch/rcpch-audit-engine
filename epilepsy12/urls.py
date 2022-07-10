@@ -15,8 +15,8 @@ urlpatterns = [
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
     path('case/<int:id>/register',
          views.register, name='register'),
-    path('registration/<int:id>/update',
-         views.update_registration, name="update_registration"),
+    #     path('registration/<int:id>/update',
+    #          views.update_registration, name="update_registration"),
     path('initial_assessment/<int:case_id>/create',
          views.create_initial_assessment, name="create_initial_assessment"),
     path('initial_assessment/<int:case_id>/update',
@@ -110,7 +110,9 @@ htmx_paths = [
     path('htmx/sort_by_id_down', views.case_list,
          name="sort_by_id_down"),
     path('htmx/comorbidity_search',
-         views.comorbidity_search, name="comorbidity_search")
+         views.comorbidity_search, name="comorbidity_search"),
+    path('htmx/<int:case_id>/registration_date',
+         views.registration_date, name="registration_date")
 
 ]
 

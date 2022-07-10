@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from datetime import date
 
 from ..models import Registration
 from ..models import Case
@@ -9,19 +10,15 @@ from ..forms_folder import RegistrationForm
 
 @login_required
 def register(request, id):
-    form = RegistrationForm(request.POST or None, id)
-    if request.method == "POST":
-        if form.is_valid():
-            case = Case.objects.get(id=id)
-            print(form.instance.lead_hospital)
-            obj = form.save(commit=False)
-            obj.case = case
-            obj.save()
-            return redirect('cases')
-        else:
-            print('not valid')
+
+    case = Case.objects.get(pk=id)
+    try:
+        registration = Registration.objects.get(case=case)
+    except:
+        registration = None
+
     context = {
-        "form": form,
+        "registration": registration,
         "case_id": id,
         "initial_assessment_complete": False,
         "assessment_complete": False,
@@ -34,38 +31,23 @@ def register(request, id):
 
 
 @login_required
-def update_registration(request, id):
-    registration = Registration.objects.filter(case=id).first()
-    form = RegistrationForm(instance=registration)
-    if request.method == "POST":
-        if ('delete') in request.POST:
-            registration.delete()
-            return redirect('cases')
-        form = RegistrationForm(request.POST, instance=registration)
-        if form.is_valid:
-            obj = form.save()
-            obj.save()
-            messages.success(
-                request, "You successfully added some epilepsy risk factors!")
-            return redirect('cases')
-    case = Case.objects.get(id=id)
-    context = {
-        "form": form,
-        "case_id": id,
-        "case_name": case.first_name + " " + case.surname,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "unchosen"
-    }
-
-    return render(request=request, template_name='epilepsy12/register.html', context=context)
-
-
-@login_required
 def delete_registration(request, id):
     registration = get_object_or_404(Registration, id=id)
     registration.delete()
     return redirect('cases')
+
+
+# HTMX endpoints
+
+@login_required
+def registration_date(request, case_id):
+    registration_date = date.today()
+    case = Case.objects.get(pk=case_id)
+    Registration.objects.update_or_create(
+        registration_date=registration_date, case=case)
+    registration = Registration.objects.filter(case=case).first()
+    context = {
+        'case_id': case_id,
+        'registration': registration
+    }
+    return render(request=request, template_name='epilepsy12/partials/registration_dates.html', context=context)

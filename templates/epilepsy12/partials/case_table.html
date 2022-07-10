@@ -90,9 +90,9 @@
                       {% if case.registration %}
                           {% percent_complete case.registration as percentComplete %}
                           {% if case.locked %}
-                            <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                            <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
                           {% else %}
-                            <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                            <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
                           {% endif %}
                       {% else %}
                         {% if case.locked %}

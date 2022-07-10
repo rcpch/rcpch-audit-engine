@@ -1,69 +1,27 @@
 <form class="ui form" method="post">
     {% csrf_token %}
-        <div class="three fields">
-          <div class="field">
-            <label>Registration Date</label>
-            <div class="field">{{form.registration_date}}</div>
-            {% if form.registration_date.errors %}
-              <div class="ui pointing red basic label">
-                {{form.registration_date.errors}}
-              </div>
-            {% endif %}
-          </div>
-          <div class="field">
-            <label>Registration Close Date</label>
-            <div class="disabled field" readonly="">{{form.registration_close_date}}</div>
-          </div>
-          <div class="field">
-            <label>Cohort</label>
-            <div class="disabled field" readonly="">{{form.cohort}}</div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Referring Clinician</label>
-          {{form.referring_clinician}} 
-          {% if form.referring_clinician.errors %}
-            <div class="ui pointing red basic label">
-              {{form.referring_clinician.errors}}
-            </div>
-          {% endif %}
-        </div>
-        <div class="three fields">
-          
-          <div class="field">
-            <label>Lead Hospital</label>
-            <div class="ui search hospitalSearch">
-              <div class="ui icon input">
-                {{ form.lead_hospital }}
-                <i class="search icon"></i>
-                <span class="text"></span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="field">
-            <label>Tertiary Neurology Centre</label>
-            <div class="ui search hospitalSearch">
-              <div class="ui icon input">
-                {{ form.tertiary_paediatric_neurology_centre }}
-                <i class="search icon"></i>
-                <span class="text"></span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="field">
-            <label>Paediatric Epilepsy Surgery Centre</label>
-            <div class="ui search hospitalSearch">
-              <div class="ui icon input">
-                {{ form.epilepsy_surgery_centre }}
-                <i class="search icon"></i>
-                <span class="text"></span>
-              </div>
-            </div>
-          </div>
-
-        </div>
+    <div class="ui message">
+        <h5>Eligibility Criteria</h5>
+        <p>The following criteria must <b>all</b> be fulfilled before registering for Epilepsy12</p>
+        <ul>
+          <li>NHS patient</li>
+          <li>Child must have had 2 or more seizures more than 24 hours apart</li>
+          <li>Child has an epilepsy diagnosis for another reason</li>
+          <li>If the child had a previous EEG or paediatric assessments for similar episode(s) or epilepsy prior to this initial assessment</li>
+        </ul>
+    </div>
+    <div id="registration_date_results">
+      {% include 'epilepsy12/partials/registration_dates.html' with case_id=case_id registration=registration %}
+    </div>
+      
+    <div class="field">
+      <label>Referring Clinician</label>
+      {% if registration %}
+        {{registration.referring_clinician}} 
+      {% else %}
+        <p>Hello</p>
+      {% endif %}
+    </div>
 
     <div class="ui grid">
       <div class="six wide column">  
