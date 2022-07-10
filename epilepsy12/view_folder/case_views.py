@@ -30,6 +30,8 @@ def case_list(request):
 
     """
 
+    sort_flag = None
+
     filter_term = request.GET.get('filtered_case_list')
     if filter_term:
         all_cases = Case.objects.filter(
@@ -38,13 +40,15 @@ def case_list(request):
             Q(nhs_number__icontains=filter_term)
         ).order_by('surname').all()
     else:
-        if request.htmx.trigger_name == "sort_by_imd_up":
+        if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
             # this is to sort on IMD
             all_cases = Case.objects.all().order_by(
                 'index_of_multiple_deprivation_quintile').all()
-        elif request.htmx.trigger_name == "sort_by_imd_down":
+            sort_flag = "sort_by_imd_up"
+        elif request.htmx.trigger_name == "sort_by_imd_down" or request.GET.get('sort_flag') == "sort_by_imd_down":
             all_cases = Case.objects.all().order_by(
                 '-index_of_multiple_deprivation_quintile').all()
+            sort_flag = "sort_by_imd_down"
         else:
             all_cases = Case.objects.all().order_by('surname').all()
 
@@ -64,7 +68,8 @@ def case_list(request):
     context = {
         'case_list': case_list,
         'total_cases': case_count,
-        'total_registrations': registered_count
+        'total_registrations': registered_count,
+        'sort_flag': sort_flag
     }
     if request.htmx:
         return render(request=request, template_name='epilepsy12/partials/case_table.html', context=context)

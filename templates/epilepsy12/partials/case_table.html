@@ -76,10 +76,10 @@
             <tr>
               <th colspan="10" class="right aligned" id="cases_list_segment_footer">
                   {% if case_list.has_previous %}
-                    <div class="ui tiny button" id="continue_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.previous_page_number}}" hx-swap="innerHTML">Previous 20</div>
+                    <div class="ui tiny button" id="continue_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Previous 20</div>
                   {% endif %}
                   {% if case_list.has_next %}
-                    <div class="ui tiny button" id="continue_button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.next_page_number}}" hx-swap="innerHTML">Next 20</div>
+                    <div class="ui tiny button" id="continue_button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Next 20</div>
                   {% endif %}
               </th>
             </tr>
