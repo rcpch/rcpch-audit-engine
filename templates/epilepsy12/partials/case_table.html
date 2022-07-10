@@ -9,8 +9,14 @@
             <th id="table_header">Ethnicity</th>
             <th id="table_header">NHS Number</th>
             <th id="table_header">IMD (quintile)
+              {% if sort_flag and sort_flag == "sort_by_imd_down" %}
+                <i class="caret square up icon" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
+              {% elif sort_flag and sort_flag == "sort_by_imd_up" %}
+                <i class="caret square down icon" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
+              {% else %}
                 <i class="caret square up icon" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
                 <i class="caret square down icon" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
+              {% endif %}
             </th>
             <th id="table_header" colspan="2"></th>
           </tr>
