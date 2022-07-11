@@ -1,3 +1,4 @@
+from epilepsy12.view_folder.registration_views import registration_date
 from . import views
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
@@ -111,8 +112,12 @@ htmx_paths = [
          name="sort_by_id_down"),
     path('htmx/comorbidity_search',
          views.comorbidity_search, name="comorbidity_search"),
-    path('htmx/<int:case_id>/registration_date',
-         views.registration_date, name="registration_date")
+    path('htmx/case/<int:case_id>/registration_date',
+         views.registration_date, name="registration_date"),
+    path('htmx/registration/<int:registration_id>/lead_centre',
+         views.lead_centre, name="lead_centre"),
+    path('htmx/registration/<int:registration_id>/hospital_trust_select',
+         views.hospital_trust_select, name="hospital_trust_select")
 
 ]
 
