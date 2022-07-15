@@ -58,38 +58,39 @@ def run_hospitals_seed():
     # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
     added = 0
     for index, hospital in enumerate(ALL_HOSPITALS):
-        hospital_trust = HospitalTrust(
-            OrganisationID=hospital["OrganisationID"],
-            OrganisationCode=hospital["OrganisationCode"],
-            OrganisationType=hospital["OrganisationType"],
-            SubType=hospital["SubType"],
-            Sector=hospital["Sector"],
-            OrganisationStatus=hospital["OrganisationStatus"],
-            IsPimsManaged=hospital["IsPimsManaged"],
-            OrganisationName=hospital["OrganisationName"],
-            Address1=hospital["Address1"],
-            Address2=hospital["Address2"],
-            Address3=hospital["Address3"],
-            City=hospital["City"],
-            County=hospital["County"],
-            Postcode=hospital["Postcode"],
-            Latitude=hospital["Latitude"],
-            Longitude=hospital["Longitude"],
-            ParentODSCode=hospital["ParentODSCode"],
-            ParentName=hospital["ParentName"],
-            Phone=hospital["Phone"],
-            Email=hospital["Email"],
-            Website=hospital["Website"],
-            Fax=hospital["Fax"]
-        )
-        try:
-            hospital_trust.save()
-        except Exception as error:
-            print("Exception at "+hospital["OrganisationName"])
-            print(error)
-        added += 1
-        chosen_hospital = hospital["OrganisationName"]
-        print(f"New hospital added...{added}: {chosen_hospital}")
+        if hospital["Sector"] == "NHS Trust":
+            hospital_trust = HospitalTrust(
+                OrganisationID=hospital["OrganisationID"],
+                OrganisationCode=hospital["OrganisationCode"],
+                OrganisationType=hospital["OrganisationType"],
+                SubType=hospital["SubType"],
+                Sector=hospital["Sector"],
+                OrganisationStatus=hospital["OrganisationStatus"],
+                IsPimsManaged=hospital["IsPimsManaged"],
+                OrganisationName=hospital["OrganisationName"],
+                Address1=hospital["Address1"],
+                Address2=hospital["Address2"],
+                Address3=hospital["Address3"],
+                City=hospital["City"],
+                County=hospital["County"],
+                Postcode=hospital["Postcode"],
+                Latitude=hospital["Latitude"],
+                Longitude=hospital["Longitude"],
+                ParentODSCode=hospital["ParentODSCode"],
+                ParentName=hospital["ParentName"],
+                Phone=hospital["Phone"],
+                Email=hospital["Email"],
+                Website=hospital["Website"],
+                Fax=hospital["Fax"]
+            )
+            try:
+                hospital_trust.save()
+            except Exception as error:
+                print("Exception at "+hospital["ParentName"])
+                print(error)
+            added += 1
+            chosen_hospital = hospital["ParentName"]
+            print(f"New hospital added...{added}: {chosen_hospital}")
     print(f"Hospitals added...{added}")
 
 
