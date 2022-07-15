@@ -45,7 +45,12 @@
     </div>
     <div class="two fields">
       <div class="field">
-        <label>Postcode</label>
+        <label>Postcode
+        <i class="question circle icon link" id="postcodeIdPopup"></i>
+        <div class="ui flowing popup top left transition hidden">
+            <p>Post code at the time of registration in Epilepsy12</p>
+        </div>
+        </label>
         {{form.postcode}} {% if form.postcode.errors %}
         <div class="ui pointing red basic label">
           {{form.postcode.errors}}
