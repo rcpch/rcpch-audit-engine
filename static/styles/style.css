@@ -185,7 +185,12 @@ h3 {
 }
 
 #sort_button:hover {
-  background-color: #e00087;
+  color: #e00087;
+}
+
+#sort_button {
+  margin: 0px;
+  padding: 0%;
 }
 
 /* audit sections */

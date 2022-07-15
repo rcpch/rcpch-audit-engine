@@ -26,7 +26,9 @@ class Case(models.Model):
     # _id = models.ObjectIdField()
     locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
         "Locked",
-        default=False
+        default=False,
+        blank=True,
+        null=True
     )
     locked_at = models.DateTimeField(
         "Date record locked",
@@ -37,7 +39,8 @@ class Case(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=CASCADE,
         verbose_name="locked by",
-        null=True
+        null=True,
+        blank=True
     )
     # nhs_patient = models.BooleanField(
     #     "Is an NHS patient?"
