@@ -3,7 +3,7 @@
 Registration Details
 {% endblock %}
 {% block audit_section_form %}
-{% include './forms/registration_form.html'  with registration=registration %}
+{% include './forms/registration_form.html'  with registration=registration registration_enabled=registration_enabled %}
 {% endblock %}
 {% block audit_section_instructions %}
 This audit can be completed in stages, and in any order. 

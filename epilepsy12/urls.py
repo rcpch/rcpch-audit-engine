@@ -112,6 +112,8 @@ htmx_paths = [
          name="sort_by_id_down"),
     path('htmx/comorbidity_search',
          views.comorbidity_search, name="comorbidity_search"),
+    path('htmx/registration<int:registration_id>/confirm_eligibility',
+         views.confirm_eligible, name="confirm_eligible"),
     path('htmx/case/<int:case_id>/registration_date',
          views.registration_date, name="registration_date"),
     path('htmx/registration/<int:registration_id>/lead_centre',

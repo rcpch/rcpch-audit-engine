@@ -22,12 +22,15 @@ class Registration(models.Model):
     #         return False
 
     registration_date = models.DateField(
-        "Date on which registered for the the Epilepsy12 audit"
+        "Date on which registered for the the Epilepsy12 audit",
+        null=True,
+        default=None
     )
 
     registration_close_date = models.DateField(
         "Date at which the registration is due to close",
-        default=None
+        default=None,
+        null=True
     )
 
     def registration_date_one_year_on(self):
@@ -39,6 +42,11 @@ class Registration(models.Model):
 
     referring_clinician = models.CharField(
         max_length=50,
+        default=None,
+        null=True
+    )
+
+    eligibility_criteria_met = models.BooleanField(
         default=None,
         null=True
     )
@@ -88,6 +96,8 @@ class Registration(models.Model):
         verbose_name_plural = 'Registrations'
 
     def save(self, *args, **kwargs) -> None:
-        self.registration_close_date = self.registration_date_one_year_on()
-        self.cohort = cohort_number_from_enrolment_date(self.registration_date)
+        if self.registration_date:
+            self.registration_close_date = self.registration_date_one_year_on()
+            self.cohort = cohort_number_from_enrolment_date(
+                self.registration_date)
         return super().save(*args, **kwargs)

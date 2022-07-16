@@ -87,7 +87,7 @@
                       <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini icon button" id="negative_button" tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
                     </div>
                     <div class="ui ten wide column">
-                      {% if case.registration %}
+                      {% if case.registration.registration_date %}
                           {% percent_complete case.registration as percentComplete %}
                           {% if case.locked %}
                             <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
@@ -103,7 +103,7 @@
                       {% endif %}
                     </div>
                   </div>
-                  {% if case.registration %}
+                  {% if case.registration.registration_date %}
                       <div class="row">
                         <div class="ui sixteen wide column">
                           <div class="ui small blue progress" data-value={{percentComplete}} data-total="52" id="casecompletionprogress">

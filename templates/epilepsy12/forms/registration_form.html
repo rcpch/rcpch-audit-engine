@@ -9,11 +9,17 @@
           <li>Child has an epilepsy diagnosis for another reason</li>
           <li>If the child had a previous EEG or paediatric assessments for similar episode(s) or epilepsy prior to this initial assessment</li>
         </ul>
+        
+          {% if registration.eligibility_criteria_met %}
+            {% include 'epilepsy12/partials/is_eligible_label.html' with has_error=False message="Eligibility Criteria Confirmed." %}
+          {% else %}
+            <div id='eligibility_result'>
+              <button class="ui button" hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" hx-target='#eligibility_result' hx-trigger="click">I confirm all criteria are present</button>
+            </div>
+          {% endif %}
+        
     </div>
-    <div id="registration_date_results">
-      {% include 'epilepsy12/partials/registration_dates.html' with case_id=case_id registration=registration %}
-    </div>
-
+    
     <div class="three fields">
       
       <div class="field">
@@ -42,13 +48,17 @@
         {% endif %}
       </div>
 
-      {% if registration %}
-        <div class="field" id="lead_hospital_select">
-          <label>Lead Centre</label>
-          {% include 'epilepsy12/partials/hospital_list_select.html' with registration_id=registration.pk %}
-        </div>
-      {% endif %}
-    
+      <div class="field" id="lead_hospital_select">
+        <label>Lead Centre</label>
+        {% include 'epilepsy12/partials/hospital_list_select.html' with registration_id=registration.pk %}
+      </div>
     </div>
+
+    <div id="registration_date_results">
+      {% include 'epilepsy12/partials/registration_dates.html' with case_id=case_id registration=registration %}
+    </div>
+    
+
+
       
   </form>

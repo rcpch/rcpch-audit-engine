@@ -16,17 +16,21 @@ def register(request, id):
 
     case = Case.objects.get(pk=id)
     try:
-        registration = Registration.objects.get(case=case)
-    except:
+        # create a registration object
+        registration, created = Registration.objects.get_or_create(case=case)
+    except Exception as error:
+        print(f'got or created exception {error}')
         registration = None
 
     if registration:
-        active_template = "unchose"
+        registration_object = registration
+        active_template = "unchosen"
     else:
+        registration_object = created
         active_template = "none"
 
     context = {
-        "registration": registration,
+        "registration": registration_object,
         "case_id": id,
         "initial_assessment_complete": False,
         "assessment_complete": False,
@@ -49,8 +53,10 @@ def delete_registration(request, id):
 
 @login_required
 def registration_date(request, case_id):
+
     registration_date = date.today()
     case = Case.objects.get(pk=case_id)
+
     Registration.objects.update_or_create(
         registration_date=registration_date,
         case=case,
@@ -70,6 +76,7 @@ def registration_date(request, case_id):
 
 @login_required
 def lead_centre(request, registration_id):
+
     user_input = request.GET.get('lead_hospital')
     if user_input is not None:
         hospital_list = HospitalTrust.objects.filter(
@@ -96,6 +103,36 @@ def lead_centre(request, registration_id):
 
 @login_required
 def hospital_trust_select(request, registration_id):
-    Registration.objects.filter(pk=registration_id).update(
-        lead_hospital=request.POST.get('hospital_trust'))
-    return HttpResponse('Success')
+    Registration.objects.update_or_create(pk=registration_id, defaults={
+        'lead_hospital': request.POST.get('hospital_trust')
+    })
+    hospital_list = hospital_list = HospitalTrust.objects.filter(
+        Sector="NHS Sector").order_by('ParentName')
+    context = {
+        'hospital_list': hospital_list,
+        'selected_lead_hospital': request.POST.get('hospital_trust'),
+        'registration_id': registration_id
+    }
+    return HttpResponse("success")
+
+
+@login_required
+def confirm_eligible(request, registration_id):
+    context = {
+        'has_error': False,
+        'message': 'Eligibility Criteria Confirmed.'
+    }
+    try:
+        Registration.objects.update_or_create(pk=registration_id, defaults={
+            'eligibility_criteria_met': True
+        })
+    except Exception as error:
+        context = {
+            'has_error': True,
+            'message': error
+        }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/is_eligible_label.html', context=context)
+
+    return response
