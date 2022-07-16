@@ -28,7 +28,7 @@ def create_assessment(request, case_id):
     context = {
         "form": form,
         "case_id": case_id,
-        "case_name": registration.case.first_name + " " + registration.case.surname,
+        "registration": registration,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,

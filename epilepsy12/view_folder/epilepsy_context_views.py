@@ -33,7 +33,7 @@ def create_epilepsy_context(request, case_id):
     context = {
         "form": form,
         "case_id": case_id,
-        "case_name": registration.case.first_name + " " + registration.case.surname,
+        "registration": registration,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
@@ -75,7 +75,7 @@ def update_epilepsy_context(request, case_id):
     context = {
         "form": form,
         "case_id": case_id,
-        "case_name": case.first_name + " " + case.surname,
+        "registration": registration,
         # "epilepsy_decimal_years": epilepsy_context.epilepsy_decimal_years,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,

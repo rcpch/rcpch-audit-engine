@@ -41,7 +41,7 @@ def create_comorbidity(request, case_id):
     context = {
         "form": form,
         "case_id": case_id,
-        "case_name": case.first_name + " " + case.surname,
+        "registration": registration,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,

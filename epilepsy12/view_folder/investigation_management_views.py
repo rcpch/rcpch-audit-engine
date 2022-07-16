@@ -29,7 +29,7 @@ def create_investigation_management(request, case_id):
     context = {
         "investigation_management_form": investigation_management_form,
         "case_id": case_id,
-        "case_name": case.first_name + " " + case.surname,
+        "registration": registration,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
@@ -65,7 +65,7 @@ def update_investigation_management(request, case_id):
     context = {
         "investigation_management_form": investigation_management_form,
         "case_id": case_id,
-        "case_name": case.first_name + " " + case.surname,
+        "registration": registration,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
