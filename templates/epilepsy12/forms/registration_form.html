@@ -1,78 +1,64 @@
 <form class="ui form" method="post">
     {% csrf_token %}
-        <div class="three fields">
-          <div class="field">
-            <label>Registration Date</label>
-            <div class="field">{{form.registration_date}}</div>
-            {% if form.registration_date.errors %}
-              <div class="ui pointing red basic label">
-                {{form.registration_date.errors}}
-              </div>
-            {% endif %}
-          </div>
-          <div class="field">
-            <label>Registration Close Date</label>
-            <div class="disabled field" readonly="">{{form.registration_close_date}}</div>
-          </div>
-          <div class="field">
-            <label>Cohort</label>
-            <div class="disabled field" readonly="">{{form.cohort}}</div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Referring Clinician</label>
-          {{form.referring_clinician}} 
-          {% if form.referring_clinician.errors %}
-            <div class="ui pointing red basic label">
-              {{form.referring_clinician.errors}}
+    <div class="ui message">
+        <h5>Eligibility Criteria</h5>
+        <p>The following criteria must <b>all</b> be fulfilled before registering for Epilepsy12</p>
+        <ul>
+          <li>NHS patient</li>
+          <li>Child must have had 2 or more seizures more than 24 hours apart</li>
+          <li>Child has an epilepsy diagnosis for another reason</li>
+          <li>If the child had a previous EEG or paediatric assessments for similar episode(s) or epilepsy prior to this initial assessment</li>
+        </ul>
+        
+          {% if registration.eligibility_criteria_met %}
+            {% include 'epilepsy12/partials/is_eligible_label.html' with has_error=False message="Eligibility Criteria Confirmed." %}
+          {% else %}
+            <div id='eligibility_result'>
+              <button class="ui button" hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" hx-target='#eligibility_result' hx-trigger="click">I confirm all criteria are present</button>
             </div>
           {% endif %}
-        </div>
-        <div class="three fields">
-          
-          <div class="field">
-            <label>Lead Hospital</label>
-            <div class="ui search hospitalSearch">
-              <div class="ui icon input">
-                {{ form.lead_hospital }}
-                <i class="search icon"></i>
-                <span class="text"></span>
-              </div>
-            </div>
+        
+    </div>
+    
+    <div class="three fields">
+      
+      <div class="field">
+        <label>Referring Clinician</label>
+        {% if registration and registration.referring_clinician is not None %}
+          <input type="text" placeholder="{{registration.referring_clinician}}"/>
+        {% else %}
+          {% if registration %}
+            <input type="text" placeholder="Enter Surname of referring clinician"/>
+          {% else %}
+            <input type="text" disabled placeholder="Enter Surname of referring clinician"/>
+          {% endif %}
+        {% endif %}
+      </div>
+      
+      <div class="field">
+        <label>Lead Centre</label>
+        {% if registration %}
+          <div class="ui input">
+            <input placeholder="Search hospitals..." type="text" name="lead_hospital" hx-get="{% url 'lead_centre' registration_id=registration.pk %}" hx-target="#lead_hospital_select" hx-trigger="keyup, load"/>
           </div>
-          
-          <div class="field">
-            <label>Tertiary Neurology Centre</label>
-            <div class="ui search hospitalSearch">
-              <div class="ui icon input">
-                {{ form.tertiary_paediatric_neurology_centre }}
-                <i class="search icon"></i>
-                <span class="text"></span>
-              </div>
-            </div>
+        {% else %}
+          <div class="ui input">
+            <input disabled placeholder="Search hospitals..." type="text" />
           </div>
-          
-          <div class="field">
-            <label>Paediatric Epilepsy Surgery Centre</label>
-            <div class="ui search hospitalSearch">
-              <div class="ui icon input">
-                {{ form.epilepsy_surgery_centre }}
-                <i class="search icon"></i>
-                <span class="text"></span>
-              </div>
-            </div>
-          </div>
+        {% endif %}
+      </div>
 
-        </div>
-
-    <div class="ui grid">
-      <div class="six wide column">  
-        <div class="ui buttons">
-          <button type="submit" class="ui blue button" name="update">Save</button>
-          <button type="submit" class="ui red button" name="delete">Delete</button>
-          <button type="submit" class="ui basic button">Cancel</button>
-        </div>
+      <div class="field" id="lead_hospital_select">
+        <label>Lead Centre</label>
+        {% include 'epilepsy12/partials/hospital_list_select.html' with registration_id=registration.pk %}
       </div>
     </div>
+
+    <div id="registration_date_results">
+      {% include 'epilepsy12/partials/registration_dates.html' with case_id=case_id registration=registration %}
+    </div>
+    
+
+
       
   </form>

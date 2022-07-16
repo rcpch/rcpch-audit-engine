@@ -22,12 +22,15 @@ class Registration(models.Model):
     #         return False
 
     registration_date = models.DateField(
-        "Date on which registered for the the Epilepsy12 audit"
+        "Date on which registered for the the Epilepsy12 audit",
+        null=True,
+        default=None
     )
 
     registration_close_date = models.DateField(
         "Date at which the registration is due to close",
-        default=None
+        default=None,
+        null=True
     )
 
     def registration_date_one_year_on(self):
@@ -39,7 +42,13 @@ class Registration(models.Model):
 
     referring_clinician = models.CharField(
         max_length=50,
-        default=None
+        default=None,
+        null=True
+    )
+
+    eligibility_criteria_met = models.BooleanField(
+        default=None,
+        null=True
     )
 
     cohort = models.PositiveSmallIntegerField(
@@ -53,31 +62,26 @@ class Registration(models.Model):
         default=None,
         null=True
     )
-    tertiary_paediatric_neurology_centre = models.CharField(
-        "tertiary_paediatric_neurology_centre",
-        max_length=100,
-        default=None
-    )
-    epilepsy_surgery_centre = models.CharField(
-        "epilepsy_surgery_centre",
-        max_length=100,
-        null=True
-    )
 
     initial_assessment_complete = models.BooleanField(
-        default=False
+        default=False,
+        null=True
     )
     assessment_complete = models.BooleanField(
+        null=True,
         default=False
     )
     epilepsy_context_complete = models.BooleanField(
+        null=True,
         default=False
     )
     multiaxial_description_complete = models.BooleanField(
+        null=True,
         default=False
     )
     investigation_management_complete = models.BooleanField(
-        default=False
+        default=False,
+        null=True
     )
 
     # relationships
@@ -92,7 +96,8 @@ class Registration(models.Model):
         verbose_name_plural = 'Registrations'
 
     def save(self, *args, **kwargs) -> None:
-        self.registration_close_date = self.registration_date_one_year_on()
-        self.cohort = cohort_number_from_enrolment_date(self.registration_date)
-        print(self.cohort)
+        if self.registration_date:
+            self.registration_close_date = self.registration_date_one_year_on()
+            self.cohort = cohort_number_from_enrolment_date(
+                self.registration_date)
         return super().save(*args, **kwargs)

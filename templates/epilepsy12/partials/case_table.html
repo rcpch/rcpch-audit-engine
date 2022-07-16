@@ -1,9 +1,9 @@
 {% load epilepsy12_template_tags %}
 {% if case_list.end_index > 0 %}
-      <table class="ui single line table" >
+      <table class="ui compact single line table" >
         <thead>
           <tr>
-            <th id="table_header">ID
+            <th id="table_header" class="collapsing">ID
                 {% if sort_flag and sort_flag == "sort_by_id_down" %}
                   <i class="caret square up icon" id="sort_button" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
                 {% elif sort_flag and sort_flag == "sort_by_id_up" %}
@@ -13,7 +13,7 @@
                   <i class="caret square down icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table" hx-get="{% url 'sort_by_id_down' %}" hx-trigger="click"></i>
                 {% endif %}
             </th>
-            <th id="table_header">Name
+            <th id="table_header" class="collapsing">Name
                 {% if sort_flag and sort_flag == "sort_by_name_down" %}
                   <i class="caret square up icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table" hx-get="{% url 'sort_by_name_up' %}" hx-trigger="click"></i>
                 {% elif sort_flag and sort_flag == "sort_by_name_up" %}
@@ -23,7 +23,7 @@
                   <i class="caret square down icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table" hx-get="{% url 'sort_by_name_down' %}" hx-trigger="click"></i>
                 {% endif %}
             </th>
-            <th id="table_header">Gender
+            <th id="table_header" class="collapsing">Gender
                 {% if sort_flag and sort_flag == "sort_by_gender_down" %}
                   <i class="caret square up icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
                 {% elif sort_flag and sort_flag == "sort_by_gender_up" %}
@@ -33,7 +33,7 @@
                   <i class="caret square down icon" id="sort_button" name="sort_by_gender_down" hx-target="#case_table" hx-get="{% url 'sort_by_gender_down' %}" hx-trigger="click"></i>
                 {% endif %}
             </th>
-            <th id="table_header">Ethnicity
+            <th id="table_header" class="collapsing">Ethnicity
                 {% if sort_flag and sort_flag == "sort_by_ethnicity_down" %}
                   <i class="caret square up icon" id="sort_button" name="sort_by_ethnicity_up" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_up' %}" hx-trigger="click"></i>
                 {% elif sort_flag and sort_flag == "sort_by_ethnicity_up" %}
@@ -43,7 +43,7 @@
                   <i class="caret square down icon" id="sort_button" name="sort_by_ethnicity_down" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_down' %}" hx-trigger="click"></i>
                 {% endif %}
             </th>
-            <th id="table_header">NHS Number
+            <th id="table_header" class="collapsing">NHS Number
                 {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
                   <i class="caret square up icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_up' %}" hx-trigger="click"></i>
                 {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
@@ -53,7 +53,7 @@
                   <i class="caret square down icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_down' %}" hx-trigger="click"></i>
                 {% endif %}
             </th>
-            <th id="table_header">IMD (quintile)
+            <th id="table_header" class="collapsing">IMD (quintile)
                   {% if sort_flag and sort_flag == "sort_by_imd_down" %}
                     <i class="caret square up icon" id="sort_button" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
                   {% elif sort_flag and sort_flag == "sort_by_imd_up" %}
@@ -72,12 +72,12 @@
               <td>
                 <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
               </td>
-              <td>{{case.first_name}} {{case.surname}}</td>
+              <td class="fluid">{{case.first_name}} {{case.surname}}</td>
               <td>{{case.get_gender_display}}</td>
               <td>{{case.get_ethnicity_display}}</td>
               <td>{{case.nhs_number}}</td>
               <td id="centredData">{{case.index_of_multiple_deprivation_quintile}}</td>
-              <td>
+              <td class="single line">
                 <div class="ui grid">
                   <div class="row">
                     <div class="ui three wide column">
@@ -87,12 +87,12 @@
                       <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini icon button" id="negative_button" tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
                     </div>
                     <div class="ui ten wide column">
-                      {% if case.registration %}
+                      {% if case.registration.registration_date %}
                           {% percent_complete case.registration as percentComplete %}
                           {% if case.locked %}
-                            <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                            <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
                           {% else %}
-                            <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'update_registration' case.id %}'">Enter Data</button>
+                            <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
                           {% endif %}
                       {% else %}
                         {% if case.locked %}
@@ -103,7 +103,7 @@
                       {% endif %}
                     </div>
                   </div>
-                  {% if case.registration %}
+                  {% if case.registration.registration_date %}
                       <div class="row">
                         <div class="ui sixteen wide column">
                           <div class="ui small blue progress" data-value={{percentComplete}} data-total="52" id="casecompletionprogress">

@@ -1,3 +1,4 @@
+from epilepsy12.view_folder.registration_views import registration_date
 from . import views
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
@@ -15,8 +16,8 @@ urlpatterns = [
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
     path('case/<int:id>/register',
          views.register, name='register'),
-    path('registration/<int:id>/update',
-         views.update_registration, name="update_registration"),
+    #     path('registration/<int:id>/update',
+    #          views.update_registration, name="update_registration"),
     path('initial_assessment/<int:case_id>/create',
          views.create_initial_assessment, name="create_initial_assessment"),
     path('initial_assessment/<int:case_id>/update',
@@ -110,7 +111,15 @@ htmx_paths = [
     path('htmx/sort_by_id_down', views.case_list,
          name="sort_by_id_down"),
     path('htmx/comorbidity_search',
-         views.comorbidity_search, name="comorbidity_search")
+         views.comorbidity_search, name="comorbidity_search"),
+    path('htmx/registration<int:registration_id>/confirm_eligibility',
+         views.confirm_eligible, name="confirm_eligible"),
+    path('htmx/case/<int:case_id>/registration_date',
+         views.registration_date, name="registration_date"),
+    path('htmx/registration/<int:registration_id>/lead_centre',
+         views.lead_centre, name="lead_centre"),
+    path('htmx/registration/<int:registration_id>/hospital_trust_select',
+         views.hospital_trust_select, name="hospital_trust_select")
 
 ]
 

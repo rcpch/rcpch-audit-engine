@@ -17,6 +17,22 @@ class Assessment(models.Model):
     Detail
     The cohort number is calculated from the initial date of first paediatric assessment
     """
+    lead_hospital = models.CharField(
+        "lead_hospital",
+        max_length=100,
+        default=None,
+        null=True
+    )
+    tertiary_paediatric_neurology_centre = models.CharField(
+        "tertiary_paediatric_neurology_centre",
+        max_length=100,
+        default=None
+    )
+    epilepsy_surgery_centre = models.CharField(
+        "epilepsy_surgery_centre",
+        max_length=100,
+        null=True
+    )
 
     has_an_aed_been_given = models.BooleanField(
         "Has an antiepilepsy medicine been prescribed?",
