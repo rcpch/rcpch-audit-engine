@@ -2,7 +2,7 @@
     {% csrf_token %}
         <div class="two fields">
             <div class="field">
-                <label>Has there been a previous febrile seizure?</label>
+                <label>At any point in time has the child had febrile seizure(s)?</label>
                 {{ form.previous_febrile_seizure }}
                 {% if form.previous_febrile_seizure.errors %}
                     <div class="ui pointing red basic label">
@@ -11,7 +11,7 @@
                 {% endif %}
             </div>
             <div class="field">
-                <label>Has there been a previous acute symptomatic seizure?</label>
+                <label>At any point in time has the child had acute symptomatic seizure(s)?</label>
                 {{ form.previous_acute_symptomatic_seizure }}
                 {% if form.previous_acute_symptomatic_seizure.errors %}
                     <div class="ui pointing red basic label">
@@ -31,7 +31,7 @@
             {% endif %}
             </div>
             <div class="field">
-                <label>Were there seizures in the neonatal period?</label>
+                <label>At any point in time has the child had neonatal seizure(s)?</label>
                     {{ form.previous_neonatal_seizures }}
                 {% if form.previous_neonatal_seizures.errors %}
                     <div class="ui pointing red basic label">
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="field">
-            <label>Has the diagnosis of epilepsy been withdrawn?</label>
+            <label>At any stage in the first year after first assessment, has a diagnosis of epilepsy been withdrawn because it has been subsequently deemed incorrect?</label>
                 {{ form.diagnosis_of_epilepsy_withdrawn }}
             {% if form.diagnosis_of_epilepsy_withdrawn.errors %}
                 <div class="ui pointing red basic label">
