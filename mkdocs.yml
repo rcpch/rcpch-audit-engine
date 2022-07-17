@@ -8,7 +8,9 @@ repo_url: https://github.com/rcpch/rcpch-audit-engine
 repo_name: rcpch/rcpch-audit-engine
 edit_uri: blob/main/docs
 
-site_dir: static/docs-site
+site_dir: staticfiles/docs-site
+use_directory_urls: false
+
 
 theme:
   name: material

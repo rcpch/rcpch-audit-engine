@@ -44,7 +44,7 @@
             <a {% if request.resolver_match.url_name == 'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
               Patient Access
             </a>
-            <a {% if request.resolver_match.url_name == 'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
+            <a {% if request.resolver_match.url_name == 'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' index.html %}>
               Documentation
             </a>
           <div class="right menu">
