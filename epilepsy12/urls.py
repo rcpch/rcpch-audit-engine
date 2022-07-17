@@ -1,8 +1,16 @@
-from . import views
+# standard imports
+
+# third party imports
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+
+# RCPCH imports
+from .views import SignUpView
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
-from .views import SignUpView
-from django.urls import path
+from . import views
+
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -38,14 +46,14 @@ urlpatterns = [
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
-    path('docs', views.eeg, name="docs"),
+    path('docs', views.docs, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
          name='hospital-autocomplete'),
     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
          name='semiology-keyword-autocomplete'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 htmx_paths = [
     path('htmx/<int:desscribe_id>/description',
