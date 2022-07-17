@@ -1,5 +1,5 @@
-site_name: RCPCH Epilepsy 12 
-site_description: RCPCH Epilepsy 12 Documentation Site
+site_name: RCPCH Epilepsy 12 - Documentation
+site_description: RCPCH Epilepsy 12 - Documentation Site
 site_author: The Royal College of Paediatrics and Child Health
 site_url: https://e12.rcpch.tech
 
@@ -8,7 +8,7 @@ repo_url: https://github.com/rcpch/rcpch-audit-engine
 repo_name: rcpch/rcpch-audit-engine
 edit_uri: blob/main/docs
 
-site_dir: static/documentation
+site_dir: static/docs-site
 
 theme:
   name: material
