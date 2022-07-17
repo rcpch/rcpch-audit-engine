@@ -1,14 +1,24 @@
+# main site metadata and titles
 site_name: RCPCH Epilepsy 12 - Documentation
 site_description: RCPCH Epilepsy 12 - Documentation Site
 site_author: The Royal College of Paediatrics and Child Health
 site_url: https://e12.rcpch.tech
 
+# copyright information which is shown in the footer
 copyright: Copyright &copy; 2022 Royal College of Paediatrics and Child Health (RCPCH)
+
+# these lines configure the 'GitHub repo' widget on the top right
 repo_url: https://github.com/rcpch/rcpch-audit-engine
 repo_name: rcpch/rcpch-audit-engine
 edit_uri: blob/main/docs
 
+# `mkdocs serve` serves the documentation at PORT 8001 (to avoid clashing with Django on 8000)
+dev_addr: "127.0.0.1:8001"
+
+# `mkdocs build` will create the static site in the following directory
 site_dir: staticfiles/docs-site
+
+# this is a requirement for serving MkDocs via Django
 use_directory_urls: false
 
 
