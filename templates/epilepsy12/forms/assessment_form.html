@@ -1,207 +1,32 @@
 <form class="ui form" method="post">
   {% csrf_token %}
   
+  {% include 'epilepsy12/partials/paediatrician_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+
+  {% include 'epilepsy12/partials/neurologist_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+
+  <div class="ui info message">
+    
+      <div class="header">
+      <i class="circle info icon"></i>Criteria for referral to a children's epilepsy surgery service:
+      </div>
+      <ol>
+        <li>Children with catastrophic early onset epilepsy with evidence of lateralisation of the seizure onset</li>
+        <li>All children under 24 months old with evidence of focality of seizure onset, with or without an MRI evident lesion</li>
+        <li>Children of any age with evident focal epilepsy, or lateralised seizures associated with congenital hemiplegia, resistant to two appropriate anti-epileptic drugs (AEDs)</li>
+        <li>Children who have epilepsy associated with a lateralised abnormality seen on a brain scan</li>
+        <li>Children with epilepsy associated with Sturge Weber syndrome, benign tumours with developmental issues and/or ongoing seizures, or Rasmussen’s syndrome</li>
+        <li>Children of any age with epilepsy associated with tuberous sclerosis resistant to two AEDs where seizures may arise from a single focus (probably from a single tuber)</li>
+        <li>Children who have ‘drop attacks’ as part of a more complex epilepsy</li>
+        <li>Children with epilepsy associated with hypothalamic hamartoma</li>
+      </ol>
+
+  </div>
+
+  {% include 'epilepsy12/partials/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
   
-  <div class="field">
-    <div class="ui toggle checkbox">
-      {{form.consultant_paediatrician_referral_made}}
-      <label>
-      Has a referral been made to a consultant paediatrician with an interest in epilepsy?
-      </label>
-    </div>
-    {% if form.consultant_paediatrician_referral_made.errors %}
-    <div class="ui pointing red basic label">
-      {{form.consultant_paediatrician_referral_made.errors}}
-    </div>
-    {% endif %}
-  </div>
+  {% include 'epilepsy12/partials/aed_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %}
+ 
+  {% include 'epilepsy12/partials/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 
-  <div class="two fields">
-    <div class="field">
-      <label>
-        Date of referral to a consultant paediatrician with an interest in epilepsy.
-      </label>
-      <div class="field">{{form.consultant_paediatrician_referral_date}}</div>
-      {% if form.consultant_paediatrician_referral_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.consultant_paediatrician_referral_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>
-      Date seen by a consultant paediatrician with an interest in epilepsy.
-      </label>
-      <div class="field">{{form.consultant_paediatrician_input_date}}</div>
-      {% if form.consultant_paediatrician_input_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.consultant_paediatrician_input_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="field">
-    <div class="ui toggle checkbox">
-      {{form.paediatric_neurologist_referral_made}}
-      <label
-        >Has a referral to a consultant paediatric neurologist been made?</label
-      >
-    </div>
-    {% if form.paediatric_neurologist_referral_made.errors %}
-      <div class="ui pointing red basic label">
-        {{form.paediatric_neurologist_referral_made.errors}}
-      </div>
-    {% endif %}
-  </div>
-  
-  <div class="two fields">
-    <div class="field">
-      <label>Date of referral to a consultant paediatric neurologist.</label>
-      <div class="field">{{form.paediatric_neurologist_referral_date}}</div>
-      {% if form.paediatric_neurologist_referral_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.paediatric_neurologist_referral_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>Date seen by consultant paediatric neurologist.</label>
-      <div class="field">{{form.paediatric_neurologist_input_date}}</div>
-      {% if form.paediatric_neurologist_input_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.paediatric_neurologist_input_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.childrens_epilepsy_surgical_service_referral_criteria_met}}
-        <label
-          >Has a referral been made to a consultant paediatrician with an
-          interest in epilepsy?</label
-        >
-      </div>
-      {% if form.childrens_epilepsy_surgical_service_referral_criteria_met.errors %}
-        <div class="ui pointing red basic label">
-          {{form.childrens_epilepsy_surgical_service_referral_criteria_met.errors}}
-        </div>
-      {% endif %}
-  </div>
-
-  <div class="two fields">
-    <div class="field">
-      <label>Date of referral to a children's epilepsy surgery service</label>
-      <div class="field">
-        {{form.childrens_epilepsy_surgical_service_referral_date}}
-      </div>
-      {% if form.childrens_epilepsy_surgical_service_referral_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.childrens_epilepsy_surgical_service_referral_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>Date seen by children's epilepsy surgery service</label>
-      <div class="field">
-        {{form.childrens_epilepsy_surgical_service_input_date}}
-      </div>
-      {% if form.childrens_epilepsy_surgical_service_input_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.childrens_epilepsy_surgical_service_input_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="two fields">
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.has_an_aed_been_given}}
-        <label>Has an antiepilepsy medicine been prescribed?</label>
-      </div>
-      {% if form.has_an_aed_been_given.errors %}
-        <div class="ui pointing red basic label">
-          {{form.has_an_aed_been_given.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.rescue_medication_prescribed}}
-        <label>Has a rescue medicine been prescribed?</label>
-      </div>
-      {% if form.rescue_medication_prescribed.errors %}
-        <div class="ui pointing red basic label">
-          {{form.rescue_medication_prescribed.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="two fields">
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.were_any_of_the_epileptic_seizures_convulsive}}
-        <label>Were any of the epileptic seizures convulsive?</label>
-      </div>
-      {% if form.were_any_of_the_epileptic_seizures_convulsive.errors %}
-        <div class="ui pointing red basic label">
-          {{form.were_any_of_the_epileptic_seizures_convulsive.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.prolonged_generalized_convulsive_seizures}}
-        <label>Were there any prolonged generalised epileptic seizures?</label>
-      </div>
-      {% if form.prolonged_generalized_convulsive_seizures.errors %}
-        <div class="ui pointing red basic label">
-          {{form.prolonged_generalized_convulsive_seizures.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="two fields">
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.experienced_prolonged_focal_seizures}}
-        <label>Were there any prolonged focal seizures?</label>
-      </div>
-      {% if form.experienced_prolonged_focal_seizures.errors %}
-        <div class="ui pointing red basic label">
-          {{form.experienced_prolonged_focal_seizures.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.has_an_aed_been_given}}
-        <label>Has an antiepilepsy medicine been given?</label>
-      </div>
-      {% if form.has_an_aed_been_given.errors %}
-        <div class="ui pointing red basic label">
-          {{form.has_an_aed_been_given.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="field">
-    <div class="ui toggle checkbox">
-      {{form.paroxysmal_episode}}
-      <label>Were any episodes paroxysmal?</label>
-    </div>
-    {% if form.paroxysmal_episode.errors %}
-      <div class="ui pointing red basic label">
-        {{form.paroxysmal_episode.errors}}
-      </div>
-    {% endif %}
-  </div>
-
-  <button type="submit" class="ui blue button" name="update">Save</button>
-  <button type="submit" class="ui red button" name="delete">Delete</button>
-  <button type="submit" class="ui basic button">Cancel</button>
 </form>

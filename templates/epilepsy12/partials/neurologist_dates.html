@@ -1,0 +1,66 @@
+<div class="ui segment" id="paediatric_neurologist_referral_made">
+    <div class="field">
+        <div class="ui toggle checkbox" 
+                name="paediatric_neurologist_referral_made"
+                hx-post="{% url 'paediatric_neurologist_referral_made' registration_id=registration_id %}"
+                hx-trigger="change"
+                hx-target="#paediatric_neurologist_referral_made"
+                hx-swap="outerHTML"
+            >
+            {% if assessment.paediatric_neurologist_referral_made %}
+                <input 
+                    type="checkbox" 
+                    name="paediatric_neurologist_referral_made"
+                    checked=""
+                />
+            {% else %}
+                <input 
+                    type="checkbox" 
+                    name="paediatric_neurologist_referral_made"
+                />
+            {% endif %}
+            <label>
+            Has a referral been made to a consultant paediatric neurologist?
+            </label>  
+        </div>
+    </div>
+
+    {% if assessment.paediatric_neurologist_referral_made %}
+
+        <div class="two fields">
+
+            <div class="field"
+                hx-post="{% url 'paediatric_neurologist_referral_date' assessment_id=assessment.pk %}"
+                hx-target="#consultant_paediatrician_referral_dates"
+                hx-trigger="change"
+            >
+                <label>
+                Date of referral to a consultant paediatric neurologist.
+                </label>
+                <input 
+                    type="date" 
+                    name="paediatric_neurologist_referral_date" 
+                    value={{assessment.paediatric_neurologist_referral_date|date:'Y-m-d'}}
+                />
+            </div>
+            
+            <div class="field"
+                hx-post="{% url 'paediatric_neurologist_input_date' assessment_id=assessment.pk %}"
+                hx-target="#paediatric_neurologist_referral_dates"
+                hx-trigger="change"
+            >
+                <label>
+                Date seen by a consultant paediatric neurologist.
+                </label>
+                <input 
+                    type="date" 
+                    name="paediatric_neurologist_input_date" 
+                    value={{assessment.paediatric_neurologist_input_date|date:'Y-m-d'}}
+                />
+            </div>
+
+        </div>
+        <div id='paediatric_neurologist_referral_dates'></div>
+    {% endif %}
+    
+  </div>
