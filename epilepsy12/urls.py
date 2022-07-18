@@ -119,7 +119,13 @@ htmx_paths = [
     path('htmx/registration/<int:registration_id>/lead_centre',
          views.lead_centre, name="lead_centre"),
     path('htmx/registration/<int:registration_id>/hospital_trust_select',
-         views.hospital_trust_select, name="hospital_trust_select")
+         views.hospital_trust_select, name="hospital_trust_select"),
+    path('htmx/registration/<int:registration_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
+         views.childrens_epilepsy_surgical_service_referral_criteria_met, name="childrens_epilepsy_surgical_service_referral_criteria_met"),
+    path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_date',
+         views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
+    path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',
+         views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date")
 
 ]
 

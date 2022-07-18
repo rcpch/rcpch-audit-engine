@@ -1,8 +1,8 @@
 {% extends './audit_section.html' %} 
-{% block audit_section_title %} Assessment 
+{% block audit_section_title %} Milestones 
 {% endblock %} 
 {% block audit_section_form %} 
-{% include './forms/assessment_form.html' %} 
+{% include './forms/assessment_form.html' with case_id=case_id %} 
 {% endblock %} 
 {% block audit_section_instructions %} These items must be completed across the year.
 There are lots of dates gathered here - these are important for calculating

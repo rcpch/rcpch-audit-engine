@@ -6,7 +6,7 @@
     <div class="ui toggle checkbox">
       {{form.consultant_paediatrician_referral_made}}
       <label>
-      Has a referral been made to a consultant paediatrician with an interest in epilepsy?
+      Has a referral been made to a consultant paediatrician with expertise in epilepsy?
       </label>
     </div>
     {% if form.consultant_paediatrician_referral_made.errors %}
@@ -19,7 +19,7 @@
   <div class="two fields">
     <div class="field">
       <label>
-        Date of referral to a consultant paediatrician with an interest in epilepsy.
+        Date of referral to a consultant paediatrician with expertise in epilepsy.
       </label>
       <div class="field">{{form.consultant_paediatrician_referral_date}}</div>
       {% if form.consultant_paediatrician_referral_date.errors %}
@@ -30,7 +30,7 @@
     </div>
     <div class="field">
       <label>
-      Date seen by a consultant paediatrician with an interest in epilepsy.
+      Date seen by a consultant paediatrician with expertise in epilepsy.
       </label>
       <div class="field">{{form.consultant_paediatrician_input_date}}</div>
       {% if form.consultant_paediatrician_input_date.errors %}
@@ -75,51 +75,31 @@
     </div>
   </div>
 
-  <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.childrens_epilepsy_surgical_service_referral_criteria_met}}
-        <label
-          >Has a referral been made to a consultant paediatrician with an
-          interest in epilepsy?</label
-        >
+  <div class="ui info message">
+    
+      <div class="header">
+      <i class="circle info icon"></i>Criteria for referral to a children's epilepsy surgery service:
       </div>
-      {% if form.childrens_epilepsy_surgical_service_referral_criteria_met.errors %}
-        <div class="ui pointing red basic label">
-          {{form.childrens_epilepsy_surgical_service_referral_criteria_met.errors}}
-        </div>
-      {% endif %}
+      <ol>
+        <li>Children with catastrophic early onset epilepsy with evidence of lateralisation of the seizure onset</li>
+        <li>All children under 24 months old with evidence of focality of seizure onset, with or without an MRI evident lesion</li>
+        <li>Children of any age with evident focal epilepsy, or lateralised seizures associated with congenital hemiplegia, resistant to two appropriate anti-epileptic drugs (AEDs)</li>
+        <li>Children who have epilepsy associated with a lateralised abnormality seen on a brain scan</li>
+        <li>Children with epilepsy associated with Sturge Weber syndrome, benign tumours with developmental issues and/or ongoing seizures, or Rasmussen’s syndrome</li>
+        <li>Children of any age with epilepsy associated with tuberous sclerosis resistant to two AEDs where seizures may arise from a single focus (probably from a single tuber)</li>
+        <li>Children who have ‘drop attacks’ as part of a more complex epilepsy</li>
+        <li>Children with epilepsy associated with hypothalamic hamartoma</li>
+      </ol>
+
   </div>
 
-  <div class="two fields">
-    <div class="field">
-      <label>Date of referral to a children's epilepsy surgery service</label>
-      <div class="field">
-        {{form.childrens_epilepsy_surgical_service_referral_date}}
-      </div>
-      {% if form.childrens_epilepsy_surgical_service_referral_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.childrens_epilepsy_surgical_service_referral_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>Date seen by children's epilepsy surgery service</label>
-      <div class="field">
-        {{form.childrens_epilepsy_surgical_service_input_date}}
-      </div>
-      {% if form.childrens_epilepsy_surgical_service_input_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.childrens_epilepsy_surgical_service_input_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
+  {% include 'epilepsy12/partials/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  
   <div class="two fields">
     <div class="field">
       <div class="ui toggle checkbox">
         {{form.has_an_aed_been_given}}
-        <label>Has an antiepilepsy medicine been prescribed?</label>
+        <label>Has an antiepilepsy drug been given?</label>
       </div>
       {% if form.has_an_aed_been_given.errors %}
         <div class="ui pointing red basic label">
@@ -176,29 +156,7 @@
         </div>
       {% endif %}
     </div>
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.has_an_aed_been_given}}
-        <label>Has an antiepilepsy medicine been given?</label>
-      </div>
-      {% if form.has_an_aed_been_given.errors %}
-        <div class="ui pointing red basic label">
-          {{form.has_an_aed_been_given.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="field">
-    <div class="ui toggle checkbox">
-      {{form.paroxysmal_episode}}
-      <label>Were any episodes paroxysmal?</label>
-    </div>
-    {% if form.paroxysmal_episode.errors %}
-      <div class="ui pointing red basic label">
-        {{form.paroxysmal_episode.errors}}
-      </div>
-    {% endif %}
+    
   </div>
 
   <button type="submit" class="ui blue button" name="update">Save</button>

@@ -95,9 +95,6 @@ class AssessmentForm(ModelForm):
     has_an_aed_been_given = CheckboxInput(
         #  help_text="Has an antiepilepsy medicine been given?",
     )
-    paroxysmal_episode = CheckboxInput(
-        #  help_text="Were any episodes paroxysmal?",
-    )
 
     class Meta:
         model = Assessment
@@ -116,8 +113,7 @@ class AssessmentForm(ModelForm):
             'were_any_of_the_epileptic_seizures_convulsive',
             'prolonged_generalized_convulsive_seizures',
             'experienced_prolonged_focal_seizures',
-            'has_an_aed_been_given',
-            'paroxysmal_episode'
+            'has_an_aed_been_given'
         ]
 
 
