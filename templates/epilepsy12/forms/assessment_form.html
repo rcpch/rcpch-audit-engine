@@ -25,71 +25,8 @@
 
   {% include 'epilepsy12/partials/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
   
-  <div class="two fields">
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.has_an_aed_been_given}}
-        <label>Has an antiepilepsy drug been given?</label>
-      </div>
-      {% if form.has_an_aed_been_given.errors %}
-        <div class="ui pointing red basic label">
-          {{form.has_an_aed_been_given.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.rescue_medication_prescribed}}
-        <label>Has a rescue medicine been prescribed?</label>
-      </div>
-      {% if form.rescue_medication_prescribed.errors %}
-        <div class="ui pointing red basic label">
-          {{form.rescue_medication_prescribed.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
+  {% include 'epilepsy12/partials/aed_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %}
+ 
+  {% include 'epilepsy12/partials/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 
-  <div class="two fields">
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.were_any_of_the_epileptic_seizures_convulsive}}
-        <label>Were any of the epileptic seizures convulsive?</label>
-      </div>
-      {% if form.were_any_of_the_epileptic_seizures_convulsive.errors %}
-        <div class="ui pointing red basic label">
-          {{form.were_any_of_the_epileptic_seizures_convulsive.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.prolonged_generalized_convulsive_seizures}}
-        <label>Were there any prolonged generalised epileptic seizures?</label>
-      </div>
-      {% if form.prolonged_generalized_convulsive_seizures.errors %}
-        <div class="ui pointing red basic label">
-          {{form.prolonged_generalized_convulsive_seizures.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="two fields">
-    <div class="field">
-      <div class="ui toggle checkbox">
-        {{form.experienced_prolonged_focal_seizures}}
-        <label>Were there any prolonged focal seizures?</label>
-      </div>
-      {% if form.experienced_prolonged_focal_seizures.errors %}
-        <div class="ui pointing red basic label">
-          {{form.experienced_prolonged_focal_seizures.errors}}
-        </div>
-      {% endif %}
-    </div>
-    
-  </div>
-
-  <button type="submit" class="ui blue button" name="update">Save</button>
-  <button type="submit" class="ui red button" name="delete">Delete</button>
-  <button type="submit" class="ui basic button">Cancel</button>
 </form>

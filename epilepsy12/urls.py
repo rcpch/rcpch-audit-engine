@@ -137,8 +137,20 @@ htmx_paths = [
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_date',
          views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',
-         views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date")
+         views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date"),
 
+    path('htmx/registration/<int:registration_id>/has_an_aed_been_given',
+         views.has_an_aed_been_given, name="has_an_aed_been_given"),
+    path('htmx/registration/<int:registration_id>/rescue_medication_prescribed',
+         views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
+
+    path('htmx/registration/<int:registration_id>/were_any_of_the_epileptic_seizures_convulsive',
+         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
+    path('htmx/registration/<int:registration_id>/prolonged_generalized_convulsive_seizures',
+         views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
+    path('htmx/registration/<int:registration_id>/experienced_prolonged_focal_seizures',
+         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
 ]
+
 
 urlpatterns += htmx_paths

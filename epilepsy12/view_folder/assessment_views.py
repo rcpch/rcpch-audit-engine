@@ -196,6 +196,157 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 
 
 @login_required
+def has_an_aed_been_given(request, registration_id):
+
+    registration = Registration.objects.get(pk=registration_id)
+
+    print(request.POST.get('has_an_aed_been_given'))
+
+    if request.POST.get('has_an_aed_been_given') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'has_an_aed_been_given': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'has_an_aed_been_given': False,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return render(request=request, template_name="epilepsy12/partials/aed_checkboxes.html", context=context)
+
+
+@login_required
+def rescue_medication_prescribed(request, registration_id):
+
+    registration = Registration.objects.get(pk=registration_id)
+
+    print(request.POST.get('rescue_medication_prescribed'))
+
+    if request.POST.get('rescue_medication_prescribed') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'rescue_medication_prescribed': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'rescue_medication_prescribed': False,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return HttpResponse("Success", context)
+
+
+@login_required
+def were_any_of_the_epileptic_seizures_convulsive(request, registration_id):
+
+    registration = Registration.objects.get(pk=registration_id)
+
+    print(request.POST.get('were_any_of_the_epileptic_seizures_convulsive'))
+
+    if request.POST.get('were_any_of_the_epileptic_seizures_convulsive') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'were_any_of_the_epileptic_seizures_convulsive': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'were_any_of_the_epileptic_seizures_convulsive': False,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return render(request=request, template_name="epilepsy12/partials/seizure_length_checkboxes.html", context=context)
+
+
+@login_required
+def prolonged_generalized_convulsive_seizures(request, registration_id):
+
+    registration = Registration.objects.get(pk=registration_id)
+
+    print(request.POST.get('prolonged_generalized_convulsive_seizures'))
+
+    if request.POST.get('prolonged_generalized_convulsive_seizures') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'prolonged_generalized_convulsive_seizures': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'prolonged_generalized_convulsive_seizures': False,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return render(request=request, template_name="epilepsy12/partials/seizure_length_checkboxes.html", context=context)
+
+
+@login_required
+def experienced_prolonged_focal_seizures(request, registration_id):
+
+    registration = Registration.objects.get(pk=registration_id)
+
+    print(request.POST.get('experienced_prolonged_focal_seizures'))
+
+    if request.POST.get('experienced_prolonged_focal_seizures') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'experienced_prolonged_focal_seizures': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'experienced_prolonged_focal_seizures': False,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return HttpResponse('success', context)
+    return render(request=request, template_name="epilepsy12/partials/seizure_length_checkboxes.html", context=context)
+
+
+@login_required
 def create_assessment(request, case_id):
     form = AssessmentForm(request.POST or None)
     registration = Registration.objects.filter(case=case_id).first()

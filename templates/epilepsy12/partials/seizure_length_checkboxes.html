@@ -1,0 +1,75 @@
+<div class="ui segment" id="seizure_length_checkboxes">
+    <div class="three fields">
+
+      <div class="field">
+        <div class="ui toggle checkbox" 
+              hx-post="{% url 'were_any_of_the_epileptic_seizures_convulsive' registration_id=registration_id %}"
+              hx-trigger="change"
+              hx-target="#seizure_length_checkboxes"
+              hx-swap="outerHTML"
+          >
+          {% if assessment.were_any_of_the_epileptic_seizures_convulsive %}
+              <input 
+                  type="checkbox" 
+                  name="were_any_of_the_epileptic_seizures_convulsive"
+                  checked=""
+              />
+          {% else %}
+              <input 
+                  type="checkbox" 
+                  name="were_any_of_the_epileptic_seizures_convulsive"
+              />
+          {% endif %}
+          <label>Were any of the epileptic seizures convulsive?</label>
+        </div>
+      </div>
+      
+      <div class="field">
+        <div class="ui toggle checkbox" 
+              hx-post="{% url 'prolonged_generalized_convulsive_seizures' registration_id=registration_id %}"
+              hx-trigger="change"
+              hx-target="#seizure_length_checkboxes"
+              hx-swap="outerHTML"
+          >
+          {% if assessment.prolonged_generalized_convulsive_seizures %}
+              <input 
+                  type="checkbox" 
+                  name="prolonged_generalized_convulsive_seizures"
+                  checked=""
+              />
+          {% else %}
+              <input 
+                  type="checkbox" 
+                  name="prolonged_generalized_convulsive_seizures"
+              />
+          {% endif %}
+          <label>Were there any prolonged generalised epileptic seizures?</label>
+        </div>
+      </div>
+      
+      <div class="field">
+        <div class="ui toggle checkbox" 
+              hx-post="{% url 'experienced_prolonged_focal_seizures' registration_id=registration_id %}"
+              hx-trigger="change"
+              hx-target="#seizure_length_checkboxes"
+              hx-swap="outerHTML"
+          >
+          {% if assessment.experienced_prolonged_focal_seizures %}
+              <input 
+                  type="checkbox" 
+                  name="experienced_prolonged_focal_seizures"
+                  checked=""
+              />
+          {% else %}
+              <input 
+                  type="checkbox" 
+                  name="experienced_prolonged_focal_seizures"
+              />
+          {% endif %}
+          <label>Were there any prolonged focal seizures?</label>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
