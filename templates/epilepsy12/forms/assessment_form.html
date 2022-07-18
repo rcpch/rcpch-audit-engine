@@ -1,79 +1,9 @@
 <form class="ui form" method="post">
   {% csrf_token %}
   
-  
-  <div class="field">
-    <div class="ui toggle checkbox">
-      {{form.consultant_paediatrician_referral_made}}
-      <label>
-      Has a referral been made to a consultant paediatrician with expertise in epilepsy?
-      </label>
-    </div>
-    {% if form.consultant_paediatrician_referral_made.errors %}
-    <div class="ui pointing red basic label">
-      {{form.consultant_paediatrician_referral_made.errors}}
-    </div>
-    {% endif %}
-  </div>
+  {% include 'epilepsy12/partials/paediatrician_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
 
-  <div class="two fields">
-    <div class="field">
-      <label>
-        Date of referral to a consultant paediatrician with expertise in epilepsy.
-      </label>
-      <div class="field">{{form.consultant_paediatrician_referral_date}}</div>
-      {% if form.consultant_paediatrician_referral_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.consultant_paediatrician_referral_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>
-      Date seen by a consultant paediatrician with expertise in epilepsy.
-      </label>
-      <div class="field">{{form.consultant_paediatrician_input_date}}</div>
-      {% if form.consultant_paediatrician_input_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.consultant_paediatrician_input_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-  <div class="field">
-    <div class="ui toggle checkbox">
-      {{form.paediatric_neurologist_referral_made}}
-      <label
-        >Has a referral to a consultant paediatric neurologist been made?</label
-      >
-    </div>
-    {% if form.paediatric_neurologist_referral_made.errors %}
-      <div class="ui pointing red basic label">
-        {{form.paediatric_neurologist_referral_made.errors}}
-      </div>
-    {% endif %}
-  </div>
-  
-  <div class="two fields">
-    <div class="field">
-      <label>Date of referral to a consultant paediatric neurologist.</label>
-      <div class="field">{{form.paediatric_neurologist_referral_date}}</div>
-      {% if form.paediatric_neurologist_referral_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.paediatric_neurologist_referral_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-    <div class="field">
-      <label>Date seen by consultant paediatric neurologist.</label>
-      <div class="field">{{form.paediatric_neurologist_input_date}}</div>
-      {% if form.paediatric_neurologist_input_date.errors %}
-        <div class="ui pointing red basic label">
-          {{form.paediatric_neurologist_input_date.errors}}
-        </div>
-      {% endif %}
-    </div>
-  </div>
+  {% include 'epilepsy12/partials/neurologist_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
 
   <div class="ui info message">
     

@@ -12,6 +12,126 @@ from ..forms_folder import AssessmentForm
 
 
 @login_required
+def consultant_paediatrician_referral_made(request, registration_id):
+    registration = Registration.objects.get(pk=registration_id)
+    if request.POST.get('consultant_paediatrician_referral_made') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'consultant_paediatrician_referral_made': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'consultant_paediatrician_referral_made': False,
+            'consultant_paediatrician_referral_date': None,
+            'consultant_paediatrician_input_date': None,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return render(request=request, template_name="epilepsy12/partials/paediatrician_dates.html", context=context)
+
+
+@login_required
+def consultant_paediatrician_referral_date(request, assessment_id):
+    new_date = request.POST.get(
+        'consultant_paediatrician_referral_date')
+    message = "Consultant Paediatrician referral date updated."
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.consultant_paediatrician_referral_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+    return HttpResponse(message)
+
+
+@login_required
+def consultant_paediatrician_input_date(request, assessment_id):
+    new_date = request.POST.get(
+        'consultant_paediatrician_input_date')
+    message = "Consultant Paediatrician input date updated."
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.consultant_paediatrician_input_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+    return HttpResponse(message)
+
+
+@login_required
+def paediatric_neurologist_referral_made(request, registration_id):
+    registration = Registration.objects.get(pk=registration_id)
+    if request.POST.get('paediatric_neurologist_referral_made') == 'on':
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'paediatric_neurologist_referral_made': True,
+            'registration': registration
+        })
+    else:
+        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
+            'paediatric_neurologist_referral_made': False,
+            'paediatric_neurologist_referral_date': None,
+            'paediatric_neurologist_input_date': None,
+            'registration': registration
+        })
+
+    if created:
+        assessment_object = created
+    else:
+        assessment_object = assessment
+
+    context = {
+        'registration_id': registration.pk,
+        'assessment': assessment_object
+    }
+    return render(request=request, template_name="epilepsy12/partials/neurologist_dates.html", context=context)
+
+
+@login_required
+def paediatric_neurologist_referral_date(request, assessment_id):
+    new_date = request.POST.get(
+        'paediatric_neurologist_referral_date')
+    message = "Paediatric neurologist referral date updated."
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.paediatric_neurologist_referral_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+    return HttpResponse(message)
+
+
+@login_required
+def paediatric_neurologist_input_date(request, assessment_id):
+    new_date = request.POST.get(
+        'paediatric_neurologist_input_date')
+    message = "Paediatric neurologist input date updated."
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.paediatric_neurologist_input_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+    return HttpResponse(message)
+
+
+@login_required
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)

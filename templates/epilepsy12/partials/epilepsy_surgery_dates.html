@@ -1,10 +1,10 @@
 <div class="ui segment" id="childrens_epilepsy_surgical_service_referral_criteria_met">
     <div class="field">
         <div class="ui toggle checkbox" 
-        hx-post="{% url 'childrens_epilepsy_surgical_service_referral_criteria_met' registration_id=registration_id %}"
-        hx-trigger="change"
-        hx-target="#childrens_epilepsy_surgical_service_referral_criteria_met"
-        hx-swap="outerHTML"
+            hx-post="{% url 'childrens_epilepsy_surgical_service_referral_criteria_met' registration_id=registration_id %}"
+            hx-trigger="change"
+            hx-target="#childrens_epilepsy_surgical_service_referral_criteria_met"
+            hx-swap="outerHTML"
         >
         {% if assessment.childrens_epilepsy_surgical_service_referral_criteria_met %}
             <input 
