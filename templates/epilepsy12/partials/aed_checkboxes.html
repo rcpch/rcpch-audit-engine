@@ -6,20 +6,20 @@
               hx-trigger="change"
               hx-target="#aed_checkboxes"
               hx-swap="outerHTML"
+              name="has_an_aed_been_given"
           >
           {% if assessment.has_an_aed_been_given %}
               <input 
                   type="checkbox" 
-                  name="has_an_aed_been_given"
                   checked=""
               />
           {% else %}
               <input 
-                  type="checkbox" 
+                  type="checkbox"
                   name="has_an_aed_been_given"
               />
           {% endif %}
-          <label>Has an Antiepilepsy Drug been given?</label>
+          <label>Has an Antiepilepsy Drug been given? {{assessment.has_an_aed_been_given}}</label>
         </div>
       </div>
       
@@ -29,16 +29,16 @@
               hx-trigger="change"
               hx-target="#aed_checkboxes"
               hx-swap="outerHTML"
+              name="rescue_medication_prescribed"
           >
           {% if assessment.rescue_medication_prescribed %}
               <input 
                   type="checkbox" 
-                  name="rescue_medication_prescribed"
                   checked=""
               />
           {% else %}
               <input 
-                  type="checkbox" 
+                  type="checkbox"
                   name="rescue_medication_prescribed"
               />
           {% endif %}

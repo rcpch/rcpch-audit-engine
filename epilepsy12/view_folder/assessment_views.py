@@ -200,8 +200,6 @@ def has_an_aed_been_given(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
 
-    print(request.POST.get('has_an_aed_been_given'))
-
     if request.POST.get('has_an_aed_been_given') == 'on':
         assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
             'has_an_aed_been_given': True,
@@ -222,6 +220,7 @@ def has_an_aed_been_given(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
+
     return render(request=request, template_name="epilepsy12/partials/aed_checkboxes.html", context=context)
 
 
@@ -229,8 +228,6 @@ def has_an_aed_been_given(request, registration_id):
 def rescue_medication_prescribed(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
-
-    print(request.POST.get('rescue_medication_prescribed'))
 
     if request.POST.get('rescue_medication_prescribed') == 'on':
         assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
@@ -252,7 +249,7 @@ def rescue_medication_prescribed(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return HttpResponse("Success", context)
+    return render(request=request, template_name="epilepsy12/partials/aed_checkboxes.html", context=context)
 
 
 @login_required
