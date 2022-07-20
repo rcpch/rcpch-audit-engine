@@ -1,10 +1,7 @@
-from curses.ascii import HT
-from random import choices
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from epilepsy12.constants import comorbidities
 from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.forms_folder.multiaxial_description_form import MultiaxialDescriptionForm
@@ -14,7 +11,6 @@ from ..general_functions import fuzzy_scan_for_keywords
 
 from ..models import Registration, Keyword, DESSCRIBE, Case
 
-from ..forms_folder import DescriptionForm
 from ..general_functions import *
 
 
@@ -546,26 +542,13 @@ def multiaxial_description(request, case_id):
         desscribe = DESSCRIBE.objects.create(registration=registration)
 
     multiaxial_description_form = MultiaxialDescriptionForm(instance=desscribe)
-    description_form = DescriptionForm(instance=desscribe)
 
-    # epilepsy_or_nonepilepsy_status_form = EpilepsyOrNonEpilepsyStatusForm(instance=desscribe)
-    # if request.method == "POST":
-    #     if form.is_valid():
-    #         obj = form.save(commit=False)
-    #         registration = Registration.objects.filter(case=id)
-    #         obj.registration = registration
-    #         obj.save()
-    #         return redirect('cases')
-    #     else:
-    #         print('not valid')
     choices = Keyword.objects.all()
 
     context = {
         "desscribe": desscribe,
         "registration": registration,
-        "description_form": description_form,
         "multiaxial_description_form": multiaxial_description_form,
-        # "epilepsy_or_nonepilepsy_status_form": epilepsy_or_nonepilepsy_status_form,
         "choices": choices,
         "case_id": case_id,
         "initial_assessment_complete": registration.initial_assessment_complete,
@@ -577,51 +560,6 @@ def multiaxial_description(request, case_id):
     }
 
     return render(request=request, template_name='epilepsy12/multiaxial_description.html', context=context)
-
-
-@ login_required
-def update_multiaxial_description(request, case_id):
-    # multiaxial_description_form = MultiaxialDescriptionForm.objects.filter(
-    #     registration__case=id).first()
-    registration = Registration.objects.filter(case=case_id).first()
-    # form = MultiaxialDescriptionForm(instance=multiaxial_description_form)
-    desscribe = DESSCRIBE.objects.filter(registration=registration).first()
-
-    if request.method == "POST":
-        if ('delete') in request.POST:
-            # multiaxial_description.delete()
-            return redirect('cases')
-        # form = MultiaxialDescriptionForm(request.POST, instance=)
-        # if form.is_valid:
-        #     obj = form.save()
-        #     obj.save()
-        #     # messages.success(request, "You successfully updated the post")
-        #     return redirect('cases')
-
-    case = Case.objects.get(id=case_id)
-
-    context = {
-        "desscribe": desscribe,
-        # "form": form,
-        "case_id": case_id,
-        "registration": registration,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "multiaxial_description"
-    }
-
-    return render(request=request, template_name='epilepsy12/multiaxial_description.html', context=context)
-
-
-@ login_required
-def delete_multiaxial_description(request, id):
-    # multiaxial_description = get_object_or_404(
-    #     MultiaxialDescriptionForm, id=id)
-    # multiaxial_description.delete()
-    return redirect('cases')
 
 
 def set_all_epilepsy_causes_to_none(except_field):
