@@ -65,17 +65,17 @@
 
     {% if assessment_complete %}
         {% if active_template == "assessment" %}
-          <a class="active completed step" href="{% url 'update_assessment' case_id %}">
+          <a class="active completed step" href="{% url 'assessment' case_id %}">
         {% else %}
-          <a class="completed step" href="{% url 'update_assessment' case_id %}">
+          <a class="completed step" href="{% url 'assessment' case_id %}">
         {% endif %}
     {% else %}
         {% if active_template == "assessment" %}
-          <a href="{% url 'update_assessment' case_id %}" class="active step">
+          <a href="{% url 'assessment' case_id %}" class="active step">
         {% elif active_template == "none" %}
-          <a href="{% url 'update_assessment' case_id %}" class="disabled step">
+          <a href="{% url 'assessment' case_id %}" class="disabled step">
         {% else %}
-          <a href="{% url 'create_assessment' case_id %}" class="step">
+          <a href="{% url 'assessment' case_id %}" class="step">
         {% endif %}
     {% endif %}
       <div class="content">
