@@ -51,25 +51,35 @@
         <div class="ui header">
             <div class="ui blue circular label">RIBE</div>
         </div>
-        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="ui form">
             
-            <div class="field">
-                <div class="ui toggle checkbox" >
-                {% if desscribe.relevant_impairments_behavioural_educational %}
-                    <input type="checkbox" checked name={{desscribe}} hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" name="ribe" hx-target="#ribe_result" hx-trigger="load, change">
-                {% else %}
-                    <input type="checkbox" name={{desscribe}} hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" name="ribe" hx-target="#ribe_result" hx-trigger="load, change">
-                {% endif %}
-                    <label>Are there any <b><i>r</i></b>elevant <b><i>i</b></i>mpairments: <i><b>b</b></i>ehavioural or <i><b>e</b></i>ducational/<i><b>e</b></i>motional problems?</label>
-                </div>
+        <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            <div class="ui toggle checkbox" 
+                name='ribe'
+            >
+            {% if desscribe.relevant_impairments_behavioural_educational %}
+                <input 
+                    type="checkbox" 
+                    checked 
+                    name='ribe'
+                    hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" 
+                    hx-target="#ribe_result" 
+                    hx-trigger="load, change">
+            {% else %}
+                <input 
+                    type="checkbox" 
+                    hx-post="{% url 'ribe' desscribe_id=desscribe.id %}" 
+                    name='ribe'
+                    hx-target="#ribe_result" 
+                    hx-trigger="load, change">
+            {% endif %}
+                <label>Are there any <b><i>r</i></b>elevant <b><i>i</b></i>mpairments: <i><b>b</b></i>ehavioural or <i><b>e</b></i>ducational/<i><b>e</b></i>motional problems?</label>
             </div>
-            <div id="ribe_result"></div>
         </div>
-    </div>
-
         
+        <div id="ribe_result"></div>
+        
+        
+    </div>
+    
 
-    <button type="submit" class="ui green button" name="update">Save</button>
-    <button type="submit" class="ui red button" name="delete">Delete</button>
-    <button type="submit" class="ui blue button">Cancel</button>
 </form>

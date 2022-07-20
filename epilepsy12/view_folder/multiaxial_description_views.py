@@ -46,14 +46,6 @@ def edit_description(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    # stem = f"<div class='ui field'><label>{len(description)} characters</label></div>"
-    # for index, keyword in enumerate(desscribe.description_keywords):
-    #     url = reverse('delete_description_keyword', kwargs={
-    #                   'desscribe_id': desscribe_id, 'description_keyword_id': index})
-    #     stem += f"<div class='ui blue label' style='margin: 5px;'>{keyword}<i class='icon close' hx-post='{url}' hx-target='#description_results' hx-trigger='click' hx-swap='innerHTML'></i></div>"
-
-    # return HttpResponse(stem)
-
     return render(request, 'epilepsy12/partials/description_labels.html', context)
 
 
@@ -299,17 +291,18 @@ def autoantibodies(request, desscribe_id):
 
 @login_required
 def ribe(request, desscribe_id):
-    toggle = request.POST.get('NE')
+
+    toggle = request.POST.get('ribe')
+
     if toggle == 'on':
         toggle = True
     else:
         toggle = False
 
-    registration_field = DESSCRIBE.objects.filter(
-        pk=desscribe_id).select_related('registration').first()
+    desscribe = DESSCRIBE.objects.get(
+        pk=desscribe_id)
 
-    registration = Registration.objects.filter(
-        id=registration_field.id).first()
+    registration = desscribe.registration
     case = registration.case
     comorbidities = Comorbidity.objects.filter(case=case)
 
@@ -318,10 +311,16 @@ def ribe(request, desscribe_id):
 
     DESSCRIBE.objects.filter(id=desscribe_id).update(
         relevant_impairments_behavioural_educational=toggle)
+
+    updated_desscribe = DESSCRIBE.objects.get(
+        pk=desscribe_id)
+
     context = {
+        'desscribe': updated_desscribe,
         'comorbidities': comorbidities,
         'case_id': case.id
     }
+
     return render(request, "epilepsy12/partials/ribe.html", context)
 
 
