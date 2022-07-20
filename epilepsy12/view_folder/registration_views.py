@@ -1,7 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from datetime import date
 from django.db.models import Q
 
@@ -40,13 +39,6 @@ def register(request, id):
         "active_template": active_template
     }
     return render(request=request, template_name='epilepsy12/register.html', context=context)
-
-
-@login_required
-def delete_registration(request, id):
-    registration = get_object_or_404(Registration, id=id)
-    registration.delete()
-    return redirect('cases')
 
 
 # HTMX endpoints
