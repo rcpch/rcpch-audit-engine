@@ -15,10 +15,12 @@ urlpatterns = [
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
     path('case/<int:id>/register',
          views.register, name='register'),
-    path('initial_assessment/<int:case_id>/create',
-         views.create_initial_assessment, name="create_initial_assessment"),
-    path('initial_assessment/<int:case_id>/update',
-         views.update_initial_assessment, name="update_initial_assessment"),
+    path('initial_assessment/<int:case_id>',
+         views.initial_assessment, name="initial_assessment"),
+    #     path('initial_assessment/<int:case_id>/create',
+    #          views.create_initial_assessment, name="create_initial_assessment"),
+    #     path('initial_assessment/<int:case_id>/update',
+    #          views.update_initial_assessment, name="update_initial_assessment"),
     path('assessment/<int:case_id>/',
          views.assessment, name="assessment"),
     #     path('assessment/<int:case_id>/update',
@@ -47,6 +49,7 @@ urlpatterns = [
 ]
 
 htmx_paths = [
+    # desscribe / multiaxial description htmx endpoints
     path('htmx/<int:desscribe_id>/description',
          views.edit_description, name='edit_description'),
     path('htmx/<int:desscribe_id>/description_keyword/<int:description_keyword_id>/delete',
@@ -81,6 +84,7 @@ htmx_paths = [
          views.mitochondrial, name='mitochondrial'),
     path('htmx/<int:desscribe_id>/ribe',
          views.ribe, name='ribe'),
+    # case table endpoints
     path('htmx/filter_case_list', views.case_list,
          name="filter_case_list"),
     path('htmx/sort_by_imd_up', views.case_list,
@@ -109,6 +113,7 @@ htmx_paths = [
          name="sort_by_id_down"),
     path('htmx/comorbidity_search',
          views.comorbidity_search, name="comorbidity_search"),
+    #     registration endpoints
     path('htmx/registration<int:registration_id>/confirm_eligibility',
          views.confirm_eligible, name="confirm_eligible"),
     path('htmx/case/<int:case_id>/registration_date',
@@ -147,6 +152,35 @@ htmx_paths = [
          views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
     path('htmx/registration/<int:registration_id>/experienced_prolonged_focal_seizures',
          views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+
+    # initial assessment endpoints
+    path('htmx/registration/<int:initial_assessment_id>/date_of_initial_assessment',
+         views.date_of_initial_assessment, name="date_of_initial_assessment"),
+    path('htmx/registration/<int:initial_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting',
+         views.first_paediatric_assessment_in_acute_or_nonacute_setting, name="first_paediatric_assessment_in_acute_or_nonacute_setting"),
+    path('htmx/registration/<int:initial_assessment_id>/general_paediatrics_referral_made',
+         views.general_paediatrics_referral_made, name="general_paediatrics_referral_made"),
+    path('htmx/registration/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
+         views.date_of_referral_to_general_paediatrics, name="date_of_referral_to_general_paediatrics"),
+    path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred',
+         views.when_the_first_epileptic_episode_occurred, name="when_the_first_epileptic_episode_occurred"),
+    path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred_confidence',
+         views.when_the_first_epileptic_episode_occurred_confidence, name="when_the_first_epileptic_episode_occurred_confidence"),
+    path('htmx/registration/<int:initial_assessment_id>/has_description_of_the_episode_or_episodes_been_gathered',
+         views.has_description_of_the_episode_or_episodes_been_gathered, name="has_description_of_the_episode_or_episodes_been_gathered"),
+    path('htmx/registration/<int:initial_assessment_id>/has_number_of_episodes_since_the_first_been_documented',
+         views.has_number_of_episodes_since_the_first_been_documented, name="has_number_of_episodes_since_the_first_been_documented"),
+    path('htmx/registration/<int:initial_assessment_id>/general_examination_performed',
+         views.general_examination_performed, name="general_examination_performed"),
+    path('htmx/registration/<int:initial_assessment_id>/neurological_examination_performed',
+         views.neurological_examination_performed, name="neurological_examination_performed"),
+    path('htmx/registration/<int:initial_assessment_id>/developmental_learning_or_schooling_problems',
+         views.developmental_learning_or_schooling_problems, name="developmental_learning_or_schooling_problems"),
+    path('htmx/registration/<int:initial_assessment_id>/behavioural_or_emotional_problems',
+         views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
+    path('htmx/registration/<int:initial_assessment_id>/diagnostic_status',
+         views.diagnostic_status, name="diagnostic_status"),
+
 ]
 
 

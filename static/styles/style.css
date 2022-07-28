@@ -23,7 +23,9 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4,
+h5 {
   font-family: "Arial";
   color: black;
 }
@@ -224,3 +226,5 @@ h3 {
 #ribe_result {
   margin-top: 10px;
 }
+
+#form_header {}

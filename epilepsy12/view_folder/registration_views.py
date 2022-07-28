@@ -49,14 +49,18 @@ def registration_date(request, case_id):
     registration_date = date.today()
     case = Case.objects.get(pk=case_id)
 
+    defaults = {
+        'registration_date': registration_date,
+        'initial_assessment_complete': False,
+        'assessment_complete': False,
+        'epilepsy_context_complete': False,
+        'multiaxial_description_complete': False,
+        'investigation_management_complete': False
+    }
+
     Registration.objects.update_or_create(
-        registration_date=registration_date,
-        case=case,
-        initial_assessment_complete=False,
-        assessment_complete=False,
-        epilepsy_context_complete=False,
-        multiaxial_description_complete=False,
-        investigation_management_complete=False
+        defaults=defaults,
+        case=case.pk,
     )
     registration = Registration.objects.filter(case=case).first()
     context = {
