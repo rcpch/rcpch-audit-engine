@@ -208,8 +208,6 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
     when_the_first_epileptic_episode_occurred = request.POST.get(
         'when_the_first_epileptic_episode_occurred')
 
-    message = "success"
-
     if when_the_first_epileptic_episode_occurred:
         new_date = datetime.strptime(
             when_the_first_epileptic_episode_occurred, "%Y-%m-%d").date()
@@ -221,7 +219,19 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
         except Exception as error:
             message = error
 
-    return HttpResponse(message)
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        'initial_assessment_id': initial_assessment_id,
+        'initial_assessment': initial_assessment,
+        "chronicity_selection": CHRONICITY,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+    }
+
+    # return HttpResponse(message)
+    return render(request=request, template_name="epilepsy12/partials/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def when_the_first_epileptic_episode_occurred_confidence(request, initial_assessment_id):

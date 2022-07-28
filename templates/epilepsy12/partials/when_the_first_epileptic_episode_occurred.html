@@ -1,144 +1,145 @@
-<div class="two fields">
-      
-    <div class="field"
-      hx-post="{% url 'when_the_first_epileptic_episode_occurred' initial_assessment_id=initial_assessment.pk %}"
-      hx-target="#when_the_first_epileptic_episode_occurred"
-      hx-trigger="change"
-    >
-        <label>Date of first episode</label>
-      <input
-        name="when_the_first_epileptic_episode_occurred"
-        type="date"
-        value={{initial_assessment.when_the_first_epileptic_episode_occurred|date:'Y-m-d'}}
-      />
-      <div id="when_the_first_epileptic_episode_occurred"></div>
+<div id="when_the_first_epileptic_episode_occurred">
+    <div class="two fields">
+        
+        <div class="field"
+        hx-post="{% url 'when_the_first_epileptic_episode_occurred' initial_assessment_id=initial_assessment.pk %}"
+        hx-target="#when_the_first_epileptic_episode_occurred"
+        hx-trigger="change"
+        >
+            <label>Date of first episode</label>
+        <input
+            name="when_the_first_epileptic_episode_occurred"
+            type="date"
+            value={{initial_assessment.when_the_first_epileptic_episode_occurred|date:'Y-m-d'}}
+        />
+        </div>
+        
+        {% if initial_assessment.when_the_first_epileptic_episode_occurred %}
+            <div class="field" 
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                hx-post="{% url 'when_the_first_epileptic_episode_occurred_confidence' initial_assessment_id=initial_assessment.pk %}" 
+                hx-target="#when_the_first_epileptic_episode_occurred_confidence_result" 
+                hx-trigger="load, change"
+                hx-swap="innerHTML"
+                >
+                <label>Confidence in reported date of first episode</label>
+                <select 
+                    class="ui dropdown" 
+                    name="when_the_first_epileptic_episode_occurred_confidence"
+                >
+                    {% for item in when_the_first_epileptic_episode_occurred_confidence_selection %}
+                        {% if initial_assessment.when_the_first_epileptic_episode_occurred_confidence == item.0 %}
+                            <option selected value={{item.0}}>{{item.1}}</option>
+                        {% else %}
+                            <option value={{item.0}}>{{item.1}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div id="when_the_first_epileptic_episode_occurred_confidence_result"></div>
+            </div>
+        {% endif%}
+
     </div>
-    
+
     {% if initial_assessment.when_the_first_epileptic_episode_occurred %}
-        <div class="field" 
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-            hx-post="{% url 'when_the_first_epileptic_episode_occurred_confidence' initial_assessment_id=initial_assessment.pk %}" 
-            hx-target="#when_the_first_epileptic_episode_occurred_confidence_result" 
-            hx-trigger="load, change"
-            hx-swap="innerHTML"
-            >
-            <label>Confidence in reported date of first episode</label>
-            <select 
-                class="ui dropdown" 
-                name="when_the_first_epileptic_episode_occurred_confidence"
-            >
-                {% for item in when_the_first_epileptic_episode_occurred_confidence_selection %}
-                    {% if initial_assessment.when_the_first_epileptic_episode_occurred_confidence == item.0 %}
-                        <option selected value={{item.0}}>{{item.1}}</option>
+        <div class="ui segment">
+            <div class="header">
+                During the time period from the patient's first paroxysmal episode considered epileptic to the first paediatric assessment was there documentation of the following:
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#has_description_of_the_episode_or_episodes_been_gathered_result" hx-swap="outerHTML" name="has_description_of_the_episode_or_episodes_been_gathered">
+                    {% if initial_assessment.has_description_of_the_episode_or_episodes_been_gathered %}
+                        <input type="checkbox" name="has_description_of_the_episode_or_episodes_been_gathered" checked="">
                     {% else %}
-                        <option value={{item.0}}>{{item.1}}</option>
+                        <input type="checkbox" name="has_description_of_the_episode_or_episodes_been_gathered">
                     {% endif %}
-                {% endfor %}
-            </select>
-            <div id="when_the_first_epileptic_episode_occurred_confidence_result"></div>
+                        <label>Has description of episode(s) been gathered?</label>
+                    </div>
+                </div>
+                <div hidden id="has_description_of_the_episode_or_episodes_been_gathered_result"></div>
+                <div class="field">
+                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#has_number_of_episodes_since_the_first_been_documented_result" hx-swap="outerHTML" name="has_number_of_episodes_since_the_first_been_documented">
+                    {% if initial_assessment.has_number_of_episodes_since_the_first_been_documented %}
+                        <input type="checkbox" name="has_number_of_episodes_since_the_first_been_documented" checked="">
+                    {% else %}
+                        <input type="checkbox" name="has_number_of_episodes_since_the_first_been_documented">
+                    {% endif %}
+                        <label>Has the number of episodes been documented?</label>
+                    </div>
+                </div>
+                <div hidden id="has_number_of_episodes_since_the_first_been_documented_result"></div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#general_examination_performed_result" hx-swap="outerHTML" name="general_examination_performed">
+                    {% if initial_assessment.general_examination_performed %}
+                        <input type="checkbox" name="general_examination_performed" checked="">
+                    {% else %}
+                        <input type="checkbox" name="general_examination_performed">
+                    {% endif %}
+                        <label>Was clinical examination documented?</label>
+                    </div>
+                </div>
+                <div hidden id="general_examination_performed_result"></div>
+                <div class="field">
+                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#neurological_examination_performed_result" hx-swap="outerHTML" name="neurological_examination_performed">
+                    {% if initial_assessment.neurological_examination_performed %}
+                        <input type="checkbox" name="neurological_examination_performed" checked="">
+                    {% else %}
+                        <input type="checkbox" name="neurological_examination_performed">
+                    {% endif %}
+                        <label>Has a neurological examination been documented?</label>
+                    </div>
+                </div>
+                <div hidden id="neurological_examination_performed_result"></div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#developmental_learning_or_schooling_problems_result" hx-swap="outerHTML" name="developmental_learning_or_schooling_problems">
+                    {% if initial_assessment.developmental_learning_or_schooling_problems %}
+                        <input type="checkbox" name="developmental_learning_or_schooling_problems" checked="">
+                    {% else %}
+                        <input type="checkbox" name="developmental_learning_or_schooling_problems">
+                    {% endif %}
+                        <label>Are there any learning, developmental or educational difficulties?</label>
+                    </div>
+                </div>
+                <div hidden id="developmental_learning_or_schooling_problems_result"></div>
+                <div class="field">
+                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#behavioural_or_emotional_problems_result" hx-swap="outerHTML" name="behavioural_or_emotional_problems">
+                    {% if initial_assessment.behavioural_or_emotional_problems %}
+                        <input type="checkbox" name="behavioural_or_emotional_problems" checked="">
+                    {% else %}
+                        <input type="checkbox" name="behavioural_or_emotional_problems">
+                    {% endif %}
+                        <label>Are there any emotional or behavioural difficulties?</label>
+                    </div>
+                </div>
+                <div hidden id="behavioural_or_emotional_problems_result"></div>
+            </div>
+            <div class="field" 
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                hx-post="{% url 'diagnostic_status' initial_assessment_id=initial_assessment.pk %}" 
+                hx-target="#diagnostic_status_result" 
+                hx-trigger="load, change"
+                hx-swap="innerHTML"
+                >
+                <label>Diagnostic status?</label>
+                <select 
+                    class="ui dropdown" 
+                    name="diagnostic_status"
+                >
+                    {% for item in diagnostic_status_selection %}
+                        {% if initial_assessment.diagnostic_status == item.0 %}
+                            <option selected value={{item.0}}>{{item.1}}</option>
+                        {% else %}
+                            <option value={{item.0}}>{{item.1}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div hidden id="diagnostic_status_result"></div>
+            </div>
         </div>
-    {% endif%}
-
+    {% endif %}
 </div>
-
-{% if initial_assessment.when_the_first_epileptic_episode_occurred %}
-    <div class="ui segment">
-        <div class="header">
-            During the time period from the patient's first paroxysmal episode considered epileptic to the first paediatric assessment was there documentation of the following:
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#has_description_of_the_episode_or_episodes_been_gathered_result" hx-swap="outerHTML" name="has_description_of_the_episode_or_episodes_been_gathered">
-                {% if initial_assessment.has_description_of_the_episode_or_episodes_been_gathered %}
-                    <input type="checkbox" name="has_description_of_the_episode_or_episodes_been_gathered" checked="">
-                {% else %}
-                    <input type="checkbox" name="has_description_of_the_episode_or_episodes_been_gathered">
-                {% endif %}
-                    <label>Has description of episode(s) been gathered?</label>
-                </div>
-            </div>
-            <div hidden id="has_description_of_the_episode_or_episodes_been_gathered_result"></div>
-            <div class="field">
-                <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#has_number_of_episodes_since_the_first_been_documented_result" hx-swap="outerHTML" name="has_number_of_episodes_since_the_first_been_documented">
-                {% if initial_assessment.has_number_of_episodes_since_the_first_been_documented %}
-                    <input type="checkbox" name="has_number_of_episodes_since_the_first_been_documented" checked="">
-                {% else %}
-                    <input type="checkbox" name="has_number_of_episodes_since_the_first_been_documented">
-                {% endif %}
-                    <label>Has the number of episodes been documented?</label>
-                </div>
-            </div>
-            <div hidden id="has_number_of_episodes_since_the_first_been_documented_result"></div>
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#general_examination_performed_result" hx-swap="outerHTML" name="general_examination_performed">
-                {% if initial_assessment.general_examination_performed %}
-                    <input type="checkbox" name="general_examination_performed" checked="">
-                {% else %}
-                    <input type="checkbox" name="general_examination_performed">
-                {% endif %}
-                    <label>Was clinical examination documented?</label>
-                </div>
-            </div>
-            <div hidden id="general_examination_performed_result"></div>
-            <div class="field">
-                <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#neurological_examination_performed_result" hx-swap="outerHTML" name="neurological_examination_performed">
-                {% if initial_assessment.neurological_examination_performed %}
-                    <input type="checkbox" name="neurological_examination_performed" checked="">
-                {% else %}
-                    <input type="checkbox" name="neurological_examination_performed">
-                {% endif %}
-                    <label>Has a neurological examination been documented?</label>
-                </div>
-            </div>
-            <div hidden id="neurological_examination_performed_result"></div>
-        </div>
-        <div class="two fields">
-            <div class="field">
-                <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#developmental_learning_or_schooling_problems_result" hx-swap="outerHTML" name="developmental_learning_or_schooling_problems">
-                {% if initial_assessment.developmental_learning_or_schooling_problems %}
-                    <input type="checkbox" name="developmental_learning_or_schooling_problems" checked="">
-                {% else %}
-                    <input type="checkbox" name="developmental_learning_or_schooling_problems">
-                {% endif %}
-                    <label>Are there any learning, developmental or educational difficulties?</label>
-                </div>
-            </div>
-            <div hidden id="developmental_learning_or_schooling_problems_result"></div>
-            <div class="field">
-                <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#behavioural_or_emotional_problems_result" hx-swap="outerHTML" name="behavioural_or_emotional_problems">
-                {% if initial_assessment.behavioural_or_emotional_problems %}
-                    <input type="checkbox" name="behavioural_or_emotional_problems" checked="">
-                {% else %}
-                    <input type="checkbox" name="behavioural_or_emotional_problems">
-                {% endif %}
-                    <label>Are there any emotional or behavioural difficulties?</label>
-                </div>
-            </div>
-            <div hidden id="behavioural_or_emotional_problems_result"></div>
-        </div>
-        <div class="field" 
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-            hx-post="{% url 'diagnostic_status' initial_assessment_id=initial_assessment.pk %}" 
-            hx-target="#diagnostic_status_result" 
-            hx-trigger="load, change"
-            hx-swap="innerHTML"
-            >
-            <label>Diagnostic status?</label>
-            <select 
-                class="ui dropdown" 
-                name="diagnostic_status"
-            >
-                {% for item in diagnostic_status_selection %}
-                    {% if initial_assessment.diagnostic_status == item.0 %}
-                        <option selected value={{item.0}}>{{item.1}}</option>
-                    {% else %}
-                        <option value={{item.0}}>{{item.1}}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-            <div hidden id="diagnostic_status_result"></div>
-        </div>
-    </div>
-{% endif %}
