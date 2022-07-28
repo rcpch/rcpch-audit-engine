@@ -1,13 +1,9 @@
 from datetime import datetime
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import hospital_trust
 from epilepsy12.models.registration import Registration
-from epilepsy12.models.hospital_trust import HospitalTrust
-from epilepsy12.view_folder.registration_views import register
 from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
@@ -93,7 +89,8 @@ def case_list(request):
             all_cases = Case.objects.all().order_by('surname').all()
 
     registered_cases = Registration.objects.filter(
-        lead_hospital=request.user.hospital_trust)
+        Q(registration_date=None),
+    )
 
 
 #     fetch_snomed(365456003, 'descendentSelfOf')
@@ -108,7 +105,7 @@ def case_list(request):
     context = {
         'case_list': case_list,
         'total_cases': case_count,
-        'total_registrations': registered_count,
+        'total_registrations': case_count - registered_count,
         'sort_flag': sort_flag
     }
     if request.htmx:
