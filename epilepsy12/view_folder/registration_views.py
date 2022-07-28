@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from datetime import date
 from django.db.models import Q
+from django_htmx.http import trigger_client_event
 
 from epilepsy12.models.hospital_trust import HospitalTrust
 
@@ -131,4 +132,20 @@ def confirm_eligible(request, registration_id):
     response = render(
         request=request, template_name='epilepsy12/partials/is_eligible_label.html', context=context)
 
+    trigger_client_event(
+        response=response, name="registration_status", params={})
+
     return response
+
+
+def registration_status(request, registration_id):
+
+    registration = Registration.objects.get(pk=registration_id)
+    case = registration.case
+
+    context = {
+        'case_id': case.pk,
+        'registration': registration
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/registration_dates.html', context=context)

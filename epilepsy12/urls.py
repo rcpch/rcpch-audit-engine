@@ -180,6 +180,9 @@ htmx_paths = [
          views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
     path('htmx/registration/<int:initial_assessment_id>/diagnostic_status',
          views.diagnostic_status, name="diagnostic_status"),
+    path('htmx/registration/<int:registration_id>/registration_status',
+         views.registration_status, name="registration_status"),
+
 
 ]
 
