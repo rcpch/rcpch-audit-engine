@@ -5,7 +5,13 @@
     </div>
     
         <div class="field" hx-post="{% url 'edit_description' desscribe_id=desscribe.id %}" hx-target="#description_results" hx-trigger="keyup" hx-swap="innerHTML">
-            {{description_form.description}}
+            <input 
+                type="text" 
+                class="ui textarea" 
+                rows="3" 
+                name="description" 
+                value="{{desscribe.description}}"
+                placeholder="While watching television {{desscribe.registration.case}} fell to the floor... "/>
         </div>
     
     <div>
