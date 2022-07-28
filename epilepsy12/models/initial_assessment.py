@@ -1,3 +1,5 @@
+from dateutil import relativedelta
+from datetime import date
 from django.db import models
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
@@ -96,6 +98,16 @@ class InitialAssessment(models.Model):
         null=True
     )
 
+    @property
+    def epilepsy_decimal_years(self):
+        # this is a calculated field - it relies on the availability of the date of the first seizure
+        # "Years elapsed since first seizure.",
+        if (self.when_the_first_epileptic_episode_occurred):
+            today = date.today()
+            calculated_age = relativedelta.relativedelta(
+                today, self.when_the_first_epileptic_episode_occurred)
+            return round(calculated_age.days/365.25, 3)
+
     # relationships
     registration = models.OneToOneField(
         Registration,
@@ -108,5 +120,13 @@ class InitialAssessment(models.Model):
         verbose_name = 'initial assessment'
         verbose_name_plural = 'initial assessments'
 
+    def save(
+            self,
+            *args, **kwargs) -> None:
+        return super().save(*args, **kwargs)
+
     def __str__(self) -> str:
-        return f"id: {self.pk}"
+        if self.date_of_initial_assessment:
+            return f"Intial assessment on {self.date_of_initial_assessment}"
+        else:
+            return f"id: {self.pk} has not yet had an initial assessment."

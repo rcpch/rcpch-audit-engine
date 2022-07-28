@@ -1,5 +1,5 @@
 <div id="when_the_first_epileptic_episode_occurred">
-    <div class="two fields">
+    <div class="three fields">
         
         <div class="field"
         hx-post="{% url 'when_the_first_epileptic_episode_occurred' initial_assessment_id=initial_assessment.pk %}"
@@ -36,6 +36,11 @@
                     {% endfor %}
                 </select>
                 <div id="when_the_first_epileptic_episode_occurred_confidence_result"></div>
+            </div>
+
+            <div class="field">
+                <label>Epilepsy years</label>
+                <input disabled value="{{initial_assessment.epilepsy_decimal_years}} y"/>
             </div>
         {% endif%}
 

@@ -1,7 +1,5 @@
-from dateutil import relativedelta
-from datetime import date
+
 from django.db import models
-from django.forms import DecimalField, FloatField
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -44,19 +42,6 @@ class EpilepsyContext(models.Model):
         choices=OPT_OUT,
         default=OPT_OUT[1][0]
     )
-    date_of_first_epileptic_seizure = models.DateField(
-        "What date was the first reported epileptic seizure?"
-    )
-
-    @property
-    def epilepsy_decimal_years(self):
-        # this is a calculated field - it relies on the availability of the date of the first seizure
-        # "Years elapsed since first seizure.",
-        if (self.date_of_first_epileptic_seizure):
-            today = date.today()
-            calculated_age = relativedelta.relativedelta(
-                today, self.date_of_first_epileptic_seizure)
-            return calculated_age.days/365.25
 
     # relationships
     registration = models.OneToOneField(
@@ -76,4 +61,7 @@ class EpilepsyContext(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.date_of_first_epileptic_seizure.strftime("%m/%d/%Y")
+        if self.previous_neonatal_seizures or self.diagnosis_of_epilepsy_withdrawn or self.previous_acute_symptomatic_seizure or self.previous_febrile_seizure:
+            return 'This child has had previous symptomatic or neonatal or febrile seizures.'
+        else:
+            return 'This child has never had epileptic seizures or a previous diagnosis has been withdrawn.'
