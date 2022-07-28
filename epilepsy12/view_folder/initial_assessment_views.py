@@ -29,6 +29,7 @@ def initial_assessment(request, case_id):
         "chronicity_selection": CHRONICITY,
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
@@ -38,88 +39,6 @@ def initial_assessment(request, case_id):
     }
 
     return render(request=request, template_name='epilepsy12/initial_assessment.html', context=context)
-
-
-# @login_required
-# def create_initial_assessment(request, case_id):
-#     form = InitialAssessmentForm(request.POST or None)
-#     initial_assessment = InitialAssessment.objects.filter(
-#         registration__case=case_id).first()
-
-#     registration = Registration.objects.filter(case=case_id).first()
-#     if request.method == "POST":
-#         if form.is_valid():
-#             obj = form.save(commit=False)
-#             obj.registration = registration
-#             Registration.objects.filter(case=case_id).update(
-#                 initial_assessment_complete=True)
-#             messages.success(
-#                 request, "You successfully added an initial assessment!")
-#             obj.save()
-#             return redirect('update_initial_assessment', case_id)
-#         else:
-#             print('not valid')
-
-#     context = {
-#         "form": form,
-#         "case_id": case_id,
-#         "registration": registration,
-#         "initial_assessment": initial_assessment,
-#         "initial_assessment_complete": registration.initial_assessment_complete,
-#         "assessment_complete": registration.assessment_complete,
-#         "epilepsy_context_complete": registration.epilepsy_context_complete,
-#         "multiaxial_description_complete": registration.multiaxial_description_complete,
-#         "investigation_management_complete": registration.investigation_management_complete,
-#         "active_template": "initial_assessment"
-#     }
-#     return render(request=request, template_name='epilepsy12/initial_assessment.html', context=context)
-
-
-# @login_required
-# def update_initial_assessment(request, case_id):
-#     initial_assessment = InitialAssessment.objects.filter(
-#         registration__case=case_id).first()
-#     registration = Registration.objects.filter(case=case_id).first()
-#     form = InitialAssessmentForm(instance=initial_assessment)
-
-#     if request.method == "POST":
-#         if ('delete') in request.POST:
-#             Registration.objects.filter(case=case_id).update(
-#                 initial_assessment_complete=False)
-#             initial_assessment.delete()
-#             messages.success(
-#                 request, "You successfully deleted the initial assessment.")
-#             return redirect('create_initial_assessment', case_id)
-#         form = InitialAssessmentForm(request.POST, instance=initial_assessment)
-#         if form.is_valid:
-#             obj = form.save()
-#             obj.save()
-#             Registration.objects.filter(case=case_id).update(
-#                 epilepsy_context_complete=True)
-#             messages.success(
-#                 request, "You successfully updated the initial assessment.")
-
-#     context = {
-#         "form": form,
-#         "case_id": case_id,
-#         "registration": registration,
-#         "initial_assessement": initial_assessment,
-#         "initial_assessment_complete": registration.initial_assessment_complete,
-#         "assessment_complete": registration.assessment_complete,
-#         "epilepsy_context_complete": registration.epilepsy_context_complete,
-#         "multiaxial_description_complete": registration.multiaxial_description_complete,
-#         "investigation_management_complete": registration.investigation_management_complete,
-#         "active_template": "initial_assessment"
-#     }
-
-#     return render(request=request, template_name='epilepsy12/initial_assessment.html', context=context)
-
-
-# @login_required
-# def delete_initial_assessment(request, id):
-#     initial_assessment = get_object_or_404(InitialAssessmentForm, id=id)
-#     initial_assessment.delete()
-#     return redirect('cases')
 
 
 # htmx
@@ -228,6 +147,7 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
         "chronicity_selection": CHRONICITY,
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     # return HttpResponse(message)
@@ -400,6 +320,22 @@ def diagnostic_status(request, initial_assessment_id):
     try:
         InitialAssessment.objects.filter(
             pk=initial_assessment_id).update(diagnostic_status=diagnostic_status)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    return HttpResponse("success")
+
+
+def episode_definition(request, initial_assessment_id):
+
+    episode_definition = request.POST.get(
+        'episode_definition')
+    # validation here TODO
+
+    try:
+        InitialAssessment.objects.filter(
+            pk=initial_assessment_id).update(episode_definition=episode_definition)
     except Exception as error:
         print(error)
         return HttpResponse(error)

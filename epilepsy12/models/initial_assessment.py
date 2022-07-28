@@ -88,6 +88,13 @@ class InitialAssessment(models.Model):
         default=None,
         null=True
     )
+    episode_definition = models.CharField(
+        max_length=1,
+        choices=EPISODE_DEFINITION,
+        verbose_name="Episode definition. Part of case definition and defines if represents a cluster or discrete episodes.",
+        default=None,
+        null=True
+    )
 
     # relationships
     registration = models.OneToOneField(

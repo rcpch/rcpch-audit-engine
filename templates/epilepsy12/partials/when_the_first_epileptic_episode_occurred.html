@@ -118,28 +118,59 @@
                 </div>
                 <div hidden id="behavioural_or_emotional_problems_result"></div>
             </div>
-            <div class="field" 
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                hx-post="{% url 'diagnostic_status' initial_assessment_id=initial_assessment.pk %}" 
-                hx-target="#diagnostic_status_result" 
-                hx-trigger="load, change"
-                hx-swap="innerHTML"
-                >
-                <label>Diagnostic status?</label>
-                <select 
-                    class="ui dropdown" 
-                    name="diagnostic_status"
-                >
-                    {% for item in diagnostic_status_selection %}
-                        {% if initial_assessment.diagnostic_status == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div hidden id="diagnostic_status_result"></div>
-            </div>
+ 
         </div>
+
+        <h5 class="header">
+        Case Definition
+        </h5>
+
+        
+        <div class="field" 
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+            hx-post="{% url 'diagnostic_status' initial_assessment_id=initial_assessment.pk %}" 
+            hx-target="#diagnostic_status_result" 
+            hx-trigger="load, change"
+            hx-swap="innerHTML"
+            >
+            <label>Diagnostic status</label>
+            <select 
+                class="ui dropdown" 
+                name="diagnostic_status"
+            >
+                {% for item in diagnostic_status_selection %}
+                    {% if initial_assessment.diagnostic_status == item.0 %}
+                        <option selected value={{item.0}}>{{item.1}}</option>
+                    {% else %}
+                        <option value={{item.0}}>{{item.1}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div hidden id="diagnostic_status_result"></div>
+        </div>
+        
+        <div class="field" 
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+            hx-post="{% url 'episode_definition' initial_assessment_id=initial_assessment.pk %}" 
+            hx-target="#episode_definition_result" 
+            hx-trigger="load, change"
+            hx-swap="innerHTML"
+            >
+            <label>Episode definition</label>
+            <select 
+                class="ui dropdown" 
+                name="episode_definition"
+            >
+                {% for item in episode_definition_selection %}
+                    {% if initial_assessment.episode_definition == item.0 %}
+                        <option selected value={{item.0}}>{{item.1}}</option>
+                    {% else %}
+                        <option value={{item.0}}>{{item.1}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div hidden id="episode_definition_result"></div>
+        </div>
+
     {% endif %}
 </div>

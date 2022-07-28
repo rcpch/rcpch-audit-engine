@@ -152,6 +152,8 @@ htmx_paths = [
          views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
     path('htmx/registration/<int:registration_id>/experienced_prolonged_focal_seizures',
          views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+    path('htmx/registration/<int:registration_id>/registration_status',
+         views.registration_status, name="registration_status"),
 
     # initial assessment endpoints
     path('htmx/registration/<int:initial_assessment_id>/date_of_initial_assessment',
@@ -180,8 +182,11 @@ htmx_paths = [
          views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
     path('htmx/registration/<int:initial_assessment_id>/diagnostic_status',
          views.diagnostic_status, name="diagnostic_status"),
-    path('htmx/registration/<int:registration_id>/registration_status',
-         views.registration_status, name="registration_status"),
+    path('htmx/registration/<int:initial_assessment_id>/episode_definition',
+         views.episode_definition, name="episode_definition"),
+
+
+
 
 
 ]
