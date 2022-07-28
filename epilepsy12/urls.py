@@ -15,16 +15,15 @@ urlpatterns = [
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
     path('case/<int:id>/register',
          views.register, name='register'),
+
+    # initial assessment path
     path('initial_assessment/<int:case_id>',
          views.initial_assessment, name="initial_assessment"),
-    #     path('initial_assessment/<int:case_id>/create',
-    #          views.create_initial_assessment, name="create_initial_assessment"),
-    #     path('initial_assessment/<int:case_id>/update',
-    #          views.update_initial_assessment, name="update_initial_assessment"),
+    # assessment path
     path('assessment/<int:case_id>/',
          views.assessment, name="assessment"),
-    #     path('assessment/<int:case_id>/update',
-    #          views.update_assessment, name="update_assessment"),
+
+    # multiaxial description path
     path('multiaxial_description/<int:case_id>',
          views.multiaxial_description, name='multiaxial_description'),
     path('epilepsy_context/<int:case_id>/create',
