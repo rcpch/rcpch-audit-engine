@@ -1,5 +1,6 @@
 from dateutil import relativedelta
 from datetime import date
+import math
 from django.db import models
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
@@ -104,9 +105,58 @@ class InitialAssessment(models.Model):
         # "Years elapsed since first seizure.",
         if (self.when_the_first_epileptic_episode_occurred):
             today = date.today()
-            calculated_age = relativedelta.relativedelta(
-                today, self.when_the_first_epileptic_episode_occurred)
-            return round(calculated_age.days/365.25, 3)
+
+            today = date.today()
+        calculated_age = relativedelta.relativedelta(
+            today, self.when_the_first_epileptic_episode_occurred)
+        months = calculated_age.months
+        years = calculated_age.years
+        weeks = calculated_age.weeks
+        days = calculated_age.days
+        final = ''
+        if years == 1:
+            final += f'{calculated_age.years} year'
+            if (months/12) - years == 1:
+                final += f'{months} month'
+            elif (months/12)-years > 1:
+                final += f'{math.floor((months*12)-years)} months'
+            else:
+                return final
+
+        elif years > 1:
+            final += f'{calculated_age.years} years'
+            if (months/12) - years == 1:
+                final += f', {months} month'
+            elif (months/12)-years > 1:
+                final += f', {math.floor((months*12)-years)} months'
+            else:
+                return final
+        else:
+            # under a year of age
+            if months == 1:
+                final += f'{months} month'
+            elif months > 0:
+                final += f'{months} months, '
+                if weeks >= (months*4):
+                    if (weeks-(months*4)) == 1:
+                        final += '1 week'
+                    else:
+                        final += f'{math.floor(weeks-(months*4))} weeks'
+            else:
+                if weeks > 0:
+                    if weeks == 1:
+                        final += f'{math.floor(weeks)} week'
+                    else:
+                        final += f'{math.floor(weeks)} weeks'
+                else:
+                    if days > 0:
+                        if days == 1:
+                            final += f'{math.floor(days)} day'
+                        if days > 1:
+                            final += f'{math.floor(days)} days'
+                    else:
+                        final += 'Happy birthday'
+        return final
 
     # relationships
     registration = models.OneToOneField(
