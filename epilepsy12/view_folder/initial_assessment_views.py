@@ -14,18 +14,10 @@ def initial_assessment(request, case_id):
     initial_assessment, created = InitialAssessment.objects.get_or_create(
         registration=registration)
 
-    print(created)
-
-    if created:
-        initial_assessment_object = created
-        print(initial_assessment_object)
-    else:
-        initial_assessment_object = initial_assessment
-
     context = {
         "case_id": case_id,
         "registration": registration,
-        "initial_assessment": initial_assessment_object,
+        "initial_assessment": initial_assessment,
         "chronicity_selection": CHRONICITY,
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,

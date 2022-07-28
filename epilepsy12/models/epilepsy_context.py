@@ -36,11 +36,10 @@ class EpilepsyContext(models.Model):
         choices=OPT_OUT_UNCERTAIN,
         default=OPT_OUT_UNCERTAIN[1][0]
     )
-    diagnosis_of_epilepsy_withdrawn = models.CharField(
+    diagnosis_of_epilepsy_withdrawn = models.BooleanField(
         "has the diagnosis of epilepsy been withdrawn?",
-        max_length=2,
-        choices=OPT_OUT,
-        default=OPT_OUT[1][0]
+        null=True,
+        default=False
     )
 
     # relationships

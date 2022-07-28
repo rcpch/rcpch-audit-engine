@@ -1,89 +1,124 @@
 
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from epilepsy12.models.comorbidity import Comorbidity
 
 from epilepsy12.models.registration import Registration
-
-from ..forms_folder.epilepsy_context_form import EpilepsyContextForm
-from ..models import Case
 from ..models import EpilepsyContext
 
 
 @login_required
-def create_epilepsy_context(request, case_id):
-    form = EpilepsyContextForm(request.POST or None)
+def epilepsy_context(request, case_id):
+
     registration = Registration.objects.filter(case=case_id).first()
     comorbidities = Comorbidity.objects.filter(
         case=case_id).all()
-    if request.method == "POST":
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.registration = registration
-            Registration.objects.filter(case=case_id).update(
-                epilepsy_context_complete=True)
-            obj.save()
-            messages.success(
-                request, "You successfully added some epilepsy risk factors!")
-            return redirect('update_epilepsy_context', case_id)
+
+    epilepsy_context, created = EpilepsyContext.objects.get_or_create(
+        registration=registration)
+
+    context = {
+        "case_id": case_id,
+        "registration": registration,
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
+        "initial_assessment_complete": registration.initial_assessment_complete,
+        "assessment_complete": registration.assessment_complete,
+        "epilepsy_context_complete": registration.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.multiaxial_description_complete,
+        "investigation_management_complete": registration.investigation_management_complete,
+        "active_template": "epilepsy_context",
+        "comorbidities": comorbidities
+    }
+    return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
+
+# HTMX
+
+
+def previous_febrile_seizure(request, epilepsy_context_id):
+
+    previous_febrile_seizure = request.POST.get(
+        'previous_febrile_seizure')
+    # validation here TODO
+
+    try:
+        EpilepsyContext.objects.filter(
+            pk=epilepsy_context_id).update(previous_febrile_seizure=previous_febrile_seizure)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    return HttpResponse("success")
+
+
+def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
+
+    previous_acute_symptomatic_seizure = request.POST.get(
+        'previous_acute_symptomatic_seizure')
+    # validation here TODO
+
+    try:
+        EpilepsyContext.objects.filter(
+            pk=epilepsy_context_id).update(previous_acute_symptomatic_seizure=previous_acute_symptomatic_seizure)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    return HttpResponse("success")
+
+
+def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
+
+    is_there_a_family_history_of_epilepsy = request.POST.get(
+        'is_there_a_family_history_of_epilepsy')
+    # validation here TODO
+
+    try:
+        EpilepsyContext.objects.filter(
+            pk=epilepsy_context_id).update(is_there_a_family_history_of_epilepsy=is_there_a_family_history_of_epilepsy)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    return HttpResponse("success")
+
+
+def previous_neonatal_seizures(request, epilepsy_context_id):
+
+    previous_neonatal_seizures = request.POST.get(
+        'previous_neonatal_seizures')
+    # validation here TODO
+
+    try:
+        EpilepsyContext.objects.filter(
+            pk=epilepsy_context_id).update(previous_neonatal_seizures=previous_neonatal_seizures)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    return HttpResponse("success")
+
+
+def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
+
+    diagnosis_of_epilepsy_withdrawn = request.POST.get(
+        'diagnosis_of_epilepsy_withdrawn')
+
+    message = "success"
+    selected = False
+
+    if diagnosis_of_epilepsy_withdrawn:
+        if diagnosis_of_epilepsy_withdrawn == 'on':
+            selected = True
         else:
-            print('not valid')
+            selected = False
 
-    context = {
-        "form": form,
-        "case_id": case_id,
-        "registration": registration,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "epilepsy_context",
-        "comorbidities": comorbidities
-    }
-    return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
+        try:
+            EpilepsyContext.objects.filter(pk=epilepsy_context_id).update(
+                diagnosis_of_epilepsy_withdrawn=selected)
+        except Exception as error:
+            message = error
 
-
-@login_required
-def update_epilepsy_context(request, case_id):
-    epilepsy_context = EpilepsyContext.objects.filter(
-        registration__case=case_id).first()
-    registration = Registration.objects.filter(case=case_id).first()
-    comorbidities = Comorbidity.objects.filter(
-        case=case_id).all()
-    form = EpilepsyContextForm(instance=epilepsy_context)
-
-    if request.method == "POST":
-        if ('delete') in request.POST:
-            epilepsy_context.delete()
-            Registration.objects.filter(case=case_id).update(
-                epilepsy_context_complete=False)
-            messages.success(
-                request, "You successfully deleted the epilepsy risk factors!")
-            return redirect('cases')
-        form = EpilepsyContextForm(request.POST, instance=epilepsy_context)
-        if form.is_valid:
-            obj = form.save()
-            obj.save()
-            messages.success(
-                request, "You successfully updated the epilepsy risk factors!")
-            # return redirect('cases')
-
-    case = Case.objects.get(id=case_id)
-
-    context = {
-        "form": form,
-        "case_id": case_id,
-        "registration": registration,
-        # "epilepsy_decimal_years": epilepsy_context.epilepsy_decimal_years,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "epilepsy_context",
-        "comorbidities": comorbidities
-    }
-
-    return render(request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
+    return HttpResponse(message)

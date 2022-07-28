@@ -26,10 +26,12 @@ urlpatterns = [
     # multiaxial description path
     path('multiaxial_description/<int:case_id>',
          views.multiaxial_description, name='multiaxial_description'),
-    path('epilepsy_context/<int:case_id>/create',
-         views.create_epilepsy_context, name='create_epilepsy_context'),
-    path('epilepsy_context/<int:case_id>/update',
-         views.update_epilepsy_context, name='update_epilepsy_context'),
+
+    # epilepsy context path
+    path('epilepsy_context/<int:case_id>',
+         views.epilepsy_context, name='epilepsy_context'),
+
+    #   comorbidity paths
     path('comorbidity/<int:case_id>/create',
          views.create_comorbidity, name="create_comorbidity"),
     path('comorbidity/<int:case_id>/update',
@@ -183,6 +185,18 @@ htmx_paths = [
          views.diagnostic_status, name="diagnostic_status"),
     path('htmx/registration/<int:initial_assessment_id>/episode_definition',
          views.episode_definition, name="episode_definition"),
+
+    # epilepsy context htmx
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',
+         views.previous_febrile_seizure, name="previous_febrile_seizure"),
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_acute_symptomatic_seizure',
+         views.previous_acute_symptomatic_seizure, name="previous_acute_symptomatic_seizure"),
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/is_there_a_family_history_of_epilepsy',
+         views.is_there_a_family_history_of_epilepsy, name="is_there_a_family_history_of_epilepsy"),
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_neonatal_seizures',
+         views.previous_neonatal_seizures, name="previous_neonatal_seizures"),
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/diagnosis_of_epilepsy_withdrawn',
+         views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
 
 
 

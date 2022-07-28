@@ -23,17 +23,17 @@
 
     {% if epilepsy_context_complete %}
       {% if active_template == "epilepsy_context" %}
-        <a class="active completed step" href="{% url 'update_epilepsy_context' case_id %}">
+        <a class="active completed step" href="{% url 'epilepsy_context' case_id %}">
       {% else %}
-        <a class="completed step" href="{% url 'update_epilepsy_context' case_id %}">
+        <a class="completed step" href="{% url 'epilepsy_context' case_id %}">
       {% endif %}
     {% else %}
         {% if active_template == "epilepsy_context" %}
-          <a href="{% url 'update_epilepsy_context' case_id %}" class="active step">
+          <a href="{% url 'epilepsy_context' case_id %}" class="active step">
         {% elif active_template == "none" %}
-            <a class="disabled step" href="{% url 'update_epilepsy_context' case_id %}">
+            <a class="disabled step" href="{% url 'epilepsy_context' case_id %}">
         {% else %}
-          <a href="{% url 'create_epilepsy_context' case_id %}" class="step">
+          <a href="{% url 'epilepsy_context' case_id %}" class="step">
         {% endif %}
     {% endif %}
       <div class="content">
