@@ -89,7 +89,8 @@ def case_list(request):
             all_cases = Case.objects.all().order_by('surname').all()
 
     registered_cases = Registration.objects.filter(
-        Q(registration_date=None),
+        Q(lead_hospital=request.user.hospital_trust) &
+        ~Q(registration_date=None),
     )
 
 
@@ -105,7 +106,7 @@ def case_list(request):
     context = {
         'case_list': case_list,
         'total_cases': case_count,
-        'total_registrations': case_count - registered_count,
+        'total_registrations': registered_count,
         'sort_flag': sort_flag
     }
     if request.htmx:
