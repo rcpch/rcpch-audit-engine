@@ -1,5 +1,3 @@
-{% load widget_tweaks %}
-
 <form class="ui form" method="post">
     {% csrf_token %}
 
@@ -16,35 +14,65 @@
         </div>
         {% include 'epilepsy12/partials/epilepsy_nonepilepsy_status_dropdown.html' with desscribe_id=desscribe.id epilepsy_or_nonepilepsy_status_field=multiaxial_description_form.epilepsy_or_nonepilepsy_status %}
     </div>
-    
-    <div class="ui blue segment">
+
+    <div class="ui segment">
         <div class="ui header">
             <div class="ui blue circular label">S</div>
         </div>
-        <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        <div class="ui form" method="post">
             <div class="field">
                 <label>Is there an identifiable epilepsy syndrome?</label>
+                <select 
+                    class='ui dropdown'
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                    hx-post="{% url 'syndrome_select' desscribe_id=desscribe.pk %}" 
+                    hx-target="#syndrome_select_result" 
+                    hx-trigger="change" 
+                    hx-swap="outerHTML"
+                    name='syndrome_select'>
+                    {% for item in syndrome_selection %}
+                        {% if desscribe.syndrome == item.0 %}
+                            <option selected value={{item.0}}>{{item.1}}</option>
+                        {% else %}
+                            <option value={{item.0}}>{{item.1}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div id="syndrome_select_result"></div>
             </div>
-            {% url 'syndrome_select' desscribe_id=desscribe.id as URL %}
-            {% render_field multiaxial_description_form.syndrome class+="sixteen wide field" name="syndrome_select" hx-post=URL hx-trigger="load, change" hx-target="#syndrome_result" %}
         </div>
-        <div hidden id="syndrome_result"></div>
+        
     </div>
     
     <div class="ui blue segment">
         <div class="ui header">
             <div class="ui blue circular label">C</div>
         </div>
-        <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="ui form">
-            <div class="field">
+        <div class="ui form" method="post">
+            <div class='field' >
                 <label>What is the cause of this epilepsy?</label>
+                <select 
+                    class='ui dropdown'
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                    hx-post="{% url 'seizure_cause_main' desscribe_id=desscribe.pk %}" 
+                    hx-target='#seizure_cause_main_result'
+                    hx-trigger='load, change'
+                    hx-swap='innerHTML'
+                    name='seizure_cause_main'>
+                    {% for item in seizure_cause_selection %}
+                        {% if desscribe.seizure_cause_main == item.0 %}
+                            <option selected value={{item.0}}>{{item.1}}</option>
+                        {% else %}
+                            <option value={{item.0}}>{{item.1}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div class="ui message">
+                    <div id='seizure_cause_main_result'></div>
+                </div>
             </div>
-            {% url 'seizure_cause_main' desscribe_id=desscribe.id as SEIZURE_CAUSE_URL %}
-            {% render_field multiaxial_description_form.seizure_cause_main class+="sixteen wide field" class+="ui dropdown" hx-post=SEIZURE_CAUSE_URL hx-trigger="load, change" name="seizure_cause_main" hx-target="#seizure_cause_main_result" %} 
         </div>
-        <div class="ui message">
-            <div id="seizure_cause_main_result"></div>
-        </div>
+        
     </div>
     
     <div class="ui blue segment">

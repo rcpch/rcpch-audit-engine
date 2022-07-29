@@ -1,15 +1,16 @@
+from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
+from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
-from epilepsy12.forms_folder.multiaxial_description_form import MultiaxialDescriptionForm
+from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.models.comorbidity import Comorbidity
 
 from ..general_functions import fuzzy_scan_for_keywords
 
-from ..models import Registration, Keyword, DESSCRIBE, Case
+from ..models import Registration, Keyword, DESSCRIBE
 
 from ..general_functions import *
 
@@ -83,7 +84,7 @@ def seizure_cause_main(request, desscribe_id):
     context = {}
 
     if selection == 'Met':
-        select_list = METABOLIC_CAUSES
+        select_list = sorted(METABOLIC_CAUSES, key=itemgetter(1))
         currently_selected = desscribe.seizure_cause_metabolic
 
         context.update({
@@ -91,21 +92,22 @@ def seizure_cause_main(request, desscribe_id):
             'currently_selected': currently_selected
         })
     elif selection == 'Str':
-        select_list = EPILEPSY_STRUCTURAL_CAUSE_TYPES
+        select_list = sorted(
+            EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1))
         currently_selected = desscribe.seizure_cause_structural
         context.update({
             'select_list': select_list,
             'currently_selected': currently_selected,
         })
     elif selection == 'Gen':
-        select_list = EPILEPSY_GENETIC_CAUSE_TYPES
+        select_list = sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1))
         currently_selected = desscribe.seizure_cause_genetic
         context.update({
             'select_list': select_list,
             'currently_selected': currently_selected,
         })
     elif selection == 'Imm':
-        select_list = IMMUNE_CAUSES
+        select_list = sorted(IMMUNE_CAUSES, key=itemgetter(1))
         currently_selected = desscribe.seizure_cause_immune
         context.update({
             'select_list': select_list,
@@ -212,7 +214,7 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
             desscribe = DESSCRIBE.objects.get(id=desscribe_id)
             context = {
                 'selected_autoantibody': desscribe.seizure_cause_immune_antibody,
-                'selection': AUTOANTIBODIES,
+                'selection': sorted(AUTOANTIBODIES, key=itemgetter(1)),
                 'desscribe_id': desscribe_id
             }
             # antibody mediated - offer antibodies select
@@ -241,7 +243,7 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
             'desscribe_id': desscribe_id,
             'seizure_cause_main': seizure_cause_main,
             'selected_choice': seizure_cause_main_choice,
-            'selection': EPILEPSY_GENE_DEFECTS,
+            'selection': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
             'selected_gene_defect': desscribe.seizure_cause_gene_abnormality
         }
         if seizure_cause_main_choice == "GeA":
@@ -454,22 +456,24 @@ def nonepilepsy_subtypes(request, desscribe_id):
     return_list = []
     subtype = ""
     if nonepilepsy_subtypes == "SAS":
-        return_list = NON_EPILEPTIC_SYNCOPES
+        return_list = sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1))
         subtype = "syncope/anoxic seizure"
     if nonepilepsy_subtypes == "BPP":
-        return_list = NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS
+        return_list = sorted(
+            NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1))
         subtype = "behavioural/psychological or psychiatric"
     if nonepilepsy_subtypes == "SRC":
-        return_list = NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS
+        return_list = sorted(
+            NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1))
         subtype = "sleep-related"
     if nonepilepsy_subtypes == "PMD":
-        return_list = NON_EPILEPSY_PAROXYSMS
+        return_list = sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1))
         subtype = "paroxysmal movement disorder"
     if nonepilepsy_subtypes == "MAD":
-        return_list = MIGRAINES
+        return_list = sorted(MIGRAINES, key=itemgetter(1))
         subtype = "migraine"
     if nonepilepsy_subtypes == "ME":
-        return_list = EPIS_MISC
+        return_list = sorted(EPIS_MISC, key=itemgetter(1))
         subtype = "miscellaneous"
     if nonepilepsy_subtypes == "Oth":
         return HttpResponse("Other")
@@ -521,7 +525,8 @@ def nonepilepsy_subtype_selection(request, desscribe_id, nonepilepsy_selected_su
 
 @login_required
 def syndrome_select(request, desscribe_id):
-    syndrome_code = request.POST.get('syndrome')
+    syndrome_code = request.POST.get('syndrome_select')
+
     if syndrome_code:
         DESSCRIBE.objects.filter(id=desscribe_id).update(
             syndrome=syndrome_code)
@@ -532,7 +537,7 @@ def syndrome_select(request, desscribe_id):
 
 @ login_required
 def multiaxial_description(request, case_id):
-    case = Case.objects.get(pk=case_id)
+
     registration = Registration.objects.filter(case=case_id).first()
     if DESSCRIBE.objects.filter(registration=registration).exists():
         # there is already a desscribe object for this registration
@@ -541,16 +546,15 @@ def multiaxial_description(request, case_id):
         # this is not yet a desscribe object for this description - create one
         desscribe = DESSCRIBE.objects.create(registration=registration)
 
-    multiaxial_description_form = MultiaxialDescriptionForm(instance=desscribe)
-
     choices = Keyword.objects.all()
 
     context = {
         "desscribe": desscribe,
         "registration": registration,
-        "multiaxial_description_form": multiaxial_description_form,
         "choices": choices,
         "case_id": case_id,
+        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
