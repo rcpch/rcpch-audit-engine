@@ -6,6 +6,7 @@ from django.urls import reverse
 from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
+from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from epilepsy12.models.comorbidity import Comorbidity
 
 from ..general_functions import fuzzy_scan_for_keywords
@@ -328,28 +329,28 @@ def epilepsy_or_nonepilepsy_status_changed(request, desscribe_id):
     Function triggered by a change in the epilepsy_or_nonepilepsy_status_changed dropdown leading to a post request.
     The desscribe_id is also passed in allowing update of the model.
     """
-    if request.POST:
-        epilepsy_or_nonepilepsy_status = request.POST.get(
-            'epilepsy_or_nonepilepsy_status')
-        DESSCRIBE.objects.filter(pk=desscribe_id).update(
-            epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status
-        )
-        desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    epilepsy_or_nonepilepsy_status = request.POST.get(
+        'epilepsy_or_nonepilepsy_status')
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status
+    )
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
     if epilepsy_or_nonepilepsy_status == 'E':
 
         # return epilepsy dropdowns
         template = 'epilepsy12/partials/epilepsy_dropdowns.html'
         context = {
-            'epilepsy_onset_types': EPILEPSY_SEIZURE_TYPE,
+            'epilepsy_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
             'desscribe_id': desscribe_id
         }
     elif epilepsy_or_nonepilepsy_status == "NE":
         # return nonepilepsy dropdowns
         template = 'epilepsy12/partials/nonepilepsy_dropdowns.html'
         context = {
-            'nonepilepsy_generalised_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-            'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_TYPE,
+            'nonepilepsy_generalised_onset_types': sorted(NON_EPILEPSY_SEIZURE_ONSET, key=itemgetter(1)),
+            'nonepilepsy_onset_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
             'desscribe': desscribe
         }
     else:
@@ -371,10 +372,8 @@ def epilepsy_onset_changed(request, desscribe_id):
     if epilepsy_onset == 'FO':
         template = "epilepsy12/partials/focal_onset_epilepsy.html"
         desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-        # multiaxial_description_form = MultiaxialDescriptionForm(
-        #     instance=desscribe)
+
         context = {
-            # 'multiaxial_description_form': multiaxial_description_form,
             'desscribe': desscribe
         }
     elif epilepsy_onset == 'GO':
@@ -553,6 +552,7 @@ def multiaxial_description(request, case_id):
         "registration": registration,
         "choices": choices,
         "case_id": case_id,
+        "epilepsy_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         "initial_assessment_complete": registration.initial_assessment_complete,

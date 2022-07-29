@@ -12,7 +12,7 @@
         <div class="ui header">
             <div class="ui blue circular label">E</div>
         </div>
-        {% include 'epilepsy12/partials/epilepsy_nonepilepsy_status_dropdown.html' with desscribe_id=desscribe.id epilepsy_or_nonepilepsy_status_field=multiaxial_description_form.epilepsy_or_nonepilepsy_status %}
+        {% include 'epilepsy12/partials/epilepsy_nonepilepsy_status_dropdown.html' with desscribe=desscribe epilepsy_or_nonepilepsy_status_choices=epilepsy_or_nonepilepsy_status_choices %}
     </div>
 
     <div class="ui segment">
