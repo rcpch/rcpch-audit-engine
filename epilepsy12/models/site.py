@@ -1,4 +1,6 @@
 from django.db import models
+
+from epilepsy12.models.hospital_trust import HospitalTrust
 from ..constants import *
 # other tables
 from .registration import Registration
@@ -15,7 +17,23 @@ class Site(models.Model):
         default=False)
     site_is_primary_centre_of_epilepsy_care = models.BooleanField(
         default=False,
-        unique=True
+    )
+    site_is_childrens_epilepsy_surgery_centre = models.BooleanField(
+        default=False,
+    )
+    site_is_childrens_epilepsy_surgery_centre = models.BooleanField(
+        default=False,
+    )
+    site_is_paediatric_neurology_centre = models.BooleanField(
+        default=False,
+    )
+    site_is_general_paediatric_centre = models.BooleanField(
+        default=False,
+    )
+
+    site = models.ForeignKey(
+        HospitalTrust,
+        on_delete=models.DO_NOTHING
     )
 
     # Relationships
