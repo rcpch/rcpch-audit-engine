@@ -39,10 +39,10 @@
     </div>
 
     <div id="lead_site">
-      {% include 'epilepsy12/partials/lead_site.html' with registration=registration site=site edit=False transfer=False %}
+      {% include 'epilepsy12/partials/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list %}
     </div>
 
-    <div id="previous_sites">
+    <div id="previous_sites" class="ui segment">
         {% include 'epilepsy12/partials/previous_sites.html' with previously_registered_sites=previously_registered_sites registration=registration %}
     </div>
 

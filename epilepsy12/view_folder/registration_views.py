@@ -30,7 +30,10 @@ def register(request, id):
         registration_object = created
         active_template = "none"
 
-    # if no allocated site, allocate to Parent trust of logged in user
+    hospital_list = HospitalTrust.objects.filter(
+        Sector="NHS Sector").order_by('OrganisationName')
+
+    # if no allocated site, allocate to organisationname of trust of logged in user
     try:
         user_hospital_trust = HospitalTrust.objects.filter(
             OrganisationName=request.user.hospital_trust).first()
@@ -63,6 +66,7 @@ def register(request, id):
     context = {
         "registration": registration_object,
         "case_id": id,
+        "hospital_list": hospital_list,
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
         "initial_assessment_complete": False,
@@ -108,34 +112,73 @@ def registration_date(request, case_id):
     return render(request=request, template_name='epilepsy12/partials/registration_dates.html', context=context)
 
 
-@login_required
-def lead_centre(request, registration_id):
-    # note, although the hospitals are ordered by organisation name
-    # and this is what the user sees and selects,
-    # it is the ParentName that is persisted in the database
+# @login_required
+# def lead_centre(request, registration_id):
+#     # note, although the hospitals are ordered by organisation name
+#     # and this is what the user sees and selects,
+#     # it is the ParentName that is persisted in the database
 
-    user_input = request.GET.get('lead_hospital')
-    if user_input is not None:
-        hospital_list = HospitalTrust.objects.filter(
-            Q(OrganisationName__icontains=user_input)
-        ).filter(Sector="NHS Sector").order_by('OrganisationName')
-    else:
-        hospital_list = HospitalTrust.objects.filter(
-            Sector="NHS Sector").order_by('OrganisationName')
+#     print("hello lead site")
 
+#     user_input = request.GET.get('lead_hospital')
+#     if user_input is not None:
+#         hospital_list = HospitalTrust.objects.filter(
+#             Q(OrganisationName__icontains=user_input)
+#         ).filter(Sector="NHS Sector").order_by('OrganisationName')
+#     else:
+#         hospital_list = HospitalTrust.objects.filter(
+#             Sector="NHS Sector").order_by('OrganisationName')
+
+#     registration = Registration.objects.get(pk=registration_id)
+#     if registration.lead_hospital:
+#         selected_lead_hospital = registration.lead_hospital
+#     else:
+#         selected_lead_hospital = request.user.hospital_trust
+
+#     context = {
+#         'hospital_list': hospital_list,
+#         'selected_lead_hospital': selected_lead_hospital,
+#         'registration_id': registration_id
+#     }
+
+#     return render(request=request, template_name='epilepsy12/partials/hospital_list_select.html', context=context)
+
+
+def allocate_lead_site(request, registration_id):
+    """
+    Allocate site when none have been assigned
+    """
     registration = Registration.objects.get(pk=registration_id)
-    if registration.lead_hospital:
-        selected_lead_hospital = registration.lead_hospital
-    else:
-        selected_lead_hospital = request.user.hospital_trust
+    new_trust_id = request.POST.get('hospital_trust')
+
+    selected_hospital_trust = HospitalTrust.objects.get(
+        OrganisationID=new_trust_id)
+
+    # create a new site
+    site = Site.objects.create(
+        registration=registration,
+        hospital_trust=selected_hospital_trust,
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_childrens_epilepsy_surgery_centre=False,
+        site_is_paediatric_neurology_centre=False,
+        site_is_general_paediatric_centre=True
+    )
+    site.save()
+
+    # get the new
+
+    hospital_list = HospitalTrust.objects.filter(
+        Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
-        'hospital_list': hospital_list,
-        'selected_lead_hospital': selected_lead_hospital,
-        'registration_id': registration_id
+        "hospital_list": hospital_list,
+        "registration": registration,
+        "site": site,
+        "edit": False,
+        "transfer": False
     }
-
-    return render(request=request, template_name='epilepsy12/partials/hospital_list_select.html', context=context)
+    return render(request=request, template_name="epilepsy12/partials/lead_site.html", context=context)
 
 
 def edit_lead_site(request, registration_id, site_id):
@@ -183,7 +226,6 @@ def cancel_lead_site(request, registration_id, site_id):
 
 def update_lead_site(request, registration_id, site_id, update):
     new_trust_id = request.POST.get('hospital_trust')
-    print(new_trust_id)
     registration = Registration.objects.get(pk=registration_id)
     new_hospital_trust = HospitalTrust.objects.get(OrganisationID=new_trust_id)
 

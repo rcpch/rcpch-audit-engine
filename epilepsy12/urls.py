@@ -119,8 +119,8 @@ htmx_paths = [
          views.confirm_eligible, name="confirm_eligible"),
     path('htmx/case/<int:case_id>/registration_date',
          views.registration_date, name="registration_date"),
-    path('htmx/registration/<int:registration_id>/lead_centre',
-         views.lead_centre, name="lead_centre"),
+    #     path('htmx/registration/<int:registration_id>/lead_centre',
+    #          views.lead_centre, name="lead_centre"),
     path('htmx/registration/<int:registration_id>/hospital_trust_select',
          views.hospital_trust_select, name="hospital_trust_select"),
 
@@ -132,6 +132,8 @@ htmx_paths = [
          views.cancel_lead_site, name="cancel_lead_site"),
     path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/update/<str:update>',
          views.update_lead_site, name="update_lead_site"),
+    path('htmx/registration/<int:registration_id>/allocate_lead_site',
+         views.allocate_lead_site, name="allocate_lead_site"),
     path('htmx/registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
 
