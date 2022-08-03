@@ -123,6 +123,19 @@ htmx_paths = [
          views.lead_centre, name="lead_centre"),
     path('htmx/registration/<int:registration_id>/hospital_trust_select',
          views.hospital_trust_select, name="hospital_trust_select"),
+
+    path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/edit',
+         views.edit_lead_site, name="edit_lead_site"),
+    path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/transfer',
+         views.transfer_lead_site, name="transfer_lead_site"),
+    path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/cancel',
+         views.cancel_lead_site, name="cancel_lead_site"),
+    path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/update/<str:update>',
+         views.update_lead_site, name="update_lead_site"),
+    path('htmx/registration/<int:registration_id>/previous_sites',
+         views.previous_sites, name="previous_sites"),
+
+
     path('htmx/registration/<int:registration_id>/consultant_paediatrician_referral_made',
          views.consultant_paediatrician_referral_made, name="consultant_paediatrician_referral_made"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_date',

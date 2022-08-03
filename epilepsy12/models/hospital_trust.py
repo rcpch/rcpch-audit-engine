@@ -143,9 +143,9 @@ class HospitalTrust(models.Model):
     )
 
     class Meta:
-        indexes = [models.Index(fields=['OrganisationName'])]
+        indexes = [models.Index(fields=['ParentName'])]
         verbose_name = 'hospital trust'
         verbose_name_plural = 'hospital trusts'
 
     def __str__(self) -> str:
-        return self.OrganisationName
+        return self.ParentName

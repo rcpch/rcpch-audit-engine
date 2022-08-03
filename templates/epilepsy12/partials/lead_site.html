@@ -1,0 +1,74 @@
+<div class="ui form">
+    <div class="two fields">
+        <div class="ten wide field">
+            <label>Active Lead Centre</label>
+            {% if edit or transfer %}
+                <select class="ui search normal selection dropdown" name="hospital_trust">
+                    {% for item in hospital_list %}
+                        {% if item.OrganisationName == site.hospital_trust.OrganisationName %}
+                            <option selected value="{{item.pk}}">{{item.OrganisationName}}</option>
+                        {% else %}
+                            <option value="{{item.pk}}">{{item.OrganisationName}}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </select>
+            {% else %}
+                {% if site %}
+                    <input disabled placeholder="Enter lead centre..." value="{{site.hospital_trust.OrganisationName}}" />
+                {% else %}
+                    <input disabled placeholder="Enter lead centre..." value="Currently no lead site allocated" />
+                {% endif %}
+
+            {% endif %}
+        </div>
+        {% if edit or transfer %}
+            <div class="six wide field">
+                <label hidden>Action</label>
+                {% if edit %}
+                <button 
+                    class="ui button" 
+                    id="action_button"
+                    hx-post="{% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update='edit'%}"
+                    hx-target="#lead_site"
+                    hx-include="[name='hospital_trust']"
+                    hx-trigger="click">Update</button>
+                {% elif transfer %}
+                    <button 
+                        class="ui button" 
+                        id="action_button"
+                        hx-post="{% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update='transfer' %}"
+                        hx-target="#lead_site"
+                        hx-include="[name='hospital_trust']"
+                        hx-trigger="click">Update</button>
+                {% endif %}    
+                <button 
+                    class="ui button" 
+                    id="negative_button"
+                    name="cancel_lead_site_button"
+                    hx-post="{% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                    hx-target="#lead_site"
+                    hx-trigger="click">Cancel</button>
+            </div>
+        {% else %}
+            <div class="six wide field">
+                <label hidden>Action</label>
+                <button 
+                    class="ui button" 
+                    id="action_button"
+                    name="edit_lead_site_button"
+                    hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                    hx-target="#lead_site"
+                    hx-trigger="click">Edit</button>
+                <button 
+                    class="ui button" 
+                    id="action_button"
+                    name="transfer_lead_centre_button"
+                    hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                    hx-target="#lead_site"
+                    hx-trigger="click">Transfer Care</button>
+            </div>
+        {% endif %}
+    </div>
+    
+</div>
