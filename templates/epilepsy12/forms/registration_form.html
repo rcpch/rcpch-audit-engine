@@ -25,45 +25,29 @@
         
     </div>
     
-    <div class="three fields">
-      
-      <div class="field">
-        <label>Referring Clinician</label>
-        {% if registration and registration.referring_clinician is not None %}
-          <input type="text" placeholder="{{registration.referring_clinician}}"/>
-        {% else %}
-          {% if registration %}
-            <input type="text" placeholder="Enter Surname of referring clinician"/>
-          {% else %}
-            <input type="text" disabled placeholder="Enter Surname of referring clinician"/>
-          {% endif %}
-        {% endif %}
-      </div>
-      
-      <div class="field">
-        <label>Lead Centre</label>
+    <div class="field">
+      <label>Referring Clinician</label>
+      {% if registration and registration.referring_clinician is not None %}
+        <input type="text" placeholder="{{registration.referring_clinician}}"/>
+      {% else %}
         {% if registration %}
-          <div class="ui input">
-            <input placeholder="Search hospitals..." type="text" name="lead_hospital" hx-get="{% url 'lead_centre' registration_id=registration.pk %}" hx-target="#lead_hospital_select" hx-trigger="keyup, load"/>
-          </div>
+          <input type="text" placeholder="Enter Surname of referring clinician"/>
         {% else %}
-          <div class="ui input">
-            <input disabled placeholder="Search hospitals..." type="text" />
-          </div>
+          <input type="text" disabled placeholder="Enter Surname of referring clinician"/>
         {% endif %}
-      </div>
+      {% endif %}
+    </div>
 
-      <div class="field" id="lead_hospital_select">
-        <label>Lead Centre</label>
-        {% include 'epilepsy12/partials/hospital_list_select.html' with registration_id=registration.pk %}
-      </div>
+    <div id="lead_site">
+      {% include 'epilepsy12/partials/lead_site.html' with registration=registration site=site edit=False transfer=False %}
+    </div>
+
+    <div id="previous_sites">
+        {% include 'epilepsy12/partials/previous_sites.html' with previously_registered_sites=previously_registered_sites registration=registration %}
     </div>
 
     <div id="registration_date_results">
       {% include 'epilepsy12/partials/registration_dates.html' with case_id=case_id registration=registration %}
     </div>
-    
-
-
       
   </form>

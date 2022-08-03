@@ -14,31 +14,36 @@ class Site(models.Model):
     """
 
     site_is_actively_involved_in_epilepsy_care = models.BooleanField(
-        default=False)
+        default=False,
+        null=True
+    )
     site_is_primary_centre_of_epilepsy_care = models.BooleanField(
         default=False,
+        null=True
     )
     site_is_childrens_epilepsy_surgery_centre = models.BooleanField(
         default=False,
-    )
-    site_is_childrens_epilepsy_surgery_centre = models.BooleanField(
-        default=False,
+        null=True
     )
     site_is_paediatric_neurology_centre = models.BooleanField(
         default=False,
+        null=True
     )
     site_is_general_paediatric_centre = models.BooleanField(
         default=False,
+        null=True
     )
 
-    site = models.ForeignKey(
-        HospitalTrust,
+    hospital_trust = models.OneToOneField(
+        default=1,
+        to=HospitalTrust,
+        related_name="hospital_site",
         on_delete=models.DO_NOTHING
     )
 
     # Relationships
     registration = models.ForeignKey(
-        Registration,
+        to=Registration,
         on_delete=models.CASCADE
     )
 
@@ -47,4 +52,4 @@ class Site(models.Model):
         verbose_name_plural = 'sites'
 
     def __str__(self) -> str:
-        return self.hospital_trust
+        return self.hospital_trust.ParentName
