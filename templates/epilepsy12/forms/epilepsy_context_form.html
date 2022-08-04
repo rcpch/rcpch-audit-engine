@@ -101,16 +101,6 @@
 
         </div>
 
-        <div class="field">
-            <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'diagnosis_of_epilepsy_withdrawn' epilepsy_context_id=epilepsy_context.pk %}" hx-trigger="change" hx-target="#diagnosis_of_epilepsy_withdrawn_result" hx-swap="outerHTML" name="diagnosis_of_epilepsy_withdrawn">
-            {% if epilepsy_context.diagnosis_of_epilepsy_withdrawn %}
-                <input type="checkbox" name="diagnosis_of_epilepsy_withdrawn" checked="">
-            {% else %}
-                <input type="checkbox" name="diagnosis_of_epilepsy_withdrawn">
-            {% endif %}
-                <label>At any stage in the first year after first assessment, has a diagnosis of epilepsy been withdrawn because it has been subsequently deemed incorrect?</label>
-            </div>
-        </div>
-        <div hidden id="diagnosis_of_epilepsy_withdrawn_result"></div>
+        {% include 'epilepsy12/partials/epilepsy_diagnosis_withdrawn.html' with epilepsy_context=epilepsy_context %}
 
 </form>

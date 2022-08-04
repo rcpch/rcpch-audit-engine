@@ -103,22 +103,19 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
 
-    diagnosis_of_epilepsy_withdrawn = request.POST.get(
-        'diagnosis_of_epilepsy_withdrawn')
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+    diagnosis_of_epilepsy_withdrawn_status = not epilepsy_context.diagnosis_of_epilepsy_withdrawn
 
-    message = "success"
-    selected = False
+    try:
+        EpilepsyContext.objects.filter(pk=epilepsy_context_id).update(
+            diagnosis_of_epilepsy_withdrawn=diagnosis_of_epilepsy_withdrawn_status)
+    except Exception as error:
+        message = error
 
-    if diagnosis_of_epilepsy_withdrawn:
-        if diagnosis_of_epilepsy_withdrawn == 'on':
-            selected = True
-        else:
-            selected = False
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
-        try:
-            EpilepsyContext.objects.filter(pk=epilepsy_context_id).update(
-                diagnosis_of_epilepsy_withdrawn=selected)
-        except Exception as error:
-            message = error
+    context = {
+        "epilepsy_context": epilepsy_context
+    }
 
-    return HttpResponse(message)
+    return render(request=request, template_name="epilepsy12/partials/epilepsy_diagnosis_withdrawn.html", context=context)
