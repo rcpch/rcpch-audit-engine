@@ -5,7 +5,6 @@ python-dateutil
 # third party imports
 django
 psycopg2-binary
-dj_database_url
 django-autocomplete-light
 rapidfuzz
 django-widget-tweaks

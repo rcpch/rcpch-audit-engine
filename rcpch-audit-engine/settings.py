@@ -15,7 +15,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 import sys
-import dj_database_url
 
 # third party imports
 from django.core.management.utils import get_random_secret_key
