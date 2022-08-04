@@ -38,10 +38,6 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
                           "127.0.0.1,localhost").split(",")
 
-# Development mode allows the use of alternate settings when running locally
-# Defaults to False. Set to true in an environment variable if needed.
-DEVELOPMENT_MODE = os.getenv("E12_DEVELOPMENT_MODE", "False") == "True"
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -100,24 +96,18 @@ WSGI_APPLICATION = 'rcpch-audit-engine.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
-if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        "default": {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
-            'USER': os.environ.get('E12_POSTGRES_DB_USER'),
-            'PASSWORD': os.environ.get('E12_POSTGRES_DB_PASSWORD'),
-            'HOST': os.environ.get('E12_POSTGRES_DB_HOST'),
-            'PORT': os.environ.get('E12_POSTGRES_DB_PORT'),
-        }
+
+DATABASES = {
+    "default": {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
+        'USER': os.environ.get('E12_POSTGRES_DB_USER'),
+        'PASSWORD': os.environ.get('E12_POSTGRES_DB_PASSWORD'),
+        'HOST': os.environ.get('E12_POSTGRES_DB_HOST'),
+        'PORT': os.environ.get('E12_POSTGRES_DB_PORT'),
     }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if os.getenv("E12_PRODUCTION_DATABASE_URL", None) is None:
-        raise Exception(
-            "E12_PRODUCTION_DATABASE_URL environment variable not defined")
-    DATABASES = {
-        "default": dj_database_url.parse(os.environ.get("E12_PRODUCTION_DATABASE_URL")),
-    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
