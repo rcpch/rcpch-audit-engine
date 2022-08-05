@@ -1,9 +1,9 @@
 <form class="ui form" method="post">
   {% csrf_token %}
   
-  {% include 'epilepsy12/partials/paediatrician_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  {% include 'epilepsy12/partials/assessment/paediatrician_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
 
-  {% include 'epilepsy12/partials/neurologist_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  {% include 'epilepsy12/partials/assessment/neurologist_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
 
   <div class="ui info message">
     
@@ -23,10 +23,10 @@
 
   </div>
 
-  {% include 'epilepsy12/partials/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  {% include 'epilepsy12/partials/assessment/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
   
-  {% include 'epilepsy12/partials/aed_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %}
+  {% include 'epilepsy12/partials/assessment/aed_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %}
  
-  {% include 'epilepsy12/partials/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
+  {% include 'epilepsy12/partials/assessment/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 
 </form>

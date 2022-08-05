@@ -34,7 +34,7 @@ def consultant_paediatrician_referral_made(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/paediatrician_dates.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/paediatrician_dates.html", context=context)
 
 
 @login_required
@@ -94,7 +94,7 @@ def paediatric_neurologist_referral_made(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/neurologist_dates.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/neurologist_dates.html", context=context)
 
 
 @login_required
@@ -156,7 +156,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, registrat
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/epilepsy_surgery_dates.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery_dates.html", context=context)
 
 
 @login_required
@@ -217,7 +217,7 @@ def has_an_aed_been_given(request, registration_id):
         'assessment': assessment_object
     }
 
-    return render(request=request, template_name="epilepsy12/partials/aed_checkboxes.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/aed_checkboxes.html", context=context)
 
 
 @login_required
@@ -245,7 +245,7 @@ def rescue_medication_prescribed(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/aed_checkboxes.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/aed_checkboxes.html", context=context)
 
 
 @login_required
@@ -273,7 +273,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/seizure_length_checkboxes.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
 
 
 @login_required
@@ -301,7 +301,7 @@ def prolonged_generalized_convulsive_seizures(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/seizure_length_checkboxes.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
 
 
 @login_required
@@ -330,7 +330,7 @@ def experienced_prolonged_focal_seizures(request, registration_id):
         'assessment': assessment_object
     }
     return HttpResponse('success', context)
-    return render(request=request, template_name="epilepsy12/partials/seizure_length_checkboxes.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
 
 
 @login_required
