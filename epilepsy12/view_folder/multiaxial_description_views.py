@@ -19,7 +19,7 @@ from ..general_functions import *
 @login_required
 def edit_description(request, desscribe_id):
     """
-    This function is triggered by an htmx post request from the partials/description.html form for the desscribe description.
+    This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description.
     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
     The htmx post request is triggered on every key up.
     This function returns html to the browser.
@@ -44,13 +44,13 @@ def edit_description(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/description_labels.html', context)
+    return render(request, 'epilepsy12/partials/desscribe/description_labels.html', context)
 
 
 @login_required
 def delete_description_keyword(request, desscribe_id, description_keyword_id):
     """
-    This function is triggered by an htmx post request from the partials/description.html form for the desscribe description_keyword.
+    This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description_keyword.
     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
     The htmx post request is triggered on click of a keyword. It removes that keyword from the saved list.
     This function returns html to the browser.
@@ -130,7 +130,7 @@ def seizure_cause_main(request, desscribe_id):
         'desscribe_id': desscribe_id
     })
 
-    return render(request, 'epilepsy12/partials/seizure_cause_main.html', context)
+    return render(request, 'epilepsy12/partials/desscribe/seizure_cause_main.html', context)
 
 
 @login_required
@@ -171,7 +171,7 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
                 'desscribe_id': desscribe_id,
                 'seizure_cause_mitochondrial_sctid': seizure_cause_mitochondrial_sctid
             }
-            return render(request, 'epilepsy12/partials/mitochondrial_selection_dropdown.html', context)
+            return render(request, 'epilepsy12/partials/desscribe/mitochondrial_selection_dropdown.html', context)
 
     elif seizure_cause_main == 'Str':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
@@ -219,7 +219,7 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
                 'desscribe_id': desscribe_id
             }
             # antibody mediated - offer antibodies select
-            return render(request, "epilepsy12/partials/autoantibodies.html", context)
+            return render(request, "epilepsy12/partials/desscribe/autoantibodies.html", context)
         else:
             return HttpResponse("Success")
 
@@ -249,7 +249,7 @@ def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
         }
         if seizure_cause_main_choice == "GeA":
             # gene abnormality selected
-            return render(request, "epilepsy12/partials/gene_defect.html", context)
+            return render(request, "epilepsy12/partials/desscribe/gene_defect.html", context)
         else:
             return HttpResponse("Success")
     else:
@@ -320,7 +320,7 @@ def ribe(request, desscribe_id):
         'case_id': case.id
     }
 
-    return render(request, "epilepsy12/partials/ribe.html", context)
+    return render(request, "epilepsy12/partials/desscribe/ribe.html", context)
 
 
 @login_required
@@ -340,14 +340,14 @@ def epilepsy_or_nonepilepsy_status_changed(request, desscribe_id):
     if epilepsy_or_nonepilepsy_status == 'E':
 
         # return epilepsy dropdowns
-        template = 'epilepsy12/partials/epilepsy_dropdowns.html'
+        template = 'epilepsy12/partials/desscribe/epilepsy_dropdowns.html'
         context = {
             'epilepsy_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
             'desscribe_id': desscribe_id
         }
     elif epilepsy_or_nonepilepsy_status == "NE":
         # return nonepilepsy dropdowns
-        template = 'epilepsy12/partials/nonepilepsy_dropdowns.html'
+        template = 'epilepsy12/partials/desscribe/nonepilepsy_dropdowns.html'
         context = {
             'nonepilepsy_generalised_onset_types': sorted(NON_EPILEPSY_SEIZURE_ONSET, key=itemgetter(1)),
             'nonepilepsy_onset_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
@@ -370,7 +370,7 @@ def epilepsy_onset_changed(request, desscribe_id):
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
         epileptic_seizure_onset_type=epilepsy_onset)
     if epilepsy_onset == 'FO':
-        template = "epilepsy12/partials/focal_onset_epilepsy.html"
+        template = "epilepsy12/partials/desscribe/focal_onset_epilepsy.html"
         desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
         context = {
@@ -381,7 +381,7 @@ def epilepsy_onset_changed(request, desscribe_id):
         context = {
             'desscribe': desscribe
         }
-        template = "epilepsy12/partials/generalised_onset_epilepsy.html"
+        template = "epilepsy12/partials/desscribe/generalised_onset_epilepsy.html"
     return render(request, template, context)
 
 
@@ -422,7 +422,7 @@ def nonepilepsy_generalised_onset(request, desscribe_id):
         context = {
             'desscribe': desscribe
         }
-        return render(request, 'epilepsy12/partials/nonepileptic_seizure_unknown_onset.html', context)
+        return render(request, 'epilepsy12/partials/desscribe/nonepileptic_seizure_unknown_onset.html', context)
     else:
         return HttpResponse("")
 
@@ -484,7 +484,7 @@ def nonepilepsy_subtypes(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/nonepilepsy_subtypes.html', context)
+    return render(request, 'epilepsy12/partials/desscribe/nonepilepsy_subtypes.html', context)
 
 
 @login_required

@@ -109,39 +109,7 @@ def registration_date(request, case_id):
         'case_id': case_id,
         'registration': registration
     }
-    return render(request=request, template_name='epilepsy12/partials/registration_dates.html', context=context)
-
-
-# @login_required
-# def lead_centre(request, registration_id):
-#     # note, although the hospitals are ordered by organisation name
-#     # and this is what the user sees and selects,
-#     # it is the ParentName that is persisted in the database
-
-#     print("hello lead site")
-
-#     user_input = request.GET.get('lead_hospital')
-#     if user_input is not None:
-#         hospital_list = HospitalTrust.objects.filter(
-#             Q(OrganisationName__icontains=user_input)
-#         ).filter(Sector="NHS Sector").order_by('OrganisationName')
-#     else:
-#         hospital_list = HospitalTrust.objects.filter(
-#             Sector="NHS Sector").order_by('OrganisationName')
-
-#     registration = Registration.objects.get(pk=registration_id)
-#     if registration.lead_hospital:
-#         selected_lead_hospital = registration.lead_hospital
-#     else:
-#         selected_lead_hospital = request.user.hospital_trust
-
-#     context = {
-#         'hospital_list': hospital_list,
-#         'selected_lead_hospital': selected_lead_hospital,
-#         'registration_id': registration_id
-#     }
-
-#     return render(request=request, template_name='epilepsy12/partials/hospital_list_select.html', context=context)
+    return render(request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
 
 
 def allocate_lead_site(request, registration_id):
@@ -178,7 +146,7 @@ def allocate_lead_site(request, registration_id):
         "edit": False,
         "transfer": False
     }
-    return render(request=request, template_name="epilepsy12/partials/lead_site.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
 
 
 def edit_lead_site(request, registration_id, site_id):
@@ -209,7 +177,7 @@ def transfer_lead_site(request, registration_id, site_id):
         "edit": False,
         "transfer": True
     }
-    return render(request=request, template_name="epilepsy12/partials/lead_site.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
 
 
 def cancel_lead_site(request, registration_id, site_id):
@@ -221,7 +189,7 @@ def cancel_lead_site(request, registration_id, site_id):
         "edit": False,
         "transfer": False
     }
-    return render(request=request, template_name="epilepsy12/partials/lead_site.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
 
 
 def update_lead_site(request, registration_id, site_id, update):
@@ -249,7 +217,7 @@ def update_lead_site(request, registration_id, site_id, update):
     }
 
     response = render(
-        request=request, template_name="epilepsy12/partials/lead_site.html", context=context)
+        request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
     trigger_client_event(
         response=response, name="add_previously_registered_site", params={})
     return response
@@ -266,7 +234,7 @@ def previous_sites(request, registration_id):
         'previously_registered_sites': previous_sites,
         'registration': registration
     }
-    return render(request=request, template_name="epilepsy12/partials/previous_sites.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/registration/previous_sites.html", context=context)
 
 
 @login_required
@@ -301,7 +269,7 @@ def confirm_eligible(request, registration_id):
         }
 
     response = render(
-        request=request, template_name='epilepsy12/partials/is_eligible_label.html', context=context)
+        request=request, template_name='epilepsy12/partials/registration/is_eligible_label.html', context=context)
 
     trigger_client_event(
         response=response, name="registration_status", params={})
@@ -319,4 +287,4 @@ def registration_status(request, registration_id):
         'registration': registration
     }
 
-    return render(request=request, template_name='epilepsy12/partials/registration_dates.html', context=context)
+    return render(request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)

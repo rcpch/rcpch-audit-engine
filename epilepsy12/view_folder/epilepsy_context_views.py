@@ -118,4 +118,4 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
         "epilepsy_context": epilepsy_context
     }
 
-    return render(request=request, template_name="epilepsy12/partials/epilepsy_diagnosis_withdrawn.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html", context=context)
