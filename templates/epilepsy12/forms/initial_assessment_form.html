@@ -53,12 +53,12 @@
   A general paediatric referral must be completed at the first assessment.
   </div>
 
-  {% include 'epilepsy12/partials/general_paediatrics_referral_made.html' with initial_assessment_id=initial_assessment.pk %}
+  {% include 'epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html' with initial_assessment_id=initial_assessment.pk %}
 
   <h5 class="header">
     The first episode
   </h5>
 
-  {% include 'epilepsy12/partials/when_the_first_epileptic_episode_occurred.html' with initial_assessment_id=initial_assessment_id when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}
+  {% include 'epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html' with initial_assessment_id=initial_assessment_id when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}
   
 </form>

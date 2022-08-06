@@ -90,7 +90,7 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
         'initial_assessment': initial_assessment
     }
 
-    return render(request=request, template_name='epilepsy12/partials/general_paediatrics_referral_made.html', context=context)
+    return render(request=request, template_name='epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html', context=context)
 
 
 def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
@@ -143,7 +143,7 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
     }
 
     # return HttpResponse(message)
-    return render(request=request, template_name="epilepsy12/partials/when_the_first_epileptic_episode_occurred.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def when_the_first_epileptic_episode_occurred_confidence(request, initial_assessment_id):
