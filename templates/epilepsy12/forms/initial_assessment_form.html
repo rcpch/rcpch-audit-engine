@@ -1,64 +1,43 @@
-<form class="ui form" method="post">
+<div class="ui form" method="post">
   {% csrf_token %}
 
   <div class="ui info message" id="info_message">
   The initial assessment must be completed with x weeks of the reported episode.
   </div>
 
-  <div class="two fields">
-    <div class="field"
-      hx-post="{% url 'date_of_initial_assessment' initial_assessment_id=initial_assessment.pk %}"
-      hx-target="#date_of_initial_assessment_result"
-      hx-trigger="change"
-    >
-      <label>Date of Initial Assessment</label>
-      <input
-        name="date_of_initial_assessment"
-        type="date"
-        value={{initial_assessment.date_of_initial_assessment|date:'Y-m-d'}}
-      />
-      <div id="date_of_initial_assessment_result"></div>
+
+
+    <div id="date_of_initial_assessment" class="field">
+      {% include 'epilepsy12/partials/initial_assessment/date_of_initial_assessment.html' with initial_assessment=initial_assessment %}
     </div>
-    <div class="eight wide field" 
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-      hx-post="{% url 'first_paediatric_assessment_in_acute_or_nonacute_setting' initial_assessment_id=initial_assessment.pk %}" 
-      hx-target="#first_paediatric_assessment_in_acute_or_nonacute_setting_result" 
-      hx-trigger="load, change"
-      hx-swap="innerHTML"
-    >
-      <label>Is the first paediatric assessment in an acute or nonacute setting?</label>
-      <select 
-        class="ui dropdown" 
-        name="first_paediatric_assessment_in_acute_or_nonacute_setting"
-      >
-          {% for item in chronicity_selection %}
-              {% if initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting == item.0 %}
-                  <option selected value={{item.0}}>{{item.1}}</option>
-              {% else %}
-                  <option value={{item.0}}>{{item.1}}</option>
-              {% endif %}
-          {% endfor %}
-      </select>
-      <div id="first_paediatric_assessment_in_acute_or_nonacute_setting_result"></div>
+    
+    
+    <div id="first_paediatric_assessment_in_acute_or_nonacute_setting" class="eight wide field">
+      {% include 'epilepsy12/partials/initial_assessment/first_paediatric_assessment_in_acute_or_nonacute_setting.html' with initial_assessment=initial_assessment chronicity_selection=chronicity_selection %}
     </div>
 
-  </div>
+
 
   <h5 class="header">
   Involving General Paediatrics
   </h5>
 
 
+
+  <div id="general_paediatrics_referral_made" class="field">
+    {% include 'epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html' with initial_assessment=initial_assessment %}
+  </div>
+
   <div class="ui info message" id="info_message">
   A general paediatric referral must be completed at the first assessment.
   </div>
-
-  {% include 'epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html' with initial_assessment_id=initial_assessment.pk %}
-
+  
   <h5 class="header">
     The first episode
   </h5>
 
-  {% include 'epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html' with initial_assessment_id=initial_assessment_id when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}
+  <div class="field" id="when_the_first_epileptic_episode_occurred">
+    {% include 'epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html' with initial_assessment=initial_assessment when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}
+  </div>
   
-</form>
+</div>

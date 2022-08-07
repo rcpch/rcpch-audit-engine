@@ -1,0 +1,15 @@
+<div 
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    class="field"
+    hx-post="{% url 'date_of_referral_to_general_paediatrics' initial_assessment_id=initial_assessment.pk %}" 
+    hx-target="#date_of_referral_to_general_paediatrics"
+    hx-swap="innerHTML"
+    hx-trigger="change"
+    hx-include="[name='date_of_referral_to_general_paediatrics']"
+    >
+        <label>Date of referral to general paediatrics</label>
+        <input
+            type="date"
+            name="date_of_referral_to_general_paediatrics"
+            value={{initial_assessment.date_of_referral_to_general_paediatrics|date:'Y-m-d'}} />
+</div>

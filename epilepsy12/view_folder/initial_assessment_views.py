@@ -51,7 +51,14 @@ def date_of_initial_assessment(request, initial_assessment_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse('Success')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        "initial_assessment": initial_assessment
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
 
 
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_assessment_id):
@@ -67,15 +74,25 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_as
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        "chronicity_selection": CHRONICITY,
+        "initial_assessment": initial_assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/first_paediatric_assessment_in_acute_or_nonacute_setting.html", context=context)
 
 
 def general_paediatrics_referral_made(request, initial_assessment_id):
 
-    general_paediatrics_referral_made = request.POST.get(
-        'general_paediatrics_referral_made')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-    if general_paediatrics_referral_made == 'on':
+    general_paediatrics_referral_made = not initial_assessment.general_paediatrics_referral_made
+
+    if general_paediatrics_referral_made:
         InitialAssessment.objects.filter(
             pk=initial_assessment_id).update(general_paediatrics_referral_made=True)
     else:
@@ -85,8 +102,9 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
     initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
+    print(f"hello {initial_assessment.general_paediatrics_referral_made} {initial_assessment.date_of_referral_to_general_paediatrics}")
+
     context = {
-        'initial_assessment_id': initial_assessment_id,
         'initial_assessment': initial_assessment
     }
 
@@ -111,7 +129,17 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
         except Exception as error:
             message = error
 
-    return HttpResponse(message)
+    else:
+        message = "no dice"
+
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        "initial_assessment": initial_assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/date_of_referral_to_general_paediatrics.html", context=context)
 
 
 def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
@@ -142,7 +170,6 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
         "episode_definition_selection": EPISODE_DEFINITION,
     }
 
-    # return HttpResponse(message)
     return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
@@ -165,142 +192,146 @@ def when_the_first_epileptic_episode_occurred_confidence(request, initial_assess
 
 def has_description_of_the_episode_or_episodes_been_gathered(request, initial_assessment_id):
 
-    has_description_of_the_episode_or_episodes_been_gathered = request.POST.get(
-        'has_description_of_the_episode_or_episodes_been_gathered')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+    has_description_of_the_episode_or_episodes_been_gathered = not initial_assessment.has_description_of_the_episode_or_episodes_been_gathered
 
-    message = "success"
-    selected = False
+    try:
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            has_description_of_the_episode_or_episodes_been_gathered=has_description_of_the_episode_or_episodes_been_gathered)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if has_description_of_the_episode_or_episodes_been_gathered:
-        if has_description_of_the_episode_or_episodes_been_gathered == 'on':
-            selected = True
-        else:
-            selected = False
+    new_initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                has_description_of_the_episode_or_episodes_been_gathered=selected)
-        except Exception as error:
-            message = error
-
-    print(selected)
-
-    return HttpResponse(message)
+    context = {
+        "initial_assessment": new_initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def has_number_of_episodes_since_the_first_been_documented(request, initial_assessment_id):
 
-    has_number_of_episodes_since_the_first_been_documented = request.POST.get(
-        'has_number_of_episodes_since_the_first_been_documented')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+    has_number_of_episodes_since_the_first_been_documented = not initial_assessment.has_number_of_episodes_since_the_first_been_documented
 
-    message = "success"
-    selected = False
+    try:
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            has_number_of_episodes_since_the_first_been_documented=has_number_of_episodes_since_the_first_been_documented)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if has_number_of_episodes_since_the_first_been_documented:
-        if has_number_of_episodes_since_the_first_been_documented == 'on':
-            selected = True
-        else:
-            selected = False
+    new_initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                has_number_of_episodes_since_the_first_been_documented=selected)
-        except Exception as error:
-            message = error
-
-    return HttpResponse(message)
+    context = {
+        "initial_assessment": new_initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def general_examination_performed(request, initial_assessment_id):
 
-    general_examination_performed = request.POST.get(
-        'general_examination_performed')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+    general_examination_performed = not initial_assessment.general_examination_performed
 
-    message = "success"
-    selected = False
+    try:
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            general_examination_performed=general_examination_performed)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if general_examination_performed:
-        if general_examination_performed == 'on':
-            selected = True
-        else:
-            selected = False
+    new_initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                general_examination_performed=selected)
-        except Exception as error:
-            message = error
-
-    return HttpResponse(message)
+    context = {
+        "initial_assessment": new_initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def neurological_examination_performed(request, initial_assessment_id):
 
-    neurological_examination_performed = request.POST.get(
-        'neurological_examination_performed')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+    neurological_examination_performed = not initial_assessment.neurological_examination_performed
 
-    message = "success"
-    selected = False
+    try:
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            neurological_examination_performed=neurological_examination_performed)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if neurological_examination_performed:
-        if neurological_examination_performed == 'on':
-            selected = True
-        else:
-            selected = False
+    new_initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                neurological_examination_performed=selected)
-        except Exception as error:
-            message = error
-
-    return HttpResponse(message)
+    context = {
+        "initial_assessment": new_initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def developmental_learning_or_schooling_problems(request, initial_assessment_id):
 
-    developmental_learning_or_schooling_problems = request.POST.get(
-        'developmental_learning_or_schooling_problems')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+    developmental_learning_or_schooling_problems = not initial_assessment.developmental_learning_or_schooling_problems
 
-    message = "success"
-    selected = False
+    try:
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            developmental_learning_or_schooling_problems=developmental_learning_or_schooling_problems)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if developmental_learning_or_schooling_problems:
-        if developmental_learning_or_schooling_problems == 'on':
-            selected = True
-        else:
-            selected = False
+    new_initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                developmental_learning_or_schooling_problems=selected)
-        except Exception as error:
-            message = error
-
-    return HttpResponse(message)
+    context = {
+        "initial_assessment": new_initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def behavioural_or_emotional_problems(request, initial_assessment_id):
 
-    behavioural_or_emotional_problems = request.POST.get(
-        'behavioural_or_emotional_problems')
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+    behavioural_or_emotional_problems = not initial_assessment.behavioural_or_emotional_problems
 
-    message = "success"
-    selected = False
+    try:
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            behavioural_or_emotional_problems=behavioural_or_emotional_problems)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if behavioural_or_emotional_problems:
-        if behavioural_or_emotional_problems == 'on':
-            selected = True
-        else:
-            selected = False
+    new_initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
 
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                behavioural_or_emotional_problems=selected)
-        except Exception as error:
-            message = error
-
-    return HttpResponse(message)
+    context = {
+        "initial_assessment": new_initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def diagnostic_status(request, initial_assessment_id):

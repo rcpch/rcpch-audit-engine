@@ -1,0 +1,12 @@
+<div class="field"
+    hx-post="{% url 'date_of_initial_assessment' initial_assessment_id=initial_assessment.pk %}"
+    hx-target="#date_of_initial_assessment"
+    hx-trigger="change"
+>
+    <label>Date of Initial Assessment</label>
+    <input
+    name="date_of_initial_assessment"
+    type="date"
+    value={{initial_assessment.date_of_initial_assessment|date:'Y-m-d'}}
+    />
+</div>

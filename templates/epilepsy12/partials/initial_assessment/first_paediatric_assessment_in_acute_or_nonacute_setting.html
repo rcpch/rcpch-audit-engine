@@ -1,0 +1,21 @@
+<div class="eight wide field" 
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+    hx-post="{% url 'first_paediatric_assessment_in_acute_or_nonacute_setting' initial_assessment_id=initial_assessment.pk %}" 
+    hx-target="#first_paediatric_assessment_in_acute_or_nonacute_setting" 
+    hx-trigger="load, change"
+    hx-swap="outerHTML"
+>
+    <label>Is the first paediatric assessment in an acute or nonacute setting?</label>
+    <select 
+    class="ui dropdown" 
+    name="first_paediatric_assessment_in_acute_or_nonacute_setting"
+    >
+        {% for item in chronicity_selection %}
+            {% if initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting == item.0 %}
+                <option selected value={{item.0}}>{{item.1}}</option>
+            {% else %}
+                <option value={{item.0}}>{{item.1}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+</div>
