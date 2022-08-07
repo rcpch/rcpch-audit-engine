@@ -1,4 +1,4 @@
-<div id="when_the_first_epileptic_episode_occurred">
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' >
     <div class="three fields">
         
         <div class="field"
@@ -16,7 +16,6 @@
         
         {% if initial_assessment.when_the_first_epileptic_episode_occurred %}
             <div class="field" 
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
                 hx-post="{% url 'when_the_first_epileptic_episode_occurred_confidence' initial_assessment_id=initial_assessment.pk %}" 
                 hx-target="#when_the_first_epileptic_episode_occurred_confidence_result" 
                 hx-trigger="load, change"
@@ -49,82 +48,175 @@
     {% if initial_assessment.when_the_first_epileptic_episode_occurred %}
         <div class="ui segment">
             <div class="header">
-                During the time period from the patient's first paroxysmal episode considered epileptic to the first paediatric assessment was there documentation of the following:
+                During the time period from the patient's first paroxysmal episode considered epileptic to the first paediatric assessment select where there is documentation of the following:
             </div>
             <div class="two fields">
+
                 <div class="field">
-                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#has_description_of_the_episode_or_episodes_been_gathered_result" hx-swap="outerHTML" name="has_description_of_the_episode_or_episodes_been_gathered">
+
                     {% if initial_assessment.has_description_of_the_episode_or_episodes_been_gathered %}
-                        <input type="checkbox" name="has_description_of_the_episode_or_episodes_been_gathered" checked="">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button active"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >Yes</div>
+                        <label>A description of the episode(s)</label>
+                    </span>
                     {% else %}
-                        <input type="checkbox" name="has_description_of_the_episode_or_episodes_been_gathered">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-trigger='click' 
+                            hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >No</div>
+                        <label>A description of the episode(s)</label>
+                    </span>
                     {% endif %}
-                        <label>Has description of episode(s) been gathered?</label>
-                    </div>
+
                 </div>
-                <div hidden id="has_description_of_the_episode_or_episodes_been_gathered_result"></div>
+
                 <div class="field">
-                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#has_number_of_episodes_since_the_first_been_documented_result" hx-swap="outerHTML" name="has_number_of_episodes_since_the_first_been_documented">
+
                     {% if initial_assessment.has_number_of_episodes_since_the_first_been_documented %}
-                        <input type="checkbox" name="has_number_of_episodes_since_the_first_been_documented" checked="">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button active"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-post="{% url 'has_number_of_episodes_since_the_first_been_documented' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >Yes</div>
+                        <label>The number of episodes</label>
+                    </span>
                     {% else %}
-                        <input type="checkbox" name="has_number_of_episodes_since_the_first_been_documented">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-trigger='click' 
+                            hx-post="{% url 'has_number_of_episodes_since_the_first_been_documented' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >No</div>
+                        <label>The number of episodes</label>
+                    </span>
                     {% endif %}
-                        <label>Has the number of episodes been documented?</label>
-                    </div>
+
                 </div>
-                <div hidden id="has_number_of_episodes_since_the_first_been_documented_result"></div>
+                
             </div>
+
             <div class="two fields">
+
                 <div class="field">
-                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#general_examination_performed_result" hx-swap="outerHTML" name="general_examination_performed">
                     {% if initial_assessment.general_examination_performed %}
-                        <input type="checkbox" name="general_examination_performed" checked="">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button active"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >Yes</div>
+                        <label>Clinical examination has been performed.</label>
+                    </span>
                     {% else %}
-                        <input type="checkbox" name="general_examination_performed">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-trigger='click' 
+                            hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >No</div>
+                        <label>Clinical examination has been performed.</label>
+                    </span>
                     {% endif %}
-                        <label>Was clinical examination documented?</label>
-                    </div>
                 </div>
-                <div hidden id="general_examination_performed_result"></div>
+
                 <div class="field">
-                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#neurological_examination_performed_result" hx-swap="outerHTML" name="neurological_examination_performed">
                     {% if initial_assessment.neurological_examination_performed %}
-                        <input type="checkbox" name="neurological_examination_performed" checked="">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button active"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >Yes</div>
+                        <label>A neurological examination has been performed.</label>
+                    </span>
                     {% else %}
-                        <input type="checkbox" name="neurological_examination_performed">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-trigger='click' 
+                            hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >No</div>
+                        <label>A neurological examination has been performed.</label>
+                    </span>
                     {% endif %}
-                        <label>Has a neurological examination been documented?</label>
-                    </div>
                 </div>
-                <div hidden id="neurological_examination_performed_result"></div>
+                    
             </div>
+
             <div class="two fields">
+
                 <div class="field">
-                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#developmental_learning_or_schooling_problems_result" hx-swap="outerHTML" name="developmental_learning_or_schooling_problems">
                     {% if initial_assessment.developmental_learning_or_schooling_problems %}
-                        <input type="checkbox" name="developmental_learning_or_schooling_problems" checked="">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button active"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >Yes</div>
+                        <label>Learning, developmental or educational difficulties have been sought.</label>
+                    </span>
                     {% else %}
-                        <input type="checkbox" name="developmental_learning_or_schooling_problems">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-trigger='click' 
+                            hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >No</div>
+                        <label>Learning, developmental or educational difficulties have been sought.</label>
+                    </span>
                     {% endif %}
-                        <label>Are there any learning, developmental or educational difficulties?</label>
-                    </div>
                 </div>
-                <div hidden id="developmental_learning_or_schooling_problems_result"></div>
+
                 <div class="field">
-                    <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}" hx-trigger="change" hx-target="#behavioural_or_emotional_problems_result" hx-swap="outerHTML" name="behavioural_or_emotional_problems">
                     {% if initial_assessment.behavioural_or_emotional_problems %}
-                        <input type="checkbox" name="behavioural_or_emotional_problems" checked="">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button active"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >Yes</div>
+                        <label>Emotional or behavioural problems have been sought.</label>
+                    </span>
                     {% else %}
-                        <input type="checkbox" name="behavioural_or_emotional_problems">
+                    <span>
+                        <div 
+                            class="ui tiny compact toggle button"
+                            hx-target="#when_the_first_epileptic_episode_occurred"
+                            hx-trigger='click' 
+                            hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}"
+                            hx-swap="innerHTML"
+                        >No</div>
+                        <label>Emotional or behavioural problems have been sought.</label>
+                    </span>
                     {% endif %}
-                        <label>Are there any emotional or behavioural difficulties?</label>
-                    </div>
                 </div>
-                <div hidden id="behavioural_or_emotional_problems_result"></div>
+
             </div>
- 
-        </div>
+
+    {% endif %}
 
         <h5 class="header">
         Case Definition
@@ -177,5 +269,5 @@
             <div hidden id="episode_definition_result"></div>
         </div>
 
-    {% endif %}
+    
 </div>

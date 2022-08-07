@@ -3,7 +3,7 @@
 Initial Assessment 
 {% endblock %} 
 {% block audit_section_form %} 
-{% include './forms/initial_assessment_form.html' %} 
+{% include './forms/initial_assessment_form.html' with initial_assessment=initial_assessment %} 
 {% endblock %} 
 {% block audit_section_instructions %} 
 These items must be completed at the first assessment. There are lots of dates gathered here - these are important for

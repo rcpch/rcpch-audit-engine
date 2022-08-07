@@ -1,26 +1,40 @@
-<div class="two fields" id="general_paediatrics_referral_made_result">    
-  <div class="field">
-      <div class="ui toggle checkbox" hx-trigger='change' hx-post="{% url 'general_paediatrics_referral_made' initial_assessment_id=initial_assessment_id %}" hx-trigger="change" hx-target="#general_paediatrics_referral_made_result" hx-swap="outerHTML" name="general_paediatrics_referral_made">
+<form class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div class="field" >
+    <span>
       {% if initial_assessment.general_paediatrics_referral_made %}
-        <input type="checkbox" name="general_paediatrics_referral_made" checked="">
-      {% else %}
-        <input type="checkbox" name="general_paediatrics_referral_made">
+            
+              <div 
+                  class="ui tiny compact toggle button active"
+                  hx-target="#general_paediatrics_referral_made"
+                  hx-post="{% url 'general_paediatrics_referral_made' initial_assessment_id=initial_assessment.pk %}"
+                  hx-swap="innerHTML"
+              >
+              Yes
+              </div>
+              <label class="toggle_button_label">Has a referral to general paediatrics been made?</label>
+              
+            
+          {% else %}
+            
+              <div 
+                  class="ui tiny compact toggle button"
+                  hx-target="#general_paediatrics_referral_made"
+                  hx-trigger='click' 
+                  hx-post="{% url 'general_paediatrics_referral_made' initial_assessment_id=initial_assessment.pk %}"
+                  hx-swap="innerHTML"
+              >No</div>
+              <label class="toggle_button_label">Has a referral to general paediatrics been made?</label>
+            
+          
       {% endif %}
-        <label>Has a referral to general paediatrics been made?</label>
-      </div>
+
+      
+    </span>
+</div>
+{% if initial_assessment.general_paediatrics_referral_made %}
+  <div id="date_of_referral_to_general_paediatrics" class="field">
+        {% include 'epilepsy12/partials/initial_assessment/date_of_referral_to_general_paediatrics.html' with initial_assessment=initial_assessment %}
   </div>
-    {% if initial_assessment.general_paediatrics_referral_made %}
-      <div 
-        class="field" 
-        hx-post="{% url 'date_of_referral_to_general_paediatrics' initial_assessment_id=initial_assessment_id %}" 
-        hx-target="#date_of_referral_to_general_paediatrics_result" 
-        hx-trigger="load, change">
-          <label>Date of referral to general paediatrics</label>
-          <input 
-            type="date"
-            name="date_of_referral_to_general_paediatrics" 
-            value={{initial_assessment.date_of_referral_to_general_paediatrics|date:'Y-m-d'}}>
-      </div>
-      <div id="date_of_referral_to_general_paediatrics_result"></div>
-      {% endif %}
+{% endif %}
+
 </div>
