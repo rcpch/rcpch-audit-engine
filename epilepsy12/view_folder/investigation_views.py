@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils.timezone import make_aware
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.models.investigations import Investigation
@@ -43,12 +44,15 @@ def eeg_indicated(request, investigations_id):
 
 def eeg_request_date(request, investigations_id):
     investigations = Investigation.objects.get(pk=investigations_id)
-    eeg_request_date = request.POST.get('eeg_request_date')
+    naive_eeg_request_date = datetime.strptime(
+        request.POST.get('eeg_request_date'), "%Y-%m-%d").date()
+
+    # aware_eeg_request_date = make_aware(naive_eeg_request_date)
 
     Investigation.objects.filter(pk=investigations_id).update(
-        eeg_request_date=datetime.strptime(
-            eeg_request_date, "%Y-%m-%d").date())
+        eeg_request_date=naive_eeg_request_date)
     investigations = Investigation.objects.get(pk=investigations_id)
+
     context = {
         'investigations': investigations
     }
@@ -58,11 +62,11 @@ def eeg_request_date(request, investigations_id):
 
 def eeg_performed_date(request, investigations_id):
     investigations = Investigation.objects.get(pk=investigations_id)
-    eeg_performed_date = request.POST.get('eeg_performed_date')
+    naive_eeg_performed_date = datetime.strptime(
+        request.POST.get('eeg_performed_date'), "%Y-%m-%d").date()
 
     Investigation.objects.filter(pk=investigations_id).update(
-        eeg_requested=datetime.strptime(
-            eeg_performed_date, "%Y-%m-%d").date())
+        eeg_performed_date=naive_eeg_performed_date)
     investigations = Investigation.objects.get(pk=investigations_id)
     context = {
         'investigations': investigations
