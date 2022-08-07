@@ -225,6 +225,16 @@
             </div>
         {% endif %}
     </div>
+{{investigation_management.pk}}
+    <div class="field"
+        
+        hx-target="#medication_dropdown"
+        hx-trigger="keyup"
+        hx-swap="innerHTML"
+    >
+        <input type="text" placeholder="Enter a medication..." name="medication_input"/>
+    </div>
+    <div id="medication_dropdown"></div>
 
     <button type="submit" class="ui green button" name="update">Save</button>
     <button type="submit" class="ui red button" name="delete">Delete</button>

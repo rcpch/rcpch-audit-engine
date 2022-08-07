@@ -47,6 +47,8 @@ urlpatterns = [
          name='hospital-autocomplete'),
     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
          name='semiology-keyword-autocomplete'),
+    path('investigations/<int:case_id>',
+         views.investigations, name='investigations')
 ]
 
 htmx_paths = [
@@ -213,8 +215,27 @@ htmx_paths = [
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/diagnosis_of_epilepsy_withdrawn',
          views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
 
+    # investigation_management htmx
+    path('htmx/investigation_management/<int:investigation_management_id>/medication_lookup',
+         views.medication_lookup, name="medication_lookup"),
 
 
+    # investigations
+    path('htmx/investigations/<int:investigations_id>/eeg_indicated',
+         views.eeg_indicated, name="eeg_indicated"),
+    path('htmx/investigations/<int:investigations_id>/eeg_request_date',
+         views.eeg_request_date, name="eeg_request_date"),
+    path('htmx/investigations/<int:investigations_id>/eeg_performed_date',
+         views.eeg_performed_date, name="eeg_performed_date"),
+
+    path('htmx/investigations/<int:investigations_id>/twelve_lead_ecg_status',
+         views.twelve_lead_ecg_status, name="twelve_lead_ecg_status"),
+    path('htmx/investigations/<int:investigations_id>/ct_head_scan_status',
+         views.ct_head_scan_status, name="ct_head_scan_status"),
+    path('htmx/investigations/<int:investigations_id>/mri_indicated',
+         views.mri_indicated, name="mri_indicated"),
+    path('htmx/investigations/<int:investigations_id>/mri_brain_date',
+         views.mri_brain_date, name="mri_brain_date"),
 
 
 ]

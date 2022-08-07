@@ -1,108 +1,255 @@
 {% block steps %}
-<div class="ui ordered tiny steps">
+<div class="ui ordered mini steps">
     {% if initial_assessment_complete %}
         {% if active_template == "initial_assessment" %}
           <a class="active completed step" href="{% url 'initial_assessment' case_id %}">
+            <div class="content">
+              <div class="title">Initial Assessment</div>
+              <div class="description">The first visit</div>
+            </div>
+          </a>
         {% else %}
           <a class="completed step" href="{% url 'initial_assessment' case_id %}">
+            <div class="content">
+              <div class="title">Initial Assessment</div>
+              <div class="description">The first visit</div>
+            </div>
+          </a>
         {% endif %}
     {% else %}
         {% if active_template == "initial_assessment" %}
           <a href="{% url 'initial_assessment' case_id %}" class="active step">
+            <div class="content">
+              <div class="title">Initial Assessment</div>
+              <div class="description">The first visit</div>
+            </div>
+          </a>
         {% elif active_template == "none" %}
           <a href="{% url 'initial_assessment' case_id %}" class="disabled step">
+            <div class="content">
+              <div class="title">Initial Assessment</div>
+              <div class="description">The first visit</div>
+            </div>
+          </a>
         {% else %}
           <a href="{% url 'initial_assessment' case_id %}" class="step">
+            <div class="content">
+              <div class="title">Initial Assessment</div>
+              <div class="description">The first visit</div>
+            </div>
+          </a>
         {% endif %}
     {% endif %}
-      <div class="content">
-        <div class="title">Initial Assessment</div>
-        <div class="description">The first visit</div>
-      </div>
-    </a>
+    
 
     {% if epilepsy_context_complete %}
       {% if active_template == "epilepsy_context" %}
         <a class="active completed step" href="{% url 'epilepsy_context' case_id %}">
+          <div class="content">
+              <div class="title">Epilepsy Context</div>
+              <div class="description">Background and Risk Factors</div>
+            </div>
+        </a>
       {% else %}
         <a class="completed step" href="{% url 'epilepsy_context' case_id %}">
+          <div class="content">
+              <div class="title">Epilepsy Context</div>
+              <div class="description">Background and Risk Factors</div>
+            </div>
+        </a>
       {% endif %}
     {% else %}
         {% if active_template == "epilepsy_context" %}
           <a href="{% url 'epilepsy_context' case_id %}" class="active step">
+            <div class="content">
+              <div class="title">Epilepsy Context</div>
+              <div class="description">Background and Risk Factors</div>
+            </div>
+          </a>
         {% elif active_template == "none" %}
             <a class="disabled step" href="{% url 'epilepsy_context' case_id %}">
+              <div class="content">
+              <div class="title">Epilepsy Context</div>
+              <div class="description">Background and Risk Factors</div>
+            </div>
+            </a>
         {% else %}
           <a href="{% url 'epilepsy_context' case_id %}" class="step">
+            <div class="content">
+              <div class="title">Epilepsy Context</div>
+              <div class="description">Background and Risk Factors</div>
+            </div>
+          </a>
         {% endif %}
     {% endif %}
-      <div class="content">
-        <div class="title">Epilepsy Context</div>
-        <div class="description">Background and Risk Factors</div>
-      </div>
-    </a>
+    
     
     {% if multiaxial_description_complete %}
       {% if active_template == "multiaxial_description" %}
         <a class="active completed step" href="{% url 'multiaxial_description' case_id %}">
+          <div class="content">
+              <div class="title">Multiaxial Description</div>
+              <div class="description">DESSCRIBE definition</div>
+            </div>
+        </a>
       {% else %}
         <a class="completed step" href="{% url 'multiaxial_description' case_id %}">
+          <div class="content">
+              <div class="title">Multiaxial Description</div>
+              <div class="description">DESSCRIBE definition</div>
+            </div>
+        </a>
       {% endif %}
     {% else %}
         {% if active_template == "multiaxial_description" %}
           <a href="{% url 'multiaxial_description' case_id %}" class="active step">
+            <div class="content">
+              <div class="title">Multiaxial Description</div>
+              <div class="description">DESSCRIBE definition</div>
+            </div>
+          </a>
         {% elif active_template == "none" %}
           <a href="{% url 'multiaxial_description' case_id %}" class="disabled step">
+            <div class="content">
+              <div class="title">Multiaxial Description</div>
+              <div class="description">DESSCRIBE definition</div>
+            </div>
+          </a>
         {% else %}
           <a href="{% url 'multiaxial_description' case_id %}" class="step">
+            <div class="content">
+              <div class="title">Multiaxial Description</div>
+              <div class="description">DESSCRIBE definition</div>
+            </div>
+          </a>
         {% endif %}
     {% endif %}
-      <div class="content">
-        <div class="title">Multiaxial Description</div>
-        <div class="description">DESSCRIBE definition</div>
-      </div>
-    </a>
+    
 
     {% if assessment_complete %}
         {% if active_template == "assessment" %}
           <a class="active completed step" href="{% url 'assessment' case_id %}">
+            <div class="content">
+              <div class="title">Milestones</div>
+              <div class="description">Important milestones</div>
+            </div>
+          </a>
         {% else %}
           <a class="completed step" href="{% url 'assessment' case_id %}">
+            <div class="content">
+              <div class="title">Milestones</div>
+              <div class="description">Important milestones</div>
+            </div>
+          </a>
         {% endif %}
     {% else %}
         {% if active_template == "assessment" %}
           <a href="{% url 'assessment' case_id %}" class="active step">
+            <div class="content">
+              <div class="title">Milestones</div>
+              <div class="description">Important milestones</div>
+            </div>
+          </a>
         {% elif active_template == "none" %}
           <a href="{% url 'assessment' case_id %}" class="disabled step">
+            <div class="content">
+              <div class="title">Milestones</div>
+              <div class="description">Important milestones</div>
+            </div>
+          </a>
         {% else %}
           <a href="{% url 'assessment' case_id %}" class="step">
+            <div class="content">
+              <div class="title">Milestones</div>
+              <div class="description">Important milestones</div>
+            </div>
+          </a>
         {% endif %}
     {% endif %}
-      <div class="content">
-        <div class="title">Milestones</div>
-        <div class="description">Important milestones</div>
-      </div>
-    </a>
+    
+
+    {% if investigations_complete %}
+      {% if active_template == "investigations" %}
+        <a class="active completed step" href="{% url 'investigations' case_id %}">
+          <div class="content">
+            <div class="title">Tests</div>
+            <div class="description">EEG, ECG and MRI</div>
+          </div>
+        </a>
+      {% else %}
+        <a class="completed step" href="{% url 'investigations' case_id %}">
+          <div class="content">
+            <div class="title">Tests</div>
+            <div class="description">EEG, ECG and MRI</div>
+          </div>
+        </a>
+      {% endif %}
+    {% else %}
+      {% if active_template == "investigations" %}
+        <a href="{% url 'investigations' case_id %}" class="active step">
+          <div class="content">
+            <div class="title">Tests</div>
+            <div class="description">EEG, ECG and MRI</div>
+          </div>
+        </a>
+      {% elif active_template == "none" %}
+        <a href="{% url 'investigations' case_id %}" class="disabled step">
+          <div class="content">
+            <div class="title">Tests</div>
+            <div class="description">EEG, ECG and MRI</div>
+          </div>
+        </a>
+      {% else %}
+        <a href="{% url 'investigations' case_id %}" class="step">
+          <div class="content">
+            <div class="title">Tests</div>
+            <div class="description">EEG, ECG and MRI</div>
+          </div>
+        </a>
+      {% endif %}
+    {% endif %}
 
     {% if investigation_management_complete %}
       {% if active_template == "investigation_management" %}
         <a class="active completed step" href="{% url 'update_investigation_management' case_id %}">
+          <div class="content">
+            <div class="title">Tests & Treatment</div>
+            <div class="description">Tests, medications and teams</div>
+          </div>
+        </a>
       {% else %}
         <a class="completed step" href="{% url 'update_investigation_management' case_id %}">
+          <div class="content">
+            <div class="title">Tests & Treatment</div>
+            <div class="description">Tests, medications and teams</div>
+          </div>
+        </a>
       {% endif %}
     {% else %}
       {% if active_template == "investigation_management" %}
         <a href="{% url 'update_investigation_management' case_id %}" class="active step">
+          <div class="content">
+            <div class="title">Tests & Treatment</div>
+            <div class="description">Tests, medications and teams</div>
+          </div>
+        </a>
       {% elif active_template == "none" %}
         <a href="{% url 'update_investigation_management' case_id %}" class="disabled step">
+          <div class="content">
+            <div class="title">Tests & Treatment</div>
+            <div class="description">Tests, medications and teams</div>
+          </div>
+        </a>
       {% else %}
         <a href="{% url 'create_investigation_management' case_id %}" class="step">
+          <div class="content">
+            <div class="title">Tests & Treatment</div>
+            <div class="description">Tests, medications and teams</div>
+          </div>
+        </a>
       {% endif %}
     {% endif %}
-      <div class="content">
-        <div class="title">Tests & Treatment</div>
-        <div class="description">Tests, medications and teams</div>
-      </div>
-    </a>
+      
+
   </div>
 {% endblock steps %}

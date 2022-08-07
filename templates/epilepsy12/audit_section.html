@@ -20,7 +20,7 @@
   {% block audit_section_instructions %}{% endblock %}
 </div>
 {% block audit_section_list %}{% endblock %}
-<div class="ui container">
+
   {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete assessment=assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
-</div>
+
 {% endblock %}
