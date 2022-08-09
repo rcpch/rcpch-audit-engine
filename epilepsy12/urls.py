@@ -40,6 +40,10 @@ urlpatterns = [
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
+    #     management paths
+    path('management/<int:case_id>',
+         views.management, name='management'),
+
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
@@ -139,7 +143,7 @@ htmx_paths = [
     path('htmx/registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
 
-
+    # assessment paths
     path('htmx/registration/<int:registration_id>/consultant_paediatrician_referral_made',
          views.consultant_paediatrician_referral_made, name="consultant_paediatrician_referral_made"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_date',
@@ -152,6 +156,14 @@ htmx_paths = [
          views.paediatric_neurologist_referral_date, name="paediatric_neurologist_referral_date"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_input_date',
          views.paediatric_neurologist_input_date, name="paediatric_neurologist_input_date"),
+
+    path('htmx/registration/<int:assessment_id>/epilepsy_specialist_nurse_referral_made',
+         views.epilepsy_specialist_nurse_referral_made, name="epilepsy_specialist_nurse_referral_made"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_date',
+         views.epilepsy_specialist_nurse_referral_date, name="epilepsy_specialist_nurse_referral_date"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_input_date',
+         views.epilepsy_specialist_nurse_input_date, name="epilepsy_specialist_nurse_input_date"),
+
     path('htmx/registration/<int:registration_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
          views.childrens_epilepsy_surgical_service_referral_criteria_met, name="childrens_epilepsy_surgical_service_referral_criteria_met"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_date',
@@ -236,6 +248,8 @@ htmx_paths = [
          views.mri_indicated, name="mri_indicated"),
     path('htmx/investigations/<int:investigations_id>/mri_brain_date',
          views.mri_brain_date, name="mri_brain_date"),
+
+    # management
 
 
 ]

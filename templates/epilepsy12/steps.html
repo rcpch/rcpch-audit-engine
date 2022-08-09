@@ -209,41 +209,41 @@
       {% endif %}
     {% endif %}
 
-    {% if investigation_management_complete %}
-      {% if active_template == "investigation_management" %}
-        <a class="active completed step" href="{% url 'update_investigation_management' case_id %}">
+    {% if management_complete %}
+      {% if active_template == "managment" %}
+        <a class="active completed step" href="{% url 'management' case_id %}">
           <div class="content">
-            <div class="title">Tests & Treatment</div>
+            <div class="title">Treatment and Plans</div>
             <div class="description">Tests, medications and teams</div>
           </div>
         </a>
       {% else %}
-        <a class="completed step" href="{% url 'update_investigation_management' case_id %}">
+        <a class="completed step" href="{% url 'management' case_id %}">
           <div class="content">
-            <div class="title">Tests & Treatment</div>
+            <div class="title">Treatment and Plans</div>
             <div class="description">Tests, medications and teams</div>
           </div>
         </a>
       {% endif %}
     {% else %}
-      {% if active_template == "investigation_management" %}
-        <a href="{% url 'update_investigation_management' case_id %}" class="active step">
+      {% if active_template == "managment" %}
+        <a href="{% url 'management' case_id %}" class="active step">
           <div class="content">
-            <div class="title">Tests & Treatment</div>
+            <div class="title">Treatment and Plans</div>
             <div class="description">Tests, medications and teams</div>
           </div>
         </a>
       {% elif active_template == "none" %}
-        <a href="{% url 'update_investigation_management' case_id %}" class="disabled step">
+        <a href="{% url 'management' case_id %}" class="disabled step">
           <div class="content">
-            <div class="title">Tests & Treatment</div>
+            <div class="title">Treatment and Plans</div>
             <div class="description">Tests, medications and teams</div>
           </div>
         </a>
       {% else %}
-        <a href="{% url 'create_investigation_management' case_id %}" class="step">
+        <a href="{% url 'management' case_id %}" class="step">
           <div class="content">
-            <div class="title">Tests & Treatment</div>
+            <div class="title">Treatment and Plans</div>
             <div class="description">Tests, medications and teams</div>
           </div>
         </a>

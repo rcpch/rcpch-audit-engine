@@ -7,6 +7,7 @@ from epilepsy12.models.investigations import Investigation
 from epilepsy12.models.registration import Registration
 
 
+@login_required
 def investigations(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()
 

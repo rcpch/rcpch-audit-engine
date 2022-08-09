@@ -25,6 +25,10 @@
 
   {% include 'epilepsy12/partials/assessment/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
   
+  <div id="epilepsy_specialist_nurse">
+    {% include 'epilepsy12/partials/assessment/epilepsy_nurse.html' with assessment=registration.assessment %}
+  </div>
+  
   {% include 'epilepsy12/partials/assessment/aed_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %}
  
   {% include 'epilepsy12/partials/assessment/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 

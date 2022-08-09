@@ -192,6 +192,66 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 
 
 @login_required
+def epilepsy_specialist_nurse_referral_made(request, assessment_id):
+    assessment = Assessment.objects.get(pk=assessment_id)
+    epilepsy_specialist_nurse_referral_made = not assessment.epilepsy_specialist_nurse_referral_made
+
+    try:
+        Assessment.objects.filter(pk=assessment_id).update(
+            epilepsy_specialist_nurse_referral_made=epilepsy_specialist_nurse_referral_made)
+    except Exception as error:
+        return HttpResponse(error)
+
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    context = {
+        "assessment": assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+
+@login_required
+def epilepsy_specialist_nurse_referral_date(request, assessment_id):
+    new_date = request.POST.get(
+        'epilepsy_specialist_nurse_referral_date')
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.epilepsy_specialist_nurse_referral_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+
+    context = {
+        "assessment": assessment,
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+
+@login_required
+def epilepsy_specialist_nurse_input_date(request, assessment_id):
+    new_date = request.POST.get(
+        'epilepsy_specialist_nurse_input_date')
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.epilepsy_specialist_nurse_input_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+
+    context = {
+        "assessment": assessment,
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+
+@login_required
 def has_an_aed_been_given(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -329,7 +389,6 @@ def experienced_prolonged_focal_seizures(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return HttpResponse('success', context)
     return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
 
 

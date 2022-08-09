@@ -88,6 +88,23 @@ class Assessment(models.Model):
         default=None,
         null=True
     )
+    epilepsy_specialist_nurse_referral_made = models.BooleanField(
+        "Has a referral to an epilepsy nurse specialist been made?",
+        default=False,
+        null=True
+    )
+    epilepsy_specialist_nurse_referral_date = models.DateField(
+        "Date of referral to an epilepsy nurse specialist",
+        blank=True,
+        default=None,
+        null=True
+    )
+    epilepsy_specialist_nurse_input_date = models.DateField(
+        "Date seen by an epilepsy nurse specialist",
+        blank=True,
+        default=None,
+        null=True
+    )
     were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
         "Were any of the epileptic seizures convulsive?",
         default=False,
@@ -100,11 +117,6 @@ class Assessment(models.Model):
     )
     experienced_prolonged_focal_seizures = models.BooleanField(
         "Were there any prolonged focal seizures?",
-        default=False,
-        null=True
-    )
-    has_an_aed_been_given = models.BooleanField(
-        "Has an antiepilepsy medicine been given?",
         default=False,
         null=True
     )

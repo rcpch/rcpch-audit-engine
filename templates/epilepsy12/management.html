@@ -1,0 +1,10 @@
+{% extends './audit_section.html' %} 
+{% block audit_section_title %}
+Treatment and Plans
+{% endblock %} 
+{% block audit_section_form %} 
+{% include './forms/management_form.html' with investigations=investigations %} 
+{% endblock %} 
+{% block audit_section_instructions %} 
+These are the milestones for medications and care plans.
+{% endblock %}

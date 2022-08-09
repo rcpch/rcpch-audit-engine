@@ -9,3 +9,4 @@ from .comorbidity_views import *
 from .hospital_trust_autocomplete import *
 from .semiology_keyword_autocomplete import *
 from .investigation_views import *
+from .management_views import *

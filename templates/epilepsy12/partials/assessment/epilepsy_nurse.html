@@ -1,0 +1,54 @@
+
+
+
+<div class="ui segment" id="epilepsy_specialist_nurse_referral_made">
+    <div class="field">
+        <div class="ui toggle checkbox" 
+            hx-post="{% url 'epilepsy_specialist_nurse_referral_made' assessment_id=assessment.pk %}"
+            hx-trigger="change"
+            hx-target="#epilepsy_specialist_nurse"
+            hx-swap="innerHTML"
+        >
+        {% if assessment.epilepsy_specialist_nurse_referral_made %}
+            <input 
+                type="checkbox" 
+                name="epilepsy_specialist_nurse_referral_made"
+                checked=""
+            />
+        {% else %}
+            <input 
+                type="checkbox" 
+                name="epilepsy_specialist_nurse_referral_made"
+            />
+        {% endif %}
+        <label>Has a referral been made to an epilepsy nurse specialist?</label>
+        </div>
+    </div>
+    {% if assessment.epilepsy_specialist_nurse_referral_made %}
+        <div class="two fields">
+            <div class="field"
+                hx-post="{% url 'epilepsy_specialist_nurse_referral_date' assessment_id=assessment.pk %}"
+                hx-target="#epilepsy_specialist_nurse"
+                hx-trigger="change"
+            >
+                <label>Date of referral to a epilepsy nurse specialise</label>
+                <input 
+                    type="date" 
+                    name="epilepsy_specialist_nurse_referral_date" 
+                    value={{assessment.epilepsy_specialist_nurse_referral_date|date:'Y-m-d'}}
+                />
+            </div>
+
+            <div class="field"
+                hx-post="{% url 'epilepsy_specialist_nurse_input_date' assessment_id=assessment.pk %}"
+                hx-target="#epilepsy_specialist_nurse"
+                hx-trigger="change"
+            >
+                <label>Date seen by children's epilepsy surgery service</label>
+                <input type="date" 
+                    name="epilepsy_specialist_nurse_input_date" 
+                    value="{{assessment.epilepsy_specialist_nurse_input_date|date:'Y-m-d'}}"/>
+            </div>
+        </div>
+    {% endif %}
+</div>
