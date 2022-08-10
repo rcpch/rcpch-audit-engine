@@ -26,3 +26,39 @@ def management(request, case_id):
         "active_template": "investigations"
     }
     return render(request=request, template_name='epilepsy12/management.html', context=context)
+
+
+@login_required
+def has_an_aed_been_given(request, management_id):
+
+    management = Management.objects.get(pk=management_id)
+
+    has_an_aed_been_given = not management.has_an_aed_been_given
+
+    management.has_an_aed_been_given = has_an_aed_been_given
+    management.save()
+
+    context = {
+        'management': management
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/management/aeds.html", context=context)
+
+
+@login_required
+def rescue_medication_prescribed(request, management_id):
+
+    management = Management.objects.get(pk=management_id)
+
+    has_rescue_medication_been_prescribed = not management.has_rescue_medication_been_prescribed
+
+    management.has_rescue_medication_been_prescribed = has_rescue_medication_been_prescribed
+    management.save()
+
+    management = Management.objects.get(pk=management_id)
+
+    context = {
+        'management': management
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)

@@ -1,4 +1,10 @@
 <form class="ui form" method="post">
     {% csrf_token %}
     <h1>Hello</h1>
+    <div class="field" id="aeds">
+        {% include 'epilepsy12/partials/management/aeds.html' with management=management %}
+    </div>
+    <div class="field" id="rescue_medicines">
+        {% include 'epilepsy12/partials/management/rescue_medicines.html' with management=management %}
+    </div>
 </form>

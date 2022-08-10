@@ -1,10 +1,10 @@
 <div class="ui segment" id="childrens_epilepsy_surgical_service_referral_criteria_met">
     <div class="field">
         <div class="ui toggle checkbox" 
-            hx-post="{% url 'childrens_epilepsy_surgical_service_referral_criteria_met' registration_id=registration_id %}"
+            hx-post="{% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk %}"
             hx-trigger="change"
-            hx-target="#childrens_epilepsy_surgical_service_referral_criteria_met"
-            hx-swap="outerHTML"
+            hx-target="#childrens_epilepsy_surgical_service"
+            hx-swap="innerHTML"
         >
         {% if assessment.childrens_epilepsy_surgical_service_referral_criteria_met %}
             <input 
@@ -25,7 +25,7 @@
         <div class="two fields">
             <div class="field"
                 hx-post="{% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk %}"
-                hx-target="#childrens_epilepsy_surgical_service_dates"
+                hx-target="#childrens_epilepsy_surgical_service"
                 hx-trigger="change"
             >
                 <label>Date of referral to a children's epilepsy surgery service</label>
@@ -38,7 +38,7 @@
 
             <div class="field"
                 hx-post="{% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk %}"
-                hx-target="#childrens_epilepsy_surgical_service_dates"
+                hx-target="#childrens_epilepsy_surgical_service"
                 hx-trigger="change"
             >
                 <label>Date seen by children's epilepsy surgery service</label>
@@ -47,6 +47,6 @@
                     value="{{assessment.childrens_epilepsy_surgical_service_input_date|date:'Y-m-d'}}"/>
             </div>
         </div>
-        <div id='childrens_epilepsy_surgical_service_dates'></div>
+
     {% endif %}
 </div>

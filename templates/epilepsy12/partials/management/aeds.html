@@ -1,0 +1,38 @@
+<div class="ui segment">
+    <div class="two fields">
+      
+    <div class="field" >
+        <span>
+            {% if management.has_an_aed_been_given %}
+                    
+                    <div 
+                        class="ui tiny compact toggle button active"
+                        hx-target="#aeds"
+                        hx-post="{% url 'has_an_aed_been_given' management_id=management.pk %}"
+                        hx-swap="innerHTML"
+                    >
+                    Yes
+                    </div>
+                    <label class="toggle_button_label">Has an Antiepilepsy Drug been given?</label>   
+                    
+            {% else %}
+                    
+                    <div 
+                        class="ui tiny compact toggle button"
+                        hx-target="#aeds"
+                        hx-trigger='click' 
+                        hx-post="{% url 'has_an_aed_been_given' management_id=management.pk %}"
+                        hx-swap="innerHTML"
+                    >No</div>
+                    <label class="toggle_button_label">Has an Antiepilepsy Drug been given?</label>
+                    
+            {% endif %}
+        </span>
+    </div>
+
+    
+
+  </div>
+</div>
+
+  

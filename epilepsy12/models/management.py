@@ -23,7 +23,7 @@ class Management(models.Model):
         default=False,
         null=True
     )
-    has_rescue_medication_prescribed = models.BooleanField(
+    has_rescue_medication_been_prescribed = models.BooleanField(
         "Has a rescue medicine been prescribed?",
         default=False,
         null=True

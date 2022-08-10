@@ -144,37 +144,33 @@ htmx_paths = [
          views.previous_sites, name="previous_sites"),
 
     # assessment paths
-    path('htmx/registration/<int:registration_id>/consultant_paediatrician_referral_made',
+    path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_made',
          views.consultant_paediatrician_referral_made, name="consultant_paediatrician_referral_made"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_date',
          views.consultant_paediatrician_referral_date, name="consultant_paediatrician_referral_date"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_input_date',
          views.consultant_paediatrician_input_date, name="consultant_paediatrician_input_date"),
-    path('htmx/registration/<int:registration_id>/paediatric_neurologist_referral_made',
+    path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_made',
          views.paediatric_neurologist_referral_made, name="paediatric_neurologist_referral_made"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_date',
          views.paediatric_neurologist_referral_date, name="paediatric_neurologist_referral_date"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_input_date',
          views.paediatric_neurologist_input_date, name="paediatric_neurologist_input_date"),
 
-    path('htmx/registration/<int:assessment_id>/epilepsy_specialist_nurse_referral_made',
+    path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_made',
          views.epilepsy_specialist_nurse_referral_made, name="epilepsy_specialist_nurse_referral_made"),
     path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_date',
          views.epilepsy_specialist_nurse_referral_date, name="epilepsy_specialist_nurse_referral_date"),
     path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_input_date',
          views.epilepsy_specialist_nurse_input_date, name="epilepsy_specialist_nurse_input_date"),
 
-    path('htmx/registration/<int:registration_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
+    path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
          views.childrens_epilepsy_surgical_service_referral_criteria_met, name="childrens_epilepsy_surgical_service_referral_criteria_met"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_date',
          views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',
          views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date"),
 
-    path('htmx/registration/<int:registration_id>/has_an_aed_been_given',
-         views.has_an_aed_been_given, name="has_an_aed_been_given"),
-    path('htmx/registration/<int:registration_id>/rescue_medication_prescribed',
-         views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
 
     path('htmx/registration/<int:registration_id>/were_any_of_the_epileptic_seizures_convulsive',
          views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
@@ -250,7 +246,10 @@ htmx_paths = [
          views.mri_brain_date, name="mri_brain_date"),
 
     # management
-
+    path('htmx/management/<int:management_id>/has_an_aed_been_given',
+         views.has_an_aed_been_given, name="has_an_aed_been_given"),
+    path('htmx/management/<int:management_id>/rescue_medication_prescribed',
+         views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
 
 ]
 

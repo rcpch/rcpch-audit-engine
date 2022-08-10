@@ -34,17 +34,6 @@ class Assessment(models.Model):
         max_length=100,
         null=True
     )
-
-    has_an_aed_been_given = models.BooleanField(
-        "Has an antiepilepsy medicine been prescribed?",
-        default=False,
-        null=True
-    )
-    rescue_medication_prescribed = models.BooleanField(
-        "Has a rescue medicine been prescribed?",
-        default=False,
-        null=True
-    )
     childrens_epilepsy_surgical_service_referral_criteria_met = models.BooleanField(
         "Have the criteria for referral to a children's epilepsy surgery service been met?",
         default=False,
