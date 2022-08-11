@@ -22,11 +22,15 @@ def management(request, case_id):
     rescue_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=True).all()
 
+    antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management, is_rescue_medicine=False).all()
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "management": management,
         "rescue_medicines": rescue_medicines,
+        "antiepilepsy_medicines": antiepilepsy_medicines,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
@@ -111,17 +115,23 @@ def save_selected_rescue_medicine(request, management_id):
     This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
     Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
     """
+
     management = Management.objects.get(pk=management_id)
     snomed_concept = fetch_concept(request.POST.get(
         'selected_rescue_medicine')
     )
+
+    if snomed_concept["preferredDescription"]["term"]:
+        name = snomed_concept["preferredDescription"]["term"]
+    else:
+        name = "No SNOMED preferred term"
 
     AntiEpilepsyMedicine.objects.create(
         antiepilepsy_medicine_type=None,
         is_rescue_medicine=True,
         antiepilepsy_medicine_snomed_code=request.POST.get(
             'selected_rescue_medicine'),
-        antiepilepsy_medicine_snomed_preferred_name=snomed_concept["preferredDescription"]["term"],
+        antiepilepsy_medicine_snomed_preferred_name=name,
         antiepilepsy_medicine_start_date=None,
         antiepilepsy_medicine_stop_date=None,
         antiepilepsy_medicine_risk_discussed=None,
@@ -136,3 +146,62 @@ def save_selected_rescue_medicine(request, management_id):
     }
 
     return render(request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
+
+
+def antiepilepsy_medicine_search(request, management_id):
+    """
+    HTMX callback from management template
+    GET request filtering query to SNOMED server using keyup from input
+    Returns snomed list of terms
+    """
+    antiepilepsy_medicine_search_text = request.GET.get(
+        'antiepilepsy_medicine_search')
+    items = snomed_medicine_search(antiepilepsy_medicine_search_text)
+
+    context = {
+        'items': items,
+        'management_id': management_id
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
+
+
+def save_selected_antiepilepsy_medicine(request, management_id):
+    """
+    HTMX callback from antiepilepsy_medicine_select template
+    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
+    rescue medicine currently selected.
+    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
+    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
+    """
+
+    management = Management.objects.get(pk=management_id)
+    snomed_concept = fetch_concept(request.POST.get(
+        'selected_antiepilepsy_medicine')
+    )
+
+    if snomed_concept["preferredDescription"]["term"]:
+        name = snomed_concept["preferredDescription"]["term"]
+    else:
+        name = "No SNOMED preferred term"
+
+    AntiEpilepsyMedicine.objects.create(
+        antiepilepsy_medicine_type=None,
+        is_rescue_medicine=False,
+        antiepilepsy_medicine_snomed_code=request.POST.get(
+            'selected_antiepilepsy_medicine'),
+        antiepilepsy_medicine_snomed_preferred_name=name,
+        antiepilepsy_medicine_start_date=None,
+        antiepilepsy_medicine_stop_date=None,
+        antiepilepsy_medicine_risk_discussed=None,
+        is_a_pregnancy_prevention_programme_in_place=False,
+        management=management
+    )
+
+    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
+
+    context = {
+        'antiepilepsy_medicines': medicines
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicines_list.html", context=context)

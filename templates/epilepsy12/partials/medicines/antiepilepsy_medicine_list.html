@@ -1,0 +1,12 @@
+<div class="ui message">
+    <h5 class="header">
+    Previously added antiepilepsy medicines
+    </h5>
+    {% if antiepilepsy_medicines|length < 1%}
+        There are no antiepilepsy medicines documented yet...
+    {% else %}
+        {% for antiepilepsy_medicine in antiepilepsy_medicines %}
+        <li>{{antiepilepsy_medicine.antiepilepsy_medicine_snomed_preferred_name}}</li>
+        {% endfor %}
+    {% endif %}
+</div>

@@ -1,0 +1,44 @@
+
+    <div class="two fields">
+        <div class="field" >
+            <span>
+                {% if test_positive %}
+                        <div class="ui buttons">
+                            <div 
+                                class="ui mini compact positive button"
+                            >
+                            Yes
+                            </div>
+                            <div 
+                                class="ui mini compact button"
+                                hx-target="{{hx_target}}"
+                                hx-post="{{hx_post}}"
+                                hx-swap="{{hx_swap}}"
+                                hx-trigger='{{hx_trigger}}'
+                            >
+                            No
+                            </div>
+                        </div>
+                        <label class="toggle_button_label">{{label}}</label>   
+                        
+                {% else %}
+                    <div class="ui buttons">
+                        <div 
+                            class="ui mini compact button"
+                            hx-target="{{hx_target}}"
+                            hx-post="{{hx_post}}"
+                            hx-swap="{{hx_swap}}"
+                            hx-trigger='{{hx_trigger}}'
+                        >
+                        Yes
+                        </div>
+                        <div 
+                            class="ui mini compact button positive"
+                        >No</div>
+                    </div>
+                        <label class="toggle_button_label">{{label}}</label>
+                {% endif %}
+            </span>
+        </div>
+
+    </div>
