@@ -23,8 +23,14 @@ class AntiEpilepsyMedicine(models.Model):
         null=True,
         blank=True
     )
-    antiepilepsy_medicine_snomed_code = models.CharField(
+    antiepilepsy_medicine_snomed_code = models.IntegerField(
         "antiepilepsy medicine SNOMED-CT code",
+        default=None,
+        null=True,
+        blank=True
+    )
+    antiepilepsy_medicine_snomed_preferred_name = models.CharField(
+        "antiepilepsy medicine SNOMED-CT preferred name",
         max_length=50,
         default=None,
         null=True,
@@ -91,7 +97,4 @@ class AntiEpilepsyMedicine(models.Model):
                 "Cannot calculate length of treatment without 2 dates.")
 
     def __str__(self) -> str:
-        if (self.antiepilepsy_medicine_type):
-            return self.antiepilepsy_medicine_type
-        else:
-            return self.antiepilepsy_medicine_type_other
+        return self.antiepilepsy_medicine_snomed_code

@@ -1,6 +1,8 @@
 <form class="ui form" method="post">
     {% csrf_token %}
-    <h1>Hello</h1>
+    <h5 class="header">
+    Antiepilepsy and rescue medicines
+    </h5>
     <div class="field" id="aeds">
         {% include 'epilepsy12/partials/management/aeds.html' with management=management %}
     </div>

@@ -19,8 +19,8 @@
   <i class="info circle icon"></i>
   {% block audit_section_instructions %}{% endblock %}
 </div>
+<div class="ui ordered mini top attached steps">
+  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete assessment=assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete management_complete=management_complete case_id=case_id %}
+</div>
 {% block audit_section_list %}{% endblock %}
-
-  {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete assessment=assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete investigation_management_complete=investigation_management_complete case_id=case_id %}
-
 {% endblock %}

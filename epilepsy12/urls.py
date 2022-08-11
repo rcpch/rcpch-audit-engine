@@ -250,6 +250,10 @@ htmx_paths = [
          views.has_an_aed_been_given, name="has_an_aed_been_given"),
     path('htmx/management/<int:management_id>/rescue_medication_prescribed',
          views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
+    path('htmx/management/<int:management_id>/rescue_medicine_search',
+         views.rescue_medicine_search, name='rescue_medicine_search'),
+    path('htmx/management/<int:management_id>/save_selected_rescue_medicine',
+         views.save_selected_rescue_medicine, name='save_selected_rescue_medicine')
 
 ]
 

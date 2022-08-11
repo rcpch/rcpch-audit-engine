@@ -1,5 +1,5 @@
 {% block steps %}
-<div class="ui ordered mini steps">
+
     {% if initial_assessment_complete %}
         {% if active_template == "initial_assessment" %}
           <a class="active completed step" href="{% url 'initial_assessment' case_id %}">
@@ -210,7 +210,7 @@
     {% endif %}
 
     {% if management_complete %}
-      {% if active_template == "managment" %}
+      {% if active_template == "management" %}
         <a class="active completed step" href="{% url 'management' case_id %}">
           <div class="content">
             <div class="title">Treatment and Plans</div>
@@ -226,30 +226,29 @@
         </a>
       {% endif %}
     {% else %}
-      {% if active_template == "managment" %}
+      {% if active_template == "management" %}
         <a href="{% url 'management' case_id %}" class="active step">
           <div class="content">
             <div class="title">Treatment and Plans</div>
-            <div class="description">Tests, medications and teams</div>
+            <div class="description">Medications and teams</div>
           </div>
         </a>
       {% elif active_template == "none" %}
         <a href="{% url 'management' case_id %}" class="disabled step">
           <div class="content">
             <div class="title">Treatment and Plans</div>
-            <div class="description">Tests, medications and teams</div>
+            <div class="description">Medications and teams</div>
           </div>
         </a>
       {% else %}
         <a href="{% url 'management' case_id %}" class="step">
           <div class="content">
             <div class="title">Treatment and Plans</div>
-            <div class="description">Tests, medications and teams</div>
+            <div class="description">Medications and teams</div>
           </div>
         </a>
       {% endif %}
     {% endif %}
       
 
-  </div>
 {% endblock steps %}

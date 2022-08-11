@@ -1,6 +1,4 @@
 <div class="ui segment">
-    <div class="two fields">
-      
 
     <div class="field" >
         <span>
@@ -31,7 +29,34 @@
         </span>
     </div>
 
-  </div>
+    {% if management.has_rescue_medication_been_prescribed %}
+    <div class="three fields">
+        <div class="field">
+            <label>Add a new rescue medicine</label>
+            <div class="field">
+                <div class="ui input" >
+                <input 
+                    type="text" 
+                    placeholder="Search..." 
+                    name="rescue_medicine_search" 
+                    hx-target="#rescue_medicine_select" 
+                    hx-get="{% url 'rescue_medicine_search' management_id=management.pk %}" 
+                    hx-trigger="keyup"
+                    hx-swap="innerHTML">
+                </div>
+            </div>
+        </div>
+        <div class="field" id="rescue_medicine_select"></div>
+    </div>
+    {% endif %}
+
+    
+    <div id="rescue_medicine_list">
+        {% include 'epilepsy12/partials/medicines/rescue_medicine_list.html' with management_id=management.pk %}
+    </div>
+    
+
+
 </div>
 
   

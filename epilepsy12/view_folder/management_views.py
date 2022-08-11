@@ -1,35 +1,50 @@
-from datetime import datetime
 from django.utils.timezone import make_aware
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from epilepsy12.general_functions.fetch_snomed import fetch_concept, snomed_medicine_search
 from epilepsy12.models.management import Management
+from epilepsy12.models.antiepilepsy_medicine import AntiEpilepsyMedicine
 
 from epilepsy12.models.registration import Registration
 
 
 @login_required
 def management(request, case_id):
+    # function called on form load
+    # creates a new management object if one does not exist
+    # loads historical medicines and passes them to template
+
     registration = Registration.objects.filter(case=case_id).first()
 
     management, created = Management.objects.get_or_create(
         registration=registration)
 
+    rescue_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management, is_rescue_medicine=True).all()
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "management": management,
+        "rescue_medicines": rescue_medicines,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,
         "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
-        "active_template": "investigations"
+        "management_complete": registration.investigation_management_complete,
+        "active_template": "management"
     }
+
     return render(request=request, template_name='epilepsy12/management.html', context=context)
+
+# HTMX
 
 
 @login_required
 def has_an_aed_been_given(request, management_id):
+    # HTMX call back from management template
+    # POST request on toggle button click
+    # if AED has been prescribed returns partial template comprising AED search box and dropdown
 
     management = Management.objects.get(pk=management_id)
 
@@ -47,6 +62,13 @@ def has_an_aed_been_given(request, management_id):
 
 @login_required
 def rescue_medication_prescribed(request, management_id):
+    """
+    HTMX call from management template
+    POST request on toggle button click
+    If rescue medicine has been prescribed, return partial template comprising input search and dropdown
+    """
+
+    # TODO if rescue medicine toggled from true to false, need to delete previous rescue medicines with modal warning
 
     management = Management.objects.get(pk=management_id)
 
@@ -62,3 +84,55 @@ def rescue_medication_prescribed(request, management_id):
     }
 
     return render(request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
+
+
+def rescue_medicine_search(request, management_id):
+    """
+    HTMX callback from management template
+    GET request filtering query to SNOMED server using keyup from input
+    Returns snomed list of terms
+    """
+    rescue_medicine_search_text = request.GET.get('rescue_medicine_search')
+    items = snomed_medicine_search(rescue_medicine_search_text)
+
+    context = {
+        'items': items,
+        'management_id': management_id
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
+
+
+def save_selected_rescue_medicine(request, management_id):
+    """
+    HTMX callback from rescue_medicine_select template
+    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
+    rescue medicine currently selected.
+    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
+    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
+    """
+    management = Management.objects.get(pk=management_id)
+    snomed_concept = fetch_concept(request.POST.get(
+        'selected_rescue_medicine')
+    )
+
+    AntiEpilepsyMedicine.objects.create(
+        antiepilepsy_medicine_type=None,
+        is_rescue_medicine=True,
+        antiepilepsy_medicine_snomed_code=request.POST.get(
+            'selected_rescue_medicine'),
+        antiepilepsy_medicine_snomed_preferred_name=snomed_concept["preferredDescription"]["term"],
+        antiepilepsy_medicine_start_date=None,
+        antiepilepsy_medicine_stop_date=None,
+        antiepilepsy_medicine_risk_discussed=None,
+        is_a_pregnancy_prevention_programme_in_place=False,
+        management=management
+    )
+
+    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
+
+    context = {
+        'rescue_medicines': medicines
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
