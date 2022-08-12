@@ -1,12 +1,20 @@
 <div class="ui message">
+
     <h5 class="header">
     Previously added antiepilepsy medicines
     </h5>
-    {% if antiepilepsy_medicines|length < 1%}
+
+    {% if antiepilepsy_medicines|length < 1 %}
         There are no antiepilepsy medicines documented yet...
     {% else %}
         {% for antiepilepsy_medicine in antiepilepsy_medicines %}
         <li>{{antiepilepsy_medicine.antiepilepsy_medicine_snomed_preferred_name}}</li>
         {% endfor %}
     {% endif %}
+
 </div>
+
+{% if valproate_pregnancy_advice_needs_addressing %}
+    {% url 'is_a_pregnancy_prevention_programme_in_place' management_id=management.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.is_a_pregnancy_prevention_programme_in_place hx_post=hx_post hx_swap="innerHTML" hx_target="#antiepilepsy_medicine_list" hx_trigger="click" label="Is a pregnancy prevention programme (PPP) in place?" %}
+{% endif %}

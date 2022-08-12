@@ -23,8 +23,9 @@ class AntiEpilepsyMedicine(models.Model):
         null=True,
         blank=True
     )
-    antiepilepsy_medicine_snomed_code = models.IntegerField(
+    antiepilepsy_medicine_snomed_code = models.CharField(
         "antiepilepsy medicine SNOMED-CT code",
+        max_length=50,
         default=None,
         null=True,
         blank=True
@@ -51,12 +52,6 @@ class AntiEpilepsyMedicine(models.Model):
     antiepilepsy_medicine_risk_discussed = models.BooleanField(
         "have the risks related to the antiepilepsy medicine been discussed?",
         default=False,
-        null=True,
-        blank=True
-    )
-    is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
-        "Is there a pregnancy prevention programme (PPP) in place?",
-        default=None,
         null=True,
         blank=True
     )

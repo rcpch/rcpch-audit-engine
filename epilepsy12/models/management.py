@@ -28,6 +28,12 @@ class Management(models.Model):
         default=False,
         null=True
     )
+    is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
+        "Is there a pregnancy prevention programme (PPP) in place?",
+        default=None,
+        null=True,
+        blank=True
+    )
     rescue_medication_prescribed = models.CharField(
         "Which rescue medicine has been prescribed?",
         max_length=100,

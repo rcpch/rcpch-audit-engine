@@ -257,7 +257,10 @@ htmx_paths = [
     path('htmx/management/<int:management_id>/rescue_medicine_search',
          views.rescue_medicine_search, name='rescue_medicine_search'),
     path('htmx/management/<int:management_id>/save_selected_rescue_medicine',
-         views.save_selected_rescue_medicine, name='save_selected_rescue_medicine')
+         views.save_selected_rescue_medicine, name='save_selected_rescue_medicine'),
+
+    path('htmx/management/<int:management_id>/is_a_pregnancy_prevention_programme_in_place',
+         views.is_a_pregnancy_prevention_programme_in_place, name='is_a_pregnancy_prevention_programme_in_place')
 
 ]
 
