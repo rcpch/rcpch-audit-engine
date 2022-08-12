@@ -9,7 +9,7 @@
         {% if management.individualised_care_plan_in_place %}
             <div class="field">
                 {% url 'individualised_care_plan_date' management_id=management.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" date_value=management.individualised_care_plan_date label="On what date was the individualised care plan put in place?" data_position="top left"%}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date label="On what date was the individualised care plan put in place?" data_position="top left"%}
             </div>
         {% endif %}
     

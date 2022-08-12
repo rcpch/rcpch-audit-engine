@@ -6,10 +6,11 @@
         hx_trigger: usually 'click' but can be any event
         label: this is the label text
         date_value: date value
+    NOTE - in the view, the value of the date can be retrieved by request.POST.get('input_date_field')
 {% endcomment %}
 
 
-    <div class="inline field" >
+    <div class="inline field">
         {% if date_value is None %}
             <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
                 <i class="blue dot circle outline icon"></i>
@@ -18,10 +19,11 @@
             <i class="green check circle outline icon"></i>
         {% endif %}
         
-        <input type="date" 
+        <input type="date"
+            name="input_date_field"
             hx-post="{{hx_post}}" 
             hx-target="{{hx_target}}" 
             hx-trigger="{{hx_trigger}}"
-            value={{date_value|date:'Y-m-d'}}/>
+            value="{{date_value|date:'Y-m-d'}}"/>
         <label>{{label}}</label>
     </div>

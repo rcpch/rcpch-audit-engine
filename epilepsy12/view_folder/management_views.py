@@ -312,8 +312,22 @@ def individualised_care_plan_in_place(request, management_id):
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
+        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_in_place=Q(individualised_care_plan_in_place=False))
+            individualised_care_plan_in_place=Q(
+                individualised_care_plan_in_place=False),
+            individualised_care_plan_date=None,
+            individualised_care_plan_has_parent_carer_child_agreement=None,
+            individualised_care_plan_includes_service_contact_details=None,
+            individualised_care_plan_include_first_aid=None,
+            individualised_care_plan_parental_prolonged_seizure_care=None,
+            individualised_care_plan_includes_general_participation_risk=None,
+            individualised_care_plan_addresses_water_safety=None,
+            individualised_care_plan_addresses_sudep=None,
+            individualised_care_plan_includes_aihp=None,
+            individualised_care_plan_includes_ehcp=None,
+            has_individualised_care_plan_been_updated_in_the_last_year=None,
+        )
 
     management = Management.objects.get(pk=management_id)
 
@@ -330,10 +344,11 @@ def individualised_care_plan_date(request, management_id):
     It is triggered by a toggle in the partial generating a post request
     This persists the care plan date value, and returns the same partial.
     """
+
     # TODO date validation needed
     Management.objects.filter(pk=management_id).update(
         individualised_care_plan_date=datetime.strptime(
-            request.POST.get('individualised_care_plan_date'), "%Y-%m-%d").date())
+            request.POST.get('input_date_field'), "%Y-%m-%d").date())
     management = Management.objects.get(pk=management_id)
     context = {
         'management': management
