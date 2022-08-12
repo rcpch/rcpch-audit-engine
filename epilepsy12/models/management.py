@@ -46,7 +46,7 @@ class Management(models.Model):
         null=True
     )
     individualised_care_plan_date = models.DateField(
-        "Has an individualised care plan been put in place?",
+        "On what date was the individualised care plan put in place?",
         default=None,
         null=True
     )

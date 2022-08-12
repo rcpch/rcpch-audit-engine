@@ -260,7 +260,45 @@ htmx_paths = [
          views.save_selected_rescue_medicine, name='save_selected_rescue_medicine'),
 
     path('htmx/management/<int:management_id>/is_a_pregnancy_prevention_programme_in_place',
-         views.is_a_pregnancy_prevention_programme_in_place, name='is_a_pregnancy_prevention_programme_in_place')
+         views.is_a_pregnancy_prevention_programme_in_place, name='is_a_pregnancy_prevention_programme_in_place'),
+
+    path('htmx/management/<int:management_id>/individualised_care_plan_in_place',
+         views.individualised_care_plan_in_place, name='individualised_care_plan_in_place'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_date',
+         views.individualised_care_plan_date, name='individualised_care_plan_date'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_has_parent_carer_child_agreement',
+         views.individualised_care_plan_has_parent_carer_child_agreement, name='individualised_care_plan_has_parent_carer_child_agreement'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_service_contact_details',
+         views.individualised_care_plan_includes_service_contact_details, name='individualised_care_plan_includes_service_contact_details'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_include_first_aid',
+         views.individualised_care_plan_include_first_aid, name='individualised_care_plan_include_first_aid'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_parental_prolonged_seizure_care',
+         views.individualised_care_plan_parental_prolonged_seizure_care, name='individualised_care_plan_parental_prolonged_seizure_care'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_general_participation_risk',
+         views.individualised_care_plan_includes_general_participation_risk, name='individualised_care_plan_includes_general_participation_risk'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_addresses_water_safety',
+         views.individualised_care_plan_addresses_water_safety, name='individualised_care_plan_addresses_water_safety'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_addresses_sudep',
+         views.individualised_care_plan_addresses_sudep, name='individualised_care_plan_addresses_sudep'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_aihp',
+         views.individualised_care_plan_includes_aihp, name='individualised_care_plan_includes_aihp'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_ehcp',
+         views.individualised_care_plan_includes_ehcp, name='individualised_care_plan_includes_ehcp'),
+    path('htmx/management/<int:management_id>/has_individualised_care_plan_been_updated_in_the_last_year',
+         views.has_individualised_care_plan_been_updated_in_the_last_year, name='has_individualised_care_plan_been_updated_in_the_last_year'),
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ]
 

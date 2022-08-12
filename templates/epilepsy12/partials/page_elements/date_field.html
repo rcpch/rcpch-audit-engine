@@ -1,0 +1,27 @@
+{% comment %}
+    This date field is used in multiple places
+    It accepts the following parameters
+        hx_post: the url posted to including parameters
+        hx_target: the id of the html element to target the server response
+        hx_trigger: usually 'click' but can be any event
+        label: this is the label text
+        date_value: date value
+{% endcomment %}
+
+
+    <div class="inline field" >
+        {% if date_value is None %}
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                <i class="blue dot circle outline icon"></i>
+            </span>
+        {% else %}
+            <i class="green check circle outline icon"></i>
+        {% endif %}
+        
+        <input type="date" 
+            hx-post="{{hx_post}}" 
+            hx-target="{{hx_target}}" 
+            hx-trigger="{{hx_trigger}}"
+            value={{date_value|date:'Y-m-d'}}/>
+        <label>{{label}}</label>
+    </div>

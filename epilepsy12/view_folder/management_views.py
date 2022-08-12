@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.utils.timezone import make_aware
 from django.shortcuts import render
@@ -108,6 +109,7 @@ def rescue_medication_prescribed(request, management_id):
     return render(request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
 
 
+@login_required
 def rescue_medicine_search(request, management_id):
     """
     HTMX callback from management template
@@ -125,6 +127,7 @@ def rescue_medicine_search(request, management_id):
     return render(request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
 
 
+@login_required
 def save_selected_rescue_medicine(request, management_id):
     """
     HTMX callback from rescue_medicine_select template
@@ -166,6 +169,7 @@ def save_selected_rescue_medicine(request, management_id):
     return render(request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
 
 
+@login_required
 def antiepilepsy_medicine_search(request, management_id):
     """
     HTMX callback from management template
@@ -184,6 +188,7 @@ def antiepilepsy_medicine_search(request, management_id):
     return render(request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicine_select.html", context=context)
 
 
+@login_required
 def save_selected_antiepilepsy_medicine(request, management_id):
     """
     HTMX callback from antiepilepsy_medicine_select template
@@ -234,6 +239,7 @@ def save_selected_antiepilepsy_medicine(request, management_id):
     return render(request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
 
 
+@login_required
 def is_a_pregnancy_prevention_programme_in_place(request, management_id):
     """
     This is an HTMX callback from antiepilepsy_medicine_list template on click of toggle is_a_pregnancy_prevention_programme_in_place
@@ -261,3 +267,364 @@ def is_a_pregnancy_prevention_programme_in_place(request, management_id):
     }
 
     return render(request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+
+
+@login_required
+def individualised_care_plan_in_place(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value or sets it based on user selection if none exists, 
+    and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_in_place=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_in_place=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_in_place=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_in_place=Q(individualised_care_plan_in_place=False))
+
+    management = Management.objects.get(pk=management_id)
+
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_date(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This persists the care plan date value, and returns the same partial.
+    """
+    # TODO date validation needed
+    Management.objects.filter(pk=management_id).update(
+        individualised_care_plan_date=datetime.strptime(
+            request.POST.get('individualised_care_plan_date'), "%Y-%m-%d").date())
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_has_parent_carer_child_agreement=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_has_parent_carer_child_agreement=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_has_parent_carer_child_agreement=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_has_parent_carer_child_agreement=Q(individualised_care_plan_has_parent_carer_child_agreement=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_includes_service_contact_details(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_includes_service_contact_details=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_service_contact_details=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_service_contact_details=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_includes_service_contact_details=Q(individualised_care_plan_includes_service_contact_details=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_include_first_aid(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_include_first_aid=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_include_first_aid=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_include_first_aid=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_include_first_aid=Q(individualised_care_plan_include_first_aid=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_parental_prolonged_seizure_care=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_parental_prolonged_seizure_care=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_parental_prolonged_seizure_care=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_parental_prolonged_seizure_care=Q(individualised_care_plan_parental_prolonged_seizure_care=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_includes_general_participation_risk(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_includes_general_participation_risk=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_general_participation_risk=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_general_participation_risk=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_includes_general_participation_risk=Q(individualised_care_plan_includes_general_participation_risk=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_addresses_water_safety(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_addresses_water_safety=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_addresses_water_safety=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_addresses_water_safety=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_addresses_water_safety=Q(individualised_care_plan_addresses_water_safety=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_addresses_sudep(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_addresses_sudep=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_addresses_sudep=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_addresses_sudep=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_addresses_sudep=Q(individualised_care_plan_addresses_sudep=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_includes_aihp(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_includes_aihp=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_aihp=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_aihp=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_includes_aihp=Q(individualised_care_plan_includes_aihp=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def individualised_care_plan_includes_ehcp(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, individualised_care_plan_includes_ehcp=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_ehcp=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                individualised_care_plan_includes_ehcp=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_includes_ehcp=Q(individualised_care_plan_includes_ehcp=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+
+@login_required
+def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
+    """
+    This is an HTMX callback from the individualised_care_plan partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, and returns the same partial.
+    """
+
+    if Management.objects.filter(pk=management_id, has_individualised_care_plan_been_updated_in_the_last_year=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Management.objects.filter(pk=management_id).update(
+                has_individualised_care_plan_been_updated_in_the_last_year=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Management.objects.filter(pk=management_id).update(
+                has_individualised_care_plan_been_updated_in_the_last_year=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        Management.objects.filter(pk=management_id).update(
+            has_individualised_care_plan_been_updated_in_the_last_year=Q(has_individualised_care_plan_been_updated_in_the_last_year=False))
+
+    management = Management.objects.get(pk=management_id)
+    context = {
+        'management': management
+    }
+    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
