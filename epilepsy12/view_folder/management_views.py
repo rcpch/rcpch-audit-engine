@@ -51,7 +51,18 @@ def management(request, case_id):
 
     return render(request=request, template_name='epilepsy12/management.html', context=context)
 
-# HTMX
+
+"""
+HTMX fields
+There is a function/hx route for each field in the form
+Each one is protected by @login_required
+Each one updates the record.
+
+
+
+
+Fields relating to rescue medication begin here
+"""
 
 
 @login_required
@@ -81,92 +92,6 @@ def has_an_aed_been_given(request, management_id):
     }
 
     return render(request=request, template_name="epilepsy12/partials/management/aeds.html", context=context)
-
-
-@login_required
-def rescue_medication_prescribed(request, management_id):
-    """
-    HTMX call from management template
-    POST request on toggle button click
-    If rescue medicine has been prescribed, return partial template comprising input search and dropdown
-    """
-
-    # TODO if rescue medicine toggled from true to false, need to delete previous rescue medicines with modal warning
-
-    management = Management.objects.get(pk=management_id)
-
-    has_rescue_medication_been_prescribed = not management.has_rescue_medication_been_prescribed
-
-    management.has_rescue_medication_been_prescribed = has_rescue_medication_been_prescribed
-    management.save()
-
-    management = Management.objects.get(pk=management_id)
-
-    context = {
-        'management': management
-    }
-
-    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
-
-
-@login_required
-def rescue_medicine_search(request, management_id):
-    """
-    HTMX callback from management template
-    GET request filtering query to SNOMED server using keyup from input
-    Returns snomed list of terms
-    """
-    rescue_medicine_search_text = request.GET.get('rescue_medicine_search')
-    items = snomed_medicine_search(rescue_medicine_search_text)
-
-    context = {
-        'items': items,
-        'management_id': management_id
-    }
-
-    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
-
-
-@login_required
-def save_selected_rescue_medicine(request, management_id):
-    """
-    HTMX callback from rescue_medicine_select template
-    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
-    rescue medicine currently selected.
-    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
-    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
-    """
-
-    management = Management.objects.get(pk=management_id)
-    snomed_concept = fetch_concept(request.POST.get(
-        'selected_rescue_medicine')
-    )
-
-    if snomed_concept["preferredDescription"]["term"]:
-        name = snomed_concept["preferredDescription"]["term"]
-    else:
-        name = "No SNOMED preferred term"
-
-    AntiEpilepsyMedicine.objects.create(
-        antiepilepsy_medicine_type=None,
-        is_rescue_medicine=True,
-        antiepilepsy_medicine_snomed_code=request.POST.get(
-            'selected_rescue_medicine'),
-        antiepilepsy_medicine_snomed_preferred_name=name,
-        antiepilepsy_medicine_start_date=None,
-        antiepilepsy_medicine_stop_date=None,
-        antiepilepsy_medicine_risk_discussed=None,
-        is_a_pregnancy_prevention_programme_in_place=False,
-        management=management
-    )
-
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
-
-    context = {
-        'rescue_medicines': medicines
-    }
-
-    return render(request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
 
 
 @login_required
@@ -267,6 +192,102 @@ def is_a_pregnancy_prevention_programme_in_place(request, management_id):
     }
 
     return render(request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+
+
+""" 
+Fields relating to rescue medication begin here
+"""
+
+
+@login_required
+def rescue_medication_prescribed(request, management_id):
+    """
+    HTMX call from management template
+    POST request on toggle button click
+    If rescue medicine has been prescribed, return partial template comprising input search and dropdown
+    """
+
+    # TODO if rescue medicine toggled from true to false, need to delete previous rescue medicines with modal warning
+
+    management = Management.objects.get(pk=management_id)
+
+    has_rescue_medication_been_prescribed = not management.has_rescue_medication_been_prescribed
+
+    management.has_rescue_medication_been_prescribed = has_rescue_medication_been_prescribed
+    management.save()
+
+    management = Management.objects.get(pk=management_id)
+
+    context = {
+        'management': management
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
+
+
+@login_required
+def rescue_medicine_search(request, management_id):
+    """
+    HTMX callback from management template
+    GET request filtering query to SNOMED server using keyup from input
+    Returns snomed list of terms
+    """
+    rescue_medicine_search_text = request.GET.get('rescue_medicine_search')
+    items = snomed_medicine_search(rescue_medicine_search_text)
+
+    context = {
+        'items': items,
+        'management_id': management_id
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
+
+
+@login_required
+def save_selected_rescue_medicine(request, management_id):
+    """
+    HTMX callback from rescue_medicine_select template
+    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
+    rescue medicine currently selected.
+    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
+    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
+    """
+
+    management = Management.objects.get(pk=management_id)
+    snomed_concept = fetch_concept(request.POST.get(
+        'selected_rescue_medicine')
+    )
+
+    if snomed_concept["preferredDescription"]["term"]:
+        name = snomed_concept["preferredDescription"]["term"]
+    else:
+        name = "No SNOMED preferred term"
+
+    AntiEpilepsyMedicine.objects.create(
+        antiepilepsy_medicine_type=None,
+        is_rescue_medicine=True,
+        antiepilepsy_medicine_snomed_code=request.POST.get(
+            'selected_rescue_medicine'),
+        antiepilepsy_medicine_snomed_preferred_name=name,
+        antiepilepsy_medicine_start_date=None,
+        antiepilepsy_medicine_stop_date=None,
+        antiepilepsy_medicine_risk_discussed=None,
+        is_a_pregnancy_prevention_programme_in_place=False,
+        management=management
+    )
+
+    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
+
+    context = {
+        'rescue_medicines': medicines
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
+
+
+"""
+Fields relating to individual care plans begin here
+"""
 
 
 @login_required
