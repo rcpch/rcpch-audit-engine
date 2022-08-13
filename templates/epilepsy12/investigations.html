@@ -1,0 +1,10 @@
+{% extends './audit_section.html' %} 
+{% block audit_section_title %}
+Investigations
+{% endblock %} 
+{% block audit_section_form %} 
+{% include './forms/investigations_form.html' with investigations=investigations %} 
+{% endblock %} 
+{% block audit_section_instructions %} 
+These are the milestones for ECG, EEG and MRI investigations.
+{% endblock %}

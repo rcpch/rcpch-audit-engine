@@ -1,0 +1,12 @@
+<div class="ui message">
+    <h5 class="header">
+    Previously added rescue medicines
+    </h5>
+    {% if rescue_medicines|length < 1%}
+        There are no rescue medicines documented yet...
+    {% else %}
+        {% for rescue_medicine in rescue_medicines %}
+        <li>{{rescue_medicine.antiepilepsy_medicine_snomed_preferred_name}}</li>
+        {% endfor %}
+    {% endif %}
+</div>

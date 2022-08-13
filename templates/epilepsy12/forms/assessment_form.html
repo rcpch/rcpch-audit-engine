@@ -1,9 +1,13 @@
 <form class="ui form" method="post">
   {% csrf_token %}
   
-  {% include 'epilepsy12/partials/assessment/paediatrician_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  <div id="consultant_paediatrician" class="field">
+    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=registration.assessment %}
+  </div>
 
-  {% include 'epilepsy12/partials/assessment/neurologist_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  <div id="paediatric_neurologist" class="field">
+    {% include 'epilepsy12/partials/assessment/paediatric_neurologist.html' with assessment=registration.assessment %}
+  </div>
 
   <div class="ui info message">
     
@@ -23,9 +27,13 @@
 
   </div>
 
-  {% include 'epilepsy12/partials/assessment/epilepsy_surgery_dates.html' with registration_id=registration.pk assessment=registration.assessment %}
+  <div id="childrens_epilepsy_surgical_service" class="field">
+    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=registration.assessment %}
+  </div>
   
-  {% include 'epilepsy12/partials/assessment/aed_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %}
+  <div id="epilepsy_specialist_nurse" class="field">
+    {% include 'epilepsy12/partials/assessment/epilepsy_nurse.html' with assessment=registration.assessment %}
+  </div>
  
   {% include 'epilepsy12/partials/assessment/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 

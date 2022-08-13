@@ -2,7 +2,7 @@ from django.db import models
 from django.forms import ValidationError
 from ..constants import *
 
-from .assessment import Assessment
+from .management import Management
 
 
 class AntiEpilepsyMedicine(models.Model):
@@ -12,27 +12,48 @@ class AntiEpilepsyMedicine(models.Model):
     """
     antiepilepsy_medicine_type = models.IntegerField(
         "antiepilepsy medicine name",
-        choices=ANTIEPILEPSY_MEDICINE_TYPES
+        choices=ANTIEPILEPSY_MEDICINE_TYPES,
+        default=None,
+        null=True,
+        blank=True
     )
-    antiepilepsy_medicine_type_other = models.CharField(
-        "other antiepilepsy medicine name",
-        max_length=50,
+    is_rescue_medicine = models.BooleanField(
+        "Is the medicine a rescue medicine?",
+        default=None,
+        null=True,
         blank=True
     )
     antiepilepsy_medicine_snomed_code = models.CharField(
         "antiepilepsy medicine SNOMED-CT code",
         max_length=50,
+        default=None,
+        null=True,
+        blank=True
+    )
+    antiepilepsy_medicine_snomed_preferred_name = models.CharField(
+        "antiepilepsy medicine SNOMED-CT preferred name",
+        max_length=50,
+        default=None,
+        null=True,
         blank=True
     )
     antiepilepsy_medicine_start_date = models.DateField(
         "antiepilepsy medicine start date",
+        default=None,
+        null=True,
+        blank=True
     )
     antiepilepsy_medicine_stop_date = models.DateField(
         "antiepilepsy medicine start date",
+        default=None,
+        null=True,
+        blank=True
     )
     antiepilepsy_medicine_risk_discussed = models.BooleanField(
         "have the risks related to the antiepilepsy medicine been discussed?",
-        default=False
+        default=False,
+        null=True,
+        blank=True
     )
 
     def clean(self):
@@ -43,10 +64,11 @@ class AntiEpilepsyMedicine(models.Model):
 
     # relationships
 
-    assessment = models.ForeignKey(
-        Assessment,
+    management = models.ForeignKey(
+        Management,
         on_delete=models.CASCADE,
-        verbose_name="related assessment"
+        verbose_name="related management",
+        default=1
     )
 
     class Meta:
@@ -70,7 +92,4 @@ class AntiEpilepsyMedicine(models.Model):
                 "Cannot calculate length of treatment without 2 dates.")
 
     def __str__(self) -> str:
-        if (self.antiepilepsy_medicine_type):
-            return self.antiepilepsy_medicine_type
-        else:
-            return self.antiepilepsy_medicine_type_other
+        return self.antiepilepsy_medicine_snomed_code

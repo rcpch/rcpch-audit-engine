@@ -1,0 +1,21 @@
+
+<div class="two fields">
+    <div class="field">
+        <label>Antiepilepsy Medicines</label>
+        <select class="ui search dropdown" name="selected_antiepilepsy_medicine">
+            {% for item in items %}
+                <option value="{{item.conceptId}}">{{item.term}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="field">
+        <label>Action</label>
+        <div 
+            class="ui button"
+            hx-post="{% url 'save_selected_antiepilepsy_medicine' management_id=management_id %}"
+            hx-trigger="click"
+            hx-target="#antiepilepsy_medicine_list"
+            hx-swap="outerHTML"
+        >Save Medicine</div>
+    </div>
+</div>

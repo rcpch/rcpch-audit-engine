@@ -40,6 +40,10 @@ urlpatterns = [
          views.create_investigation_management, name='create_investigation_management'),
     path('investigation_management/<int:case_id>/update',
          views.update_investigation_management, name='update_investigation_management'),
+    #     management paths
+    path('management/<int:case_id>',
+         views.management, name='management'),
+
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
@@ -47,6 +51,8 @@ urlpatterns = [
          name='hospital-autocomplete'),
     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
          name='semiology-keyword-autocomplete'),
+    path('investigations/<int:case_id>',
+         views.investigations, name='investigations')
 ]
 
 htmx_paths = [
@@ -137,30 +143,34 @@ htmx_paths = [
     path('htmx/registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
 
-
-    path('htmx/registration/<int:registration_id>/consultant_paediatrician_referral_made',
+    # assessment paths
+    path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_made',
          views.consultant_paediatrician_referral_made, name="consultant_paediatrician_referral_made"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_date',
          views.consultant_paediatrician_referral_date, name="consultant_paediatrician_referral_date"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_input_date',
          views.consultant_paediatrician_input_date, name="consultant_paediatrician_input_date"),
-    path('htmx/registration/<int:registration_id>/paediatric_neurologist_referral_made',
+    path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_made',
          views.paediatric_neurologist_referral_made, name="paediatric_neurologist_referral_made"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_date',
          views.paediatric_neurologist_referral_date, name="paediatric_neurologist_referral_date"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_input_date',
          views.paediatric_neurologist_input_date, name="paediatric_neurologist_input_date"),
-    path('htmx/registration/<int:registration_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
+
+    path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_made',
+         views.epilepsy_specialist_nurse_referral_made, name="epilepsy_specialist_nurse_referral_made"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_date',
+         views.epilepsy_specialist_nurse_referral_date, name="epilepsy_specialist_nurse_referral_date"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_input_date',
+         views.epilepsy_specialist_nurse_input_date, name="epilepsy_specialist_nurse_input_date"),
+
+    path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
          views.childrens_epilepsy_surgical_service_referral_criteria_met, name="childrens_epilepsy_surgical_service_referral_criteria_met"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_date',
          views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',
          views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date"),
 
-    path('htmx/registration/<int:registration_id>/has_an_aed_been_given',
-         views.has_an_aed_been_given, name="has_an_aed_been_given"),
-    path('htmx/registration/<int:registration_id>/rescue_medication_prescribed',
-         views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
 
     path('htmx/registration/<int:registration_id>/were_any_of_the_epileptic_seizures_convulsive',
          views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
@@ -212,6 +222,79 @@ htmx_paths = [
          views.previous_neonatal_seizures, name="previous_neonatal_seizures"),
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/diagnosis_of_epilepsy_withdrawn',
          views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
+
+    # investigation_management htmx
+    path('htmx/investigation_management/<int:investigation_management_id>/medication_lookup',
+         views.medication_lookup, name="medication_lookup"),
+
+
+    # investigations
+    path('htmx/investigations/<int:investigations_id>/eeg_indicated',
+         views.eeg_indicated, name="eeg_indicated"),
+    path('htmx/investigations/<int:investigations_id>/eeg_request_date',
+         views.eeg_request_date, name="eeg_request_date"),
+    path('htmx/investigations/<int:investigations_id>/eeg_performed_date',
+         views.eeg_performed_date, name="eeg_performed_date"),
+
+    path('htmx/investigations/<int:investigations_id>/twelve_lead_ecg_status',
+         views.twelve_lead_ecg_status, name="twelve_lead_ecg_status"),
+    path('htmx/investigations/<int:investigations_id>/ct_head_scan_status',
+         views.ct_head_scan_status, name="ct_head_scan_status"),
+    path('htmx/investigations/<int:investigations_id>/mri_indicated',
+         views.mri_indicated, name="mri_indicated"),
+    path('htmx/investigations/<int:investigations_id>/mri_brain_date',
+         views.mri_brain_date, name="mri_brain_date"),
+
+    # management
+    path('htmx/management/<int:management_id>/has_an_aed_been_given',
+         views.has_an_aed_been_given, name="has_an_aed_been_given"),
+    path('htmx/management/<int:management_id>/rescue_medication_prescribed',
+         views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
+    path('htmx/management/<int:management_id>/antiepilepsy_medicine_search',
+         views.antiepilepsy_medicine_search, name='antiepilepsy_medicine_search'),
+    path('htmx/management/<int:management_id>/save_selected_antiepilepsy_medicine',
+         views.save_selected_antiepilepsy_medicine, name='save_selected_antiepilepsy_medicine'),
+    path('htmx/management/<int:management_id>/rescue_medicine_search',
+         views.rescue_medicine_search, name='rescue_medicine_search'),
+    path('htmx/management/<int:management_id>/save_selected_rescue_medicine',
+         views.save_selected_rescue_medicine, name='save_selected_rescue_medicine'),
+
+    path('htmx/management/<int:management_id>/is_a_pregnancy_prevention_programme_in_place',
+         views.is_a_pregnancy_prevention_programme_in_place, name='is_a_pregnancy_prevention_programme_in_place'),
+
+    path('htmx/management/<int:management_id>/individualised_care_plan_in_place',
+         views.individualised_care_plan_in_place, name='individualised_care_plan_in_place'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_date',
+         views.individualised_care_plan_date, name='individualised_care_plan_date'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_has_parent_carer_child_agreement',
+         views.individualised_care_plan_has_parent_carer_child_agreement, name='individualised_care_plan_has_parent_carer_child_agreement'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_service_contact_details',
+         views.individualised_care_plan_includes_service_contact_details, name='individualised_care_plan_includes_service_contact_details'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_include_first_aid',
+         views.individualised_care_plan_include_first_aid, name='individualised_care_plan_include_first_aid'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_parental_prolonged_seizure_care',
+         views.individualised_care_plan_parental_prolonged_seizure_care, name='individualised_care_plan_parental_prolonged_seizure_care'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_general_participation_risk',
+         views.individualised_care_plan_includes_general_participation_risk, name='individualised_care_plan_includes_general_participation_risk'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_addresses_water_safety',
+         views.individualised_care_plan_addresses_water_safety, name='individualised_care_plan_addresses_water_safety'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_addresses_sudep',
+         views.individualised_care_plan_addresses_sudep, name='individualised_care_plan_addresses_sudep'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_aihp',
+         views.individualised_care_plan_includes_aihp, name='individualised_care_plan_includes_aihp'),
+    path('htmx/management/<int:management_id>/individualised_care_plan_includes_ehcp',
+         views.individualised_care_plan_includes_ehcp, name='individualised_care_plan_includes_ehcp'),
+    path('htmx/management/<int:management_id>/has_individualised_care_plan_been_updated_in_the_last_year',
+         views.has_individualised_care_plan_been_updated_in_the_last_year, name='has_individualised_care_plan_been_updated_in_the_last_year'),
+
+
+
+
+
+
+
+
+
 
 
 

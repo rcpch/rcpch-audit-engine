@@ -1,11 +1,11 @@
-<div class="ui segment" id="paediatric_neurologist_referral_made">
+<div class="ui segment">
     <div class="field">
         <div class="ui toggle checkbox" 
                 name="paediatric_neurologist_referral_made"
-                hx-post="{% url 'paediatric_neurologist_referral_made' registration_id=registration_id %}"
+                hx-post="{% url 'paediatric_neurologist_referral_made' assessment_id=assessment.pk %}"
                 hx-trigger="change"
-                hx-target="#paediatric_neurologist_referral_made"
-                hx-swap="outerHTML"
+                hx-target="#paediatric_neurologist"
+                hx-swap="innerHTML"
             >
             {% if assessment.paediatric_neurologist_referral_made %}
                 <input 
@@ -31,7 +31,7 @@
 
             <div class="field"
                 hx-post="{% url 'paediatric_neurologist_referral_date' assessment_id=assessment.pk %}"
-                hx-target="#consultant_paediatrician_referral_dates"
+                hx-target="#paediatric_neurologist"
                 hx-trigger="change"
             >
                 <label>
@@ -46,7 +46,7 @@
             
             <div class="field"
                 hx-post="{% url 'paediatric_neurologist_input_date' assessment_id=assessment.pk %}"
-                hx-target="#paediatric_neurologist_referral_dates"
+                hx-target="#paediatric_neurologist"
                 hx-trigger="change"
             >
                 <label>
@@ -60,7 +60,7 @@
             </div>
 
         </div>
-        <div id='paediatric_neurologist_referral_dates'></div>
+
     {% endif %}
     
   </div>

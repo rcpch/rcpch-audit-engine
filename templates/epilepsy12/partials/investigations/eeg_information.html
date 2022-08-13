@@ -1,0 +1,78 @@
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    
+    <div class="ui segment">
+    
+        <div class="ui info message">
+            <p>Indications for EEG:</p>
+            <li>Paroxysmal episode(s)</li>
+            <li>Afebrile</li>
+        </div>
+
+        <div class="field">
+
+            {% url 'eeg_indicated' investigations_id=investigations.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label="Is an EEG indicated?" data_position="top left" %}   
+
+        </div>
+
+        {% if investigations.eeg_indicated %}
+            <div class="three fields">
+
+                <div class="field">
+                    {% if investigations.eeg_request_date is None %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                            <i class="blue dot circle outline icon"></i>
+                            <label class='toggle_button_label'>Date EEG requested</label>
+                        </span>
+                    {% else %}
+                        <span>
+                            <i class="green check circle outline icon"></i>
+                            <label class='toggle_button_label'>Date EEG requested</label>
+                        </span>
+                    {% endif %}
+                    <input 
+                        class="ui input" 
+                        type="date"
+                        hx-target="#eeg_information"
+                        name="eeg_request_date"
+                        hx-trigger='change' 
+                        hx-post="{% url 'eeg_request_date' investigations_id=investigations.pk %}"
+                        hx-swap="innerHTML"
+                        value="{{investigations.eeg_request_date|date:'Y-m-d'}}"/>
+                </div>
+                
+                <div class="field">
+                    {% if investigations.eeg_performed_date is None %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                            <i class="blue dot circle outline icon"></i>
+                            <label class='toggle_button_label'>Date EEG performed</label>
+                        </span>
+                    {% else %}
+                        <span>
+                            <i class="green check circle outline icon"></i>
+                            <label class='toggle_button_label'>Date EEG performed</label>
+                        <span>
+                    {% endif %}
+                    <input 
+                        class="ui input" 
+                        type="date"
+                        name="eeg_performed_date"
+                        hx-target="#eeg_information"
+                        hx-trigger='change' 
+                        hx-post="{% url 'eeg_performed_date' investigations_id=investigations.pk %}"
+                        hx-swap="innerHTML"
+                        value="{{investigations.eeg_performed_date|date:'Y-m-d'}}"/>
+                </div>
+                
+                <div class="field">
+                    <label class='toggle_button_label'>Time to EEG</label>
+                    <input class="ui input" type="text" value="{{investigations.eeg_time}}" disabled/>
+                </div>
+            
+            </div>
+            
+        {% endif %}
+
+    </div>
+
+</div>

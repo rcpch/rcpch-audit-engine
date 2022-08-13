@@ -54,3 +54,31 @@ def snomed_search(search_term):
     serialised = response.json()
 
     return serialised
+
+
+def snomed_medicine_search(search_term):
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_term}\&constraint=<373873005'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def fetch_concept(concept_id):
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/concepts/{concept_id}/extended'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised

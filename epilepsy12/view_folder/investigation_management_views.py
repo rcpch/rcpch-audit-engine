@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.forms_folder.investigation_management_form import InvestigationManagementForm
@@ -13,6 +14,8 @@ def create_investigation_management(request, case_id):
     investigation_management_form = InvestigationManagementForm(
         request.POST or None)
     registration = Registration.objects.filter(case=case_id).first()
+    investigation_management = Investigation_Management.objects.filter(
+        registration=registration)
     if request.method == "POST":
         if investigation_management_form.is_valid():
             investigation_management_obj = investigation_management_form.save(
@@ -28,6 +31,7 @@ def create_investigation_management(request, case_id):
 
     context = {
         "investigation_management_form": investigation_management_form,
+        "investigation_management": investigation_management,
         "case_id": case_id,
         "registration": registration,
         "initial_assessment_complete": registration.initial_assessment_complete,
@@ -82,3 +86,10 @@ def delete_investigation_management(request, case_id):
     # investigation_management = get_object_or_404(InvestigationManagmentForm, id=id)
     # investigation_management.delete()
     return redirect('cases')
+
+
+# HX endpoints
+
+def medication_lookup(request, investigation_management_id):
+    print(request.POST.get('medication_lookup'))
+    return HttpResponse("Medications")

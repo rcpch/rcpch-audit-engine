@@ -10,38 +10,29 @@ from ..models import Assessment
 
 
 @login_required
-def consultant_paediatrician_referral_made(request, registration_id):
-    registration = Registration.objects.get(pk=registration_id)
-    if request.POST.get('consultant_paediatrician_referral_made') == 'on':
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'consultant_paediatrician_referral_made': True,
-            'registration': registration
-        })
-    else:
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'consultant_paediatrician_referral_made': False,
-            'consultant_paediatrician_referral_date': None,
-            'consultant_paediatrician_input_date': None,
-            'registration': registration
-        })
+def consultant_paediatrician_referral_made(request, assessment_id):
+    assessment = Assessment.objects.get(pk=assessment_id)
+    consultant_paediatrician_referral_made = not assessment.consultant_paediatrician_referral_made
 
-    if created:
-        assessment_object = created
+    if consultant_paediatrician_referral_made:
+        assessment.consultant_paediatrician_referral_made = consultant_paediatrician_referral_made
+        assessment.save()
     else:
-        assessment_object = assessment
+        assessment.consultant_paediatrician_referral_made = consultant_paediatrician_referral_made
+        assessment.consultant_paediatrician_referral_date = None
+        assessment.consultant_paediatrician_input_date = None
+        assessment.save()
 
     context = {
-        'registration_id': registration.pk,
-        'assessment': assessment_object
+        'assessment': assessment
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatrician_dates.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 
 
 @login_required
 def consultant_paediatrician_referral_date(request, assessment_id):
     new_date = request.POST.get(
         'consultant_paediatrician_referral_date')
-    message = "Consultant Paediatrician referral date updated."
 
     try:
         assessment = Assessment.objects.get(pk=assessment_id)
@@ -50,14 +41,18 @@ def consultant_paediatrician_referral_date(request, assessment_id):
         assessment.save()
     except Exception as error:
         message = error
-    return HttpResponse(message)
+        return HttpResponse(message)
+
+    context = {
+        'assessment': assessment
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 
 
 @login_required
 def consultant_paediatrician_input_date(request, assessment_id):
     new_date = request.POST.get(
         'consultant_paediatrician_input_date')
-    message = "Consultant Paediatrician input date updated."
 
     try:
         assessment = Assessment.objects.get(pk=assessment_id)
@@ -66,42 +61,37 @@ def consultant_paediatrician_input_date(request, assessment_id):
         assessment.save()
     except Exception as error:
         message = error
-    return HttpResponse(message)
+        return HttpResponse(message)
+
+    context = {
+        'assessment': assessment
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 
 
 @login_required
-def paediatric_neurologist_referral_made(request, registration_id):
-    registration = Registration.objects.get(pk=registration_id)
-    if request.POST.get('paediatric_neurologist_referral_made') == 'on':
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'paediatric_neurologist_referral_made': True,
-            'registration': registration
-        })
+def paediatric_neurologist_referral_made(request, assessment_id):
+    assessment = Assessment.objects.get(pk=assessment_id)
+    paediatric_neurologist_referral_made = not assessment.paediatric_neurologist_referral_made
+    if paediatric_neurologist_referral_made:
+        assessment.paediatric_neurologist_referral_made = paediatric_neurologist_referral_made
+        assessment.save()
     else:
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'paediatric_neurologist_referral_made': False,
-            'paediatric_neurologist_referral_date': None,
-            'paediatric_neurologist_input_date': None,
-            'registration': registration
-        })
-
-    if created:
-        assessment_object = created
-    else:
-        assessment_object = assessment
+        assessment.paediatric_neurologist_referral_made = paediatric_neurologist_referral_made
+        assessment.paediatric_neurologist_referral_date = None
+        assessment.paediatric_neurologist_input_date = None
+        assessment.save()
 
     context = {
-        'registration_id': registration.pk,
-        'assessment': assessment_object
+        'assessment': assessment
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/neurologist_dates.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurologist.html", context=context)
 
 
 @login_required
 def paediatric_neurologist_referral_date(request, assessment_id):
     new_date = request.POST.get(
         'paediatric_neurologist_referral_date')
-    message = "Paediatric neurologist referral date updated."
 
     try:
         assessment = Assessment.objects.get(pk=assessment_id)
@@ -110,14 +100,17 @@ def paediatric_neurologist_referral_date(request, assessment_id):
         assessment.save()
     except Exception as error:
         message = error
-    return HttpResponse(message)
+
+    context = {
+        'assessment': assessment
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurologist.html", context=context)
 
 
 @login_required
 def paediatric_neurologist_input_date(request, assessment_id):
     new_date = request.POST.get(
         'paediatric_neurologist_input_date')
-    message = "Paediatric neurologist input date updated."
 
     try:
         assessment = Assessment.objects.get(pk=assessment_id)
@@ -126,44 +119,41 @@ def paediatric_neurologist_input_date(request, assessment_id):
         assessment.save()
     except Exception as error:
         message = error
-    return HttpResponse(message)
+        return HttpResponse(message)
+
+    context = {
+        'assessment': assessment
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurologist.html", context=context)
 
 
 @login_required
-def childrens_epilepsy_surgical_service_referral_criteria_met(request, registration_id):
+def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
 
-    registration = Registration.objects.get(pk=registration_id)
+    assessment = Assessment.objects.get(pk=assessment_id)
+    childrens_epilepsy_surgical_service_referral_criteria_met = not assessment.childrens_epilepsy_surgical_service_referral_criteria_met
 
-    if request.POST.get('childrens_epilepsy_surgical_service_referral_criteria_met') == 'on':
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'childrens_epilepsy_surgical_service_referral_criteria_met': True,
-            'registration': registration
-        })
+    if childrens_epilepsy_surgical_service_referral_criteria_met:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.childrens_epilepsy_surgical_service_referral_criteria_met = childrens_epilepsy_surgical_service_referral_criteria_met
+        assessment.save()
     else:
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'childrens_epilepsy_surgical_service_referral_criteria_met': False,
-            'childrens_epilepsy_surgical_service_referral_date': None,
-            'childrens_epilepsy_surgical_service_referral_date': None,
-            'registration': registration
-        })
-
-    if created:
-        assessment_object = created
-    else:
-        assessment_object = assessment
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.childrens_epilepsy_surgical_service_referral_criteria_met = childrens_epilepsy_surgical_service_referral_criteria_met
+        assessment.childrens_epilepsy_surgical_service_referral_date = None
+        assessment.childrens_epilepsy_surgical_service_input_date = None
+        assessment.save()
 
     context = {
-        'registration_id': registration.pk,
-        'assessment': assessment_object
+        'assessment': assessment
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery_dates.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
 
 
 @login_required
 def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     new_date = request.POST.get(
         'childrens_epilepsy_surgical_service_referral_date')
-    message = "Children's epilepsy surgery service referral date updated."
 
     try:
         assessment = Assessment.objects.get(pk=assessment_id)
@@ -171,15 +161,18 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
             new_date, "%Y-%m-%d").date()
         assessment.save()
     except Exception as error:
-        message = error
-    return HttpResponse(message)
+        return HttpResponse(error)
+
+    context = {
+        'assessment': assessment
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
 
 
 @login_required
 def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     new_date = request.POST.get(
         'childrens_epilepsy_surgical_service_input_date')
-    message = "Children's epilepsy surgery service input date updated."
 
     try:
         assessment = Assessment.objects.get(pk=assessment_id)
@@ -188,64 +181,73 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
         assessment.save()
     except Exception as error:
         message = error
-    return HttpResponse(message)
+        return HttpResponse(message)
+
+    context = {
+        'assessment': assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
 
 
 @login_required
-def has_an_aed_been_given(request, registration_id):
+def epilepsy_specialist_nurse_referral_made(request, assessment_id):
+    assessment = Assessment.objects.get(pk=assessment_id)
+    epilepsy_specialist_nurse_referral_made = not assessment.epilepsy_specialist_nurse_referral_made
 
-    registration = Registration.objects.get(pk=registration_id)
+    try:
+        Assessment.objects.filter(pk=assessment_id).update(
+            epilepsy_specialist_nurse_referral_made=epilepsy_specialist_nurse_referral_made)
+    except Exception as error:
+        return HttpResponse(error)
 
-    if request.POST.get('has_an_aed_been_given') == 'on':
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'has_an_aed_been_given': True,
-            'registration': registration
-        })
-    else:
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'has_an_aed_been_given': False,
-            'registration': registration
-        })
-
-    if created:
-        assessment_object = created
-    else:
-        assessment_object = assessment
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
-        'registration_id': registration.pk,
-        'assessment': assessment_object
+        "assessment": assessment
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/aed_checkboxes.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
 
 
 @login_required
-def rescue_medication_prescribed(request, registration_id):
+def epilepsy_specialist_nurse_referral_date(request, assessment_id):
+    new_date = request.POST.get(
+        'epilepsy_specialist_nurse_referral_date')
 
-    registration = Registration.objects.get(pk=registration_id)
-
-    if request.POST.get('rescue_medication_prescribed') == 'on':
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'rescue_medication_prescribed': True,
-            'registration': registration
-        })
-    else:
-        assessment, created = Assessment.objects.update_or_create(registration=registration, defaults={
-            'rescue_medication_prescribed': False,
-            'registration': registration
-        })
-
-    if created:
-        assessment_object = created
-    else:
-        assessment_object = assessment
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.epilepsy_specialist_nurse_referral_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        return HttpResponse(error)
 
     context = {
-        'registration_id': registration.pk,
-        'assessment': assessment_object
+        "assessment": assessment,
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/aed_checkboxes.html", context=context)
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+
+@login_required
+def epilepsy_specialist_nurse_input_date(request, assessment_id):
+    new_date = request.POST.get(
+        'epilepsy_specialist_nurse_input_date')
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+        assessment.epilepsy_specialist_nurse_input_date = datetime.strptime(
+            new_date, "%Y-%m-%d").date()
+        assessment.save()
+    except Exception as error:
+        message = error
+
+    context = {
+        "assessment": assessment,
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
 
 
 @login_required
@@ -329,7 +331,6 @@ def experienced_prolonged_focal_seizures(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return HttpResponse('success', context)
     return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
 
 
