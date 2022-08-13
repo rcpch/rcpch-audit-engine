@@ -1,10 +1,8 @@
 from datetime import datetime
-from email.policy import default
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
+from django.db.models import Q
 from ..models import Registration
 from ..models import Assessment
 
@@ -31,17 +29,18 @@ def consultant_paediatrician_referral_made(request, assessment_id):
 
 @login_required
 def consultant_paediatrician_referral_date(request, assessment_id):
-    new_date = request.POST.get(
-        'consultant_paediatrician_referral_date')
+    """
+    This is an HTMX callback from the consultant_paediatrician partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the consultant paediatrician referral date value, and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.consultant_paediatrician_referral_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        message = error
-        return HttpResponse(message)
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        consultant_paediatrician_referral_date=datetime.strptime(
+            request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
         'assessment': assessment
@@ -51,17 +50,18 @@ def consultant_paediatrician_referral_date(request, assessment_id):
 
 @login_required
 def consultant_paediatrician_input_date(request, assessment_id):
-    new_date = request.POST.get(
-        'consultant_paediatrician_input_date')
+    """
+    This is an HTMX callback from the consultant_paediatrician partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the consultant paediatrician input date value, and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.consultant_paediatrician_input_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        message = error
-        return HttpResponse(message)
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        consultant_paediatrician_input_date=datetime.strptime(
+            request.POST.get('consultant_paediatrician_input_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
         'assessment': assessment
@@ -69,65 +69,90 @@ def consultant_paediatrician_input_date(request, assessment_id):
     return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 
 
-@login_required
+@ login_required
 def paediatric_neurologist_referral_made(request, assessment_id):
-    assessment = Assessment.objects.get(pk=assessment_id)
-    paediatric_neurologist_referral_made = not assessment.paediatric_neurologist_referral_made
-    if paediatric_neurologist_referral_made:
-        assessment.paediatric_neurologist_referral_made = paediatric_neurologist_referral_made
-        assessment.save()
+    """
+    This is an HTMX callback from the paediatric_neurologist partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value or sets it based on user selection if none exists,
+    and returns the same partial.
+    """
+
+    if Assessment.objects.filter(pk=assessment_id, paediatric_neurologist_referral_made=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Assessment.objects.filter(pk=assessment_id).update(
+                paediatric_neurologist_referral_made=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Assessment.objects.filter(pk=assessment_id).update(
+                paediatric_neurologist_referral_made=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
     else:
-        assessment.paediatric_neurologist_referral_made = paediatric_neurologist_referral_made
-        assessment.paediatric_neurologist_referral_date = None
-        assessment.paediatric_neurologist_input_date = None
-        assessment.save()
+        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
+        Assessment.objects.filter(pk=assessment_id).update(
+            paediatric_neurologist_referral_made=Q(
+                paediatric_neurologist_referral_made=False),
+            paediatric_neurologist_referral_date=None,
+            paediatric_neurologist_input_date=None
+        )
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
-        'assessment': assessment
+        "assessment": assessment
     }
+
     return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurologist.html", context=context)
 
 
-@login_required
+@ login_required
 def paediatric_neurologist_referral_date(request, assessment_id):
-    new_date = request.POST.get(
-        'paediatric_neurologist_referral_date')
+    """
+    This is an HTMX callback from the paediatric_neurologist partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the paediatric neurologist referral date value, and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.paediatric_neurologist_referral_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        message = error
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        paediatric_neurologist_referral_date=datetime.strptime(
+            request.POST.get('paediatric_neurologist_referral_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
         'assessment': assessment
     }
+
     return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurologist.html", context=context)
 
 
-@login_required
+@ login_required
 def paediatric_neurologist_input_date(request, assessment_id):
-    new_date = request.POST.get(
-        'paediatric_neurologist_input_date')
+    """
+    This is an HTMX callback from the paediatric_neurologist partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the paediatric neurologist referral date value, and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.paediatric_neurologist_input_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        message = error
-        return HttpResponse(message)
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        paediatric_neurologist_input_date=datetime.strptime(
+            request.POST.get('paediatric_neurologist_input_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
         'assessment': assessment
     }
+
     return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurologist.html", context=context)
 
 
-@login_required
+@ login_required
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -150,56 +175,118 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
 
 
-@login_required
-def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
-    new_date = request.POST.get(
-        'childrens_epilepsy_surgical_service_referral_date')
+@ login_required
+def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
+    """
+    This is an HTMX callback from the paediatric_neurologist partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value or sets it based on user selection if none exists,
+    and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.childrens_epilepsy_surgical_service_referral_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        return HttpResponse(error)
-
-    context = {
-        'assessment': assessment
-    }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
-
-
-@login_required
-def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
-    new_date = request.POST.get(
-        'childrens_epilepsy_surgical_service_input_date')
-
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.childrens_epilepsy_surgical_service_input_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        message = error
-        return HttpResponse(message)
-
-    context = {
-        'assessment': assessment
-    }
-
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
-
-
-@login_required
-def epilepsy_specialist_nurse_referral_made(request, assessment_id):
-    assessment = Assessment.objects.get(pk=assessment_id)
-    epilepsy_specialist_nurse_referral_made = not assessment.epilepsy_specialist_nurse_referral_made
-
-    try:
+    if Assessment.objects.filter(pk=assessment_id, childrens_epilepsy_surgical_service_referral_made=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Assessment.objects.filter(pk=assessment_id).update(
+                childrens_epilepsy_surgical_service_referral_made=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Assessment.objects.filter(pk=assessment_id).update(
+                childrens_epilepsy_surgical_service_referral_made=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
         Assessment.objects.filter(pk=assessment_id).update(
-            epilepsy_specialist_nurse_referral_made=epilepsy_specialist_nurse_referral_made)
-    except Exception as error:
-        return HttpResponse(error)
+            childrens_epilepsy_surgical_service_referral_made=Q(
+                childrens_epilepsy_surgical_service_referral_made=False),
+            childrens_epilepsy_surgical_service_referral_date=None,
+            childrens_epilepsy_surgical_service_input_date=None
+        )
+
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    context = {
+        "assessment": assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@ login_required
+def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
+    """
+    This is an HTMX callback from the epilepsy_surgery partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the children's epilepsy surgery referral date value, and returns the same partial.
+    """
+
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        childrens_epilepsy_surgical_service_referral_date=datetime.strptime(
+            request.POST.get('childrens_epilepsy_surgical_service_referral_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    context = {
+        'assessment': assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@ login_required
+def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
+    """
+    This is an HTMX callback from the epilepsy_surgery partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the children's epilepsy surgery referral date value, and returns the same partial.
+    """
+
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        childrens_epilepsy_surgical_service_input_date=datetime.strptime(
+            request.POST.get('childrens_epilepsy_surgical_service_input_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    context = {
+        'assessment': assessment
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@ login_required
+def epilepsy_specialist_nurse_referral_made(request, assessment_id):
+    """
+    This is an HTMX callback from the epilepsy_nurse partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value or sets it based on user selection if none exists,
+    and returns the same partial.
+    """
+
+    if Assessment.objects.filter(pk=assessment_id, epilepsy_specialist_nurse_referral_made=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Assessment.objects.filter(pk=assessment_id).update(
+                individualised_care_plan_in_place=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Assessment.objects.filter(pk=assessment_id).update(
+                individualised_care_plan_in_place=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
+        Assessment.objects.filter(pk=assessment_id).update(
+            epilepsy_specialist_nurse_referral_made=Q(
+                epilepsy_specialist_nurse_referral_made=False),
+            epilepsy_specialist_nurse_referral_date=None,
+            epilepsy_specialist_nurse_input_date=None
+        )
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -212,41 +299,43 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 
 @login_required
 def epilepsy_specialist_nurse_referral_date(request, assessment_id):
-    new_date = request.POST.get(
-        'epilepsy_specialist_nurse_referral_date')
+    """
+    This is an HTMX callback from the epilepsy_nurse partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the epilepsy nurse specialist referral date value, and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.epilepsy_specialist_nurse_referral_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        return HttpResponse(error)
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        epilepsy_specialist_nurse_referral_date=datetime.strptime(
+            request.POST.get('epilepsy_specialist_nurse_referral_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
-        "assessment": assessment,
+        'assessment': assessment
     }
-
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
 
 
 @login_required
 def epilepsy_specialist_nurse_input_date(request, assessment_id):
-    new_date = request.POST.get(
-        'epilepsy_specialist_nurse_input_date')
+    """
+    This is an HTMX callback from the epilepsy_nurse partial template
+    It is triggered by a change in custom date input in the partial, generating a post request.
+    This persists the epilepsy nurse specialist referral date value, and returns the same partial.
+    """
 
-    try:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.epilepsy_specialist_nurse_input_date = datetime.strptime(
-            new_date, "%Y-%m-%d").date()
-        assessment.save()
-    except Exception as error:
-        message = error
+    # TODO date validation needed
+    Assessment.objects.filter(pk=assessment_id).update(
+        epilepsy_specialist_nurse_input_date=datetime.strptime(
+            request.POST.get('epilepsy_specialist_nurse_input_date'), "%Y-%m-%d").date())
+
+    assessment = Assessment.objects.get(pk=assessment_id)
 
     context = {
-        "assessment": assessment,
+        'assessment': assessment
     }
-
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
 
 

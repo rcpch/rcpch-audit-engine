@@ -166,6 +166,8 @@ htmx_paths = [
 
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
          views.childrens_epilepsy_surgical_service_referral_criteria_met, name="childrens_epilepsy_surgical_service_referral_criteria_met"),
+    path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_made',
+         views.childrens_epilepsy_surgical_service_referral_made, name="childrens_epilepsy_surgical_service_referral_made"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_date',
          views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',

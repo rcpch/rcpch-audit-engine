@@ -1,52 +1,49 @@
-<div class="ui segment" id="childrens_epilepsy_surgical_service_referral_criteria_met">
-    <div class="field">
-        <div class="ui toggle checkbox" 
-            hx-post="{% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk %}"
-            hx-trigger="change"
-            hx-target="#childrens_epilepsy_surgical_service"
-            hx-swap="innerHTML"
-        >
-        {% if assessment.childrens_epilepsy_surgical_service_referral_criteria_met %}
-            <input 
-                type="checkbox" 
-                name="childrens_epilepsy_surgical_service_referral_criteria_met"
-                checked=""
-            />
-        {% else %}
-            <input 
-                type="checkbox" 
-                name="childrens_epilepsy_surgical_service_referral_criteria_met"
-            />
-        {% endif %}
-        <label>Has a referral been made to a children's epilepsy surgery service?</label>
-        </div>
-    </div>
+<div class="ui segment">
+
+    <div class="ui info message">
+    
+      <div class="header">
+        <i class="circle info icon"></i>Criteria for referral to a children's epilepsy surgery service:
+      </div>
+      <ol>
+        <li>Children with catastrophic early onset epilepsy with evidence of lateralisation of the seizure onset</li>
+        <li>All children under 24 months old with evidence of focality of seizure onset, with or without an MRI evident lesion</li>
+        <li>Children of any age with evident focal epilepsy, or lateralised seizures associated with congenital hemiplegia, resistant to two appropriate anti-epileptic drugs (AEDs)</li>
+        <li>Children who have epilepsy associated with a lateralised abnormality seen on a brain scan</li>
+        <li>Children with epilepsy associated with Sturge Weber syndrome, benign tumours with developmental issues and/or ongoing seizures, or Rasmussen’s syndrome</li>
+        <li>Children of any age with epilepsy associated with tuberous sclerosis resistant to two AEDs where seizures may arise from a single focus (probably from a single tuber)</li>
+        <li>Children who have ‘drop attacks’ as part of a more complex epilepsy</li>
+        <li>Children with epilepsy associated with hypothalamic hamartoma</li>
+      </ol>
+
+        {% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk as hx_post %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Are ANY of these criteria present?" data_position="top left" %}
+
+  </div>
+    
     {% if assessment.childrens_epilepsy_surgical_service_referral_criteria_met %}
-        <div class="two fields">
-            <div class="field"
-                hx-post="{% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk %}"
-                hx-target="#childrens_epilepsy_surgical_service"
-                hx-trigger="change"
-            >
-                <label>Date of referral to a children's epilepsy surgery service</label>
-                <input 
-                    type="date" 
-                    name="childrens_epilepsy_surgical_service_referral_date" 
-                    value={{assessment.childrens_epilepsy_surgical_service_referral_date|date:'Y-m-d'}}
-                />
+        {% url 'childrens_epilepsy_surgical_service_referral_made' assessment_id=assessment.pk as hx_post %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Has a referral been made to a children's epilepsy surgery service?" data_position="top left" %}
+
+        {% if assessment.childrens_epilepsy_surgical_service_referral_made %}
+
+            <div class="ui message">
+
+                {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label="Date of referral to a children's epilepsy surgery service." date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" %}
+                
+                {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label="Date seen by children's epilepsy surgery service." date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" %}
+
+                <div class="inline field">
+                    <label class='toggle_button_label'>Time to Review</label>
+                    <input class="ui input" type="text" value="{{assessment.childrens_epilepsy_surgery_wait}}" disabled/>
+                </div>
+
             </div>
 
-            <div class="field"
-                hx-post="{% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk %}"
-                hx-target="#childrens_epilepsy_surgical_service"
-                hx-trigger="change"
-            >
-                <label>Date seen by children's epilepsy surgery service</label>
-                <input type="date" 
-                    name="childrens_epilepsy_surgical_service_input_date" 
-                    value="{{assessment.childrens_epilepsy_surgical_service_input_date|date:'Y-m-d'}}"/>
-            </div>
-        </div>
-
+        {% endif %}
+    
     {% endif %}
+    
 </div>
