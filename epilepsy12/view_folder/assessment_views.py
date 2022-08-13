@@ -154,24 +154,42 @@ def paediatric_neurologist_input_date(request, assessment_id):
 
 @ login_required
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
+    """
+    This is an HTMX callback from the epilepsy_surgery partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value or sets it based on user selection if none exists,
+    and returns the same partial.
+    TODO #69 children's surgery referral criteria
+    """
+
+    if Assessment.objects.filter(pk=assessment_id, childrens_epilepsy_surgical_service_referral_criteria_met=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Assessment.objects.filter(pk=assessment_id).update(
+                childrens_epilepsy_surgical_service_referral_criteria_met=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Assessment.objects.filter(pk=assessment_id).update(
+                childrens_epilepsy_surgical_service_referral_criteria_met=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
+        Assessment.objects.filter(pk=assessment_id).update(
+            childrens_epilepsy_surgical_service_referral_criteria_met=Q(
+                childrens_epilepsy_surgical_service_referral_criteria_met=False),
+            childrens_epilepsy_surgical_service_referral_made=None,
+            childrens_epilepsy_surgical_service_referral_date=None,
+            childrens_epilepsy_surgical_service_input_date=None
+        )
 
     assessment = Assessment.objects.get(pk=assessment_id)
-    childrens_epilepsy_surgical_service_referral_criteria_met = not assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-
-    if childrens_epilepsy_surgical_service_referral_criteria_met:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.childrens_epilepsy_surgical_service_referral_criteria_met = childrens_epilepsy_surgical_service_referral_criteria_met
-        assessment.save()
-    else:
-        assessment = Assessment.objects.get(pk=assessment_id)
-        assessment.childrens_epilepsy_surgical_service_referral_criteria_met = childrens_epilepsy_surgical_service_referral_criteria_met
-        assessment.childrens_epilepsy_surgical_service_referral_date = None
-        assessment.childrens_epilepsy_surgical_service_input_date = None
-        assessment.save()
 
     context = {
-        'assessment': assessment
+        "assessment": assessment
     }
+
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
 
 

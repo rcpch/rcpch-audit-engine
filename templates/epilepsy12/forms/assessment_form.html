@@ -1,18 +1,34 @@
 <form class="ui form" method="post">
   {% csrf_token %}
+
+  <h5 class="header">
+    General Paediatrics
+  </h5>
   
   <div id="consultant_paediatrician" class="field">
     {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=registration.assessment %}
   </div>
 
+  <h5 class="header">
+    Paediatric Neurology
+  </h5>
+
   <div id="paediatric_neurologist" class="field">
     {% include 'epilepsy12/partials/assessment/paediatric_neurologist.html' with assessment=registration.assessment %}
   </div>
+
+  <h5 class="header">
+    Epilepsy Surgery
+  </h5>
 
   <div id="childrens_epilepsy_surgical_service" class="field">
     {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=registration.assessment %}
   </div>
   
+  <h5 class="header">
+    Epilepsy Nurse Specialist
+  </h5>
+
   <div id="epilepsy_specialist_nurse" class="field">
     {% include 'epilepsy12/partials/assessment/epilepsy_nurse.html' with assessment=registration.assessment %}
   </div>
