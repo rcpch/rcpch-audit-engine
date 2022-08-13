@@ -1,0 +1,20 @@
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <div class="ui segment">
+
+        <div class="ui info message">
+                <p>Indications for a 12-Lead ECG:</p>
+                <li>Everyone gets one of these</li>
+                <li>That's it</li>
+        </div>
+
+        <div class="field">
+
+                {% url 'twelve_lead_ecg_status' investigations_id=investigations.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ecg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.twelve_lead_ecg_status label="Has an ECG been performed?" data_position="top left" %}
+
+        </div>
+
+    </div>
+
+</div>

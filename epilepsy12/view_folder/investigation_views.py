@@ -1,4 +1,6 @@
 from datetime import datetime
+from django.http import HttpResponse
+from django.db.models import Q
 from django.utils.timezone import make_aware
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -31,19 +33,51 @@ def investigations(request, case_id):
 # htmx
 
 def eeg_indicated(request, investigations_id):
+    """
+    This is an HTMX callback from the eeg_information.html partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, or makes a selection if none is made, 
+    and returns the same partial.
+    """
+
+    if Investigation.objects.filter(pk=investigations_id, eeg_indicated=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Investigation.objects.filter(pk=investigations_id).update(
+                eeg_indicated=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Investigation.objects.filter(pk=investigations_id).update(
+                eeg_indicated=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        # there is a selection. If this has become false, set all associated fields to None
+        Investigation.objects.filter(pk=investigations_id).update(
+            eeg_indicated=Q(eeg_indicated=False),
+            eeg_request_date=None,
+            eeg_performed_date=None
+        )
+
+    # return the updated model
     investigations = Investigation.objects.get(pk=investigations_id)
-    eeg_indicated = not investigations.eeg_indicated
-    Investigation.objects.filter(pk=investigations_id).update(
-        eeg_indicated=eeg_indicated)
-    investigations = Investigation.objects.get(pk=investigations_id)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
 
 
 def eeg_request_date(request, investigations_id):
+    """
+    This is an HTMX callback from the ecg_information.html partial template
+    which contains fields on eeg_indicated, eeg_request_date and eeg_performed_date.
+    It also contains a calculated field showing time to EEG from request.
+    It is triggered by a toggle in the partial generating a post request on change in the date field.
+    This updates the model and returns the same partial.
+    """
     investigations = Investigation.objects.get(pk=investigations_id)
     naive_eeg_request_date = datetime.strptime(
         request.POST.get('eeg_request_date'), "%Y-%m-%d").date()
@@ -58,10 +92,17 @@ def eeg_request_date(request, investigations_id):
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
 
 
 def eeg_performed_date(request, investigations_id):
+    """
+    This is an HTMX callback from the ecg_information.html partial template
+    which contains fields on eeg_indicated, eeg_request_date and eeg_performed_date.
+    It also contains a calculated field showing time to EEG from request.
+    It is triggered by a toggle in the partial generating a post request on change in the date field.
+    This updates the model and returns the same partial.
+    """
     investigations = Investigation.objects.get(pk=investigations_id)
     naive_eeg_performed_date = datetime.strptime(
         request.POST.get('eeg_performed_date'), "%Y-%m-%d").date()
@@ -73,10 +114,16 @@ def eeg_performed_date(request, investigations_id):
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
 
 
 def twelve_lead_ecg_status(request, investigations_id):
+    """
+    This is an HTMX callback from the ecg_status.html partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, or makes a selection if none is made, 
+    and returns the same partial.
+    """
     investigations = Investigation.objects.get(pk=investigations_id)
     twelve_lead_ecg_status = not investigations.twelve_lead_ecg_status
     Investigation.objects.filter(pk=investigations_id).update(
@@ -86,10 +133,16 @@ def twelve_lead_ecg_status(request, investigations_id):
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/ecg_status.html", context=context)
 
 
 def ct_head_scan_status(request, investigations_id):
+    """
+    This is an HTMX callback from the ct_head_status.html partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, or makes a selection if none is made, 
+    and returns the same partial.
+    """
     investigations = Investigation.objects.get(pk=investigations_id)
     ct_head_scan_status = not investigations.ct_head_scan_status
     Investigation.objects.filter(pk=investigations_id).update(
@@ -99,32 +152,60 @@ def ct_head_scan_status(request, investigations_id):
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/ct_head_status.html", context=context)
 
 
 def mri_indicated(request, investigations_id):
+    """
+    This is an HTMX callback from the mri_brain_information.html partial template
+    It is triggered by a toggle in the partial generating a post request
+    This inverts the boolean field value, or makes a selection if none is made, 
+    and returns the same partial.
+    """
+    if Investigation.objects.filter(pk=investigations_id, mri_indicated=None).exists():
+        # no selection - get the name of the button
+        if request.htmx.trigger_name == 'button-true':
+            Investigation.objects.filter(pk=investigations_id).update(
+                mri_indicated=True)
+        elif request.htmx.trigger_name == 'button-false':
+            Investigation.objects.filter(pk=investigations_id).update(
+                mri_indicated=False)
+        else:
+            print(
+                "Some kind of error - this will need to be raised and returned to template")
+            return HttpResponse("Error")
+    else:
+        # there is a selection. If this has become false, set all associated fields to None
+        Investigation.objects.filter(pk=investigations_id).update(
+            mri_indicated=Q(mri_indicated=False),
+            mri_brain_date=None
+        )
+
+    # return the updated model
     investigations = Investigation.objects.get(pk=investigations_id)
-    mri_indicated = not investigations.mri_indicated
-    Investigation.objects.filter(pk=investigations_id).update(
-        mri_indicated=mri_indicated)
-    investigations = Investigation.objects.get(pk=investigations_id)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)
 
 
 def mri_brain_date(request, investigations_id):
+    """
+    This is an HTMX callback from the mri_brain_information.html partial template
+    It is triggered by a change in the date_input_field partial generating a post request
+    This returns a date value which is stored in the model and returns the same partial.
+    """
     investigations = Investigation.objects.get(pk=investigations_id)
-    mri_brain_date = request.POST.get('mri_brain_date')
+    mri_brain_date = request.POST.get('input_date_field')
 
     Investigation.objects.filter(pk=investigations_id).update(
-        eeg_requested=datetime.strptime(
+        mri_brain_date=datetime.strptime(
             mri_brain_date, "%Y-%m-%d").date())
     investigations = Investigation.objects.get(pk=investigations_id)
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_indicated.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)

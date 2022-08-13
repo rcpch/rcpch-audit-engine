@@ -8,17 +8,17 @@
         encouraging users actively to choose if a given field is true or false.
         This also means that unselected fields can be counted and register that model as incomplete
         This toggle button accepts the following parameters:
-        hx_post: the url posted to including parameters
-        hx_target: the id of the html element to target the server response
-        hx_trigger: usually 'click' but can be any event
-        hx_swap: usually 'innerHTML'
-        test_positive: the model boolean field 
-        label: this is the label text
-        data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
+            hx_post: the url posted to including parameters
+            hx_target: the id of the html element to target the server response
+            hx_trigger: usually 'click' but can be any event
+            hx_swap: usually 'innerHTML'
+            test_positive: the model boolean field 
+            label: this is the label text
+            data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
     {% endcomment %}
 
     
-        <div class="field" >
+        <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
             <span>
                 {% if test_positive is None %}
                     <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">

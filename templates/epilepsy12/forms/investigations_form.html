@@ -1,5 +1,17 @@
 <div class="ui form">
-    <div id="eeg_indicated">
-        {% include 'epilepsy12/partials/investigations/eeg_indicated.html' with investigations_id=investigations.pk %}
+    <div id="eeg_information" class="field" >
+        {% include 'epilepsy12/partials/investigations/eeg_information.html' with investigations_id=investigations.pk %}
+    </div>
+
+    <div id="ecg_information" class="field" >
+        {% include 'epilepsy12/partials/investigations/ecg_status.html' with investigations_id=investigations.pk %}
+    </div>
+    
+    <div id="ct_head_information" class="field" >
+        {% include 'epilepsy12/partials/investigations/ct_head_status.html' with investigations_id=investigations.pk %}
+    </div>
+    
+    <div id="mri_brain_information" class="field" >
+        {% include 'epilepsy12/partials/investigations/mri_brain_information.html' with investigations_id=investigations.pk %}
     </div>
 </div>

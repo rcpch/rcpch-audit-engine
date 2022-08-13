@@ -9,15 +9,21 @@ from .registration import Registration
 class Investigation(models.Model):
 
     eeg_indicated = models.BooleanField(
+        "Is an EEG indicated?",
         default=None,
-        null=True
+        null=True,
+        blank=True
     )
     eeg_request_date = models.DateField(
+        "Date EEG requested",
+        default=None,
         null=True,
         blank=True
     )
 
     eeg_performed_date = models.DateField(
+        "Date EEG performed",
+        default=None,
         null=True,
         blank=True
     )
@@ -29,22 +35,30 @@ class Investigation(models.Model):
     )
 
     ct_head_scan_status = models.BooleanField(
-        default=False
+        "Has a CT head been performed?",
+        default=None,
+        null=True,
+        blank=True
     )
 
     mri_indicated = models.BooleanField(
+        "Is an MRI brain indicated?",
         default=None,
         null=True,
         blank=True
     )
 
     mri_brain_date = models.DateField(
+        "MRI brain date",
         default=None,
         null=True,
         blank=True
     )
 
     def eeg_time(self):
+        """
+        Calculated field. Returns time elapsed between date EEG requested and performed as a string.
+        """
         if self.eeg_performed_date and self.eeg_request_date:
             calculated_age = relativedelta.relativedelta(
                 self.eeg_performed_date, self.eeg_request_date)

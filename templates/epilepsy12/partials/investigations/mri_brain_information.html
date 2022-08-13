@@ -1,0 +1,23 @@
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <div class="ui segment">
+        
+        <div class="ui info message">
+            <p>Indications for a brain MRI:</p>
+            <li>Focal seizure</li>
+            <li>Laterality on EEG</li>
+        </div>
+
+        {% url 'mri_indicated' investigations_id=investigations.pk as hx_post %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label="Is an MRI brain indicated?" data_position="top left" %}
+
+        {% if investigations.mri_indicated %}
+            
+            {% url 'mri_brain_date' investigations_id=investigations.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain date" date_value=investigations.mri_brain_date %}
+        
+        {% endif %}
+
+    </div>
+
+</div>
