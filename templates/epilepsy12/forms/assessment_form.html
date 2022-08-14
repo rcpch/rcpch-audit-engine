@@ -42,6 +42,8 @@
  
   {% include 'epilepsy12/partials/assessment/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 
+
+{% comment %}
 <h5>
 table for {{registration.case.first_name}} {{registration.surname}}
 registration id: {{registration.pk}}
@@ -65,6 +67,6 @@ assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}
   </tr>
 {% endfor%}
 </table>
-
+{% endcomment %}
 </form>
 
