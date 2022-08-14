@@ -1,5 +1,7 @@
 from django.db import models
 
+from epilepsy12.models.site import Site
+
 from ..general_functions import calculate_time_elapsed
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
@@ -22,17 +24,6 @@ class Assessment(models.Model):
         "lead_hospital",
         max_length=100,
         default=None,
-        null=True
-    )
-    tertiary_paediatric_neurology_centre = models.CharField(
-        "tertiary_paediatric_neurology_centre",
-        max_length=100,
-        default=None,
-        null=True
-    )
-    epilepsy_surgery_centre = models.CharField(
-        "epilepsy_surgery_centre",
-        max_length=100,
         null=True
     )
     childrens_epilepsy_surgical_service_referral_criteria_met = models.BooleanField(
@@ -157,6 +148,21 @@ class Assessment(models.Model):
         on_delete=models.CASCADE,
         verbose_name="related registration"
     )
+
+    # tertiary_paediatric_neurology_centre = models.OneToOneField(
+    #     Site,
+    #     on_delete=models.CASCADE,
+    #     verbose_name="related paediatric neurology centre",
+    #     default=None,
+    #     null=True
+    # )
+    # epilepsy_surgery_centre = models.OneToOneField(
+    #     Site,
+    #     on_delete=models.CASCADE,
+    #     verbose_name="related children's epilepsy surgery centre",
+    #     default=None,
+    #     null=True
+    # )
 
     class Meta:
         verbose_name = "assessment",

@@ -56,6 +56,11 @@ urlpatterns = [
 ]
 
 htmx_paths = [
+    # generic paths
+    path('htmx/hospital_list',
+         views.hospital_list, name='hospital_list'),
+
+
     # desscribe / multiaxial description htmx endpoints
     path('htmx/<int:desscribe_id>/description',
          views.edit_description, name='edit_description'),
@@ -172,6 +177,14 @@ htmx_paths = [
          views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',
          views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_surgery_centre',
+         views.epilepsy_surgery_centre, name="epilepsy_surgery_centre"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_surgery_centre/<int:site_id>/delete',
+         views.delete_epilepsy_surgery_centre, name="delete_epilepsy_surgery_centre"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_surgery_centre/<int:site_id>/edit',
+         views.edit_epilepsy_surgery_centre, name="edit_epilepsy_surgery_centre"),
+    path('htmx/assessment/<int:assessment_id>/epilepsy_surgery_centre/<int:site_id>/active/<str:action>',
+         views.update_epilepsy_surgery_centre_pressed, name="update_epilepsy_surgery_centre_pressed"),
 
 
     path('htmx/registration/<int:registration_id>/were_any_of_the_epileptic_seizures_convulsive',

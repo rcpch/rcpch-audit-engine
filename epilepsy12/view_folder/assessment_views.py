@@ -3,6 +3,10 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+
+from epilepsy12.models.site import Site
+
+from ..models.hospital_trust import HospitalTrust
 from ..models import Registration
 from ..models import Assessment
 
@@ -215,7 +219,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
-        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
+        # A surgical referral has not been made - set all fields related fields to None
         Assessment.objects.filter(pk=assessment_id).update(
             childrens_epilepsy_surgical_service_referral_made=Q(
                 childrens_epilepsy_surgical_service_referral_made=False),
@@ -225,8 +229,22 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
     context = {
-        "assessment": assessment
+        "assessment": assessment,
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": False
     }
 
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
@@ -247,8 +265,22 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
     context = {
-        'assessment': assessment
+        'assessment': assessment,
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": False
     }
 
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
@@ -269,10 +301,150 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
     context = {
-        'assessment': assessment
+        'assessment': assessment,
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": False
     }
 
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@login_required
+def epilepsy_surgery_centre(request, assessment_id):
+
+    epilepsy_surgery_centre = HospitalTrust.objects.get(pk=request.POST.get(
+        'hospital_trust'))
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    Site.objects.create(
+        registration=assessment.registration,
+        hospital_trust=epilepsy_surgery_centre,
+        site_is_childrens_epilepsy_surgery_centre=True,
+        site_is_actively_involved_in_epilepsy_care=True
+    )
+
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": False
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@login_required
+def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
+    """
+    HTMX call back from epilepsy_surgery partial template. This is a POST request on button click.
+    It updates the Site object and returns the same partial template.
+    """
+    hospital_trust = HospitalTrust.objects.get(
+        pk=request.POST.get('hospital_trust'))
+
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    Site.objects.filter(pk=site_id).update(hospital_trust=hospital_trust,
+                                           site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=True)
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": False
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@login_required
+def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, action):
+    """
+    HTMX callback from epilepsy_surgery partial on click of Update or Cancel
+    (action is 'edit' or 'cancel') to change the surgery_edit_active flag
+    It returns the partial template with the updated flag.
+    """
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
+    surgery_edit_active = True
+    if action == 'cancel':
+        surgery_edit_active = False
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": surgery_edit_active
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+
+@login_required
+def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
+
+    Site.objects.filter(pk=site_id).delete()
+    assessment = Assessment.objects.get(pk=assessment_id)
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_surgical_site = None
+    historical_surgical_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_surgical_sites": historical_surgical_sites,
+        "active_surgical_site": active_surgical_site,
+        "surgery_edit_active": False
+    }
     return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
 
 
@@ -444,10 +616,37 @@ def experienced_prolonged_focal_seizures(request, registration_id):
 @login_required
 def assessment(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()
+    sites = Site.objects.filter(registration=registration).all()
+
+    active_surgical_site = None
+    active_neurology_site = None
+    active_general_paediatric_site = None
+
+    historical_neurology_sites = Site.objects.filter(
+        registration=registration, site_is_paediatric_neurology_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+    historical_surgical_sites = Site.objects.filter(
+        registration=registration, site_is_childrens_epilepsy_surgery_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_childrens_epilepsy_surgery_centre:
+                active_surgical_site = site
+            elif site.site_is_paediatric_neurology_centre:
+                active_neurology_site = site
+            else:
+                active_general_paediatric_site = site
 
     context = {
         "case_id": case_id,
         "registration": registration,
+        "historical_neurology_sites": historical_neurology_sites,
+        "historical_surgical_sites": historical_surgical_sites,
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_surgical_site": active_surgical_site,
+        "active_neurology_site": active_neurology_site,
+        "active_general_paediatric_site": active_general_paediatric_site,
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,

@@ -1,0 +1,35 @@
+
+        <div class="field">
+            <span>
+                <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                    <i class="blue dot circle outline icon"></i>
+                </span>
+                <div class="ui compact search selection dropdown">
+                        <input type="hidden" name="hospital_trust"/>
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Allocate a children's epilepsy surgery centre...</div>
+                        <div class="menu">
+                        {% for item in hospital_list %}
+                            {% if item.OrganisationName == site.hospital_trust.OrganisationName %}
+                                <div class="item" selected data-value={{item.pk}}>{{item.OrganisationName}}</div>
+                            {% else %}
+                                <div class="item" data-value={{item.pk}}>{{item.OrganisationName}}</div>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                </div>
+                <button 
+                    class="ui tiny positive right attached button"
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="innerHTML"
+                    hx-include="[name='hospital_trust']"
+                    hx-trigger="click"
+                    name="hospital_trust_button"
+                >{{label}}</button>
+            </span>
+        </div>
+
+<script>
+$('.ui.dropdown').dropdown();
+</script>
