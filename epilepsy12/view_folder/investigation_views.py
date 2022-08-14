@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.utils.timezone import make_aware
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from epilepsy12.models.investigations import Investigation
+from epilepsy12.models.investigations import Investigations
 
 from epilepsy12.models.registration import Registration
 
@@ -13,7 +13,7 @@ from epilepsy12.models.registration import Registration
 def investigations(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()
 
-    investigations, created = Investigation.objects.get_or_create(
+    investigations, created = Investigations.objects.get_or_create(
         registration=registration)
 
     context = {
@@ -40,13 +40,13 @@ def eeg_indicated(request, investigations_id):
     and returns the same partial.
     """
 
-    if Investigation.objects.filter(pk=investigations_id, eeg_indicated=None).exists():
+    if Investigations.objects.filter(pk=investigations_id, eeg_indicated=None).exists():
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
-            Investigation.objects.filter(pk=investigations_id).update(
+            Investigations.objects.filter(pk=investigations_id).update(
                 eeg_indicated=True)
         elif request.htmx.trigger_name == 'button-false':
-            Investigation.objects.filter(pk=investigations_id).update(
+            Investigations.objects.filter(pk=investigations_id).update(
                 eeg_indicated=False)
         else:
             print(
@@ -54,14 +54,14 @@ def eeg_indicated(request, investigations_id):
             return HttpResponse("Error")
     else:
         # there is a selection. If this has become false, set all associated fields to None
-        Investigation.objects.filter(pk=investigations_id).update(
+        Investigations.objects.filter(pk=investigations_id).update(
             eeg_indicated=Q(eeg_indicated=False),
             eeg_request_date=None,
             eeg_performed_date=None
         )
 
     # return the updated model
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
         'investigations': investigations
@@ -78,15 +78,15 @@ def eeg_request_date(request, investigations_id):
     It is triggered by a toggle in the partial generating a post request on change in the date field.
     This updates the model and returns the same partial.
     """
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     naive_eeg_request_date = datetime.strptime(
         request.POST.get('eeg_request_date'), "%Y-%m-%d").date()
 
     # aware_eeg_request_date = make_aware(naive_eeg_request_date)
 
-    Investigation.objects.filter(pk=investigations_id).update(
+    Investigations.objects.filter(pk=investigations_id).update(
         eeg_request_date=naive_eeg_request_date)
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
         'investigations': investigations
@@ -103,13 +103,13 @@ def eeg_performed_date(request, investigations_id):
     It is triggered by a toggle in the partial generating a post request on change in the date field.
     This updates the model and returns the same partial.
     """
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     naive_eeg_performed_date = datetime.strptime(
         request.POST.get('eeg_performed_date'), "%Y-%m-%d").date()
 
-    Investigation.objects.filter(pk=investigations_id).update(
+    Investigations.objects.filter(pk=investigations_id).update(
         eeg_performed_date=naive_eeg_performed_date)
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     context = {
         'investigations': investigations
     }
@@ -124,11 +124,11 @@ def twelve_lead_ecg_status(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     twelve_lead_ecg_status = not investigations.twelve_lead_ecg_status
-    Investigation.objects.filter(pk=investigations_id).update(
+    Investigations.objects.filter(pk=investigations_id).update(
         twelve_lead_ecg_status=twelve_lead_ecg_status)
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     context = {
         'investigations': investigations
     }
@@ -143,11 +143,11 @@ def ct_head_scan_status(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     ct_head_scan_status = not investigations.ct_head_scan_status
-    Investigation.objects.filter(pk=investigations_id).update(
+    Investigations.objects.filter(pk=investigations_id).update(
         ct_head_scan_status=ct_head_scan_status)
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     context = {
         'investigations': investigations
     }
@@ -162,13 +162,13 @@ def mri_indicated(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
-    if Investigation.objects.filter(pk=investigations_id, mri_indicated=None).exists():
+    if Investigations.objects.filter(pk=investigations_id, mri_indicated=None).exists():
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
-            Investigation.objects.filter(pk=investigations_id).update(
+            Investigations.objects.filter(pk=investigations_id).update(
                 mri_indicated=True)
         elif request.htmx.trigger_name == 'button-false':
-            Investigation.objects.filter(pk=investigations_id).update(
+            Investigations.objects.filter(pk=investigations_id).update(
                 mri_indicated=False)
         else:
             print(
@@ -176,13 +176,13 @@ def mri_indicated(request, investigations_id):
             return HttpResponse("Error")
     else:
         # there is a selection. If this has become false, set all associated fields to None
-        Investigation.objects.filter(pk=investigations_id).update(
+        Investigations.objects.filter(pk=investigations_id).update(
             mri_indicated=Q(mri_indicated=False),
             mri_brain_date=None
         )
 
     # return the updated model
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
         'investigations': investigations
@@ -197,13 +197,13 @@ def mri_brain_date(request, investigations_id):
     It is triggered by a change in the date_input_field partial generating a post request
     This returns a date value which is stored in the model and returns the same partial.
     """
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     mri_brain_date = request.POST.get('input_date_field')
 
-    Investigation.objects.filter(pk=investigations_id).update(
+    Investigations.objects.filter(pk=investigations_id).update(
         mri_brain_date=datetime.strptime(
             mri_brain_date, "%Y-%m-%d").date())
-    investigations = Investigation.objects.get(pk=investigations_id)
+    investigations = Investigations.objects.get(pk=investigations_id)
     context = {
         'investigations': investigations
     }

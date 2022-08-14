@@ -36,11 +36,11 @@ urlpatterns = [
          views.create_comorbidity, name="create_comorbidity"),
     path('comorbidity/<int:case_id>/update',
          views.update_comorbidity, name="update_comorbidity"),
-    path('investigation_management/<int:case_id>/create',
-         views.create_investigation_management, name='create_investigation_management'),
-    path('investigation_management/<int:case_id>/update',
-         views.update_investigation_management, name='update_investigation_management'),
-    #     management paths
+    #     path('investigation_management/<int:case_id>/create',
+    #          views.create_investigation_management, name='create_investigation_management'),
+    #     path('investigation_management/<int:case_id>/update',
+    #          views.update_investigation_management, name='update_investigation_management'),
+    #     #     management paths
     path('management/<int:case_id>',
          views.management, name='management'),
 
@@ -239,8 +239,8 @@ htmx_paths = [
          views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
 
     # investigation_management htmx
-    path('htmx/investigation_management/<int:investigation_management_id>/medication_lookup',
-         views.medication_lookup, name="medication_lookup"),
+    #     path('htmx/investigation_management/<int:investigation_management_id>/medication_lookup',
+    #          views.medication_lookup, name="medication_lookup"),
 
 
     # investigations

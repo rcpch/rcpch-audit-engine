@@ -5,7 +5,7 @@ from ..general_functions import calculate_time_elapsed
 from .registration import Registration
 
 
-class Investigation(models.Model):
+class Investigations(models.Model):
 
     eeg_indicated = models.BooleanField(
         "Is an EEG indicated?",

@@ -149,21 +149,6 @@ class Assessment(models.Model):
         verbose_name="related registration"
     )
 
-    # tertiary_paediatric_neurology_centre = models.OneToOneField(
-    #     Site,
-    #     on_delete=models.CASCADE,
-    #     verbose_name="related paediatric neurology centre",
-    #     default=None,
-    #     null=True
-    # )
-    # epilepsy_surgery_centre = models.OneToOneField(
-    #     Site,
-    #     on_delete=models.CASCADE,
-    #     verbose_name="related children's epilepsy surgery centre",
-    #     default=None,
-    #     null=True
-    # )
-
     class Meta:
         verbose_name = "assessment",
         verbose_name_plural = "assessments"
