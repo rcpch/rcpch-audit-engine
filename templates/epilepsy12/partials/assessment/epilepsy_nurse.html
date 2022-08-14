@@ -2,53 +2,26 @@
 
 
 <div class="ui segment">
-    <div class="field">
-        <div class="ui toggle checkbox" 
-            hx-post="{% url 'epilepsy_specialist_nurse_referral_made' assessment_id=assessment.pk %}"
-            hx-trigger="change"
-            hx-target="#epilepsy_specialist_nurse"
-            hx-swap="innerHTML"
-        >
-        {% if assessment.epilepsy_specialist_nurse_referral_made %}
-            <input 
-                type="checkbox" 
-                name="epilepsy_specialist_nurse_referral_made"
-                checked=""
-            />
-        {% else %}
-            <input 
-                type="checkbox" 
-                name="epilepsy_specialist_nurse_referral_made"
-            />
-        {% endif %}
-        <label>Has a referral been made to an epilepsy nurse specialist?</label>
-        </div>
-    </div>
-    {% if assessment.epilepsy_specialist_nurse_referral_made %}
-        <div class="two fields">
-            <div class="field"
-                hx-post="{% url 'epilepsy_specialist_nurse_referral_date' assessment_id=assessment.pk %}"
-                hx-target="#epilepsy_specialist_nurse"
-                hx-trigger="change"
-            >
-                <label>Date of referral to a epilepsy nurse specialise</label>
-                <input 
-                    type="date" 
-                    name="epilepsy_specialist_nurse_referral_date" 
-                    value={{assessment.epilepsy_specialist_nurse_referral_date|date:'Y-m-d'}}
-                />
-            </div>
 
-            <div class="field"
-                hx-post="{% url 'epilepsy_specialist_nurse_input_date' assessment_id=assessment.pk %}"
-                hx-target="#epilepsy_specialist_nurse"
-                hx-trigger="change"
-            >
-                <label>Date seen by children's epilepsy surgery service</label>
-                <input type="date" 
-                    name="epilepsy_specialist_nurse_input_date" 
-                    value="{{assessment.epilepsy_specialist_nurse_input_date|date:'Y-m-d'}}"/>
+    {% url 'epilepsy_specialist_nurse_referral_made' assessment_id=assessment.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label="Has a referral been made to an epilepsy nurse specialist?" data_position='top left' %}
+
+    {% if assessment.epilepsy_specialist_nurse_referral_made %}
+
+        <div class="ui message">
+
+            {% url 'epilepsy_specialist_nurse_referral_date' assessment_id=assessment.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change" label="Date of referral to a epilepsy nurse specialist." date_value=assessment.epilepsy_specialist_nurse_referral_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_referral_date" %}
+                
+            {% url 'epilepsy_specialist_nurse_input_date' assessment_id=assessment.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change" label="Date seen by an epilepsy nurse specialist." date_value=assessment.epilepsy_specialist_nurse_input_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_input_date" %}
+
+            <div class="inline field">
+                <label class='toggle_button_label'>Time to Review</label>
+                <input class="ui input" type="text" value="{{assessment.epilepsy_nurse_specialist_wait}}" disabled/>
             </div>
+        
         </div>
+
     {% endif %}
 </div>

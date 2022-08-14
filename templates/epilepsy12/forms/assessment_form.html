@@ -1,40 +1,72 @@
 <form class="ui form" method="post">
   {% csrf_token %}
+
   
-  <div id="consultant_paediatrician" class="field">
-    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=registration.assessment %}
+  
+  
+  
+  
+  
+
+  <h5 class="header">
+    General Paediatrics
+  </h5>
+  
+  <div id="general_paediatric" class="field">
+    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=registration.assessment historical_general_paediatric_sites=historical_general_paediatric_sites active_general_paediatric_site=active_general_paediatric_site %}
   </div>
 
-  <div id="paediatric_neurologist" class="field">
-    {% include 'epilepsy12/partials/assessment/paediatric_neurologist.html' with assessment=registration.assessment %}
+  <h5 class="header">
+    Paediatric Neurology
+  </h5>
+
+  <div id="paediatric_neurology" class="field">
+    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=registration.assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site %}
   </div>
 
-  <div class="ui info message">
-    
-      <div class="header">
-      <i class="circle info icon"></i>Criteria for referral to a children's epilepsy surgery service:
-      </div>
-      <ol>
-        <li>Children with catastrophic early onset epilepsy with evidence of lateralisation of the seizure onset</li>
-        <li>All children under 24 months old with evidence of focality of seizure onset, with or without an MRI evident lesion</li>
-        <li>Children of any age with evident focal epilepsy, or lateralised seizures associated with congenital hemiplegia, resistant to two appropriate anti-epileptic drugs (AEDs)</li>
-        <li>Children who have epilepsy associated with a lateralised abnormality seen on a brain scan</li>
-        <li>Children with epilepsy associated with Sturge Weber syndrome, benign tumours with developmental issues and/or ongoing seizures, or Rasmussen’s syndrome</li>
-        <li>Children of any age with epilepsy associated with tuberous sclerosis resistant to two AEDs where seizures may arise from a single focus (probably from a single tuber)</li>
-        <li>Children who have ‘drop attacks’ as part of a more complex epilepsy</li>
-        <li>Children with epilepsy associated with hypothalamic hamartoma</li>
-      </ol>
-
-  </div>
+  <h5 class="header">
+    Epilepsy Surgery
+  </h5>
 
   <div id="childrens_epilepsy_surgical_service" class="field">
-    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=registration.assessment %}
+    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=registration.assessment sites=sites historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site %}
   </div>
   
+  <h5 class="header">
+    Epilepsy Nurse Specialist
+  </h5>
+
   <div id="epilepsy_specialist_nurse" class="field">
     {% include 'epilepsy12/partials/assessment/epilepsy_nurse.html' with assessment=registration.assessment %}
   </div>
  
   {% include 'epilepsy12/partials/assessment/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 
+
+{% comment %}
+<h5>
+table for {{registration.case.first_name}} {{registration.surname}}
+registration id: {{registration.pk}}
+assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}}
+</h5>
+<table class="ui table">
+  <th>Name</th>
+  <th>Is Lead</th>
+  <th>Neuro</th>
+  <th>Surgery</th>
+  <th>Paeds</th>
+  <th>Active</th>
+{% for site in all_my_sites %}
+  <tr>
+    <td>{{site.hospital_trust.OrganisationName}}</td>
+    <td>{{site.site_is_primary_centre_of_epilepsy_care}}</td>
+    <td>{{site.site_is_paediatric_neurology_centre}}</td>
+    <td>{{site.site_is_childrens_epilepsy_surgery_centre}}</td>
+    <td>{{site.site_is_general_paediatric_centre}}</td>
+    <td>{{site.site_is_actively_involved_in_epilepsy_care}}</td>
+  </tr>
+{% endfor%}
+</table>
+{% endcomment %}
 </form>
+

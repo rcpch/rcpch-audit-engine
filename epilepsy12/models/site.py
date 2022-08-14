@@ -35,10 +35,9 @@ class Site(models.Model):
     )
 
     hospital_trust = models.OneToOneField(
-        default=1,
         to=HospitalTrust,
-        related_name="hospital_site",
-        on_delete=models.DO_NOTHING
+        related_name="hospital_trust",
+        on_delete=models.PROTECT
     )
 
     # Relationships

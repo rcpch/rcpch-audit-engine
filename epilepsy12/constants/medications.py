@@ -1,14 +1,14 @@
 # Medications
 
-ANTIEPILEPSY_MEDICINE_TYPES=(
-    (1, "Acetazolamide"), 
-    (2, "ACTH"), 
-    (3, "Carbamazepine"), 
-    (4, "Clobazam"), 
-    (5, "Clonazepam"), 
-    (6, "Eslicarbazepine acetate"), 
-    (7, "Ethosuximide"), 
-    (8, "Gabapentin"), 
+ANTIEPILEPSY_MEDICINE_TYPES = (
+    (1, "Acetazolamide"),
+    (2, "ACTH"),
+    (3, "Carbamazepine"),
+    (4, "Clobazam"),
+    (5, "Clonazepam"),
+    (6, "Eslicarbazepine acetate"),
+    (7, "Ethosuximide"),
+    (8, "Gabapentin"),
     (9, "Lacosamide"),
     (10, "Lamotrigine"),
     (11, "Levetiracetam"),
@@ -33,8 +33,42 @@ ANTIEPILEPSY_MEDICINE_TYPES=(
     ("O", "Other")
 )
 
-BENZODIAZEPINE_TYPES=(
+BENZODIAZEPINE_TYPES = (
     ("BMZ", "Buccal midazolam"),
     ("RDZ", "Rectal diazepam"),
     ("Oth", "Other")
 )
+
+ANTIEPILEPSY_MEDICINES = {
+    (0, "Acetazolamide"),
+    (1, "ACTH"),
+    (2, "Carbamazepine"),
+    (3, "Clobazam"),
+    (4, "Clonazepam"),
+    (5, "Eslicarbazepine acetate"),
+    (6, "Ethosuximide;Gabapentin"),
+    (7, "Lacosamide"),
+    (8, "Lamotrigine"),
+    (9, "Levetiracetam"),
+    (10, "Methylprednisolone"),
+    (11, "Nitrazepam"),
+    (12, "Oxcarbazepine"),
+    (13, "Perampanel"),
+    (14, "Piracetam"),
+    (15, "Phenobarbital"),
+    (16, "Phenytoin"),
+    (17, "Pregabalin"),
+    (18, "Prednisolone"),
+    (19, "Primidone"),
+    (20, "Rufinamide"),
+    (21, "Sodium valproate"),
+    (22, "Stiripentol"),
+    (23, "Sulthiame"),
+    (24, "Tiagabine"),
+    (25, "Topiramate"),
+    (26, "Vigabatrin"),
+    (27, "Zonisamide"),
+    (28, "Epidyolex® "),
+    (29, "Other Cannabis-based medicinal product"),
+    (30, "Other")
+}
