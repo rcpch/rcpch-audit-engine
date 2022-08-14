@@ -20,8 +20,8 @@
     Paediatric Neurology
   </h5>
 
-  <div id="paediatric_neurologist" class="field">
-    {% include 'epilepsy12/partials/assessment/paediatric_neurologist.html' with assessment=registration.assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site %}
+  <div id="paediatric_neurology" class="field">
+    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=registration.assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site %}
   </div>
 
   <h5 class="header">
@@ -42,4 +42,29 @@
  
   {% include 'epilepsy12/partials/assessment/seizure_length_checkboxes.html' with registration_id=registration.pk assessment=registration.assessment %} 
 
+<h5>
+table for {{registration.case.first_name}} {{registration.surname}}
+registration id: {{registration.pk}}
+assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}}
+</h5>
+<table class="ui table">
+  <th>Name</th>
+  <th>Is Lead</th>
+  <th>Neuro</th>
+  <th>Surgery</th>
+  <th>Paeds</th>
+  <th>Active</th>
+{% for site in all_my_sites %}
+  <tr>
+    <td>{{site.hospital_trust.OrganisationName}}</td>
+    <td>{{site.site_is_primary_centre_of_epilepsy_care}}</td>
+    <td>{{site.site_is_paediatric_neurology_centre}}</td>
+    <td>{{site.site_is_childrens_epilepsy_surgery_centre}}</td>
+    <td>{{site.site_is_general_paediatric_centre}}</td>
+    <td>{{site.site_is_actively_involved_in_epilepsy_care}}</td>
+  </tr>
+{% endfor%}
+</table>
+
 </form>
+

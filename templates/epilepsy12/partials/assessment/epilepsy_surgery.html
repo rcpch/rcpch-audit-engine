@@ -85,13 +85,13 @@
                             </div>  
                             {% if surgery_edit_active %}
                             
-                                <div class="field" id="allocate_surgical_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_surgical_centre" hx-swap="innerHTML" hx-trigger="load once" name="edit_epilepsy_surgery_centre" hx-vals='{"hx_target":"childrens_epilepsy_surgical_service", "hx_assessment_id": "{{assessment.pk}}", "hx_target":"#childrens_epilepsy_surgical_service", "hx_site_id":"{{active_surgical_site.pk}}"}'>
+                                <div class="field" id="allocate_surgical_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_surgical_centre" hx-swap="innerHTML" hx-trigger="load once" name="edit_epilepsy_surgery_centre" hx-vals='{"hx_target":"childrens_epilepsy_surgical_service", "hx_assessment_id": "{{assessment.pk}}", "hx_target":"#childrens_epilepsy_surgical_service", "hx_site_id":"{{active_surgical_site.pk}}", "hx_name":"epilepsy_surgery_centre"}'>
                                     {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
                                 </div>
                             {% endif %}
                             
                         {% else %}
-                            <div class="field" id="allocate_surgical_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_surgical_centre" hx-swap="innerHTML" hx-trigger="load once" name="epilepsy_surgery_centre" hx-vals='{"hx_target":"childrens_epilepsy_surgical_service", "hx_assessment_id": "{{assessment.pk}}", "hx_target":"#childrens_epilepsy_surgical_service"}'>
+                            <div class="field" id="allocate_surgical_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_surgical_centre" hx-swap="innerHTML" hx-trigger="load once" name="epilepsy_surgery_centre" hx-vals='{"hx_target":"childrens_epilepsy_surgical_service", "hx_assessment_id": "{{assessment.pk}}", "hx_target":"#childrens_epilepsy_surgical_service", "hx_name":"epilepsy_surgery_centre"}'>
                                 <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
                                 {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
                             </div>

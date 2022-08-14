@@ -148,20 +148,35 @@ htmx_paths = [
     path('htmx/registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
 
-    # assessment paths
+
+    #     ** Assessment paths **
+
+    #     Consultant paediatrician fields
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_made',
          views.consultant_paediatrician_referral_made, name="consultant_paediatrician_referral_made"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_referral_date',
          views.consultant_paediatrician_referral_date, name="consultant_paediatrician_referral_date"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_input_date',
          views.consultant_paediatrician_input_date, name="consultant_paediatrician_input_date"),
+
+    #     Consultant paediatric neurologist fields
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_made',
          views.paediatric_neurologist_referral_made, name="paediatric_neurologist_referral_made"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_date',
          views.paediatric_neurologist_referral_date, name="paediatric_neurologist_referral_date"),
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_input_date',
          views.paediatric_neurologist_input_date, name="paediatric_neurologist_input_date"),
+    #     paediatric neurology centre selection
+    path('htmx/assessment/<int:assessment_id>/paediatric_neurology_centre',
+         views.paediatric_neurology_centre, name="paediatric_neurology_centre"),
+    path('htmx/assessment/<int:assessment_id>/paediatric_neurology_centre/<int:site_id>/delete',
+         views.delete_paediatric_neurology_centre, name="delete_paediatric_neurology_centre"),
+    path('htmx/assessment/<int:assessment_id>/paediatric_neurology_centre/<int:site_id>/edit',
+         views.edit_paediatric_neurology_centre, name="edit_paediatric_neurology_centre"),
+    path('htmx/assessment/<int:assessment_id>/paediatric_neurology_centre/<int:site_id>/active/<str:action>',
+         views.update_paediatric_neurology_centre_pressed, name="update_paediatric_neurology_centre_pressed"),
 
+    #     Epilepsy nurse specialist fields
     path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_made',
          views.epilepsy_specialist_nurse_referral_made, name="epilepsy_specialist_nurse_referral_made"),
     path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_referral_date',
@@ -169,6 +184,7 @@ htmx_paths = [
     path('htmx/assessment/<int:assessment_id>/epilepsy_specialist_nurse_input_date',
          views.epilepsy_specialist_nurse_input_date, name="epilepsy_specialist_nurse_input_date"),
 
+    #     Children's epilepsy surgery fields
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_criteria_met',
          views.childrens_epilepsy_surgical_service_referral_criteria_met, name="childrens_epilepsy_surgical_service_referral_criteria_met"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_referral_made',
@@ -177,6 +193,7 @@ htmx_paths = [
          views.childrens_epilepsy_surgical_service_referral_date, name="childrens_epilepsy_surgical_service_referral_date"),
     path('htmx/assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date',
          views.childrens_epilepsy_surgical_service_input_date, name="childrens_epilepsy_surgical_service_input_date"),
+    # children's epilepsy surgery centre selection
     path('htmx/assessment/<int:assessment_id>/epilepsy_surgery_centre',
          views.epilepsy_surgery_centre, name="epilepsy_surgery_centre"),
     path('htmx/assessment/<int:assessment_id>/epilepsy_surgery_centre/<int:site_id>/delete',

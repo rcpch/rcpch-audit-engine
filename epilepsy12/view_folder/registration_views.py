@@ -38,15 +38,17 @@ def register(request, id):
         user_hospital_trust = HospitalTrust.objects.filter(
             OrganisationName=request.user.hospital_trust).first()
 
-    except Site.DoesNotExist:
         Site(
             hospital_trust=user_hospital_trust,
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_childrens_epilepsy_surgery_centre=False,
             site_is_paediatric_neurology_centre=False,
-            site_is_general_paediatric_centre=False
+            site_is_general_paediatric_centre=False,
+            registration=registration
         ).save()
+    except Exception as error:
+        print(error)
 
     previously_registered = 0
 
