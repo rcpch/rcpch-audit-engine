@@ -3,14 +3,12 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from requests import delete
 
 from epilepsy12.models.site import Site
 
 from ..models.hospital_trust import HospitalTrust
 from ..models import Registration
 from ..models import Assessment
-from epilepsy12.models import hospital_trust
 
 
 @login_required
@@ -71,6 +69,220 @@ def consultant_paediatrician_input_date(request, assessment_id):
 
     context = {
         'assessment': assessment
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+# centre CRUD
+
+
+@login_required
+def general_paediatric_centre(request, assessment_id):
+    """
+    HTMX call back from hospital_list partial.
+    POST request to update/save centre in Site model
+    assessment_id passed to hospital_list partial from
+    consultant_paediatrician partial which is its parent
+    """
+    general_paediatric_centre = HospitalTrust.objects.get(pk=request.POST.get(
+        'general_paediatric_centre'))
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    # if centre already has a record in sites associated with this registration,
+    # update it include general paediatrics, else create a new record
+    site, created = Site.objects.get_or_create(
+        registration=assessment.registration,
+        hospital_trust=general_paediatric_centre,
+        defaults={
+            # if this is a new record, need to create all these fields
+            'site_is_primary_centre_of_epilepsy_care': False,
+            'site_is_childrens_epilepsy_surgery_centre': False,
+            'site_is_actively_involved_in_epilepsy_care': True,
+            'site_is_primary_centre_of_epilepsy_care': False,
+            'site_is_paediatric_neurology_centre': False,
+            'site_is_general_paediatric_centre': True,
+        },
+    )
+    if not created:
+        # this record existed, only the surgical aspects are updated
+        Site.objects.update(
+            pk=site.pk,
+            defaults={
+                'site_is_actively_involved_in_epilepsy_care': True,
+                'site_is_general_paediatric_centre': True,
+            }
+        )
+
+    # get fresh list of all sites associated with registration
+    # which are organised for the template to filtered to share all active
+    # and inactive general paediatric centres
+    refreshed_sites = Site.objects.filter(registration=assessment.registration)
+
+    active_general_paediatric_site = None
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in refreshed_sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_general_paediatric_centre:
+                active_general_paediatric_site = site
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_general_paediatric_site": active_general_paediatric_site,
+        "general_paediatric_edit_active": False
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+
+@ login_required
+def edit_general_paediatric_centre(request, assessment_id, site_id):
+    """
+    HTMX call back from consultant_paediatrician partial template. This is a POST request on button click.
+    It updates the Site object and returns the same partial template.
+    """
+    new_hospital_trust = HospitalTrust.objects.get(
+        pk=request.POST.get('general_paediatric_centre'))
+
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    if Site.objects.filter(
+        registration=assessment.registration,
+        hospital_trust=new_hospital_trust,
+        site_is_actively_involved_in_epilepsy_care=True
+    ).exists():
+        # this hospital trust already exists for this registration
+        # update that record, delete this
+
+        site = Site.objects.filter(
+            registration=assessment.registration,
+            hospital_trust=new_hospital_trust,
+            site_is_actively_involved_in_epilepsy_care=True
+        ).get()
+        site.site_is_general_paediatric_centre = True
+        site.save()
+        Site.objects.get(pk=site_id).delete()
+
+    else:
+        # this change is a new hospital
+        Site.objects.filter(pk=site_id).update(
+            hospital_trust=new_hospital_trust,
+            site_is_general_paediatric_centre=True,
+            site_is_actively_involved_in_epilepsy_care=True
+        )
+
+    # refresh sites and return to partial
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_general_paediatric_site = None
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_general_paediatric_centre:
+                active_general_paediatric_site = site
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_general_paediatric_site": active_general_paediatric_site,
+        "general_paediatric_edit_active": False
+    }
+    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+
+@ login_required
+def update_general_paediatric_centre_pressed(request, assessment_id, site_id, action):
+    """
+    HTMX callback from consultant_paediatrician partial on click of Update or Cancel
+    (action is 'edit' or 'cancel') to change the general_paediatric_edit_active flag
+    It returns the partial template with the updated flag.
+    Note it does not update the record - only toggles the cancel button and
+    shows/hides the hospital_list dropdown partial
+    """
+    assessment = Assessment.objects.get(pk=assessment_id)
+
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_general_paediatric_site = None
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_general_paediatric_centre:
+                active_general_paediatric_site = site
+
+    general_paediatric_edit_active = True
+    if action == 'cancel':
+        general_paediatric_edit_active = False
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_general_paediatric_site": active_general_paediatric_site,
+        "general_paediatric_edit_active": general_paediatric_edit_active
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/assessment/general_paediatric.html", context=context)
+
+
+@ login_required
+def delete_general_paediatric_centre(request, assessment_id, site_id):
+    """
+    HTMX call back from hospitals_select partial template.
+    This is a POST request on button click.
+    It carries parameters passed in from the consultant_paediatrician partial.
+    If the Site object associated with this centre is also associate
+    with another centre, the object is updated to reflect not involved in general paediatrics.
+    If the Site object is not associated with another centre, it is deleted.
+    It returns
+    the same partial template.
+    """
+    error_message = ""
+
+    associated_site = Site.objects.filter(pk=site_id).get()
+
+    if (
+        associated_site.site_is_primary_centre_of_epilepsy_care or
+        associated_site.site_is_paediatric_neurology_centre or
+        associated_site.site_is_childrens_epilepsy_surgery_centre
+    ):
+        # this site also delivers (or has delivered) surgical or general paediatric care
+        # update to remove neurology
+
+        associated_site.site_is_general_paediatric_centre = False
+        associated_site.save()
+
+    else:
+        # there are no other associated centres with this record: can delete
+        Site.objects.filter(pk=associated_site.pk).delete()
+
+    # refresh all objects and return
+    assessment = Assessment.objects.get(pk=assessment_id)
+    sites = Site.objects.filter(registration=assessment.registration)
+    # """
+    # HTMX callback from the hospitals_select partial, with informaton on which partial it itself is
+    # embedded into including site_id and assessment_id
+
+    # """
+
+    active_general_paediatric_site = None
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_general_paediatric_centre:
+                active_general_paediatric_site = site
+
+    context = {
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_general_paediatric_site": active_general_paediatric_site,
+        "general_paediatric_edit_active": False,
+        "error": error_message
     }
     return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 

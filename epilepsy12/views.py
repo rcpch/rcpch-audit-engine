@@ -144,6 +144,23 @@ def hospital_list(request):
                           'assessment_id': hx_assessment_id, 'site_id': hx_site_id})
         site = Site.objects.get(pk=hx_site_id)
         hx_default_text = "Search for a paediatric neurology centre..."
+    elif request.htmx.trigger_name == "general_paediatric_centre":
+        # request is coming from assessment tab to add a new paediatric neurology centre
+        hx_post_url = 'general_paediatric_centre'
+        hx_post = reverse(hx_post_url, kwargs={
+                          'assessment_id': hx_assessment_id})
+        hx_label = "Allocate General Paediatric Centre"
+        hx_default_text = "Search for a general paediatric centre..."
+
+    elif request.htmx.trigger_name == "edit_general_paediatric_centre":
+        # request if coming from assessment tab to update/edit an existing paediatric neurology centre
+        hx_post_url = 'edit_general_paediatric_centre'
+        hx_label = "Update General Paediatric Centre"
+        hx_site_id = request.GET.get('hx_site_id')
+        hx_post = reverse(hx_post_url, kwargs={
+                          'assessment_id': hx_assessment_id, 'site_id': hx_site_id})
+        site = Site.objects.get(pk=hx_site_id)
+        hx_default_text = "Search for a general paediatric centre..."
 
     # filter list to include only NHS hospitals
     hospital_list = HospitalTrust.objects.filter(

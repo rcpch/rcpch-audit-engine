@@ -158,6 +158,16 @@ htmx_paths = [
          views.consultant_paediatrician_referral_date, name="consultant_paediatrician_referral_date"),
     path('htmx/assessment/<int:assessment_id>/consultant_paediatrician_input_date',
          views.consultant_paediatrician_input_date, name="consultant_paediatrician_input_date"),
+    # general paediatric centre fields
+    path('htmx/assessment/<int:assessment_id>/general_paediatric_centre',
+         views.general_paediatric_centre, name="general_paediatric_centre"),
+    path('htmx/assessment/<int:assessment_id>/general_paediatric_centre/<int:site_id>/delete',
+         views.delete_general_paediatric_centre, name="delete_general_paediatric_centre"),
+    path('htmx/assessment/<int:assessment_id>/general_paediatric_centre/<int:site_id>/edit',
+         views.edit_general_paediatric_centre, name="edit_general_paediatric_centre"),
+    path('htmx/assessment/<int:assessment_id>/general_paediatric_centre/<int:site_id>/active/<str:action>',
+         views.update_general_paediatric_centre_pressed, name="update_general_paediatric_centre_pressed"),
+
 
     #     Consultant paediatric neurologist fields
     path('htmx/assessment/<int:assessment_id>/paediatric_neurologist_referral_made',
