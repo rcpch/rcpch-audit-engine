@@ -1,49 +1,22 @@
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' >
-    <div class="three fields">
+    
+
+        {% url 'when_the_first_epileptic_episode_occurred' initial_assessment_id=initial_assessment.pk as hx_post %}
+        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="change" label="Date of first episode" date_value=initial_assessment.when_the_first_epileptic_episode_occurred data_position="top left" input_date_field_name="when_the_first_epileptic_episode_occurred" %}
         
-        <div class="field"
-        hx-post="{% url 'when_the_first_epileptic_episode_occurred' initial_assessment_id=initial_assessment.pk %}"
-        hx-target="#when_the_first_epileptic_episode_occurred"
-        hx-trigger="change"
-        >
-            <label>Date of first episode</label>
-        <input
-            name="when_the_first_epileptic_episode_occurred"
-            type="date"
-            value={{initial_assessment.when_the_first_epileptic_episode_occurred|date:'Y-m-d'}}
-        />
-        </div>
         
         {% if initial_assessment.when_the_first_epileptic_episode_occurred %}
-            <div class="field" 
-                hx-post="{% url 'when_the_first_epileptic_episode_occurred_confidence' initial_assessment_id=initial_assessment.pk %}" 
-                hx-target="#when_the_first_epileptic_episode_occurred_confidence_result" 
-                hx-trigger="load, change"
-                hx-swap="innerHTML"
-                >
-                <label>Confidence in reported date of first episode</label>
-                <select 
-                    class="ui dropdown" 
-                    name="when_the_first_epileptic_episode_occurred_confidence"
-                >
-                    {% for item in when_the_first_epileptic_episode_occurred_confidence_selection %}
-                        {% if initial_assessment.when_the_first_epileptic_episode_occurred_confidence == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div id="when_the_first_epileptic_episode_occurred_confidence_result"></div>
-            </div>
-
-            <div class="field">
+            <div class="inline field">
                 <label>Epilepsy years</label>
                 <input disabled value="{{initial_assessment.epilepsy_decimal_years}}"/>
             </div>
+
+            {% url 'when_the_first_epileptic_episode_occurred_confidence' initial_assessment_id=initial_assessment.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=when_the_first_epileptic_episode_occurred_confidence_selection hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.when_the_first_epileptic_episode_occurred_confidence label="Confidence in reported date of first episode" data_position="top left" %}
+
         {% endif%}
 
-    </div>
+    
 
     {% if initial_assessment.when_the_first_epileptic_episode_occurred %}
         <div class="ui segment">
@@ -52,167 +25,32 @@
             </div>
             <div class="two fields">
 
-                <div class="field">
 
-                    {% if initial_assessment.has_description_of_the_episode_or_episodes_been_gathered %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button active"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >Yes</div>
-                        <label>A description of the episode(s)</label>
-                    </span>
-                    {% else %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-trigger='click' 
-                            hx-post="{% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >No</div>
-                        <label>A description of the episode(s)</label>
-                    </span>
-                    {% endif %}
-
-                </div>
-
-                <div class="field">
-
-                    {% if initial_assessment.has_number_of_episodes_since_the_first_been_documented %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button active"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-post="{% url 'has_number_of_episodes_since_the_first_been_documented' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >Yes</div>
-                        <label>The number of episodes</label>
-                    </span>
-                    {% else %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-trigger='click' 
-                            hx-post="{% url 'has_number_of_episodes_since_the_first_been_documented' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >No</div>
-                        <label>The number of episodes</label>
-                    </span>
-                    {% endif %}
-
-                </div>
+                    {% url 'has_description_of_the_episode_or_episodes_been_gathered' initial_assessment_id=initial_assessment.pk as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.has_description_of_the_episode_or_episodes_been_gathered label="A description of the episode(s)" data_position="top left" %}
+                    
+                    {% url 'has_number_of_episodes_since_the_first_been_documented' initial_assessment_id=initial_assessment.pk as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.has_number_of_episodes_since_the_first_been_documented label="The number of episodes" data_position="top left" %}
                 
             </div>
 
             <div class="two fields">
 
-                <div class="field">
-                    {% if initial_assessment.general_examination_performed %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button active"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >Yes</div>
-                        <label>Clinical examination has been performed.</label>
-                    </span>
-                    {% else %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-trigger='click' 
-                            hx-post="{% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >No</div>
-                        <label>Clinical examination has been performed.</label>
-                    </span>
-                    {% endif %}
-                </div>
-
-                <div class="field">
-                    {% if initial_assessment.neurological_examination_performed %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button active"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >Yes</div>
-                        <label>A neurological examination has been performed.</label>
-                    </span>
-                    {% else %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-trigger='click' 
-                            hx-post="{% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >No</div>
-                        <label>A neurological examination has been performed.</label>
-                    </span>
-                    {% endif %}
-                </div>
+                    {% url 'general_examination_performed' initial_assessment_id=initial_assessment.pk as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.general_examination_performed label="Clinical examination has been performed." data_position="top left" %}
+                    
+                    {% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.neurological_examination_performed label="A neurological examination has been performed." data_position="top left" %}
                     
             </div>
 
             <div class="two fields">
 
-                <div class="field">
-                    {% if initial_assessment.developmental_learning_or_schooling_problems %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button active"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >Yes</div>
-                        <label>Learning, developmental or educational difficulties have been sought.</label>
-                    </span>
-                    {% else %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-trigger='click' 
-                            hx-post="{% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >No</div>
-                        <label>Learning, developmental or educational difficulties have been sought.</label>
-                    </span>
-                    {% endif %}
-                </div>
+                {% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.developmental_learning_or_schooling_problems label="Learning, developmental or educational difficulties have been sought." data_position="top left" %}
 
-                <div class="field">
-                    {% if initial_assessment.behavioural_or_emotional_problems %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button active"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >Yes</div>
-                        <label>Emotional or behavioural problems have been sought.</label>
-                    </span>
-                    {% else %}
-                    <span>
-                        <div 
-                            class="ui tiny compact toggle button"
-                            hx-target="#when_the_first_epileptic_episode_occurred"
-                            hx-trigger='click' 
-                            hx-post="{% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk %}"
-                            hx-swap="innerHTML"
-                        >No</div>
-                        <label>Emotional or behavioural problems have been sought.</label>
-                    </span>
-                    {% endif %}
-                </div>
+                {% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#when_the_first_epileptic_episode_occurred" hx_trigger="click" hx_swap="innerHTML" test_positive=initial_assessment.behavioural_or_emotional_problems label="Emotional or behavioural problems have been sought." data_position="top left" %}
 
             </div>
 

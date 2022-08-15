@@ -37,7 +37,9 @@ def initial_assessment(request, case_id):
 # htmx
 
 def date_of_initial_assessment(request, initial_assessment_id):
-
+    """
+    HTMX call back from date_of_initial_assessment partial
+    """
     date_of_initial_assessment = request.POST.get('date_of_initial_assessment')
     # validation here TODO
 
@@ -63,8 +65,12 @@ def date_of_initial_assessment(request, initial_assessment_id):
 
 
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_assessment_id):
+    """
+    HTMX callback from first_paediatric_assessment_in_acute_or_nonacute_setting partial, itself
+    parent to single_choice_multiple_choice_toggle partial, whose button name stores the selected value
+    On selection first_paediatric_assessment_in_acute_or_nonacute_setting partial is returned.
+    """
 
-    print("called: first_paediatric_assessment_in_acute_or_nonacute_setting")
     first_paediatric_assessment_in_acute_or_nonacute_setting = int(
         request.htmx.trigger_name)
     # validation here TODO
@@ -88,6 +94,11 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_as
 
 
 def general_paediatrics_referral_made(request, initial_assessment_id):
+    """
+    HTMX callback from general_paediatrics_referral_made_partial, itself the parent of a toggle_button 
+    partial instance. The name of the post request toggles this field in the model and returns the 
+    same partial.
+    """
 
     initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
@@ -104,8 +115,6 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
     initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
-    print(f"hello {initial_assessment.general_paediatrics_referral_made} {initial_assessment.date_of_referral_to_general_paediatrics}")
-
     context = {
         'initial_assessment': initial_assessment
     }
@@ -117,14 +126,10 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
 
     date_of_referral_to_general_paediatrics = request.POST.get(
         'date_of_referral_to_general_paediatrics')
-    message = "success"
 
     if date_of_referral_to_general_paediatrics:
         new_date = datetime.strptime(
             date_of_referral_to_general_paediatrics, "%Y-%m-%d").date()
-
-        # TODO validation goes here
-
         try:
             InitialAssessment.objects.filter(pk=initial_assessment_id).update(
                 date_of_referral_to_general_paediatrics=new_date)
@@ -176,11 +181,11 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
 
 
 def when_the_first_epileptic_episode_occurred_confidence(request, initial_assessment_id):
-
-    when_the_first_epileptic_episode_occurred_confidence = request.POST.get(
-        'when_the_first_epileptic_episode_occurred_confidence')
-
-    message = "success"
+    """
+    HTMX callback from when_the_first_epileptic_episode_occurred
+    """
+    when_the_first_epileptic_episode_occurred_confidence = request.htmx.trigger_name
+    print(f"hello {when_the_first_epileptic_episode_occurred_confidence}")
 
     if when_the_first_epileptic_episode_occurred_confidence:
         try:
@@ -189,7 +194,19 @@ def when_the_first_epileptic_episode_occurred_confidence(request, initial_assess
         except Exception as error:
             message = error
 
-    return HttpResponse(message)
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        'initial_assessment_id': initial_assessment_id,
+        'initial_assessment': initial_assessment,
+        "chronicity_selection": CHRONICITY,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def has_description_of_the_episode_or_episodes_been_gathered(request, initial_assessment_id):
