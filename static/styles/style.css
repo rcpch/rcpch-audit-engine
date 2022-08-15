@@ -16,6 +16,20 @@
     url("fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
 }
 
+:root {
+  --rcpch_lightest_blue: #f0fafe;
+  --rcpch_lightest_grey: #f3f3f3;
+  --rcpch_strong_blue: #3366cc;
+  --rcpch_dark_blue: #0d0d58;
+  --rcpch_light_blue: #11a7f2;
+  --rcpch_pink: #e00087;
+  --rcpch_light_grey: #d9d9d9;
+  --rcpch_mid_grey: #b3b3b3;
+  --rcpch_dark_grey: #808080;
+  --rcpch_charcoal: #4d4d4d;
+  --rcpch_black: #000000;
+}
+
 body {
   color: white;
   font-family: Montserrat-Regular;
@@ -227,6 +241,116 @@ h5 {
   margin-top: 10px;
 }
 
+.ui.rcpch_dark_blue.buttons {
+  background-color: #a9a9a9;
+  border-radius: 0%;
+  border-color: #a9a9a9;
+}
+
+/* message */
+.ui.rcpch_dark_blue.message {
+  background-color: var(--rcpch_dark_blue);
+  color: #fff;
+}
+
+.ui.rcpch_lightest_blue.message {
+  background-color: var(--rcpch_lightest_blue);
+  color: #fff;
+}
+
+.ui.rcpch_light_blue.message {
+  background-color: var(--rcpch_light_blue);
+  color: #fff;
+}
+
+.ui.rcpch_light_grey.message {
+  background-color: var(--rcpch_light_grey);
+}
+
+.ui.rcpch_lightest_grey.message {
+  background-color: var(--rcpch_lightest_grey);
+}
+
+/* toggle buttons / date_field input */
 .toggle_button_label {
   color: black;
+}
+
+.ui.rcpch_dark_blue.button {
+  transition-duration: 0.4s;
+}
+
+.ui.rcpch_dark_blue.button {
+  background-color: var(--rcpch_light_grey);
+  color: black;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_dark_blue.button:active {
+  background-color: var(--rcpch_pink);
+  color: white;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_dark_blue.positive.button {
+  background-color: var(--rcpch_light_blue);
+  color: white;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_dark_blue.button:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_dark_blue.positive.button:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+  border-radius: 0% !important;
+}
+
+.rcpch_pink.icon {
+  color: var(--rcpch_pink);
+}
+
+.rcpch_dark_blue.icon {
+  color: var(--rcpch_dark_blue);
+}
+
+/* buttons */
+.ui.rcpch_light_blue.buttons {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+}
+
+.ui.rcpch_light_blue.buttons:active {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_pink);
+}
+
+.ui.rcpch_light_blue.buttons:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+}
+
+.ui.rcpch_light_blue.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+}
+
+.ui.rcpch_light_blue.button:active {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_pink);
+}
+
+.ui.rcpch_light_blue.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
 }

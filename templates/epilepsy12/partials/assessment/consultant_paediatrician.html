@@ -5,7 +5,7 @@
 
     {% if assessment.consultant_paediatrician_referral_made %}
 
-        <div class="ui message">
+        <div class="ui rcpch_lightest_blue message">
 
             {% url 'consultant_paediatrician_referral_date' assessment_id=assessment.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="change" label="Date of referral to a consultant paediatrician with expertise in epilepsy." date_value=assessment.consultant_paediatrician_referral_date input_date_field_name="consultant_paediatrician_referral_date" data_position="top left" %}
@@ -23,21 +23,21 @@
             {% if active_general_paediatric_site %}
                 <div class="field">
                     <span>
-                        <i class="green check circle outline icon"></i>
+                        <i class="rcpch_pink check circle outline icon"></i>
                             <label>General paediatric centre actively involved in care</label>
                         <div class="ui right action input">
                             
                             <input disabled value="{{active_general_paediatric_site.hospital_trust.OrganisationName}} ({{active_general_paediatric_site.hospital_trust.ParentName}})">
-                            <div class="ui buttons">
+                            <div class="ui rcpch_dark_blue buttons">
                                 <button 
-                                    class="ui positive button"
+                                    class="ui rcpch_dark_blue button"
                                     hx-post="{% url 'delete_general_paediatric_centre' site_id=active_general_paediatric_site.pk assessment_id=assessment.pk %}"
                                     hx-target="#general_paediatric"
                                     hx-swap="innerHTML"
                                     hx-trigger="click"
                                 >Delete</button>
                                 <button 
-                                    class="ui positive button"
+                                    class="ui rcpch_dark_blue button"
                                     hx-post="{% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='edit' %}"
                                     hx-target="#general_paediatric"
                                     hx-swap="innerHTML"

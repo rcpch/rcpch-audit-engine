@@ -5,7 +5,7 @@
 
     {% if assessment.paediatric_neurologist_referral_made %}
 
-        <div class="ui message">
+        <div class="ui rcpch_lightest_blue message">
 
             {% url 'paediatric_neurologist_referral_date' assessment_id=assessment.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label="Date of referral to a consultant paediatric neurologist." date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" %}
@@ -23,14 +23,14 @@
             {% if active_neurology_site %}
                             <div class="field">
                                 <span>
-                                    <i class="green check circle outline icon"></i>
+                                    <i class="rcpch_pink check circle outline icon"></i>
                                      <label>Paediatric neurology centre actively involved in care</label>
                                     <div class="ui right action input">
                                         
                                         <input disabled value="{{active_neurology_site.hospital_trust.OrganisationName}} ({{active_neurology_site.hospital_trust.ParentName}})">
-                                        <div class="ui buttons">
+                                        <div class="ui rcpch_light_blue buttons">
                                             <button 
-                                                class="ui positive button"
+                                                class="ui rcpch_light_blue button"
                                                 hx-post="{% url 'delete_paediatric_neurology_centre' site_id=active_neurology_site.pk assessment_id=assessment.pk %}"
                                                 hx-target="#paediatric_neurology"
                                                 hx-swap="innerHTML"
@@ -38,7 +38,7 @@
                                                 hx-trigger="click"
                                             >Delete</button>
                                             <button 
-                                                class="ui positive button"
+                                                class="ui rcpch_light_blue button"
                                                 hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='edit' %}"
                                                 hx-target="#paediatric_neurology"
                                                 hx-swap="innerHTML"
