@@ -1,21 +1,19 @@
 <div class="ui form" method="post">
   {% csrf_token %}
 
-  <div class="ui info message" id="info_message">
+  <div class="ui info message">
   The initial assessment must be completed with x weeks of the reported episode.
   </div>
 
-
-
     <div id="date_of_initial_assessment" class="field">
-      {% include 'epilepsy12/partials/initial_assessment/date_of_initial_assessment.html' with initial_assessment=initial_assessment %}
+      {% url 'date_of_initial_assessment' initial_assessment_id=initial_assessment.pk as hx_post %}
+      {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post="{{hx_post}}" hx_target='#date_of_initial_assessment' hx_trigger="change" label="Date of Initial Assessment" date_value=initial_assessment.date_of_initial_assessment data_position="top left" input_date_field_name="date_of_initial_assessment" %} 
     </div>
     
-    
-    <div id="first_paediatric_assessment_in_acute_or_nonacute_setting" class="eight wide field">
-      {% include 'epilepsy12/partials/initial_assessment/first_paediatric_assessment_in_acute_or_nonacute_setting.html' with initial_assessment=initial_assessment chronicity_selection=chronicity_selection %}
+    <div id="first_paediatric_assessment_in_acute_or_nonacute_setting" class="field">
+      {% url 'first_paediatric_assessment_in_acute_or_nonacute_setting' initial_assessment_id=initial_assessment.pk as hx_post %}
+      {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_in_acute_or_nonacute_setting' hx_trigger="click" label="Is the first paediatric assessment in an acute or nonacute setting?" test_positive=initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting data_position="top left" choices=chronicity_selection %} 
     </div>
-
 
 
   <h5 class="header">
@@ -35,6 +33,8 @@
   <h5 class="header">
     The first episode
   </h5>
+
+  
 
   <div class="field" id="when_the_first_epileptic_episode_occurred">
     {% include 'epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html' with initial_assessment=initial_assessment when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}

@@ -22,6 +22,7 @@
         {% endif %}
         
         <input type="date"
+            hx-swap="innerHTML"
             name="{{input_date_field_name}}"
             hx-post="{{hx_post}}" 
             hx-target="{{hx_target}}" 

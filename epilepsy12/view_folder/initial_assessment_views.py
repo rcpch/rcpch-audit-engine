@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants import *
+from ..general_functions.value_from_key import value_from_key
 
 from ..models import Registration
 from ..models import InitialAssessment
@@ -63,8 +64,9 @@ def date_of_initial_assessment(request, initial_assessment_id):
 
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_assessment_id):
 
-    first_paediatric_assessment_in_acute_or_nonacute_setting = request.POST.get(
-        'first_paediatric_assessment_in_acute_or_nonacute_setting')
+    print("called: first_paediatric_assessment_in_acute_or_nonacute_setting")
+    first_paediatric_assessment_in_acute_or_nonacute_setting = int(
+        request.htmx.trigger_name)
     # validation here TODO
 
     try:
