@@ -1,0 +1,2 @@
+{% url 'is_there_a_family_history_of_epilepsy' epilepsy_context_id=epilepsy_context.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#is_there_a_family_history_of_epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.is_there_a_family_history_of_epilepsy label="Is there a family history of epilepsy?" data_position='top left' %}

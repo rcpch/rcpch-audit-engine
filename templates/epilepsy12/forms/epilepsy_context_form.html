@@ -1,106 +1,35 @@
 <form class="ui form" method="post">
     {% csrf_token %}
 
-        <div class="two fields">
+        
 
-            <div class="field" 
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                hx-post="{% url 'previous_febrile_seizure' epilepsy_context_id=epilepsy_context.pk %}" 
-                hx-target="#previous_febrile_seizure_result" 
-                hx-trigger="load, change"
-                hx-swap="innerHTML"
-                >
-                <label>At any point in time has the child had febrile seizure(s)?</label>
-                <select 
-                    class="ui dropdown" 
-                    name="previous_febrile_seizure"
-                >
-                    {% for item in uncertain_choices %}
-                        {% if epilepsy_context.previous_febrile_seizure == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div id="previous_febrile_seizure_result"></div>
+            <div id="previous_febrile_seizure" class="field">
+                {% url 'previous_febrile_seizure' epilepsy_context_id=epilepsy_context.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_febrile_seizure" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_febrile_seizure label="At any point in time has the child had febrile seizure(s)?" data_position='top left' %}
+            </div>
+
+            <div id="previous_acute_symptomatic_seizure" class="field">
+                {% url 'previous_acute_symptomatic_seizure' epilepsy_context_id=epilepsy_context.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_acute_symptomatic_seizure" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_acute_symptomatic_seizure label="At any point in time has the child had acute symptomatic seizure(s)?" data_position='top left' %}
+            </div>
+
+        
+
+            <div id="is_there_a_family_history_of_epilepsy" class="field">
+                {% url 'is_there_a_family_history_of_epilepsy' epilepsy_context_id=epilepsy_context.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#is_there_a_family_history_of_epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.is_there_a_family_history_of_epilepsy label="Is there a family history of epilepsy?" data_position='top left' %}
             </div>
             
-            <div class="field" 
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                hx-post="{% url 'previous_acute_symptomatic_seizure' epilepsy_context_id=epilepsy_context.pk %}" 
-                hx-target="#previous_acute_symptomatic_seizure_result" 
-                hx-trigger="load, change"
-                hx-swap="innerHTML"
-                >
-                <label>At any point in time has the child had acute symptomatic seizure(s)?</label>
-                <select 
-                    class="ui dropdown" 
-                    name="previous_acute_symptomatic_seizure"
-                >
-                    {% for item in uncertain_choices %}
-                        {% if epilepsy_context.previous_acute_symptomatic_seizure == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div id="previous_acute_symptomatic_seizure_result"></div>
+            <div id="previous_neonatal_seizures" class="field">
+                {% url 'previous_neonatal_seizures' epilepsy_context_id=epilepsy_context.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_neonatal_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_neonatal_seizures label="were there seizures in the neonatal period?" data_position='top left' %}
             </div>
 
+        
+
+        <div id="diagnosis_of_epilepsy_withdrawn" class="field">
+            {% url 'diagnosis_of_epilepsy_withdrawn' epilepsy_context_id=epilepsy_context.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#diagnosis_of_epilepsy_withdrawn" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.diagnosis_of_epilepsy_withdrawn label="In the first year after first assessment, has a diagnosis of epilepsy been withdrawn because it has been subsequently deemed incorrect?" data_position='top left' %}
         </div>
-
-        <div class="two fields">
-
-            <div class="field" 
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                hx-post="{% url 'is_there_a_family_history_of_epilepsy' epilepsy_context_id=epilepsy_context.pk %}" 
-                hx-target="#is_there_a_family_history_of_epilepsy_result" 
-                hx-trigger="load, change"
-                hx-swap="innerHTML"
-                >
-                <label>Is there a family history of epilepsy?</label>
-                <select 
-                    class="ui dropdown" 
-                    name="is_there_a_family_history_of_epilepsy"
-                >
-                    {% for item in uncertain_choices %}
-                        {% if epilepsy_context.is_there_a_family_history_of_epilepsy == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div id="is_there_a_family_history_of_epilepsy_result"></div>
-            </div>
-            
-            <div class="field" 
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                hx-post="{% url 'previous_neonatal_seizures' epilepsy_context_id=epilepsy_context.pk %}" 
-                hx-target="#previous_neonatal_seizures_result" 
-                hx-trigger="load, change"
-                hx-swap="innerHTML"
-                >
-                <label>At any point in time has the child had neonatal seizure(s)?</label>
-                <select 
-                    class="ui dropdown" 
-                    name="previous_neonatal_seizures"
-                >
-                    {% for item in uncertain_choices %}
-                        {% if epilepsy_context.previous_neonatal_seizures == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div id="previous_neonatal_seizures_result"></div>
-            </div>
-
-        </div>
-
-        {% include 'epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html' with epilepsy_context=epilepsy_context %}
 
 </form>

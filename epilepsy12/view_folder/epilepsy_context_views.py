@@ -38,9 +38,13 @@ def epilepsy_context(request, case_id):
 
 
 def previous_febrile_seizure(request, epilepsy_context_id):
+    """
+    HTMX callback from the previous_febrile_seizure partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
 
-    previous_febrile_seizure = request.POST.get(
-        'previous_febrile_seizure')
+    previous_febrile_seizure = request.htmx.trigger_name
     # validation here TODO
 
     try:
@@ -50,13 +54,24 @@ def previous_febrile_seizure(request, epilepsy_context_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/epilepsy_context/previous_febrile_seizure.html", context=context)
 
 
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
+    """
+    HTMX callback from the previous_febrile_seizure partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
 
-    previous_acute_symptomatic_seizure = request.POST.get(
-        'previous_acute_symptomatic_seizure')
+    previous_acute_symptomatic_seizure = request.htmx.trigger_name
     # validation here TODO
 
     try:
@@ -66,13 +81,24 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/epilepsy_context/previous_acute_symptomatic_seizure.html", context=context)
 
 
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
+    """
+    HTMX callback from the previous_febrile_seizure partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
 
-    is_there_a_family_history_of_epilepsy = request.POST.get(
-        'is_there_a_family_history_of_epilepsy')
+    is_there_a_family_history_of_epilepsy = request.htmx.trigger_name
     # validation here TODO
 
     try:
@@ -82,13 +108,24 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/epilepsy_context/is_there_a_family_history_of_epilepsy.html", context=context)
 
 
 def previous_neonatal_seizures(request, epilepsy_context_id):
+    """
+    HTMX callback from the previous_febrile_seizure partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
 
-    previous_neonatal_seizures = request.POST.get(
-        'previous_neonatal_seizures')
+    previous_neonatal_seizures = request.htmx.trigger_name
     # validation here TODO
 
     try:
@@ -98,10 +135,22 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/epilepsy_context/previous_neonatal_seizures.html", context=context)
 
 
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
+    """
+    HTMX callback from the previous_febrile_seizure partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
     diagnosis_of_epilepsy_withdrawn_status = not epilepsy_context.diagnosis_of_epilepsy_withdrawn

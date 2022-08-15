@@ -67,8 +67,7 @@ class AntiEpilepsyMedicine(models.Model):
     management = models.ForeignKey(
         Management,
         on_delete=models.CASCADE,
-        verbose_name="related management",
-        default=1
+        verbose_name="related management"
     )
 
     class Meta:
