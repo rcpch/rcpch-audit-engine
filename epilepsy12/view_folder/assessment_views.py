@@ -44,10 +44,24 @@ def consultant_paediatrician_referral_date(request, assessment_id):
         consultant_paediatrician_referral_date=datetime.strptime(
             request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date())
 
+    # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_general_paediatric_site = None
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_general_paediatric_centre:
+                active_general_paediatric_site = site
 
     context = {
-        'assessment': assessment
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_general_paediatric_site": active_general_paediatric_site,
+        "general_paediatric_edit_active": False
     }
     return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 
@@ -65,10 +79,24 @@ def consultant_paediatrician_input_date(request, assessment_id):
         consultant_paediatrician_input_date=datetime.strptime(
             request.POST.get('consultant_paediatrician_input_date'), "%Y-%m-%d").date())
 
+    # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
+    sites = Site.objects.filter(registration=assessment.registration)
+
+    active_general_paediatric_site = None
+    historical_general_paediatric_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_general_paediatric_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_general_paediatric_centre:
+                active_general_paediatric_site = site
 
     context = {
-        'assessment': assessment
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_general_paediatric_sites": historical_general_paediatric_sites,
+        "active_general_paediatric_site": active_general_paediatric_site,
+        "general_paediatric_edit_active": False
     }
     return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
 
@@ -262,11 +290,6 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
     sites = Site.objects.filter(registration=assessment.registration)
-    # """
-    # HTMX callback from the hospitals_select partial, with informaton on which partial it itself is
-    # embedded into including site_id and assessment_id
-
-    # """
 
     active_general_paediatric_site = None
     historical_general_paediatric_sites = Site.objects.filter(
@@ -344,10 +367,27 @@ def paediatric_neurologist_referral_date(request, assessment_id):
         paediatric_neurologist_referral_date=datetime.strptime(
             request.POST.get('paediatric_neurologist_referral_date'), "%Y-%m-%d").date())
 
+    # get fresh list of all sites associated with registration
+    # which are organised for the template to filtered to share all active
+    # and inactive neurology centres
+
     assessment = Assessment.objects.get(pk=assessment_id)
+    refreshed_sites = Site.objects.filter(registration=assessment.registration)
+
+    active_neurology_site = None
+    historical_neurology_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_paediatric_neurology_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in refreshed_sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_paediatric_neurology_centre:
+                active_neurology_site = site
 
     context = {
-        'assessment': assessment
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_neurology_sites": historical_neurology_sites,
+        "active_neurology_site": active_neurology_site,
+        "neurology_edit_active": False
     }
 
     return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
@@ -366,10 +406,27 @@ def paediatric_neurologist_input_date(request, assessment_id):
         paediatric_neurologist_input_date=datetime.strptime(
             request.POST.get('paediatric_neurologist_input_date'), "%Y-%m-%d").date())
 
+    # get fresh list of all sites associated with registration
+    # which are organised for the template to filtered to share all active
+    # and inactive neurology centres
+
     assessment = Assessment.objects.get(pk=assessment_id)
+    refreshed_sites = Site.objects.filter(registration=assessment.registration)
+
+    active_neurology_site = None
+    historical_neurology_sites = Site.objects.filter(
+        registration=assessment.registration, site_is_paediatric_neurology_centre=True, site_is_actively_involved_in_epilepsy_care=False).all()
+
+    for site in refreshed_sites:
+        if site.site_is_actively_involved_in_epilepsy_care:
+            if site.site_is_paediatric_neurology_centre:
+                active_neurology_site = site
 
     context = {
-        'assessment': assessment
+        "assessment": Assessment.objects.get(pk=assessment_id),
+        "historical_neurology_sites": historical_neurology_sites,
+        "active_neurology_site": active_neurology_site,
+        "neurology_edit_active": False
     }
 
     return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
