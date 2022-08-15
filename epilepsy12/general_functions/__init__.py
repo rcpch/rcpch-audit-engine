@@ -9,3 +9,5 @@ from .random_postcodes import *
 from .fuzzy_matching import *
 from .fetch_snomed import *
 from .time_elapsed import calculate_time_elapsed
+from .key_from_value import *
+from .value_from_key import *
