@@ -255,7 +255,7 @@ h5 {
 
 .ui.rcpch_lightest_blue.message {
   background-color: var(--rcpch_lightest_blue);
-  color: #fff;
+  color: var(--rcpch_black);
 }
 
 .ui.rcpch_light_blue.message {
@@ -314,8 +314,8 @@ h5 {
   color: var(--rcpch_pink);
 }
 
-.rcpch_dark_blue.icon {
-  color: var(--rcpch_dark_blue);
+.rcpch_light_blue.icon {
+  color: var(--rcpch_light_blue);
 }
 
 /* buttons */
