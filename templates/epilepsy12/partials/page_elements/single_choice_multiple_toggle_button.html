@@ -61,6 +61,7 @@
                                         hx-trigger='{{hx_trigger}}'
                                         name="{{choice.0}}"
                                     >{{choice.1}}
+                                    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                                     </div>
                                 {% endif %}
                             {% endfor %}
@@ -86,6 +87,7 @@
                                     hx-trigger='{{hx_trigger}}'
                                     name="{{choice.0}}"
                                 >{{choice.1}}
+                                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                                 </div>
                             {% endif %}
                         {% endfor %}

@@ -354,3 +354,16 @@ h5 {
   color: white;
   background-color: var(--rcpch_dark_blue);
 }
+
+/* spinner */
+.htmx-indicator.spinner.loading.icon {
+  display: none;
+}
+
+.htmx-request .htmx-indicator.spinner.loading.icon {
+  display: inline;
+}
+
+.htmx-request.htmx-indicator.spinner.loading.icon {
+  display: inline;
+}
