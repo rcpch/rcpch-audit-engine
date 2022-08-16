@@ -64,12 +64,11 @@ def delete_description_keyword(request, desscribe_id, description_keyword_id):
         description_keywords=description_keywords)
     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
-    stem = f"<div class='ui field'><label>{len(desscribe.description)} characters</label></div>"
-    for index, keyword in enumerate(desscribe.description_keywords):
-        url = reverse('delete_description_keyword', kwargs={
-                      'desscribe_id': desscribe_id, 'description_keyword_id': index})
-        stem += f"<div class='ui blue label' style='margin: 5px;'>{keyword}<i class='icon close' hx-post='{url}' hx-target='#description_results' hx-trigger='click' hx-swap='innerHTML'></i></div>"
-    return HttpResponse(stem)
+    context = {
+        'desscribe': desscribe
+    }
+
+    return render(request, 'epilepsy12/partials/desscribe/description_labels.html', context)
 
 
 @login_required
