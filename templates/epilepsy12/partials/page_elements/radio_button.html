@@ -1,0 +1,18 @@
+{% comment %}
+Radiobutton partial with interacts with css 
+Embeds in a radio-tile-group class element, in turn embedded in a container class element
+Accepts parameters:
+hx_radio_name
+hx_radio_id
+hx_radio_label_text
+hx_post
+{% endcomment %}
+
+<div class="input-container">
+      
+    <input id="{{hx_radio_id}}" class="radio-button" type="radio" name="{{hx_radio_name}}" />
+    <div class="radio-tile">
+    <label for="walk" class="radio-tile-label">{{hx_radio_label_text}}</label>
+    </div>
+
+</div>

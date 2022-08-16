@@ -1,0 +1,68 @@
+<div class="ui grid">
+    <div class="four wide column">
+        <h5>
+        Laterality (patient)
+        </h5>
+            <div class="container">
+                <div class="radio-tile-group">
+                {% url 'focal_onset_epilepsy_checked_changed' desscribe_id=desscribe.pk as hx_post %}
+                
+                {% include 'epilepsy12/partials/page_elements/radio_button.html' with hx_post=hx_post hx_radio_label_text="Left" hx_radio_name="focal_onset_left" %}
+                {% include 'epilepsy12/partials/page_elements/radio_button.html' with hx_post=hx_post hx_radio_label_text="Right" hx_radio_name="focal_onset_right" %}
+                
+                </div>
+            </div>
+    
+    </div>
+
+    <div class="four wide column">
+        <h5>
+        Motor manifestations
+        </h5>
+
+            <div class="container">
+                <div class="radio-tile-group">
+                {% url 'focal_onset_epilepsy_checked_changed' desscribe_id=desscribe.pk as hx_post %}
+                {% for focal_epilepsy_field in focal_epilepsy_motor_manifestations %}
+                    {% include 'epilepsy12/partials/page_elements/radio_button.html' with hx_post=hx_post hx_radio_label_text=focal_epilepsy_field.text hx_radio_name=focal_epilepsy_field.name %}
+                {% endfor %}
+                </div>
+            </div>
+    
+    </div>
+
+    <div class="four wide column">
+
+        <h5>
+        Non-motor manifestations
+        </h5>
+
+            <div class="container">
+                <div class="radio-tile-group">
+                {% url 'focal_onset_epilepsy_checked_changed' desscribe_id=desscribe.pk as hx_post %}
+                {% for focal_epilepsy_field in focal_epilepsy_nonmotor_manifestations %}
+                    {% include 'epilepsy12/partials/page_elements/radio_button.html' with hx_post=hx_post hx_radio_label_text=focal_epilepsy_field.text hx_radio_name=focal_epilepsy_field.name %}
+                {% endfor %}
+                </div>
+            </div>
+    
+    </div>
+
+    <div class="four wide column">
+
+        <h5>
+        EEG manifestations
+        </h5>
+
+            <div class="container">
+                <div class="radio-tile-group">
+                {% url 'focal_onset_epilepsy_checked_changed' desscribe_id=desscribe.pk as hx_post %}
+                {% for focal_epilepsy_field in focal_epilepsy_eeg_manifestations %}
+                    {% include 'epilepsy12/partials/page_elements/radio_button.html' with hx_post=hx_post hx_radio_label_text=focal_epilepsy_field.text hx_radio_name=focal_epilepsy_field.name %}
+                {% endfor %}
+                </div>
+            </div>
+    
+    </div>
+
+</div>
