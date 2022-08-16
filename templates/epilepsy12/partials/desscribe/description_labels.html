@@ -11,8 +11,7 @@
                 {% for keyword in desscribe.description_keywords %}
                     {% url 'delete_description_keyword' desscribe.pk forloop.counter0 as hx_post %}
                     <div 
-                        class='ui blue label' 
-                        style='margin: 5px;'
+                        class='ui rcpch_light_blue label'
                     >{{keyword}}
                         <i class='icon close' 
                             hx-post='{{hx_post}}' 

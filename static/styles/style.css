@@ -367,3 +367,15 @@ h5 {
 .htmx-request.htmx-indicator.spinner.loading.icon {
   display: inline;
 }
+
+/* description labels */
+.ui.rcpch_light_blue.label {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+  margin: 5px;
+}
+
+.icon.close:hover {
+  color: var(--rcpch_dark_blue);
+}
