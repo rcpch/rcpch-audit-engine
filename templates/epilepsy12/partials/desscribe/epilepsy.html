@@ -1,22 +1,29 @@
+{% url 'were_any_of_the_epileptic_seizures_convulsive' desscribe_id=desscribe.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=desscribe.were_any_of_the_epileptic_seizures_convulsive label="Were any of the epileptic seizures convulsive?" data_position="top left" %}
+
 {% url 'epileptic_seizure_onset_type' desscribe_id=desscribe.pk as hx_post %}
 {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=desscribe.epileptic_seizure_onset_type label="How best would describe the onset of the epileptic episode?" data_position="top left" %}
 
+
 {% if desscribe.epileptic_seizure_onset_type == 'GO' %}
-    <h1>Generalised Onset</h1>
+    <h3>Generalised Onset Epilepsy</h3>
+    <div id="generalised_epilepsy">
+        {% include 'epilepsy12/partials/desscribe/generalised_onset_epilepsy.html' with desscribe=desscribe  %}
+    </div>
 {% elif desscribe.epileptic_seizure_onset_type == 'FO' %}
-    <h3>Focal Onset</h3>
+    <h3>Focal Onset Epilepsy</h3>
     <div id="focal_epilepsy">
         {% include 'epilepsy12/partials/desscribe/focal_onset_epilepsy.html' with desscribe=desscribe focal_epilepsy_motor_manifestations=focal_epilepsy_motor_manifestations focal_epilepsy_nonmotor_manifestations=focal_epilepsy_nonmotor_manifestations focal_epilepsy_eeg_manifestations=focal_epilepsy_eeg_manifestations %}
     </div>
 {% elif desscribe.epileptic_seizure_onset_type == 'UC' %}
     <div class="ui message">
-        <h1>Unclassified Onset</h1>
+        <h3>Unclassified Onset Epilepsy</h3>
         <p>Interesting, but actually not enough to gather any data on this</p>
         <p>Thanks for playing.</p>
     </div>
 {% elif desscribe.epileptic_seizure_onset_type == 'UO' %}
     <div class="ui message">
-        <h1>Unknown Onset</h1>
+        <h3>Unknown Onset Epilepsy</h3>
         <p>This really does not wash. Make your mind up.</p>
         <p>Thanks for playing.</p>
     </div>

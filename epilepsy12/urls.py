@@ -66,7 +66,12 @@ htmx_paths = [
          views.epileptic_seizure_onset_type, name='epileptic_seizure_onset_type'),
     path('htmx/<int:desscribe_id>/focal_onset_epilepsy_checked_changed',
          views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
-
+    path('htmx/desscribe/<int:desscribe_id>/experienced_prolonged_focal_seizures',
+         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+    path('htmx/desscribe/<int:desscribe_id>/were_any_of_the_epileptic_seizures_convulsive',
+         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
+    path('htmx/desscribe/<int:desscribe_id>/prolonged_generalized_convulsive_seizures',
+         views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
     #     path('htmx/<int:desscribe_id>/epilepsy_onset_changed',
     #          views.epilepsy_onset_changed, name='epilepsy_onset_changed'),
     #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
@@ -211,12 +216,7 @@ htmx_paths = [
          views.update_epilepsy_surgery_centre_pressed, name="update_epilepsy_surgery_centre_pressed"),
 
 
-    path('htmx/registration/<int:registration_id>/were_any_of_the_epileptic_seizures_convulsive',
-         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
-    path('htmx/registration/<int:registration_id>/prolonged_generalized_convulsive_seizures',
-         views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
-    path('htmx/registration/<int:registration_id>/experienced_prolonged_focal_seizures',
-         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+
     path('htmx/registration/<int:registration_id>/registration_status',
          views.registration_status, name="registration_status"),
 

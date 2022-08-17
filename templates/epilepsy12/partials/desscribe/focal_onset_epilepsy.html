@@ -1,5 +1,11 @@
+<div class="field">
+    {% url 'experienced_prolonged_focal_seizures' desscribe_id=desscribe.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=desscribe.experienced_prolonged_focal_seizures label="Were there any prolonged focal seizures?" data_position="top left" %}
+</div>
 
 <div class="ui grid">
+
+
     <div class="four wide column">
         <h5>
         Laterality (patient)

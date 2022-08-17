@@ -6,6 +6,7 @@ from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPS
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES, EPILEPSY_DIAGNOSIS_STATUS, EPIS_TYPE
+from epilepsy12.models import desscribe
 from epilepsy12.models.comorbidity import Comorbidity
 
 from ..general_functions import fuzzy_scan_for_keywords
@@ -19,6 +20,7 @@ DESSCRIBE Field lists and supporting functions
 """
 
 FOCAL_EPILEPSY_FIELDS = [
+    "experienced_prolonged_focal_seizures",
     "focal_onset_impaired_awareness",
     "focal_onset_automatisms",
     "focal_onset_atonic",
@@ -46,6 +48,7 @@ FOCAL_EPILEPSY_FIELDS = [
 ]
 
 GENERALISED_ONSET_EPILEPSY_FIELDS = [
+    'prolonged_generalized_convulsive_seizures',
     "epileptic_generalised_onset",
     "epileptic_generalised_onset_other_details",
 ]
@@ -62,7 +65,8 @@ ONSET_NONEPILEPSY = [
     'nonepileptic_seizure_other',
 ]
 
-EPILEPSY_FIELDS = FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
+EPILEPSY_FIELDS = ['were_any_of_the_epileptic_seizures_convulsive'] + \
+    FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
 NONEPILEPSY_FIELDS = ONSET_NONEPILEPSY
 
 SEIZURE_CAUSE = [
@@ -124,9 +128,11 @@ laterality = [
 def set_epilepsy_fields_to_none(desscribe_id):
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
     DESSCRIBE.objects.filter(registration=desscribe.registration).update(
+        were_any_of_the_epileptic_seizures_convulsive=None,
         epileptic_seizure_onset_type=None,
         epileptic_generalised_onset=None,
         epileptic_generalised_onset_other_details=None,
+        prolonged_generalized_convulsive_seizures=None,
         focal_onset_impaired_awareness=None,
         focal_onset_automatisms=None,
         focal_onset_atonic=None,
@@ -270,6 +276,66 @@ def epilepsy_or_nonepilepsy_status(request, desscribe_id):
 
 
 @login_required
+def were_any_of_the_epileptic_seizures_convulsive(request, desscribe_id):
+    """
+    Post request from multiple choice toggle within epilepsy partial.
+    Updates the model and returns the epilepsy partial and parameters
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        were_any_of_the_epileptic_seizures_convulsive = True
+    elif request.htmx.trigger_name == 'button-false':
+        were_any_of_the_epileptic_seizures_convulsive = False
+    else:
+        were_any_of_the_epileptic_seizures_convulsive = None
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive
+    )
+
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    context = {
+        'desscribe': desscribe,
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'laterality': laterality,
+        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+
+
+@login_required
+def prolonged_generalized_convulsive_seizures(request, desscribe_id):
+    """
+    Post request from multiple choice toggle within epilepsy partial.
+    Updates the model and returns the epilepsy partial and parameters
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        prolonged_generalized_convulsive_seizures = True
+    elif request.htmx.trigger_name == 'button-false':
+        prolonged_generalized_convulsive_seizures = False
+    else:
+        prolonged_generalized_convulsive_seizures = None
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        prolonged_generalized_convulsive_seizures=prolonged_generalized_convulsive_seizures
+    )
+
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    context = {
+        'desscribe': desscribe
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/desscribe/generalised_onset_epilepsy.html', context=context)
+
+
+@login_required
 def epileptic_seizure_onset_type(request, desscribe_id):
     """
     Defines type of onset if considered to be epilepsy
@@ -357,6 +423,37 @@ def focal_onset_epilepsy_checked_changed(request, desscribe_id):
             })
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    context = {
+        'desscribe': desscribe,
+        'laterality': laterality,
+        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
+
+
+@login_required
+def experienced_prolonged_focal_seizures(request, desscribe_id):
+    """
+    Post request from multiple choice toggle within epilepsy partial.
+    Updates the model and returns the epilepsy partial and parameters
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        experienced_prolonged_focal_seizures = True
+    elif request.htmx.trigger_name == 'button-false':
+        experienced_prolonged_focal_seizures = False
+    else:
+        experienced_prolonged_focal_seizures = None
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        experienced_prolonged_focal_seizures=experienced_prolonged_focal_seizures
+    )
 
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 

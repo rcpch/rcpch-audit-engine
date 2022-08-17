@@ -39,7 +39,23 @@ class DESSCRIBE(models.Model):
         null=True
     )
 
-    # type
+    were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
+        "Were any of the epileptic seizures convulsive?",
+        default=None,
+        null=True
+    )
+    prolonged_generalized_convulsive_seizures = models.BooleanField(
+        "Were there any prolonged generalised epileptic seizures?",
+        default=None,
+        null=True
+    )
+    experienced_prolonged_focal_seizures = models.BooleanField(
+        "Were there any prolonged focal seizures?",
+        default=None,
+        null=True
+    )
+
+    # onset type
     epileptic_seizure_onset_type = models.CharField(
         "If epileptic, what is the seizure type (s)?",
         max_length=3,
