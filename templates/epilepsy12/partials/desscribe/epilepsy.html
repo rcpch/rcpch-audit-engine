@@ -4,7 +4,7 @@
 {% if desscribe.epileptic_seizure_onset_type == 'GO' %}
     <h1>Generalised Onset</h1>
 {% elif desscribe.epileptic_seizure_onset_type == 'FO' %}
-    <h1>Focal Onset</h1>
+    <h3>Focal Onset</h3>
     <div id="focal_epilepsy">
         {% include 'epilepsy12/partials/desscribe/focal_onset_epilepsy.html' with desscribe=desscribe focal_epilepsy_motor_manifestations=focal_epilepsy_motor_manifestations focal_epilepsy_nonmotor_manifestations=focal_epilepsy_nonmotor_manifestations focal_epilepsy_eeg_manifestations=focal_epilepsy_eeg_manifestations %}
     </div>

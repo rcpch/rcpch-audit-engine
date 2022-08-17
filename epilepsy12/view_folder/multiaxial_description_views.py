@@ -1,14 +1,11 @@
 from operator import itemgetter
-from pydoc import describe
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES, EPILEPSY_DIAGNOSIS_STATUS, EPIS_TYPE
-from epilepsy12.models import desscribe
 from epilepsy12.models.comorbidity import Comorbidity
 
 from ..general_functions import fuzzy_scan_for_keywords
@@ -16,6 +13,10 @@ from ..general_functions import fuzzy_scan_for_keywords
 from ..models import Registration, Keyword, DESSCRIBE
 
 from ..general_functions import *
+
+"""
+DESSCRIBE Field lists and supporting functions
+"""
 
 FOCAL_EPILEPSY_FIELDS = [
     "focal_onset_impaired_awareness",
@@ -118,6 +119,55 @@ laterality = [
     {'name': 'focal_onset_left', 'text': 'Left'},
     {'name': 'focal_onset_right', 'text': 'Right'}
 ]
+
+
+def set_epilepsy_fields_to_none(desscribe_id):
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    DESSCRIBE.objects.filter(registration=desscribe.registration).update(
+        epileptic_seizure_onset_type=None,
+        epileptic_generalised_onset=None,
+        epileptic_generalised_onset_other_details=None,
+        focal_onset_impaired_awareness=None,
+        focal_onset_automatisms=None,
+        focal_onset_atonic=None,
+        focal_onset_clonic=None,
+        focal_onset_left=None,
+        focal_onset_right=None,
+        focal_onset_epileptic_spasms=None,
+        focal_onset_hyperkinetic=None,
+        focal_onset_myoclonic=None,
+        focal_onset_tonic=None,
+        focal_onset_autonomic=None,
+        focal_onset_behavioural_arrest=None,
+        focal_onset_cognitive=None,
+        focal_onset_emotional=None,
+        focal_onset_sensory=None,
+        focal_onset_centrotemporal=None,
+        focal_onset_temporal=None,
+        focal_onset_frontal=None,
+        focal_onset_parietal=None,
+        focal_onset_occipital=None,
+        focal_onset_gelastic=None,
+        focal_onset_focal_to_bilateral_tonic_clonic=None,
+        focal_onset_other=None,
+        focal_onset_other_details=None
+    )
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+
+def set_all_nonepilepsy_fields_to_none(desscribe_id: int):
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    DESSCRIBE.objects.filter(registration=desscribe.registration).update(
+        nonepileptic_seizure_unknown_onset=None,
+        nonepileptic_seizure_unknown_onset_other_details=None,
+        nonepileptic_seizure_syncope=None,
+        nonepileptic_seizure_behavioural=None,
+        nonepileptic_seizure_sleep=None,
+        nonepileptic_seizure_paroxysmal=None,
+        nonepileptic_seizure_migraine=None,
+        nonepileptic_seizure_miscellaneous=None,
+        nonepileptic_seizure_other=None
+    )
 
 
 @login_required
@@ -225,12 +275,40 @@ def epileptic_seizure_onset_type(request, desscribe_id):
     Defines type of onset if considered to be epilepsy
     Accepts POST request from epilepsy partial and returns the same having
     updated the model with the selection
+    If focal onset, sent general onset fields to none, or both 
+    to none if not known
     """
     epileptic_seizure_onset_type = request.htmx.trigger_name
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        epileptic_seizure_onset_type=epileptic_seizure_onset_type
-    )
+    update_fields = {}
+    if epileptic_seizure_onset_type == "FO":
+        # focal onset - set all generalised onset fields to none
+        for field in GENERALISED_ONSET_EPILEPSY_FIELDS:
+            update_fields.update({
+                field: None
+            })
+    elif epileptic_seizure_onset_type == "GO":
+        # generalised onset - set focal onset fields to none
+        for field in FOCAL_EPILEPSY_FIELDS:
+            update_fields.update({
+                field: None
+            })
+    else:
+        # unknown or unclassified onset. Set all to none
+        for field in EPILEPSY_FIELDS:
+            update_fields.update({
+                field: None
+            })
+
+    # update the fields object to include latest selection
+    update_fields.update({
+        'epileptic_seizure_onset_type': epileptic_seizure_onset_type
+    })
+
+    # update the model
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+
+    # retrieve updated object instance
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
     context = {
@@ -777,52 +855,3 @@ def set_all_epilepsy_causes_to_none(except_field):
         set_to_none.update({'seizure_cause_immune_snomed_code': None})
 
     return set_to_none
-
-
-def set_epilepsy_fields_to_none(desscribe_id):
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-    DESSCRIBE.objects.filter(registration=desscribe.registration).update(
-        epileptic_seizure_onset_type=None,
-        epileptic_generalised_onset=None,
-        epileptic_generalised_onset_other_details=None,
-        focal_onset_impaired_awareness=None,
-        focal_onset_automatisms=None,
-        focal_onset_atonic=None,
-        focal_onset_clonic=None,
-        focal_onset_left=None,
-        focal_onset_right=None,
-        focal_onset_epileptic_spasms=None,
-        focal_onset_hyperkinetic=None,
-        focal_onset_myoclonic=None,
-        focal_onset_tonic=None,
-        focal_onset_autonomic=None,
-        focal_onset_behavioural_arrest=None,
-        focal_onset_cognitive=None,
-        focal_onset_emotional=None,
-        focal_onset_sensory=None,
-        focal_onset_centrotemporal=None,
-        focal_onset_temporal=None,
-        focal_onset_frontal=None,
-        focal_onset_parietal=None,
-        focal_onset_occipital=None,
-        focal_onset_gelastic=None,
-        focal_onset_focal_to_bilateral_tonic_clonic=None,
-        focal_onset_other=None,
-        focal_onset_other_details=None
-    )
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-
-
-def set_all_nonepilepsy_fields_to_none(desscribe_id: int):
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-    DESSCRIBE.objects.filter(registration=desscribe.registration).update(
-        nonepileptic_seizure_unknown_onset=None,
-        nonepileptic_seizure_unknown_onset_other_details=None,
-        nonepileptic_seizure_syncope=None,
-        nonepileptic_seizure_behavioural=None,
-        nonepileptic_seizure_sleep=None,
-        nonepileptic_seizure_paroxysmal=None,
-        nonepileptic_seizure_migraine=None,
-        nonepileptic_seizure_miscellaneous=None,
-        nonepileptic_seizure_other=None
-    )
