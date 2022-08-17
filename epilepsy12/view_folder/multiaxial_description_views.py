@@ -1,4 +1,5 @@
 from operator import itemgetter
+from pydoc import describe
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -6,7 +7,8 @@ from django.urls import reverse
 from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
-from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
+from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES, EPILEPSY_DIAGNOSIS_STATUS, EPIS_TYPE
+from epilepsy12.models import desscribe
 from epilepsy12.models.comorbidity import Comorbidity
 
 from ..general_functions import fuzzy_scan_for_keywords
@@ -14,6 +16,108 @@ from ..general_functions import fuzzy_scan_for_keywords
 from ..models import Registration, Keyword, DESSCRIBE
 
 from ..general_functions import *
+
+FOCAL_EPILEPSY_FIELDS = [
+    "focal_onset_impaired_awareness",
+    "focal_onset_automatisms",
+    "focal_onset_atonic",
+    "focal_onset_clonic",
+    "focal_onset_left",
+    "focal_onset_right",
+    "focal_onset_epileptic_spasms",
+    "focal_onset_hyperkinetic",
+    "focal_onset_myoclonic",
+    "focal_onset_tonic",
+    "focal_onset_autonomic",
+    "focal_onset_behavioural_arrest",
+    "focal_onset_cognitive",
+    "focal_onset_emotional",
+    "focal_onset_sensory",
+    "focal_onset_centrotemporal",
+    "focal_onset_temporal",
+    "focal_onset_frontal",
+    "focal_onset_parietal",
+    "focal_onset_occipital",
+    "focal_onset_gelastic",
+    "focal_onset_focal_to_bilateral_tonic_clonic",
+    "focal_onset_other",
+    "focal_onset_other_details"
+]
+
+GENERALISED_ONSET_EPILEPSY_FIELDS = [
+    "epileptic_generalised_onset",
+    "epileptic_generalised_onset_other_details",
+]
+
+ONSET_NONEPILEPSY = [
+    'nonepileptic_seizure_unknown_onset',
+    'nonepileptic_seizure_unknown_onset_other_details',
+    'nonepileptic_seizure_syncope',
+    'nonepileptic_seizure_behavioural',
+    'nonepileptic_seizure_sleep',
+    'nonepileptic_seizure_paroxysmal',
+    'nonepileptic_seizure_migraine',
+    'nonepileptic_seizure_miscellaneous',
+    'nonepileptic_seizure_other',
+]
+
+EPILEPSY_FIELDS = FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
+NONEPILEPSY_FIELDS = ONSET_NONEPILEPSY
+
+SEIZURE_CAUSE = [
+    'syndrome',
+    'seizure_cause_main',
+    'seizure_cause_main_snomed_code',
+    'seizure_cause_structural',
+    'seizure_cause_structural_snomed_code',
+    'seizure_cause_genetic',
+    'seizure_cause_gene_abnormality',
+    'seizure_cause_genetic_other',
+    'seizure_cause_gene_abnormality_snomed_code',
+    'seizure_cause_chromosomal_abnormality',
+    'seizure_cause_infectious',
+    'seizure_cause_infectious_snomed_code',
+    'seizure_cause_metabolic',
+    'seizure_cause_mitochondrial_sctid',
+    'seizure_cause_metabolic_other',
+    'seizure_cause_metabolic_snomed_code',
+    'seizure_cause_immune',
+    'seizure_cause_immune_antibody',
+    'seizure_cause_immune_antibody_other',
+    'seizure_cause_immune_snomed_code',
+    'relevant_impairments_behavioural_educational'
+]
+
+focal_epilepsy_motor_manifestations = [
+    {'name': 'focal_onset_atonic', 'text': "Atonic"},
+    {'name': 'focal_onset_clonic', 'text': 'Clonic'},
+    {'name': 'focal_onset_epileptic_spasms', 'text': 'Spasms'},
+    {'name': 'focal_onset_hyperkinetic', 'text': 'Hyperkinetic'},
+    {'name': 'focal_onset_myoclonic', 'text': 'Myoclonic'},
+    {'name': 'focal_onset_tonic', 'text': 'Tonic'},
+    {'name': 'focal_onset_focal_to_bilateral_tonic_clonic', 'text': 'Tonic-Clonic'},
+]
+focal_epilepsy_nonmotor_manifestations = [
+    {'name': 'focal_onset_automatisms', 'text': 'Automatisms'},
+    {'name': 'focal_onset_impaired_awareness', 'text': 'Impaired Awareness'},
+    {'name': 'focal_onset_gelastic', 'text': 'Gelastic'},
+    {'name': 'focal_onset_autonomic', 'text': 'Autonomic'},
+    {'name': 'focal_onset_behavioural_arrest', 'text': 'Behavioural Arrest'},
+    {'name': 'focal_onset_cognitive', 'text': 'Cognitive'},
+    {'name': 'focal_onset_emotional', 'text': 'Emotional'},
+    {'name': 'focal_onset_sensory', 'text': 'Sensory'}
+]
+focal_epilepsy_eeg_manifestations = [
+    {'name': 'focal_onset_centrotemporal', 'text': 'Centrotemporal'},
+    {'name': 'focal_onset_temporal', 'text': 'Temporal'},
+    {'name': 'focal_onset_frontal', 'text': 'Frontal'},
+    {'name': 'focal_onset_parietal', 'text': 'Parietal'},
+    {'name': 'focal_onset_occipital', 'text': 'Occipital'},
+]
+laterality = [
+    {'name': 'focal_onset_left', 'text': 'Left'},
+    {'name': 'focal_onset_right', 'text': 'Right'}
+]
 
 
 @login_required
@@ -69,6 +173,124 @@ def delete_description_keyword(request, desscribe_id, description_keyword_id):
     }
 
     return render(request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+
+# epilepsy onset
+
+
+@login_required
+def epilepsy_or_nonepilepsy_status(request, desscribe_id):
+    """
+    Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
+    The desscribe_id is also passed in allowing update of the model.
+    Selections for epilepsy set all nonepilepsy related fields to None, and selections for
+    nonepilepsy set all epilepsy fields to None. Selections to not known set all 
+    selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
+    """
+    epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
+
+    if epilepsy_or_nonepilepsy_status == 'E':
+        # epilepsy selected - set all nonepilepsy to none
+        set_epilepsy_fields_to_none(desscribe_id=desscribe_id)
+    elif epilepsy_or_nonepilepsy_status == 'NE':
+        # nonepilepsy selected - set all epilepsy to none
+        set_all_nonepilepsy_fields_to_none(desscribe_id=desscribe_id)
+    elif epilepsy_or_nonepilepsy_status == 'NK':
+        # notknown selected - set all epilepsy and nonepilepsy to none
+        set_epilepsy_fields_to_none(desscribe_id=desscribe_id)
+        set_all_nonepilepsy_fields_to_none(desscribe_id=desscribe_id)
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status
+    )
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    template = 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html'
+    context = {
+        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'nonepilepsy_onset_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'laterality': laterality,
+        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+        'desscribe': desscribe
+    }
+
+    return render(request, template, context)
+
+
+@login_required
+def epileptic_seizure_onset_type(request, desscribe_id):
+    """
+    Defines type of onset if considered to be epilepsy
+    Accepts POST request from epilepsy partial and returns the same having
+    updated the model with the selection
+    """
+    epileptic_seizure_onset_type = request.htmx.trigger_name
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        epileptic_seizure_onset_type=epileptic_seizure_onset_type
+    )
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    context = {
+        'desscribe': desscribe,
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'laterality': laterality,
+        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+
+
+@login_required
+def focal_onset_epilepsy_checked_changed(request, desscribe_id):
+    """
+    Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
+    The desscribe_id is also passed in allowing update of the model.
+    The id of the radio button clicked holds the name of the field in the desscribe model to update
+    the name of the radiobutton group clicked holds the name of the list from which to select model fields to update
+    """
+
+    if request.htmx.trigger_name == 'focal_epilepsy_motor_manifestations':
+        focal_fields = focal_epilepsy_motor_manifestations
+    elif request.htmx.trigger_name == 'focal_epilepsy_nonmotor_manifestations':
+        focal_fields = focal_epilepsy_nonmotor_manifestations
+    elif request.htmx.trigger_name == 'focal_epilepsy_eeg_manifestations':
+        focal_fields = focal_epilepsy_eeg_manifestations
+    elif request.htmx.trigger_name == 'laterality':
+        focal_fields = laterality
+    else:
+        # TODO this is an error that needs handling
+        focal_fields = ()
+
+    update_fields = {}
+    for item in focal_fields:
+        if request.htmx.trigger == item.get('name'):
+            update_fields.update({
+                item.get('name'): True
+            })
+        else:
+            update_fields.update({
+                item.get('name'): False
+            })
+
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    context = {
+        'desscribe': desscribe,
+        'laterality': laterality,
+        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+    }
+
+    return render(request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
 
 
 @login_required
@@ -322,234 +544,145 @@ def ribe(request, desscribe_id):
     return render(request, "epilepsy12/partials/desscribe/ribe.html", context)
 
 
-@login_required
-def epilepsy_or_nonepilepsy_status_changed(request, desscribe_id):
-    """
-    Function triggered by a change in the epilepsy_or_nonepilepsy_status_changed dropdown leading to a post request.
-    The desscribe_id is also passed in allowing update of the model.
-    """
-    epilepsy_or_nonepilepsy_status = request.POST.get(
-        'epilepsy_or_nonepilepsy_status')
-
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status
-    )
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-
-    if epilepsy_or_nonepilepsy_status == 'E':
-
-        # return epilepsy dropdowns
-        template = 'epilepsy12/partials/desscribe/epilepsy_dropdowns.html'
-        context = {
-            'epilepsy_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-            'desscribe_id': desscribe_id
-        }
-    elif epilepsy_or_nonepilepsy_status == "NE":
-        # return nonepilepsy dropdowns
-        template = 'epilepsy12/partials/desscribe/nonepilepsy_dropdowns.html'
-        context = {
-            'nonepilepsy_generalised_onset_types': sorted(NON_EPILEPSY_SEIZURE_ONSET, key=itemgetter(1)),
-            'nonepilepsy_onset_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-            'desscribe': desscribe
-        }
-    else:
-        # not known
-        return HttpResponse("The diagnosis of epilepsy is uncertain.")
-
-    return render(request, template, context)
+# @login_required
+# def epilepsy_onset_changed(request, desscribe_id):
+#     """
+#     Function triggered by a change in the epilepsy_onset dropdown leading to a post request.
+#     The desscribe_id is also passed in allowing update of the model.
+#     """
+#     epilepsy_onset = request.POST.get('epilepsy_onset_changed')
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         epileptic_seizure_onset_type=epilepsy_onset)
+#     if epilepsy_onset == 'FO':
+#         template = "epilepsy12/partials/desscribe/focal_onset_epilepsy.html"
+#         desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
 
-@login_required
-def epilepsy_onset_changed(request, desscribe_id):
-    """
-    Function triggered by a change in the epilepsy_onset dropdown leading to a post request.
-    The desscribe_id is also passed in allowing update of the model.
-    """
-    epilepsy_onset = request.POST.get('epilepsy_onset_changed')
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        epileptic_seizure_onset_type=epilepsy_onset)
-    if epilepsy_onset == 'FO':
-        template = "epilepsy12/partials/desscribe/focal_onset_epilepsy.html"
-        desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-        focal_epilepsy_motor_manifestations = [
-            {'name': 'focal_onset_atonic', 'text': "Atonic"},
-            {'name': 'focal_onset_clonic', 'text': 'Clonic'},
-            {'name': 'focal_onset_epileptic_spasms', 'text': 'Spasms'},
-            {'name': 'focal_onset_hyperkinetic', 'text': 'Hyperkinetic'},
-            {'name': 'focal_onset_myoclonic', 'text': 'Myoclonic'},
-            {'name': 'focal_onset_tonic', 'text': 'Tonic'},
-            {'name': 'focal_onset_focal_to_bilateral_tonic_clonic',
-                'text': 'Tonic-Clonic'}
-        ]
-        focal_epilepsy_nonmotor_manifestations = [
-            {'name': 'focal_onset_automatisms', 'text': 'Automatisms'},
-            {'name': 'focal_onset_impaired_awareness', 'text': 'Impaired Awareness'},
-            {'name': 'focal_onset_gelastic', 'text': 'Gelastic'},
-            {'name': 'focal_onset_autonomic', 'text': 'Autonomic'},
-            {'name': 'focal_onset_behavioural_arrest', 'text': 'Behavioural Arrest'},
-            {'name': 'focal_onset_cognitive', 'text': 'Cognitive'},
-            {'name': 'focal_onset_emotional', 'text': 'Emotional'},
-            {'name': 'focal_onset_sensory', 'text': 'Sensory'}
-        ]
-        focal_epilepsy_eeg_manifestations = [
-            {'name': 'focal_onset_centrotemporal', 'text': 'Centrotemporal'},
-            {'name': 'focal_onset_temporal', 'text': 'Temporal'},
-            {'name': 'focal_onset_frontal', 'text': 'Frontal'},
-            {'name': 'focal_onset_parietal', 'text': 'Parietal'},
-            {'name': 'focal_onset_occipital', 'text': 'Occipital'},
-
-        ]
-
-        context = {
-            'desscribe': desscribe,
-            'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-            'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-            'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations
-        }
-    elif epilepsy_onset == 'GO':
-        desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-        context = {
-            'desscribe': desscribe
-        }
-        template = "epilepsy12/partials/desscribe/generalised_onset_epilepsy.html"
-    return render(request, template, context)
+#         context = {
+#             'desscribe': desscribe,
+#             'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#             'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#             'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations
+#         }
+#     elif epilepsy_onset == 'GO':
+#         desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#         context = {
+#             'desscribe': desscribe
+#         }
+#         template = "epilepsy12/partials/desscribe/generalised_onset_epilepsy.html"
+#     return render(request, template, context)
 
 
-@login_required
-def focal_onset_epilepsy_checked_changed(request, desscribe_id):
-    """
-    Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
-    The desscribe_id is also passed in allowing update of the model.
-    """
-    focal_fields = ('focal_onset_atonic', 'focal_onset_clonic', 'focal_onset_left', 'focal_onset_right', 'focal_onset_epileptic_spasms', 'focal_onset_hyperkinetic', 'focal_onset_myoclonic', 'focal_onset_tonic', 'focal_onset_focal_to_bilateral_tonic_clonic', 'focal_onset_automatisms', 'focal_onset_impaired_awareness',
-                    'focal_onset_gelastic', 'focal_onset_autonomic', 'focal_onset_behavioural_arrest', 'focal_onset_cognitive', 'focal_onset_emotional', 'focal_onset_sensory', 'focal_onset_centrotemporal', 'focal_onset_temporal', 'focal_onset_frontal', 'focal_onset_parietal', 'focal_onset_occipital',)
+# @login_required
+# def nonepilepsy_generalised_onset(request, desscribe_id):
 
-    update_fields = {}
-    for item in focal_fields:
-        if item in request.POST:
-            update_fields.update({
-                item: True
-            })
-        else:
-            update_fields.update({
-                item: False
-            })
-
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
-
-    return HttpResponse("Saved!")
+#     nonepilepsy_generalised_onset = request.POST.get(
+#         'nonepilepsy_generalised_onset')
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset)
+#     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+#     if nonepilepsy_generalised_onset == "Oth":
+#         context = {
+#             'desscribe': desscribe
+#         }
+#         return render(request, 'epilepsy12/partials/desscribe/nonepileptic_seizure_unknown_onset.html', context)
+#     else:
+#         return HttpResponse("")
 
 
-@login_required
-def nonepilepsy_generalised_onset(request, desscribe_id):
+# @login_required
+# def nonepilepsy_generalised_onset_edit(request, desscribe_id):
+#     nonepilepsy_generalised_onset_edit_text = request.POST.get(
+#         'nonepilepsy_generalised_onset_edit')
 
-    nonepilepsy_generalised_onset = request.POST.get(
-        'nonepilepsy_generalised_onset')
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset)
-    desscribe = DESSCRIBE.objects.get(id=desscribe_id)
-    if nonepilepsy_generalised_onset == "Oth":
-        context = {
-            'desscribe': desscribe
-        }
-        return render(request, 'epilepsy12/partials/desscribe/nonepileptic_seizure_unknown_onset.html', context)
-    else:
-        return HttpResponse("")
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         nonepileptic_seizure_unknown_onset_other_details=nonepilepsy_generalised_onset_edit_text)
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     return HttpResponse(desscribe.nonepileptic_seizure_unknown_onset_other_details)
 
 
-@login_required
-def nonepilepsy_generalised_onset_edit(request, desscribe_id):
-    nonepilepsy_generalised_onset_edit_text = request.POST.get(
-        'nonepilepsy_generalised_onset_edit')
+# @login_required
+# def nonepilepsy_subtypes(request, desscribe_id):
+#     """
+#     Function triggered by a change or load in the nonepilepsy subtype dropdown leading to a post request.
+#     The desscribe_id is also passed in allowing update of the model.
+#     """
+#     nonepilepsy_subtypes = request.POST.get('nonepilepsy_subtypes')
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        nonepileptic_seizure_unknown_onset_other_details=nonepilepsy_generalised_onset_edit_text)
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-    return HttpResponse(desscribe.nonepileptic_seizure_unknown_onset_other_details)
+#     # persist the result
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         nonepileptic_seizure_type=nonepilepsy_subtypes)
 
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-@login_required
-def nonepilepsy_subtypes(request, desscribe_id):
-    """
-    Function triggered by a change or load in the nonepilepsy subtype dropdown leading to a post request.
-    The desscribe_id is also passed in allowing update of the model.
-    """
-    nonepilepsy_subtypes = request.POST.get('nonepilepsy_subtypes')
+#     return_list = []
+#     subtype = ""
+#     if nonepilepsy_subtypes == "SAS":
+#         return_list = sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1))
+#         subtype = "syncope/anoxic seizure"
+#     if nonepilepsy_subtypes == "BPP":
+#         return_list = sorted(
+#             NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1))
+#         subtype = "behavioural/psychological or psychiatric"
+#     if nonepilepsy_subtypes == "SRC":
+#         return_list = sorted(
+#             NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1))
+#         subtype = "sleep-related"
+#     if nonepilepsy_subtypes == "PMD":
+#         return_list = sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1))
+#         subtype = "paroxysmal movement disorder"
+#     if nonepilepsy_subtypes == "MAD":
+#         return_list = sorted(MIGRAINES, key=itemgetter(1))
+#         subtype = "migraine"
+#     if nonepilepsy_subtypes == "ME":
+#         return_list = sorted(EPIS_MISC, key=itemgetter(1))
+#         subtype = "miscellaneous"
+#     if nonepilepsy_subtypes == "Oth":
+#         return HttpResponse("Other")
 
-    # persist the result
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        nonepileptic_seizure_type=nonepilepsy_subtypes)
+#     context = {
+#         'nonepilepsy_subtype_list': return_list,
+#         'nonepilepsy_selected_subtype': subtype,
+#         'nonepilepsy_selected_subtype_code': nonepilepsy_subtypes,
+#         'desscribe': desscribe
+#     }
 
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-
-    return_list = []
-    subtype = ""
-    if nonepilepsy_subtypes == "SAS":
-        return_list = sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1))
-        subtype = "syncope/anoxic seizure"
-    if nonepilepsy_subtypes == "BPP":
-        return_list = sorted(
-            NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1))
-        subtype = "behavioural/psychological or psychiatric"
-    if nonepilepsy_subtypes == "SRC":
-        return_list = sorted(
-            NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1))
-        subtype = "sleep-related"
-    if nonepilepsy_subtypes == "PMD":
-        return_list = sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1))
-        subtype = "paroxysmal movement disorder"
-    if nonepilepsy_subtypes == "MAD":
-        return_list = sorted(MIGRAINES, key=itemgetter(1))
-        subtype = "migraine"
-    if nonepilepsy_subtypes == "ME":
-        return_list = sorted(EPIS_MISC, key=itemgetter(1))
-        subtype = "miscellaneous"
-    if nonepilepsy_subtypes == "Oth":
-        return HttpResponse("Other")
-
-    context = {
-        'nonepilepsy_subtype_list': return_list,
-        'nonepilepsy_selected_subtype': subtype,
-        'nonepilepsy_selected_subtype_code': nonepilepsy_subtypes,
-        'desscribe': desscribe
-    }
-
-    return render(request, 'epilepsy12/partials/desscribe/nonepilepsy_subtypes.html', context)
+#     return render(request, 'epilepsy12/partials/desscribe/nonepilepsy_dropdowns.html', context)
 
 
-@login_required
-def nonepilepsy_subtype_selection(request, desscribe_id, nonepilepsy_selected_subtype_code):
-    # POST request receiving selection of nonepilepsy subtype and persisting the result
+# @login_required
+# def nonepilepsy_subtype_selection(request, desscribe_id, nonepilepsy_selected_subtype_code):
+#     # POST request receiving selection of nonepilepsy subtype and persisting the result
 
-    nonepilepsy_subtype_selection = request.POST.get(
-        "nonepilepsy_subtype_selection")
+#     nonepilepsy_subtype_selection = request.POST.get(
+#         "nonepilepsy_subtype_selection")
 
-    try:
-        if nonepilepsy_selected_subtype_code == "SAS":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_syncope=nonepilepsy_subtype_selection)
-        if nonepilepsy_selected_subtype_code == "BPP":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_behavioural=nonepilepsy_subtype_selection)
-        if nonepilepsy_selected_subtype_code == "SRC":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_sleep=nonepilepsy_subtype_selection)
-        if nonepilepsy_selected_subtype_code == "PMD":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_paroxysmal=nonepilepsy_subtype_selection)
-        if nonepilepsy_selected_subtype_code == "MAD":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_migraine=nonepilepsy_subtype_selection)
-        if nonepilepsy_selected_subtype_code == "ME":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_miscellaneous=nonepilepsy_subtype_selection)
-        if nonepilepsy_selected_subtype_code == "Oth":
-            DESSCRIBE.objects.filter(pk=desscribe_id).update(
-                nonepileptic_seizure_other=nonepilepsy_subtype_selection)
-    except Exception as error:
-        return HttpResponse(error)
-    else:
-        return HttpResponse("Success")
+#     try:
+#         if nonepilepsy_selected_subtype_code == "SAS":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_syncope=nonepilepsy_subtype_selection)
+#         if nonepilepsy_selected_subtype_code == "BPP":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_behavioural=nonepilepsy_subtype_selection)
+#         if nonepilepsy_selected_subtype_code == "SRC":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_sleep=nonepilepsy_subtype_selection)
+#         if nonepilepsy_selected_subtype_code == "PMD":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_paroxysmal=nonepilepsy_subtype_selection)
+#         if nonepilepsy_selected_subtype_code == "MAD":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_migraine=nonepilepsy_subtype_selection)
+#         if nonepilepsy_selected_subtype_code == "ME":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_miscellaneous=nonepilepsy_subtype_selection)
+#         if nonepilepsy_selected_subtype_code == "Oth":
+#             DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#                 nonepileptic_seizure_other=nonepilepsy_subtype_selection)
+#     except Exception as error:
+#         return HttpResponse(error)
+#     else:
+#         return HttpResponse("Success")
 
 
 @login_required
@@ -582,7 +715,12 @@ def multiaxial_description(request, case_id):
         "registration": registration,
         "choices": choices,
         "case_id": case_id,
-        "epilepsy_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        "epileptic_seizure_onset_types": sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'laterality': laterality,
+        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         "initial_assessment_complete": registration.initial_assessment_complete,
@@ -641,277 +779,50 @@ def set_all_epilepsy_causes_to_none(except_field):
     return set_to_none
 
 
-"""focal onset epilepsy template
-{% load widget_tweaks %}
-<div class="ui message">
-    <form class="ui form" name="focal_epilepsy_form">
-        {% csrf_token %}
-        
-        <h5 class='header'>
-        Motor Manifestations
-        </h5>
+def set_epilepsy_fields_to_none(desscribe_id):
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    DESSCRIBE.objects.filter(registration=desscribe.registration).update(
+        epileptic_seizure_onset_type=None,
+        epileptic_generalised_onset=None,
+        epileptic_generalised_onset_other_details=None,
+        focal_onset_impaired_awareness=None,
+        focal_onset_automatisms=None,
+        focal_onset_atonic=None,
+        focal_onset_clonic=None,
+        focal_onset_left=None,
+        focal_onset_right=None,
+        focal_onset_epileptic_spasms=None,
+        focal_onset_hyperkinetic=None,
+        focal_onset_myoclonic=None,
+        focal_onset_tonic=None,
+        focal_onset_autonomic=None,
+        focal_onset_behavioural_arrest=None,
+        focal_onset_cognitive=None,
+        focal_onset_emotional=None,
+        focal_onset_sensory=None,
+        focal_onset_centrotemporal=None,
+        focal_onset_temporal=None,
+        focal_onset_frontal=None,
+        focal_onset_parietal=None,
+        focal_onset_occipital=None,
+        focal_onset_gelastic=None,
+        focal_onset_focal_to_bilateral_tonic_clonic=None,
+        focal_onset_other=None,
+        focal_onset_other_details=None
+    )
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-        <div class="five fields">
-            
-            <div class="field">
-                <div class="ui toggle checkbox">
-                    {% if desscribe.focal_onset_atonic %}
-                        <input type="checkbox" checked name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
-                    {% else %}
-                        <input type="checkbox" name='focal_onset_atonic' value={{desscribe.focal_onset_atonic}}>
-                    {% endif %}
-                    <label>Atonic</label>
-                </div>
-            </div>
 
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_clonic %}
-                    <input type="checkbox" name='focal_onset_clonic' checked>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_clonic'>
-                {% endif %}
-                    <label>Clonic</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_left %}
-                    <input type="checkbox" checked name='focal_onset_left'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_left'>
-                {% endif %}
-                    <label>Left</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_right %}
-                    <input type="checkbox" checked name='focal_onset_right'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_right'>
-                {% endif %}
-                    <label>Right</label>
-                </div>
-            </div>
-        </div>
-        <div class="fields">
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_epileptic_spasms %}
-                    <input type="checkbox" checked name='focal_onset_epileptic_spasms'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_epileptic_spasms'>
-                {% endif %}
-                    <label>Spasms</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_hyperkinetic %}
-                    <input type="checkbox" checked name='focal_onset_hyperkinetic'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_hyperkinetic'>
-                {% endif %}
-                    <label>Hyperkinetic</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_myoclonic %}
-                    <input type="checkbox" checked name='focal_onset_myoclonic'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_myoclonic'>
-                {% endif %}
-                    <label>Myoclonic</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_tonic %}
-                    <input type="checkbox" checked name='focal_onset_tonic'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_tonic'>
-                {% endif %}
-                    <label>Tonic</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_focal_to_bilateral_tonic_clonic %}
-                    <input type="checkbox" checked name='focal_onset_focal_to_bilateral_tonic_clonic'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_focal_to_bilateral_tonic_clonic'>
-                {% endif %}
-                    <label>Tonic-Clonic</label>
-                </div>
-            </div>
-
-        </div>
-
-        <h5 class="header">
-        Non-Motor Manifestations
-        </h5>
-        <div class="five fields">
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_automatisms %}
-                    <input type="checkbox" checked name='focal_onset_automatisms'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_automatisms'>
-                {% endif %}
-                    <label>Automatisms</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_impaired_awareness %}
-                    <input type="checkbox" checked name='focal_onset_impaired_awareness'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_impaired_awareness'>
-                {% endif %}
-                    <label>Impaired Awareness</label>
-                </div>
-            </div>
-            
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_gelastic %}
-                    <input type="checkbox" checked name='focal_onset_gelastic'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_gelastic'>
-                {% endif %}
-                    <label>Gelastic</label>
-                </div>
-            </div>
-            
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_autonomic %}
-                    <input type="checkbox" checked name='focal_onset_autonomic'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_autonomic'>
-                {% endif %}
-                    <label>Autonomic</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_behavioural_arrest %}
-                    <input type="checkbox" checked name='focal_onset_behavioural_arrest'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_behavioural_arrest'>
-                {% endif %}
-                    <label>Behavioural Arrest</label>
-                </div>
-            </div>
-            
-        </div>
-        <div class='five fields'>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_cognitive %}
-                    <input type="checkbox" checked name='focal_onset_cognitive'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_cognitive'>
-                {% endif %}
-                    <label>Cognitive</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_emotional %}
-                    <input type="checkbox" checked name='focal_onset_emotional'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_emotional'>
-                {% endif %}
-                    <label>Emotional</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_sensory %}
-                    <input type="checkbox" checked name='focal_onset_sensory'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_sensory'>
-                {% endif %}
-                    <label>Sensory</label>
-                </div>
-            </div>
-
-        </div>
-        
-        <h5 class="header">
-        EEG Manifestations
-        </h5>
-
-        <div class="five fields">
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                    {% if desscribe.focal_onset_centrotemporal %}
-                        <input type="checkbox" checked name='focal_onset_centrotemporal'>
-                    {% else %}
-                        <input type="checkbox" name='focal_onset_centrotemporal'>
-                    {% endif %}
-                    <label>Centrotemporal</label>
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_temporal %}
-                    <input type="checkbox" checked name='focal_onset_temporal'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_temporal'>
-                {% endif %}
-                    <label>Temporal</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_frontal %}
-                    <input type="checkbox" checked name='focal_onset_frontal'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_frontal'>
-                {% endif %}
-                    <label>Frontal</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_parietal %}
-                    <input type="checkbox" checked name='focal_onset_parietal'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_parietal'>
-                {% endif %}
-                    <label>Parietal</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui toggle checkbox">
-                {% if desscribe.focal_onset_occipital %}
-                    <input type="checkbox" checked name='focal_onset_occipital'>
-                {% else %}
-                    <input type="checkbox" name='focal_onset_occipital'>
-                {% endif %}
-                    <label>Occipital</label>
-                </div>
-            </div>
-
-        </div>
-        <div class="ui green button" hx-post="{% url 'focal_onset_epilepsy_checked_changed' desscribe_id=desscribe.id %}" hx-trigger="click" id="focal_button">Save</div>
-    </form>
-    
-</div>
-"""
+def set_all_nonepilepsy_fields_to_none(desscribe_id: int):
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    DESSCRIBE.objects.filter(registration=desscribe.registration).update(
+        nonepileptic_seizure_unknown_onset=None,
+        nonepileptic_seizure_unknown_onset_other_details=None,
+        nonepileptic_seizure_syncope=None,
+        nonepileptic_seizure_behavioural=None,
+        nonepileptic_seizure_sleep=None,
+        nonepileptic_seizure_paroxysmal=None,
+        nonepileptic_seizure_migraine=None,
+        nonepileptic_seizure_miscellaneous=None,
+        nonepileptic_seizure_other=None
+    )

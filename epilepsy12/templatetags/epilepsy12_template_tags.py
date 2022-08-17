@@ -35,3 +35,13 @@ def custom_filter(text, color):
     safe_text = '<span style="color:{color}">{text}</span>'.format(
         color=color, text=text)
     return mark_safe(safe_text)
+
+
+@register.simple_tag
+def matches_model_field(field_name, model):
+    if field_name:
+        value = getattr(model, field_name)
+        if value:
+            return True
+        else:
+            return False

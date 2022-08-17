@@ -35,7 +35,8 @@ class DESSCRIBE(models.Model):
         max_length=3,
         choices=EPILEPSY_DIAGNOSIS_STATUS,
         blank=True,
-        default=EPILEPSY_DIAGNOSIS_STATUS[0][0]
+        default=None,
+        null=True
     )
 
     # type
@@ -43,7 +44,8 @@ class DESSCRIBE(models.Model):
         "If epileptic, what is the seizure type (s)?",
         max_length=3,
         choices=EPILEPSY_SEIZURE_TYPE,
-        default=EPILEPSY_SEIZURE_TYPE[0][0]
+        default=None,
+        null=True
     )
     nonepileptic_seizure_type = models.CharField(
         max_length=3,

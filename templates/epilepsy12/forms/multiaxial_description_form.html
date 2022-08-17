@@ -12,13 +12,16 @@
         <div class="ui header">
             <div class="ui blue circular label">E</div>
         </div>
-        {% include 'epilepsy12/partials/desscribe/epilepsy_nonepilepsy_status_dropdown.html' with desscribe=desscribe epilepsy_or_nonepilepsy_status_choices=epilepsy_or_nonepilepsy_status_choices %}
+        <div id="epilepsy_or_nonepilepsy_status">
+            {% include 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html' with desscribe=desscribe epilepsy_or_nonepilepsy_status_choices=epilepsy_or_nonepilepsy_status_choices %}
+        </div>
     </div>
 
     <div class="ui segment">
         <div class="ui header">
             <div class="ui blue circular label">S</div>
         </div>
+        
         <div class="ui form" method="post">
             <div class="field">
                 <label>Is there an identifiable epilepsy syndrome?</label>

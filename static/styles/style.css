@@ -381,6 +381,7 @@ h5 {
 }
 
 /* radio buttons */
+
 .radio-tile-group {
   display: -webkit-box;
   display: flex;
@@ -391,8 +392,8 @@ h5 {
 
 .radio-tile-group .input-container {
   position: relative;
-  height: 1.50rem;
-  width: 1.50rem;
+  height: 2rem;
+  width: 2rem;
   margin: 0.75rem;
 }
 
@@ -408,7 +409,6 @@ h5 {
 }
 
 .radio-tile-group .input-container .radio-tile {
-
   width: 100%;
   height: 100%;
   border: 2px solid var(--rcpch_light_blue);
@@ -432,8 +432,8 @@ h5 {
 }
 
 .radio-tile-group .input-container .radio-button:checked+.radio-tile {
-  background-color: #079ad9;
-  border: 2px solid #079ad9;
+  background-color: var(--rcpch_light_blue);
+  border: 2px solid var(--rcpch_light_blue);
   color: white;
   -webkit-transform: scale(1.1, 1.1);
   transform: scale(1.1, 1.1);
