@@ -20,6 +20,7 @@
     {% endcomment %}
 
     
+        <label class="toggle_button_label">{{label}}</label>
         <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
             <span>
                 {% if test_positive is None %}
@@ -93,9 +94,6 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                <span>
-                    <label class="toggle_button_label">{{label}}</label>
-                </span>
             </span>
         </div>
 

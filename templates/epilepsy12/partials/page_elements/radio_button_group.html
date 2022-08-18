@@ -1,0 +1,65 @@
+{% load epilepsy12_template_tags %}
+
+{% comment %}
+Radiobutton group partial with interacts with css 
+For the radiobuttons to work as a group, they must all have the same name
+This is the name of the list of radio-button options passed in
+The id of the individual radiobuttons is the fieldname, retrieved in the view to 
+update the model
+Note this element interacts with the matches_model_field tag which returns true or false 
+depending on whether radio button selected or not.
+Accepts parameters:
+hx_field_list: list of radiobutton options
+hx_field_list_name: the name of the list of options
+hx_model: model instance to update on selection
+hx_post: url and params
+hx_target: target element id
+{% endcomment %}
+
+<div class="container">
+
+    <div class="radio-tile-group">
+
+        {% for hx_field in hx_field_list %}
+
+            <div class="input-container">
+
+                {% matches_model_field hx_field.name hx_model as test_positive %}
+
+                {% if test_positive %}
+                    <input 
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        id="{{hx_field.name}}" 
+                        class="radio-button"
+                        type="radio" 
+                        name="{{hx_field_list_name}}"
+                        hx-post="{{hx_post}}"
+                        hx-trigger="change delay:1s"
+                        hx-target="{{hx_target}}"
+                        checked
+                    />
+                {% else %}
+                    <input 
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        id="{{hx_field.name}}" 
+                        class="radio-button" 
+                        type="radio" 
+                        name="{{hx_field_list_name}}"
+                         hx-post="{{hx_post}}"
+                        hx-trigger="change delay:1s"
+                        hx-target="{{hx_target}}"
+                        
+                    />
+                {% endif %}
+                <div class="radio-tile">
+                <label 
+                    for="{{hx_field.name}}"
+                    class="radio-tile-label">{{hx_field.text}}</label>
+                </div>
+
+            </div>    
+            
+        {% endfor %}
+
+    </div>
+</div>

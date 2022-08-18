@@ -1,3 +1,2 @@
-<div class="ui message">
-Generalised onset
-</div>
+{% url 'prolonged_generalized_convulsive_seizures' desscribe_id=desscribe.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#generalised_epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=desscribe.prolonged_generalized_convulsive_seizures label="Were there any prolonged generalised epileptic seizures?" data_position="top left" %}

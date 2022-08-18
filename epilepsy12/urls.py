@@ -36,13 +36,7 @@ urlpatterns = [
          views.create_comorbidity, name="create_comorbidity"),
     path('comorbidity/<int:case_id>/update',
          views.update_comorbidity, name="update_comorbidity"),
-    #     path('investigation_management/<int:case_id>/create',
-    #          views.create_investigation_management, name='create_investigation_management'),
-    #     path('investigation_management/<int:case_id>/update',
-    #          views.update_investigation_management, name='update_investigation_management'),
-    #     #     management paths
-    path('management/<int:case_id>',
-         views.management, name='management'),
+    path('management/<int:case_id>', views.management, name='management'),
 
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
@@ -66,34 +60,40 @@ htmx_paths = [
          views.edit_description, name='edit_description'),
     path('htmx/<int:desscribe_id>/description_keyword/<int:description_keyword_id>/delete',
          views.delete_description_keyword, name='delete_description_keyword'),
-    path('htmx/<int:desscribe_id>/epilepsy_or_nonepilepsy_status_changed',
-         views.epilepsy_or_nonepilepsy_status_changed, name='epilepsy_or_nonepilepsy_status_changed'),
-    path('htmx/<int:desscribe_id>/epilepsy_onset_changed',
-         views.epilepsy_onset_changed, name='epilepsy_onset_changed'),
+    path('htmx/<int:desscribe_id>/epilepsy_or_nonepilepsy_status',
+         views.epilepsy_or_nonepilepsy_status, name='epilepsy_or_nonepilepsy_status'),
+    path('htmx/<int:desscribe_id>/epileptic_seizure_onset_type',
+         views.epileptic_seizure_onset_type, name='epileptic_seizure_onset_type'),
     path('htmx/<int:desscribe_id>/focal_onset_epilepsy_checked_changed',
          views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
+    path('htmx/desscribe/<int:desscribe_id>/experienced_prolonged_focal_seizures',
+         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+    path('htmx/desscribe/<int:desscribe_id>/were_any_of_the_epileptic_seizures_convulsive',
+         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
+    path('htmx/desscribe/<int:desscribe_id>/prolonged_generalized_convulsive_seizures',
+         views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
+
+    #     nonepilepsy
     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
          views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
-    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset_edit',
-         views.nonepilepsy_generalised_onset_edit, name='nonepilepsy_generalised_onset_edit'),
-    path('htmx/<int:desscribe_id>/nonepilepsy_subtypes',
-         views.nonepilepsy_subtypes, name='nonepilepsy_subtypes'),
-    path('htmx/<int:desscribe_id>/nonepilepsy_subtype_selection/<str:nonepilepsy_selected_subtype_code>',
-         views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
-    path('htmx/<int:desscribe_id>/syndrome_select',
-         views.syndrome_select, name='syndrome_select'),
+    path('htmx/<int:desscribe_id>/nonepileptic_seizure_type',
+         views.nonepileptic_seizure_type, name='nonepileptic_seizure_type'),
+    path('htmx/<int:desscribe_id>/nonepileptic_seizure_subtype',
+         views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
+
     path('htmx/<int:desscribe_id>/seizure_cause_main',
          views.seizure_cause_main, name='seizure_cause_main'),
-    path('htmx/<int:desscribe_id>/seizure_cause_main/<str:seizure_cause_main>',
-         views.seizure_cause_main_choice, name='seizure_cause_main_choice'),
-    path('htmx/<int:desscribe_id>/seizure_cause_infectious',
-         views.seizure_cause_infectious, name='seizure_cause_infectious'),
-    path('htmx/<int:desscribe_id>/genetic_selection',
-         views.seizure_cause_genetic_choice, name='seizure_cause_genetic_choice'),
-    path('htmx/<int:desscribe_id>/autoantibodies',
-         views.autoantibodies, name='autoantibodies'),
-    path('htmx/<int:desscribe_id>/mitochondrial',
-         views.mitochondrial, name='mitochondrial'),
+    path('htmx/<int:desscribe_id>/seizure_cause_subtype/<str:subtype>',
+         views.seizure_cause_subtype, name='seizure_cause_subtype'),
+    path('htmx/<int:desscribe_id>/seizure_cause_subtype_subtype',
+         views.seizure_cause_subtype_subtype, name='seizure_cause_subtype_subtype'),
+
+    # syndrome
+    path('htmx/<int:desscribe_id>/syndrome_present',
+         views.syndrome_present, name='syndrome_present'),
+    path('htmx/<int:desscribe_id>/syndrome',
+         views.syndrome, name='syndrome'),
+
     path('htmx/<int:desscribe_id>/ribe',
          views.ribe, name='ribe'),
     # case table endpoints
@@ -214,12 +214,7 @@ htmx_paths = [
          views.update_epilepsy_surgery_centre_pressed, name="update_epilepsy_surgery_centre_pressed"),
 
 
-    path('htmx/registration/<int:registration_id>/were_any_of_the_epileptic_seizures_convulsive',
-         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
-    path('htmx/registration/<int:registration_id>/prolonged_generalized_convulsive_seizures',
-         views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
-    path('htmx/registration/<int:registration_id>/experienced_prolonged_focal_seizures',
-         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+
     path('htmx/registration/<int:registration_id>/registration_status',
          views.registration_status, name="registration_status"),
 
@@ -264,11 +259,6 @@ htmx_paths = [
          views.previous_neonatal_seizures, name="previous_neonatal_seizures"),
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/diagnosis_of_epilepsy_withdrawn',
          views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
-
-    # investigation_management htmx
-    #     path('htmx/investigation_management/<int:investigation_management_id>/medication_lookup',
-    #          views.medication_lookup, name="medication_lookup"),
-
 
     # investigations
     path('htmx/investigations/<int:investigations_id>/eeg_indicated',

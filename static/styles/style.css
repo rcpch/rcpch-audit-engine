@@ -367,3 +367,101 @@ h5 {
 .htmx-request.htmx-indicator.spinner.loading.icon {
   display: inline;
 }
+
+/* description labels */
+.ui.rcpch_light_blue.label {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+  margin: 5px;
+}
+
+.icon.close:hover {
+  color: var(--rcpch_dark_blue);
+}
+
+/* radio buttons */
+
+.radio-tile-group {
+  display: -webkit-box;
+  display: flex;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  justify-content: center;
+}
+
+.radio-tile-group .input-container {
+  position: relative;
+  height: 2rem;
+  width: 2rem;
+  margin: 0.75rem;
+}
+
+.radio-tile-group .input-container .radio-button {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.radio-tile-group .input-container .radio-tile {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--rcpch_light_blue);
+  border-radius: 0px;
+  padding: 1rem;
+  -webkit-transition: -webkit-transform 300ms ease;
+  transition: -webkit-transform 300ms ease;
+  transition: transform 300ms ease;
+  transition: transform 300ms ease, -webkit-transform 300ms ease;
+}
+
+.radio-tile-group .input-container .radio-tile {
+  display: flex;
+  align-items: center;
+}
+
+.radio-tile-group .input-container .radio-tile-label {
+  text-align: left;
+  color: var(--rcpch_black);
+  padding-left: 25px;
+}
+
+.radio-tile-group .input-container .radio-button:checked+.radio-tile {
+  background-color: var(--rcpch_light_blue);
+  border: 2px solid var(--rcpch_light_blue);
+  color: white;
+  -webkit-transform: scale(1.1, 1.1);
+  transform: scale(1.1, 1.1);
+}
+
+.radio-tile-group .input-container .radio-button:checked+.radio-tile .radio-tile-label {
+  color: var(--rcpch_black);
+}
+
+/* selects */
+.ui.rcpch_light_blue.selection.dropdown {
+  border-radius: 0%;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.ui.rcpch_light_blue.dropdown .item:hover {
+  background-color: var(--rcpch_light_blue);
+  color: white;
+}
+
+/* DESSCRIBE */
+
+.ui.rcpch_pink.circular.label {
+  color: white;
+  background-color: var(--rcpch_pink);
+}
+
+.ui.rcpch_pink.segment {
+  border-top-color: var(--rcpch_pink);
+}
