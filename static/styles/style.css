@@ -247,6 +247,11 @@ h5 {
   border-color: #a9a9a9;
 }
 
+/* segment */
+.ui.segment {
+  border-radius: 0%;
+}
+
 /* message */
 .ui.rcpch_dark_blue.message {
   background-color: var(--rcpch_dark_blue);

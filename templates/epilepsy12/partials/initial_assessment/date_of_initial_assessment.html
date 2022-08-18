@@ -1,0 +1,2 @@
+{% url 'date_of_initial_assessment' initial_assessment_id=initial_assessment.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#date_of_initial_assessment' hx_trigger='change' label='Date of Initial Assessment' date_value=initial_assessment.date_of_initial_assessment data_position='top left' input_date_field_name='date_of_initial_assessment' %} 

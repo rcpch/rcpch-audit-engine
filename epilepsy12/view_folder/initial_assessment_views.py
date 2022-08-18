@@ -40,7 +40,7 @@ def date_of_initial_assessment(request, initial_assessment_id):
     """
     HTMX call back from date_of_initial_assessment partial
     """
-    date_of_initial_assessment = request.POST.get('date_of_initial_assessment')
+    date_of_initial_assessment = request.POST.get(request.htmx.trigger_name)
     # validation here TODO
 
     new_date = datetime.strptime(
@@ -110,7 +110,10 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
             pk=initial_assessment_id).update(general_paediatrics_referral_made=True)
     else:
         InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(general_paediatrics_referral_made=False, date_of_referral_to_general_paediatrics=None)
+            pk=initial_assessment_id).update(
+                general_paediatrics_referral_made=False,
+                date_of_referral_to_general_paediatrics=None
+        )
 
     initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
@@ -123,7 +126,9 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
 
 
 def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
-
+    """
+    HTMX call back from date_of_initial_assessment partial
+    """
     date_of_referral_to_general_paediatrics = request.POST.get(
         'date_of_referral_to_general_paediatrics')
 
@@ -366,7 +371,16 @@ def diagnostic_status(request, initial_assessment_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        "initial_assessment": initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
 
 def episode_definition(request, initial_assessment_id):
@@ -382,4 +396,13 @@ def episode_definition(request, initial_assessment_id):
         print(error)
         return HttpResponse(error)
 
-    return HttpResponse("success")
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        "initial_assessment": initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)

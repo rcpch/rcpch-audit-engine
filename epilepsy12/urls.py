@@ -225,7 +225,7 @@ htmx_paths = [
          views.first_paediatric_assessment_in_acute_or_nonacute_setting, name="first_paediatric_assessment_in_acute_or_nonacute_setting"),
     path('htmx/registration/<int:initial_assessment_id>/general_paediatrics_referral_made',
          views.general_paediatrics_referral_made, name="general_paediatrics_referral_made"),
-    path('htmx/registration/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
+    path('htmx/initial_assessment/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
          views.date_of_referral_to_general_paediatrics, name="date_of_referral_to_general_paediatrics"),
     path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred',
          views.when_the_first_epileptic_episode_occurred, name="when_the_first_epileptic_episode_occurred"),
