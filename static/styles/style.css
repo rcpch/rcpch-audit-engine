@@ -442,3 +442,15 @@ h5 {
 .radio-tile-group .input-container .radio-button:checked+.radio-tile .radio-tile-label {
   color: var(--rcpch_black);
 }
+
+/* selects */
+.ui.rcpch_light_blue.selection.dropdown {
+  border-radius: 0%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.ui.rcpch_light_blue.dropdown .item:hover {
+  background-color: var(--rcpch_light_blue);
+  color: white;
+}

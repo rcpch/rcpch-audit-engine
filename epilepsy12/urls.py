@@ -77,10 +77,9 @@ htmx_paths = [
          views.seizure_cause_main, name='seizure_cause_main'),
     path('htmx/<int:desscribe_id>/seizure_cause_subtype/<str:subtype>',
          views.seizure_cause_subtype, name='seizure_cause_subtype'),
-    #     path('htmx/<int:desscribe_id>/seizure_cause_genetic',
-    #          views.seizure_cause_genetic, name='sseizure_cause_genetic'),
-    #     path('htmx/<int:desscribe_id>/epilepsy_onset_changed',
-    #          views.epilepsy_onset_changed, name='epilepsy_onset_changed'),
+    path('htmx/<int:desscribe_id>/seizure_cause_subtype_subtype',
+         views.seizure_cause_subtype_subtype, name='seizure_cause_subtype_subtype'),
+
     #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
     #          views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
     #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset_edit',
@@ -91,13 +90,7 @@ htmx_paths = [
     #          views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
     path('htmx/<int:desscribe_id>/syndrome_select',
          views.syndrome_select, name='syndrome_select'),
-    #     path('htmx/<int:desscribe_id>/seizure_cause_infectious',
-    #          views.seizure_cause_infectious, name='seizure_cause_infectious'),
 
-    #     path('htmx/<int:desscribe_id>/autoantibodies',
-    #          views.autoantibodies, name='autoantibodies'),
-    #     path('htmx/<int:desscribe_id>/mitochondrial',
-    #          views.mitochondrial, name='mitochondrial'),
     path('htmx/<int:desscribe_id>/ribe',
          views.ribe, name='ribe'),
     # case table endpoints
