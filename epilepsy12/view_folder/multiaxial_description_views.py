@@ -301,6 +301,7 @@ def epilepsy_or_nonepilepsy_status(request, desscribe_id):
     template = 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html'
     context = {
         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
         'laterality': laterality,
         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
