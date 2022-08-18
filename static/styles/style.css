@@ -447,7 +447,7 @@ h5 {
 .ui.rcpch_light_blue.selection.dropdown {
   border-radius: 0%;
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .ui.rcpch_light_blue.dropdown .item:hover {
