@@ -6,7 +6,6 @@ from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPS
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES, EPILEPSY_DIAGNOSIS_STATUS, EPIS_TYPE
-from epilepsy12.models import desscribe
 from epilepsy12.models.comorbidity import Comorbidity
 
 from ..general_functions import fuzzy_scan_for_keywords
@@ -122,6 +121,22 @@ focal_epilepsy_eeg_manifestations = [
 laterality = [
     {'name': 'focal_onset_left', 'text': 'Left'},
     {'name': 'focal_onset_right', 'text': 'Right'}
+]
+
+seizure_cause_main_choices = [
+    {'name': 'seizure_cause_structural', 'text': 'Structural', 'id': 'Str'},
+    {'name': 'seizure_cause_genetic', 'text': 'Genetic', 'id': 'Gen'},
+    {'name': 'seizure_cause_infectious', 'text': 'Infectious', 'id': 'Inf'},
+    {'name': 'seizure_cause_metabolic', 'text': 'Metabolic', 'id': 'Met'},
+    {'name': 'seizure_cause_immune', 'text': 'Immune', 'id': 'Imm'},
+]
+
+causes = [
+    {'name': 'seizure_cause_gene_abnormality',
+        'text': 'Gene Abnormality', 'id': ''},
+    {'name': 'seizure_cause_immune_antibody', 'text': 'Antibody', 'id': ''},
+    {'name': 'seizure_cause_chromosomal_abnormality',
+        'text': 'Chromosomal Abnormality', 'id': ''},
 ]
 
 
@@ -470,218 +485,315 @@ def experienced_prolonged_focal_seizures(request, desscribe_id):
 
 @login_required
 def seizure_cause_main(request, desscribe_id):
+    """
+    Post request from multiple choice toggle within seizure_cause_main partial.
+    Updates the model and returns the epilepsy partial and parameters
+    """
 
-    selection = request.POST.get('seizure_cause_main')
+    seizure_cause_main = request.htmx.trigger_name
 
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        seizure_cause_main=selection)
+    # update the model
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(
+        seizure_cause_main=seizure_cause_main)
 
+    # retrieve updated object instance
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    context = {}
+    context = {
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+        'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+        'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+        'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+        'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+        'epilepsy_antibodies_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+        'desscribe': desscribe
+    }
 
-    if selection == 'Met':
-        select_list = sorted(METABOLIC_CAUSES, key=itemgetter(1))
-        currently_selected = desscribe.seizure_cause_metabolic
-
-        context.update({
-            'select_list': select_list,
-            'currently_selected': currently_selected
-        })
-    elif selection == 'Str':
-        select_list = sorted(
-            EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1))
-        currently_selected = desscribe.seizure_cause_structural
-        context.update({
-            'select_list': select_list,
-            'currently_selected': currently_selected,
-        })
-    elif selection == 'Gen':
-        select_list = sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1))
-        currently_selected = desscribe.seizure_cause_genetic
-        context.update({
-            'select_list': select_list,
-            'currently_selected': currently_selected,
-        })
-    elif selection == 'Imm':
-        select_list = sorted(IMMUNE_CAUSES, key=itemgetter(1))
-        currently_selected = desscribe.seizure_cause_immune
-        context.update({
-            'select_list': select_list,
-            'currently_selected': currently_selected,
-        })
-    elif selection == 'Inf':
-        context.update({
-            'currently_selected': desscribe.seizure_cause_infectious
-        })
-
-    elif selection == 'NK':
-        return HttpResponse("Not Known")
-    else:
-        # inf - this is a text input
-        return HttpResponse("No Selection")
-
-    context.update({
-        'seizure_cause_main': selection,
-        'desscribe_id': desscribe_id
-    })
-
-    return render(request, 'epilepsy12/partials/desscribe/seizure_cause_main.html', context)
+    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
 
 
-@login_required
-def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
-    seizure_cause_main_choice = request.POST.get('seizure_cause_main_choice')
+def seizure_cause_subtype(request, desscribe_id, subtype):
+    """
+    POST request from seizure cause subtype multiple choice toggle
+    within seizure_cause_main partial.
+    Updates the model and returns the epilepsy partial and parameters
+    Set to None any unselected types
+    """
+    subtype_selection = request.htmx.trigger_name
 
-    if seizure_cause_main == 'Met':
-        DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_metabolic=seizure_cause_main_choice,
-            seizure_cause_immune=None,
-            seizure_cause_immune_antibody=None,
-            seizure_cause_immune_antibody_other=None,
-            seizure_cause_immune_snomed_code=None,
-            seizure_cause_infectious=None,
-            seizure_cause_infectious_snomed_code=None,
-            seizure_cause_gene_abnormality_snomed_code=None,
-            seizure_cause_genetic_other=None,
-            seizure_cause_gene_abnormality=None,
-            seizure_cause_genetic=None,
-            seizure_cause_chromosomal_abnormality=None,
-            seizure_cause_structural=None,
-            seizure_cause_structural_snomed_code=None
-        )
-        desscribe = DESSCRIBE.objects.get(id=desscribe_id)
-
-        if seizure_cause_main_choice == "Mit":
-            mitochondrial_selection = fetch_snomed(
-                sctid=240096000, syntax='childSelfOf')
-
-            if desscribe.seizure_cause_mitochondrial_sctid:
-                seizure_cause_mitochondrial_sctid = int(
-                    desscribe.seizure_cause_mitochondrial_sctid)
-            else:
-                seizure_cause_mitochondrial_sctid = None
-
-            context = {
-                'mitochondrial_selection': mitochondrial_selection,
-                'desscribe_id': desscribe_id,
-                'seizure_cause_mitochondrial_sctid': seizure_cause_mitochondrial_sctid
-            }
-            return render(request, 'epilepsy12/partials/desscribe/mitochondrial_selection_dropdown.html', context)
-
-    elif seizure_cause_main == 'Str':
-        DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_structural=seizure_cause_main_choice,
-            seizure_cause_immune=None,
-            seizure_cause_immune_antibody=None,
-            seizure_cause_immune_antibody_other=None,
-            seizure_cause_immune_snomed_code=None,
-            seizure_cause_infectious=None,
-            seizure_cause_infectious_snomed_code=None,
-            seizure_cause_gene_abnormality_snomed_code=None,
-            seizure_cause_genetic_other=None,
-            seizure_cause_gene_abnormality=None,
-            seizure_cause_genetic=None,
-            seizure_cause_chromosomal_abnormality=None,
-            seizure_cause_metabolic=None,
-            seizure_cause_mitochondrial_sctid=None,
-            seizure_cause_metabolic_other=None,
-            seizure_cause_metabolic_snomed_code=None
-        )
-
-    elif seizure_cause_main == 'Imm':
-        DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_immune=seizure_cause_main_choice,
-            seizure_cause_infectious=None,
-            seizure_cause_infectious_snomed_code=None,
-            seizure_cause_gene_abnormality_snomed_code=None,
-            seizure_cause_genetic_other=None,
-            seizure_cause_gene_abnormality=None,
-            seizure_cause_genetic=None,
-            seizure_cause_chromosomal_abnormality=None,
-            seizure_cause_metabolic=None,
-            seizure_cause_mitochondrial_sctid=None,
-            seizure_cause_metabolic_other=None,
-            seizure_cause_metabolic_snomed_code=None,
-            seizure_cause_structural=None,
-            seizure_cause_structural_snomed_code=None
-        )
-
-        if seizure_cause_main_choice == "AnM":
-            desscribe = DESSCRIBE.objects.get(id=desscribe_id)
-            context = {
-                'selected_autoantibody': desscribe.seizure_cause_immune_antibody,
-                'selection': sorted(AUTOANTIBODIES, key=itemgetter(1)),
-                'desscribe_id': desscribe_id
-            }
-            # antibody mediated - offer antibodies select
-            return render(request, "epilepsy12/partials/desscribe/autoantibodies.html", context)
+    update_fields = {}
+    for seizure_main_choice in seizure_cause_main_choices:
+        if subtype == subtype.id:
+            update_fields.update({
+                seizure_main_choice.get('name'): subtype_selection
+            })
         else:
-            return HttpResponse("Success")
+            update_fields.update({
+                seizure_main_choice.get('name'): None
+            })
 
-    elif seizure_cause_main == 'Gen':
-        DESSCRIBE.objects.filter(id=desscribe_id).update(
-            seizure_cause_genetic=seizure_cause_main_choice,
-            seizure_cause_immune=None,
-            seizure_cause_immune_antibody=None,
-            seizure_cause_immune_antibody_other=None,
-            seizure_cause_immune_snomed_code=None,
-            seizure_cause_infectious=None,
-            seizure_cause_infectious_snomed_code=None,
-            seizure_cause_metabolic=None,
-            seizure_cause_mitochondrial_sctid=None,
-            seizure_cause_metabolic_other=None,
-            seizure_cause_metabolic_snomed_code=None,
-            seizure_cause_structural=None,
-            seizure_cause_structural_snomed_code=None
-        )
-        desscribe = DESSCRIBE.objects.get(id=desscribe_id)
-        context = {
-            'desscribe_id': desscribe_id,
-            'seizure_cause_main': seizure_cause_main,
-            'selected_choice': seizure_cause_main_choice,
-            'selection': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
-            'selected_gene_defect': desscribe.seizure_cause_gene_abnormality
-        }
-        if seizure_cause_main_choice == "GeA":
-            # gene abnormality selected
-            return render(request, "epilepsy12/partials/desscribe/gene_defect.html", context)
-        else:
-            return HttpResponse("Success")
-    else:
-        return HttpResponse('Error!')
-    return HttpResponse("Selected")
+    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+
+    # retrieve updated object instance
+    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+    context = {
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+        'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+        'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+        'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+        'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+        'epilepsy_antibodies_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+        'desscribe': desscribe
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
 
 
-@login_required
-def mitochondrial(request, desscribe_id):
-    mitochondrial_type_sctid = request.POST.get('mitochondrial_type')
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        seizure_cause_mitochondrial_sctid=mitochondrial_type_sctid)
-    return HttpResponse("Saved Mitochondrial")
+# def seizure_cause_genetic(request, desscribe_id):
+#     """
+#     Post request from multiple choice toggle within seizure_cause_main partial.
+#     Updates the model and returns the epilepsy partial and parameters
+#     """
+
+#     seizure_cause_genetic = request.htmx.trigger_name
+
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         seizure_cause_genetic=seizure_cause_genetic
+#     )
+
+#     # retrieve updated object instance
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+#     context = {
+#         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+#         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+#         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+#         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+#         'epilepsy_antibodies_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
+
+#     return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+# @login_required
+# def seizure_cause_main(request, desscribe_id):
+
+#     selection = request.POST.get('seizure_cause_main')
+
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         seizure_cause_main=selection)
+
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+#     context = {}
+
+#     if selection == 'Met':
+#         select_list = sorted(METABOLIC_CAUSES, key=itemgetter(1))
+#         currently_selected = desscribe.seizure_cause_metabolic
+
+#         context.update({
+#             'select_list': select_list,
+#             'currently_selected': currently_selected
+#         })
+#     elif selection == 'Str':
+#         select_list = sorted(
+#             EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1))
+#         currently_selected = desscribe.seizure_cause_structural
+#         context.update({
+#             'select_list': select_list,
+#             'currently_selected': currently_selected,
+#         })
+#     elif selection == 'Gen':
+#         select_list = sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1))
+#         currently_selected = desscribe.seizure_cause_genetic
+#         context.update({
+#             'select_list': select_list,
+#             'currently_selected': currently_selected,
+#         })
+#     elif selection == 'Imm':
+#         select_list = sorted(IMMUNE_CAUSES, key=itemgetter(1))
+#         currently_selected = desscribe.seizure_cause_immune
+#         context.update({
+#             'select_list': select_list,
+#             'currently_selected': currently_selected,
+#         })
+#     elif selection == 'Inf':
+#         context.update({
+#             'currently_selected': desscribe.seizure_cause_infectious
+#         })
+
+#     elif selection == 'NK':
+#         return HttpResponse("Not Known")
+#     else:
+#         # inf - this is a text input
+#         return HttpResponse("No Selection")
+
+#     context.update({
+#         'seizure_cause_main': selection,
+#         'desscribe_id': desscribe_id
+#     })
+
+#     return render(request, 'epilepsy12/partials/desscribe/seizure_cause_main.html', context)
 
 
-@login_required
-def seizure_cause_infectious(request, desscribe_id):
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        seizure_cause_infectious=request.POST.get('seizure_cause_infectious'))
-    return HttpResponse("Success!")
+# @login_required
+# def seizure_cause_main_choice(request, desscribe_id, seizure_cause_main):
+#     seizure_cause_main_choice = request.POST.get('seizure_cause_main_choice')
+
+#     if seizure_cause_main == 'Met':
+#         DESSCRIBE.objects.filter(id=desscribe_id).update(
+#             seizure_cause_metabolic=seizure_cause_main_choice,
+#             seizure_cause_immune=None,
+#             seizure_cause_immune_antibody=None,
+#             seizure_cause_immune_antibody_other=None,
+#             seizure_cause_immune_snomed_code=None,
+#             seizure_cause_infectious=None,
+#             seizure_cause_infectious_snomed_code=None,
+#             seizure_cause_gene_abnormality_snomed_code=None,
+#             seizure_cause_genetic_other=None,
+#             seizure_cause_gene_abnormality=None,
+#             seizure_cause_genetic=None,
+#             seizure_cause_chromosomal_abnormality=None,
+#             seizure_cause_structural=None,
+#             seizure_cause_structural_snomed_code=None
+#         )
+#         desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+
+#         if seizure_cause_main_choice == "Mit":
+#             mitochondrial_selection = fetch_snomed(
+#                 sctid=240096000, syntax='childSelfOf')
+
+#             if desscribe.seizure_cause_mitochondrial_sctid:
+#                 seizure_cause_mitochondrial_sctid = int(
+#                     desscribe.seizure_cause_mitochondrial_sctid)
+#             else:
+#                 seizure_cause_mitochondrial_sctid = None
+
+#             context = {
+#                 'mitochondrial_selection': mitochondrial_selection,
+#                 'desscribe_id': desscribe_id,
+#                 'seizure_cause_mitochondrial_sctid': seizure_cause_mitochondrial_sctid
+#             }
+#             return render(request, 'epilepsy12/partials/desscribe/mitochondrial_selection_dropdown.html', context)
+
+#     elif seizure_cause_main == 'Str':
+#         DESSCRIBE.objects.filter(id=desscribe_id).update(
+#             seizure_cause_structural=seizure_cause_main_choice,
+#             seizure_cause_immune=None,
+#             seizure_cause_immune_antibody=None,
+#             seizure_cause_immune_antibody_other=None,
+#             seizure_cause_immune_snomed_code=None,
+#             seizure_cause_infectious=None,
+#             seizure_cause_infectious_snomed_code=None,
+#             seizure_cause_gene_abnormality_snomed_code=None,
+#             seizure_cause_genetic_other=None,
+#             seizure_cause_gene_abnormality=None,
+#             seizure_cause_genetic=None,
+#             seizure_cause_chromosomal_abnormality=None,
+#             seizure_cause_metabolic=None,
+#             seizure_cause_mitochondrial_sctid=None,
+#             seizure_cause_metabolic_other=None,
+#             seizure_cause_metabolic_snomed_code=None
+#         )
+
+#     elif seizure_cause_main == 'Imm':
+#         DESSCRIBE.objects.filter(id=desscribe_id).update(
+#             seizure_cause_immune=seizure_cause_main_choice,
+#             seizure_cause_infectious=None,
+#             seizure_cause_infectious_snomed_code=None,
+#             seizure_cause_gene_abnormality_snomed_code=None,
+#             seizure_cause_genetic_other=None,
+#             seizure_cause_gene_abnormality=None,
+#             seizure_cause_genetic=None,
+#             seizure_cause_chromosomal_abnormality=None,
+#             seizure_cause_metabolic=None,
+#             seizure_cause_mitochondrial_sctid=None,
+#             seizure_cause_metabolic_other=None,
+#             seizure_cause_metabolic_snomed_code=None,
+#             seizure_cause_structural=None,
+#             seizure_cause_structural_snomed_code=None
+#         )
+
+#         if seizure_cause_main_choice == "AnM":
+#             desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+#             context = {
+#                 'selected_autoantibody': desscribe.seizure_cause_immune_antibody,
+#                 'selection': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+#                 'desscribe_id': desscribe_id
+#             }
+#             # antibody mediated - offer antibodies select
+#             return render(request, "epilepsy12/partials/desscribe/autoantibodies.html", context)
+#         else:
+#             return HttpResponse("Success")
+
+#     elif seizure_cause_main == 'Gen':
+#         DESSCRIBE.objects.filter(id=desscribe_id).update(
+#             seizure_cause_genetic=seizure_cause_main_choice,
+#             seizure_cause_immune=None,
+#             seizure_cause_immune_antibody=None,
+#             seizure_cause_immune_antibody_other=None,
+#             seizure_cause_immune_snomed_code=None,
+#             seizure_cause_infectious=None,
+#             seizure_cause_infectious_snomed_code=None,
+#             seizure_cause_metabolic=None,
+#             seizure_cause_mitochondrial_sctid=None,
+#             seizure_cause_metabolic_other=None,
+#             seizure_cause_metabolic_snomed_code=None,
+#             seizure_cause_structural=None,
+#             seizure_cause_structural_snomed_code=None
+#         )
+#         desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+#         context = {
+#             'desscribe_id': desscribe_id,
+#             'seizure_cause_main': seizure_cause_main,
+#             'selected_choice': seizure_cause_main_choice,
+#             'selection': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+#             'selected_gene_defect': desscribe.seizure_cause_gene_abnormality
+#         }
+#         if seizure_cause_main_choice == "GeA":
+#             # gene abnormality selected
+#             return render(request, "epilepsy12/partials/desscribe/gene_defect.html", context)
+#         else:
+#             return HttpResponse("Success")
+#     else:
+#         return HttpResponse('Error!')
+#     return HttpResponse("Selected")
 
 
-@login_required
-def seizure_cause_genetic_choice(request, desscribe_id):
-    gene_abnormality = request.POST.get('seizure_cause_genetic_choice')
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        seizure_cause_gene_abnormality=gene_abnormality)
-    return HttpResponse('Selected')
+# @login_required
+# def mitochondrial(request, desscribe_id):
+#     mitochondrial_type_sctid = request.POST.get('mitochondrial_type')
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         seizure_cause_mitochondrial_sctid=mitochondrial_type_sctid)
+#     return HttpResponse("Saved Mitochondrial")
 
 
-@login_required
-def autoantibodies(request, desscribe_id):
-    autoantibodies = request.POST.get('autoantibodies')
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        seizure_cause_immune_antibody=autoantibodies)
-    return HttpResponse('Selected')
+# @login_required
+# def seizure_cause_infectious(request, desscribe_id):
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         seizure_cause_infectious=request.POST.get('seizure_cause_infectious'))
+#     return HttpResponse("Success!")
+
+
+# @login_required
+# def seizure_cause_genetic_choice(request, desscribe_id):
+#     gene_abnormality = request.POST.get('seizure_cause_genetic_choice')
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         seizure_cause_gene_abnormality=gene_abnormality)
+#     return HttpResponse('Selected')
+
+
+# @login_required
+# def autoantibodies(request, desscribe_id):
+#     autoantibodies = request.POST.get('autoantibodies')
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         seizure_cause_immune_antibody=autoantibodies)
+#     return HttpResponse('Selected')
 
 
 @login_required
@@ -898,6 +1010,12 @@ def multiaxial_description(request, case_id):
         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+        'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+        'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+        'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+        'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+        'epilepsy_antibodies_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
         "epilepsy_context_complete": registration.epilepsy_context_complete,

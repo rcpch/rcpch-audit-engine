@@ -288,26 +288,10 @@ class DESSCRIBE(models.Model):
         blank=True,
         null=True
     )
-    seizure_cause_main_snomed_code = models.CharField(
-        "SNOMED-CT code for main identified cause of seizure(s)",
-        max_length=3,
-        choices=EPILEPSY_CAUSES,
-        default=None,
-        blank=True,
-        null=True
-    )
     seizure_cause_structural = models.CharField(
         "main identified structural cause of seizure(s)",
         max_length=3,
         choices=sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
-        default=None,
-        blank=True,
-        null=True
-    )
-    seizure_cause_structural_snomed_code = models.CharField(
-        "SNOMED-CT code for main identified structural cause of seizure(s)",
-        max_length=3,
-        choices=sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES),
         default=None,
         blank=True,
         null=True
@@ -335,13 +319,6 @@ class DESSCRIBE(models.Model):
         blank=True,
         null=True
     )
-    seizure_cause_gene_abnormality_snomed_code = models.CharField(
-        "SNOMED-CT code for main identified genetic cause of seizure(s)",
-        max_length=50,
-        default=None,
-        blank=True,
-        null=True
-    )
     seizure_cause_chromosomal_abnormality = models.CharField(  # would be good to pull in known chromosomal abnormalities
         "main identified chromosomal cause of seizure(s)",
         max_length=200,
@@ -357,13 +334,6 @@ class DESSCRIBE(models.Model):
         blank=True,
         null=True
     )
-    seizure_cause_infectious_snomed_code = models.CharField(
-        "SNOMED-CT code for main identified infectious cause of seizure(s)",
-        max_length=250,
-        default=None,
-        blank=True,
-        null=True
-    )
     seizure_cause_metabolic = models.CharField(
         "main identified metabolic cause of seizure(s)",
         max_length=3,
@@ -373,23 +343,8 @@ class DESSCRIBE(models.Model):
         null=True
     )
 
-    seizure_cause_mitochondrial_sctid = models.CharField(
-        "SNOMED CT identifier of mitochondrial disease type",
-        max_length=50,
-        default=None,
-        blank=True,
-        null=True
-    )
-
     seizure_cause_metabolic_other = models.CharField(
         "other identified metabolic cause of seizure(s) not previously specified.",
-        max_length=250,
-        default=None,
-        blank=True,
-        null=True
-    )
-    seizure_cause_metabolic_snomed_code = models.CharField(
-        "SNOMED-CT code for other identified metabolic cause of seizure(s) not previously specified.",
         max_length=250,
         default=None,
         blank=True,
@@ -413,13 +368,6 @@ class DESSCRIBE(models.Model):
     )
     seizure_cause_immune_antibody_other = models.CharField(
         "other identified antibody not previously specified causing seizure(s).",
-        max_length=250,
-        default=None,
-        blank=True,
-        null=True
-    )
-    seizure_cause_immune_snomed_code = models.CharField(
-        "SNOMED-CT code for main identified immune cause of seizure(s).",
         max_length=250,
         default=None,
         blank=True,

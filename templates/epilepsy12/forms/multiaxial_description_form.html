@@ -51,31 +51,9 @@
         <div class="ui header">
             <div class="ui blue circular label">C</div>
         </div>
-        <div class="ui form" method="post">
-            <div class='field' >
-                <label>What is the cause of this epilepsy?</label>
-                <select 
-                    class='ui dropdown'
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                    hx-post="{% url 'seizure_cause_main' desscribe_id=desscribe.pk %}" 
-                    hx-target='#seizure_cause_main_result'
-                    hx-trigger='load, change'
-                    hx-swap='innerHTML'
-                    name='seizure_cause_main'>
-                    {% for item in seizure_cause_selection %}
-                        {% if desscribe.seizure_cause_main == item.0 %}
-                            <option selected value={{item.0}}>{{item.1}}</option>
-                        {% else %}
-                            <option value={{item.0}}>{{item.1}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <div class="ui message">
-                    <div id='seizure_cause_main_result'></div>
-                </div>
-            </div>
+        <div id="epilepsy_causes">
+            {% include 'epilepsy12/partials/desscribe/epilepsy_causes.html' with desscribe=desscribe seizure_cause_selection=seizure_cause_selection epilepsy_genetic_cause_choices=epilepsy_genetic_cause_choices  epilepsy_structural_cause_choices=epilepsy_structural_cause_choices epilepsy_gene_cause_choices=epilepsy_gene_cause_choices epilepsy_metabolic_cause_choices=epilepsy_metabolic_cause_choices epilepsy_immune_cause_choices=epilepsy_immune_cause_choices epilepsy_antibodies_cause_choices=epilepsy_antibodies_cause_choices %}
         </div>
-        
     </div>
     
     <div class="ui blue segment">
