@@ -73,6 +73,14 @@ htmx_paths = [
     path('htmx/desscribe/<int:desscribe_id>/prolonged_generalized_convulsive_seizures',
          views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
 
+    #     nonepilepsy
+    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
+         views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
+    path('htmx/<int:desscribe_id>/nonepileptic_seizure_type',
+         views.nonepileptic_seizure_type, name='nonepileptic_seizure_type'),
+    path('htmx/<int:desscribe_id>/nonepileptic_seizure_subtype',
+         views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
+
     path('htmx/<int:desscribe_id>/seizure_cause_main',
          views.seizure_cause_main, name='seizure_cause_main'),
     path('htmx/<int:desscribe_id>/seizure_cause_subtype/<str:subtype>',
@@ -82,8 +90,8 @@ htmx_paths = [
     path('htmx/<int:desscribe_id>/syndrome',
          views.syndrome, name='syndrome'),
 
-    #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
-    #          views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
+
+
     #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset_edit',
     #          views.nonepilepsy_generalised_onset_edit, name='nonepilepsy_generalised_onset_edit'),
     #     path('htmx/<int:desscribe_id>/nonepilepsy_subtypes',

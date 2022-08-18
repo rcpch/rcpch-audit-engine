@@ -8,7 +8,7 @@
         </div>
     {% elif desscribe.epilepsy_or_nonepilepsy_status == 'NE'%}
         <div id="nonepilepsy" class="field">
-            {% include 'epilepsy12/partials/desscribe/nonepilepsy.html' with desscribe=desscribe nonepilepsy_generalised_onset_types=nonepilepsy_generalised_onset_types %}
+            {% include 'epilepsy12/partials/desscribe/nonepilepsy.html' with desscribe=desscribe nonepilepsy_onset_types=nonepilepsy_onset_types nonepilepsy_types=nonepilepsy_types syncopes=syncopes behavioural=behavioural sleep=sleep paroxyms=paroxyms migraines=migraines nonepilepsy_miscellaneous=nonepilepsy_miscellaneous %}
         </div>
     {% else %}
         <div class="ui warning message">
