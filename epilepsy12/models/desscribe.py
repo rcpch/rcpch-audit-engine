@@ -270,8 +270,15 @@ class DESSCRIBE(models.Model):
 
     # Syndrome
 
-    syndrome = models.IntegerField(
+    syndrome_present = models.BooleanField(
         "Is there an identifiable epilepsy syndrome?",
+        null=True,
+        blank=True,
+        default=None
+    )
+
+    syndrome = models.IntegerField(
+        "Select an identifiable epilepsy syndrome?",
         choices=sorted(SYNDROMES, key=itemgetter(1)),
         null=True,
         blank=True,

@@ -87,17 +87,12 @@ htmx_paths = [
          views.seizure_cause_subtype, name='seizure_cause_subtype'),
     path('htmx/<int:desscribe_id>/seizure_cause_subtype_subtype',
          views.seizure_cause_subtype_subtype, name='seizure_cause_subtype_subtype'),
+
+    # syndrome
+    path('htmx/<int:desscribe_id>/syndrome_present',
+         views.syndrome_present, name='syndrome_present'),
     path('htmx/<int:desscribe_id>/syndrome',
          views.syndrome, name='syndrome'),
-
-
-
-    #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset_edit',
-    #          views.nonepilepsy_generalised_onset_edit, name='nonepilepsy_generalised_onset_edit'),
-    #     path('htmx/<int:desscribe_id>/nonepilepsy_subtypes',
-    #          views.nonepilepsy_subtypes, name='nonepilepsy_subtypes'),
-    #     path('htmx/<int:desscribe_id>/nonepilepsy_subtype_selection/<str:nonepilepsy_selected_subtype_code>',
-    #          views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
 
     path('htmx/<int:desscribe_id>/ribe',
          views.ribe, name='ribe'),
@@ -264,11 +259,6 @@ htmx_paths = [
          views.previous_neonatal_seizures, name="previous_neonatal_seizures"),
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/diagnosis_of_epilepsy_withdrawn',
          views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
-
-    # investigation_management htmx
-    #     path('htmx/investigation_management/<int:investigation_management_id>/medication_lookup',
-    #          views.medication_lookup, name="medication_lookup"),
-
 
     # investigations
     path('htmx/investigations/<int:investigations_id>/eeg_indicated',

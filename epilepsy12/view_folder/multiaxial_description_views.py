@@ -129,6 +129,7 @@ seizure_cause_main_choices = [
     {'name': 'seizure_cause_infectious', 'text': 'Infectious', 'id': 'Inf'},
     {'name': 'seizure_cause_metabolic', 'text': 'Metabolic', 'id': 'Met'},
     {'name': 'seizure_cause_immune', 'text': 'Immune', 'id': 'Imm'},
+    {'name': None, 'text': 'Unknown', 'id': 'NK'},
 ]
 
 seizure_cause_subtype_choices = [
@@ -300,8 +301,7 @@ def epilepsy_or_nonepilepsy_status(request, desscribe_id):
     template = 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html'
     context = {
         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        'nonepilepsy_onset_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
         'laterality': laterality,
         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
@@ -529,7 +529,7 @@ def nonepilepsy_generalised_onset(request, desscribe_id):
         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-        'paroxyms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
         'desscribe': desscribe
@@ -577,7 +577,7 @@ def nonepileptic_seizure_type(request, desscribe_id):
         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-        'paroxyms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
         'desscribe': desscribe
@@ -616,7 +616,7 @@ def nonepileptic_seizure_subtype(request, desscribe_id):
         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-        'paroxyms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
         'desscribe': desscribe
@@ -628,6 +628,36 @@ def nonepileptic_seizure_subtype(request, desscribe_id):
 """
 Epilepsy Syndromes
 """
+
+
+@login_required
+def syndrome_present(request, desscribe_id):
+    """
+    POST request from the syndrome partial in the multiaxial_description_form 
+    Updates model and returns the syndrome partial
+    """
+    if request.htmx.trigger_name == 'button-true':
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            syndrome_present=True
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        DESSCRIBE.objects.filter(id=desscribe_id).update(
+            syndrome_present=False,
+            syndrome=None
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
+
+    updated_desscribe = DESSCRIBE.objects.get(
+        pk=desscribe_id)
+
+    context = {
+        "desscribe": updated_desscribe,
+        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
 
 
 @login_required
@@ -682,9 +712,11 @@ def seizure_cause_main(request, desscribe_id):
                 'seizure_cause_main': seizure_cause_main
             })
         else:
-            update_field.update({
-                field.get('name'): None
-            })
+            if field.get('name'):
+                # No Known option has no field
+                update_field.update({
+                    field.get('name'): None
+                })
 
     # update the model
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
@@ -726,9 +758,11 @@ def seizure_cause_subtype(request, desscribe_id, subtype):
                 seizure_cause_main_choice.get('name'): subtype_selection
             })
         else:
-            update_fields.update({
-                seizure_cause_main_choice.get('name'): None
-            })
+            if seizure_cause_main_choice.get('name'):
+                # unknown option has no field - do not update
+                update_fields.update({
+                    seizure_cause_main_choice.get('name'): None
+                })
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
 
@@ -867,7 +901,6 @@ def multiaxial_description(request, case_id):
         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-
 
         "initial_assessment_complete": registration.initial_assessment_complete,
         "assessment_complete": registration.assessment_complete,
