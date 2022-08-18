@@ -786,20 +786,34 @@ def ribe(request, desscribe_id):
 
 
 @login_required
-def syndrome_select(request, desscribe_id):
-    syndrome_code = request.POST.get('syndrome_select')
+def syndrome(request, desscribe_id):
+    """
+    POST request from the syndrome partial in the multiaxial_description_form 
+    Updates model and returns the syndrome partial
+    """
+    syndrome = request.POST.get('syndrome')
 
-    if syndrome_code:
+    if syndrome:
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            syndrome=syndrome_code)
-        return HttpResponse("Success!")
+            syndrome=syndrome)
     else:
         return HttpResponse('No dice')
+
+    updated_desscribe = DESSCRIBE.objects.get(
+        pk=desscribe_id)
+
+    context = {
+        "desscribe": updated_desscribe,
+        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
 
 
 @ login_required
 def multiaxial_description(request, case_id):
-
+    """
+    """
     registration = Registration.objects.filter(case=case_id).first()
     if DESSCRIBE.objects.filter(registration=registration).exists():
         # there is already a desscribe object for this registration

@@ -79,6 +79,8 @@ htmx_paths = [
          views.seizure_cause_subtype, name='seizure_cause_subtype'),
     path('htmx/<int:desscribe_id>/seizure_cause_subtype_subtype',
          views.seizure_cause_subtype_subtype, name='seizure_cause_subtype_subtype'),
+    path('htmx/<int:desscribe_id>/syndrome',
+         views.syndrome, name='syndrome'),
 
     #     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
     #          views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
@@ -88,8 +90,6 @@ htmx_paths = [
     #          views.nonepilepsy_subtypes, name='nonepilepsy_subtypes'),
     #     path('htmx/<int:desscribe_id>/nonepilepsy_subtype_selection/<str:nonepilepsy_selected_subtype_code>',
     #          views.nonepilepsy_subtype_selection, name='nonepilepsy_subtype_selection'),
-    path('htmx/<int:desscribe_id>/syndrome_select',
-         views.syndrome_select, name='syndrome_select'),
 
     path('htmx/<int:desscribe_id>/ribe',
          views.ribe, name='ribe'),

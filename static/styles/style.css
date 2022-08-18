@@ -454,3 +454,14 @@ h5 {
   background-color: var(--rcpch_light_blue);
   color: white;
 }
+
+/* DESSCRIBE */
+
+.ui.rcpch_pink.circular.label {
+  color: white;
+  background-color: var(--rcpch_pink);
+}
+
+.ui.rcpch_pink.segment {
+  border-top-color: var(--rcpch_pink);
+}
