@@ -1,0 +1,41 @@
+<canvas id="cases_aggregated_by_ethnicity"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
+<script>
+            var ctx = document.getElementById('cases_aggregated_by_ethnicity').getContext('2d');
+            var myChart = new Chart(ctx, { 
+                type: 'pie',
+                data: {
+                    labels: [{% for data in cases_aggregated_by_ethnicity %}'{{ data.ethnicity_display }}',{% endfor %}], //loop through queryset, 
+                    datasets: [{
+                        data: [{% for case in cases_aggregated_by_ethnicity %}{{ case.ethnicities }},{% endfor %}],
+                        backgroundColor: [
+                            'rgba(17, 167, 242, 1.0)', 
+                            'rgba(45, 49, 109, 1.0)',
+                            'rgba(128, 128, 128, 1.0)',
+                        ],
+                        borderColor: [
+                            'rgba(17, 167, 242, 1.0)', 
+                            'rgba(45, 49, 109, 1.0)',
+                            'rgba(128, 128, 128, 1.0)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: "Ethnicity Distribution",
+                        position: 'top',
+                        align: 'start'
+                      },
+                      legend: {
+                        display: true,
+                        position: 'right'
+                      }
+                    },
+                }
+            });
+</script>

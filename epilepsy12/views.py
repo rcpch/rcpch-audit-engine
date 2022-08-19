@@ -1,4 +1,4 @@
-import django
+import operator
 from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse, reverse_lazy
@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models.case import Case
-from django.db.models import Count, When, Value, CharField
+from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
 
 from .view_folder import *
@@ -31,11 +31,24 @@ def hospital_reports(request):
     hospital_object = HospitalTrust.objects.get(
         OrganisationName=request.user.hospital_trust)
 
+    deprivation_quintiles = (
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5)
+    )
+
     ethnicity_long_list = [When(ethnicity=k, then=Value(v))
                            for k, v in ETHNICITIES]
+    imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
+                     for k, v in deprivation_quintiles]
+    gender_long_list = [When(gender=k, then=Value(v))
+                        for k, v in SEX_TYPE]
 
-    case = (
-        Case.objects.values('ethnicity')
+    cases_aggregated_by_ethnicity = (
+        Case.objects
+        .values('ethnicity')
         .annotate(
             ethnicity_display=DJANGO_CASE(
                 *ethnicity_long_list, output_field=CharField()
@@ -43,13 +56,42 @@ def hospital_reports(request):
         )
         .values('ethnicity_display')
         .annotate(
-            ethnicities=Count('ethnicity')).order_by()
+            ethnicities=Count('ethnicity')).order_by('ethnicities')
+    )
+
+    cases_aggregated_by_gender = (
+        Case.objects
+        .values('gender')
+        .annotate(
+            gender_display=DJANGO_CASE(
+                *gender_long_list, output_field=CharField()
+            )
+        )
+        .values('gender_display')
+        .annotate(
+            genders=Count('gender')).order_by('genders')
+    )
+
+    cases_aggregated_by_deprivation = (
+        Case.objects
+        .values('index_of_multiple_deprivation_quintile')
+        .annotate(
+            index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
+                *imd_long_list, output_field=PositiveSmallIntegerField()
+            )
+        )
+        .values('index_of_multiple_deprivation_quintile_display')
+        .annotate(
+            cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
+        .order_by('cases_aggregated_by_deprivation')
     )
 
     return render(request=request, template_name=template_name, context={
         'user': request.user,
         'hospital': hospital_object,
-        'cases': case
+        'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
+        'cases_aggregated_by_gender': cases_aggregated_by_gender,
+        'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation
     })
 
 

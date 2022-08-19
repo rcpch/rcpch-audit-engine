@@ -3,9 +3,10 @@
 {% block content %}
 <div class="ui container">
     <div class="ui attached inverted segment" id="hospital_segment">
-        <div class="ui two column grid">
+        <div class="ui grid">
+
             <div class="four wide column">
-                <div class="ui card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         <div class="header" id="description">
                             {{ hospital.ParentName }}
@@ -23,12 +24,45 @@
                     </div>
                 </div>
             </div>
+
             <div class="twelve wide column">
-                <div id="piechartContainer">
-                {% include 'epilepsy12/partials/piechart.html' with cases=cases %}
-                </div>
+
+                    <div id="ethnicity_piechart" class="ui rcpch_chart_container segment">
+                        {% if cases_aggregated_by_ethnicity %}
+                            {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                        {% else %}
+                            <h5>No data yet!<h5>
+                        {% endif %}
+                    </div>
+                
             </div>
+
+            <div class="eight wide column">
+
+                <div id="cases_aggregated_by_gender" class="ui rcpch_chart_container segment">
+                    {% if cases_aggregated_by_gender %}
+                        {% include 'epilepsy12/partials/charts/cases_aggregated_by_gender.html' with cases_aggregated_by_gender=cases_aggregated_by_gender %}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
+                </div>
+                
+            </div>
+
+            <div class="eight wide column">
+
+                <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container segment">
+                    {% if cases_aggregated_by_deprivation %}
+                        {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
+                </div>
+            
+            </div>
+
         </div>
+        
     </div>
     <div class="ui bottom attached message" id="bottom_attached_message">
         <div>

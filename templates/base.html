@@ -37,10 +37,11 @@
               <a {% if request.resolver_match.url_name == 'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
                 Database Management
               </a>
-            {% endif %}
+            
             <a {% if request.resolver_match.url_name == "hospital_reports" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
               Hospital Clinician
             </a>
+            {% endif %}
             <a {% if request.resolver_match.url_name == 'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
               Patient Access
             </a>

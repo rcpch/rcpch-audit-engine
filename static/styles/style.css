@@ -114,17 +114,24 @@ h5 {
   font-family: Montserrat-Regular;
 }
 
-#piechartContainer {
-  width: 400px;
-  height: auto;
+ui.rcpch_chart_container.segment {
+  border-radius: 0%;
+  height: 200px;
+  width: auto;
+  background-color: var(--rcpch_mid_grey);
 }
 
 #bottom_attached_message {
   background-color: #3366cc;
 }
 
-.ui.card {
+.ui.rcpch_light_blue.card {
   background-color: #11a7f2;
+  border-radius: 0%;
+  font-family: Montserrat-Regular;
+}
+
+.ui.white.card {
   border-radius: 0%;
   font-family: Montserrat-Regular;
 }

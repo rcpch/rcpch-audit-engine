@@ -77,7 +77,6 @@ admin.site.register(HospitalTrust)
 admin.site.register(InitialAssessment)
 admin.site.register(Investigations)
 admin.site.register(Management)
-# admin.site.register(Investigation_Management)
 admin.site.register(NonEpilepsy)
 admin.site.register(Registration)
 admin.site.register(SeizureCause)
@@ -85,3 +84,6 @@ admin.site.register(SeizureType)
 admin.site.register(Keyword)
 admin.site.register(DESSCRIBE)
 admin.site.register(Site)
+
+admin.site.site_header = 'Epilepsy12 admin'
+admin.site.site_title = 'Epilepsy12 admin'
