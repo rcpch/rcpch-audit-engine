@@ -21,6 +21,7 @@
             {% comment%}New Code here{% endcomment%}
 
             {% if active_neurology_site %}
+
                             <div class="field">
                                 <span>
                                     <i class="rcpch_pink check circle outline icon"></i>
@@ -28,31 +29,39 @@
                                     <div class="ui right action input">
                                         
                                         <input disabled value="{{active_neurology_site.hospital_trust.OrganisationName}} ({{active_neurology_site.hospital_trust.ParentName}})">
-                                        <div class="ui rcpch_light_blue buttons">
-                                            <button 
-                                                class="ui rcpch_light_blue button"
-                                                hx-post="{% url 'delete_paediatric_neurology_centre' site_id=active_neurology_site.pk assessment_id=assessment.pk %}"
-                                                hx-target="#paediatric_neurology"
-                                                hx-swap="innerHTML"
-                                                hx-include="[name='hospital_trust']"
-                                                hx-trigger="click"
-                                            >Delete</button>
-                                            <button 
-                                                class="ui rcpch_light_blue button"
-                                                hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='edit' %}"
-                                                hx-target="#paediatric_neurology"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Edit</button>
+                                        <div class="ui buttons">
+                                            
                                             {% if neurology_edit_active %}
+                                                
                                                 <button 
-                                                class="ui negative button"
-                                                hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' %}"
-                                                hx-target="#paediatric_neurology"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Cancel</button>
+                                                    class="ui rcpch_negative button"
+                                                    hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' %}"
+                                                    hx-target="#paediatric_neurology"
+                                                    hx-swap="innerHTML"
+                                                    hx-trigger="click"
+                                                >Cancel</button>
+                                            
+                                            {% else %}
+
+                                                <button 
+                                                    class="ui rcpch_primary button"
+                                                    hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='edit' %}"
+                                                    hx-target="#paediatric_neurology"
+                                                    hx-swap="innerHTML"
+                                                    hx-trigger="click"
+                                                >Edit</button>
+
+                                                <button 
+                                                    class="ui rcpch_danger button"
+                                                    hx-post="{% url 'delete_paediatric_neurology_centre' site_id=active_neurology_site.pk assessment_id=assessment.pk %}"
+                                                    hx-target="#paediatric_neurology"
+                                                    hx-swap="innerHTML"
+                                                    hx-include="[name='hospital_trust']"
+                                                    hx-trigger="click"
+                                                >Delete</button>
+
                                             {% endif %}
+
                                         </div>    
                                         
                                     </div>
@@ -61,15 +70,18 @@
                             </div>  
                             {% if neurology_edit_active %}
                             
-                                <div class="field" id="allocate_paediatric_neurology_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_paediatric_neurology_centre" hx-swap="innerHTML" hx-trigger="load once" name="edit_paediatric_neurology_centre" hx-vals='{"hx_target":"#paediatric_neurology", "hx_assessment_id": "{{assessment.pk}}", "hx_site_id":"{{active_neurology_site.pk}}", "hx_name":"paediatric_neurology_centre"}'>
-                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
+                                <div class="field" id="allocate_paediatric_neurology_centre">
+                                    {% url 'edit_paediatric_neurology_centre' assessment_id=assessment.pk site_id=active_neurology_site.pk as hx_post %}
+                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_paediatric_neurology_centre" test_positive=active_paediatric_neurology_centre.pk label="Update Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" %}
                                 </div>
+
                             {% endif %}
                             
                         {% else %}
-                            <div class="field" id="allocate_paediatric_neurology_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_paediatric_neurology_centre" hx-swap="innerHTML" hx-trigger="load once" name="paediatric_neurology_centre" hx-vals='{"hx_target":"#paediatric_neurology", "hx_assessment_id": "{{assessment.pk}}", "hx_name":"paediatric_neurology_centre"}'>
+                            <div class="field" id="allocate_paediatric_neurology_centre">
                                 <p>There is currently no paediatric neurology centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
-                                {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
+                                {% url 'paediatric_neurology_centre' assessment_id=assessment.pk as hx_post %}
+                                {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="paediatric_neurology_centre" test_positive=None label="Allocate Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" %}
                             </div>
                         {% endif %}
 

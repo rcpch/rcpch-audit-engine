@@ -164,7 +164,7 @@ def edit_lead_site(request, registration_id, site_id):
         "edit": True,
         "transfer": False
     }
-    return render(request=request, template_name="epilepsy12/partials/lead_site.html", context=context)
+    return render(request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
 
 
 def transfer_lead_site(request, registration_id, site_id):
@@ -195,6 +195,14 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 def update_lead_site(request, registration_id, site_id, update):
+    """
+    HTMX POST request on button click from the lead_site partial
+    It either edits the existing lead centre or creates a new one and 
+    set site_is_actively_involved_in_epilepsy_care and site_is_actively_involved_in_epilepsy_care
+    to False in the current record.
+    Returns a lead_site partial but also updates the previous_sites partial also
+    """
+
     new_trust_id = request.POST.get('hospital_trust')
     registration = Registration.objects.get(pk=registration_id)
     new_hospital_trust = HospitalTrust.objects.get(OrganisationID=new_trust_id)
