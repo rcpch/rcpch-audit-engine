@@ -10,7 +10,14 @@ class Site(models.Model):
     """
     This class records information about each site that oversees the epilepsy care of each case.
     This class references the HospitalTrust class, as one hospital trust may reference multiple sites
-    This class references the Case class, as each case may have multiple sites.
+    One registration can have several sites
+    Each registration that has a record in sites that has 
+    site_is_actively_involved_in_epilepsy_care as True will have a unique hospital trust, which can
+    have more than one role (eg can be neurology and surgery lead together)
+    It is possible for a registration to have two sites each with the same hospital_trust, however,
+    if one of those hospital trusts is nolonger actively involved in the care.
+
+    Each site can have more than one role
     """
 
     site_is_actively_involved_in_epilepsy_care = models.BooleanField(
@@ -34,7 +41,7 @@ class Site(models.Model):
         null=True
     )
 
-    hospital_trust = models.OneToOneField(
+    hospital_trust = models.ForeignKey(
         to=HospitalTrust,
         related_name="hospital_trust",
         on_delete=models.PROTECT

@@ -1,109 +1,92 @@
 <div class="ui form">
-    <div class="two fields">
-        <div class="ten wide field">
-            <label>Active Lead Centre</label>
 
-            {% if edit or transfer %}
+            {% if site %}
 
-                <select class="ui search normal selection dropdown" name="hospital_trust">
-                    {% for item in hospital_list %}
-                        {% if item.OrganisationName == site.hospital_trust.OrganisationName %}
-                            <option selected value="{{item.pk}}">{{item.OrganisationName}}</option>
-                        {% else %}
-                            <option value="{{item.pk}}">{{item.OrganisationName}}</option>
-                        {% endif %}
-                    {% endfor %}
-                    
-                </select>
+                <div class="field">
 
-            {% else %}
+                    <span>
 
-                {% if site %}
-                    <input disabled placeholder="Enter lead centre..." value="{{site.hospital_trust.OrganisationName}}" />
-                {% else %}
+                        <i class="rcpch_pink check circle outline icon"></i>
+                        <label>Lead Centre</label>
+                        
+                        <div class="ui right action input">
+                            
+                            <input disabled value="{{site.hospital_trust.OrganisationName}} ({{site.hospital_trust.ParentName}})">
 
-                    <select class="ui search normal selection dropdown" name="hospital_trust">
-                        {% for item in hospital_list %}
-                            <option value="{{item.pk}}">{{item.OrganisationName}}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="field" id="allocate_lead_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_lead_centre" hx-swap="innerHTML" hx-trigger="load once" name="edit_general_paediatric_centre" hx-vals='{"hx_target":"#general_paediatric", "hx_assessment_id": "{{assessment.pk}}", "hx_site_id":"{{active_general_paediatric_site.pk}}", "hx_name":"general_paediatric_centre"}'>
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
+                            <div class="ui buttons">
+
+                                {% if edit or transfer %}
+
+                                    <button 
+                                        class="ui rcpch_warning button"
+                                        hx-post="{% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                        hx-target="#lead_site"
+                                        hx-swap="innerHTML"
+                                        hx-trigger="click"
+                                    >Cancel</button>
+
+                                {% else %}
+
+                                    <button 
+                                        class="ui rcpch_primary button"
+                                        hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                        hx-target="#lead_site"
+                                        hx-swap="innerHTML"
+                                        hx-trigger="click"
+                                    >Edit</button>
+                                    
+                                    <button 
+                                        class="ui rcpch_primary button"
+                                        hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                        hx-target="#lead_site"
+                                        hx-swap="innerHTML"
+                                        hx-trigger="click"
+                                    >Transfer</button>
+
+                                    <button 
+                                        class="ui rcpch_danger button"
+                                        hx-post="{% url 'delete_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                        hx-target="#lead_site"
+                                        hx-swap="innerHTML"
+                                        hx-trigger="click"
+                                    >Delete</button>
+
+                                {% endif %}
+
+                            </div>    
+                            
+                        </div>
+
+                    </span>
+                
+                </div>
+
+                {% if edit  %} 
+
+                    <div class="field" id="edit_lead_centre" >
+                        {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="edit" as hx_post %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_lead_site" test_positive=site.pk label="Update Lead Centre" hx_default_text="Search hospitals..." data_position="top left" %}
                     </div>
+                
+                {% elif transfer %}
+                    
+                    <div class="field" id="transfer_lead_centre" >
+                        {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="transfer" as hx_post %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="transfer_lead_site" test_positive=site.pk label="Transfer Lead Centre" hx_default_text="Search hospitals..." data_position="top left" %}
+                    </div>
+
                 {% endif %}
-
-            {% endif %}
-        </div>
-        {% if site %}
-            {% if edit or transfer %}
-                <div class="six wide field">
-                    <label hidden>Action</label>
-                    {% if edit %}
-                    <button 
-                        class="ui button" 
-                        id="action_button"
-                        hx-post="{% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update='edit'%}"
-                        hx-target="#lead_site"
-                        hx-include="[name='hospital_trust']"
-                        hx-trigger="click">Update</button>
-                    {% elif transfer %}
-                        <button 
-                            class="ui button" 
-                            id="action_button"
-                            hx-post="{% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update='transfer' %}"
-                            hx-target="#lead_site"
-                            hx-include="[name='hospital_trust']"
-                            hx-trigger="click">Update</button>
-                    {% endif %}    
-                    <button 
-                        class="ui button" 
-                        id="negative_button"
-                        name="cancel_lead_site_button"
-                        hx-post="{% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                        hx-target="#lead_site"
-                        hx-trigger="click">Cancel</button>
-                </div>
+                
             {% else %}
-                <div class="six wide field">
-                    <label hidden>Action</label>
-                    <button 
-                        class="ui button" 
-                        id="action_button"
-                        name="edit_lead_site_button"
-                        hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                        hx-target="#lead_site"
-                        hx-trigger="click">Edit</button>
-                    <button 
-                        class="ui button" 
-                        id="action_button"
-                        name="transfer_lead_site_button"
-                        hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                        hx-target="#lead_site"
-                        hx-trigger="click">Transfer Care</button>
-                </div>
-            {% endif %}
-        {% else %}
-            <div class="six wide field">
-                <label hidden>Action</label>
-                <button 
-                        class="ui button" 
-                        id="action_button"
-                        name="transfer_lead_site_button"
-                        hx-target="#lead_site"
-                        hx-post="{% url 'allocate_lead_site' registration_id=registration.pk %}"
-                        hx-include="[name='hospital_trust']"
-                        hx-trigger="click">Allocate Centre</button>
-            </div>
-        {% endif %}
-    </div>
-    
-    {% if site %}
 
-    {% else %}
-        <div class="ui centered danger icon message">
-            <i class="exclamation circle icon"></i>
-            There is currently no allocated lead site - please select one
-        </div>
-    {% endif %}
-    
+                <div class="field" id="allocate_lead_centre" >
+                    <label>There is currently no lead centre allocated to {{registration.case.first_name}} {{registration.case.surname}}</label>
+                    <div class="field" >
+                        {% url 'allocate_lead_site' registration_id=registration.pk as hx_post %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="allocate_lead_site" test_positive=None label="Allocate Lead Site" hx_default_text="Search hospitals..." data_position="top left" %}
+                    </div>
+                </div>
+
+            {% endif %}
+
 </div>

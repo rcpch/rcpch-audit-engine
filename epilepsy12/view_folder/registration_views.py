@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
+from epilepsy12.models import hospital_trust
 
 from epilepsy12.models.hospital_trust import HospitalTrust
 
@@ -108,22 +109,45 @@ def allocate_lead_site(request, registration_id):
     Allocate site when none have been assigned
     """
     registration = Registration.objects.get(pk=registration_id)
-    new_trust_id = request.POST.get('hospital_trust')
+    new_trust_id = request.POST.get('allocate_lead_site')
+    selected_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
 
-    selected_hospital_trust = HospitalTrust.objects.get(
-        OrganisationID=new_trust_id)
-
-    # create a new site
-    site = Site.objects.create(
+    # test if site exists
+    if Site.objects.filter(
         registration=registration,
         hospital_trust=selected_hospital_trust,
-        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True
+    ).exists():
+        # this site already plays an active role in the care of this child
+        # update the status therefore to include the lead role
+
+        Site.objects.filter(
+            registration=registration,
+            hospital_trust=selected_hospital_trust,
+            site_is_actively_involved_in_epilepsy_care=True
+        ).update(
+            site_is_primary_centre_of_epilepsy_care=True
+        )
+    else:
+        # this site may still be associated with this registration but not actively
+        # it is therefore safe to create a new record
+        Site.objects.create(
+            registration=registration,
+            hospital_trust=selected_hospital_trust,
+            site_is_actively_involved_in_epilepsy_care=True,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_childrens_epilepsy_surgery_centre=False,
+            site_is_paediatric_neurology_centre=False,
+            site_is_general_paediatric_centre=True
+        )
+
+    # retrieve the current active site
+    site = Site.objects.filter(
+        registration=registration,
+        hospital_trust=selected_hospital_trust,
         site_is_primary_centre_of_epilepsy_care=True,
-        site_is_childrens_epilepsy_surgery_centre=False,
-        site_is_paediatric_neurology_centre=False,
-        site_is_general_paediatric_centre=True
-    )
-    site.save()
+        site_is_actively_involved_in_epilepsy_care=True,
+    ).get()
 
     # get the new
 
@@ -141,6 +165,10 @@ def allocate_lead_site(request, registration_id):
 
 
 def edit_lead_site(request, registration_id, site_id):
+    """
+    Edit lead centre button call back from lead_site partial
+    Does not edit the centre - returns only the template with the edit set to true
+    """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
     hospital_list = HospitalTrust.objects.filter(
@@ -160,7 +188,7 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
     hospital_list = HospitalTrust.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+        Sector="NHS Sector").order_by('OrganisationName').all()
     context = {
         "hospital_list": hospital_list,
         "registration": registration,
@@ -174,11 +202,14 @@ def transfer_lead_site(request, registration_id, site_id):
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
+    hospital_list = HospitalTrust.objects.filter(
+        Sector="NHS Sector").order_by('OrganisationName')
     context = {
         "registration": registration,
         "site": site,
         "edit": False,
-        "transfer": False
+        "transfer": False,
+        'hospital_site': hospital_list
     }
     return render(request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
 
@@ -192,27 +223,91 @@ def update_lead_site(request, registration_id, site_id, update):
     Returns a lead_site partial but also updates the previous_sites partial also
     """
 
-    new_trust_id = request.POST.get('hospital_trust')
     registration = Registration.objects.get(pk=registration_id)
-    new_hospital_trust = HospitalTrust.objects.get(OrganisationID=new_trust_id)
 
     if update == "edit":
-        Site.objects.filter(pk=site_id).update(hospital_trust=new_hospital_trust,
-                                               site_is_primary_centre_of_epilepsy_care=True, site_is_actively_involved_in_epilepsy_care=True)
-    elif update == "transfer":
+        new_trust_id = request.POST.get('edit_lead_site')
+        new_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
-            site_is_primary_centre_of_epilepsy_care=True, site_is_actively_involved_in_epilepsy_care=False)
-        Site.objects.create(hospital_trust=new_hospital_trust,
-                            site_is_primary_centre_of_epilepsy_care=True, site_is_actively_involved_in_epilepsy_care=True, registration=registration)
+            hospital_trust=new_hospital_trust,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True)
+    elif update == "transfer":
+        new_trust_id = request.POST.get('transfer_lead_site')
+        new_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
+        Site.objects.filter(pk=site_id).update(
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=False)
+        Site.objects.create(
+            hospital_trust=new_hospital_trust,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True,
+            registration=registration)
 
-    site = Site.objects.filter(registration=registration, site_is_primary_centre_of_epilepsy_care=True,
-                               site_is_actively_involved_in_epilepsy_care=True).first()
+    site = Site.objects.filter(
+        registration=registration,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True).first()
+
+    hospital_list = HospitalTrust.objects.filter(
+        Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "registration": registration,
         "site": site,
         "edit": False,
-        "transfer": False
+        "transfer": False,
+        'hospital_list': hospital_list
+    }
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
+    trigger_client_event(
+        response=response, name="add_previously_registered_site", params={})
+    return response
+
+
+def delete_lead_site(request, registration_id, site_id):
+    """
+    HTMX POST request on button click from the lead_site partial
+    It deletes the site.
+    Returns a lead_site partial but also updates the previous_sites partial also
+    """
+    registration = Registration.objects.get(pk=registration_id)
+
+    # test first to see if this site is associated with other roles
+    # either past or present
+    if Site.objects.filter(
+        Q(registration=registration) &
+        Q(pk=site_id) &
+        Q(
+            Q(site_is_childrens_epilepsy_surgery_centre=True) |
+            Q(site_is_paediatric_neurology_centre=True) |
+            Q(site_is_general_paediatric_centre=True)
+        )
+    ).exists():
+        # remove the lead role allocation
+        Site.objects.filter(
+            pk=site_id
+        ).update(site_is_primary_centre_of_epilepsy_care=False)
+
+    else:
+        # there are no other roles (previous or current)
+        # it is safe to delete this record
+        Site.objects.filter(pk=site_id).delete()
+
+    lead_site = Site.objects.filter(
+        registration=registration,
+        site_is_primary_centre_of_epilepsy_care=True,
+        site_is_actively_involved_in_epilepsy_care=True).first()
+    hospital_list = HospitalTrust.objects.filter(
+        Sector="NHS Sector").order_by('OrganisationName')
+    context = {
+        "registration": registration,
+        "site": lead_site,
+        "edit": False,
+        "transfer": False,
+        'hospital_list': hospital_list
     }
 
     response = render(
@@ -234,21 +329,6 @@ def previous_sites(request, registration_id):
         'registration': registration
     }
     return render(request=request, template_name="epilepsy12/partials/registration/previous_sites.html", context=context)
-
-
-@login_required
-def hospital_trust_select(request, registration_id):
-    Registration.objects.update_or_create(pk=registration_id, defaults={
-        'lead_hospital': request.POST.get('hospital_trust')
-    })
-    hospital_list = HospitalTrust.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
-    context = {
-        'hospital_list': hospital_list,
-        'selected_lead_hospital': request.POST.get('hospital_trust'),
-        'registration_id': registration_id
-    }
-    return HttpResponse("success")
 
 
 @login_required
@@ -287,3 +367,13 @@ def registration_status(request, registration_id):
     }
 
     return render(request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
+
+
+"""
+<button 
+                                        class="ui rcpch_primary button" 
+                                        name="transfer_lead_site_button"
+                                        hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                        hx-target="#lead_site"
+                                        hx-trigger="click">Transfer Care</button>
+"""

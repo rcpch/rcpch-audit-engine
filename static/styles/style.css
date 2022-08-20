@@ -57,6 +57,12 @@ h5 {
   color: black;
 }
 
+ul {
+  list-style-type: square;
+  font-family: Montserrat-Regular;
+  color: var(--rcpch_charcoal);
+}
+
 .footer {
   position: absolute;
   bottom: 0;
