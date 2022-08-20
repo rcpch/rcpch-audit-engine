@@ -37,6 +37,10 @@
   --rcpch_gold: #c2a712;
   --rcpch_vivid_green: #c8d400;
   --rcpch_aqua_green: #00dbaa;
+  /* SGA colours */
+  --rcpch_purple: #7159aa;
+  --rcpch_magenta: #E00087;
+  --rcpch_strong_green: #66cc33;
 }
 
 body {
@@ -524,4 +528,50 @@ ui.rcpch_chart_container.segment {
 
 .ui.rcpch_pink.segment {
   border-top-color: var(--rcpch_pink);
+}
+
+/* Steps */
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .title {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--rcpch_black);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .description {
+  font-family: Montserrat-Regular;
+  color: var(--rcpch_charcoal);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover {
+  background-color: var(--rcpch_light_blue);
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .description {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .title {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step .title {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step .description {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step:before {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step::after {
+  color: white;
+  background-color: var(--rcpch_dark_blue);
 }
