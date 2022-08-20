@@ -1,6 +1,6 @@
 {% block steps %}
 
-    {% if verification_complete %}
+    {% if registration_complete %}
         {% if active_template == "register" %}
           <a class="active completed step" href="{% url 'register' case_id %}">
             <div class="content">

@@ -9,6 +9,7 @@ from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models.case import Case
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
+from .models import AuditProgress
 
 from .view_folder import *
 
@@ -30,6 +31,18 @@ def hospital_reports(request):
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(
         OrganisationName=request.user.hospital_trust)
+
+    # all_registrations = Registration.objects.all()
+    # for registration in all_registrations.iterator():
+    #     ap = AuditProgress.objects.create(
+    #         initial_assessment_complete=False,
+    #         assessment_complete=False,
+    #         epilepsy_context_complete=False,
+    #         multiaxial_description_complete=False,
+    #         investigation_management_complete=False
+    #     )
+    #     registration.audit_progress = ap
+    #     registration.save()
 
     deprivation_quintiles = (
         (1, 1),

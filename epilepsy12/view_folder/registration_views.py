@@ -9,50 +9,39 @@ from django_htmx.http import trigger_client_event
 from epilepsy12.models.hospital_trust import HospitalTrust
 
 from ..models import Registration, Site
-from ..models import Case
+from ..models import Case, AuditProgress
 
 
 @login_required
 def register(request, id):
 
     case = Case.objects.get(pk=id)
-    try:
-        # create a registration object
-        registration, created = Registration.objects.get_or_create(case=case)
-    except Exception as error:
-        print(f'got or created exception {error}')
-        registration = None
+    active_template = "none"
 
-    if registration:
-        registration_object = registration
-        active_template = "unchosen"
-    else:
-        registration_object = created
-        active_template = "none"
+    if not Registration.objects.filter(case=case).exists():
+        audit_progress = AuditProgress.objects.create(
+            initial_assessment_complete=False,
+            assessment_complete=False,
+            epilepsy_context_complete=False,
+            multiaxial_description_complete=False,
+            investigation_management_complete=False
+        )
+        Registration.objects.create(
+            case=case,
+            audit_progress=audit_progress
+        )
+
+    registration = Registration.objects.filter(case=case).get()
+    if registration.eligibility_criteria_met:
+        active_template = "register"
 
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
-    # if no allocated site, allocate to organisationname of trust of logged in user
-    try:
-        user_hospital_trust = HospitalTrust.objects.filter(
-            OrganisationName=request.user.hospital_trust).first()
-
-        Site(
-            hospital_trust=user_hospital_trust,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_primary_centre_of_epilepsy_care=True,
-            site_is_childrens_epilepsy_surgery_centre=False,
-            site_is_paediatric_neurology_centre=False,
-            site_is_general_paediatric_centre=False,
-            registration=registration
-        ).save()
-    except Exception as error:
-        print(error)
-
     previously_registered = 0
 
     lead_site = None
+
     registered_sites = Site.objects.filter(registration=registration)
     for registered_site in registered_sites:
         if registered_site.site_is_primary_centre_of_epilepsy_care and registered_site.site_is_actively_involved_in_epilepsy_care:
@@ -66,16 +55,16 @@ def register(request, id):
             registration=registration, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
 
     context = {
-        "registration": registration_object,
+        "registration": registration,
         "case_id": id,
         "hospital_list": hospital_list,
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
-        "initial_assessment_complete": False,
-        "assessment_complete": False,
-        "epilepsy_context_complete": False,
-        "multiaxial_description_complete": False,
-        "investigation_management_complete": False,
+        "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
+        "assessment_complete": registration.audit_progress.assessment_complete,
+        "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
+        "investigation_management_complete": registration.audit_progress.investigation_management_complete,
         "active_template": active_template
     }
 

@@ -42,11 +42,12 @@ def create_comorbidity(request, case_id):
         "form": form,
         "case_id": case_id,
         "registration": registration,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
+        "registration_complete": registration.auditprogress.registration_complete,
+        "initial_assessment_complete": registration.auditprogress.initial_assessment_complete,
+        "assessment_complete": registration.auditprogress.assessment_complete,
+        "epilepsy_context_complete": registration.auditprogress.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.auditprogress.multiaxial_description_complete,
+        "investigation_management_complete": registration.auditprogress.investigation_management_complete,
         "active_template": "epilepsy_context",
     }
     return render(request=request, template_name='epilepsy12/comorbidity.html', context=context)

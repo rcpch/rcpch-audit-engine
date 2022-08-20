@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.db import models
+from epilepsy12.models.audit_progress import AuditProgress
 
-from epilepsy12.models.hospital_trust import HospitalTrust
 from .case import Case
 from ..constants import *
 from ..general_functions import *
@@ -63,30 +63,15 @@ class Registration(models.Model):
         null=True
     )
 
-    initial_assessment_complete = models.BooleanField(
-        default=False,
-        null=True
-    )
-    assessment_complete = models.BooleanField(
-        null=True,
-        default=False
-    )
-    epilepsy_context_complete = models.BooleanField(
-        null=True,
-        default=False
-    )
-    multiaxial_description_complete = models.BooleanField(
-        null=True,
-        default=False
-    )
-    investigation_management_complete = models.BooleanField(
-        default=False,
-        null=True
-    )
-
     # relationships
     case = models.OneToOneField(
         Case,
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    audit_progress = models.OneToOneField(
+        AuditProgress,
         on_delete=models.CASCADE,
         null=True
     )
