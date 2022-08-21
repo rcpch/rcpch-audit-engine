@@ -29,7 +29,7 @@ class InitialAssessment(models.Model):
     general_paediatrics_referral_made = models.BooleanField(
         "date of referral to general paediatrics",
         null=True,
-        default=False
+        default=None
     )
     date_of_referral_to_general_paediatrics = models.DateField(
         "date of referral to general paediatrics",
