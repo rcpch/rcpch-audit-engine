@@ -19,6 +19,7 @@ def register(request, case_id):
 
     if not Registration.objects.filter(case=case).exists():
         audit_progress = AuditProgress.objects.create(
+            registration_complete=False,
             initial_assessment_complete=False,
             assessment_complete=False,
             epilepsy_context_complete=False,
@@ -32,7 +33,7 @@ def register(request, case_id):
         )
 
     registration = Registration.objects.filter(case=case).get()
-    if registration.eligibility_criteria_met:
+    if registration.eligibility_criteria_met and registration.registration_date is not None:
         active_template = "register"
 
     hospital_list = HospitalTrust.objects.filter(
@@ -127,6 +128,13 @@ def allocate_lead_site(request, registration_id):
         site_is_actively_involved_in_epilepsy_care=True,
     ).get()
 
+    # if all registration components present, update AuditProcess
+    if registration.eligibility_criteria_met and registration.registration_date:
+        # registration now complete
+        # TODO need to update this function and the registration_date function to include lead clinician
+        registration.audit_progress.registration_complete = True
+        registration.save()
+
     # get the new
 
     hospital_list = HospitalTrust.objects.filter(
@@ -139,7 +147,18 @@ def allocate_lead_site(request, registration_id):
         "edit": False,
         "transfer": False
     }
-    return render(request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
+
+    if registration.eligibility_criteria_met:
+        # activate registration button if eligibility and lead centre set
+        trigger_client_event(
+            response=response,
+            name="registration_status",
+            params={})  # updates the registration status bar with date in the client
+
+    return response
 
 
 def edit_lead_site(request, registration_id, site_id):
@@ -240,8 +259,11 @@ def update_lead_site(request, registration_id, site_id, update):
 
     response = render(
         request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
-    trigger_client_event(
-        response=response, name="add_previously_registered_site", params={})
+
+    if registration.eligibility_criteria_met:
+        trigger_client_event(
+            response=response, name="add_previously_registered_site", params={})
+
     return response
 
 
@@ -340,8 +362,27 @@ def confirm_eligible(request, registration_id):
     response = render(
         request=request, template_name='epilepsy12/partials/registration/is_eligible_label.html', context=context)
 
-    trigger_client_event(
-        response=response, name="registration_status", params={})  # updates the registration status bar with date in the client
+    registration = Registration.objects.filter(pk=registration_id).get()
+
+    if registration.eligibility_criteria_met and Site.objects.filter(registration=registration, site_is_primary_centre_of_epilepsy_care=True).exists():
+        # activate registration button if eligibility and lead centre set
+        trigger_client_event(
+            response=response,
+            name="registration_status",
+            params={})  # updates the registration status bar with date in the client
+
+    # if all registration components present, update AuditProcess
+    if registration.eligibility_criteria_met and registration.registration_date is not None:
+        # registration now complete
+        AuditProgress.objects.filter(pk=registration.audit_progress.pk).update(
+            registration_complete=True
+        )
+        # TODO need to update this function and the registration_date function to include lead clinician
+        # trigger a GET request from the steps template
+        trigger_client_event(
+            response=response,
+            name="registration_active",
+            params={})  # reloads the form to show the active steps
 
     return response
 
@@ -389,9 +430,19 @@ def registration_date(request, case_id):
     response = render(
         request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response, name="registration_active", params={})  # reloads the form to show the active steps
+    # if all registration components present, update AuditProcess
+    registration = Registration.objects.filter(case=case_id).get()
+    if registration.eligibility_criteria_met and registration.registration_date is not None:
+        # registration now complete
+        AuditProgress.objects.filter(pk=registration.audit_progress.pk).update(
+            registration_complete=True
+        )
+        # TODO need to update this function and the registration_date function to include lead clinician
+        # trigger a GET request from the steps template
+        trigger_client_event(
+            response=response,
+            name="registration_active",
+            params={})  # reloads the form to show the active steps
 
     return response
 
@@ -410,10 +461,10 @@ def registration_active(request, case_id):
         active_template = 'none'
 
     context = {
-        'initial_assessment_complete': audit_progress.initial_assessment,
-        'assessment_complete': audit_progress.assessment,
-        'epilepsy_context_complete': audit_progress.epilepsy,
-        'multiaxial_description_complete': audit_progress.multiaxial,
+        'initial_assessment_complete': audit_progress.initial_assessment_complete,
+        'assessment_complete': audit_progress.assessment_complete,
+        'epilepsy_context_complete': audit_progress.epilepsy_context_complete,
+        'multiaxial_description_complete': audit_progress.multiaxial_description_complete,
         "investigation_complete": registration.audit_progress.investigation_complete,
         "management_complete": registration.audit_progress.management_complete,
         'active_template': active_template,

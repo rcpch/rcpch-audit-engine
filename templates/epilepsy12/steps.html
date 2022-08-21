@@ -2,7 +2,7 @@
 
   <div
       hx-get='{% url "registration_active" case_id %}'
-      hx-trigger='registration_active'
+      hx-trigger='registration_active from:body'
       hx-target='#registration_active'
       hx-swap="innerHTML"
       name="steps"

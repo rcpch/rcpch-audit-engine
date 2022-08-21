@@ -39,3 +39,4 @@ class AuditProgress(models.Model):
 
     class Meta:
         verbose_name = 'Audit Progress'
+        verbose_name_plural = 'Audit Progresses'
