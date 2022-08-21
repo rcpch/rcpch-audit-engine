@@ -7,15 +7,15 @@ register = template.Library()
 @register.simple_tag
 def percent_complete(registration):
     total = 0
-    if registration.initial_assessment_complete:
+    if registration.audit_progress.initial_assessment_complete:
         total += 12
-    if registration.epilepsy_context_complete:
+    if registration.audit_progress.epilepsy_context_complete:
         total += 6
-    if registration.multiaxial_description_complete:
+    if registration.audit_progress.multiaxial_description_complete:
         total += 6
-    if registration.assessment_complete:
+    if registration.audit_progress.assessment_complete:
         total += 16
-    if registration.investigation_management_complete:
+    if registration.audit_progress.investigation_management_complete:
         total += 12
     return total
 
@@ -45,3 +45,19 @@ def matches_model_field(field_name, model):
             return True
         else:
             return False
+
+
+@register.filter
+def is_in(url_name, args):
+    """
+    receives the request.resolver_match.url_name
+    and compares with the template name (can be a list in a string separated by commas),
+    returning true if a match is present
+    """
+    if args is None:
+        return None
+    arg_list = [arg.strip() for arg in args.split(',')]
+    if url_name in arg_list:
+        return True
+    else:
+        return False

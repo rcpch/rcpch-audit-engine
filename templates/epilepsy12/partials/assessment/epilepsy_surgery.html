@@ -29,9 +29,6 @@
 
             <div class="ui rcpch_lightest_blue message">
                 
-                
-
-                    
                         {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
                         {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label="Date of referral to a children's epilepsy surgery service." date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" %}
                     
@@ -52,30 +49,34 @@
                                     <div class="ui right action input">
                                         
                                         <input disabled value="{{active_surgical_site.hospital_trust.OrganisationName}} ({{active_surgical_site.hospital_trust.ParentName}})">
-                                        <div class="ui rcpch_dark_blue buttons">
-                                            <button 
-                                                class="ui rcpch_dark_blue button"
-                                                hx-post="{% url 'delete_epilepsy_surgery_centre' site_id=active_surgical_site.pk assessment_id=assessment.pk %}"
-                                                hx-target="#childrens_epilepsy_surgical_service"
-                                                hx-swap="innerHTML"
-                                                hx-include="[name='hospital_trust']"
-                                                hx-trigger="click"
-                                            >Delete</button>
-                                            <button 
-                                                class="ui rcpch_dark_blue button"
-                                                hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='edit' %}"
-                                                hx-target="#childrens_epilepsy_surgical_service"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Edit</button>
+                                        <div class="ui buttons">
+                                        
                                             {% if surgery_edit_active %}
                                                 <button 
-                                                class="ui negative button"
-                                                hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' %}"
-                                                hx-target="#childrens_epilepsy_surgical_service"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Cancel</button>
+                                                    class="ui rcpch_negative button"
+                                                    hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' %}"
+                                                    hx-target="#childrens_epilepsy_surgical_service"
+                                                    hx-swap="innerHTML"
+                                                    hx-trigger="click"
+                                                >Cancel</button>
+                                            {% else %}
+                                                <button 
+                                                    class="ui rcpch_primary button"
+                                                    hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='edit' %}"
+                                                    hx-target="#childrens_epilepsy_surgical_service"
+                                                    hx-swap="innerHTML"
+                                                    hx-trigger="click"
+                                                >Edit</button>
+
+                                                <button 
+                                                    class="ui rcpch_danger button"
+                                                    hx-post="{% url 'delete_epilepsy_surgery_centre' site_id=active_surgical_site.pk assessment_id=assessment.pk %}"
+                                                    hx-target="#childrens_epilepsy_surgical_service"
+                                                    hx-swap="innerHTML"
+                                                    hx-include="[name='hospital_trust']"
+                                                    hx-trigger="click"
+                                                >Delete</button>
+
                                             {% endif %}
                                         </div>    
                                         
@@ -85,15 +86,17 @@
                             </div>  
                             {% if surgery_edit_active %}
                             
-                                <div class="field" id="allocate_surgical_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_surgical_centre" hx-swap="innerHTML" hx-trigger="load once" name="edit_epilepsy_surgery_centre" hx-vals='{"hx_target":"childrens_epilepsy_surgical_service", "hx_assessment_id": "{{assessment.pk}}", "hx_target":"#childrens_epilepsy_surgical_service", "hx_site_id":"{{active_surgical_site.pk}}", "hx_name":"epilepsy_surgery_centre"}'>
-                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
+                                <div class="field" id="allocate_surgical_centre">
+                                    {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
+                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" %}
                                 </div>
                             {% endif %}
                             
                         {% else %}
-                            <div class="field" id="allocate_surgical_centre" hx-get="{% url 'hospital_list' %}" hx-target="#allocate_surgical_centre" hx-swap="innerHTML" hx-trigger="load once" name="epilepsy_surgery_centre" hx-vals='{"hx_target":"childrens_epilepsy_surgical_service", "hx_assessment_id": "{{assessment.pk}}", "hx_target":"#childrens_epilepsy_surgical_service", "hx_name":"epilepsy_surgery_centre"}'>
+                            <div class="field" id="allocate_surgical_centre">
                                 <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
-                                {% include 'epilepsy12/partials/page_elements/hospitals_select.html' %}
+                                {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
+                                {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" %}
                             </div>
                         {% endif %}
 

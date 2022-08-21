@@ -13,8 +13,7 @@ urlpatterns = [
     path('case/<int:id>/update', views.update_case, name="update_case"),
     path('case/create', views.create_case, name="create_case"),
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
-    path('case/<int:id>/register',
-         views.register, name='register'),
+    path('case/<int:case_id>/register', views.register, name='register'),
 
     # initial assessment path
     path('initial_assessment/<int:case_id>',
@@ -130,11 +129,6 @@ htmx_paths = [
          views.confirm_eligible, name="confirm_eligible"),
     path('htmx/case/<int:case_id>/registration_date',
          views.registration_date, name="registration_date"),
-    #     path('htmx/registration/<int:registration_id>/lead_centre',
-    #          views.lead_centre, name="lead_centre"),
-    path('htmx/registration/<int:registration_id>/hospital_trust_select',
-         views.hospital_trust_select, name="hospital_trust_select"),
-
     path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/edit',
          views.edit_lead_site, name="edit_lead_site"),
     path('htmx/registration/<int:registration_id>/lead_site/<int:site_id>/transfer',
@@ -145,6 +139,8 @@ htmx_paths = [
          views.update_lead_site, name="update_lead_site"),
     path('htmx/registration/<int:registration_id>/allocate_lead_site',
          views.allocate_lead_site, name="allocate_lead_site"),
+    path('htmx/registration/<int:registration_id>/site/<int:site_id>/delete',
+         views.delete_lead_site, name="delete_lead_site"),
     path('htmx/registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
 
@@ -247,6 +243,8 @@ htmx_paths = [
          views.diagnostic_status, name="diagnostic_status"),
     path('htmx/registration/<int:initial_assessment_id>/episode_definition',
          views.episode_definition, name="episode_definition"),
+    path('htmx/registration/<int:case_id>/registration_active',
+         views.registration_active, name='registration_active'),
 
     # epilepsy context htmx
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',

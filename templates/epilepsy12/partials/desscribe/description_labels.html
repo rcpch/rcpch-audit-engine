@@ -1,13 +1,5 @@
-{% load epilepsy12_template_tags %}
-    <div class="ui field">
-        {% if desscribe.description %}
-            <label>Characters: {% characters_left desscribe.description %} </label>
-        {% else %}
-            <label>Characters: 5000 </label>
-        {% endif %}
-    </div>
         {% if desscribe.description_keywords|length > 0 %}
-            <div class="ui message">
+            
                 {% for keyword in desscribe.description_keywords %}
                     {% url 'delete_description_keyword' desscribe.pk forloop.counter0 as hx_post %}
                     <div 
@@ -20,5 +12,5 @@
                             hx-swap='innerHTML'></i>
                     </div>
                 {% endfor %}
-            </div>
+            
         {% endif %}

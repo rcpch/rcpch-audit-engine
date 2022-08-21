@@ -4,26 +4,55 @@
          Write a freehand description of the episode, using as much detail as you can, to a maximum of 5000 characters. Any key words we recognise will automatically be gathered. Remove these from the collection if you feel they are not key words in the context.
     </div>
     
-        <div class="field" hx-post="{% url 'edit_description' desscribe_id=desscribe.id %}" hx-target="#description_results" hx-trigger="keyup" hx-swap="innerHTML">
-            <input 
-                type="text" 
-                class="ui textarea" 
-                rows="3" 
-                name="description" 
-                value="{{desscribe.description}}"
-                placeholder="While watching television {{desscribe.registration.case}} fell to the floor... "/>
+        <div 
+            class="field" 
+            hx-post="{% url 'edit_description' desscribe_id=desscribe.id %}"
+            hx-target="#description_results" 
+            hx-trigger="keyup" 
+            hx-swap="innerHTML">
+
+            <div class="ui left icon input">
+            
+                {% if desscribe.description|length > 0 %}
+                    <i class="rcpch_pink check circle outline icon"></i>
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                {% endif %}
+
+                <textarea 
+                    type="text" 
+                    class="ui textarea" 
+                    rows="3" 
+                    name="description"
+                    placeholder="While watching television {{desscribe.registration.case}} fell to the floor... ">{{desscribe.description}}</textarea>
+            
+            </div>
+
         </div>
     
-    <div>
-        <i class="question circle icon link" id="choicesPopup"></i>
-        <div class="ui flowing popup top left transition hidden">
-            <p>Some examples of keywords to choose from...</p>
-            {% for choice in choices %}
-                <div class="ui label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
-            {% endfor %}
+    
+        <span>
+            <i class="question circle icon link" id="choicesPopup"></i>
+            <div class="ui flowing popup top left transition hidden">
+                <p>Some examples of keywords to choose from...</p>
+                {% for choice in choices %}
+                    <div class="ui rcpch_light_blue label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
+                {% endfor %}
+            </div>
+            {% load epilepsy12_template_tags %}
+            <div class="ui field">
+                {% if desscribe.description %}
+                    <label>Characters: {% characters_left desscribe.description %} </label>
+                {% else %}
+                    <label>Characters: 5000 </label>
+                {% endif %}
+            </div>
+
+        </span>
+        <div id="description_results">
+            {% include 'epilepsy12/partials/desscribe/description_labels.html' with desscribe=desscribe %}
         </div>
-    </div>
-    <div id="description_results">
-        {% include 'epilepsy12/partials/desscribe/description_labels.html' with desscribe=desscribe %}
-    </div>
+    
 </form>

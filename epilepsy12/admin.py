@@ -84,6 +84,7 @@ admin.site.register(SeizureType)
 admin.site.register(Keyword)
 admin.site.register(DESSCRIBE)
 admin.site.register(Site)
+admin.site.register(AuditProgress)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'

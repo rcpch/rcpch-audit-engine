@@ -8,17 +8,16 @@
           <li>Child must have had 2 or more seizures more than 24 hours apart</li>
           <li>Child has an epilepsy diagnosis for another reason</li>
           <li>If the child had a previous EEG or paediatric assessments for similar episode(s) or epilepsy prior to this initial assessment</li>
-        </ul>
+        </ul> 
         
           {% if registration.eligibility_criteria_met %}
             {% include 'epilepsy12/partials/registration/is_eligible_label.html' with has_error=False message="Eligibility Criteria Confirmed." %}
           {% else %}
             <div id='eligibility_result'>
               <button 
-                class="ui button" 
+                class="ui rcpch_primary button" 
                 hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" 
                 hx-target='#eligibility_result'
-                id="action_button"
                 hx-trigger="click">I confirm all criteria are present</button>
             </div>
           {% endif %}
@@ -38,7 +37,7 @@
       {% endif %}
     </div>
 
-    <div id="lead_site">
+    <div id="lead_site" class="field">
       {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list %}
     </div>
 

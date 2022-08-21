@@ -91,9 +91,9 @@
                           {% endif %}
                       {% else %}
                         {% if case.locked %}
-                          <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
+                          <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
                         {% else %}
-                          <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' id=case.id %}'">Register</button>
+                          <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
                         {% endif %}
                       {% endif %}
                     </div>

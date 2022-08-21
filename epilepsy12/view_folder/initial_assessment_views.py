@@ -23,11 +23,13 @@ def initial_assessment(request, case_id):
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
+        "registration_complete": registration.audit_progress.registration_complete,
+        "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
+        "assessment_complete": registration.audit_progress.assessment_complete,
+        "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
+        "investigation_complete": registration.audit_progress.investigation_complete,
+        "management_complete": registration.audit_progress.management_complete,
         "active_template": "initial_assessment"
     }
 

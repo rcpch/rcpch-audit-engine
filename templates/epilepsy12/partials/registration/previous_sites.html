@@ -3,19 +3,22 @@
     hx-target="#previous_sites"
     hx-trigger="add_previously_registered_site from:body"
     name="previous_sites"
+    class="ui message"
 >
         
             {% if previously_registered_sites %}
                 
-                <h5 class="header">
-                Previous centres leading care:
                 <h5>
-                {% for previously_registered_site in previously_registered_sites %}
-                    <li>{{previously_registered_site.hospital_trust.ParentName}} ({{previously_registered_site.hospital_trust.OrganisationName}})</li>
-                {% endfor %}
+                Previous centres leading care:
+                </h5>
+                <ul>
+                    {% for previously_registered_site in previously_registered_sites %}
+                        <li>{{previously_registered_site.hospital_trust.ParentName}} ({{previously_registered_site.hospital_trust.OrganisationName}})</li>
+                    {% endfor %}
+                </ul>
                     
             {% else %}
-            <p>No previous hospitals have managed the care of {{registration.case}}</p>
+            <p>No hospitals have previously led the care of {{registration.case}}</p>
             {% endif %}
             
-    </div>
+</div>

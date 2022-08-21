@@ -23,11 +23,24 @@
   --rcpch_dark_blue: #0d0d58;
   --rcpch_light_blue: #11a7f2;
   --rcpch_pink: #e00087;
+  /* monochrome */
+  --rcpch_white: #ffffff;
   --rcpch_light_grey: #d9d9d9;
   --rcpch_mid_grey: #b3b3b3;
   --rcpch_dark_grey: #808080;
   --rcpch_charcoal: #4d4d4d;
   --rcpch_black: #000000;
+  /* secondary colours */
+  --rcpch_red: #e60700;
+  --rcpch_orange: #ff8000;
+  --rcpch_yellow: #fdc300;
+  --rcpch_gold: #c2a712;
+  --rcpch_vivid_green: #c8d400;
+  --rcpch_aqua_green: #00dbaa;
+  /* SGA colours */
+  --rcpch_purple: #7159aa;
+  --rcpch_magenta: #E00087;
+  --rcpch_strong_green: #66cc33;
 }
 
 body {
@@ -42,6 +55,17 @@ h4,
 h5 {
   font-family: "Arial";
   color: black;
+}
+
+textarea {
+  font-family: Montserrat-Regular;
+  color: var(--rcpch_black);
+}
+
+ul {
+  list-style-type: square;
+  font-family: Montserrat-Regular;
+  color: var(--rcpch_charcoal);
 }
 
 .footer {
@@ -248,12 +272,6 @@ ui.rcpch_chart_container.segment {
   margin-top: 10px;
 }
 
-.ui.rcpch_dark_blue.buttons {
-  background-color: #a9a9a9;
-  border-radius: 0%;
-  border-color: #a9a9a9;
-}
-
 /* segment */
 .ui.segment {
   border-radius: 0%;
@@ -322,6 +340,8 @@ ui.rcpch_chart_container.segment {
   border-radius: 0% !important;
 }
 
+
+
 .rcpch_pink.icon {
   color: var(--rcpch_pink);
 }
@@ -365,6 +385,49 @@ ui.rcpch_chart_container.segment {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_dark_blue);
+  border-color: transparent;
+}
+
+/* individual buttons */
+
+.ui.rcpch_primary.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+  border-color: var(--rcpch_light_blue);
+}
+
+.ui.rcpch_primary.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+}
+
+.ui.rcpch_negative.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_yellow);
+}
+
+.ui.rcpch_negative.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_orange);
+  transition-duration: 0.4s;
+}
+
+.ui.rcpch_danger.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_red);
+}
+
+.ui.rcpch_danger.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: #8a0400;
+  transition-duration: 0.4s;
 }
 
 /* spinner */
@@ -476,4 +539,71 @@ ui.rcpch_chart_container.segment {
 
 .ui.rcpch_pink.segment {
   border-top-color: var(--rcpch_pink);
+}
+
+/* Steps */
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .title {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--rcpch_black);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .description {
+  font-family: Montserrat-Regular;
+  color: var(--rcpch_charcoal);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover {
+  background-color: var(--rcpch_light_blue);
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .description {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .title {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step .title {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step .description {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step:before {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step::after {
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step {
+  color: white;
+  background-color: var(--rcpch_pink);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::after {
+  background-color: var(--rcpch_pink);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step .title {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step .description {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::before {
+  color: white;
 }

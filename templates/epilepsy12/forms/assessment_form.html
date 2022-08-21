@@ -13,7 +13,7 @@
   </h5>
   
   <div id="general_paediatric" class="field">
-    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=registration.assessment historical_general_paediatric_sites=historical_general_paediatric_sites active_general_paediatric_site=active_general_paediatric_site %}
+    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=registration.assessment historical_general_paediatric_sites=historical_general_paediatric_sites active_general_paediatric_site=active_general_paediatric_site hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">
@@ -21,7 +21,7 @@
   </h5>
 
   <div id="paediatric_neurology" class="field">
-    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=registration.assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site %}
+    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=registration.assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">
@@ -29,7 +29,7 @@
   </h5>
 
   <div id="childrens_epilepsy_surgical_service" class="field">
-    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=registration.assessment sites=sites historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site %}
+    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=registration.assessment sites=sites historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site hospital_list=hospital_list %}
   </div>
   
   <h5 class="header">
@@ -40,8 +40,10 @@
     {% include 'epilepsy12/partials/assessment/epilepsy_nurse.html' with assessment=registration.assessment %}
   </div>
 
-{% comment %}
+
 <h5>
+
+{% comment %}
 table for {{registration.case.first_name}} {{registration.surname}}
 registration id: {{registration.pk}}
 assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}}

@@ -1,50 +1,60 @@
 {% comment %}
 This partial template is a dropdown of all the hospital trusts
 It relies on a little bit of jquery unfortunately because that is semantic-ui
-On load (in its parent) it triggers a get request with retrieves a filtered list of hospitals_select
-and some parameters from it parent partial template.
-It's view (which makes the HospitalTrust query, is in views.py)
-The parent partial template (either paediatric_neurology or epilepsy_surgery) send parameter is the header
-which include the name of the hidden input where the selected hospital id is stored and retrieved
-on POST request on button click to which ever view (depending on the hx_url passed in)
 Parameters:
 hx_name: [paediatric_neurology_centre, epilepsy_surgery_centre]
 hx_url: the url complete with parameters to POST
 label: received from the parent - text for the button
-default_text: placeholder text for the search select dropdown
 hx_target: the id of the html element to be replaced 
+hx_default_text: placeholder text for the search select dropdown
+hx_post: url to post to
+hospital_list: a filtered list of hospitals
+test_positive: currently selected hospital id
 {% endcomment %}
 
 <div class="field">
     <span>
-        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-            <i class="rcpch_light_blue dot circle outline icon"></i>
-        </span>
-        <div class="ui compact search selection dropdown">
+            
+        {% if test_positive %}
+            <i class="rcpch_pink check circle outline icon"></i>
+        {% else %}
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+        {% endif %}
+
+        <div 
+            class="ui rcpch_light_blue search selection dropdown"
+        >
                 <i class="dropdown icon"></i>
-                <input type="hidden" name={{hx_name}}>
-                <div class="default text">{{default_text}}</div>
+                <input type="hidden" 
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="{{hx_swap}}"
+                    hx-trigger="{{hx_trigger}}"
+                    name='{{hx_name}}'
+                    value="{{test_positive}}"
+                >
+                <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
-                {% for item in hospital_list %}
-                    {% if item.OrganisationName == site.hospital_trust.OrganisationName %}
-                        <div class="item" selected='selected' data-value={{item.pk}}>{{item.OrganisationName}}</div>
-                    {% else %}
-                        <div class="item" data-value={{item.pk}}>{{item.OrganisationName}}</div>
-                    {% endif %}
-                {% endfor %}
+                    {% for item in hospital_list %}
+                        <div class="item" data-value="{{item.pk}}">{{item.OrganisationName}}</div>
+                    {% endfor %}
                 </div>
         </div>
+
         <button 
-            class="ui tiny rcpch_light_blue right attached button"
+            class="ui rcpch_primary button"
             hx-post="{{hx_post}}"
             hx-target="{{hx_target}}"
             hx-swap="innerHTML"
             hx-trigger="click"
-            name="hospital_trust_button"
+            name='hospital_allocate_button'
         >{{label}}</button>
-    </span>
-</div>
 
+    </span>
+
+</div>
 <script>
-$('.ui.dropdown').dropdown();
+$('.ui.rcpch_light_blue.search.selection.dropdown').dropdown();
 </script>

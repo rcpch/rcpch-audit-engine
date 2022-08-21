@@ -24,11 +24,13 @@ def epilepsy_context(request, case_id):
         "registration": registration,
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        "initial_assessment_complete": registration.initial_assessment_complete,
-        "assessment_complete": registration.assessment_complete,
-        "epilepsy_context_complete": registration.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.multiaxial_description_complete,
-        "investigation_management_complete": registration.investigation_management_complete,
+        "registration_complete": registration.audit_progress.registration_complete,
+        "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
+        "assessment_complete": registration.audit_progress.assessment_complete,
+        "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
+        "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
+        "investigation_complete": registration.audit_progress.investigation_complete,
+        "management_complete": registration.audit_progress.management_complete,
         "active_template": "epilepsy_context",
         "comorbidities": comorbidities
     }
