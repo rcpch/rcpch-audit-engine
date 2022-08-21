@@ -24,45 +24,54 @@ class Assessment(models.Model):
         "lead_hospital",
         max_length=100,
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     childrens_epilepsy_surgical_service_referral_criteria_met = models.BooleanField(
         "Have the criteria for referral to a children's epilepsy surgery service been met?",
+        blank=True,
         default=None,
-        null=True,
+        null=True
     )
     consultant_paediatrician_referral_made = models.BooleanField(
         "Has a referral been made to a consultant paediatrician with an interest in epilepsy?",
+        blank=True,
         default=None,
         null=True
     )
     consultant_paediatrician_referral_date = models.DateField(
         "Date of referral to a consultant paediatrician with expertise in epilepsy.",
+        blank=True,
         null=True,
         default=None
     )
     consultant_paediatrician_input_date = models.DateField(
         "Date seen by a consultant paediatrician with expertise in epilepsy.",
+        blank=True,
         default=None,
         null=True
     )
     paediatric_neurologist_referral_made = models.BooleanField(
         "Has a referral to a consultant paediatric neurologist been made?",
+        blank=True,
         default=None,
         null=True
     )
     paediatric_neurologist_referral_date = models.DateField(
         "Date of referral to a consultant paediatric neurologist.",
+        blank=True,
         default=None,
         null=True
     )
     paediatric_neurologist_input_date = models.DateField(
         "Date seen by consultant paediatric neurologist.",
+        blank=True,
         null=True,
         default=None
     )
     childrens_epilepsy_surgical_service_referral_made = models.BooleanField(
         "Has a referral to a children's epilepsy surgery service been made?",
+        blank=True,
         default=None,
         null=True
     )
@@ -80,6 +89,7 @@ class Assessment(models.Model):
     )
     epilepsy_specialist_nurse_referral_made = models.BooleanField(
         "Has a referral to an epilepsy nurse specialist been made?",
+        blank=True,
         default=None,
         null=True
     )

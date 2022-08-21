@@ -62,7 +62,10 @@
         {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_structural_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=desscribe.seizure_cause_structural label="Structural Abnormalities" data_position="top left" hx_name="seizure_cause_structural" hx_default_text="Select structural abnormality..." %}
     
 {% else %}
+    {% comment %}
+    some kind of warning should go here
     <div class="ui warming message">
     Uh oh!
     </div>
+    {% endcomment%}
 {% endif %}

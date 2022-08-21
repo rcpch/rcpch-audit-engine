@@ -20,13 +20,15 @@ class Management(models.Model):
 
     has_an_aed_been_given = models.BooleanField(
         "Has an antiepilepsy medicine been prescribed?",
-        default=False,
-        null=True
+        default=None,
+        null=True,
+        blank=True
     )
     has_rescue_medication_been_prescribed = models.BooleanField(
         "Has a rescue medicine been prescribed?",
-        default=False,
-        null=True
+        default=None,
+        null=True,
+        blank=True,
     )
     is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
         "Is there a pregnancy prevention programme (PPP) in place?",
@@ -37,68 +39,81 @@ class Management(models.Model):
     rescue_medication_prescribed = models.CharField(
         "Which rescue medicine has been prescribed?",
         max_length=100,
-        default=False,
-        null=True
+        default=None,
+        null=True,
+        blank=True,
     )
     individualised_care_plan_in_place = models.BooleanField(
         "Has an individualised care plan been put in place?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_date = models.DateField(
         "On what date was the individualised care plan put in place?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_has_parent_carer_child_agreement = models.BooleanField(
         "Has the parent or carer and child agreement to an individualised care plan been documented?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_includes_service_contact_details = models.BooleanField(
         "Does the individualised care plan include service contact details?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_include_first_aid = models.BooleanField(
         "Does the individualised care plan include first aid advice?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_parental_prolonged_seizure_care = models.BooleanField(
         "Does the individualised care plan include parental advice on managing prolonged seizures?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_includes_general_participation_risk = models.BooleanField(
         "Does the individualised care plan include general participation and risk assessment?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_addresses_water_safety = models.BooleanField(
         "Does the individualised care plan address water safety?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_addresses_sudep = models.BooleanField(
         "Does the individualised care plan address sudden unexplained death in epilepsy?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_includes_aihp = models.BooleanField(
         "Does the individualised care plan include AIHP?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     individualised_care_plan_includes_ehcp = models.BooleanField(
         "Does the individualised care plan include an educational health care plan (EHCP)?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
     has_individualised_care_plan_been_updated_in_the_last_year = models.BooleanField(
         "Has the individualised care plan been updated in the last year?",
         default=None,
-        null=True
+        null=True,
+        blank=True,
     )
 
     registration = models.OneToOneField(
