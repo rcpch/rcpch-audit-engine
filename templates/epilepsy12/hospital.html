@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load epilepsy12_template_tags %}
 {% block content %}
 <div class="ui container">
     <div class="ui attached inverted segment" id="hospital_segment">
@@ -60,6 +61,24 @@
                 </div>
             
             </div>
+
+            
+                <div class="four wide column">
+                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" %}
+                </div>
+                <div class="four wide column">
+                    {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
+                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases %}
+                </div>
+                <div class="four wide column">
+                    {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
+                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases %}
+                </div>
+                <div class="four wide column">
+                    {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
+                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases %}
+                </div>
+            
 
         </div>
         

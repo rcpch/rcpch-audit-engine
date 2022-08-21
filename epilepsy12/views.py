@@ -1,3 +1,4 @@
+import math
 import operator
 from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm
@@ -31,8 +32,6 @@ def hospital_reports(request):
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(
         OrganisationName=request.user.hospital_trust)
-
-    # Registration.objects.all().delete()
 
     deprivation_quintiles = (
         (1, 1),
@@ -89,12 +88,29 @@ def hospital_reports(request):
         .order_by('cases_aggregated_by_deprivation')
     )
 
+    total_registrations = Registration.objects.all().count()
+    total_cases = Case.objects.all().count()
+
+    total_referred_to_paediatrics = Assessment.objects.filter(
+        consultant_paediatrician_referral_made=True).count()
+    total_referred_to_neurology = Assessment.objects.filter(
+        paediatric_neurologist_referral_made=True).count()
+    total_referred_to_surgery = Assessment.objects.filter(
+        childrens_epilepsy_surgical_service_referral_made=True).count()
+
     return render(request=request, template_name=template_name, context={
         'user': request.user,
         'hospital': hospital_object,
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
         'cases_aggregated_by_gender': cases_aggregated_by_gender,
-        'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation
+        'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
+        'percent_completed_registrations': round((total_registrations/total_cases)*100),
+        'total_registrations': total_registrations,
+        'total_cases': total_cases,
+        'total_referred_to_paediatrics': total_referred_to_paediatrics,
+        'total_referred_to_neurology': total_referred_to_neurology,
+        'total_referred_to_surgery': total_referred_to_surgery,
+
     })
 
 

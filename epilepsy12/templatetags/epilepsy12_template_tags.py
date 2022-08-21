@@ -32,6 +32,11 @@ def characters_left(description):
     return mark_safe(safe_text)
 
 
+@register.simple_tag
+def percentage_of_total(numerator, denominator):
+    return round(numerator/denominator)
+
+
 @register.filter
 def custom_filter(text, color):
     safe_text = '<span style="color:{color}">{text}</span>'.format(

@@ -607,3 +607,87 @@ ui.rcpch_chart_container.segment {
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::before {
   color: white;
 }
+
+/* radial progress */
+/* (thanks to Keith Clark on codepen for the ideas behind this implementation: https://codepen.io/keithclark/pen/aEbEoo */
+
+.pie {
+  position: relative;
+  display: inline-block;
+  background-image: conic-gradient(rgba(0, 0, 0, 0) calc(3.6deg * var(--percent)),
+      rgba(0, 0, 0, 1) calc(3.6deg * var(--percent)));
+  background-blend-mode: overlay;
+  background-position: 50% 50%;
+  background-size: 150%;
+  /* oversize bg image to prevent "underdraw" */
+  width: 3.75em;
+  height: 3.75em;
+  border-radius: 50%;
+}
+
+/* show the percentage (thanks to Ana Tudor for the counter() trick) */
+.pie--value::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  counter-reset: percent var(--percent);
+  content: counter(percent) "%";
+  color: var(--rcpch_light_blue);
+  font-weight: bold;
+}
+
+.pie--disc::before {
+  content: '';
+  position: absolute;
+  top: .5em;
+  left: .5em;
+  right: .5em;
+  bottom: .5em;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.pie--disc::after {
+  color: #000;
+  text-shadow: none;
+}
+
+
+/* demo styles
+----------------------------------------------------- */
+
+.pie-box {
+  text-align: center;
+}
+
+.pie {
+  margin: .75rem;
+}
+
+.pie:nth-child(1) {
+  background-color: var(--rcpch_light_grey);
+}
+
+.big {
+  font-size: 200%;
+}
+
+.med {
+  font-size: 150%;
+}
+
+.sml {
+  font-size: 100%;
+}
+
+.rcpch_pie_title {
+  color: var(--rcpch_charcoal);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.rcpch_pie_label {
+  color: var(--rcpch_dark_grey);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+}
