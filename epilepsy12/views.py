@@ -43,68 +43,72 @@ def hospital_reports(request):
     record_in_ap = 0
     no_audit_progress = 0
     update_made = 0
-    for registration in all_registrations.iterator():
 
-        if registration.audit_progress:
-            record_in_ap = record_in_ap+1
-            # test if registration is complete
-            if registration.eligibility_criteria_met and registration.lead_hospital and registration.registration_date:
-                if registration.audit_progress.registration_complete:
-                    complete_inx = complete_inx+1
-                else:
-                    # update record to reflect complete
-                    ap = AuditProgress.objects.create(
-                        initial_assessment_complete=False,
-                        assessment_complete=False,
-                        epilepsy_context_complete=False,
-                        multiaxial_description_complete=False,
-                        investigation_complete=False,
-                        management_complete=False,
-                        registration_complete=True
-                    )
-                    registration.audit_progress = ap
-                    registration.save()
-                    update_made = update_made+1
+    # delete all AP
+    AuditProgress.objects.all().delete()
 
-        else:
-            # no AP record exists
-            no_audit_progress = no_audit_progress+1
+    # for registration in all_registrations.iterator():
 
-            if registration.eligibility_criteria_met and registration.lead_hospital and registration.registration_date:
-                # registration is complete
-                # create an AuditProgress record to reflect this
-                complete_inx = complete_inx + 1
+    #     if registration.audit_progress:
+    #         record_in_ap = record_in_ap+1
+    #         # test if registration is complete
+    #         if registration.eligibility_criteria_met and registration.lead_hospital and registration.registration_date:
+    #             if registration.audit_progress.registration_complete:
+    #                 complete_inx = complete_inx+1
+    #             else:
+    #                 # update record to reflect complete
+    #                 ap = AuditProgress.objects.create(
+    #                     initial_assessment_complete=False,
+    #                     assessment_complete=False,
+    #                     epilepsy_context_complete=False,
+    #                     multiaxial_description_complete=False,
+    #                     investigation_complete=False,
+    #                     management_complete=False,
+    #                     registration_complete=True
+    #                 )
+    #                 registration.audit_progress = ap
+    #                 registration.save()
+    #                 update_made = update_made+1
 
-                ap = AuditProgress.objects.create(
-                    initial_assessment_complete=False,
-                    assessment_complete=False,
-                    epilepsy_context_complete=False,
-                    multiaxial_description_complete=False,
-                    investigation_complete=False,
-                    management_complete=False,
-                    registration_complete=True
-                )
-                registration.audit_progress = ap
-                registration.save()
-                update_made = update_made+1
+    #     else:
+    #         # no AP record exists
+    #         no_audit_progress = no_audit_progress+1
 
-            else:
-                # incomplete registration
-                # create record in AP to reflect this
-                incomplete_inx = incomplete_inx + 1
+    #         if registration.eligibility_criteria_met and registration.lead_hospital and registration.registration_date:
+    #             # registration is complete
+    #             # create an AuditProgress record to reflect this
+    #             complete_inx = complete_inx + 1
 
-                ap = AuditProgress.objects.create(
-                    initial_assessment_complete=False,
-                    assessment_complete=False,
-                    epilepsy_context_complete=False,
-                    multiaxial_description_complete=False,
-                    investigation_complete=False,
-                    management_complete=False,
-                    registration_complete=False
-                )
-                registration.audit_progress = ap
-                registration.save()
-                update_made = update_made+1
+    #             ap = AuditProgress.objects.create(
+    #                 initial_assessment_complete=False,
+    #                 assessment_complete=False,
+    #                 epilepsy_context_complete=False,
+    #                 multiaxial_description_complete=False,
+    #                 investigation_complete=False,
+    #                 management_complete=False,
+    #                 registration_complete=True
+    #             )
+    #             registration.audit_progress = ap
+    #             registration.save()
+    #             update_made = update_made+1
+
+    #         else:
+    #             # incomplete registration
+    #             # create record in AP to reflect this
+    #             incomplete_inx = incomplete_inx + 1
+
+    #             ap = AuditProgress.objects.create(
+    #                 initial_assessment_complete=False,
+    #                 assessment_complete=False,
+    #                 epilepsy_context_complete=False,
+    #                 multiaxial_description_complete=False,
+    #                 investigation_complete=False,
+    #                 management_complete=False,
+    #                 registration_complete=False
+    #             )
+    #             registration.audit_progress = ap
+    #             registration.save()
+    #             update_made = update_made+1
 
     print(
         f"record exists in AP: {record_in_ap} completed records: {complete_inx}, incomplete_records {incomplete_inx} updates made: {update_made}")

@@ -23,7 +23,8 @@ def register(request, case_id):
             assessment_complete=False,
             epilepsy_context_complete=False,
             multiaxial_description_complete=False,
-            investigation_management_complete=False
+            management_complete=False,
+            investigation_complete=False
         )
         Registration.objects.create(
             case=case,
@@ -371,28 +372,14 @@ def registration_date(request, case_id):
     case = Case.objects.get(pk=case_id)
 
     # update the AuditProgress
-    audit_progress = AuditProgress.objects.create(
-        initial_assessment_complete=False,
-        assessment_complete=False,
-        epilepsy_context_complete=False,
-        multiaxial_description_complete=False,
-        investigation_complete=False,
-        management_complete=False,
-        registration_complete=True
-    )
-
-    defaults = {
-        'audit_progress': audit_progress,
-        'registration_date': registration_date,
-    }
+    registration = Registration.objects.get(case=case_id)
+    registration.registration_date = registration_date
+    registration.audit_progress.registration_complete = True
 
     # update the Registration with the date and the audit_progress record
-    Registration.objects.update_or_create(
-        defaults=defaults,
-        case=case.pk,
-    )
+    registration.save()
 
-    registration = Registration.objects.filter(case=case).first()
+    # registration = Registration.objects.filter(case=case).first()
 
     context = {
         'case_id': case_id,
