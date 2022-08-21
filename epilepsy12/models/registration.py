@@ -66,7 +66,7 @@ class Registration(models.Model):
     # relationships
     case = models.OneToOneField(
         Case,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True
     )
 
