@@ -16,8 +16,6 @@ from ..models import Case
 def consultant_paediatrician_referral_made(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    print(f"assessment made: {assessment.consultant_paediatrician_referral_made} selection: {request.POST.get(request.htmx.trigger_name)} from {request.htmx.trigger_name}")
-
     consultant_paediatrician_referral_made = not assessment.consultant_paediatrician_referral_made
 
     if consultant_paediatrician_referral_made:
@@ -48,10 +46,15 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     This persists the consultant paediatrician referral date value, and returns the same partial.
     """
 
+    # Assessment.objects.filter(pk=assessment_id).update(
+    #     consultant_paediatrician_referral_date=datetime.strptime(
+    #         request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date())
+
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         consultant_paediatrician_referral_date=datetime.strptime(
-            request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date())
+            request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date()
+    )
 
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -1168,20 +1171,22 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     and returns the same partial.
     """
 
-    if Assessment.objects.filter(pk=assessment_id, epilepsy_specialist_nurse_referral_made=None).exists():
+    if Assessment.objects.filter(
+            pk=assessment_id,
+            epilepsy_specialist_nurse_referral_made=None).exists():
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Assessment.objects.filter(pk=assessment_id).update(
-                individualised_care_plan_in_place=True)
+                epilepsy_specialist_nurse_referral_made=True)
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
-                individualised_care_plan_in_place=False)
+                epilepsy_specialist_nurse_referral_made=False)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
-        # There is no(longer) any individualised care plan in place - set all ICP related fields to None
+        # There is no(longer) epilepsy nurse referral in place - set all epilepsy nurse related fields to None
         Assessment.objects.filter(pk=assessment_id).update(
             epilepsy_specialist_nurse_referral_made=Q(
                 epilepsy_specialist_nurse_referral_made=False),
@@ -1366,9 +1371,14 @@ def assessment(request, case_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # fields_expected = total_fields_expected(assessment)
+    # fields_completed = total_fields_completed(assessment)
+    # print(f"{fields_completed}/{fields_expected}")
+
     context = {
         "case_id": case_id,
         "assessment": assessment,
+        "registration": assessment.registration,
         "historical_neurology_sites": historical_neurology_sites,
         "historical_surgical_sites": historical_surgical_sites,
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
@@ -1387,3 +1397,60 @@ def assessment(request, case_id):
         "hospital_list": hospital_list
     }
     return render(request=request, template_name='epilepsy12/assessment.html', context=context)
+
+
+def total_fields_expected(model_instance):
+    # a minimum total fields would be:
+    #  childrens_epilepsy_surgical_service_referral_criteria_met
+    #  consultant_paediatrician_referral_made
+    # paediatric_neurologist_referral_made
+    # childrens_epilepsy_surgical_service_referral_made
+    #  for each if selected, there are an additional 2 date fields, and
+    # for surgery, gen paeds or neuro there are site fields to include also
+
+    cumulative_fields = 0
+    if model_instance.childrens_epilepsy_surgical_service_referral_criteria_met or model_instance.childrens_epilepsy_surgical_service_referral_criteria_met is None:
+        cumulative_fields += 4
+    else:
+        cumulative_fields += 1
+
+    if model_instance.consultant_paediatrician_referral_made or model_instance.consultant_paediatrician_referral_made is None:
+        cumulative_fields += 4
+    else:
+        cumulative_fields += 1
+
+    if model_instance.paediatric_neurologist_referral_made or model_instance.paediatric_neurologist_referral_made is not None:
+        cumulative_fields += 4
+    else:
+        cumulative_fields += 1
+
+    if model_instance.epilepsy_specialist_nurse_referral_made or model_instance.epilepsy_specialist_nurse_referral_made is not None:
+        cumulative_fields += 3
+    else:
+        cumulative_fields += 1
+
+    if cumulative_fields == 0:
+        return 4
+    else:
+        return cumulative_fields
+
+
+def total_fields_completed(model_instance):
+    # counts the number of completed fields
+    fields = model_instance._meta.get_fields()
+    counter = 0
+    for field in fields:
+        if getattr(model_instance, field.name) is not None and field.name is not 'id' and field.name is not 'registration':
+            counter += 1
+    # must include centres allocated also
+    sites = Site.objects.filter(
+        registration=model_instance.registration, site_is_actively_involved_in_epilepsy_care=True).all()
+    if sites:
+        for site in sites:
+            if model_instance.childrens_epilepsy_surgical_service_referral_criteria_met and site.site_is_childrens_epilepsy_surgery_centre:
+                counter += 1
+            elif model_instance.consultant_paediatrician_referral_made and site.site_is_general_paediatric_centre:
+                counter += 1
+            elif model_instance.paediatric_neurologist_referral_made and site.site_is_paediatric_neurology_centre:
+                counter += 1
+    return counter

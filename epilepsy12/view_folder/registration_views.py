@@ -33,8 +33,11 @@ def register(request, case_id):
         )
 
     registration = Registration.objects.filter(case=case).get()
-    if registration.eligibility_criteria_met and registration.registration_date is not None:
+    # update audit progress if all registration criteria are met
+    if registration.eligibility_criteria_met and registration.registration_date is not None and Site.objects.filter(registration=registration, site_is_actively_involved_in_epilepsy_care=True, site_is_primary_centre_of_epilepsy_care=True):
         active_template = "register"
+        AuditProgress.objects.filter(registration=registration).update(
+            registration_complete=True)
 
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')

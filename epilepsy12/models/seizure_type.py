@@ -167,12 +167,6 @@ class SeizureType(models.Model):
     )
     nonepileptic_seizure_other = models.CharField(max_length=250)
 
-    # relationships
-    assessment = models.ForeignKey(
-        Assessment,
-        on_delete=models.CASCADE
-    )
-
     class Meta:
         verbose_name = 'Main type of seizure(s)'
         verbose_name_plural = "Main types of seizure(s)"

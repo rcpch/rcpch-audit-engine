@@ -146,3 +146,10 @@ class Assessment(models.Model):
 
     # TODO #14 Class function to calculate cohort based on first paediatric assessment date
     # this creates a cohort number (integer) based on where in the year they are
+
+    def save(
+            self,
+            *args, **kwargs) -> None:
+        # called on save of a record
+
+        return super().save(*args, **kwargs)
