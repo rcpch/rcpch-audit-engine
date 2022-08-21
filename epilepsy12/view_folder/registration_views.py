@@ -1,22 +1,20 @@
-from itertools import count
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from datetime import date
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
-from epilepsy12.models import hospital_trust
 
 from epilepsy12.models.hospital_trust import HospitalTrust
+from epilepsy12.view_folder.investigation_views import investigations
 
 from ..models import Registration, Site
 from ..models import Case, AuditProgress
 
 
 @login_required
-def register(request, id):
+def register(request, case_id):
 
-    case = Case.objects.get(pk=id)
+    case = Case.objects.get(pk=case_id)
     active_template = "none"
 
     if not Registration.objects.filter(case=case).exists():
@@ -57,7 +55,7 @@ def register(request, id):
 
     context = {
         "registration": registration,
-        "case_id": id,
+        "case_id": case_id,
         "hospital_list": hospital_list,
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
@@ -65,7 +63,8 @@ def register(request, id):
         "assessment_complete": registration.audit_progress.assessment_complete,
         "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
         "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        "investigation_management_complete": registration.audit_progress.investigation_management_complete,
+        "investigation_complete": registration.audit_progress.investigation_complete,
+        "management_complete": registration.audit_progress.management_complete,
         "active_template": active_template
     }
 
@@ -77,31 +76,9 @@ def register(request, id):
 
 # HTMX endpoints
 
-@login_required
-def registration_date(request, case_id):
-
-    registration_date = date.today()
-    case = Case.objects.get(pk=case_id)
-
-    defaults = {
-        'registration_date': registration_date,
-        'initial_assessment_complete': False,
-        'assessment_complete': False,
-        'epilepsy_context_complete': False,
-        'multiaxial_description_complete': False,
-        'investigation_management_complete': False
-    }
-
-    Registration.objects.update_or_create(
-        defaults=defaults,
-        case=case.pk,
-    )
-    registration = Registration.objects.filter(case=case).first()
-    context = {
-        'case_id': case_id,
-        'registration': registration
-    }
-    return render(request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
+"""
+Lead site allocation, deletion, updating and transfer
+"""
 
 
 def allocate_lead_site(request, registration_id):
@@ -331,8 +308,20 @@ def previous_sites(request, registration_id):
     return render(request=request, template_name="epilepsy12/partials/registration/previous_sites.html", context=context)
 
 
+"""
+Validation process
+"""
+
+
 @login_required
 def confirm_eligible(request, registration_id):
+    """
+    HTMX POST request on button press in registration_form confirming child
+    meets eligibility criteria of the audit.
+    This will set the eligibility_criteria_met flag in the Registration model
+    to True and replace the button with the is_eligible partial, a label confirming
+    eligibility. The button will not be shown again.
+    """
     context = {
         'has_error': False,
         'message': 'Eligibility Criteria Confirmed.'
@@ -351,7 +340,7 @@ def confirm_eligible(request, registration_id):
         request=request, template_name='epilepsy12/partials/registration/is_eligible_label.html', context=context)
 
     trigger_client_event(
-        response=response, name="registration_status", params={})
+        response=response, name="registration_status", params={})  # updates the registration status bar with date in the client
 
     return response
 
@@ -369,11 +358,79 @@ def registration_status(request, registration_id):
     return render(request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
 
 
-"""
-<button 
-                                        class="ui rcpch_primary button" 
-                                        name="transfer_lead_site_button"
-                                        hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                        hx-target="#lead_site"
-                                        hx-trigger="click">Transfer Care</button>
-"""
+@login_required
+def registration_date(request, case_id):
+    """
+    This defines registration in the audit. 
+    Call back from POST request on button press of register button
+    in registration_dates partial.
+    This sets the registration date, and in turn, the cohort number
+    It also triggers htmx 'registration_active' to enable the steps
+    """
+    registration_date = date.today()
+    case = Case.objects.get(pk=case_id)
+
+    # update the AuditProgress
+    audit_progress = AuditProgress.objects.create(
+        initial_assessment_complete=False,
+        assessment_complete=False,
+        epilepsy_context_complete=False,
+        multiaxial_description_complete=False,
+        investigation_complete=False,
+        management_complete=False,
+        registration_complete=True
+    )
+
+    defaults = {
+        'audit_progress': audit_progress,
+        'registration_date': registration_date,
+    }
+
+    # update the Registration with the date and the audit_progress record
+    Registration.objects.update_or_create(
+        defaults=defaults,
+        case=case.pk,
+    )
+
+    registration = Registration.objects.filter(case=case).first()
+
+    context = {
+        'case_id': case_id,
+        'registration': registration
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response, name="registration_active", params={})  # reloads the form to show the active steps
+
+    return response
+
+
+def registration_active(request, case_id):
+    """
+    Call back from GET request in steps partial template
+    Triggered also on registration in the audit
+    """
+    registration = Registration.objects.get(case=case_id)
+    audit_progress = registration.audit_progress
+
+    if registration.eligibility_criteria_met:
+        active_template = 'register'
+    else:
+        active_template = 'none'
+
+    context = {
+        'initial_assessment_complete': audit_progress.initial_assessment,
+        'assessment_complete': audit_progress.assessment,
+        'epilepsy_context_complete': audit_progress.epilepsy,
+        'multiaxial_description_complete': audit_progress.multiaxial,
+        "investigation_complete": registration.audit_progress.investigation_complete,
+        "management_complete": registration.audit_progress.management_complete,
+        'active_template': active_template,
+        'case_id': case_id
+    }
+
+    return render(request=request, template_name='epilepsy12/steps.html', context=context)

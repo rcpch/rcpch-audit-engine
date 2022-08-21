@@ -1,17 +1,14 @@
-<div class="ui form">
+
 
             {% if site %}
 
-                <div class="field">
-
-                    <span>
-
-                        <i class="rcpch_pink check circle outline icon"></i>
+                    <div class="field">
                         <label>Lead Centre</label>
-                        
-                        <div class="ui right action input">
-                            
+
+                        <div class="ui right action left icon input">
                             <input disabled value="{{site.hospital_trust.OrganisationName}} ({{site.hospital_trust.ParentName}})">
+                            
+                            <i class="rcpch_pink check circle outline icon"></i>
 
                             <div class="ui buttons">
 
@@ -57,9 +54,9 @@
                             
                         </div>
 
-                    </span>
+                    </div>
                 
-                </div>
+                
 
                 {% if edit  %} 
 
@@ -89,4 +86,3 @@
 
             {% endif %}
 
-</div>

@@ -17,7 +17,7 @@ class DESSCRIBE(models.Model):
     description = models.CharField(
         help_text="What is the episode(s) like and is the description adequate?",
         max_length=5000,
-        default=None,
+        default="",
         blank=True,
         null=True
     )
@@ -404,6 +404,7 @@ class DESSCRIBE(models.Model):
     def save(
             self,
             *args, **kwargs) -> None:
+
         if self.epilepsy_or_nonepilepsy_status == "E":
             # epilepsy
             set_all_nonepilepsy_seizure_onsets_to_none(self)

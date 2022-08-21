@@ -1366,7 +1366,8 @@ def assessment(request, case_id):
         "assessment_complete": registration.audit_progress.assessment_complete,
         "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
         "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        "investigation_management_complete": registration.audit_progress.investigation_management_complete,
+        "investigation_complete": registration.audit_progress.investigation_complete,
+        "management_complete": registration.audit_progress.management_complete,
         "active_template": "assessment",
         "all_my_sites": sites,
         "hospital_list": hospital_list

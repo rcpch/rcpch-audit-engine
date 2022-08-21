@@ -13,8 +13,7 @@ urlpatterns = [
     path('case/<int:id>/update', views.update_case, name="update_case"),
     path('case/create', views.create_case, name="create_case"),
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
-    path('case/<int:id>/register',
-         views.register, name='register'),
+    path('case/<int:case_id>/register', views.register, name='register'),
 
     # initial assessment path
     path('initial_assessment/<int:case_id>',
@@ -244,6 +243,8 @@ htmx_paths = [
          views.diagnostic_status, name="diagnostic_status"),
     path('htmx/registration/<int:initial_assessment_id>/episode_definition',
          views.episode_definition, name="episode_definition"),
+    path('htmx/registration/<int:case_id>/registration_active',
+         views.registration_active, name='registration_active'),
 
     # epilepsy context htmx
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',

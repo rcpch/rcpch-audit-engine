@@ -15,10 +15,9 @@
           {% else %}
             <div id='eligibility_result'>
               <button 
-                class="ui button" 
+                class="ui rcpch_primary button" 
                 hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" 
                 hx-target='#eligibility_result'
-                id="action_button"
                 hx-trigger="click">I confirm all criteria are present</button>
             </div>
           {% endif %}

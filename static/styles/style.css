@@ -57,6 +57,11 @@ h5 {
   color: black;
 }
 
+textarea {
+  font-family: Montserrat-Regular;
+  color: var(--rcpch_black);
+}
+
 ul {
   list-style-type: square;
   font-family: Montserrat-Regular;
@@ -580,4 +585,25 @@ ui.rcpch_chart_container.segment {
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .active.step::after {
   color: white;
   background-color: var(--rcpch_dark_blue);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step {
+  color: white;
+  background-color: var(--rcpch_pink);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::after {
+  background-color: var(--rcpch_pink);
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step .title {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step .description {
+  color: white;
+}
+
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::before {
+  color: white;
 }

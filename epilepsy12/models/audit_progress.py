@@ -28,7 +28,11 @@ class AuditProgress(models.Model):
         null=True,
         default=False
     )
-    investigation_management_complete = models.BooleanField(
+    investigation_complete = models.BooleanField(
+        default=False,
+        null=True
+    )
+    management_complete = models.BooleanField(
         default=False,
         null=True
     )
