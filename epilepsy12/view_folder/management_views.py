@@ -41,13 +41,14 @@ def management(request, case_id):
         "rescue_medicines": rescue_medicines,
         "antiepilepsy_medicines": antiepilepsy_medicines,
         "valproate_pregnancy_advice_needs_addressing": valproate_pregnancy_advice_needs_addressing,
-        "registration_complete": registration.audit_progress.registration_complete,
-        "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        "assessment_complete": registration.audit_progress.assessment_complete,
-        "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        "investigation_complete": registration.audit_progress.investigation_complete,
-        "management_complete": registration.audit_progress.management_complete,
+        # "registration_complete": registration.audit_progress.registration_complete,
+        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
+        # "assessment_complete": registration.audit_progress.assessment_complete,
+        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
+        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
+        # "investigation_complete": registration.audit_progress.investigation_complete,
+        # "management_complete": registration.audit_progress.management_complete,
+        "audit_progress": registration.audit_progress,
         "active_template": "management"
     }
 

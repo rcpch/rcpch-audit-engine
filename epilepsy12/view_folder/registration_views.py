@@ -25,7 +25,21 @@ def register(request, case_id):
             epilepsy_context_complete=False,
             multiaxial_description_complete=False,
             management_complete=False,
-            investigation_complete=False
+            investigation_complete=False,
+            registration_total_expected_fields=4,
+            registration_total_completed_fields=0,
+            initial_assessment_total_expected_fields=0,
+            initial_assessment_total_completed_fields=0,
+            assessment_total_expected_fields=0,
+            assessment_total_completed_fields=0,
+            epilepsy_context_total_expected_fields=0,
+            epilepsy_context_total_completed_fields=0,
+            multiaxial_description_total_expected_fields=0,
+            multiaxial_description_total_completed_fields=0,
+            investigation_total_expected_fields=0,
+            investigation_total_completed_fields=0,
+            management_total_expected_fields=0,
+            management_total_completed_fields=0
         )
         Registration.objects.create(
             case=case,
@@ -64,12 +78,13 @@ def register(request, case_id):
         "hospital_list": hospital_list,
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
-        "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        "assessment_complete": registration.audit_progress.assessment_complete,
-        "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        "investigation_complete": registration.audit_progress.investigation_complete,
-        "management_complete": registration.audit_progress.management_complete,
+        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
+        # "assessment_complete": registration.audit_progress.assessment_complete,
+        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
+        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
+        # "investigation_complete": registration.audit_progress.investigation_complete,
+        # "management_complete": registration.audit_progress.management_complete,
+        "audit_progress": registration.audit_progress,
         "active_template": active_template
     }
 
@@ -464,12 +479,13 @@ def registration_active(request, case_id):
         active_template = 'none'
 
     context = {
-        'initial_assessment_complete': audit_progress.initial_assessment_complete,
-        'assessment_complete': audit_progress.assessment_complete,
-        'epilepsy_context_complete': audit_progress.epilepsy_context_complete,
-        'multiaxial_description_complete': audit_progress.multiaxial_description_complete,
-        "investigation_complete": registration.audit_progress.investigation_complete,
-        "management_complete": registration.audit_progress.management_complete,
+        # 'initial_assessment_complete': audit_progress.initial_assessment_complete,
+        # 'assessment_complete': audit_progress.assessment_complete,
+        # 'epilepsy_context_complete': audit_progress.epilepsy_context_complete,
+        # 'multiaxial_description_complete': audit_progress.multiaxial_description_complete,
+        # "investigation_complete": registration.audit_progress.investigation_complete,
+        # "management_complete": registration.audit_progress.management_complete,
+        'audit_progress': audit_progress,
         'active_template': active_template,
         'case_id': case_id
     }

@@ -9,7 +9,7 @@
       name="steps"
     >
 
-    {% if registration_complete %}
+    {% if audit_progress.registration_complete %}
         {% if active_template == "register" %}
           <a class="active completed step" href="{% url 'register' case_id %}">
             <div class="content">
@@ -50,7 +50,7 @@
         {% endif %}
     {% endif %}
 
-    {% if initial_assessment_complete %}
+    {% if audit_progress.initial_assessment_complete %}
         {% if active_template == "initial_assessment" %}
           <a class="active completed step" href="{% url 'initial_assessment' case_id %}">
             <div class="content">
@@ -92,7 +92,7 @@
     {% endif %}
     
 
-    {% if epilepsy_context_complete %}
+    {% if audit_progress.epilepsy_context_complete %}
       {% if active_template == "epilepsy_context" %}
         <a class="active completed step" href="{% url 'epilepsy_context' case_id %}">
           <div class="content">
@@ -134,7 +134,7 @@
     {% endif %}
     
     
-    {% if multiaxial_description_complete %}
+    {% if audit_progress.multiaxial_description_complete %}
       {% if active_template == "multiaxial_description" %}
         <a class="active completed step" href="{% url 'multiaxial_description' case_id %}">
           <div class="content">
@@ -176,7 +176,7 @@
     {% endif %}
     
 
-    {% if assessment_complete %}
+    {% if audit_progress.assessment_complete %}
         {% if active_template == "assessment" %}
           <a class="active completed step" href="{% url 'assessment' case_id %}">
             <div class="content">
@@ -218,7 +218,7 @@
     {% endif %}
     
 
-    {% if investigations_complete %}
+    {% if audit_progress.investigations_complete %}
       {% if active_template == "investigations" %}
         <a class="active completed step" href="{% url 'investigations' case_id %}">
           <div class="content">
@@ -259,7 +259,7 @@
       {% endif %}
     {% endif %}
 
-    {% if management_complete %}
+    {% if audit_progress.management_complete %}
       {% if active_template == "management" %}
         <a class="active completed step" href="{% url 'management' case_id %}">
           <div class="content">
@@ -301,12 +301,10 @@
     {% endif %}
 
     
-    {% comment %}
     <div id="progress">
       {% percentage_of_total 10 20 as total_percent %}
       {% include 'epilepsy12/partials/charts/progress.html' with numerator=10 denominator=20 percentage=total_percent title=active_template %}
     </div>
-    {% endcomment %}
 
   </div>
 

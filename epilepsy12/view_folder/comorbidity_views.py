@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.forms import ComorbidityForm
+from epilepsy12.models import audit_progress
 from epilepsy12.models.registration import Registration
 from ..models import Comorbidity
 from ..models import Case
@@ -42,12 +43,13 @@ def create_comorbidity(request, case_id):
         "form": form,
         "case_id": case_id,
         "registration": registration,
-        "registration_complete": registration.auditprogress.registration_complete,
-        "initial_assessment_complete": registration.auditprogress.initial_assessment_complete,
-        "assessment_complete": registration.auditprogress.assessment_complete,
-        "epilepsy_context_complete": registration.auditprogress.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.auditprogress.multiaxial_description_complete,
-        "investigation_management_complete": registration.auditprogress.investigation_management_complete,
+        # "registration_complete": registration.auditprogress.registration_complete,
+        # "initial_assessment_complete": registration.auditprogress.initial_assessment_complete,
+        # "assessment_complete": registration.auditprogress.assessment_complete,
+        # "epilepsy_context_complete": registration.auditprogress.epilepsy_context_complete,
+        # "multiaxial_description_complete": registration.auditprogress.multiaxial_description_complete,
+        # "investigation_management_complete": registration.auditprogress.investigation_management_complete,
+        "audit_progress": audit_progress,
         "active_template": "epilepsy_context",
     }
     return render(request=request, template_name='epilepsy12/comorbidity.html', context=context)
