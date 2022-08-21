@@ -1,5 +1,5 @@
         {% if desscribe.description_keywords|length > 0 %}
-            <div class="ui message">
+            
                 {% for keyword in desscribe.description_keywords %}
                     {% url 'delete_description_keyword' desscribe.pk forloop.counter0 as hx_post %}
                     <div 
@@ -12,5 +12,5 @@
                             hx-swap='innerHTML'></i>
                     </div>
                 {% endfor %}
-            </div>
+            
         {% endif %}

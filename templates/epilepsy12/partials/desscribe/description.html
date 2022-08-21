@@ -26,9 +26,7 @@
                     class="ui textarea" 
                     rows="3" 
                     name="description"
-                    value="{{desscribe.description}}"
-                    placeholder="While watching television {{desscribe.registration.case}} fell to the floor... ">
-                </textarea>
+                    placeholder="While watching television {{desscribe.registration.case}} fell to the floor... ">{{desscribe.description}}</textarea>
             
             </div>
 
@@ -40,7 +38,7 @@
             <div class="ui flowing popup top left transition hidden">
                 <p>Some examples of keywords to choose from...</p>
                 {% for choice in choices %}
-                    <div class="ui label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
+                    <div class="ui rcpch_light_blue label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
                 {% endfor %}
             </div>
             {% load epilepsy12_template_tags %}

@@ -32,17 +32,22 @@ def hospital_reports(request):
     hospital_object = HospitalTrust.objects.get(
         OrganisationName=request.user.hospital_trust)
 
-    # all_registrations = Registration.objects.all()
-    # for registration in all_registrations.iterator():
-    #     ap = AuditProgress.objects.create(
-    #         initial_assessment_complete=False,
-    #         assessment_complete=False,
-    #         epilepsy_context_complete=False,
-    #         multiaxial_description_complete=False,
-    #         investigation_management_complete=False
-    #     )
-    #     registration.audit_progress = ap
-    #     registration.save()
+    """
+    Seed all old registration records with an associated AuditProgress record
+    For first run of app only and then comment out
+    """
+
+    all_registrations = Registration.objects.all()
+    for registration in all_registrations.iterator():
+        ap = AuditProgress.objects.create(
+            initial_assessment_complete=False,
+            assessment_complete=False,
+            epilepsy_context_complete=False,
+            multiaxial_description_complete=False,
+            investigation_management_complete=False
+        )
+        registration.audit_progress = ap
+        registration.save()
 
     deprivation_quintiles = (
         (1, 1),
