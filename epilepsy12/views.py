@@ -32,7 +32,7 @@ def hospital_reports(request):
     hospital_object = HospitalTrust.objects.get(
         OrganisationName=request.user.hospital_trust)
 
-    Registration.objects.all().delete()
+    # Registration.objects.all().delete()
 
     deprivation_quintiles = (
         (1, 1),
