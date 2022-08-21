@@ -3,18 +3,21 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from epilepsy12.models import registration
 
 from epilepsy12.models.site import Site
 
 from ..models.hospital_trust import HospitalTrust
 from ..models import Registration
 from ..models import Assessment
+from ..models import Case
 
 
 @login_required
 def consultant_paediatrician_referral_made(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
+
+    print(f"assessment made: {assessment.consultant_paediatrician_referral_made} selection: {request.POST.get(request.htmx.trigger_name)} from {request.htmx.trigger_name}")
+
     consultant_paediatrician_referral_made = not assessment.consultant_paediatrician_referral_made
 
     if consultant_paediatrician_referral_made:
@@ -1323,7 +1326,20 @@ def experienced_prolonged_focal_seizures(request, registration_id):
 
 @ login_required
 def assessment(request, case_id):
-    registration = Registration.objects.filter(case=case_id).first()
+
+    case = Case.objects.get(pk=case_id)
+    registration = Registration.objects.filter(case=case).get()
+
+    # create an assessment object if one does not exist
+    if not Assessment.objects.filter(registration=registration).exists():
+
+        # create an assessment object
+        Assessment.objects.create(
+            registration=registration
+        )
+
+    assessment = Assessment.objects.filter(registration=registration).get()
+
     sites = Site.objects.filter(registration=registration).all()
 
     active_surgical_site = None
@@ -1346,15 +1362,13 @@ def assessment(request, case_id):
             if site.site_is_general_paediatric_centre:
                 active_general_paediatric_site = site
 
-    # Site.objects.filter(registration=registration).delete()
-
     # filter list to include only NHS hospitals
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "case_id": case_id,
-        "registration": registration,
+        "assessment": assessment,
         "historical_neurology_sites": historical_neurology_sites,
         "historical_surgical_sites": historical_surgical_sites,
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
