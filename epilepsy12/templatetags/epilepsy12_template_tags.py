@@ -15,8 +15,10 @@ def percent_complete(registration):
         total += 6
     if registration.audit_progress.assessment_complete:
         total += 16
-    if registration.audit_progress.investigation_management_complete:
-        total += 12
+    if registration.audit_progress.investigation_complete:
+        total += 4
+    if registration.audit_progress.management_complete:
+        total += 4
     return total
 
 
