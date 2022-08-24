@@ -15,6 +15,10 @@ urlpatterns = [
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
     path('case/<int:case_id>/register', views.register, name='register'),
 
+    #     htmx callback from steps
+    path('htmx/registration/<int:case_id>/registration_active/<str:active_template>',
+         views.registration_active, name='registration_active'),
+
     # initial assessment path
     path('initial_assessment/<int:case_id>',
          views.initial_assessment, name="initial_assessment"),
@@ -40,18 +44,18 @@ urlpatterns = [
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
-    path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
-         name='hospital-autocomplete'),
-    path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
-         name='semiology-keyword-autocomplete'),
+    #     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
+    #          name='hospital-autocomplete'),
+    #     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
+    #          name='semiology-keyword-autocomplete'),
     path('investigations/<int:case_id>',
          views.investigations, name='investigations')
 ]
 
 htmx_paths = [
     # generic paths
-    path('htmx/hospital_list',
-         views.hospital_list, name='hospital_list'),
+    #     path('htmx/hospital_list',
+    #          views.hospital_list, name='hospital_list'),
 
 
     # desscribe / multiaxial description htmx endpoints
@@ -243,8 +247,6 @@ htmx_paths = [
          views.diagnostic_status, name="diagnostic_status"),
     path('htmx/registration/<int:initial_assessment_id>/episode_definition',
          views.episode_definition, name="episode_definition"),
-    path('htmx/registration/<int:case_id>/registration_active',
-         views.registration_active, name='registration_active'),
 
     # epilepsy context htmx
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',

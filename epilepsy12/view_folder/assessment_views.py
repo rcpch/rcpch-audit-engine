@@ -3,13 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-
-from epilepsy12.models.site import Site
-
-from ..models.hospital_trust import HospitalTrust
-from ..models import Registration
-from ..models import Assessment
-from ..models import Case
+from ..models import Registration, AuditProgress, Assessment, Case, HospitalTrust, Site
+from django_htmx.http import trigger_client_event
 
 
 @login_required
@@ -35,7 +30,20 @@ def consultant_paediatrician_referral_made(request, assessment_id):
         'assessment': assessment,
         'hospital_list': hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -45,10 +53,6 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     It is triggered by a change in custom date input in the partial, generating a post request.
     This persists the consultant paediatrician referral date value, and returns the same partial.
     """
-
-    # Assessment.objects.filter(pk=assessment_id).update(
-    #     consultant_paediatrician_referral_date=datetime.strptime(
-    #         request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date())
 
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
@@ -73,14 +77,27 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
         "active_general_paediatric_site": active_general_paediatric_site,
         "general_paediatric_edit_active": False,
         'hospital_list': hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -113,6 +130,9 @@ def consultant_paediatrician_input_date(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
@@ -120,7 +140,17 @@ def consultant_paediatrician_input_date(request, assessment_id):
         "general_paediatric_edit_active": False,
         'hospital_list': hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 # centre CRUD
 
@@ -177,6 +207,9 @@ def general_paediatric_centre(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
@@ -184,7 +217,17 @@ def general_paediatric_centre(request, assessment_id):
         "general_paediatric_edit_active": False,
         'hospital_list': hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -243,6 +286,9 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
@@ -250,7 +296,17 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
         "general_paediatric_edit_active": False,
         'hospital_list': hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -284,15 +340,27 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
         "active_general_paediatric_site": active_general_paediatric_site,
         "general_paediatric_edit_active": general_paediatric_edit_active,
         'hospital_list': hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -343,15 +411,28 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_general_paediatric_sites": historical_general_paediatric_sites,
         "active_general_paediatric_site": active_general_paediatric_site,
         "general_paediatric_edit_active": False,
         "error": error_message,
         'hospital_list': hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/consultant_paediatrician.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 """
@@ -395,12 +476,24 @@ def paediatric_neurologist_referral_made(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": assessment,
         'hospital_list': hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -436,15 +529,27 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_neurology_sites": historical_neurology_sites,
         "active_neurology_site": active_neurology_site,
         "neurology_edit_active": False,
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -480,15 +585,27 @@ def paediatric_neurologist_input_date(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_neurology_sites": historical_neurology_sites,
         "active_neurology_site": active_neurology_site,
         "neurology_edit_active": False,
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 # paediatric neurology centre selection
 
@@ -544,14 +661,27 @@ def paediatric_neurology_centre(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_neurology_sites": historical_neurology_sites,
         "active_neurology_site": active_neurology_site,
         "neurology_edit_active": False,
         "hospital_list": hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -608,14 +738,27 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_neurology_sites": historical_neurology_sites,
         "active_neurology_site": active_neurology_site,
         "neurology_edit_active": False,
         "hospital_list": hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -650,15 +793,27 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_neurology_sites": historical_neurology_sites,
         "active_neurology_site": active_neurology_site,
         "neurology_edit_active": neurology_edit_active,
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -715,15 +870,28 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
-        "assessment": Assessment.objects.get(pk=assessment_id),
+        "assessment": assessment,
         "historical_surgical_sites": historical_neurology_sites,
         "active_surgical_site": active_neurology_site,
         "surgery_edit_active": False,
         "error": error_message,
         "hospital_list": hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/paediatric_neurology.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 """
@@ -768,12 +936,24 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": assessment,
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -823,6 +1003,9 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": assessment,
         "historical_surgical_sites": historical_surgical_sites,
@@ -832,7 +1015,16 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -865,6 +1057,9 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         'assessment': assessment,
         "historical_surgical_sites": historical_surgical_sites,
@@ -874,7 +1069,16 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -907,6 +1111,9 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         'assessment': assessment,
         "historical_surgical_sites": historical_surgical_sites,
@@ -916,7 +1123,16 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
         "hospital_list": hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 # children epilepsy surgery centre selection
 
@@ -973,6 +1189,9 @@ def epilepsy_surgery_centre(request, assessment_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_surgical_sites": historical_surgical_sites,
@@ -981,7 +1200,17 @@ def epilepsy_surgery_centre(request, assessment_id):
         "error": None,
         "hospital_list": hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1040,6 +1269,9 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_surgical_sites": historical_surgical_sites,
@@ -1048,7 +1280,17 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
         "error": None,
         "hospital_list": hospital_list
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1082,6 +1324,9 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_surgical_sites": historical_surgical_sites,
@@ -1091,7 +1336,16 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
         'hospital_list': hospital_list
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1145,6 +1399,9 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "historical_surgical_sites": historical_surgical_sites,
@@ -1154,7 +1411,17 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
         'hospital_list': hospital_list
 
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_surgery.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 """
@@ -1196,11 +1463,23 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         "assessment": assessment
     }
 
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1221,7 +1500,17 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     context = {
         'assessment': assessment
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1239,10 +1528,23 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
     context = {
         'assessment': assessment
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/epilepsy_nurse.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1270,7 +1572,20 @@ def were_any_of_the_epileptic_seizures_convulsive(request, registration_id):
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
+
+    # score the form
+    test_fields_update_audit_progress(assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1294,11 +1609,24 @@ def prolonged_generalized_convulsive_seizures(request, registration_id):
     else:
         assessment_object = assessment
 
+    # score the form
+    test_fields_update_audit_progress(assessment_object)
+
     context = {
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1322,11 +1650,24 @@ def experienced_prolonged_focal_seizures(request, registration_id):
     else:
         assessment_object = assessment
 
+        # score the form
+    test_fields_update_audit_progress(assessment_object)
+
     context = {
         'registration_id': registration.pk,
         'assessment': assessment_object
     }
-    return render(request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/assessment/seizure_length_checkboxes.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @ login_required
@@ -1371,9 +1712,8 @@ def assessment(request, case_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
-    # fields_expected = total_fields_expected(assessment)
-    # fields_completed = total_fields_completed(assessment)
-    # print(f"{fields_completed}/{fields_expected}")
+    # score the form
+    test_fields_update_audit_progress(assessment)
 
     context = {
         "case_id": case_id,
@@ -1385,19 +1725,22 @@ def assessment(request, case_id):
         "active_surgical_site": active_surgical_site,
         "active_neurology_site": active_neurology_site,
         "active_general_paediatric_site": active_general_paediatric_site,
-        # "registration_complete": registration.audit_progress.registration_complete,
-        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        # "assessment_complete": registration.audit_progress.assessment_complete,
-        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
         "audit_progress": registration.audit_progress,
         "active_template": "assessment",
         "all_my_sites": sites,
         "hospital_list": hospital_list
     }
-    return render(request=request, template_name='epilepsy12/assessment.html', context=context)
+
+    response = render(
+        request=request, template_name='epilepsy12/assessment.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def total_fields_expected(model_instance):
@@ -1441,7 +1784,7 @@ def total_fields_completed(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name is not 'id' and field.name is not 'registration':
+        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
             counter += 1
     # must include centres allocated also
     sites = Site.objects.filter(
@@ -1455,3 +1798,15 @@ def total_fields_completed(model_instance):
             elif model_instance.paediatric_neurologist_referral_made and site.site_is_paediatric_neurology_centre:
                 counter += 1
     return counter
+
+# test all fields
+
+
+def test_fields_update_audit_progress(model_instance):
+    all_completed_fields = total_fields_completed(model_instance)
+    all_fields = total_fields_expected(model_instance)
+    AuditProgress.objects.filter(registration=model_instance.registration).update(
+        assessment_total_expected_fields=all_fields,
+        assessment_total_completed_fields=all_completed_fields,
+        assessment_complete=all_completed_fields == all_fields
+    )

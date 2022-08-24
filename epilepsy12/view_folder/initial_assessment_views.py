@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants import *
-from ..general_functions.value_from_key import value_from_key
+from epilepsy12.models.audit_progress import AuditProgress
+from django_htmx.http import trigger_client_event
 
 from ..models import Registration
 from ..models import InitialAssessment
@@ -15,6 +16,8 @@ def initial_assessment(request, case_id):
     initial_assessment, created = InitialAssessment.objects.get_or_create(
         registration=registration)
 
+    test_fields_update_audit_progress(initial_assessment)
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -23,18 +26,19 @@ def initial_assessment(request, case_id):
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
-        # "registration_complete": registration.audit_progress.registration_complete,
-        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        # "assessment_complete": registration.audit_progress.assessment_complete,
-        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
         "audit_progress": registration.audit_progress,
         "active_template": "initial_assessment"
     }
 
-    return render(request=request, template_name='epilepsy12/initial_assessment.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/initial_assessment.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 # htmx
@@ -64,7 +68,17 @@ def date_of_initial_assessment(request, initial_assessment_id):
         "initial_assessment": initial_assessment
     }
 
-    return render(request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_assessment_id):
@@ -93,7 +107,17 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_as
         "initial_assessment": initial_assessment
     }
 
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/first_paediatric_assessment_in_acute_or_nonacute_setting.html", context=context)
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/first_paediatric_assessment_in_acute_or_nonacute_setting.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def general_paediatrics_referral_made(request, initial_assessment_id):
@@ -125,7 +149,17 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
         'initial_assessment': initial_assessment
     }
 
-    return render(request=request, template_name='epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html', context=context)
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
@@ -154,7 +188,17 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
         "initial_assessment": initial_assessment
     }
 
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/date_of_referral_to_general_paediatrics.html", context=context)
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/date_of_referral_to_general_paediatrics.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
@@ -185,7 +229,17 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
         "episode_definition_selection": EPISODE_DEFINITION,
     }
 
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def when_the_first_epileptic_episode_occurred_confidence(request, initial_assessment_id):
@@ -214,7 +268,15 @@ def when_the_first_epileptic_episode_occurred_confidence(request, initial_assess
         "episode_definition_selection": EPISODE_DEFINITION,
     }
 
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def has_description_of_the_episode_or_episodes_been_gathered(request, initial_assessment_id):
@@ -238,7 +300,16 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, initial_as
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def has_number_of_episodes_since_the_first_been_documented(request, initial_assessment_id):
@@ -262,7 +333,16 @@ def has_number_of_episodes_since_the_first_been_documented(request, initial_asse
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def general_examination_performed(request, initial_assessment_id):
@@ -286,7 +366,16 @@ def general_examination_performed(request, initial_assessment_id):
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def neurological_examination_performed(request, initial_assessment_id):
@@ -310,7 +399,16 @@ def neurological_examination_performed(request, initial_assessment_id):
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def developmental_learning_or_schooling_problems(request, initial_assessment_id):
@@ -334,7 +432,16 @@ def developmental_learning_or_schooling_problems(request, initial_assessment_id)
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def behavioural_or_emotional_problems(request, initial_assessment_id):
@@ -358,7 +465,16 @@ def behavioural_or_emotional_problems(request, initial_assessment_id):
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def diagnostic_status(request, initial_assessment_id):
@@ -383,7 +499,18 @@ def diagnostic_status(request, initial_assessment_id):
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+# trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def episode_definition(request, initial_assessment_id):
@@ -408,4 +535,82 @@ def episode_definition(request, initial_assessment_id):
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "episode_definition_selection": EPISODE_DEFINITION,
     }
-    return render(request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+# trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def test_fields_update_audit_progress(model_instance):
+    all_completed_fields = completed_fields(model_instance)
+    all_fields = total_fields_expected(model_instance)
+
+    AuditProgress.objects.filter(registration=model_instance.registration).update(
+        initial_assessment_total_expected_fields=all_fields,
+        initial_assessment_total_completed_fields=all_completed_fields,
+        initial_assessment_complete=all_completed_fields == all_fields
+    )
+
+
+def completed_fields(model_instance):
+    """
+    Test for all these completed fields
+    date_of_initial_assessment
+    general_paediatrics_referral_made
+    date_of_referral_to_general_paediatrics
+    first_paediatric_assessment_in_acute_or_nonacute_setting
+    has_description_of_the_episode_or_episodes_been_gathered
+    when_the_first_epileptic_episode_occurred_confidence
+    when_the_first_epileptic_episode_occurred
+    has_number_of_episodes_since_the_first_been_documented
+    general_examination_performed
+    neurological_examination_performed
+    developmental_learning_or_schooling_problems
+    behavioural_or_emotional_problems
+    diagnostic_status
+    episode_definition
+    """
+    fields = model_instance._meta.get_fields()
+    counter = 0
+    for field in fields:
+        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+            counter += 1
+    return counter
+
+
+def total_fields_expected(model_instance):
+    """
+    a minimum total fields would be:
+
+    date_of_initial_assessment
+    general_paediatrics_referral_made
+    date_of_referral_to_general_paediatrics
+    first_paediatric_assessment_in_acute_or_nonacute_setting
+    has_description_of_the_episode_or_episodes_been_gathered
+    when_the_first_epileptic_episode_occurred_confidence
+    when_the_first_epileptic_episode_occurred
+    has_number_of_episodes_since_the_first_been_documented
+    general_examination_performed
+    neurological_examination_performed
+    developmental_learning_or_schooling_problems
+    behavioural_or_emotional_problems
+    diagnostic_status
+    episode_definition
+
+    if general_paediatrics_referral_made then add an additional field for the date
+
+    """
+
+    cumulative_fields = 13
+    if model_instance.date_of_referral_to_general_paediatrics:
+        cumulative_fields += 1
+
+    return cumulative_fields

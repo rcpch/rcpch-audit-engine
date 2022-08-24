@@ -5,12 +5,14 @@ from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.causes import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
-from epilepsy12.constants.epilepsy_types import EPIL_TYPE_CHOICES, EPILEPSY_DIAGNOSIS_STATUS, EPIS_TYPE
-from epilepsy12.models.comorbidity import Comorbidity
+from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
+from django_htmx.http import trigger_client_event
+
+from epilepsy12.models import desscribe
 
 from ..general_functions import fuzzy_scan_for_keywords
 
-from ..models import Registration, Keyword, DESSCRIBE
+from ..models import Registration, Keyword, DESSCRIBE, AuditProgress, Comorbidity
 
 from ..general_functions import *
 
@@ -239,7 +241,17 @@ def edit_description(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+    response = render(
+        request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -263,7 +275,17 @@ def delete_description_keyword(request, desscribe_id, description_keyword_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+    response = render(
+        request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 """
@@ -310,7 +332,16 @@ def epilepsy_or_nonepilepsy_status(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, template, context)
+    response = render(request=request, template_name=template, context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 """
@@ -348,7 +379,17 @@ def were_any_of_the_epileptic_seizures_convulsive(request, desscribe_id):
         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -375,7 +416,17 @@ def prolonged_generalized_convulsive_seizures(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/generalised_onset_epilepsy.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/generalised_onset_epilepsy.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -430,7 +481,17 @@ def epileptic_seizure_onset_type(request, desscribe_id):
         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -477,7 +538,17 @@ def focal_onset_epilepsy_checked_changed(request, desscribe_id):
         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
     }
 
-    return render(request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -508,7 +579,17 @@ def experienced_prolonged_focal_seizures(request, desscribe_id):
         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
     }
 
-    return render(request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 """
@@ -536,7 +617,17 @@ def nonepilepsy_generalised_onset(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+    response = render(
+        request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def nonepileptic_seizure_type(request, desscribe_id):
@@ -584,7 +675,17 @@ def nonepileptic_seizure_type(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+    response = render(
+        request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def nonepileptic_seizure_subtype(request, desscribe_id):
@@ -623,7 +724,17 @@ def nonepileptic_seizure_subtype(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+    response = render(
+        request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 """
@@ -658,7 +769,17 @@ def syndrome_present(request, desscribe_id):
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -675,15 +796,25 @@ def syndrome(request, desscribe_id):
     else:
         return HttpResponse('No dice')
 
-    updated_desscribe = DESSCRIBE.objects.get(
+    desscribe = DESSCRIBE.objects.get(
         pk=desscribe_id)
 
     context = {
-        "desscribe": updated_desscribe,
+        "desscribe": desscribe,
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 """
@@ -737,7 +868,17 @@ def seizure_cause_main(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def seizure_cause_subtype(request, desscribe_id, subtype):
@@ -781,7 +922,17 @@ def seizure_cause_subtype(request, desscribe_id, subtype):
         'desscribe': desscribe
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def seizure_cause_subtype_subtype(request, desscribe_id):
@@ -817,7 +968,17 @@ def seizure_cause_subtype_subtype(request, desscribe_id):
         'desscribe': desscribe
     }
 
-    return render(request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 """
@@ -857,14 +1018,24 @@ def ribe(request, desscribe_id):
         'case_id': case.id
     }
 
-    return render(request, "epilepsy12/partials/desscribe/ribe.html", context)
+    response = render(
+        request, "epilepsy12/partials/desscribe/ribe.html", context)
+
+    test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @ login_required
 def multiaxial_description(request, case_id):
     """
     """
-    registration = Registration.objects.filter(case=case_id).first()
+    registration = Registration.objects.filter(case=case_id).get()
     if DESSCRIBE.objects.filter(registration=registration).exists():
         # there is already a desscribe object for this registration
         desscribe = DESSCRIBE.objects.filter(registration=registration).first()
@@ -873,6 +1044,8 @@ def multiaxial_description(request, case_id):
         desscribe = DESSCRIBE.objects.create(registration=registration)
 
     choices = Keyword.objects.all()
+
+    test_fields_update_audit_progress(desscribe)
 
     context = {
         "desscribe": desscribe,
@@ -903,60 +1076,162 @@ def multiaxial_description(request, case_id):
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
 
-        # "registration_complete": registration.audit_progress.registration_complete,
-        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        # "assessment_complete": registration.audit_progress.assessment_complete,
-        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_description"
     }
 
-    return render(request=request, template_name='epilepsy12/multiaxial_description.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/multiaxial_description.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
-def set_all_epilepsy_causes_to_none(except_field):
-    set_to_none = {
+# test all fields
+def test_fields_update_audit_progress(model_instance):
+    all_completed_fields = total_fields_completed(model_instance)
+    all_fields = total_fields_expected(model_instance)
+    AuditProgress.objects.filter(registration=model_instance.registration).update(
+        multiaxial_description_total_expected_fields=all_fields,
+        multiaxial_description_total_completed_fields=all_completed_fields,
+        multiaxial_description_complete=all_completed_fields == all_fields
+    )
 
-    }
-    if except_field is None:
-        set_to_none.update({
-            'seizure_cause_main': None,
-            'seizure_cause_main_snomed_code': None
-        })
-    elif except_field != "Str":
-        set_to_none.update({
-            'seizure_cause_structural': None,
-            'seizure_cause_structural_snomed_code': None
-        })
-    elif except_field != "Gen":
-        set_to_none.update({
-            'seizure_cause_genetic': None,
-            'seizure_cause_gene_abnormality': None,
-            'seizure_cause_genetic_other': None,
-            'seizure_cause_gene_abnormality_snomed_code': None,
-            'seizure_cause_chromosomal_abnormality': None,
-        })
-    elif except_field != "Inf":
-        set_to_none.update({
-            'seizure_cause_infectious': None,
-            'seizure_cause_infectious_snomed_code': None
-        })
-    elif except_field != "Met":
-        set_to_none.update({
-            'seizure_cause_metabolic': None,
-            'seizure_cause_metabolic_other': None,
-            'seizure_cause_metabolic_snomed_code': None
-        })
-    elif except_field != "Imm":
-        set_to_none.update({
-            'seizure_cause_immune': None,
-            'seizure_cause_immune_antibody': None,
-            'seizure_cause_immune_antibody_other': None
-        })
-    elif except_field != "NK":
-        set_to_none.update({'seizure_cause_immune_snomed_code': None})
 
-    return set_to_none
+def total_fields_expected(model_instance):
+    # a minimum total fields would be:
+    # description
+    # description_keywords
+    # epilepsy_or_nonepilepsy_status
+    # were_any_of_the_epileptic_seizures_convulsive
+    # prolonged_generalized_convulsive_seizures
+    # experienced_prolonged_focal_seizures
+    # epileptic_seizure_onset_type
+    # nonepileptic_seizure_type
+    # focal_onset_impaired_awareness
+    # focal_onset_automatisms
+    # focal_onset_atonic
+    # focal_onset_clonic
+    # focal_onset_left
+    # focal_onset_right
+    # focal_onset_epileptic_spasms
+    # focal_onset_hyperkinetic
+    # focal_onset_myoclonic
+    # focal_onset_tonic
+    # focal_onset_autonomic
+    # focal_onset_behavioural_arrest
+    # focal_onset_cognitive
+    # focal_onset_emotional
+    # focal_onset_sensory
+    # focal_onset_centrotemporal
+    # focal_onset_temporal
+    # focal_onset_frontal
+    # focal_onset_parietal
+    # focal_onset_occipital
+    # focal_onset_gelastic
+    # focal_onset_focal_to_bilateral_tonic_clonic
+    # focal_onset_other
+    # focal_onset_other_details
+    # epileptic_generalised_onset
+    # epileptic_generalised_onset_other_details
+    # nonepileptic_seizure_unknown_onset
+    # nonepileptic_seizure_unknown_onset_other_details
+    # nonepileptic_seizure_syncope
+    # nonepileptic_seizure_behavioural
+    # nonepileptic_seizure_sleep
+    # nonepileptic_seizure_paroxysmal
+    # nonepileptic_seizure_migraine
+    # nonepileptic_seizure_miscellaneous
+    # nonepileptic_seizure_other
+    # syndrome_present
+    # syndrome
+    # seizure_cause_main
+    # seizure_cause_structural
+    # seizure_cause_genetic
+    # seizure_cause_gene_abnormality
+    # seizure_cause_genetic_other
+    # seizure_cause_chromosomal_abnormality
+    # seizure_cause_infectious
+    # seizure_cause_metabolic
+    # seizure_cause_metabolic_other
+    # seizure_cause_immune
+    # seizure_cause_immune_antibody
+    # seizure_cause_immune_antibody_other
+    # relevant_impairments_behavioural_educational
+
+    cumulative_fields = 0
+    if model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'NE':
+        # nonepilepsy - includes epileptic_generalised_onset
+        cumulative_fields += 1
+        if model_instance.nonepileptic_seizure_type:
+            # options of the types always lead to the option of a single subtype
+            cumulative_fields += 2
+
+    elif model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'E':
+        # epilepsy selected - epilepsy_or_nonepilepsy_status and were_any_of_the_epileptic_seizures_convulsive
+        cumulative_fields += 2
+        if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
+            # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
+            cumulative_fields += 5
+        elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
+            # includes prolonged_generalized_convulsive_seizures
+            cumulative_fields += 2
+        else:
+            # either unclassified or unknown onset
+            cumulative_fields += 1
+    else:
+        # diagnosis is uncertain - only 2 answers expected for E
+        cumulative_fields += 2
+
+    # test S
+    if syndrome_present:
+        # includes syndrome
+        cumulative_fields += 3
+    else:
+        cumulative_fields += 1
+
+    # test C
+    if model_instance.seizure_cause_main and model_instance.seizure_cause_main in ['Inf', 'NK']:
+        cumulative_fields += 1
+    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Gen":
+        if model_instance.seizure_cause_genetic == 'GeA':
+            # genetic abnormity included
+            cumulative_fields += 3
+        else:
+            cumulative_fields += 2
+    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Imm":
+        # immune causees included
+        if model_instance.seizure_cause_immune == 'AnM':
+            # antibody mediated
+            cumulative_fields += 3
+        else:
+            cumulative_fields += 2
+    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Met":
+        # metabolic causes
+        cumulative_fields += 2
+    else:
+        cumulative_fields += 1
+
+    # IBE
+    cumulative_fields += 1
+
+    return cumulative_fields
+
+
+def total_fields_completed(model_instance):
+    # counts the number of completed fields
+    fields = model_instance._meta.get_fields()
+    counter = 0
+    for field in fields:
+        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+            if field.name == 'description':
+                if len(getattr(model_instance, field.name)) > 0:
+                    counter += 1
+            else:
+                counter += 1
+    return counter

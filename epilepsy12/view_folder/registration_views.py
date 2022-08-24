@@ -3,19 +3,16 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
-
-from epilepsy12.models.hospital_trust import HospitalTrust
-from epilepsy12.view_folder.investigation_views import investigations
-
 from ..models import Registration, Site
-from ..models import Case, AuditProgress
+from ..models import Case, AuditProgress, HospitalTrust
 
 
 @login_required
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)
-    active_template = "none"
+
+    active_template = "register"
 
     if not Registration.objects.filter(case=case).exists():
         audit_progress = AuditProgress.objects.create(
@@ -45,13 +42,17 @@ def register(request, case_id):
             case=case,
             audit_progress=audit_progress
         )
+        active_template = "none"
 
     registration = Registration.objects.filter(case=case).get()
     # update audit progress if all registration criteria are met
-    if registration.eligibility_criteria_met and registration.registration_date is not None and Site.objects.filter(registration=registration, site_is_actively_involved_in_epilepsy_care=True, site_is_primary_centre_of_epilepsy_care=True):
-        active_template = "register"
-        AuditProgress.objects.filter(registration=registration).update(
-            registration_complete=True)
+    total_fields_to_complete_form = total_fields_required()
+    already_completed_fields = total_fields_completed(registration)
+    AuditProgress.objects.filter(registration=registration).update(
+        registration_complete=already_completed_fields == total_fields_to_complete_form,
+        registration_total_expected_fields=total_fields_to_complete_form,
+        registration_total_completed_fields=already_completed_fields
+    )
 
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
@@ -78,18 +79,20 @@ def register(request, case_id):
         "hospital_list": hospital_list,
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
-        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        # "assessment_complete": registration.audit_progress.assessment_complete,
-        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
         "audit_progress": registration.audit_progress,
         "active_template": active_template
     }
 
     response = render(
-        request=request, template_name='epilepsy12/register.html', context=context)
+        request=request,
+        template_name='epilepsy12/register.html',
+        context=context
+    )
+
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
 
     return response
 
@@ -465,29 +468,35 @@ def registration_date(request, case_id):
     return response
 
 
-def registration_active(request, case_id):
+def total_fields_completed(model_instance):
     """
-    Call back from GET request in steps partial template
-    Triggered also on registration in the audit
+    Loops through all the fields in the model instance (except pk and related fields)
+    and uses these to return a total number of fields that have already been completed.
     """
-    registration = Registration.objects.get(case=case_id)
-    audit_progress = registration.audit_progress
+    counter = 0
+    if model_instance.registration_date is not None:
+        counter += 1
+    if model_instance.referring_clinician is not None or model_instance.referring_clinician != '':
+        counter += 1
+    if model_instance.eligibility_criteria_met:
+        counter += 1
+    if Site.objects.filter(
+        registration=model_instance,
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True
+    ).exists():
+        counter += 1
 
-    if registration.eligibility_criteria_met:
-        active_template = 'register'
-    else:
-        active_template = 'none'
+    return counter
 
-    context = {
-        # 'initial_assessment_complete': audit_progress.initial_assessment_complete,
-        # 'assessment_complete': audit_progress.assessment_complete,
-        # 'epilepsy_context_complete': audit_progress.epilepsy_context_complete,
-        # 'multiaxial_description_complete': audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
-        'audit_progress': audit_progress,
-        'active_template': active_template,
-        'case_id': case_id
-    }
 
-    return render(request=request, template_name='epilepsy12/steps.html', context=context)
+def total_fields_required():
+    """
+    Returns the total number of fields that need to be scored to all the form to be complete
+    In the Registration/Validation form this is:
+    registration_date
+    referring_clinician
+    eligibility_criteria_met
+    lead centre
+    """
+    return 4
