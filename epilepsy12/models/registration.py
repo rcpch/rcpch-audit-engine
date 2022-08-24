@@ -56,13 +56,6 @@ class Registration(models.Model):
         null=True
     )
 
-    lead_hospital = models.CharField(
-        "lead_hospital",
-        max_length=100,
-        default=None,
-        null=True
-    )
-
     # relationships
     case = models.OneToOneField(
         Case,

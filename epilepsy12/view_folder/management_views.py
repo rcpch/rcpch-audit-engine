@@ -1,14 +1,11 @@
 from datetime import datetime
 from django.http import HttpResponse
-from django.utils.timezone import make_aware
 from django.shortcuts import render
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from epilepsy12.general_functions.fetch_snomed import fetch_concept, snomed_medicine_search
-from epilepsy12.models.management import Management
-from epilepsy12.models.antiepilepsy_medicine import AntiEpilepsyMedicine
-
-from epilepsy12.models.registration import Registration
+from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AuditProgress, AntiEpilepsyMedicine
+from django_htmx.http import trigger_client_event
 
 
 @login_required
@@ -19,8 +16,13 @@ def management(request, case_id):
 
     registration = Registration.objects.filter(case=case_id).first()
 
-    management, created = Management.objects.get_or_create(
-        registration=registration)
+    if Management.objects.filter(
+            registration=registration).exists():
+        management = Management.objects.filter(
+            registration=registration).get()
+    else:
+        Management.objects.create(registration=registration)
+        management = Management.objects.filter(registration=registration).get()
 
     rescue_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=True).all()
@@ -34,6 +36,8 @@ def management(request, case_id):
         # patient is female and valproate has been prescribed
         valproate_pregnancy_advice_needs_addressing = True
 
+    test_fields_update_audit_progress(management)
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -41,17 +45,20 @@ def management(request, case_id):
         "rescue_medicines": rescue_medicines,
         "antiepilepsy_medicines": antiepilepsy_medicines,
         "valproate_pregnancy_advice_needs_addressing": valproate_pregnancy_advice_needs_addressing,
-        "registration_complete": registration.audit_progress.registration_complete,
-        "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        "assessment_complete": registration.audit_progress.assessment_complete,
-        "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        "investigation_complete": registration.audit_progress.investigation_complete,
-        "management_complete": registration.audit_progress.management_complete,
+        "audit_progress": registration.audit_progress,
         "active_template": "management"
     }
 
-    return render(request=request, template_name='epilepsy12/management.html', context=context)
+    response = render(
+        request=request, template_name='epilepsy12/management.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 """
@@ -93,7 +100,16 @@ def has_an_aed_been_given(request, management_id):
         'management': management
     }
 
-    return render(request=request, template_name="epilepsy12/partials/management/aeds.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/management/aeds.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    test_fields_update_audit_progress(management)
+    return response
 
 
 @login_required
@@ -111,8 +127,16 @@ def antiepilepsy_medicine_search(request, management_id):
         'items': items,
         'management_id': management_id
     }
+    response = render(
+        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicine_select.html", context=context)
 
-    return render(request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicine_select.html", context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    test_fields_update_audit_progress(management)
+    return response
 
 
 @login_required
@@ -162,8 +186,17 @@ def save_selected_antiepilepsy_medicine(request, management_id):
         'antiepilepsy_medicines': medicines,
         'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
     }
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
 
-    return render(request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -192,8 +225,17 @@ def is_a_pregnancy_prevention_programme_in_place(request, management_id):
         'antiepilepsy_medicines': medicines,
         'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
     }
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
 
-    return render(request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 """ 
@@ -223,8 +265,17 @@ def rescue_medication_prescribed(request, management_id):
     context = {
         'management': management
     }
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
 
-    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -241,8 +292,17 @@ def rescue_medicine_search(request, management_id):
         'items': items,
         'management_id': management_id
     }
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
 
-    return render(request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -283,8 +343,17 @@ def save_selected_rescue_medicine(request, management_id):
     context = {
         'rescue_medicines': medicines
     }
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
 
-    return render(request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 """
@@ -336,7 +405,17 @@ def individualised_care_plan_in_place(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -355,7 +434,17 @@ def individualised_care_plan_date(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -386,7 +475,17 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -417,7 +516,17 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -448,7 +557,17 @@ def individualised_care_plan_include_first_aid(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -479,7 +598,17 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -510,7 +639,18 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -541,7 +681,17 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -572,7 +722,18 @@ def individualised_care_plan_addresses_sudep(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -603,7 +764,18 @@ def individualised_care_plan_includes_aihp(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+    test_fields_update_audit_progress(management)
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -634,7 +806,19 @@ def individualised_care_plan_includes_ehcp(request, management_id):
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    test_fields_update_audit_progress(management)
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 @login_required
@@ -662,7 +846,92 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
             has_individualised_care_plan_been_updated_in_the_last_year=Q(has_individualised_care_plan_been_updated_in_the_last_year=False))
 
     management = Management.objects.get(pk=management_id)
+
     context = {
         'management': management
     }
-    return render(request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    test_fields_update_audit_progress(management)
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+# calculate the score
+
+
+def total_fields_expected(model_instance):
+    # all fields would be:
+    # has_an_aed_been_given
+    # has_rescue_medication_been_prescribed
+    # is_a_pregnancy_prevention_programme_in_place
+    # rescue_medication_prescribed
+    # individualised_care_plan_in_place
+    # individualised_care_plan_date
+    # individualised_care_plan_has_parent_carer_child_agreement
+    # individualised_care_plan_includes_service_contact_details
+    # individualised_care_plan_include_first_aid
+    # individualised_care_plan_parental_prolonged_seizure_care
+    # individualised_care_plan_includes_general_participation_risk
+    # individualised_care_plan_addresses_water_safety
+    # individualised_care_plan_addresses_sudep
+    # individualised_care_plan_includes_aihp
+    # individualised_care_plan_includes_ehcp
+    # has_individualised_care_plan_been_updated_in_the_last_year
+
+    valproate = False
+    if AntiEpilepsyMedicine.objects.filter(
+            management=model_instance, antiepilepsy_medicine_snomed_code=10049011000001109).exists():
+        valproate = True
+
+    cumulative_fields = 0
+    if model_instance.has_an_aed_been_given and model_instance.has_an_aed_been_given is not None:
+        cumulative_fields += 2
+    else:
+        cumulative_fields += 1
+
+    if model_instance.has_rescue_medication_been_prescribed and model_instance.has_rescue_medication_been_prescribed is not None:
+        cumulative_fields += 2
+    else:
+        cumulative_fields += 1
+
+    if valproate:
+        cumulative_fields += 1
+
+    if model_instance.individualised_care_plan_in_place and model_instance.individualised_care_plan_in_place is not None:
+        cumulative_fields += 12
+    else:
+        cumulative_fields += 1
+
+    return cumulative_fields
+
+
+def total_fields_completed(model_instance):
+    # counts the number of completed fields
+    fields = model_instance._meta.get_fields()
+
+    counter = 0
+    for field in fields:
+        if field.name is not None and field.name != 'id' and field.name != 'registration' and field.name != 'antiepilepsymedicine':
+            if getattr(model_instance, field.name) is not None:
+                counter += 1
+    return counter
+
+# test all fields
+
+
+def test_fields_update_audit_progress(model_instance):
+    all_completed_fields = total_fields_completed(model_instance)
+    all_fields = total_fields_expected(model_instance)
+    AuditProgress.objects.filter(registration=model_instance.registration).update(
+        management_total_expected_fields=all_fields,
+        management_total_completed_fields=all_completed_fields,
+        management_complete=all_completed_fields == all_fields
+    )

@@ -73,117 +73,117 @@ class DESSCRIBE(models.Model):
 
     # focal onset
     focal_onset_impaired_awareness = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_automatisms = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_atonic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_clonic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_left = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_right = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_epileptic_spasms = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_hyperkinetic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_myoclonic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_tonic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_autonomic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_behavioural_arrest = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_cognitive = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_emotional = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_sensory = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_centrotemporal = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_temporal = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_frontal = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_parietal = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_occipital = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_gelastic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_focal_to_bilateral_tonic_clonic = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )
     focal_onset_other = models.BooleanField(
-        default=False,
+        default=None,
         blank=True,
         null=True
     )

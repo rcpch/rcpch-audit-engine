@@ -1,5 +1,4 @@
 from django.db import models
-
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -35,13 +34,6 @@ class Management(models.Model):
         default=None,
         null=True,
         blank=True
-    )
-    rescue_medication_prescribed = models.CharField(
-        "Which rescue medicine has been prescribed?",
-        max_length=100,
-        default=None,
-        null=True,
-        blank=True,
     )
     individualised_care_plan_in_place = models.BooleanField(
         "Has an individualised care plan been put in place?",

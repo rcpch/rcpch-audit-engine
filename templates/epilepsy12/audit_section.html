@@ -6,7 +6,7 @@
 <div class="ui grid">
   <div class="four wide column">
       <div class="ui vertical ordered mini top attached rcpch steps" id="registration_active">
-        {% include "./steps.html" with initial_assessment_complete=initial_assessment_complete assessment=assessment_complete epilepsy_context_complete=epilepsy_context_complete multiaxial_description_complete=multiaxial_description_complete management_complete=management_complete case_id=case_id %}
+        {% include "./steps.html" with audit_progress=audit_progress case_id=case_id %}
       </div>
   </div>
   <div class="twelve wide column">
@@ -20,7 +20,6 @@
     </div>
     <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
       {% block audit_section_form %}{% endblock %}
-      {# {% block audit_section_form_2 %}{% endblock %} #}
     </div>
     <div class="ui bottom attached info icon rcpch_dark_blue message">
       <i class="info circle icon"></i>

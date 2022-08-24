@@ -430,6 +430,14 @@ ui.rcpch_chart_container.segment {
   transition-duration: 0.4s;
 }
 
+/* eligible label */
+#eligible_label {
+  border-radius: 0%;
+  border: 1px solid rgba(224, 0, 135, 0.3);
+  color: var(--rcpch_pink);
+  background: transparent;
+}
+
 /* spinner */
 .htmx-indicator.spinner.loading.icon {
   display: none;
@@ -684,6 +692,7 @@ ui.rcpch_chart_container.segment {
 .rcpch_pie_title {
   color: var(--rcpch_charcoal);
   font-family: Arial, Helvetica, sans-serif;
+  padding-top: 10px;
 }
 
 .rcpch_pie_label {
