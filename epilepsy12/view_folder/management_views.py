@@ -16,8 +16,13 @@ def management(request, case_id):
 
     registration = Registration.objects.filter(case=case_id).first()
 
-    management, created = Management.objects.get_or_create(
-        registration=registration)
+    if Management.objects.filter(
+            registration=registration).exists():
+        management = Management.objects.filter(
+            registration=registration).get()
+    else:
+        Management.objects.create(registration=registration)
+        management = Management.objects.filter(registration=registration).get()
 
     rescue_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=True).all()
@@ -31,6 +36,8 @@ def management(request, case_id):
         # patient is female and valproate has been prescribed
         valproate_pregnancy_advice_needs_addressing = True
 
+    test_fields_update_audit_progress(management)
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -41,7 +48,7 @@ def management(request, case_id):
         "audit_progress": registration.audit_progress,
         "active_template": "management"
     }
-    test_fields_update_audit_progress(management)
+
     response = render(
         request=request, template_name='epilepsy12/management.html', context=context)
 

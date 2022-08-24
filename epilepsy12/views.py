@@ -88,6 +88,8 @@ def hospital_reports(request):
         .order_by('cases_aggregated_by_deprivation')
     )
 
+    # Registration.objects.all().delete()
+
     total_registrations = Registration.objects.all().count()
     total_cases = Case.objects.all().count()
 
@@ -144,10 +146,10 @@ def registration_active(request, case_id, active_template):
     registration = Registration.objects.get(case=case_id)
     audit_progress = registration.audit_progress
 
-    # if registration.eligibility_criteria_met:
-    #     active_template = 'register'
-    # else:
-    #     active_template = 'none'
+    # enable the steps if has just registered
+    if audit_progress.registration_complete:
+        if active_template == 'none':
+            active_template = 'register'
 
     context = {
         'audit_progress': audit_progress,
@@ -156,106 +158,3 @@ def registration_active(request, case_id, active_template):
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
-
-
-# def hospital_list(request):
-#     """
-#     HTMX call back from hospital_list partial.
-#     Receives a GET request, returns just a hospital list
-#     Returns the same dropdown partial populated with hospitals
-#     It also receives the name of the selected value and uses this to
-#     identify which template to return, including params such as text in the button
-#     returned parameter include on create:
-#     hx_post_url : url name
-#     hx_post = full url with params
-#     hx_label = label for button
-#     hx_assessment_id = assessment pk
-#     hx_target = target id of element to replace with template
-#     hx_site_id = id of site selected in dropdown
-#     site = site object
-#     hx_default_text : populates the default prompt text in the input box
-#     hx_name : the name for the dropdown to identify selected hospital in the view
-#     """
-
-#     hx_post_url = None
-#     hx_post = None
-#     hx_label = None
-#     hx_site_id = None
-#     site = None
-#     hx_label = None
-#     hx_default_text = None
-#     hx_name = None
-
-#     # common params to return
-#     hx_assessment_id = request.GET.get('hx_assessment_id')
-#     hx_target = request.GET.get('hx_target')
-#     hx_name = request.GET.get('hx_name')
-
-#     if request.htmx.trigger_name == "epilepsy_surgery_centre":
-#         # request is coming from assessment tab to add a new surgical centre
-#         hx_post_url = 'epilepsy_surgery_centre'
-#         hx_post = reverse(hx_post_url, kwargs={
-#                           'assessment_id': hx_assessment_id})
-#         hx_label = "Allocate Children's Surgical Centre"
-#         hx_default_text = "Search for a children's epilepsy surgery centre..."
-
-#     elif request.htmx.trigger_name == "edit_epilepsy_surgery_centre":
-#         # request if coming from assessment tab to update/edit an existing centre
-#         hx_post_url = 'edit_epilepsy_surgery_centre'
-#         hx_label = "Update Children's Surgical Centre"
-#         hx_site_id = request.GET.get('hx_site_id')
-#         hx_post = reverse(hx_post_url, kwargs={
-#                           'assessment_id': hx_assessment_id, 'site_id': hx_site_id})
-#         site = Site.objects.get(pk=hx_site_id)
-#         hx_default_text = "Search for a children's epilepsy surgery centre..."
-
-#     elif request.htmx.trigger_name == "paediatric_neurology_centre":
-#         # request is coming from assessment tab to add a new paediatric neurology centre
-#         hx_post_url = 'paediatric_neurology_centre'
-#         hx_post = reverse(hx_post_url, kwargs={
-#                           'assessment_id': hx_assessment_id})
-#         hx_label = "Allocate Paediatric Neurology Centre"
-#         hx_default_text = "Search for a paediatric neurology centre..."
-
-#     elif request.htmx.trigger_name == "edit_paediatric_neurology_centre":
-#         # request if coming from assessment tab to update/edit an existing paediatric neurology centre
-#         hx_post_url = 'edit_paediatric_neurology_centre'
-#         hx_label = "Update Paediatric Neurology Centre"
-#         hx_site_id = request.GET.get('hx_site_id')
-#         hx_post = reverse(hx_post_url, kwargs={
-#                           'assessment_id': hx_assessment_id, 'site_id': hx_site_id})
-#         site = Site.objects.get(pk=hx_site_id)
-#         hx_default_text = "Search for a paediatric neurology centre..."
-#     elif request.htmx.trigger_name == "general_paediatric_centre":
-#         # request is coming from assessment tab to add a new paediatric neurology centre
-#         hx_post_url = 'general_paediatric_centre'
-#         hx_post = reverse(hx_post_url, kwargs={
-#                           'assessment_id': hx_assessment_id})
-#         hx_label = "Allocate General Paediatric Centre"
-#         hx_default_text = "Search for a general paediatric centre..."
-
-#     elif request.htmx.trigger_name == "edit_general_paediatric_centre":
-#         # request if coming from assessment tab to update/edit an existing paediatric neurology centre
-#         hx_post_url = 'edit_general_paediatric_centre'
-#         hx_label = "Update General Paediatric Centre"
-#         hx_site_id = request.GET.get('hx_site_id')
-#         hx_post = reverse(hx_post_url, kwargs={
-#                           'assessment_id': hx_assessment_id, 'site_id': hx_site_id})
-#         site = Site.objects.get(pk=hx_site_id)
-#         hx_default_text = "Search for a general paediatric centre..."
-
-#     # filter list to include only NHS hospitals
-#     hospital_list = HospitalTrust.objects.filter(
-#         Sector="NHS Sector").order_by('OrganisationName')
-#     context = {
-#         "hospital_list": hospital_list,
-#         "hx_post": hx_post,
-#         "label": hx_label,
-#         "default_text": hx_default_text,
-#         "assessment_id": hx_assessment_id,
-#         "hx_target": hx_target,
-#         "hx_site_id": hx_site_id,
-#         "hx_name": hx_name,
-#         "site": site
-#     }
-#     return render(request=request, template_name="epilepsy12/partials/page_elements/hospitals_select.html", context=context)

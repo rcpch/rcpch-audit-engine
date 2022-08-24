@@ -758,11 +758,11 @@ def syndrome_present(request, desscribe_id):
         print("Some mistake happened")
         # TODO need to handle this
 
-    updated_desscribe = DESSCRIBE.objects.get(
+    desscribe = DESSCRIBE.objects.get(
         pk=desscribe_id)
 
     context = {
-        "desscribe": updated_desscribe,
+        "desscribe": desscribe,
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
     }
 
