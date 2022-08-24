@@ -29,6 +29,19 @@ def database(request):
 
 @login_required
 def hospital_reports(request):
+    """
+    !!!!
+    One time statement only for development
+    Drops all registration and related records
+    !!!!
+    """
+
+    Registration.objects.all().delete()
+
+    """
+    !!!
+    """
+
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(
         OrganisationName=request.user.hospital_trust)
@@ -87,8 +100,6 @@ def hospital_reports(request):
             cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
         .order_by('cases_aggregated_by_deprivation')
     )
-
-    # Registration.objects.all().delete()
 
     total_registrations = Registration.objects.all().count()
     total_cases = Case.objects.all().count()
