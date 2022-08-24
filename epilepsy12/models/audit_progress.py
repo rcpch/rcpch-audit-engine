@@ -78,16 +78,16 @@ class AuditProgress(models.Model):
         default=0,
         null=True
     )
-    investigation_complete = models.BooleanField(
+    investigations_complete = models.BooleanField(
         default=False,
         null=True
     )
-    investigation_total_expected_fields = models.SmallIntegerField(
+    investigations_total_expected_fields = models.SmallIntegerField(
         "Total Number of fields expected",
         default=0,
         null=True
     )
-    investigation_total_completed_fields = models.SmallIntegerField(
+    investigations_total_completed_fields = models.SmallIntegerField(
         "Total Number of fields completed",
         default=0,
         null=True

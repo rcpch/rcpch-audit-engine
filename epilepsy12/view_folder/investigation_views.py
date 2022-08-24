@@ -1,12 +1,10 @@
 from datetime import datetime
 from django.http import HttpResponse
 from django.db.models import Q
-from django.utils.timezone import make_aware
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from epilepsy12.models.investigations import Investigations
-
-from epilepsy12.models.registration import Registration
+from epilepsy12.models import Investigations, Registration, AuditProgress, Site
+from django_htmx.http import trigger_client_event
 
 
 @login_required
@@ -16,21 +14,26 @@ def investigations(request, case_id):
     investigations, created = Investigations.objects.get_or_create(
         registration=registration)
 
+    test_fields_update_audit_progress(investigations)
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "investigations": investigations,
-        # "registration_complete": registration.audit_progress.registration_complete,
-        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        # "assessment_complete": registration.audit_progress.assessment_complete,
-        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
         "audit_progress": registration.audit_progress,
         "active_template": "investigations"
     }
-    return render(request=request, template_name='epilepsy12/investigations.html', context=context)
+
+    response = render(
+        request=request, template_name='epilepsy12/investigations.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 # htmx
@@ -66,11 +69,22 @@ def eeg_indicated(request, investigations_id):
     # return the updated model
     investigations = Investigations.objects.get(pk=investigations_id)
 
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def eeg_request_date(request, investigations_id):
@@ -91,11 +105,22 @@ def eeg_request_date(request, investigations_id):
         eeg_request_date=naive_eeg_request_date)
     investigations = Investigations.objects.get(pk=investigations_id)
 
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def eeg_performed_date(request, investigations_id):
@@ -113,11 +138,23 @@ def eeg_performed_date(request, investigations_id):
     Investigations.objects.filter(pk=investigations_id).update(
         eeg_performed_date=naive_eeg_performed_date)
     investigations = Investigations.objects.get(pk=investigations_id)
+
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/eeg_information.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def twelve_lead_ecg_status(request, investigations_id):
@@ -132,11 +169,23 @@ def twelve_lead_ecg_status(request, investigations_id):
     Investigations.objects.filter(pk=investigations_id).update(
         twelve_lead_ecg_status=twelve_lead_ecg_status)
     investigations = Investigations.objects.get(pk=investigations_id)
+
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/ecg_status.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/ecg_status.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def ct_head_scan_status(request, investigations_id):
@@ -151,11 +200,23 @@ def ct_head_scan_status(request, investigations_id):
     Investigations.objects.filter(pk=investigations_id).update(
         ct_head_scan_status=ct_head_scan_status)
     investigations = Investigations.objects.get(pk=investigations_id)
+
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/ct_head_status.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/ct_head_status.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def mri_indicated(request, investigations_id):
@@ -187,11 +248,22 @@ def mri_indicated(request, investigations_id):
     # return the updated model
     investigations = Investigations.objects.get(pk=investigations_id)
 
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
 
 
 def mri_brain_date(request, investigations_id):
@@ -207,8 +279,74 @@ def mri_brain_date(request, investigations_id):
         mri_brain_date=datetime.strptime(
             mri_brain_date, "%Y-%m-%d").date())
     investigations = Investigations.objects.get(pk=investigations_id)
+
+    test_fields_update_audit_progress(investigations)
+
     context = {
         'investigations': investigations
     }
 
-    return render(request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+def total_fields_expected(model_instance):
+    # all fields would be:
+    #  eeg_indicated
+    # eeg_request_date
+    # eeg_performed_date
+    # twelve_lead_ecg_status
+    # ct_head_scan_status
+    # mri_indicated
+    # mri_brain_date
+
+    cumulative_fields = 0
+    if model_instance.eeg_indicated:
+        cumulative_fields += 3
+    else:
+        cumulative_fields += 1
+
+    if model_instance.twelve_lead_ecg_status:
+        cumulative_fields += 1
+
+    if model_instance.ct_head_scan_status:
+        cumulative_fields += 1
+    else:
+        cumulative_fields += 1
+
+    if model_instance.mri_indicated:
+        cumulative_fields += 2
+    else:
+        cumulative_fields += 1
+
+    return cumulative_fields
+
+
+def total_fields_completed(model_instance):
+    # counts the number of completed fields
+    fields = model_instance._meta.get_fields()
+    counter = 0
+    for field in fields:
+        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+            counter += 1
+    return counter
+
+# test all fields
+
+
+def test_fields_update_audit_progress(model_instance):
+    all_completed_fields = total_fields_completed(model_instance)
+    all_fields = total_fields_expected(model_instance)
+    AuditProgress.objects.filter(registration=model_instance.registration).update(
+        investigations_total_expected_fields=all_fields,
+        investigations_total_completed_fields=all_completed_fields,
+        investigations_complete=all_completed_fields == all_fields
+    )

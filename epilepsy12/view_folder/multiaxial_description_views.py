@@ -7,9 +7,6 @@ from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIG
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from django_htmx.http import trigger_client_event
-
-from epilepsy12.models import desscribe
-
 from ..general_functions import fuzzy_scan_for_keywords
 
 from ..models import Registration, Keyword, DESSCRIBE, AuditProgress, Comorbidity
