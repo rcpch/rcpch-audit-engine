@@ -36,7 +36,7 @@ def hospital_reports(request):
     !!!!
     """
 
-    Registration.objects.all().delete()
+    # Registration.objects.all().delete()
 
     """
     !!!
