@@ -6,7 +6,7 @@ from .time_and_user_abstract_base_classes import *
 from .case import Case
 
 
-class Comorbidity(models.Model):
+class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information on all mental health, behavioural and developmental comorbidities
     [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from datetime import date
+from datetime import date, datetime
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
 from ..models import Registration, Site
@@ -120,7 +120,9 @@ def allocate_lead_site(request, registration_id):
             hospital_trust=selected_hospital_trust,
             site_is_actively_involved_in_epilepsy_care=True
         ).update(
-            site_is_primary_centre_of_epilepsy_care=True
+            site_is_primary_centre_of_epilepsy_care=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
     else:
         # this site may still be associated with this registration but not actively
@@ -272,17 +274,23 @@ def update_lead_site(request, registration_id, site_id, update):
         Site.objects.filter(pk=site_id).update(
             hospital_trust=new_hospital_trust,
             site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=True)
+            site_is_actively_involved_in_epilepsy_care=True,
+            updated_at=timezone.now(),
+            updated_by=request.user)
     elif update == "transfer":
         new_trust_id = request.POST.get('transfer_lead_site')
         new_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
             site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=False)
+            site_is_actively_involved_in_epilepsy_care=False,
+            updated_at=timezone.now(),
+            updated_by=request.user)
         Site.objects.create(
             hospital_trust=new_hospital_trust,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
+            updated_at=timezone.now(),
+            updated_by=request.user,
             registration=registration)
 
     site = Site.objects.filter(
@@ -335,7 +343,10 @@ def delete_lead_site(request, registration_id, site_id):
         # remove the lead role allocation
         Site.objects.filter(
             pk=site_id
-        ).update(site_is_primary_centre_of_epilepsy_care=False)
+        ).update(
+            site_is_primary_centre_of_epilepsy_care=False,
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     else:
         # there are no other roles (previous or current)
@@ -425,7 +436,9 @@ def confirm_eligible(request, registration_id):
     if registration.eligibility_criteria_met and registration.registration_date is not None:
         # registration now complete
         AuditProgress.objects.filter(pk=registration.audit_progress.pk).update(
-            registration_complete=True
+            registration_complete=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
         # TODO need to update this function and the registration_date function to include lead clinician
         # trigger a GET request from the steps template

@@ -4,9 +4,10 @@ from epilepsy12.models.hospital_trust import HospitalTrust
 from ..constants import *
 # other tables
 from .registration import Registration
+from .time_and_user_abstract_base_classes import *
 
 
-class Site(models.Model):
+class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about each site that oversees the epilepsy care of each case.
     This class references the HospitalTrust class, as one hospital trust may reference multiple sites

@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -56,6 +56,8 @@ def date_of_initial_assessment(request, initial_assessment_id):
     # save date
     try:
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            updated_at=timezone.now(),
+            updated_by=request.user,
             date_of_initial_assessment=new_date)
     except Exception as error:
         print(error)
@@ -94,7 +96,11 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_as
 
     try:
         InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(first_paediatric_assessment_in_acute_or_nonacute_setting=first_paediatric_assessment_in_acute_or_nonacute_setting)
+            pk=initial_assessment_id).update(
+                first_paediatric_assessment_in_acute_or_nonacute_setting=first_paediatric_assessment_in_acute_or_nonacute_setting,
+                updated_at=timezone.now(),
+                updated_by=request.user
+        )
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -134,12 +140,18 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
 
     if general_paediatrics_referral_made:
         InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(general_paediatrics_referral_made=True)
+            pk=initial_assessment_id).update(
+                general_paediatrics_referral_made=True,
+                updated_at=timezone.now(),
+                updated_by=request.user
+        )
     else:
         InitialAssessment.objects.filter(
             pk=initial_assessment_id).update(
                 general_paediatrics_referral_made=False,
-                date_of_referral_to_general_paediatrics=None
+                date_of_referral_to_general_paediatrics=None,
+                updated_at=timezone.now(),
+                updated_by=request.user
         )
 
     initial_assessment = InitialAssessment.objects.get(
@@ -174,7 +186,10 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
             date_of_referral_to_general_paediatrics, "%Y-%m-%d").date()
         try:
             InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                date_of_referral_to_general_paediatrics=new_date)
+                date_of_referral_to_general_paediatrics=new_date,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         except Exception as error:
             message = error
 
@@ -213,7 +228,10 @@ def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
 
         try:
             InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                when_the_first_epileptic_episode_occurred=new_date)
+                when_the_first_epileptic_episode_occurred=new_date,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         except Exception as error:
             message = error
 
@@ -247,12 +265,14 @@ def when_the_first_epileptic_episode_occurred_confidence(request, initial_assess
     HTMX callback from when_the_first_epileptic_episode_occurred
     """
     when_the_first_epileptic_episode_occurred_confidence = request.htmx.trigger_name
-    print(f"hello {when_the_first_epileptic_episode_occurred_confidence}")
 
     if when_the_first_epileptic_episode_occurred_confidence:
         try:
             InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                when_the_first_epileptic_episode_occurred_confidence=when_the_first_epileptic_episode_occurred_confidence)
+                when_the_first_epileptic_episode_occurred_confidence=when_the_first_epileptic_episode_occurred_confidence,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         except Exception as error:
             message = error
 
@@ -320,7 +340,10 @@ def has_number_of_episodes_since_the_first_been_documented(request, initial_asse
 
     try:
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            has_number_of_episodes_since_the_first_been_documented=has_number_of_episodes_since_the_first_been_documented)
+            has_number_of_episodes_since_the_first_been_documented=has_number_of_episodes_since_the_first_been_documented,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
     except Exception as error:
         return HttpResponse(error)
 
@@ -353,7 +376,9 @@ def general_examination_performed(request, initial_assessment_id):
 
     try:
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            general_examination_performed=general_examination_performed)
+            general_examination_performed=general_examination_performed,
+            updated_at=timezone.now(),
+            updated_by=request.user)
     except Exception as error:
         return HttpResponse(error)
 
@@ -386,7 +411,9 @@ def neurological_examination_performed(request, initial_assessment_id):
 
     try:
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            neurological_examination_performed=neurological_examination_performed)
+            neurological_examination_performed=neurological_examination_performed,
+            updated_at=timezone.now(),
+            updated_by=request.user)
     except Exception as error:
         return HttpResponse(error)
 
@@ -419,7 +446,9 @@ def developmental_learning_or_schooling_problems(request, initial_assessment_id)
 
     try:
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            developmental_learning_or_schooling_problems=developmental_learning_or_schooling_problems)
+            developmental_learning_or_schooling_problems=developmental_learning_or_schooling_problems,
+            updated_at=timezone.now(),
+            updated_by=request.user)
     except Exception as error:
         return HttpResponse(error)
 
@@ -452,7 +481,9 @@ def behavioural_or_emotional_problems(request, initial_assessment_id):
 
     try:
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            behavioural_or_emotional_problems=behavioural_or_emotional_problems)
+            behavioural_or_emotional_problems=behavioural_or_emotional_problems,
+            updated_at=timezone.now(),
+            updated_by=request.user)
     except Exception as error:
         return HttpResponse(error)
 
@@ -485,7 +516,11 @@ def diagnostic_status(request, initial_assessment_id):
 
     try:
         InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(diagnostic_status=diagnostic_status)
+            pk=initial_assessment_id).update(
+                diagnostic_status=diagnostic_status,
+                updated_at=timezone.now(),
+                updated_by=request.user
+        )
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -521,7 +556,10 @@ def episode_definition(request, initial_assessment_id):
 
     try:
         InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(episode_definition=episode_definition)
+            pk=initial_assessment_id).update(
+                episode_definition=episode_definition,
+                updated_at=timezone.now(),
+                updated_by=request.user)
     except Exception as error:
         print(error)
         return HttpResponse(error)

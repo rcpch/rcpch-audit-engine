@@ -9,7 +9,7 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 
-class DESSCRIBE(models.Model):
+class DESSCRIBE(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # Summarises a child or young person's epilepsy in a multiaxial way.
     # It is a standard tool for clinicians when describing or discussing a person's epilepsy and is taught nationally
     # There is one record per case.

@@ -1,4 +1,5 @@
 
+from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -27,13 +28,6 @@ def epilepsy_context(request, case_id):
         "registration": registration,
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
-        # "registration_complete": registration.audit_progress.registration_complete,
-        # "initial_assessment_complete": registration.audit_progress.initial_assessment_complete,
-        # "assessment_complete": registration.audit_progress.assessment_complete,
-        # "epilepsy_context_complete": registration.audit_progress.epilepsy_context_complete,
-        # "multiaxial_description_complete": registration.audit_progress.multiaxial_description_complete,
-        # "investigation_complete": registration.audit_progress.investigation_complete,
-        # "management_complete": registration.audit_progress.management_complete,
         "audit_progress": epilepsy_context.registration.audit_progress,
         "active_template": "epilepsy_context",
         "comorbidities": comorbidities
@@ -63,7 +57,10 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
     try:
         EpilepsyContext.objects.filter(
-            pk=epilepsy_context_id).update(previous_febrile_seizure=previous_febrile_seizure)
+            pk=epilepsy_context_id).update(
+                previous_febrile_seizure=previous_febrile_seizure,
+                updated_at=timezone.now(),
+                updated_by=request.user)
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -100,7 +97,10 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
     try:
         EpilepsyContext.objects.filter(
-            pk=epilepsy_context_id).update(previous_acute_symptomatic_seizure=previous_acute_symptomatic_seizure)
+            pk=epilepsy_context_id).update(
+                previous_acute_symptomatic_seizure=previous_acute_symptomatic_seizure,
+                updated_at=timezone.now(),
+                updated_by=request.user)
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -137,7 +137,10 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
     try:
         EpilepsyContext.objects.filter(
-            pk=epilepsy_context_id).update(is_there_a_family_history_of_epilepsy=is_there_a_family_history_of_epilepsy)
+            pk=epilepsy_context_id).update(
+                is_there_a_family_history_of_epilepsy=is_there_a_family_history_of_epilepsy,
+                updated_at=timezone.now(),
+                updated_by=request.user)
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -174,7 +177,10 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
     try:
         EpilepsyContext.objects.filter(
-            pk=epilepsy_context_id).update(previous_neonatal_seizures=previous_neonatal_seizures)
+            pk=epilepsy_context_id).update(
+                previous_neonatal_seizures=previous_neonatal_seizures,
+                updated_at=timezone.now(),
+                updated_by=request.user)
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -211,7 +217,9 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
 
     try:
         EpilepsyContext.objects.filter(pk=epilepsy_context_id).update(
-            diagnosis_of_epilepsy_withdrawn=diagnosis_of_epilepsy_withdrawn_status)
+            diagnosis_of_epilepsy_withdrawn=diagnosis_of_epilepsy_withdrawn_status,
+            updated_at=timezone.now(),
+            updated_by=request.user)
     except Exception as error:
         message = error
 

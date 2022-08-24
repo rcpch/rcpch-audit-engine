@@ -1,3 +1,4 @@
+from django.utils import timezone
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -209,7 +210,10 @@ def is_a_pregnancy_prevention_programme_in_place(request, management_id):
     """
 
     Management.objects.filter(pk=management_id).update(
-        is_a_pregnancy_prevention_programme_in_place=Q(is_a_pregnancy_prevention_programme_in_place=False))
+        is_a_pregnancy_prevention_programme_in_place=Q(
+            is_a_pregnancy_prevention_programme_in_place=False),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     medicines = AntiEpilepsyMedicine.objects.filter(management=management)
@@ -374,10 +378,14 @@ def individualised_care_plan_in_place(request, management_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_in_place=True)
+                individualised_care_plan_in_place=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_in_place=False)
+                individualised_care_plan_in_place=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -398,6 +406,8 @@ def individualised_care_plan_in_place(request, management_id):
             individualised_care_plan_includes_aihp=None,
             individualised_care_plan_includes_ehcp=None,
             has_individualised_care_plan_been_updated_in_the_last_year=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     management = Management.objects.get(pk=management_id)
@@ -429,7 +439,9 @@ def individualised_care_plan_date(request, management_id):
     # TODO date validation needed
     Management.objects.filter(pk=management_id).update(
         individualised_care_plan_date=datetime.strptime(
-            request.POST.get('input_date_field'), "%Y-%m-%d").date())
+            request.POST.get('input_date_field'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
     management = Management.objects.get(pk=management_id)
     context = {
         'management': management
@@ -459,17 +471,24 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_has_parent_carer_child_agreement=True)
+                individualised_care_plan_has_parent_carer_child_agreement=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_has_parent_carer_child_agreement=False)
+                individualised_care_plan_has_parent_carer_child_agreement=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_has_parent_carer_child_agreement=Q(individualised_care_plan_has_parent_carer_child_agreement=False))
+            individualised_care_plan_has_parent_carer_child_agreement=Q(
+                individualised_care_plan_has_parent_carer_child_agreement=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -500,17 +519,24 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_service_contact_details=True)
+                individualised_care_plan_includes_service_contact_details=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_service_contact_details=False)
+                individualised_care_plan_includes_service_contact_details=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_includes_service_contact_details=Q(individualised_care_plan_includes_service_contact_details=False))
+            individualised_care_plan_includes_service_contact_details=Q(
+                individualised_care_plan_includes_service_contact_details=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -541,17 +567,22 @@ def individualised_care_plan_include_first_aid(request, management_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_include_first_aid=True)
+                individualised_care_plan_include_first_aid=True,
+                updated_at=timezone.now())
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_include_first_aid=False)
+                individualised_care_plan_include_first_aid=False,
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_include_first_aid=Q(individualised_care_plan_include_first_aid=False))
+            individualised_care_plan_include_first_aid=Q(
+                individualised_care_plan_include_first_aid=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -592,7 +623,10 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_parental_prolonged_seizure_care=Q(individualised_care_plan_parental_prolonged_seizure_care=False))
+            individualised_care_plan_parental_prolonged_seizure_care=Q(
+                individualised_care_plan_parental_prolonged_seizure_care=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -633,7 +667,10 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_includes_general_participation_risk=Q(individualised_care_plan_includes_general_participation_risk=False))
+            individualised_care_plan_includes_general_participation_risk=Q(
+                individualised_care_plan_includes_general_participation_risk=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -665,17 +702,23 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_addresses_water_safety=True)
+                individualised_care_plan_addresses_water_safety=True,
+                updated_at=timezone.now())
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_addresses_water_safety=False)
+                individualised_care_plan_addresses_water_safety=False,
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_addresses_water_safety=Q(individualised_care_plan_addresses_water_safety=False))
+            individualised_care_plan_addresses_water_safety=Q(
+                individualised_care_plan_addresses_water_safety=False),
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -706,17 +749,24 @@ def individualised_care_plan_addresses_sudep(request, management_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_addresses_sudep=True)
+                individualised_care_plan_addresses_sudep=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_addresses_sudep=False)
+                individualised_care_plan_addresses_sudep=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_addresses_sudep=Q(individualised_care_plan_addresses_sudep=False))
+            individualised_care_plan_addresses_sudep=Q(
+                individualised_care_plan_addresses_sudep=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -748,17 +798,24 @@ def individualised_care_plan_includes_aihp(request, management_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_aihp=True)
+                individualised_care_plan_includes_aihp=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_aihp=False)
+                individualised_care_plan_includes_aihp=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_includes_aihp=Q(individualised_care_plan_includes_aihp=False))
+            individualised_care_plan_includes_aihp=Q(
+                individualised_care_plan_includes_aihp=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -790,17 +847,22 @@ def individualised_care_plan_includes_ehcp(request, management_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_ehcp=True)
+                individualised_care_plan_includes_ehcp=True,
+                updated_at=timezone.now())
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_ehcp=False)
+                individualised_care_plan_includes_ehcp=False,
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_includes_ehcp=Q(individualised_care_plan_includes_ehcp=False))
+            individualised_care_plan_includes_ehcp=Q(
+                individualised_care_plan_includes_ehcp=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -833,17 +895,24 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Management.objects.filter(pk=management_id).update(
-                has_individualised_care_plan_been_updated_in_the_last_year=True)
+                has_individualised_care_plan_been_updated_in_the_last_year=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Management.objects.filter(pk=management_id).update(
-                has_individualised_care_plan_been_updated_in_the_last_year=False)
+                has_individualised_care_plan_been_updated_in_the_last_year=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
             return HttpResponse("Error")
     else:
         Management.objects.filter(pk=management_id).update(
-            has_individualised_care_plan_been_updated_in_the_last_year=Q(has_individualised_care_plan_been_updated_in_the_last_year=False))
+            has_individualised_care_plan_been_updated_in_the_last_year=Q(
+                has_individualised_care_plan_been_updated_in_the_last_year=False),
+            updated_at=timezone.now(),
+            updated_by=request.user)
 
     management = Management.objects.get(pk=management_id)
 

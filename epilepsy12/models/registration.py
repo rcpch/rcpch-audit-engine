@@ -8,7 +8,7 @@ from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
 
-class Registration(models.Model):
+class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     A record is created in the Registration class every time a case is registered for the audit
     """

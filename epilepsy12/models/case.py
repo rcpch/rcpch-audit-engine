@@ -11,7 +11,7 @@ from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
 
-class Case(models.Model):
+class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class holds information about each child or young person
     Each case is unique

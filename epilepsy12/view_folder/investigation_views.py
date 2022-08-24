@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils import timezone
 from django.http import HttpResponse
 from django.db.models import Q
 from django.shortcuts import render
@@ -50,10 +51,12 @@ def eeg_indicated(request, investigations_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Investigations.objects.filter(pk=investigations_id).update(
-                eeg_indicated=True)
+                eeg_indicated=True,
+                updated_at=timezone.now())
         elif request.htmx.trigger_name == 'button-false':
             Investigations.objects.filter(pk=investigations_id).update(
-                eeg_indicated=False)
+                eeg_indicated=False,
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -63,7 +66,9 @@ def eeg_indicated(request, investigations_id):
         Investigations.objects.filter(pk=investigations_id).update(
             eeg_indicated=Q(eeg_indicated=False),
             eeg_request_date=None,
-            eeg_performed_date=None
+            eeg_performed_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     # return the updated model
@@ -102,7 +107,10 @@ def eeg_request_date(request, investigations_id):
     # aware_eeg_request_date = make_aware(naive_eeg_request_date)
 
     Investigations.objects.filter(pk=investigations_id).update(
-        eeg_request_date=naive_eeg_request_date)
+        eeg_request_date=naive_eeg_request_date,
+        updated_at=timezone.now(),
+        updated_by=request.user)
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
     test_fields_update_audit_progress(investigations)
@@ -136,7 +144,9 @@ def eeg_performed_date(request, investigations_id):
         request.POST.get('eeg_performed_date'), "%Y-%m-%d").date()
 
     Investigations.objects.filter(pk=investigations_id).update(
-        eeg_performed_date=naive_eeg_performed_date)
+        eeg_performed_date=naive_eeg_performed_date,
+        updated_at=timezone.now(),
+        updated_by=request.user)
     investigations = Investigations.objects.get(pk=investigations_id)
 
     test_fields_update_audit_progress(investigations)
@@ -167,7 +177,9 @@ def twelve_lead_ecg_status(request, investigations_id):
     investigations = Investigations.objects.get(pk=investigations_id)
     twelve_lead_ecg_status = not investigations.twelve_lead_ecg_status
     Investigations.objects.filter(pk=investigations_id).update(
-        twelve_lead_ecg_status=twelve_lead_ecg_status)
+        twelve_lead_ecg_status=twelve_lead_ecg_status,
+        updated_at=timezone.now(),
+        updated_by=request.user)
     investigations = Investigations.objects.get(pk=investigations_id)
 
     test_fields_update_audit_progress(investigations)
@@ -198,7 +210,10 @@ def ct_head_scan_status(request, investigations_id):
     investigations = Investigations.objects.get(pk=investigations_id)
     ct_head_scan_status = not investigations.ct_head_scan_status
     Investigations.objects.filter(pk=investigations_id).update(
-        ct_head_scan_status=ct_head_scan_status)
+        ct_head_scan_status=ct_head_scan_status,
+        updated_at=timezone.now(),
+        updated_by=request.user
+    )
     investigations = Investigations.objects.get(pk=investigations_id)
 
     test_fields_update_audit_progress(investigations)
@@ -233,7 +248,10 @@ def mri_indicated(request, investigations_id):
                 mri_indicated=True)
         elif request.htmx.trigger_name == 'button-false':
             Investigations.objects.filter(pk=investigations_id).update(
-                mri_indicated=False)
+                mri_indicated=False,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -242,7 +260,9 @@ def mri_indicated(request, investigations_id):
         # there is a selection. If this has become false, set all associated fields to None
         Investigations.objects.filter(pk=investigations_id).update(
             mri_indicated=Q(mri_indicated=False),
-            mri_brain_date=None
+            mri_brain_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     # return the updated model
@@ -277,7 +297,9 @@ def mri_brain_date(request, investigations_id):
 
     Investigations.objects.filter(pk=investigations_id).update(
         mri_brain_date=datetime.strptime(
-            mri_brain_date, "%Y-%m-%d").date())
+            mri_brain_date, "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
     investigations = Investigations.objects.get(pk=investigations_id)
 
     test_fields_update_audit_progress(investigations)
