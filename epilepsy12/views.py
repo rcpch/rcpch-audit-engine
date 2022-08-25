@@ -1,17 +1,16 @@
-import math
-import operator
 from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.ethnicities import ETHNICITIES
+from epilepsy12.models import desscribe
 from epilepsy12.models.case import Case
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
 from .models import AuditProgress
-
+from itertools import chain
 from .view_folder import *
 
 user = get_user_model()
@@ -41,6 +40,17 @@ def hospital_reports(request):
     """
     !!!
     """
+
+    initial_assessment = InitialAssessment.objects.all()
+    epilepsy_context = EpilepsyContext.objects.all()
+    desscribe = DESSCRIBE.objects.all()
+    assessment = Assessment.objects.all()
+    management = Management.objects.all()
+    registration = Registration.objects.all()
+
+    all_models = list(chain(initial_assessment, epilepsy_context,
+                      desscribe, assessment, management, registration))[:5]
+    all_models.sort(key=lambda x: x.updated_at, reverse=True)
 
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(
@@ -123,7 +133,7 @@ def hospital_reports(request):
         'total_referred_to_paediatrics': total_referred_to_paediatrics,
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
-
+        'all_models': all_models
     })
 
 

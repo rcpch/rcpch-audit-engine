@@ -68,3 +68,23 @@ def is_in(url_name, args):
         return True
     else:
         return False
+
+
+@register.filter
+def to_class_name(value):
+    if value.__class__.__name__ == "Registration":
+        return 'Verification/Registration'
+    elif value.__class__.__name__ == "InitialAssessment":
+        return 'Initial Assessment'
+    elif value.__class__.__name__ == "EpilepsyContext":
+        return 'Epilepsy Context'
+    elif value.__class__.__name__ == "DESSCRIBE":
+        return 'Multiaxial Description'
+    elif value.__class__.__name__ == "Assessment":
+        return 'Milestones'
+    elif value.__class__.__name__ == "Investigations":
+        return 'Investigations'
+    elif value.__class__.__name__ == "Management":
+        return 'Management'
+    else:
+        return 'Error'

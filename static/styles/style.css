@@ -700,3 +700,17 @@ ui.rcpch_chart_container.segment {
   font-family: Arial, Helvetica, sans-serif;
   font-size: small;
 }
+
+.numberCircle {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  margin-top: 8px;
+
+  background: var(--rcpch_light_blue);
+  border: 2px solid var(--rcpch_dark_blue);
+  color: var(--rcpch_dark_blue);
+  text-align: center;
+
+  font: 32px Arial, sans-serif;
+}
