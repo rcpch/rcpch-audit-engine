@@ -293,7 +293,7 @@ def mri_brain_date(request, investigations_id):
     This returns a date value which is stored in the model and returns the same partial.
     """
     investigations = Investigations.objects.get(pk=investigations_id)
-    mri_brain_date = request.POST.get('input_date_field')
+    mri_brain_date = request.POST.get(request.htmx.trigger_name)
 
     Investigations.objects.filter(pk=investigations_id).update(
         mri_brain_date=datetime.strptime(
@@ -338,6 +338,8 @@ def total_fields_expected(model_instance):
 
     if model_instance.twelve_lead_ecg_status:
         cumulative_fields += 1
+    else:
+        cumulative_fields += 1
 
     if model_instance.ct_head_scan_status:
         cumulative_fields += 1
@@ -357,7 +359,9 @@ def total_fields_completed(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+                getattr(model_instance, field.name) is not None
+                and field.name not in ['id', 'registration', 'created_by', 'created_at', 'updated_by', 'updated_at']):
             counter += 1
     return counter
 

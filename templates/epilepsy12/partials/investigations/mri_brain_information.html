@@ -14,7 +14,7 @@
         {% if investigations.mri_indicated %}
             
             {% url 'mri_brain_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain date" date_value=investigations.mri_brain_date %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain date" date_value=investigations.mri_brain_date data_position='top left' input_date_field_name='mri_brain_date' %}
         
         {% endif %}
 
