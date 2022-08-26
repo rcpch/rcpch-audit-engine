@@ -43,7 +43,6 @@ FOCAL_EPILEPSY_FIELDS = [
     "focal_onset_gelastic",
     "focal_onset_focal_to_bilateral_tonic_clonic",
     "focal_onset_other",
-    "focal_onset_other_details"
 ]
 
 GENERALISED_ONSET_EPILEPSY_FIELDS = [
@@ -186,7 +185,6 @@ def set_epilepsy_fields_to_none(request, desscribe_id):
         focal_onset_gelastic=None,
         focal_onset_focal_to_bilateral_tonic_clonic=None,
         focal_onset_other=None,
-        focal_onset_other_details=None,
         updated_at=timezone.now(),
         updated_by=request.user
     )
@@ -1181,7 +1179,6 @@ def total_fields_expected(model_instance):
     # focal_onset_gelastic
     # focal_onset_focal_to_bilateral_tonic_clonic
     # focal_onset_other
-    # focal_onset_other_details
     # epileptic_generalised_onset
     # epileptic_generalised_onset_other_details
     # nonepileptic_seizure_unknown_onset
@@ -1222,7 +1219,8 @@ def total_fields_expected(model_instance):
         cumulative_fields += 2
         if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
             # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
-            cumulative_fields += 5
+            # TODO #75 ask @cdunkley if it is acceptable for radiobuttons to be optional
+            cumulative_fields += 0
         elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
             # includes prolonged_generalized_convulsive_seizures
             cumulative_fields += 2
@@ -1273,10 +1271,15 @@ def total_fields_completed(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+                getattr(model_instance, field.name) is not None
+                and field.name not in ['id', 'registration', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']):
             if field.name == 'description':
                 if len(getattr(model_instance, field.name)) > 0:
                     counter += 1
+            elif field.name in FOCAL_EPILEPSY_FIELDS:
+                # see #75 - focal epilepsy types currently optional
+                counter += 0
             else:
                 counter += 1
     return counter

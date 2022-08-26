@@ -185,12 +185,6 @@ class DESSCRIBE(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         blank=True,
         null=True
     )
-    focal_onset_other_details = models.CharField(
-        max_length=250,
-        null=True,
-        default="",
-        blank=True,
-    )
     epileptic_generalised_onset = models.CharField(
         max_length=3,
         choices=sorted(GENERALISED_SEIZURE_TYPE),
