@@ -26,16 +26,14 @@ class UserStampAbstractBaseClass(models.Model):
         on_delete=models.CASCADE,
         related_name="created%(app_label)s_%(class)s_related",
         verbose_name="record created by user in %(class)",
-        null=True,
-        default=1
+        null=True
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="updated%(app_label)s_%(class)s_related",
         verbose_name="record updated by user in %(class)",
-        null=True,
-        default=1
+        null=True
     )
 
     class Meta:
