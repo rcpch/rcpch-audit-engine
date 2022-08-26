@@ -1801,30 +1801,28 @@ def total_fields_expected(model_instance):
     # for surgery, gen paeds or neuro there are site fields to include also
 
     cumulative_fields = 0
-    if model_instance.childrens_epilepsy_surgical_service_referral_criteria_met or model_instance.childrens_epilepsy_surgical_service_referral_criteria_met is None:
+    if model_instance.childrens_epilepsy_surgical_service_referral_criteria_met:
+
         cumulative_fields += 4
     else:
         cumulative_fields += 1
 
-    if model_instance.consultant_paediatrician_referral_made or model_instance.consultant_paediatrician_referral_made is None:
+    if model_instance.consultant_paediatrician_referral_made:
         cumulative_fields += 4
     else:
         cumulative_fields += 1
 
-    if model_instance.paediatric_neurologist_referral_made or model_instance.paediatric_neurologist_referral_made is not None:
+    if model_instance.paediatric_neurologist_referral_made:
         cumulative_fields += 4
     else:
         cumulative_fields += 1
 
-    if model_instance.epilepsy_specialist_nurse_referral_made or model_instance.epilepsy_specialist_nurse_referral_made is not None:
+    if model_instance.epilepsy_specialist_nurse_referral_made:
         cumulative_fields += 3
     else:
         cumulative_fields += 1
 
-    if cumulative_fields == 0:
-        return 4
-    else:
-        return cumulative_fields
+    return cumulative_fields
 
 
 def total_fields_completed(model_instance):
@@ -1832,7 +1830,10 @@ def total_fields_completed(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+                getattr(model_instance, field.name) is not None
+                and field.name not in ['id', 'registration', 'created_by', 'created_at', 'updated_by', 'updated_at']):
+            print(field.name)
             counter += 1
     # must include centres allocated also
     sites = Site.objects.filter(
