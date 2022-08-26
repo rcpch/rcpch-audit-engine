@@ -988,7 +988,9 @@ def total_fields_completed(model_instance):
 
     counter = 0
     for field in fields:
-        if field.name is not None and field.name != 'id' and field.name != 'registration' and field.name != 'antiepilepsymedicine':
+        if (
+                field.name is not None
+                and field.name not in ['id', 'registration', 'antiepilepsymedicine', 'created_by', 'created_at', 'updated_by', 'updated_at']):
             if getattr(model_instance, field.name) is not None:
                 counter += 1
     return counter
