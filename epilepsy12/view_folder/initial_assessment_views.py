@@ -1,4 +1,5 @@
 from django.utils import timezone
+from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -13,8 +14,17 @@ from ..models import InitialAssessment
 @login_required
 def initial_assessment(request, case_id):
     registration = Registration.objects.get(case=case_id)
-    initial_assessment, created = InitialAssessment.objects.get_or_create(
-        registration=registration)
+
+    if InitialAssessment.objects.filter(registration=registration).exists():
+        initial_assessment = InitialAssessment.objects.filter(
+            registration=registration).get()
+    else:
+        InitialAssessment.objects.create(
+            registration=registration
+            # will autoupdate date and user on creation
+        )
+        initial_assessment = InitialAssessment.objects.filter(
+            registration=registration).get()
 
     test_fields_update_audit_progress(initial_assessment)
 
@@ -619,7 +629,11 @@ def completed_fields(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+            getattr(model_instance, field.name) is not None
+            and field.name not in ['id', 'registration', 'created_at', 'updated_at', 'created_by', 'updated_by']
+        ):
+            print(field.name)
             counter += 1
     return counter
 

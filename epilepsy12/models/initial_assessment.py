@@ -45,7 +45,7 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     has_description_of_the_episode_or_episodes_been_gathered = models.BooleanField(
         "has a description of the episode or episodes been gathered?",
         null=True,
-        default=False
+        default=None
     )
     when_the_first_epileptic_episode_occurred_confidence = models.CharField(
         "how accurate is the date of the first epileptic episode?",
@@ -62,27 +62,27 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     has_number_of_episodes_since_the_first_been_documented = models.BooleanField(
         "has the frequency of episodes since the first recorded been documented?",
         null=True,
-        default=False
+        default=None
     )
     general_examination_performed = models.BooleanField(
         "has a general clinical examination been performed?",
         null=True,
-        default=False
+        default=None
     )
     neurological_examination_performed = models.BooleanField(
         "has a neurological examination been performed?",
         null=True,
-        default=False
+        default=None
     )
     developmental_learning_or_schooling_problems = models.BooleanField(
         "has the presence or absence of developmental, learning or school-based problems been recorded?",
         null=True,
-        default=False
+        default=None
     )
     behavioural_or_emotional_problems = models.BooleanField(
         "are there any behaviour or emotional comorbid conditions present?",
         null=True,
-        default=False
+        default=None
     )
     diagnostic_status = models.CharField(  # This currently essential - used to exclude nonepilepic kids
         max_length=1,
