@@ -1,3 +1,4 @@
+from http.client import HTTPResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
@@ -12,8 +13,6 @@ from ..models import Case, AuditProgress, HospitalTrust
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)
-
-    active_template = "register"
 
     if not Registration.objects.filter(case=case).exists():
         audit_progress = AuditProgress.objects.create(
@@ -43,7 +42,6 @@ def register(request, case_id):
             case=case,
             audit_progress=audit_progress
         )
-        active_template = "none"
 
     registration = Registration.objects.filter(case=case).get()
 
@@ -66,7 +64,14 @@ def register(request, case_id):
         previously_registered_sites = Site.objects.filter(
             registration=registration, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
 
-    test_fields_update_audit_progress(registration)
+    form_complete = test_fields_update_audit_progress(
+        model_instance=registration,
+        return_comparison=True
+    )
+    if form_complete:
+        active_template = "register"
+    else:
+        active_template = "none"
 
     context = {
         "registration": registration,
@@ -75,7 +80,8 @@ def register(request, case_id):
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
         "audit_progress": registration.audit_progress,
-        "active_template": active_template
+        "active_template": active_template,
+        'field_enabled': False
     }
 
     response = render(
@@ -486,7 +492,7 @@ def registration_date(request, case_id):
     # if all registration components present, update AuditProcess
     registration = Registration.objects.filter(case=case_id).get()
 
-    test_fields_update_audit_progress(registration)
+    test_fields_update_audit_progress(registration, False)
 
     context = {
         'case_id': case_id,
@@ -494,7 +500,9 @@ def registration_date(request, case_id):
     }
 
     response = render(
-        request=request, template_name='epilepsy12/partials/registration/registration_dates.html', context=context)
+        request=request,
+        template_name='epilepsy12/partials/registration/registration_dates.html',
+        context=context)
 
     trigger_client_event(
         response=response,
@@ -502,6 +510,61 @@ def registration_date(request, case_id):
         params={})  # reloads the form to show the active steps
 
     return response
+
+
+@login_required
+def referring_clinician(request, registration_id):
+    """
+    Call back from POST request on key up in input partial in registration_form
+    """
+
+    referring_clinician = request.POST.get(request.htmx.trigger_name)
+    registration = Registration.objects.filter(pk=registration_id).update(
+        referring_clinician=referring_clinician,
+        updated_at=timezone.now(),
+        updated_by=request.user
+    )
+
+    registration = Registration.objects.get(pk=registration_id)
+
+    context = {
+        'registration': registration,
+    }
+
+    test_fields_update_audit_progress(registration, False)
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/registration/referring_clinician.html',
+        context=context)
+
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+def editable(request, registration_id, editable):
+    """
+    Callback from input partial - enables and disables buttons in input partial
+    """
+    registration = Registration.objects.get(pk=registration_id)
+
+    if editable == 'enable':
+        hx_editable = True
+    elif editable == 'disable':
+        hx_editable = False
+    else:
+        hx_editable = False
+
+    context = {
+        'registration': registration,
+        'hx_editable': hx_editable
+    }
+
+    return render(request=request, template_name='epilepsy12/partials/registration/referring_clinician.html', context=context)
 
 
 def total_fields_completed(model_instance):
@@ -574,7 +637,13 @@ def total_fields_completed(model_instance):
     return counter
 
 
-def test_fields_update_audit_progress(model_instance):
+def test_fields_update_audit_progress(model_instance, return_comparison=False):
+    """
+    Function compares all fields that must be filled to complete this section
+    with all fields that have been filled.
+    The number of fields are persisted in AuditProgress and the match between 
+    expected and scored are returned as a boolean if return_comparison is true
+    """
     all_completed_fields = total_fields_completed(model_instance)
     all_fields = total_fields_expected(model_instance)
     AuditProgress.objects.filter(registration=model_instance).update(
@@ -582,3 +651,5 @@ def test_fields_update_audit_progress(model_instance):
         registration_total_completed_fields=all_completed_fields,
         registration_complete=all_completed_fields == all_fields
     )
+    if return_comparison:
+        return all_completed_fields == all_fields
