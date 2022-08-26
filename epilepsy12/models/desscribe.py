@@ -1,8 +1,6 @@
 from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-from django.db.models.deletion import CASCADE
-from django.forms import CharField
 
 from epilepsy12.models.registration import Registration
 from ..constants import *

@@ -701,16 +701,30 @@ ui.rcpch_chart_container.segment {
   font-size: small;
 }
 
+#avatar {
+  height: 25px;
+  width: 25px;
+  background-image: url('../images/epilepsy12-logo-2.png');
+  background-color: (--rcpch_light_blue);
+  border-radius: 50%;
+  border: var(--rcpch_light_blue);
+  display: inline-block;
+}
+
 .numberCircle {
   border-radius: 50%;
   width: 36px;
   height: 36px;
   margin-top: 8px;
-
   background: var(--rcpch_light_blue);
+  background-image: url('images/epilepsy12-logo-2.png');
   border: 2px solid var(--rcpch_dark_blue);
   color: var(--rcpch_dark_blue);
   text-align: center;
 
   font: 32px Arial, sans-serif;
+}
+
+.rcpch_circle {
+  border: 5px var(--rcpch_light_blue);
 }

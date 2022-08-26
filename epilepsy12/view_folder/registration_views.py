@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
+from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
 from ..models import Registration, Site
@@ -555,9 +556,21 @@ def total_fields_completed(model_instance):
             and field.name != 'epilepsy_context'
             and field.name != 'epilepsycontext'
             and field.name != 'registration'
+            and field.name != 'audit_progress'
+            and field.name != 'created_at'
+            and field.name != 'created_by'
+            and field.name != 'updated_by'
+            and field.name != 'updated_at'
+            and field.name != 'case'
         ):
             if getattr(model_instance, field.name) is not None:
                 counter += 1
+    if Site.objects.filter(
+        registration=model_instance,
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True
+    ).exists():
+        counter += 1
     return counter
 
 

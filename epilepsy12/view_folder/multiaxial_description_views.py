@@ -232,7 +232,9 @@ def edit_description(request, desscribe_id):
 
     update_field = {
         'description': description,
-        'description_keywords': matched_keywords
+        'description_keywords': matched_keywords,
+        'updated_at': timezone.now(),
+        'updated_by': request.user
     }
     if (len(description) <= 5000):
         DESSCRIBE.objects.update_or_create(

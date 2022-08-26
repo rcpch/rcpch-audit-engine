@@ -7,10 +7,12 @@ from ..constants import *
 # TODO #12 Mixin breaks build currently
 class TimeStampAbstractBaseClass(models.Model):
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
+        verbose_name=f"record created on {timezone.now}",
     )
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
+        verbose_name=f"record updated on {timezone.now}",
     )
 
     class Meta:
