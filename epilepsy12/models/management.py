@@ -6,7 +6,7 @@ from .time_and_user_abstract_base_classes import *
 from .registration import Registration
 
 
-class Management(models.Model):
+class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class stores information on steps in managment.
     Each Case has only a single initial assessment (the first)

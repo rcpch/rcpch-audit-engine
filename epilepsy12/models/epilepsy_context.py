@@ -6,7 +6,7 @@ from .time_and_user_abstract_base_classes import *
 from .registration import Registration
 
 
-class EpilepsyContext(models.Model):
+class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records contextual information that defines epilepsy risk.
     It references the InitialAssessment class, as each case optionally has a single epilepsy context.

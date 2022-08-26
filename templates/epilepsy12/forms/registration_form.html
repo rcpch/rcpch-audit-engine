@@ -24,17 +24,8 @@
         
     </div>
     
-    <div class="field">
-      <label>Referring Clinician</label>
-      {% if registration and registration.referring_clinician is not None %}
-        <input type="text" placeholder="{{registration.referring_clinician}}"/>
-      {% else %}
-        {% if registration %}
-          <input type="text" placeholder="Enter Surname of referring clinician"/>
-        {% else %}
-          <input type="text" disabled placeholder="Enter Surname of referring clinician"/>
-        {% endif %}
-      {% endif %}
+    <div class="field" id="referring_clinician">
+        {% include 'epilepsy12/partials/registration/referring_clinician.html' with registration=registration hx_editable=field_enabled%}
     </div>
 
     <div id="lead_site" class="field">

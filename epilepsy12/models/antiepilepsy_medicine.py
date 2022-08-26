@@ -1,11 +1,11 @@
 from django.db import models
 from django.forms import ValidationError
 from ..constants import *
-
+from .time_and_user_abstract_base_classes import *
 from .management import Management
 
 
-class AntiEpilepsyMedicine(models.Model):
+class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about antiepilepsy medicines. 
     It references the Episode class, as one episode can involve several antiepilepsy medicines.

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -57,7 +58,9 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         consultant_paediatrician_referral_date=datetime.strptime(
-            request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date()
+            request.POST.get('consultant_paediatrician_referral_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
 
     # refresh all objects and return
@@ -111,7 +114,9 @@ def consultant_paediatrician_input_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         consultant_paediatrician_input_date=datetime.strptime(
-            request.POST.get('consultant_paediatrician_input_date'), "%Y-%m-%d").date())
+            request.POST.get('consultant_paediatrician_input_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -177,6 +182,8 @@ def general_paediatric_centre(request, assessment_id):
             hospital_trust=general_paediatric_centre).update(
                 site_is_general_paediatric_centre=True,
                 site_is_actively_involved_in_epilepsy_care=True,
+                updated_at=timezone.now(),
+                updated_by=request.user
         )
     else:
         Site.objects.create(
@@ -267,7 +274,9 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
         Site.objects.filter(pk=site_id).update(
             hospital_trust=new_hospital_trust,
             site_is_general_paediatric_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True
+            site_is_actively_involved_in_epilepsy_care=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     # refresh sites and return to partial
@@ -456,7 +465,10 @@ def paediatric_neurologist_referral_made(request, assessment_id):
                 paediatric_neurologist_referral_made=True)
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
-                paediatric_neurologist_referral_made=False)
+                paediatric_neurologist_referral_made=False,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -467,7 +479,9 @@ def paediatric_neurologist_referral_made(request, assessment_id):
             paediatric_neurologist_referral_made=Q(
                 paediatric_neurologist_referral_made=False),
             paediatric_neurologist_referral_date=None,
-            paediatric_neurologist_input_date=None
+            paediatric_neurologist_input_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -507,7 +521,9 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         paediatric_neurologist_referral_date=datetime.strptime(
-            request.POST.get('paediatric_neurologist_referral_date'), "%Y-%m-%d").date())
+            request.POST.get('paediatric_neurologist_referral_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
@@ -563,7 +579,9 @@ def paediatric_neurologist_input_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         paediatric_neurologist_input_date=datetime.strptime(
-            request.POST.get('paediatric_neurologist_input_date'), "%Y-%m-%d").date())
+            request.POST.get('paediatric_neurologist_input_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
@@ -631,6 +649,8 @@ def paediatric_neurology_centre(request, assessment_id):
             hospital_trust=paediatric_neurology_centre).update(
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_paediatric_neurology_centre=True,
+                updated_at=timezone.now(),
+                updated_by=request.user
         )
     else:
         Site.objects.create(
@@ -717,7 +737,9 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
         Site.objects.filter(pk=site_id).update(
             hospital_trust=paediatric_neurology_centre,
             site_is_paediatric_neurology_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True
+            site_is_actively_involved_in_epilepsy_care=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     # refresh sites and return to partial
@@ -916,7 +938,9 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
                 childrens_epilepsy_surgical_service_referral_criteria_met=True)
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
-                childrens_epilepsy_surgical_service_referral_criteria_met=False)
+                childrens_epilepsy_surgical_service_referral_criteria_met=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -928,7 +952,9 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
                 childrens_epilepsy_surgical_service_referral_criteria_met=False),
             childrens_epilepsy_surgical_service_referral_made=None,
             childrens_epilepsy_surgical_service_referral_date=None,
-            childrens_epilepsy_surgical_service_input_date=None
+            childrens_epilepsy_surgical_service_input_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -969,10 +995,14 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Assessment.objects.filter(pk=assessment_id).update(
-                childrens_epilepsy_surgical_service_referral_made=True)
+                childrens_epilepsy_surgical_service_referral_made=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
-                childrens_epilepsy_surgical_service_referral_made=False)
+                childrens_epilepsy_surgical_service_referral_made=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -983,7 +1013,9 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
             childrens_epilepsy_surgical_service_referral_made=Q(
                 childrens_epilepsy_surgical_service_referral_made=False),
             childrens_epilepsy_surgical_service_referral_date=None,
-            childrens_epilepsy_surgical_service_input_date=None
+            childrens_epilepsy_surgical_service_input_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -1038,7 +1070,9 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         childrens_epilepsy_surgical_service_referral_date=datetime.strptime(
-            request.POST.get('childrens_epilepsy_surgical_service_referral_date'), "%Y-%m-%d").date())
+            request.POST.get('childrens_epilepsy_surgical_service_referral_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -1092,7 +1126,9 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         childrens_epilepsy_surgical_service_input_date=datetime.strptime(
-            request.POST.get('childrens_epilepsy_surgical_service_input_date'), "%Y-%m-%d").date())
+            request.POST.get('childrens_epilepsy_surgical_service_input_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -1159,6 +1195,8 @@ def epilepsy_surgery_centre(request, assessment_id):
             hospital_trust=epilepsy_surgery_centre).update(
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_childrens_epilepsy_surgery_centre=True,
+                updated_at=timezone.now(),
+                updated_by=request.user
         )
     else:
         Site.objects.create(
@@ -1248,7 +1286,9 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
         Site.objects.filter(pk=site_id).update(
             hospital_trust=new_hospital_trust,
             site_is_childrens_epilepsy_surgery_centre=True,
-            site_is_actively_involved_in_epilepsy_care=True
+            site_is_actively_involved_in_epilepsy_care=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     sites = Site.objects.filter(registration=assessment.registration)
@@ -1447,7 +1487,9 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
                 epilepsy_specialist_nurse_referral_made=True)
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
-                epilepsy_specialist_nurse_referral_made=False)
+                epilepsy_specialist_nurse_referral_made=False,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         else:
             print(
                 "Some kind of error - this will need to be raised and returned to template")
@@ -1458,7 +1500,9 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
             epilepsy_specialist_nurse_referral_made=Q(
                 epilepsy_specialist_nurse_referral_made=False),
             epilepsy_specialist_nurse_referral_date=None,
-            epilepsy_specialist_nurse_input_date=None
+            epilepsy_specialist_nurse_input_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
 
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -1493,7 +1537,9 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         epilepsy_specialist_nurse_referral_date=datetime.strptime(
-            request.POST.get('epilepsy_specialist_nurse_referral_date'), "%Y-%m-%d").date())
+            request.POST.get('epilepsy_specialist_nurse_referral_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -1524,7 +1570,9 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
     # TODO date validation needed
     Assessment.objects.filter(pk=assessment_id).update(
         epilepsy_specialist_nurse_input_date=datetime.strptime(
-            request.POST.get('epilepsy_specialist_nurse_input_date'), "%Y-%m-%d").date())
+            request.POST.get('epilepsy_specialist_nurse_input_date'), "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -1753,30 +1801,28 @@ def total_fields_expected(model_instance):
     # for surgery, gen paeds or neuro there are site fields to include also
 
     cumulative_fields = 0
-    if model_instance.childrens_epilepsy_surgical_service_referral_criteria_met or model_instance.childrens_epilepsy_surgical_service_referral_criteria_met is None:
+    if model_instance.childrens_epilepsy_surgical_service_referral_criteria_met:
+
         cumulative_fields += 4
     else:
         cumulative_fields += 1
 
-    if model_instance.consultant_paediatrician_referral_made or model_instance.consultant_paediatrician_referral_made is None:
+    if model_instance.consultant_paediatrician_referral_made:
         cumulative_fields += 4
     else:
         cumulative_fields += 1
 
-    if model_instance.paediatric_neurologist_referral_made or model_instance.paediatric_neurologist_referral_made is not None:
+    if model_instance.paediatric_neurologist_referral_made:
         cumulative_fields += 4
     else:
         cumulative_fields += 1
 
-    if model_instance.epilepsy_specialist_nurse_referral_made or model_instance.epilepsy_specialist_nurse_referral_made is not None:
+    if model_instance.epilepsy_specialist_nurse_referral_made:
         cumulative_fields += 3
     else:
         cumulative_fields += 1
 
-    if cumulative_fields == 0:
-        return 4
-    else:
-        return cumulative_fields
+    return cumulative_fields
 
 
 def total_fields_completed(model_instance):
@@ -1784,7 +1830,10 @@ def total_fields_completed(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+                getattr(model_instance, field.name) is not None
+                and field.name not in ['id', 'registration', 'created_by', 'created_at', 'updated_by', 'updated_at']):
+            print(field.name)
             counter += 1
     # must include centres allocated also
     sites = Site.objects.filter(

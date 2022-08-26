@@ -1,3 +1,4 @@
+from django.utils import timezone
 from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -42,7 +43,6 @@ FOCAL_EPILEPSY_FIELDS = [
     "focal_onset_gelastic",
     "focal_onset_focal_to_bilateral_tonic_clonic",
     "focal_onset_other",
-    "focal_onset_other_details"
 ]
 
 GENERALISED_ONSET_EPILEPSY_FIELDS = [
@@ -154,7 +154,7 @@ nonseizure_types = [
 ]
 
 
-def set_epilepsy_fields_to_none(desscribe_id):
+def set_epilepsy_fields_to_none(request, desscribe_id):
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
     DESSCRIBE.objects.filter(registration=desscribe.registration).update(
         were_any_of_the_epileptic_seizures_convulsive=None,
@@ -185,12 +185,13 @@ def set_epilepsy_fields_to_none(desscribe_id):
         focal_onset_gelastic=None,
         focal_onset_focal_to_bilateral_tonic_clonic=None,
         focal_onset_other=None,
-        focal_onset_other_details=None
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
 
-def set_all_nonepilepsy_fields_to_none(desscribe_id: int):
+def set_all_nonepilepsy_fields_to_none(request, desscribe_id: int):
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
     DESSCRIBE.objects.filter(registration=desscribe.registration).update(
         nonepileptic_seizure_unknown_onset=None,
@@ -201,7 +202,9 @@ def set_all_nonepilepsy_fields_to_none(desscribe_id: int):
         nonepileptic_seizure_paroxysmal=None,
         nonepileptic_seizure_migraine=None,
         nonepileptic_seizure_miscellaneous=None,
-        nonepileptic_seizure_other=None
+        nonepileptic_seizure_other=None,
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
 
 
@@ -227,7 +230,9 @@ def edit_description(request, desscribe_id):
 
     update_field = {
         'description': description,
-        'description_keywords': matched_keywords
+        'description_keywords': matched_keywords,
+        'updated_at': timezone.now(),
+        'updated_by': request.user
     }
     if (len(description) <= 5000):
         DESSCRIBE.objects.update_or_create(
@@ -265,7 +270,9 @@ def delete_description_keyword(request, desscribe_id, description_keyword_id):
     del description_keywords[description_keyword_id]
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        description_keywords=description_keywords)
+        description_keywords=description_keywords,
+        updated_at=timezone.now(),
+        updated_by=request.user)
     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
     context = {
@@ -303,17 +310,19 @@ def epilepsy_or_nonepilepsy_status(request, desscribe_id):
 
     if epilepsy_or_nonepilepsy_status == 'E':
         # epilepsy selected - set all nonepilepsy to none
-        set_epilepsy_fields_to_none(desscribe_id=desscribe_id)
+        set_epilepsy_fields_to_none(request, desscribe_id=desscribe_id)
     elif epilepsy_or_nonepilepsy_status == 'NE':
         # nonepilepsy selected - set all epilepsy to none
-        set_all_nonepilepsy_fields_to_none(desscribe_id=desscribe_id)
+        set_all_nonepilepsy_fields_to_none(request, desscribe_id=desscribe_id)
     elif epilepsy_or_nonepilepsy_status == 'NK':
         # notknown selected - set all epilepsy and nonepilepsy to none
-        set_epilepsy_fields_to_none(desscribe_id=desscribe_id)
-        set_all_nonepilepsy_fields_to_none(desscribe_id=desscribe_id)
+        set_epilepsy_fields_to_none(request, desscribe_id=desscribe_id)
+        set_all_nonepilepsy_fields_to_none(request, desscribe_id=desscribe_id)
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status
+        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
@@ -361,7 +370,9 @@ def were_any_of_the_epileptic_seizures_convulsive(request, desscribe_id):
         were_any_of_the_epileptic_seizures_convulsive = None
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive
+        were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive,
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
 
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
@@ -404,7 +415,9 @@ def prolonged_generalized_convulsive_seizures(request, desscribe_id):
         prolonged_generalized_convulsive_seizures = None
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        prolonged_generalized_convulsive_seizures=prolonged_generalized_convulsive_seizures
+        prolonged_generalized_convulsive_seizures=prolonged_generalized_convulsive_seizures,
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
 
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
@@ -459,7 +472,9 @@ def epileptic_seizure_onset_type(request, desscribe_id):
 
     # update the fields object to include latest selection
     update_fields.update({
-        'epileptic_seizure_onset_type': epileptic_seizure_onset_type
+        'epileptic_seizure_onset_type': epileptic_seizure_onset_type,
+        'updated_at': timezone.now(),
+        'updated_by': request.user
     })
 
     # update the model
@@ -522,6 +537,10 @@ def focal_onset_epilepsy_checked_changed(request, desscribe_id):
             update_fields.update({
                 item.get('name'): False
             })
+    update_fields.update({
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    })
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
 
@@ -563,7 +582,9 @@ def experienced_prolonged_focal_seizures(request, desscribe_id):
         experienced_prolonged_focal_seizures = None
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        experienced_prolonged_focal_seizures=experienced_prolonged_focal_seizures
+        experienced_prolonged_focal_seizures=experienced_prolonged_focal_seizures,
+        updated_at=timezone.now(),
+        updated_by=request.user
     )
 
     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
@@ -599,7 +620,9 @@ def nonepilepsy_generalised_onset(request, desscribe_id):
 
     nonepilepsy_generalised_onset = request.htmx.trigger_name
     DESSCRIBE.objects.filter(id=desscribe_id).update(
-        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset)
+        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset,
+        updated_at=timezone.now(),
+        updated_by=request.user)
     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
     context = {
@@ -644,7 +667,9 @@ def nonepileptic_seizure_type(request, desscribe_id):
     """
 
     update_fields = {
-        'nonepileptic_seizure_type': request.POST.get(request.htmx.trigger_name)
+        'nonepileptic_seizure_type': request.POST.get(request.htmx.trigger_name),
+        'updated_at': timezone.now(),
+        'updated_by': request.user
     }
 
     # set any fields that are not this subtype that might have previously been
@@ -696,7 +721,10 @@ def nonepileptic_seizure_subtype(request, desscribe_id):
     field_selection = request.POST.get(field_name)
 
     # set selected field to selection, all other nonepilepsy fields to None
-    update_fields = {}
+    update_fields = {
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    }
     for nonseizure_type in nonseizure_types:
         if nonseizure_type.get('name') == field_name:
             update_fields.update({
@@ -747,12 +775,16 @@ def syndrome_present(request, desscribe_id):
     """
     if request.htmx.trigger_name == 'button-true':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            syndrome_present=True
+            syndrome_present=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
     elif request.htmx.trigger_name == 'button-false':
         DESSCRIBE.objects.filter(id=desscribe_id).update(
             syndrome_present=False,
-            syndrome=None
+            syndrome=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
     else:
         print("Some mistake happened")
@@ -789,7 +821,10 @@ def syndrome(request, desscribe_id):
 
     if syndrome:
         DESSCRIBE.objects.filter(id=desscribe_id).update(
-            syndrome=syndrome)
+            syndrome=syndrome,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
     else:
         return HttpResponse('No dice')
 
@@ -834,7 +869,10 @@ def seizure_cause_main(request, desscribe_id):
 
     all_fields = seizure_cause_main_choices + seizure_cause_subtype_choices
 
-    update_field = {}
+    update_field = {
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    }
     for field in all_fields:
         if field.get('id') == seizure_cause_main:
             update_field.update({
@@ -890,7 +928,10 @@ def seizure_cause_subtype(request, desscribe_id, subtype):
     """
     subtype_selection = request.POST.get(request.htmx.trigger_name)
 
-    update_fields = {}
+    update_fields = {
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    }
     for seizure_cause_main_choice in seizure_cause_main_choices:
         if subtype == seizure_cause_main_choice.get('id'):
             update_fields.update({
@@ -944,7 +985,9 @@ def seizure_cause_subtype_subtype(request, desscribe_id):
     seizure_cause_subtype_subtype = request.POST.get(field_name)
 
     update_field = ({
-        field_name: seizure_cause_subtype_subtype
+        field_name: seizure_cause_subtype_subtype,
+        'updated_at': timezone.now(),
+        'updated_by': request.user
     })
 
     DESSCRIBE.objects.filter(pk=desscribe_id).update(
@@ -1004,7 +1047,10 @@ def ribe(request, desscribe_id):
         toggle = True
 
     DESSCRIBE.objects.filter(id=desscribe_id).update(
-        relevant_impairments_behavioural_educational=toggle)
+        relevant_impairments_behavioural_educational=toggle,
+        updated_at=timezone.now(),
+        updated_by=request.user
+    )
 
     updated_desscribe = DESSCRIBE.objects.get(
         pk=desscribe_id)
@@ -1133,7 +1179,6 @@ def total_fields_expected(model_instance):
     # focal_onset_gelastic
     # focal_onset_focal_to_bilateral_tonic_clonic
     # focal_onset_other
-    # focal_onset_other_details
     # epileptic_generalised_onset
     # epileptic_generalised_onset_other_details
     # nonepileptic_seizure_unknown_onset
@@ -1174,7 +1219,8 @@ def total_fields_expected(model_instance):
         cumulative_fields += 2
         if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
             # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
-            cumulative_fields += 5
+            # TODO #75 ask @cdunkley if it is acceptable for radiobuttons to be optional
+            cumulative_fields += 0
         elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
             # includes prolonged_generalized_convulsive_seizures
             cumulative_fields += 2
@@ -1225,10 +1271,15 @@ def total_fields_completed(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+                getattr(model_instance, field.name) is not None
+                and field.name not in ['id', 'registration', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']):
             if field.name == 'description':
                 if len(getattr(model_instance, field.name)) > 0:
                     counter += 1
+            elif field.name in FOCAL_EPILEPSY_FIELDS:
+                # see #75 - focal epilepsy types currently optional
+                counter += 0
             else:
                 counter += 1
     return counter

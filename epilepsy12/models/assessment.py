@@ -10,7 +10,7 @@ from .time_and_user_abstract_base_classes import *
 from .registration import Registration
 
 
-class Assessment(models.Model):
+class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class stores information on each assessment performed during the registration period.
     Each Case has only a single initial assessment (the first)

@@ -3,9 +3,10 @@ from ..constants import *
 from ..general_functions import calculate_time_elapsed
 
 from .registration import Registration
+from .time_and_user_abstract_base_classes import *
 
 
-class Investigations(models.Model):
+class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     eeg_indicated = models.BooleanField(
         "Is an EEG indicated?",

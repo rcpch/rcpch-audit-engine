@@ -44,19 +44,12 @@ urlpatterns = [
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
     path("signup/", SignUpView.as_view(), name="signup"),
-    #     path('hospital-autocomplete/', HospitalAutocomplete.as_view(),
-    #          name='hospital-autocomplete'),
-    #     path('semiology-keyword-autocomplete/', SemiologyKeywordAutocomplete.as_view(),
-    #          name='semiology-keyword-autocomplete'),
+
     path('investigations/<int:case_id>',
          views.investigations, name='investigations')
 ]
 
 htmx_paths = [
-    # generic paths
-    #     path('htmx/hospital_list',
-    #          views.hospital_list, name='hospital_list'),
-
 
     # desscribe / multiaxial description htmx endpoints
     path('htmx/<int:desscribe_id>/description',
@@ -147,6 +140,12 @@ htmx_paths = [
          views.delete_lead_site, name="delete_lead_site"),
     path('htmx/registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
+    path('htmx/registration/<int:registration_id>/referring_clinician',
+         views.referring_clinician, name="referring_clinician"),
+
+    path('htmx/registration/<int:registration_id>/<str:editable>/',
+         views.editable, name="editable"),
+
 
 
     #     ** Assessment paths **

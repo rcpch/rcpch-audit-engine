@@ -100,87 +100,33 @@
 
                         <div class="ui feed">
 
-                            <div class="event">
-                                <div class="label">
-                                    <img src="https://semantic-ui.com/images/avatar/small/elliot.jpg">
-                                </div>
-                                <div class="content">
-                                    <div class="summary">
-                                        <a class="user">
-                                            Elliot Fu
-                                        </a> added a new child to the audit
-                                        <div class="date">
-                                            1 Hour Ago
+                            {% for model in all_models %}
+
+                                <div class="event">
+                                    <div class="label">
+                                        <div class='rcpch_circle'>
+                                            <img src='{% static "images/rcpch-logo.jpg" %}'>
                                         </div>
                                     </div>
-                                    <div class="meta">
-                                        <a class="like">
-                                            <i class="like icon"></i> 4 Likes
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="event">
-                                <div class="label">
-                                    <img src="https://semantic-ui.com/images/avatar/small/helen.jpg">
-                                </div>
-                                <div class="content">
-                                    <div class="summary">
-                                        <a>Helen Troy</a> updated <a>2 new records</a>
-                                        <div class="date">
-                                            4 days ago
+                                    <div class="content">
+                                        <div class="summary">
+                                            <a class="user">
+                                                {{model.updated_by}}
+                                            </a> updated a record in {{model | to_class_name }} for {{model.registration.case}}
+                                            <div class="date">
+                                                {{model.updated_at}}
+                                            </div>
+                                        </div>
+                                        <div class="meta">
+                                            <a class="like">
+                                                <i class="like icon"></i> 4 Likes
+                                            </a>
                                         </div>
                                     </div>
-                                    <div class="meta">
-                                        <a class="like">
-                                            <i class="like icon"></i> 1 Like
-                                        </a>
-                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="event">
-                                <div class="label">
-                                    <img src="https://semantic-ui.com/images/avatar/small/jenny.jpg">
-                                </div>
-                                <div class="content">
-                                    <div class="summary">
-                                        <a class="user">
-                                            Jenny Hess
-                                        </a> deleted epilepsy context for Albert
-                                        <div class="date">
-                                            2 Days Ago
-                                        </div>
-                                    </div>
-                                    <div class="meta">
-                                        <a class="like">
-                                            <i class="like icon"></i> 8 Likes
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            {% endfor %}
 
-                            <div class="event">
-                                <div class="label">
-                                    <img src="https://semantic-ui.com/images/avatar/small/joe.jpg">
-                                </div>
-                                <div class="content">
-                                    <div class="summary">
-                                        <a>Joe Henderson</a> registered Arthur Rimbaud
-                                    <div class="date">
-                                        3 days ago
-                                    </div>
-                                </div>
-                                <div class="extra text">
-                                    Epilepsy12 launch today!
-                                </div>
-                                <div class="meta">
-                                    <a class="like">
-                                        <i class="like icon"></i> 5 Likes
-                                    </a>
-                                </div>
-                            </div>
 
                         </div>
                     </div>

@@ -1,15 +1,13 @@
 from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-from django.db.models.deletion import CASCADE
-from django.forms import CharField
 
 from epilepsy12.models.registration import Registration
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 
-class DESSCRIBE(models.Model):
+class DESSCRIBE(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # Summarises a child or young person's epilepsy in a multiaxial way.
     # It is a standard tool for clinicians when describing or discussing a person's epilepsy and is taught nationally
     # There is one record per case.
@@ -186,12 +184,6 @@ class DESSCRIBE(models.Model):
         default=None,
         blank=True,
         null=True
-    )
-    focal_onset_other_details = models.CharField(
-        max_length=250,
-        null=True,
-        default="",
-        blank=True,
     )
     epileptic_generalised_onset = models.CharField(
         max_length=3,
