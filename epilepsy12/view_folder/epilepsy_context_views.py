@@ -266,7 +266,10 @@ def completed_fields(model_instance):
     fields = model_instance._meta.get_fields()
     counter = 0
     for field in fields:
-        if getattr(model_instance, field.name) is not None and field.name != 'id' and field.name != 'registration':
+        if (
+                getattr(model_instance, field.name) is not None
+                and field.name not in ['id', 'registration', 'updated_at', 'updated_by', 'created_at', 'created_by']):
+            print(field.name)
             counter += 1
     return counter
 
