@@ -1,6 +1,19 @@
 <form class="ui form">
+
     {% url 'epilepsy_or_nonepilepsy_status' desscribe_id=desscribe.pk as hx_post %}
     {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=desscribe.epilepsy_or_nonepilepsy_status label="Is a diagnosis of epilepsy definite, or uncertain?" data_position="top left" %}
+
+    <h5 class="ui header">
+        <span class='desscribe_letters'>
+            <div class="ui rcpch_pink circular label">S</div>
+        </span>
+        <div class='content'>
+                Seizure Type
+            <div class='sub header'>
+            Describe the type of seizure(s)
+            </div>
+        </div>
+    </h5>
 
     {% if desscribe.epilepsy_or_nonepilepsy_status == 'E' %}
         <div id="epilepsy" class="field">
@@ -11,9 +24,10 @@
             {% include 'epilepsy12/partials/desscribe/nonepilepsy.html' with desscribe=desscribe nonepilepsy_onset_types=nonepilepsy_onset_types nonepilepsy_types=nonepilepsy_types syncopes=syncopes behavioural=behavioural sleep=sleep paroxyms=paroxyms migraines=migraines nonepilepsy_miscellaneous=nonepilepsy_miscellaneous %}
         </div>
     {% else %}
-        <div class="ui warning message">
+        <div class="ui negative message">
             <h5>Epilepsy Diagnosis Unclear</h5>
             <p>Data collected will not be included in reporting against national epilepsy standards</p>
         </div>
     {% endif %}
+    
 </form>
