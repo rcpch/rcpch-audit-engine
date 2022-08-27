@@ -763,3 +763,8 @@ ui.rcpch_chart_container.segment {
   -webkit-box-shadow: 0px 0px 0px 100px #FFFFFF inset !important;
   box-shadow: 0px 0px 0px 100px #FFFFFF inset !important;
 }
+
+/* desscribe letters */
+.desscribe_letters {
+  padding-right: 10px;
+}

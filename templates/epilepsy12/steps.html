@@ -16,14 +16,14 @@
 
           <a class="active completed step" href="{% url 'register' case_id %}">
             <div class="content">
-              <div class="title">Verification</div>
+              <div class="title">Verification and Registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
         {% else %}
           <a class="completed step" href="{% url 'register' case_id %}">
             <div class="content">
-              <div class="title">Verification</div>
+              <div class="title">Verification and Registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
@@ -33,21 +33,21 @@
 
           <a href="{% url 'register' case_id %}" class="active step">
             <div class="content">
-              <div class="title">Verification</div>
+              <div class="title">Verification and Registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
         {% elif active_template == "none" %}
           <a href="{% url 'register' case_id %}" class="disabled step">
             <div class="content">
-              <div class="title">Verification</div>
+              <div class="title">Verification and Registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
         {% else %}
           <a href="{% url 'register' case_id %}" class="step">
             <div class="content">
-              <div class="title">Verification</div>
+              <div class="title">Verification and Registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
@@ -147,14 +147,14 @@
 
         <a class="active completed step" href="{% url 'multiaxial_description' case_id %}">
           <div class="content">
-              <div class="title">Multiaxial Description</div>
+              <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
         </a>
       {% else %}
         <a class="completed step" href="{% url 'multiaxial_description' case_id %}">
           <div class="content">
-              <div class="title">Multiaxial Description</div>
+              <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
         </a>
@@ -164,21 +164,21 @@
 
           <a href="{% url 'multiaxial_description' case_id %}" class="active step">
             <div class="content">
-              <div class="title">Multiaxial Description</div>
+              <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
           </a>
         {% elif active_template == "none" %}
           <a href="{% url 'multiaxial_description' case_id %}" class="disabled step">
             <div class="content">
-              <div class="title">Multiaxial Description</div>
+              <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
           </a>
         {% else %}
           <a href="{% url 'multiaxial_description' case_id %}" class="step">
             <div class="content">
-              <div class="title">Multiaxial Description</div>
+              <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
           </a>
@@ -279,15 +279,15 @@
         
         <a class="active completed step" href="{% url 'management' case_id %}">
           <div class="content">
-            <div class="title">Treatment and Care Plans</div>
-            <div class="description">Tests, medications and teams</div>
+            <div class="title">Treatment and Care Planning</div>
+            <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
       {% else %}
         <a class="completed step" href="{% url 'management' case_id %}">
           <div class="content">
-            <div class="title">Treatment and Care Plans</div>
-            <div class="description">Tests, medications and teams</div>
+            <div class="title">Treatment and Care Planning</div>
+            <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
       {% endif %}
@@ -296,22 +296,22 @@
 
         <a href="{% url 'management' case_id %}" class="active step">
           <div class="content">
-            <div class="title">Treatment and Care Plans</div>
-            <div class="description">Medications and teams</div>
+            <div class="title">Treatment and Care Planning</div>
+            <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
       {% elif active_template == "none" %}
         <a href="{% url 'management' case_id %}" class="disabled step">
           <div class="content">
-            <div class="title">Treatment and Care Plans</div>
-            <div class="description">Medications and teams</div>
+            <div class="title">Treatment and Care Planning</div>
+            <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
       {% else %}
         <a href="{% url 'management' case_id %}" class="step">
           <div class="content">
-            <div class="title">Treatment and Care Plans</div>
-            <div class="description">Medications and teams</div>
+            <div class="title">Treatment and Care Planning</div>
+            <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
       {% endif %}
@@ -322,7 +322,7 @@
       {% with numerator=audit_progress.registration_total_completed_fields %}
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Registration/Validation" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Verification and Registration" %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -361,7 +361,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Multiaxial Description" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Multiaxial Diagnosis" %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -400,7 +400,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Treatment and Care Plans Plans" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Treatment and Care Planning" %}
       </div>
       {% endwith %}
       {% endwith %}

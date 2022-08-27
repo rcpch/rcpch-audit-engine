@@ -3,11 +3,17 @@
 
     <div class="ui rcpch_pink segment">
 
-        <div class="ui header">
-            <span>
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
                 <div class="ui rcpch_pink circular label">D</div>
             </span>
-        </div>
+            <div class='content'>
+                    Description
+                <div class='sub header'>
+                Describes the event(s)
+                </div>
+            </div>
+        </h5>
 
         {% include 'epilepsy12/partials/desscribe/description.html' with desscribe=desscribe choices=choices %}
 
@@ -15,9 +21,17 @@
     
     <div class="ui rcpch_pink segment">
 
-        <div class="ui header">
-            <div class="ui rcpch_pink circular label">E</div>
-        </div>
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">E</div>
+            </span>
+            <div class='content'>
+                    Epilepsy
+                <div class='sub header'>
+                Is it epilepsy?
+                </div>
+            </div>
+        </h5>
 
         <div id="epilepsy_or_nonepilepsy_status">
             {% include 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html' with desscribe=desscribe epilepsy_or_nonepilepsy_status_choices=epilepsy_or_nonepilepsy_status_choices %}
@@ -26,9 +40,17 @@
     </div>
 
     <div class="ui rcpch_pink segment">
-        <div class="ui header">
-            <div class="ui rcpch_pink circular label">S</div>
-        </div>
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">S</div>
+            </span>
+            <div class='content'>
+                    Syndrome
+                <div class='sub header'>
+                Does it fulfil criteria for an epilepsy syndrome?
+                </div>
+            </div>
+        </h5>
 
         <div id="syndrome" class="field">
             {% url 'syndrome' desscribe_id=desscribe.pk as hx_post %}
@@ -39,9 +61,17 @@
     
     <div class="ui rcpch_pink segment">
 
-        <div class="ui header">
-            <div class="ui rcpch_pink circular label">C</div>
-        </div>
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">C</div>
+            </span>
+            <div class='content'>
+                    Cause
+                <div class='sub header'>
+                Is there an identifiable cause?
+                </div>
+            </div>
+        </h5>
 
         <div id="epilepsy_causes">
             {% include 'epilepsy12/partials/desscribe/epilepsy_causes.html' with desscribe=desscribe seizure_cause_selection=seizure_cause_selection epilepsy_genetic_cause_choices=epilepsy_genetic_cause_choices  epilepsy_structural_cause_choices=epilepsy_structural_cause_choices epilepsy_gene_cause_choices=epilepsy_gene_cause_choices epilepsy_metabolic_cause_choices=epilepsy_metabolic_cause_choices epilepsy_immune_cause_choices=epilepsy_immune_cause_choices epilepsy_antibodies_cause_choices=epilepsy_antibodies_cause_choices %}
@@ -51,9 +81,17 @@
     
     <div class="ui rcpch_pink segment">
 
-        <div class="ui header">
-            <div class="ui rcpch_pink circular label">RIBE</div>
-        </div>
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">D</div>
+            </span>
+            <div class='content'>
+                    Relevant Impairments, either Behavioural or Educational
+                <div class='sub header'>
+                What other impact has this had on the child's behaviour or education?
+                </div>
+            </div>
+        </h5>
             
         <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
