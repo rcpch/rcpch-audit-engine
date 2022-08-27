@@ -11,23 +11,30 @@
     NOTE - in the view, the value of the date can be retrieved by request.POST.get(FIELD_NAME_AS_A_STRING)
 {% endcomment %}
 
-    <label>{{label}}</label>
-    <div class="inline field">
+    <div class="field">
         {% if date_value is None %}
             <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
-                <i class="rcpch_light_blue dot circle outline icon"></i>
+                <label>{{label}}</label>
             </span>
         {% else %}
-            <i class="rcpch_pink check circle outline icon"></i>
+            <label>{{label}}</label>
         {% endif %}
-        
-        <input type="date"
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-            hx-swap="innerHTML"
-            name="{{input_date_field_name}}"
-            hx-post="{{hx_post}}" 
-            hx-target="{{hx_target}}" 
-            hx-trigger="{{hx_trigger}}"
-            value="{{date_value|date:'Y-m-d'}}"/>
-        <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+        <div class='ui left icon input'>
+            <input 
+                type="date"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="innerHTML"
+                name="{{input_date_field_name}}"
+                hx-post="{{hx_post}}" 
+                hx-target="{{hx_target}}" 
+                hx-trigger="{{hx_trigger}}"
+                value="{{date_value|date:'Y-m-d'}}"/>
+            <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+
+            {% if date_value is None %}
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            {% else %}
+                <i class="rcpch_pink check circle outline icon"></i>
+            {% endif %}
+        </div>
     </div>
