@@ -260,7 +260,8 @@ def mri_indicated(request, investigations_id):
         # there is a selection. If this has become false, set all associated fields to None
         Investigations.objects.filter(pk=investigations_id).update(
             mri_indicated=Q(mri_indicated=False),
-            mri_brain_date=None,
+            mri_brain_requested_date=None,
+            mri_brain_performed_date=None,
             updated_at=timezone.now(),
             updated_by=request.user
         )
@@ -286,18 +287,52 @@ def mri_indicated(request, investigations_id):
     return response
 
 
-def mri_brain_date(request, investigations_id):
+def mri_brain_requested_date(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
     It is triggered by a change in the date_input_field partial generating a post request
     This returns a date value which is stored in the model and returns the same partial.
     """
     investigations = Investigations.objects.get(pk=investigations_id)
-    mri_brain_date = request.POST.get(request.htmx.trigger_name)
+    mri_brain_requested_date = request.POST.get(request.htmx.trigger_name)
 
     Investigations.objects.filter(pk=investigations_id).update(
-        mri_brain_date=datetime.strptime(
-            mri_brain_date, "%Y-%m-%d").date(),
+        mri_brain_requested_date=datetime.strptime(
+            mri_brain_requested_date, "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user)
+    investigations = Investigations.objects.get(pk=investigations_id)
+
+    test_fields_update_audit_progress(investigations)
+
+    context = {
+        'investigations': investigations
+    }
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/investigations/mri_brain_information.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+def mri_brain_performed_date(request, investigations_id):
+    """
+    This is an HTMX callback from the mri_brain_information.html partial template
+    It is triggered by a change in the date_input_field partial generating a post request
+    This returns a date value which is stored in the model and returns the same partial.
+    """
+    investigations = Investigations.objects.get(pk=investigations_id)
+    mri_brain_performed_date = request.POST.get(request.htmx.trigger_name)
+
+    Investigations.objects.filter(pk=investigations_id).update(
+        mri_brain_performed_date=datetime.strptime(
+            mri_brain_performed_date, "%Y-%m-%d").date(),
         updated_at=timezone.now(),
         updated_by=request.user)
     investigations = Investigations.objects.get(pk=investigations_id)
@@ -328,7 +363,8 @@ def total_fields_expected(model_instance):
     # twelve_lead_ecg_status
     # ct_head_scan_status
     # mri_indicated
-    # mri_brain_date
+    # mri_brain_requested_date
+    # mri_brain_performed_date
 
     cumulative_fields = 0
     if model_instance.eeg_indicated:
@@ -347,7 +383,7 @@ def total_fields_expected(model_instance):
         cumulative_fields += 1
 
     if model_instance.mri_indicated:
-        cumulative_fields += 2
+        cumulative_fields += 3
     else:
         cumulative_fields += 1
 

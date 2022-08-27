@@ -273,8 +273,10 @@ htmx_paths = [
          views.ct_head_scan_status, name="ct_head_scan_status"),
     path('htmx/investigations/<int:investigations_id>/mri_indicated',
          views.mri_indicated, name="mri_indicated"),
-    path('htmx/investigations/<int:investigations_id>/mri_brain_date',
-         views.mri_brain_date, name="mri_brain_date"),
+    path('htmx/investigations/<int:investigations_id>/mri_brain_requested_date',
+         views.mri_brain_requested_date, name="mri_brain_requested_date"),
+    path('htmx/investigations/<int:investigations_id>/mri_brain_performed_date',
+         views.mri_brain_performed_date, name="mri_brain_performed_date"),
 
     # management
     path('htmx/management/<int:management_id>/has_an_aed_been_given',

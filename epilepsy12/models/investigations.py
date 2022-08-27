@@ -48,12 +48,26 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         blank=True
     )
 
-    mri_brain_date = models.DateField(
-        "MRI brain date",
+    mri_brain_requested_date = models.DateField(
+        "MRI brain requested date",
         default=None,
         null=True,
         blank=True
     )
+
+    mri_brain_performed_date = models.DateField(
+        "MRI brain performed date",
+        default=None,
+        null=True,
+        blank=True
+    )
+
+    def mri_wait(self):
+        """
+        Calculated field. Returns time elapsed between date EEG requested and performed as a string.
+        """
+        if self.mri_brain_performed_date and self.mri_brain_requested_date:
+            return calculate_time_elapsed(self.mri_brain_requested_date, self.mri_brain_performed_date)
 
     def eeg_wait(self):
         """
