@@ -3,7 +3,7 @@
             {% if site %}
 
                     <div class="field">
-                        <label>Lead Centre</label>
+                        <label>Secondary care NHS Trust</label>
 
                         <div class="ui right action left icon input">
                             <input disabled value="{{site.hospital_trust.OrganisationName}} ({{site.hospital_trust.ParentName}})">
@@ -62,14 +62,14 @@
 
                     <div class="field" id="edit_lead_centre" >
                         {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="edit" as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_lead_site" test_positive=site.pk label="Update Lead Centre" hx_default_text="Search hospitals..." data_position="top left" %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_lead_site" test_positive=site.pk label="Update Secondary Care NHS Trust Centre" hx_default_text="Search hospitals..." data_position="top left" %}
                     </div>
                 
                 {% elif transfer %}
                     
                     <div class="field" id="transfer_lead_centre" >
                         {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="transfer" as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="transfer_lead_site" test_positive=site.pk label="Transfer Lead Centre" hx_default_text="Search hospitals..." data_position="top left" %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="transfer_lead_site" test_positive=site.pk label="Transfer Secondary Care NHS Trust Centre" hx_default_text="Search hospitals..." data_position="top left" %}
                     </div>
 
                 {% endif %}
@@ -77,10 +77,10 @@
             {% else %}
 
                 <div class="field" id="allocate_lead_centre" >
-                    <label>There is currently no lead centre allocated to {{registration.case.first_name}} {{registration.case.surname}}</label>
+                    <label>There is currently no secondary care NHS Trust allocated to {{registration.case.first_name}} {{registration.case.surname}}</label>
                     <div class="field" >
                         {% url 'allocate_lead_site' registration_id=registration.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="allocate_lead_site" test_positive=None label="Allocate Lead Site" hx_default_text="Search hospitals..." data_position="top left" %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="allocate_lead_site" test_positive=None label="Allocate Secondary Care NHS Trust Site" hx_default_text="Search hospitals..." data_position="top left" %}
                     </div>
                 </div>
 
