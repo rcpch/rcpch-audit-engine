@@ -59,14 +59,14 @@
 
           <a class="active completed step" href="{% url 'initial_assessment' case_id %}">
             <div class="content">
-              <div class="title">Initial Assessment</div>
+              <div class="title">First Paediatric Assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
         {% else %}
           <a class="completed step" href="{% url 'initial_assessment' case_id %}">
             <div class="content">
-              <div class="title">Initial Assessment</div>
+              <div class="title">First Paediatric Assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
@@ -76,21 +76,21 @@
 
           <a href="{% url 'initial_assessment' case_id %}" class="active step">
             <div class="content">
-              <div class="title">Initial Assessment</div>
+              <div class="title">First Paediatric Assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
         {% elif active_template == "none" %}
           <a href="{% url 'initial_assessment' case_id %}" class="disabled step">
             <div class="content">
-              <div class="title">Initial Assessment</div>
+              <div class="title">First Paediatric Assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
         {% else %}
           <a href="{% url 'initial_assessment' case_id %}" class="step">
             <div class="content">
-              <div class="title">Initial Assessment</div>
+              <div class="title">First Paediatric Assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
@@ -335,7 +335,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Initial Assessment" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="First Paediatric Assessment" %}
       </div>
       {% endwith %}
       {% endwith %}
