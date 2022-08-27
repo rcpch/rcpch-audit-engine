@@ -20,15 +20,23 @@
   --rcpch_lightest_blue: #f0fafe;
   --rcpch_lightest_grey: #f3f3f3;
   --rcpch_strong_blue: #3366cc;
+  /* 51,102,204 */
   --rcpch_dark_blue: #0d0d58;
+  /* 45,49,109 */
   --rcpch_light_blue: #11a7f2;
+  /* 17,167,242 */
   --rcpch_pink: #e00087;
+  /* 224,0,135 */
   /* monochrome */
   --rcpch_white: #ffffff;
   --rcpch_light_grey: #d9d9d9;
+  /* 217,217,217 */
   --rcpch_mid_grey: #b3b3b3;
+  /* 179,179,179 */
   --rcpch_dark_grey: #808080;
+  /* 128,128,128 */
   --rcpch_charcoal: #4d4d4d;
+  /* 77,77,77 */
   --rcpch_black: #000000;
   /* secondary colours */
   --rcpch_red: #e60700;
@@ -701,6 +709,57 @@ ui.rcpch_chart_container.segment {
   font-size: small;
 }
 
+/* audit icon */
+
 .rcpch_circle {
   border: 5px var(--rcpch_light_blue);
+  border-radius: 50%;
+}
+
+
+.ui.rcpch.form input:not([type]),
+.ui.rcpch.form input[type="date"],
+.ui.rcpch.form input[type="datetime-local"],
+.ui.rcpch.form input[type="email"],
+.ui.rcpch.form input[type="number"],
+.ui.rcpch.form input[type="password"],
+.ui.rcpch.form input[type="search"],
+.ui.rcpch.form input[type="tel"],
+.ui.rcpch.form input[type="time"],
+.ui.rcpch.form input[type="text"],
+.ui.rcpch.form input[type="file"],
+.ui.rcpch.form input[type="url"] {
+  font-family: Montserrat-Regular;
+  margin: 0em;
+  outline: none;
+  -webkit-appearance: none;
+  border: 3px solid rgba(17, 167, 242, 1);
+  border-radius: 0%;
+  line-height: 1.21428571em;
+  padding: 0.67857143em 1em;
+  font-size: 1em;
+  background: #FFFFFF;
+
+  color: rgba(0, 0, 0, 0.87);
+  -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
+  box-shadow: 0em 0em 0em 0em transparent inset;
+  -webkit-transition: color 0.1s ease, border-color 0.1s ease;
+  transition: color 0.1s ease, border-color 0.1s ease;
+}
+
+.ui.form .field.field input:-webkit-autofill {
+  border: 3px solid rgba(17, 167, 242, 1) !important;
+  background-color: #FFFFFF !important;
+}
+
+.ui.form .field.field input:-webkit-autofill:focus {
+  border: 3px solid rgba(17, 167, 242, 1) !important;
+  -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_lightest_blue) inset !important;
+  box-shadow: 0px 0px 0px 100px var(--rcpch_lightest_blue) inset !important;
+}
+
+.ui.form .field.field input:-webkit-autofill {
+  border: 3px solid rgba(17, 167, 242, 1) !important;
+  -webkit-box-shadow: 0px 0px 0px 100px #FFFFFF inset !important;
+  box-shadow: 0px 0px 0px 100px #FFFFFF inset !important;
 }

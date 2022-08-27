@@ -179,3 +179,34 @@ def registration_active(request, case_id, active_template):
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
+
+
+"""
+{{ form.as_p }}
+  <button class="ui button" type="submit">Log In</button>
+
+
+  /* rcpch login  */
+.ui.rcpch.input>input {
+  font-family: Montserrat-Regular;
+  border: 3px solid var(--rcpch_light_blue);
+  border-radius: 0%;
+}
+
+.ui.rcpch.input.focus>input,
+.ui.rcpch.input>input:focus {
+  border-color: var(--rcpch_dark_blue);
+  border-radius: 0%;
+}
+
+.ui.input.focus>input::-webkit-input-placeholder,
+.ui.input>input:focus::-webkit-input-placeholder {
+  border-color: red;
+}
+
+.ui.rcpch.input>input:active,
+.ui.rcpch.input.down input {
+  border-color: var(--rcpch_dark_blue);
+  border-radius: 0%;
+}
+"""
