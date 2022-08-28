@@ -4,6 +4,8 @@ from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+
+from epilepsy12.view_folder.multiaxial_description_views import NONEPILEPSY_FIELDS
 from ..constants import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES, GENERALISED_SEIZURE_TYPE
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
@@ -21,38 +23,8 @@ from ..general_functions import *
 """
 Constants for selections
 """
-FOCAL_EPILEPSY_FIELDS = [
-    # "experienced_prolonged_focal_seizures",
-    "focal_onset_impaired_awareness",
-    "focal_onset_automatisms",
-    "focal_onset_atonic",
-    "focal_onset_clonic",
-    "focal_onset_left",
-    "focal_onset_right",
-    "focal_onset_epileptic_spasms",
-    "focal_onset_hyperkinetic",
-    "focal_onset_myoclonic",
-    "focal_onset_tonic",
-    "focal_onset_autonomic",
-    "focal_onset_behavioural_arrest",
-    "focal_onset_cognitive",
-    "focal_onset_emotional",
-    "focal_onset_sensory",
-    "focal_onset_centrotemporal",
-    "focal_onset_temporal",
-    "focal_onset_frontal",
-    "focal_onset_parietal",
-    "focal_onset_occipital",
-    "focal_onset_gelastic",
-    "focal_onset_focal_to_bilateral_tonic_clonic",
-    # "focal_onset_other",
-]
 
-GENERALISED_ONSET_EPILEPSY_FIELDS = [
-    # 'prolonged_generalized_convulsive_seizures',
-    "epileptic_generalised_onset",
-    # "epileptic_generalised_onset_other_details",
-]
+# fields for radio buttons
 
 FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS = [
     {'name': 'focal_onset_atonic', 'text': "Atonic"},
@@ -85,8 +57,70 @@ LATERALITY = [
     {'name': 'focal_onset_right', 'text': 'Right'}
 ]
 
+nonseizure_types = [
+    {'name': 'nonepileptic_seizure_syncope',
+        'text': 'Syncope And Anoxic Seizures', 'id': 'SAS'},
+    {'name': 'nonepileptic_seizure_behavioural',
+        'text': 'Behavioral Psychological And Psychiatric Disorders', 'id': 'BPP'},
+    {'name': 'nonepileptic_seizure_sleep',
+        'text': 'Sleep Related Conditions', 'id': 'SRC'},
+    {'name': 'nonepileptic_seizure_paroxysmal',
+        'text': 'Paroxysmal Movement Disorders', 'id': 'PMD'},
+    {'name': 'nonepileptic_seizure_migraine',
+        'text': 'Migraine Associated Disorders', 'id': 'MAD'},
+    {'name': 'nonepileptic_seizure_miscellaneous',
+        'text': 'Miscellaneous Events', 'id': 'ME'},
+    {'name': 'nonepileptic_seizure_other', 'text': 'Other', 'id': 'Oth'}
+]
+
+# fields to update in model
+
+GENERALISED_ONSET_EPILEPSY_FIELDS = [
+    # 'prolonged_generalized_convulsive_seizures',
+    "epileptic_generalised_onset",
+    # "epileptic_generalised_onset_other_details",
+]
+
+FOCAL_EPILEPSY_FIELDS = [
+    "focal_onset_impaired_awareness",
+    "focal_onset_automatisms",
+    "focal_onset_atonic",
+    "focal_onset_clonic",
+    "focal_onset_left",
+    "focal_onset_right",
+    "focal_onset_epileptic_spasms",
+    "focal_onset_hyperkinetic",
+    "focal_onset_myoclonic",
+    "focal_onset_tonic",
+    "focal_onset_autonomic",
+    "focal_onset_behavioural_arrest",
+    "focal_onset_cognitive",
+    "focal_onset_emotional",
+    "focal_onset_sensory",
+    "focal_onset_centrotemporal",
+    "focal_onset_temporal",
+    "focal_onset_frontal",
+    "focal_onset_parietal",
+    "focal_onset_occipital",
+    "focal_onset_gelastic",
+    "focal_onset_focal_to_bilateral_tonic_clonic",
+]
+
 EPILEPSY_FIELDS = ['were_any_of_the_epileptic_seizures_convulsive'] + \
     FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
+
+NONEPILEPSY_FIELDS = [
+    'nonepileptic_seizure_unknown_onset',
+    'nonepileptic_seizure_syncope',
+    'nonepileptic_seizure_behavioural',
+    'nonepileptic_seizure_sleep',
+    'nonepileptic_seizure_paroxysmal',
+    'nonepileptic_seizure_migraine',
+    'nonepileptic_seizure_miscellaneous',
+    'nonepileptic_seizure_other'
+]
+
+ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
 
 
 @login_required
@@ -189,6 +223,14 @@ def edit_episode(request, episode_id):
         'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
         'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
         'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
     }
 
     response = render(
@@ -513,23 +555,34 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
     selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
     """
     epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
-    """
+
+    update_fields = {
+        'epilepsy_or_nonepilepsy_status': epilepsy_or_nonepilepsy_status,
+        'updated_at': timezone.now(),
+        'updated_by': request.user,
+    }
+
     if epilepsy_or_nonepilepsy_status == 'E':
         # epilepsy selected - set all nonepilepsy to none
-        set_epilepsy_fields_to_none(request, episode_id=episode_id)
+        for field in NONEPILEPSY_FIELDS:
+            update_fields.update({
+                f"{field}": None
+            })
+            print(field)
     elif epilepsy_or_nonepilepsy_status == 'NE':
         # nonepilepsy selected - set all epilepsy to none
-        set_all_nonepilepsy_fields_to_none(request, episode_id=episode_id)
+        for field in EPILEPSY_FIELDS:
+            update_fields.update({
+                f"{field}": None
+            })
     elif epilepsy_or_nonepilepsy_status == 'NK':
         # notknown selected - set all epilepsy and nonepilepsy to none
-        set_epilepsy_fields_to_none(request, episode_id=episode_id)
-        set_all_nonepilepsy_fields_to_none(request, episode_id=episode_id)
-    """
-    Episode.objects.filter(pk=episode_id).update(
-        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+        for field in ALL_FIELDS:
+            update_fields.update({
+                f"{field}": None
+            })
+
+    Episode.objects.filter(pk=episode_id).update(**update_fields)
     episode = Episode.objects.get(pk=episode_id)
 
     template = 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html'
@@ -542,6 +595,14 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
         'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
         'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
         'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
         'episode': episode
     }
 
@@ -624,19 +685,19 @@ def epileptic_seizure_onset_type(request, episode_id):
         # focal onset - set all generalised onset fields to none
         for field in GENERALISED_ONSET_EPILEPSY_FIELDS:
             update_fields.update({
-                field: None
+                f"{field}": None
             })
     elif epileptic_seizure_onset_type == "GO":
         # generalised onset - set focal onset fields to none
         for field in FOCAL_EPILEPSY_FIELDS:
             update_fields.update({
-                field: None
+                f"{field}": None
             })
     else:
         # unknown or unclassified onset. Set all to none
         for field in EPILEPSY_FIELDS:
             update_fields.update({
-                field: None
+                f"{field}": None
             })
 
     # update the fields object to include latest selection
@@ -765,4 +826,156 @@ def epileptic_generalised_onset(request, episode_id):
         name="registration_active",
         params={})  # reloads the form to show the active steps
 
+    return response
+
+
+"""
+Nonepilepsy
+"""
+
+
+@login_required
+def nonepilepsy_generalised_onset(request, episode_id):
+
+    nonepilepsy_generalised_onset = request.htmx.trigger_name
+    Episode.objects.filter(id=episode_id).update(
+        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset,
+        updated_at=timezone.now(),
+        updated_by=request.user)
+    episode = Episode.objects.get(id=episode_id)
+
+    context = {
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+        'episode': episode
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html', context)
+
+    # test_fields_update_audit_progress(episode)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def nonepileptic_seizure_type(request, episode_id):
+    """
+    POST request from select element within nonepilepsy partial
+    Returns one of the select options: 
+    nonepileptic_seizure_type
+    nonepileptic_seizure_syncope
+    nonepileptic_seizure_behavioural
+    nonepileptic_seizure_sleep
+    nonepileptic_seizure_paroxysmal
+    nonepileptic_seizure_migraine
+    nonepileptic_seizure_miscellaneous
+
+    Updates the nonepileptic_seizure_type and used to filter which subtype is shown
+    Returns the same partial with parameters
+    """
+
+    update_fields = {
+        'nonepileptic_seizure_type': request.POST.get(request.htmx.trigger_name),
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    }
+
+    # set any fields that are not this subtype that might have previously been
+    # set back to none
+    for nonseizure_type in nonseizure_types:
+        if nonseizure_type.get('id') is not nonepileptic_seizure_type:
+            update_fields.update({
+                nonseizure_type.get('name'): None
+            })
+
+    Episode.objects.filter(pk=episode_id).update(
+        **update_fields
+    )
+
+    episode = Episode.objects.get(pk=episode_id)
+    context = {
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+        'episode': episode
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html', context)
+
+    # test_fields_update_audit_progress(episode)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def nonepileptic_seizure_subtype(request, episode_id):
+    """
+    POST request from the nonepileptic_seizure_subtype partial select component
+    in the nonepilepsy partial
+    Returns selection from one of the dropdowns depending on which nonepileptic_seizure_type
+    was previously selected
+    """
+    field_name = request.htmx.trigger_name
+    field_selection = request.POST.get(field_name)
+
+    # set selected field to selection, all other nonepilepsy fields to None
+    update_fields = {
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    }
+    for nonseizure_type in nonseizure_types:
+        if nonseizure_type.get('name') == field_name:
+            update_fields.update({
+                field_name: field_selection
+            })
+        else:
+            update_fields.update({
+                nonseizure_type.get('name'): None
+            })
+    Episode.objects.filter(pk=episode_id).update(**update_fields)
+
+    episode = Episode.objects.get(pk=episode_id)
+    context = {
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+        'episode': episode
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html', context)
+
+    # test_fields_update_audit_progress(episode)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response

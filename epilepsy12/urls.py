@@ -81,6 +81,12 @@ htmx_paths = [
          views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
     path('episode/<int:episode_id>/epileptic_generalised_onset',
          views.epileptic_generalised_onset, name='epileptic_generalised_onset'),
+    path('episode/<int:episode_id>/nonepilepsy_generalised_onset',
+         views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
+    path('episode/<int:episode_id>/nonepileptic_seizure_type',
+         views.nonepileptic_seizure_type, name='nonepileptic_seizure_type'),
+    path('episode/<int:episode_id>/nonepileptic_seizure_subtype',
+         views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
 
     # desscribe / multiaxial description htmx endpoints
     #
@@ -90,12 +96,6 @@ htmx_paths = [
     #          views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
 
     #     nonepilepsy
-    path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
-         views.nonepilepsy_generalised_onset, name='nonepilepsy_generalised_onset'),
-    path('htmx/<int:desscribe_id>/nonepileptic_seizure_type',
-         views.nonepileptic_seizure_type, name='nonepileptic_seizure_type'),
-    path('htmx/<int:desscribe_id>/nonepileptic_seizure_subtype',
-         views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
 
     path('htmx/<int:desscribe_id>/seizure_cause_main',
          views.seizure_cause_main, name='seizure_cause_main'),

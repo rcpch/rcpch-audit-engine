@@ -73,7 +73,7 @@
         </h5>
 
         <div id="epilepsy_or_nonepilepsy_status">
-            {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html' with episode=episode epilepsy_or_nonepilepsy_status_choices=epilepsy_or_nonepilepsy_status_choices epileptic_seizure_onset_types=epileptic_seizure_onset_types LATERALITY=LATERALITY FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS GENERALISED_SEIZURE_TYPE=GENERALISED_SEIZURE_TYPE %}
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html' with episode=episode epilepsy_or_nonepilepsy_status_choices=epilepsy_or_nonepilepsy_status_choices epileptic_seizure_onset_types=epileptic_seizure_onset_types LATERALITY=LATERALITY FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS GENERALISED_SEIZURE_TYPE=GENERALISED_SEIZURE_TYPE episode=episode nonepilepsy_onset_types=nonepilepsy_onset_types nonepilepsy_types=nonepilepsy_types syncopes=syncopes behavioural=behavioural sleep=sleep paroxyms=paroxyms migraines=migraines nonepilepsy_miscellaneous=nonepilepsy_miscellaneous %}
         </div>
 
     </div>

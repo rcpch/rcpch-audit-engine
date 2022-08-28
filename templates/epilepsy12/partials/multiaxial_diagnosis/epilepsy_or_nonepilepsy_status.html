@@ -7,28 +7,38 @@
 
 {% if episode.epilepsy_or_nonepilepsy_status is not None %}
 
-    <h5 class="ui header">
-        <span class='desscribe_letters'>
-            <div class="ui rcpch_pink circular label">S</div>
-        </span>
-        <div class='content'>
-                Seizure Type
-            <div class='sub header'>
-            Describe the type of seizure(s)
+    {% if episode.epilepsy_or_nonepilepsy_status == 'E' or episode.epilepsy_or_nonepilepsy_status == 'NE' %}
+
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">S</div>
+            </span>
+            <div class='content'>
+                    Seizure Type
+                <div class='sub header'>
+                Describe the type of seizure(s)
+                </div>
             </div>
-        </div>
-    </h5>
+        </h5>
+
+    {% endif %}
 
 
     {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
         <div id="epilepsy" class="field">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy.html' with episode=episode epileptic_seizure_onset_types=epileptic_seizure_onset_types epilepsy_generalised_onset_types=epilepsy_generalised_onset_types FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS GENERALISED_SEIZURE_TYPE=GENERALISED_SEIZURE_TYPE %}
         </div>
-    {% elif desscribe.epilepsy_or_nonepilepsy_status == 'NE'%}
+        <div class='ui info message'>
+            This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
+        </div>
+    {% elif episode.epilepsy_or_nonepilepsy_status == 'NE'%}
         <div id="nonepilepsy" class="field">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html' with episode=episode nonepilepsy_onset_types=nonepilepsy_onset_types nonepilepsy_types=nonepilepsy_types syncopes=syncopes behavioural=behavioural sleep=sleep paroxyms=paroxyms migraines=migraines nonepilepsy_miscellaneous=nonepilepsy_miscellaneous %}
         </div>
-    {% else %}
+        <div class='ui info message'>
+            This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
+        </div>
+    {% elif episode.epilepsy_or_nonepilepsy_status == 'U' %}
         <div class="ui negative message">
             <h5>Epilepsy Diagnosis Unclear</h5>
             <p>Data collected will not be included in reporting against national epilepsy standards</p>

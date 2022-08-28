@@ -223,6 +223,64 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True
     )
 
+    # nonepileptic seizure onset
+
+    nonepileptic_seizure_unknown_onset = models.CharField(
+        max_length=3,
+        choices=NON_EPILEPSY_SEIZURE_ONSET,
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_syncope = models.CharField(
+        max_length=3,
+        choices=sorted(NON_EPILEPTIC_SYNCOPES),
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_behavioural = models.CharField(
+        max_length=3,
+        choices=sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS),
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_sleep = models.CharField(
+        max_length=3,
+        choices=sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS),
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_paroxysmal = models.CharField(
+        max_length=3,
+        choices=sorted(NON_EPILEPSY_PAROXYSMS),
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_migraine = models.CharField(
+        max_length=3,
+        choices=sorted(MIGRAINES),
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_miscellaneous = models.CharField(
+        max_length=3,
+        choices=sorted(EPIS_MISC),
+        default=None,
+        null=True,
+        blank=True
+    )
+    nonepileptic_seizure_other = models.CharField(
+        max_length=250,
+        default=None,
+        null=True,
+        blank=True
+    )
+
     # relationships
 
     registration = models.ForeignKey(

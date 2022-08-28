@@ -440,327 +440,327 @@ def prolonged_generalized_convulsive_seizures(request, desscribe_id):
     return response
 
 
-@login_required
-def epileptic_seizure_onset_type(request, desscribe_id):
-    """
-    Defines type of onset if considered to be epilepsy
-    Accepts POST request from epilepsy partial and returns the same having
-    updated the model with the selection
-    If focal onset, sent general onset fields to none, or both 
-    to none if not known
-    """
-    epileptic_seizure_onset_type = request.htmx.trigger_name
+# @login_required
+# def epileptic_seizure_onset_type(request, desscribe_id):
+#     """
+#     Defines type of onset if considered to be epilepsy
+#     Accepts POST request from epilepsy partial and returns the same having
+#     updated the model with the selection
+#     If focal onset, sent general onset fields to none, or both
+#     to none if not known
+#     """
+#     epileptic_seizure_onset_type = request.htmx.trigger_name
 
-    update_fields = {}
-    if epileptic_seizure_onset_type == "FO":
-        # focal onset - set all generalised onset fields to none
-        for field in GENERALISED_ONSET_EPILEPSY_FIELDS:
-            update_fields.update({
-                field: None
-            })
-    elif epileptic_seizure_onset_type == "GO":
-        # generalised onset - set focal onset fields to none
-        for field in FOCAL_EPILEPSY_FIELDS:
-            update_fields.update({
-                field: None
-            })
-    else:
-        # unknown or unclassified onset. Set all to none
-        for field in EPILEPSY_FIELDS:
-            update_fields.update({
-                field: None
-            })
+#     update_fields = {}
+#     if epileptic_seizure_onset_type == "FO":
+#         # focal onset - set all generalised onset fields to none
+#         for field in GENERALISED_ONSET_EPILEPSY_FIELDS:
+#             update_fields.update({
+#                 field: None
+#             })
+#     elif epileptic_seizure_onset_type == "GO":
+#         # generalised onset - set focal onset fields to none
+#         for field in FOCAL_EPILEPSY_FIELDS:
+#             update_fields.update({
+#                 field: None
+#             })
+#     else:
+#         # unknown or unclassified onset. Set all to none
+#         for field in EPILEPSY_FIELDS:
+#             update_fields.update({
+#                 field: None
+#             })
 
-    # update the fields object to include latest selection
-    update_fields.update({
-        'epileptic_seizure_onset_type': epileptic_seizure_onset_type,
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    })
+#     # update the fields object to include latest selection
+#     update_fields.update({
+#         'epileptic_seizure_onset_type': epileptic_seizure_onset_type,
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     })
 
-    # update the model
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+#     # update the model
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
 
-    # retrieve updated object instance
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     # retrieve updated object instance
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    context = {
-        'desscribe': desscribe,
-        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-        'laterality': laterality,
-        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
-    }
+#     context = {
+#         'desscribe': desscribe,
+#         'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+#         'laterality': laterality,
+#         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+#     }
 
-    response = render(
-        request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
 
-    test_fields_update_audit_progress(desscribe)
+#     test_fields_update_audit_progress(desscribe)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-@login_required
-def focal_onset_epilepsy_checked_changed(request, desscribe_id):
-    """
-    Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
-    The desscribe_id is also passed in allowing update of the model.
-    The id of the radio button clicked holds the name of the field in the desscribe model to update
-    the name of the radiobutton group clicked holds the name of the list from which to select model fields to update
-    """
-
-    if request.htmx.trigger_name == 'focal_epilepsy_motor_manifestations':
-        focal_fields = focal_epilepsy_motor_manifestations
-    elif request.htmx.trigger_name == 'focal_epilepsy_nonmotor_manifestations':
-        focal_fields = focal_epilepsy_nonmotor_manifestations
-    elif request.htmx.trigger_name == 'focal_epilepsy_eeg_manifestations':
-        focal_fields = focal_epilepsy_eeg_manifestations
-    elif request.htmx.trigger_name == 'laterality':
-        focal_fields = laterality
-    else:
-        # TODO this is an error that needs handling
-        focal_fields = ()
-
-    update_fields = {}
-    for item in focal_fields:
-        if request.htmx.trigger == item.get('name'):
-            update_fields.update({
-                item.get('name'): True
-            })
-        else:
-            update_fields.update({
-                item.get('name'): False
-            })
-    update_fields.update({
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    })
-
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
-
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-
-    context = {
-        'desscribe': desscribe,
-        'laterality': laterality,
-        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
-    }
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
-
-    test_fields_update_audit_progress(desscribe)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
-@login_required
-def experienced_prolonged_focal_seizures(request, desscribe_id):
-    """
-    Post request from multiple choice toggle within epilepsy partial.
-    Updates the model and returns the epilepsy partial and parameters
-    """
+# @login_required
+# def focal_onset_epilepsy_checked_changed(request, desscribe_id):
+#     """
+#     Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
+#     The desscribe_id is also passed in allowing update of the model.
+#     The id of the radio button clicked holds the name of the field in the desscribe model to update
+#     the name of the radiobutton group clicked holds the name of the list from which to select model fields to update
+#     """
 
-    if request.htmx.trigger_name == 'button-true':
-        experienced_prolonged_focal_seizures = True
-    elif request.htmx.trigger_name == 'button-false':
-        experienced_prolonged_focal_seizures = False
-    else:
-        experienced_prolonged_focal_seizures = None
+#     if request.htmx.trigger_name == 'focal_epilepsy_motor_manifestations':
+#         focal_fields = focal_epilepsy_motor_manifestations
+#     elif request.htmx.trigger_name == 'focal_epilepsy_nonmotor_manifestations':
+#         focal_fields = focal_epilepsy_nonmotor_manifestations
+#     elif request.htmx.trigger_name == 'focal_epilepsy_eeg_manifestations':
+#         focal_fields = focal_epilepsy_eeg_manifestations
+#     elif request.htmx.trigger_name == 'laterality':
+#         focal_fields = laterality
+#     else:
+#         # TODO this is an error that needs handling
+#         focal_fields = ()
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        experienced_prolonged_focal_seizures=experienced_prolonged_focal_seizures,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+#     update_fields = {}
+#     for item in focal_fields:
+#         if request.htmx.trigger == item.get('name'):
+#             update_fields.update({
+#                 item.get('name'): True
+#             })
+#         else:
+#             update_fields.update({
+#                 item.get('name'): False
+#             })
+#     update_fields.update({
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     })
 
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
 
-    context = {
-        'desscribe': desscribe,
-        'laterality': laterality,
-        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
-    }
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
+#     context = {
+#         'desscribe': desscribe,
+#         'laterality': laterality,
+#         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+#     }
 
-    test_fields_update_audit_progress(desscribe)
+#     response = render(
+#         request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     test_fields_update_audit_progress(desscribe)
 
-
-"""
-Nonepilepsy
-"""
-
-
-@login_required
-def nonepilepsy_generalised_onset(request, desscribe_id):
-
-    nonepilepsy_generalised_onset = request.htmx.trigger_name
-    DESSCRIBE.objects.filter(id=desscribe_id).update(
-        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset,
-        updated_at=timezone.now(),
-        updated_by=request.user)
-    desscribe = DESSCRIBE.objects.get(id=desscribe_id)
-
-    context = {
-        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
-        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
-        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
-        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
-        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-        'desscribe': desscribe
-    }
-
-    response = render(
-        request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
-
-    test_fields_update_audit_progress(desscribe)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
-def nonepileptic_seizure_type(request, desscribe_id):
-    """
-    POST request from select element within nonepilepsy partial
-    Returns one of the select options: 
-    nonepileptic_seizure_type
-    nonepileptic_seizure_syncope
-    nonepileptic_seizure_behavioural
-    nonepileptic_seizure_sleep
-    nonepileptic_seizure_paroxysmal
-    nonepileptic_seizure_migraine
-    nonepileptic_seizure_miscellaneous
+# @login_required
+# def experienced_prolonged_focal_seizures(request, desscribe_id):
+#     """
+#     Post request from multiple choice toggle within epilepsy partial.
+#     Updates the model and returns the epilepsy partial and parameters
+#     """
 
-    Updates the nonepileptic_seizure_type and used to filter which subtype is shown
-    Returns the same partial with parameters
-    """
+#     if request.htmx.trigger_name == 'button-true':
+#         experienced_prolonged_focal_seizures = True
+#     elif request.htmx.trigger_name == 'button-false':
+#         experienced_prolonged_focal_seizures = False
+#     else:
+#         experienced_prolonged_focal_seizures = None
 
-    update_fields = {
-        'nonepileptic_seizure_type': request.POST.get(request.htmx.trigger_name),
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    }
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         experienced_prolonged_focal_seizures=experienced_prolonged_focal_seizures,
+#         updated_at=timezone.now(),
+#         updated_by=request.user
+#     )
 
-    # set any fields that are not this subtype that might have previously been
-    # set back to none
-    for nonseizure_type in nonseizure_types:
-        if nonseizure_type.get('id') is not nonepileptic_seizure_type:
-            update_fields.update({
-                nonseizure_type.get('name'): None
-            })
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        **update_fields
-    )
+#     context = {
+#         'desscribe': desscribe,
+#         'laterality': laterality,
+#         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+#     }
 
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-    context = {
-        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
-        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
-        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
-        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
-        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-        'desscribe': desscribe
-    }
+#     response = render(
+#         request=request, template_name="epilepsy12/partials/desscribe/focal_onset_epilepsy.html", context=context)
 
-    response = render(
-        request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+#     test_fields_update_audit_progress(desscribe)
 
-    test_fields_update_audit_progress(desscribe)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
-def nonepileptic_seizure_subtype(request, desscribe_id):
-    """
-    POST request from the nonepileptic_seizure_subtype partial select component
-    in the nonepilepsy partial
-    Returns selection from one of the dropdowns depending on which nonepileptic_seizure_type
-    was previously selected
-    """
-    field_name = request.htmx.trigger_name
-    field_selection = request.POST.get(field_name)
+# """
+# Nonepilepsy
+# """
 
-    # set selected field to selection, all other nonepilepsy fields to None
-    update_fields = {
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    }
-    for nonseizure_type in nonseizure_types:
-        if nonseizure_type.get('name') == field_name:
-            update_fields.update({
-                field_name: field_selection
-            })
-        else:
-            update_fields.update({
-                nonseizure_type.get('name'): None
-            })
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
 
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-    context = {
-        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
-        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
-        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
-        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
-        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-        'desscribe': desscribe
-    }
+# @login_required
+# def nonepilepsy_generalised_onset(request, desscribe_id):
 
-    response = render(
-        request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+#     nonepilepsy_generalised_onset = request.htmx.trigger_name
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset,
+#         updated_at=timezone.now(),
+#         updated_by=request.user)
+#     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
-    test_fields_update_audit_progress(desscribe)
+#     context = {
+#         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+#         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+#         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+#         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+#         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+#         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+#         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     response = render(
+#         request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# def nonepileptic_seizure_type(request, desscribe_id):
+#     """
+#     POST request from select element within nonepilepsy partial
+#     Returns one of the select options:
+#     nonepileptic_seizure_type
+#     nonepileptic_seizure_syncope
+#     nonepileptic_seizure_behavioural
+#     nonepileptic_seizure_sleep
+#     nonepileptic_seizure_paroxysmal
+#     nonepileptic_seizure_migraine
+#     nonepileptic_seizure_miscellaneous
+
+#     Updates the nonepileptic_seizure_type and used to filter which subtype is shown
+#     Returns the same partial with parameters
+#     """
+
+#     update_fields = {
+#         'nonepileptic_seizure_type': request.POST.get(request.htmx.trigger_name),
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     }
+
+#     # set any fields that are not this subtype that might have previously been
+#     # set back to none
+#     for nonseizure_type in nonseizure_types:
+#         if nonseizure_type.get('id') is not nonepileptic_seizure_type:
+#             update_fields.update({
+#                 nonseizure_type.get('name'): None
+#             })
+
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         **update_fields
+#     )
+
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     context = {
+#         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+#         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+#         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+#         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+#         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+#         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+#         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
+
+#     response = render(
+#         request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# def nonepileptic_seizure_subtype(request, desscribe_id):
+#     """
+#     POST request from the nonepileptic_seizure_subtype partial select component
+#     in the nonepilepsy partial
+#     Returns selection from one of the dropdowns depending on which nonepileptic_seizure_type
+#     was previously selected
+#     """
+#     field_name = request.htmx.trigger_name
+#     field_selection = request.POST.get(field_name)
+
+#     # set selected field to selection, all other nonepilepsy fields to None
+#     update_fields = {
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     }
+#     for nonseizure_type in nonseizure_types:
+#         if nonseizure_type.get('name') == field_name:
+#             update_fields.update({
+#                 field_name: field_selection
+#             })
+#         else:
+#             update_fields.update({
+#                 nonseizure_type.get('name'): None
+#             })
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     context = {
+#         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+#         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+#         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+#         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+#         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+#         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+#         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
+
+#     response = render(
+#         request, 'epilepsy12/partials/desscribe/nonepilepsy.html', context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 """

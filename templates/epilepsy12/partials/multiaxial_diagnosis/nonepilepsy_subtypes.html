@@ -2,19 +2,19 @@
 
 <div class="sixteen wide field" class="ui dropdown">
     <label>How best describes the <i>{{nonepilepsy_selected_subtype}}</i> subtype?</label>
-    <select name="nonepilepsy_subtype_selection" hx-post="{% url 'nonepilepsy_subtype_selection' desscribe_id=desscribe.id nonepilepsy_selected_subtype_code=nonepilepsy_selected_subtype_code %}" hx-trigger="load, change" hx-target="#result">
+    <select name="nonepilepsy_subtype_selection" hx-post="{% url 'nonepilepsy_subtype_selection' episode_id=episode.id nonepilepsy_selected_subtype_code=nonepilepsy_selected_subtype_code %}" hx-trigger="load, change" hx-target="#result">
         {% for item in nonepilepsy_subtype_list %}
-            {% if nonepilepsy_selected_subtype_code == "SAS" and desscribe.nonepileptic_seizure_syncope == item.0 %}
+            {% if nonepilepsy_selected_subtype_code == "SAS" and episode.nonepileptic_seizure_syncope == item.0 %}
                 <option value={{item.0}} selected >{{item.1}}</option>
-            {% elif nonepilepsy_selected_subtype_code == "BPP" and desscribe.nonepileptic_seizure_behavioural == item.0 %}
+            {% elif nonepilepsy_selected_subtype_code == "BPP" and episode.nonepileptic_seizure_behavioural == item.0 %}
                 <option value={{item.0}} selected >{{item.1}}</option>
-            {% elif nonepilepsy_selected_subtype_code == "SRC" and desscribe.nonepilepsy_selected_subtype_code == item.0 %}
+            {% elif nonepilepsy_selected_subtype_code == "SRC" and episode.nonepilepsy_selected_subtype_code == item.0 %}
                 <option value={{item.0}} selected >{{item.1}}</option>
-            {% elif nonepilepsy_selected_subtype_code == "PMD" and desscribe.nonepileptic_seizure_paroxysmal == item.0 %}
+            {% elif nonepilepsy_selected_subtype_code == "PMD" and episode.nonepileptic_seizure_paroxysmal == item.0 %}
                 <option value={{item.0}} selected >{{item.1}}</option>
-            {% elif nonepilepsy_selected_subtype_code == "MAD" and desscribe.nonepileptic_seizure_migraine == item.0 %}
+            {% elif nonepilepsy_selected_subtype_code == "MAD" and episode.nonepileptic_seizure_migraine == item.0 %}
                 <option value={{item.0}} selected >{{item.1}}</option>
-            {% elif nonepilepsy_selected_subtype_code == "ME" and desscribe.nonepileptic_seizure_miscellaneous == item.0 %}
+            {% elif nonepilepsy_selected_subtype_code == "ME" and episode.nonepileptic_seizure_miscellaneous == item.0 %}
                 <option value={{item.0}} selected >{{item.1}}</option>
             {% else %}
                 <option value={{item.0}}>{{item.1}}</option>
@@ -22,4 +22,3 @@
         {% endfor %}
     </select>
 </div>
-<div class="ui message" hidden id="result"></div>

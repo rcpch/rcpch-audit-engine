@@ -1,58 +1,58 @@
 <div class="field">
-    {% url 'nonepilepsy_generalised_onset' desscribe_id=desscribe.id as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" label='How best describes the generalised nature of the nonepileptic episode(s)?' test_positive=desscribe.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left'  %}
+    {% url 'nonepilepsy_generalised_onset' episode_id=episode.id as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" label='How best describes the generalised nature of the nonepileptic episode(s)?' test_positive=episode.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left'  %}
 </div>
 
 <div class="field">
-    {% url 'nonepileptic_seizure_type' desscribe_id=desscribe.id as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/select.html' with choices=nonepilepsy_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of the nonepileptic episode(s)?' hx_default_text='Select a nonepilepsy seizure type...' test_positive=desscribe.nonepileptic_seizure_type hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_type' %}
+    {% url 'nonepileptic_seizure_type' episode_id=episode.id as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/select.html' with choices=nonepilepsy_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of the nonepileptic episode(s)?' hx_default_text='Select a nonepilepsy seizure type...' test_positive=episode.nonepileptic_seizure_type hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_type' %}
 </div>
 
-{% if desscribe.nonepileptic_seizure_type %}
+{% if episode.nonepileptic_seizure_type %}
 
 
-    {% if desscribe.nonepileptic_seizure_type == 'SAS' %}
+    {% if episode.nonepileptic_seizure_type == 'SAS' %}
         
         <div class="field">
-            {% url 'nonepileptic_seizure_subtype' desscribe_id=desscribe.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=syncopes hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of syncope?' hx_default_text='Select a syncope type...' test_positive=desscribe.nonepileptic_seizure_syncope hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_syncope' %}
+            {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=syncopes hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of syncope?' hx_default_text='Select a syncope type...' test_positive=episode.nonepileptic_seizure_syncope hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_syncope' %}
             
         </div>
 
-    {% elif desscribe.nonepileptic_seizure_type == 'BPP' %}
+    {% elif episode.nonepileptic_seizure_type == 'BPP' %}
 
         <div class="field">
-            {% url 'nonepileptic_seizure_subtype' desscribe_id=desscribe.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=behavioural hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of behavioural episode?' hx_default_text='Select a behavoural type...' test_positive=desscribe.nonepileptic_seizure_behavioural hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_behavioural' %}
+            {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=behavioural hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of behavioural episode?' hx_default_text='Select a behavoural type...' test_positive=episode.nonepileptic_seizure_behavioural hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_behavioural' %}
         </div>
 
-    {% elif desscribe.nonepileptic_seizure_type == 'SRC' %}
+    {% elif episode.nonepileptic_seizure_type == 'SRC' %}
         <div class="field">
-            {% url 'nonepileptic_seizure_subtype' desscribe_id=desscribe.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=sleep hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of sleep event?' hx_default_text='Select a sleep disturbance type...' test_positive=desscribe.nonepileptic_seizure_sleep hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_sleep' %}
+            {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=sleep hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of sleep event?' hx_default_text='Select a sleep disturbance type...' test_positive=episode.nonepileptic_seizure_sleep hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_sleep' %}
         </div>
 
-    {% elif desscribe.nonepileptic_seizure_type == 'PMD' %}
+    {% elif episode.nonepileptic_seizure_type == 'PMD' %}
         <div class="field">
-            {% url 'nonepileptic_seizure_subtype' desscribe_id=desscribe.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=paroxysms hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of paroxysmal event?' hx_default_text='Select a paroxysm type...' test_positive=desscribe.nonepileptic_seizure_paroxysmal hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_paroxysmal' %}
+            {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=paroxysms hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of paroxysmal event?' hx_default_text='Select a paroxysm type...' test_positive=episode.nonepileptic_seizure_paroxysmal hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_paroxysmal' %}
         </div>
 
-    {% elif desscribe.nonepileptic_seizure_type == 'MAD' %}
+    {% elif episode.nonepileptic_seizure_type == 'MAD' %}
         
         <div class="field">
-            {% url 'nonepileptic_seizure_subtype' desscribe_id=desscribe.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=migraines hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of migraine?' hx_default_text='Select a migraine type...' test_positive=desscribe.nonepileptic_seizure_migraine hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_migraine' %}
+            {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=migraines hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of migraine?' hx_default_text='Select a migraine type...' test_positive=episode.nonepileptic_seizure_migraine hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_migraine' %}
         </div>
 
-    {% elif desscribe.nonepileptic_seizure_type == 'ME' %}
+    {% elif episode.nonepileptic_seizure_type == 'ME' %}
 
         <div class="field">
-            {% url 'nonepileptic_seizure_subtype' desscribe_id=desscribe.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=nonepilepsy_miscellaneous hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>subtype</i>?' hx_default_text='Select a subtype...' test_positive=desscribe.nonepileptic_seizure_miscellaneous hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_miscellaneous' %}
+            {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=nonepilepsy_miscellaneous hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>subtype</i>?' hx_default_text='Select a subtype...' test_positive=episode.nonepileptic_seizure_miscellaneous hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_miscellaneous' %}
         </div>
 
-    {% elif desscribe.nonepileptic_seizure_type == 'Oth' %}
+    {% elif episode.nonepileptic_seizure_type == 'Oth' %}
         
         <div class="field">
             <div class="ui message">
