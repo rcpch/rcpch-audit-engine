@@ -1,7 +1,24 @@
+<div>
 {% if episodes|length > 0 %}
+    <table class="ui compact table">
+        <thead>
+            <th>Episode date</th>
+            <th>Epilepsy Status</th>
+            <th>Onset</th>
+        </thead>
+        <tbody>
     {% for episode in episodes %}
-        <p>{{episode.pk}} {{episode.seizure_onset_date}} <a href='{% url "edit_episode" episode_id=episode.pk %}'>Edit</a></p>
+        <td><a href='{% url "edit_episode" episode.pk %}'>{{episode.seizure_onset_date}}<a></td>
+        <td>{{episode.get_epilepsy_or_nonepilepsy_status_display}}</td>
+        {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
+            <td>{{episode.get_epileptic_seizure_onset_type_display}}</td>
+        {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
+            <td>{{episode.get_nonepileptic_seizure_type_display}}</td>
+        {% endif %}
     {% endfor %}
+        </tbody>
+    </table>
 {% else %}
 There are no documented episodes so far...
 {% endif %}
+</div>
