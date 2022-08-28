@@ -33,6 +33,8 @@ def register(request, case_id):
             epilepsy_context_total_completed_fields=0,
             multiaxial_description_total_expected_fields=0,
             multiaxial_description_total_completed_fields=0,
+            multiaxial_diagnosis_total_expected_fields=0,
+            multiaxial_diagnosis_total_completed_fields=0,
             investigations_total_expected_fields=0,
             investigations_total_completed_fields=0,
             management_total_expected_fields=0,
@@ -609,22 +611,7 @@ def total_fields_completed(model_instance):
     for field in fields:
         if (
             field.name is not None and
-            field.name != 'id' and
-            field.name != 'site' and
-            field.name != 'initial_assessment'
-            and field.name != 'initialassessment'
-            and field.name != 'management'
-            and field.name != 'investigations'
-            and field.name != 'assessment'
-            and field.name != 'epilepsy_context'
-            and field.name != 'epilepsycontext'
-            and field.name != 'registration'
-            and field.name != 'audit_progress'
-            and field.name != 'created_at'
-            and field.name != 'created_by'
-            and field.name != 'updated_by'
-            and field.name != 'updated_at'
-            and field.name != 'case'
+            field.name not in ['id','site','initial_assessment''initialassessment','management','investigations','assessment','epilepsy_context','epilepsycontext','registration','audit_progress','created_at','created_by','updated_by','updated_at','case', 'episode']
         ):
             if getattr(model_instance, field.name) is not None:
                 counter += 1

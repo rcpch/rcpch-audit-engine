@@ -10,13 +10,14 @@ from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from django_htmx.http import trigger_client_event
 from ..general_functions import fuzzy_scan_for_keywords
 
-from ..models import Registration, Keyword, DESSCRIBE, AuditProgress, Comorbidity
+from ..models import Registration, Keyword, DESSCRIBE, AuditProgress, Comorbidity, Episode
 
 from ..general_functions import *
 
 """
 DESSCRIBE Field lists and supporting functions
 """
+
 
 FOCAL_EPILEPSY_FIELDS = [
     "experienced_prolonged_focal_seizures",
@@ -213,83 +214,83 @@ Description fields
 """
 
 
-@login_required
-def edit_description(request, desscribe_id):
-    """
-    This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description.
-    This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
-    The htmx post request is triggered on every key up.
-    This function returns html to the browser.
-    TODO #33 implement 5000 character cut off
-    """
+# @login_required
+# def edit_description(request, desscribe_id):
+#     """
+#     This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description.
+#     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
+#     The htmx post request is triggered on every key up.
+#     This function returns html to the browser.
+#     TODO #33 implement 5000 character cut off
+#     """
 
-    description = request.POST.get('description')
+#     description = request.POST.get('description')
 
-    keywords = Keyword.objects.all()
-    matched_keywords = fuzzy_scan_for_keywords(description, keywords)
+#     keywords = Keyword.objects.all()
+#     matched_keywords = fuzzy_scan_for_keywords(description, keywords)
 
-    update_field = {
-        'description': description,
-        'description_keywords': matched_keywords,
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    }
-    if (len(description) <= 5000):
-        DESSCRIBE.objects.update_or_create(
-            id=desscribe_id, defaults=update_field)
-    desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+#     update_field = {
+#         'description': description,
+#         'description_keywords': matched_keywords,
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     }
+#     if (len(description) <= 5000):
+#         DESSCRIBE.objects.update_or_create(
+#             id=desscribe_id, defaults=update_field)
+#     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
-    context = {
-        'desscribe': desscribe
-    }
+#     context = {
+#         'desscribe': desscribe
+#     }
 
-    response = render(
-        request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+#     response = render(
+#         request, 'epilepsy12/partials/desscribe/description_labels.html', context)
 
-    test_fields_update_audit_progress(desscribe)
+#     test_fields_update_audit_progress(desscribe)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
-@login_required
-def delete_description_keyword(request, desscribe_id, description_keyword_id):
-    """
-    This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description_keyword.
-    This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
-    The htmx post request is triggered on click of a keyword. It removes that keyword from the saved list.
-    This function returns html to the browser.
-    """
-    description_keyword_list = DESSCRIBE.objects.filter(
-        id=desscribe_id).values('description_keywords')
-    description_keywords = description_keyword_list[0]['description_keywords']
-    del description_keywords[description_keyword_id]
+# @login_required
+# def delete_description_keyword(request, desscribe_id, description_keyword_id):
+#     """
+#     This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description_keyword.
+#     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
+#     The htmx post request is triggered on click of a keyword. It removes that keyword from the saved list.
+#     This function returns html to the browser.
+#     """
+#     description_keyword_list = DESSCRIBE.objects.filter(
+#         id=desscribe_id).values('description_keywords')
+#     description_keywords = description_keyword_list[0]['description_keywords']
+#     del description_keywords[description_keyword_id]
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        description_keywords=description_keywords,
-        updated_at=timezone.now(),
-        updated_by=request.user)
-    desscribe = DESSCRIBE.objects.get(id=desscribe_id)
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         description_keywords=description_keywords,
+#         updated_at=timezone.now(),
+#         updated_by=request.user)
+#     desscribe = DESSCRIBE.objects.get(id=desscribe_id)
 
-    context = {
-        'desscribe': desscribe
-    }
+#     context = {
+#         'desscribe': desscribe
+#     }
 
-    response = render(
-        request, 'epilepsy12/partials/desscribe/description_labels.html', context)
+#     response = render(
+#         request, 'epilepsy12/partials/desscribe/description_labels.html', context)
 
-    test_fields_update_audit_progress(desscribe)
+#     test_fields_update_audit_progress(desscribe)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 """
@@ -297,107 +298,107 @@ Epilepsy or nonepilepsy
 """
 
 
-@login_required
-def epilepsy_or_nonepilepsy_status(request, desscribe_id):
-    """
-    Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
-    The desscribe_id is also passed in allowing update of the model.
-    Selections for epilepsy set all nonepilepsy related fields to None, and selections for
-    nonepilepsy set all epilepsy fields to None. Selections to not known set all 
-    selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
-    """
-    epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
+# @login_required
+# def epilepsy_or_nonepilepsy_status(request, desscribe_id):
+#     """
+#     Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
+#     The desscribe_id is also passed in allowing update of the model.
+#     Selections for epilepsy set all nonepilepsy related fields to None, and selections for
+#     nonepilepsy set all epilepsy fields to None. Selections to not known set all
+#     selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
+#     """
+#     epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
 
-    if epilepsy_or_nonepilepsy_status == 'E':
-        # epilepsy selected - set all nonepilepsy to none
-        set_epilepsy_fields_to_none(request, desscribe_id=desscribe_id)
-    elif epilepsy_or_nonepilepsy_status == 'NE':
-        # nonepilepsy selected - set all epilepsy to none
-        set_all_nonepilepsy_fields_to_none(request, desscribe_id=desscribe_id)
-    elif epilepsy_or_nonepilepsy_status == 'NK':
-        # notknown selected - set all epilepsy and nonepilepsy to none
-        set_epilepsy_fields_to_none(request, desscribe_id=desscribe_id)
-        set_all_nonepilepsy_fields_to_none(request, desscribe_id=desscribe_id)
+#     if epilepsy_or_nonepilepsy_status == 'E':
+#         # epilepsy selected - set all nonepilepsy to none
+#         set_epilepsy_fields_to_none(request, desscribe_id=desscribe_id)
+#     elif epilepsy_or_nonepilepsy_status == 'NE':
+#         # nonepilepsy selected - set all epilepsy to none
+#         set_all_nonepilepsy_fields_to_none(request, desscribe_id=desscribe_id)
+#     elif epilepsy_or_nonepilepsy_status == 'NK':
+#         # notknown selected - set all epilepsy and nonepilepsy to none
+#         set_epilepsy_fields_to_none(request, desscribe_id=desscribe_id)
+#         set_all_nonepilepsy_fields_to_none(request, desscribe_id=desscribe_id)
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
+#         updated_at=timezone.now(),
+#         updated_by=request.user
+#     )
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    template = 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html'
-    context = {
-        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-        'laterality': laterality,
-        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
-        'desscribe': desscribe
-    }
+#     template = 'epilepsy12/partials/desscribe/epilepsy_or_nonepilepsy_status.html'
+#     context = {
+#         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+#         'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+#         'laterality': laterality,
+#         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+#         'desscribe': desscribe
+#     }
 
-    response = render(request=request, template_name=template, context=context)
+#     response = render(request=request, template_name=template, context=context)
 
-    test_fields_update_audit_progress(desscribe)
+#     test_fields_update_audit_progress(desscribe)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-"""
-Epilepsy fields
-"""
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
-@login_required
-def were_any_of_the_epileptic_seizures_convulsive(request, desscribe_id):
-    """
-    Post request from multiple choice toggle within epilepsy partial.
-    Updates the model and returns the epilepsy partial and parameters
-    """
+# """
+# Epilepsy fields
+# """
 
-    if request.htmx.trigger_name == 'button-true':
-        were_any_of_the_epileptic_seizures_convulsive = True
-    elif request.htmx.trigger_name == 'button-false':
-        were_any_of_the_epileptic_seizures_convulsive = False
-    else:
-        were_any_of_the_epileptic_seizures_convulsive = None
 
-    DESSCRIBE.objects.filter(pk=desscribe_id).update(
-        were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+# @login_required
+# def were_any_of_the_epileptic_seizures_convulsive(request, desscribe_id):
+#     """
+#     Post request from multiple choice toggle within epilepsy partial.
+#     Updates the model and returns the epilepsy partial and parameters
+#     """
 
-    desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+#     if request.htmx.trigger_name == 'button-true':
+#         were_any_of_the_epileptic_seizures_convulsive = True
+#     elif request.htmx.trigger_name == 'button-false':
+#         were_any_of_the_epileptic_seizures_convulsive = False
+#     else:
+#         were_any_of_the_epileptic_seizures_convulsive = None
 
-    context = {
-        'desscribe': desscribe,
-        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-        'laterality': laterality,
-        'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-        'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-        'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
-    }
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive,
+#         updated_at=timezone.now(),
+#         updated_by=request.user
+#     )
 
-    response = render(
-        request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
 
-    test_fields_update_audit_progress(desscribe)
+#     context = {
+#         'desscribe': desscribe,
+#         'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+#         'laterality': laterality,
+#         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+#     }
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/desscribe/epilepsy.html', context=context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 @login_required
@@ -1079,6 +1080,7 @@ def multiaxial_description(request, case_id):
     """
     """
     registration = Registration.objects.filter(case=case_id).get()
+
     if DESSCRIBE.objects.filter(registration=registration).exists():
         # there is already a desscribe object for this registration
         desscribe = DESSCRIBE.objects.filter(registration=registration).first()
@@ -1088,7 +1090,7 @@ def multiaxial_description(request, case_id):
 
     choices = Keyword.objects.all()
 
-    test_fields_update_audit_progress(desscribe)
+    # test_fields_update_audit_progress(desscribe)
 
     context = {
         "desscribe": desscribe,

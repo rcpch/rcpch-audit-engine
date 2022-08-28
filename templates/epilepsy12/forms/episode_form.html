@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+{% load epilepsy12_template_tags %}
+
+{% block content %}
+
+    <div id='episode'>
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/episode.html' with episode=episode %}
+    </div>
+
+{% endblock content %}

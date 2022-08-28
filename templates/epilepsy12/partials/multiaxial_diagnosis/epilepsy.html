@@ -1,0 +1,31 @@
+{% url 'were_any_of_the_epileptic_seizures_convulsive' episode_id=episode.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.were_any_of_the_epileptic_seizures_convulsive label="Were any of the epileptic seizures convulsive?" data_position="top left" %}
+
+{% url 'epileptic_seizure_onset_type' episode_id=episode.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epileptic_seizure_onset_type label="How best would describe the onset of the epileptic episode?" data_position="top left" %}
+
+
+{% if episode.epileptic_seizure_onset_type == 'GO' %}
+    <h5>Generalised Onset Epilepsy</h5>
+    <div id="generalised_epilepsy" class="field">
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/generalised_onset_epilepsy.html' with episode=episode  %}
+    </div>
+{% elif episode.epileptic_seizure_onset_type == 'FO' %}
+    <h5>Focal Onset Epilepsy</h5>
+    <div id="focal_epilepsy">
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/focal_onset_epilepsy.html' with episode=episode FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS %}
+    </div>
+{% elif episode.epileptic_seizure_onset_type == 'UC' %}
+    <div class="ui message">
+        <h3>Unclassified Onset Epilepsy</h3>
+        <p>This epilepsy cannot be classified.</p>
+    </div>
+{% elif episode.epileptic_seizure_onset_type == 'UO' %}
+    <div class="ui message">
+        <h3>Unknown Onset Epilepsy</h3>
+        <p>Not enough is known about the onset of this epilepsy to give it a classification.</p>
+    </div>
+{% endif %}
+<div class='ui info message'>
+    This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
+</div>

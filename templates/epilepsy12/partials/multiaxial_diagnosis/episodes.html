@@ -1,0 +1,7 @@
+{% if episodes|length > 0 %}
+    {% for episode in episodes %}
+        <p>{{episode.pk}} {{episode.seizure_onset_date}} <a href='{% url "edit_episode" episode_id=episode.pk %}'>Edit</a></p>
+    {% endfor %}
+{% else %}
+There are no documented episodes so far...
+{% endif %}

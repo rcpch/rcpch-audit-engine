@@ -1,0 +1,35 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+
+    <div class="ui rcpch_pink segment">
+
+        <div class="item">
+            Episodes
+            <div class='content'>
+            A child or young person's epilepsy may comprise one or more episodes.
+            </div>
+        </div>
+
+        <div id='episodes'>
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/episodes.html' with episodes=episodes %}
+        </div>
+
+        <div class="field">
+
+            <div 
+                class="ui rcpch_primary button"
+                hx-post="{% url 'add_episode' registration_id=registration.pk %}"
+                hx-trigger='click'
+                hx-target='#episode'
+                hx-swap='innerHTML'
+            >
+            Add a new Episode
+            </div>
+
+        </div>
+
+    </div>
+
+    
+    
+</form>

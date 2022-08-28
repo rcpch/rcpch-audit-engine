@@ -8,9 +8,9 @@ from .time_and_user_abstract_base_classes import *
 
 
 class DESSCRIBE(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
-    # Summarises a child or young person's epilepsy in a multiaxial way.
+    # Summarises a child or young person's episode in a multiaxial way.
     # It is a standard tool for clinicians when describing or discussing a person's epilepsy and is taught nationally
-    # There is one record per case.
+    # There is one record per episode.
 
     description = models.CharField(
         help_text="What is the episode(s) like and is the description adequate?",

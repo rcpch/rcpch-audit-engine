@@ -15,3 +15,4 @@ from .epilepsy12user import Epilepsy12User
 from .keyword import Keyword
 from .desscribe import DESSCRIBE
 from .audit_progress import AuditProgress
+from .episode import Episode

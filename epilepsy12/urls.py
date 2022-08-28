@@ -30,6 +30,9 @@ urlpatterns = [
     path('multiaxial_description/<int:case_id>',
          views.multiaxial_description, name='multiaxial_description'),
 
+    path('multiaxial_diagnosis/<int:case_id>',
+         views.multiaxial_diagnosis, name='multiaxial_diagnosis'),
+
     # epilepsy context path
     path('epilepsy_context/<int:case_id>',
          views.epilepsy_context, name='epilepsy_context'),
@@ -51,23 +54,40 @@ urlpatterns = [
 
 htmx_paths = [
 
-    # desscribe / multiaxial description htmx endpoints
-    path('htmx/<int:desscribe_id>/description',
+    # episodes
+    path('registration/<int:registration_id>/add_episode',
+         views.add_episode, name='add_episode'),
+    path('episode/<int:episode_id>/edit',
+         views.edit_episode, name='edit_episode'),
+    path('episode/<int:episode_id>/seizure_onset_date',
+         views.seizure_onset_date, name='seizure_onset_date'),
+    path('episode/<int:episode_id>/seizure_onset_date_confidence',
+         views.seizure_onset_date_confidence, name='seizure_onset_date_confidence'),
+    path('episode/<int:episode_id>/definition',
+         views.definition, name='definition'),
+    path('episode/<int:episode_id>/has_description_of_the_episode_or_episodes_been_gathered',
+         views.has_description_of_the_episode_or_episodes_been_gathered, name='has_description_of_the_episode_or_episodes_been_gathered'),
+    path('episode/<int:episode_id>/description',
          views.edit_description, name='edit_description'),
-    path('htmx/<int:desscribe_id>/description_keyword/<int:description_keyword_id>/delete',
+    path('episode/<int:episode_id>/description_keyword/<int:description_keyword_id>/delete',
          views.delete_description_keyword, name='delete_description_keyword'),
-    path('htmx/<int:desscribe_id>/epilepsy_or_nonepilepsy_status',
+    path('episode/<int:episode_id>/epilepsy_or_nonepilepsy_status',
          views.epilepsy_or_nonepilepsy_status, name='epilepsy_or_nonepilepsy_status'),
-    path('htmx/<int:desscribe_id>/epileptic_seizure_onset_type',
-         views.epileptic_seizure_onset_type, name='epileptic_seizure_onset_type'),
-    path('htmx/<int:desscribe_id>/focal_onset_epilepsy_checked_changed',
-         views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
-    path('htmx/desscribe/<int:desscribe_id>/experienced_prolonged_focal_seizures',
-         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
-    path('htmx/desscribe/<int:desscribe_id>/were_any_of_the_epileptic_seizures_convulsive',
+    path('episode/<int:episode_id>/were_any_of_the_epileptic_seizures_convulsive',
          views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
-    path('htmx/desscribe/<int:desscribe_id>/prolonged_generalized_convulsive_seizures',
-         views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
+    path('episode/<int:episode_id>/epileptic_seizure_onset_type',
+         views.epileptic_seizure_onset_type, name='epileptic_seizure_onset_type'),
+    path('episode/<int:episode_id>/focal_onset_epilepsy_checked_changed',
+         views.focal_onset_epilepsy_checked_changed, name='focal_onset_epilepsy_checked_changed'),
+    path('episode/<int:episode_id>/epileptic_generalised_onset',
+         views.epileptic_generalised_onset, name='epileptic_generalised_onset'),
+
+    # desscribe / multiaxial description htmx endpoints
+    #
+    #     path('htmx/desscribe/<int:desscribe_id>/experienced_prolonged_focal_seizures',
+    #          views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
+    #     path('htmx/desscribe/<int:desscribe_id>/prolonged_generalized_convulsive_seizures',
+    #          views.prolonged_generalized_convulsive_seizures, name="prolonged_generalized_convulsive_seizures"),
 
     #     nonepilepsy
     path('htmx/<int:desscribe_id>/nonepilepsy_generalised_onset',
@@ -226,12 +246,12 @@ htmx_paths = [
          views.general_paediatrics_referral_made, name="general_paediatrics_referral_made"),
     path('htmx/initial_assessment/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
          views.date_of_referral_to_general_paediatrics, name="date_of_referral_to_general_paediatrics"),
-    path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred',
-         views.when_the_first_epileptic_episode_occurred, name="when_the_first_epileptic_episode_occurred"),
-    path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred_confidence',
-         views.when_the_first_epileptic_episode_occurred_confidence, name="when_the_first_epileptic_episode_occurred_confidence"),
-    path('htmx/registration/<int:initial_assessment_id>/has_description_of_the_episode_or_episodes_been_gathered',
-         views.has_description_of_the_episode_or_episodes_been_gathered, name="has_description_of_the_episode_or_episodes_been_gathered"),
+    #     path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred',
+    #          views.when_the_first_epileptic_episode_occurred, name="when_the_first_epileptic_episode_occurred"),
+    #     path('htmx/registration/<int:initial_assessment_id>/when_the_first_epileptic_episode_occurred_confidence',
+    #          views.when_the_first_epileptic_episode_occurred_confidence, name="when_the_first_epileptic_episode_occurred_confidence"),
+    #     path('htmx/registration/<int:initial_assessment_id>/has_description_of_the_episode_or_episodes_been_gathered',
+    #          views.has_description_of_the_episode_or_episodes_been_gathered, name="has_description_of_the_episode_or_episodes_been_gathered"),
     path('htmx/registration/<int:initial_assessment_id>/has_number_of_episodes_since_the_first_been_documented',
          views.has_number_of_episodes_since_the_first_been_documented, name="has_number_of_episodes_since_the_first_been_documented"),
     path('htmx/registration/<int:initial_assessment_id>/general_examination_performed',
