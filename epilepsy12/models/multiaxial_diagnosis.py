@@ -1,8 +1,7 @@
 from operator import itemgetter
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 
-from epilepsy12.models.registration import Registration, Episode
+from ..models import Registration
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -18,14 +17,6 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     syndrome_present = models.BooleanField(
         "Is there an identifiable epilepsy syndrome?",
-        null=True,
-        blank=True,
-        default=None
-    )
-
-    syndrome = models.IntegerField(
-        "Select an identifiable epilepsy syndrome?",
-        choices=sorted(SYNDROMES, key=itemgetter(1)),
         null=True,
         blank=True,
         default=None
@@ -142,22 +133,11 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         null=True
     )
 
+    # relationships
     registration = models.OneToOneField(
         Registration,
         on_delete=models.CASCADE,
         related_name='registration'
-    )
-
-    # relationships
-
-    registration = models.OneToOneField(
-        Registration,
-        on_delete=models.CASCADE
-    )
-
-    episode = models.ForeignKey(
-        Episode,
-        on_delete=models.CASCADE
     )
 
     # Meta class

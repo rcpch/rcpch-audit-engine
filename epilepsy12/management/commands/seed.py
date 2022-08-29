@@ -58,7 +58,7 @@ def run_hospitals_seed():
     # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
     added = 0
     for index, hospital in enumerate(ALL_HOSPITALS):
-        if hospital["Sector"] == "NHS Trust":
+        if hospital["Sector"] == "NHS Sector":
             hospital_trust = HospitalTrust(
                 OrganisationID=hospital["OrganisationID"],
                 OrganisationCode=hospital["OrganisationCode"],
@@ -89,7 +89,7 @@ def run_hospitals_seed():
                 print("Exception at "+hospital["ParentName"])
                 print(error)
             added += 1
-            chosen_hospital = hospital["ParentName"]
+            chosen_hospital = hospital["OrganisationName"]
             print(f"New hospital added...{added}: {chosen_hospital}")
     print(f"Hospitals added...{added}")
 

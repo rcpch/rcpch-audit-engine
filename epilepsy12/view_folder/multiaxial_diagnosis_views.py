@@ -4,8 +4,8 @@ from operator import itemgetter
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
-from epilepsy12.view_folder.multiaxial_description_views import NONEPILEPSY_FIELDS
 from ..constants import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES, GENERALISED_SEIZURE_TYPE
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
@@ -16,7 +16,7 @@ from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from django_htmx.http import trigger_client_event
 from ..general_functions import fuzzy_scan_for_keywords
 
-from ..models import Registration, Keyword, Episode, AuditProgress, Comorbidity, Episode
+from ..models import Registration, Keyword, Episode, AuditProgress, Comorbidity, Episode, Syndrome
 
 from ..general_functions import *
 
@@ -136,9 +136,21 @@ def multiaxial_diagnosis(request, case_id):
         # this is not yet a desscribe object for this description - create one
         desscribe = Episode.objects.create(registration=registration)
     """
+    if MultiaxialDiagnosis.objects.filter(registration=registration).exists():
+        multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter(
+            registration=registration).get()
+    else:
+        MultiaxialDiagnosis.objects.create(
+            registration=registration
+        )
+        multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter(
+            registration=registration).get()
 
     episodes = Episode.objects.filter(
-        registration=registration).order_by('seizure_onset_date')
+        multiaxial_diagnosis=multiaxial_diagnosis).order_by('seizure_onset_date').all()
+
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).all()
 
     keyword_choices = Keyword.objects.all()
 
@@ -146,7 +158,9 @@ def multiaxial_diagnosis(request, case_id):
 
     context = {
         "registration": registration,
+        "multiaxial_diagnosis": multiaxial_diagnosis,
         "episodes": episodes,
+        "syndromes": syndromes,
         "keyword_choices": keyword_choices,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
@@ -166,12 +180,15 @@ def multiaxial_diagnosis(request, case_id):
 
 
 @login_required
-def add_episode(request, registration_id):
+def add_episode(request, multiaxial_diagnosis_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
     """
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+
     new_episode = Episode.objects.create(
-        registration=Registration.objects.get(pk=registration_id),
+        multiaxial_diagnosis=multiaxial_diagnosis,
         seizure_onset_date_confidence=None,
         has_description_of_the_episode_or_episodes_been_gathered=None,
         episode_definition=None,
@@ -303,10 +320,10 @@ def remove_episode(request, episode_id):
     Deletes episode from table
     """
     episode = Episode.objects.get(pk=episode_id)
-    registration = episode.registration
+    multiaxial_diagnosis = episode.multiaxial_diagnosis
     Episode.objects.get(pk=episode_id).delete()
     episodes = Episode.objects.filter(
-        registration=registration).order_by('seizure_onset_date')
+        multiaxial_diagnosis=multiaxial_diagnosis).order_by('seizure_onset_date')
 
     context = {
         'episodes': episodes
@@ -1050,8 +1067,628 @@ def nonepileptic_seizure_subtype(request, episode_id):
     return response
 
 
-class HTTPResponseHXRedirect(HttpResponseRedirect):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self['HX-Redirect'] = self['Location']
-        status_code = 200
+@login_required
+def add_syndrome(request, multiaxial_diagnosis_id):
+    """
+    HTMX post request from syndromes.html partial on button click to add new syndrome
+    """
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+
+    syndrome = Syndrome.objects.create(
+        multiaxial_diagnosis=multiaxial_diagnosis,
+        syndrome_diagnosis_date=None,
+        syndrome_name=None,
+        syndrome_diagnosis_active=None
+    )
+
+    context = {
+        'syndrome': syndrome,
+        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/syndrome.html', context)
+
+    # test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+"""
+Syndromes
+"""
+
+
+@login_required
+def edit_syndrome(request, syndrome_id):
+    """
+    HTMX post request from episodes.html partial on button click to add new episode
+    """
+    syndrome = Syndrome.objects.get(pk=syndrome_id)
+
+    keywords = Keyword.objects.all()
+
+    context = {
+        'syndrome': syndrome,
+        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        'seizure_onset_date_confidence_selection': DATE_ACCURACY,
+        'episode_definition_selection': EPISODE_DEFINITION,
+        'keyword_selection': keywords,
+        'epilepsy_or_nonepilepsy_status_choices': sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+        'LATERALITY': LATERALITY,
+        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/syndrome.html', context)
+
+    # test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+def remove_syndrome(request, syndrome_id):
+    """
+    POST request on button click from episodes partial in multiaxial_diagnosis form
+    Deletes syndrome from table
+    """
+    syndrome = Syndrome.objects.get(pk=syndrome_id)
+    multiaxial_diagnosis = syndrome.multiaxial_diagnosis
+    Syndrome.objects.get(pk=syndrome_id).delete()
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).order_by('syndrome_diagnosis_date')
+
+    context = {
+        'syndromes': syndromes
+    }
+
+    return render(request=request,  template_name='epilepsy12/partials/multiaxial_diagnosis/syndromes.html', context=context)
+
+
+@login_required
+def syndrome_present(request, multiaxial_diagnosis_id):
+    """
+# POST request from the syndrome partial in the multiaxial_description_form
+# Updates model and returns the syndrome partial
+"""
+    if request.htmx.trigger_name == 'button-true':
+        MultiaxialDiagnosis.objects.filter(id=multiaxial_diagnosis_id).update(
+            syndrome_present=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        MultiaxialDiagnosis.objects.filter(id=multiaxial_diagnosis_id).update(
+            syndrome_present=False,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).all()
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        # "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        "syndromes": syndromes
+
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/syndrome_section.html', context=context)
+
+    # test_fields_update_audit_progress(multiaxial_diagnosis)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+# @login_required
+# def syndrome(request, desscribe_id):
+#     """
+# # POST request from the syndrome partial in the multiaxial_description_form
+# # Updates model and returns the syndrome partial
+# """
+#     syndrome = request.POST.get('syndrome')
+
+#     if syndrome:
+#         DESSCRIBE.objects.filter(id=desscribe_id).update(
+#             syndrome=syndrome,
+#             updated_at=timezone.now(),
+#             updated_by=request.user
+#         )
+#     else:
+#         return HttpResponse('No dice')
+
+#     desscribe = DESSCRIBE.objects.get(
+#         pk=desscribe_id)
+
+#     context = {
+#         "desscribe": desscribe,
+#         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+#     }
+
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/desscribe/syndrome.html', context=context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# """
+# # Seizure causes
+# """
+
+
+# @login_required
+# def seizure_cause_main(request, desscribe_id):
+#     """
+# # Post request from multiple choice toggle within 'seizure_cause_main' partial.
+# # This one of Structural, Infectious, Metabolic, Genetic, Immune, Not Known
+# # These choices are stored in the EPILEPSY_CHOICES constant list,
+# # passed to the template as 'seizure_cause_selection'
+# # Updates the model, setting other fields to None
+# # and returns the epilepsy partial and parameters
+# """
+
+#     seizure_cause_main = request.htmx.trigger_name
+
+#     all_fields = seizure_cause_main_choices + seizure_cause_subtype_choices
+
+#     update_field = {
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     }
+#     for field in all_fields:
+#         if field.get('id') == seizure_cause_main:
+#             update_field.update({
+#                 'seizure_cause_main': seizure_cause_main
+#             })
+#         else:
+#             if field.get('name'):
+#                 # No Known option has no field
+#                 update_field.update({
+#                     field.get('name'): None
+#                 })
+
+#     # update the model
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         **update_field)
+
+#     # retrieve updated object instance
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+#     context = {
+#         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+#         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+#         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+#         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+#         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
+
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# def seizure_cause_subtype(request, desscribe_id, subtype):
+#     """
+# # POST request from 'seizure_cause_subtype' select
+# # within seizure_cause_main partial, a different sublist relating to the subtype
+# # parameter, selected in the 'seizure_cause_main' partial.
+# # The POST request is triggered by a change in any of the following:
+# # seizure_cause_immune, seizure_cause_metabolic and seizure_cause_structural
+# # Updates the model and returns the epilepsy partial and parameters
+# # Set to None any unselected types
+# """
+#     subtype_selection = request.POST.get(request.htmx.trigger_name)
+
+#     update_fields = {
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     }
+#     for seizure_cause_main_choice in seizure_cause_main_choices:
+#         if subtype == seizure_cause_main_choice.get('id'):
+#             update_fields.update({
+#                 seizure_cause_main_choice.get('name'): subtype_selection
+#             })
+#         else:
+#             if seizure_cause_main_choice.get('name'):
+#                 # unknown option has no field - do not update
+#                 update_fields.update({
+#                     seizure_cause_main_choice.get('name'): None
+#                 })
+
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
+
+#     # retrieve updated object instance
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+#     context = {
+#         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+#         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+#         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+#         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+#         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
+
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# def seizure_cause_subtype_subtype(request, desscribe_id):
+#     """
+# # POST request from subtype selects in seizure_cause_subtype partial. These include:
+# # seizure_cause_immune_antibody, seizure_cause_gene_abnormality
+# # within seizure_cause_main partial.
+# # Updates the model and returns the epilepsy partial and parameters
+# # Set to None any unselected types
+# """
+#     field_name = request.htmx.trigger_name
+#     seizure_cause_subtype_subtype = request.POST.get(field_name)
+
+#     update_field = ({
+#         field_name: seizure_cause_subtype_subtype,
+#         'updated_at': timezone.now(),
+#         'updated_by': request.user
+#     })
+
+#     DESSCRIBE.objects.filter(pk=desscribe_id).update(
+#         **update_field
+#     )
+
+#     # retrieve updated object instance
+#     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+
+#     context = {
+#         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+#         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+#         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+#         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+#         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+#         'desscribe': desscribe
+#     }
+
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# """
+# # RIBE
+# """
+
+
+# @login_required
+# def ribe(request, desscribe_id):
+
+#     toggle = request.POST.get('ribe')
+
+#     if toggle == 'on':
+#         toggle = True
+#     else:
+#         toggle = False
+
+#     desscribe = DESSCRIBE.objects.get(
+#         pk=desscribe_id)
+
+#     registration = desscribe.registration
+#     case = registration.case
+#     comorbidities = Comorbidity.objects.filter(case=case)
+
+#     if comorbidities.count() > 0:
+#         toggle = True
+
+#     DESSCRIBE.objects.filter(id=desscribe_id).update(
+#         relevant_impairments_behavioural_educational=toggle,
+#         updated_at=timezone.now(),
+#         updated_by=request.user
+#     )
+
+#     updated_desscribe = DESSCRIBE.objects.get(
+#         pk=desscribe_id)
+
+#     context = {
+#         'desscribe': updated_desscribe,
+#         'comorbidities': comorbidities,
+#         'case_id': case.id
+#     }
+
+#     response = render(
+#         request, "epilepsy12/partials/desscribe/ribe.html", context)
+
+#     test_fields_update_audit_progress(desscribe)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
+
+
+# @ login_required
+# def multiaxial_description(request, case_id):
+#     """
+# """
+#     registration = Registration.objects.filter(case=case_id).get()
+
+#     if DESSCRIBE.objects.filter(registration=registration).exists():
+#         # there is already a desscribe object for this registration
+#         desscribe = DESSCRIBE.objects.filter(registration=registration).first()
+#     else:
+#         # this is not yet a desscribe object for this description - create one
+#         desscribe = DESSCRIBE.objects.create(registration=registration)
+
+#     choices = Keyword.objects.all()
+
+#     # test_fields_update_audit_progress(desscribe)
+
+#     context = {
+#         "desscribe": desscribe,
+#         "registration": registration,
+#         "choices": choices,
+#         "case_id": case_id,
+#         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+#         "epileptic_seizure_onset_types": sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         'laterality': laterality,
+#         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
+#         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
+#         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
+#         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+#         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+#         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
+#         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
+#         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
+#         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
+#         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
+
+#         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+#         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+#         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+#         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+#         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+#         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+#         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+
+#         "audit_progress": registration.audit_progress,
+#         "active_template": "multiaxial_description"
+#     }
+
+#     response = render(
+#         request=request, template_name='epilepsy12/multiaxial_description.html', context=context)
+
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+
+#     return response
+
+
+# # test all fields
+# def test_fields_update_audit_progress(model_instance):
+#     all_completed_fields = total_fields_completed(model_instance)
+#     all_fields = total_fields_expected(model_instance)
+#     AuditProgress.objects.filter(registration=model_instance.registration).update(
+#         multiaxial_description_total_expected_fields=all_fields,
+#         multiaxial_description_total_completed_fields=all_completed_fields,
+#         multiaxial_description_complete=all_completed_fields == all_fields
+#     )
+
+
+# def total_fields_expected(model_instance):
+#     # a minimum total fields would be:
+#     # description
+#     # description_keywords
+#     # epilepsy_or_nonepilepsy_status
+#     # were_any_of_the_epileptic_seizures_convulsive
+#     # prolonged_generalized_convulsive_seizures
+#     # experienced_prolonged_focal_seizures
+#     # epileptic_seizure_onset_type
+#     # nonepileptic_seizure_type
+#     # focal_onset_impaired_awareness
+#     # focal_onset_automatisms
+#     # focal_onset_atonic
+#     # focal_onset_clonic
+#     # focal_onset_left
+#     # focal_onset_right
+#     # focal_onset_epileptic_spasms
+#     # focal_onset_hyperkinetic
+#     # focal_onset_myoclonic
+#     # focal_onset_tonic
+#     # focal_onset_autonomic
+#     # focal_onset_behavioural_arrest
+#     # focal_onset_cognitive
+#     # focal_onset_emotional
+#     # focal_onset_sensory
+#     # focal_onset_centrotemporal
+#     # focal_onset_temporal
+#     # focal_onset_frontal
+#     # focal_onset_parietal
+#     # focal_onset_occipital
+#     # focal_onset_gelastic
+#     # focal_onset_focal_to_bilateral_tonic_clonic
+#     # focal_onset_other
+#     # epileptic_generalised_onset
+#     # epileptic_generalised_onset_other_details
+#     # nonepileptic_seizure_unknown_onset
+#     # nonepileptic_seizure_unknown_onset_other_details
+#     # nonepileptic_seizure_syncope
+#     # nonepileptic_seizure_behavioural
+#     # nonepileptic_seizure_sleep
+#     # nonepileptic_seizure_paroxysmal
+#     # nonepileptic_seizure_migraine
+#     # nonepileptic_seizure_miscellaneous
+#     # nonepileptic_seizure_other
+#     # syndrome_present
+#     # syndrome
+#     # seizure_cause_main
+#     # seizure_cause_structural
+#     # seizure_cause_genetic
+#     # seizure_cause_gene_abnormality
+#     # seizure_cause_genetic_other
+#     # seizure_cause_chromosomal_abnormality
+#     # seizure_cause_infectious
+#     # seizure_cause_metabolic
+#     # seizure_cause_metabolic_other
+#     # seizure_cause_immune
+#     # seizure_cause_immune_antibody
+#     # seizure_cause_immune_antibody_other
+#     # relevant_impairments_behavioural_educational
+
+#     cumulative_fields = 0
+#     if model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'NE':
+#         # nonepilepsy - includes epileptic_generalised_onset
+#         cumulative_fields += 1
+#         if model_instance.nonepileptic_seizure_type:
+#             # options of the types always lead to the option of a single subtype
+#             cumulative_fields += 2
+
+#     elif model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'E':
+#         # epilepsy selected - epilepsy_or_nonepilepsy_status and were_any_of_the_epileptic_seizures_convulsive
+#         cumulative_fields += 2
+#         if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
+#             # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
+#             # TODO #75 ask @cdunkley if it is acceptable for radiobuttons to be optional
+#             cumulative_fields += 0
+#         elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
+#             # includes prolonged_generalized_convulsive_seizures
+#             cumulative_fields += 2
+#         else:
+#             # either unclassified or unknown onset
+#             cumulative_fields += 1
+#     else:
+#         # diagnosis is uncertain - only 2 answers expected for E
+#         cumulative_fields += 2
+
+#     # test S
+#     if syndrome_present:
+#         # includes syndrome
+#         cumulative_fields += 3
+#     else:
+#         cumulative_fields += 1
+
+#     # test C
+#     if model_instance.seizure_cause_main and model_instance.seizure_cause_main in ['Inf', 'NK']:
+#         cumulative_fields += 1
+#     elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Gen":
+#         if model_instance.seizure_cause_genetic == 'GeA':
+#             # genetic abnormity included
+#             cumulative_fields += 3
+#         else:
+#             cumulative_fields += 2
+#     elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Imm":
+#         # immune causees included
+#         if model_instance.seizure_cause_immune == 'AnM':
+#             # antibody mediated
+#             cumulative_fields += 3
+#         else:
+#             cumulative_fields += 2
+#     elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Met":
+#         # metabolic causes
+#         cumulative_fields += 2
+#     else:
+#         cumulative_fields += 1
+
+#     # IBE
+#     cumulative_fields += 1
+
+#     return cumulative_fields
+
+
+# def total_fields_completed(model_instance):
+#     # counts the number of completed fields
+#     fields = model_instance._meta.get_fields()
+#     counter = 0
+#     for field in fields:
+#         if (
+#                 getattr(model_instance, field.name) is not None
+#                 and field.name not in ['id', 'registration', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']):
+#             if field.name == 'description':
+#                 if len(getattr(model_instance, field.name)) > 0:
+#                     counter += 1
+#             elif field.name in FOCAL_EPILEPSY_FIELDS:
+#                 # see #75 - focal epilepsy types currently optional
+#                 counter += 0
+#             else:
+#                 counter += 1
+#     return counter
+
+# """

@@ -80,7 +80,7 @@
     </div>
 
     <div class='field'>
-        <a href='{% url "multiaxial_diagnosis" case_id=episode.registration.case.pk %}'><button class='ui rcpch_primary button'>Complete the DESSCRIBE definition for {{episode.registration.case}}</div></a>
+        <a href='{% url "multiaxial_diagnosis" case_id=episode.multiaxial_diagnosis.registration.case.pk %}'><button class='ui rcpch_primary button'>Complete the DESSCRIBE definition for {{episode.multiaxial_diagnosis.registration.case}}</div></a>
     </div>
 
 </div>

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-
-from epilepsy12.models.registration import Registration
+from .multiaxial_diagnosis import MultiaxialDiagnosis
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
@@ -283,7 +282,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     # relationships
 
-    registration = models.ForeignKey(
-        Registration,
+    multiaxial_diagnosis = models.ForeignKey(
+        MultiaxialDiagnosis,
         on_delete=models.CASCADE
     )

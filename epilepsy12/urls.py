@@ -27,8 +27,8 @@ urlpatterns = [
          views.assessment, name="assessment"),
 
     # multiaxial description path
-    path('multiaxial_description/<int:case_id>',
-         views.multiaxial_description, name='multiaxial_description'),
+    #     path('multiaxial_description/<int:case_id>',
+    #          views.multiaxial_description, name='multiaxial_description'),
 
     path('multiaxial_diagnosis/<int:case_id>',
          views.multiaxial_diagnosis, name='multiaxial_diagnosis'),
@@ -55,7 +55,7 @@ urlpatterns = [
 htmx_paths = [
 
     # episodes
-    path('registration/<int:registration_id>/add_episode',
+    path('multiaxial_diagnosis_id/<int:multiaxial_diagnosis_id>/add_episode',
          views.add_episode, name='add_episode'),
     path('episode/<int:episode_id>/edit',
          views.edit_episode, name='edit_episode'),
@@ -90,6 +90,21 @@ htmx_paths = [
     path('episode/<int:episode_id>/nonepileptic_seizure_subtype',
          views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
 
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/syndrome_present',
+         views.syndrome_present, name='syndrome_present'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/add_syndrome',
+         views.add_syndrome, name='add_syndrome'),
+    path('syndrome/<int:syndrome_id>/edit_syndrome',
+         views.edit_syndrome, name='edit_syndrome'),
+    path('syndrome/<int:syndrome_id>/remove_syndrome',
+         views.remove_syndrome, name='remove_syndrome'),
+    path('syndrome/<int:syndrome_id>/syndrome_diagnosis_date',
+         views.syndrome_diagnosis_date, name='syndrome_diagnosis_date'),
+    path('syndrome/<int:syndrome_id>/syndrome_name',
+         views.syndrome_name, name='syndrome_name'),
+    path('syndrome/<int:syndrome_id>/syndrome_diagnosis_active',
+         views.syndrome_diagnosis_active, name='syndrome_diagnosis_active'),
+
 
     # desscribe / multiaxial description htmx endpoints
     #
@@ -100,21 +115,21 @@ htmx_paths = [
 
     #     nonepilepsy
 
-    path('htmx/<int:desscribe_id>/seizure_cause_main',
-         views.seizure_cause_main, name='seizure_cause_main'),
-    path('htmx/<int:desscribe_id>/seizure_cause_subtype/<str:subtype>',
-         views.seizure_cause_subtype, name='seizure_cause_subtype'),
-    path('htmx/<int:desscribe_id>/seizure_cause_subtype_subtype',
-         views.seizure_cause_subtype_subtype, name='seizure_cause_subtype_subtype'),
+    #     path('htmx/<int:desscribe_id>/seizure_cause_main',
+    #          views.seizure_cause_main, name='seizure_cause_main'),
+    #     path('htmx/<int:desscribe_id>/seizure_cause_subtype/<str:subtype>',
+    #          views.seizure_cause_subtype, name='seizure_cause_subtype'),
+    #     path('htmx/<int:desscribe_id>/seizure_cause_subtype_subtype',
+    #          views.seizure_cause_subtype_subtype, name='seizure_cause_subtype_subtype'),
 
-    # syndrome
-    path('htmx/<int:desscribe_id>/syndrome_present',
-         views.syndrome_present, name='syndrome_present'),
-    path('htmx/<int:desscribe_id>/syndrome',
-         views.syndrome, name='syndrome'),
+    #     # syndrome
+    #     path('htmx/<int:desscribe_id>/syndrome_present',
+    #          views.syndrome_present, name='syndrome_present'),
+    #     path('htmx/<int:desscribe_id>/syndrome',
+    #          views.syndrome, name='syndrome'),
 
-    path('htmx/<int:desscribe_id>/ribe',
-         views.ribe, name='ribe'),
+    #     path('htmx/<int:desscribe_id>/ribe',
+    #          views.ribe, name='ribe'),
     # case table endpoints
     path('htmx/filter_case_list', views.case_list,
          name="filter_case_list"),

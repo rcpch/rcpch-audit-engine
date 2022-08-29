@@ -36,13 +36,37 @@
 
             <button 
                 class="ui rcpch_primary button"
-                hx-post="{% url 'add_episode' registration_id=registration.pk %}"
+                hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
                 hx-target="#episode"
                 hx-swap='innerHTML'
                 hx-trigger='click'
             >
             Add a new Episode
             </button>
+
+        </div>
+
+    </div>
+
+    <div class="ui rcpch_pink segment">
+
+        <div class="ui header">
+            <span class='desscribe_letters'>
+                <div class='ui rcpch_pink circular label'>
+                S
+                </div>
+            </span>
+            <div class='content'>
+                Syndromes
+                <div class='sub header'>
+                Maintain a list of applicable syndromes
+                </div>
+            </div>
+        </div>
+
+        <div class="field" id='syndrome_section'>
+            
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/syndrome_section.html' with multiaxial_diagnosis=multiaxial_diagnosis %}
 
         </div>
 

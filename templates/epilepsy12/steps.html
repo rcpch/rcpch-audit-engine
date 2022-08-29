@@ -141,50 +141,6 @@
         {% endif %}
     {% endif %}
     
-    
-    {% if audit_progress.multiaxial_description_complete %}
-      {% if active_template == "multiaxial_description" %}
-
-        <a class="active completed step" href="{% url 'multiaxial_description' case_id %}">
-          <div class="content">
-              <div class="title">Multiaxial Diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-        </a>
-      {% else %}
-        <a class="completed step" href="{% url 'multiaxial_description' case_id %}">
-          <div class="content">
-              <div class="title">Multiaxial Diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-        </a>
-      {% endif %}
-    {% else %}
-        {% if active_template == "multiaxial_description" %}
-
-          <a href="{% url 'multiaxial_description' case_id %}" class="active step">
-            <div class="content">
-              <div class="title">Multiaxial Diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-          </a>
-        {% elif active_template == "none" %}
-          <a href="{% url 'multiaxial_description' case_id %}" class="disabled step">
-            <div class="content">
-              <div class="title">Multiaxial Diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-          </a>
-        {% else %}
-          <a href="{% url 'multiaxial_description' case_id %}" class="step">
-            <div class="content">
-              <div class="title">Multiaxial Diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-          </a>
-        {% endif %}
-    {% endif %}
-    
     {% if audit_progress.multiaxial_diagnosis %}
       {% if active_template == "multiaxial_diagnosis" %}
 

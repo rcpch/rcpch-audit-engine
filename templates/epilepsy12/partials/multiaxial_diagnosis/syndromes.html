@@ -1,0 +1,49 @@
+<div>
+{% if syndromes|length > 0 %}
+    <table class="ui rcpch basic table">
+        <thead>
+            <tr>
+                <th>Syndrome Identification/Onset Date</th>
+                <th>Name</th>
+                <th>Diagnosis Active</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+    {% for syndrome in syndromes %}
+        <tr>
+            <td>{{syndrome.syndrome_diagnosis_date}}</td>
+            <td>{{syndrome.get_syndrome_name_display}}</td>
+            <td>{{syndrome.syndrome_diagnosis_active}}</td>
+            <td>
+                <div 
+                    class="ui rcpch_light_blue buttons">
+                    <button 
+                        class="ui rcpch_primary button"
+                        hx-post='{% url "edit_syndrome" syndrome.pk %}'
+                        hx-target='#syndrome'
+                        hx-trigger='click'
+                        hx-swap='innerHTML'
+                    >
+                        Edit
+                    </button>
+                    <button 
+                        class="ui rcpch_red icon button"
+                        hx-post='{% url "remove_syndrome" syndrome_id=syndrome.pk %}'
+                        hx-target='#syndromes'
+                        hx-trigger='click'
+                        hx-swap='innerHTML'
+                    >
+                        <i class='trash alternate outline icon'></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+There are no documented syndromes so far...
+{% endif %}
+</div>

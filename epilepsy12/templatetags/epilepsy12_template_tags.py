@@ -11,7 +11,7 @@ def percent_complete(registration):
         total += 12
     if registration.audit_progress.epilepsy_context_complete:
         total += 6
-    if registration.audit_progress.multiaxial_description_complete:
+    if registration.audit_progress.multiaxial_diagnosis_complete:
         total += 6
     if registration.audit_progress.assessment_complete:
         total += 16
@@ -34,7 +34,8 @@ def characters_left(description):
 
 @register.simple_tag
 def percentage_of_total(numerator, denominator):
-    return round(numerator/denominator*100)
+    if (denominator > 0):
+        return round(numerator/denominator*100)
 
 
 @register.filter
@@ -78,8 +79,8 @@ def to_class_name(value):
         return 'Initial Assessment'
     elif value.__class__.__name__ == "EpilepsyContext":
         return 'Epilepsy Context'
-    elif value.__class__.__name__ == "DESSCRIBE":
-        return 'Multiaxial Description'
+    elif value.__class__.__name__ == "MultiaxialDiagnosis":
+        return 'Multiaxial Diagnosis'
     elif value.__class__.__name__ == "Assessment":
         return 'Milestones'
     elif value.__class__.__name__ == "Investigations":
