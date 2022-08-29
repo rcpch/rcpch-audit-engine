@@ -59,6 +59,8 @@ htmx_paths = [
          views.add_episode, name='add_episode'),
     path('episode/<int:episode_id>/edit',
          views.edit_episode, name='edit_episode'),
+    path('episode/<int:episode_id>/delete',
+         views.remove_episode, name='remove_episode'),
     path('episode/<int:episode_id>/seizure_onset_date',
          views.seizure_onset_date, name='seizure_onset_date'),
     path('episode/<int:episode_id>/seizure_onset_date_confidence',
@@ -87,6 +89,7 @@ htmx_paths = [
          views.nonepileptic_seizure_type, name='nonepileptic_seizure_type'),
     path('episode/<int:episode_id>/nonepileptic_seizure_subtype',
          views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
+
 
     # desscribe / multiaxial description htmx endpoints
     #

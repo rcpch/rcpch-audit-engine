@@ -3,28 +3,46 @@
 
     <div class="ui rcpch_pink segment">
 
-        <div class="item">
-            Episodes
+        <div class="ui header">
+            <span class='desscribe_letters'>
+                <div class='ui rcpch_pink circular label'>
+                D
+                </div>
+                <div class='ui rcpch_pink circular label'>
+                E
+                </div>
+                <div class='ui rcpch_pink circular label'>
+                S
+                </div>
+            </span>
             <div class='content'>
-            A child or young person's epilepsy may comprise one or more episodes. Add or review all episode, completing the initial D, E, S stages of the DESSCRIBE tool.
+                Episodes
+                <div class='sub header'>
+                Description, Epilepsy Status and Seizure type of seizure episodes
+                </div>
             </div>
+        </div>
+
+        <div class='ui rcpch_info message'>
+
+        A child or young person's epilepsy may comprise one or more episodes. Add or review all episodes, completing the initial D, E, S stages of the DESSCRIBE tool.
         </div>
 
         <div id='episodes' class='field'>
             {% include 'epilepsy12/partials/multiaxial_diagnosis/episodes.html' with episodes=episodes %}
         </div>
 
-        <div class="field">
+        <div class="field" id='episode'>
 
-            <div 
+            <button 
                 class="ui rcpch_primary button"
                 hx-post="{% url 'add_episode' registration_id=registration.pk %}"
-                hx-trigger='click'
-                hx-target='#episode'
+                hx-target="#episode"
                 hx-swap='innerHTML'
+                hx-trigger='click'
             >
             Add a new Episode
-            </div>
+            </button>
 
         </div>
 

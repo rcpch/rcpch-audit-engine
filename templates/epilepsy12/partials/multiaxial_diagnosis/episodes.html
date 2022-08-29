@@ -1,20 +1,50 @@
 <div>
 {% if episodes|length > 0 %}
-    <table class="ui compact table">
+    <table class="ui rcpch basic table">
         <thead>
-            <th>Episode date</th>
-            <th>Epilepsy Status</th>
-            <th>Onset</th>
+            <tr>
+                <th>Episode date</th>
+                <th>Epilepsy Status</th>
+                <th>Onset</th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
     {% for episode in episodes %}
-        <td><a href='{% url "edit_episode" episode.pk %}'>{{episode.seizure_onset_date}}<a></td>
-        <td>{{episode.get_epilepsy_or_nonepilepsy_status_display}}</td>
-        {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
-            <td>{{episode.get_epileptic_seizure_onset_type_display}}</td>
-        {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
-            <td>{{episode.get_nonepileptic_seizure_type_display}}</td>
-        {% endif %}
+        <tr>
+            <td>{{episode.seizure_onset_date}}</td>
+            <td>{{episode.get_epilepsy_or_nonepilepsy_status_display}}</td>
+            {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
+                <td>{{episode.get_epileptic_seizure_onset_type_display}}</td>
+            {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
+                <td>{{episode.get_nonepileptic_seizure_type_display}}</td>
+            {% else %}
+                <td>Not applicable</td>
+            {% endif %}
+            <td>
+                <div 
+                    class="ui rcpch_light_blue buttons">
+                    <button 
+                        class="ui rcpch_primary button"
+                        hx-post='{% url "edit_episode" episode.pk %}'
+                        hx-target='#episode'
+                        hx-trigger='click'
+                        hx-swap='innerHTML'
+                    >
+                        Edit
+                    </button>
+                    <button 
+                        class="ui rcpch_red icon button"
+                        hx-post='{% url "remove_episode" episode_id=episode.pk %}'
+                        hx-target='#episodes'
+                        hx-trigger='click'
+                        hx-swap='innerHTML'
+                    >
+                        <i class='trash alternate outline icon'></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
     {% endfor %}
         </tbody>
     </table>

@@ -1,7 +1,7 @@
 from django.utils import timezone
 from datetime import datetime
 from operator import itemgetter
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
@@ -137,7 +137,8 @@ def multiaxial_diagnosis(request, case_id):
         desscribe = Episode.objects.create(registration=registration)
     """
 
-    episodes = Episode.objects.filter(registration=registration).all()
+    episodes = Episode.objects.filter(
+        registration=registration).order_by('seizure_onset_date')
 
     keyword_choices = Keyword.objects.all()
 
@@ -177,7 +178,41 @@ def add_episode(request, registration_id):
         has_number_of_episodes_since_the_first_been_documented=None,
         description='',
         description_keywords=None,
-        epilepsy_or_nonepilepsy_status=None
+        epilepsy_or_nonepilepsy_status=None,
+        were_any_of_the_epileptic_seizures_convulsive=None,
+        epileptic_seizure_onset_type=None,
+        nonepileptic_seizure_type=None,
+        epileptic_generalised_onset=None,
+        focal_onset_impaired_awareness=None,
+        focal_onset_automatisms=None,
+        focal_onset_atonic=None,
+        focal_onset_clonic=None,
+        focal_onset_left=None,
+        focal_onset_right=None,
+        focal_onset_epileptic_spasms=None,
+        focal_onset_hyperkinetic=None,
+        focal_onset_myoclonic=None,
+        focal_onset_tonic=None,
+        focal_onset_autonomic=None,
+        focal_onset_behavioural_arrest=None,
+        focal_onset_cognitive=None,
+        focal_onset_emotional=None,
+        focal_onset_sensory=None,
+        focal_onset_centrotemporal=None,
+        focal_onset_temporal=None,
+        focal_onset_frontal=None,
+        focal_onset_parietal=None,
+        focal_onset_occipital=None,
+        focal_onset_gelastic=None,
+        focal_onset_focal_to_bilateral_tonic_clonic=None,
+        nonepileptic_seizure_unknown_onset=None,
+        nonepileptic_seizure_syncope=None,
+        nonepileptic_seizure_behavioural=None,
+        nonepileptic_seizure_sleep=None,
+        nonepileptic_seizure_paroxysmal=None,
+        nonepileptic_seizure_migraine=None,
+        nonepileptic_seizure_miscellaneous=None,
+        nonepileptic_seizure_other=None,
     )
 
     keywords = Keyword.objects.all()
@@ -186,19 +221,34 @@ def add_episode(request, registration_id):
         'episode': new_episode,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
-        'keyword_selection': keywords
+        'keyword_selection': keywords,
+        'epilepsy_or_nonepilepsy_status_choices': sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+        'LATERALITY': LATERALITY,
+        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
     }
 
     response = render(
-        request, 'epilepsy12/forms/episode_form.html', context)
+        request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
 
     # test_fields_update_audit_progress(desscribe)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
+    # # trigger a GET request from the steps template
+    # trigger_client_event(
+    #     response=response,
+    #     name="registration_active",
+    #     params={})  # reloads the form to show the active steps
     return response
 
 
@@ -234,7 +284,7 @@ def edit_episode(request, episode_id):
     }
 
     response = render(
-        request, 'epilepsy12/forms/episode_form.html', context)
+        request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
 
     # test_fields_update_audit_progress(desscribe)
 
@@ -244,6 +294,25 @@ def edit_episode(request, episode_id):
         name="registration_active",
         params={})  # reloads the form to show the active steps
     return response
+
+
+@login_required
+def remove_episode(request, episode_id):
+    """
+    POST request on button click from episodes partial in multiaxial_diagnosis form
+    Deletes episode from table
+    """
+    episode = Episode.objects.get(pk=episode_id)
+    registration = episode.registration
+    Episode.objects.get(pk=episode_id).delete()
+    episodes = Episode.objects.filter(
+        registration=registration).order_by('seizure_onset_date')
+
+    context = {
+        'episodes': episodes
+    }
+
+    return render(request=request,  template_name='epilepsy12/partials/multiaxial_diagnosis/episodes.html', context=context)
 
 
 @login_required
@@ -979,3 +1048,10 @@ def nonepileptic_seizure_subtype(request, episode_id):
         name="registration_active",
         params={})  # reloads the form to show the active steps
     return response
+
+
+class HTTPResponseHXRedirect(HttpResponseRedirect):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self['HX-Redirect'] = self['Location']
+        status_code = 200

@@ -49,14 +49,15 @@
             {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#episode' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.has_description_of_the_episode_or_episodes_been_gathered label='Has a description of the episode(s) been gathered?' data_position='top left' %}
         </div>
 
-    {% if episode.has_description_of_the_episode_or_episodes_been_gathered %}
+        {% if episode.has_description_of_the_episode_or_episodes_been_gathered %}
 
-            <div class="field">
-                {% include 'epilepsy12/partials/multiaxial_diagnosis/description.html' with episode=episode choices=keyword_selection %}
+                <div class="field">
+                    {% include 'epilepsy12/partials/multiaxial_diagnosis/description.html' with episode=episode choices=keyword_selection %}
+                </div>
             </div>
-        </div>
 
-    {% endif %}
+        {% endif %}
+    </div>
 
     <div class="ui rcpch_pink segment">
 
