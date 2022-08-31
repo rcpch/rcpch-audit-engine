@@ -72,6 +72,27 @@
 
     </div>
 
+
+    <div class="ui rcpch_pink segment">
+
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">C</div>
+            </span>
+            <div class='content'>
+                    Cause
+                <div class='sub header'>
+                Is there an identifiable cause?
+                </div>
+            </div>
+        </h5>
+
+        <div id="epilepsy_causes">
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html' with multiaxial_diagnosis=multiaxial_diagnosis seizure_cause_selection=seizure_cause_selection epilepsy_genetic_cause_choices=epilepsy_genetic_cause_choices  epilepsy_structural_cause_choices=epilepsy_structural_cause_choices epilepsy_gene_cause_choices=epilepsy_gene_cause_choices epilepsy_metabolic_cause_choices=epilepsy_metabolic_cause_choices epilepsy_immune_cause_choices=epilepsy_immune_cause_choices epilepsy_antibodies_cause_choices=epilepsy_antibodies_cause_choices epilepsy_causes=epilepsy_causes %}
+        </div>
+
+    </div>
+
     
     
 </form>

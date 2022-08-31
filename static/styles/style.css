@@ -785,17 +785,28 @@ ui.rcpch_chart_container.segment {
 
 /* rcpch table */
 
+.ui.table {
+  border-radius: 0%;
+}
+
 .ui.rcpch.basic.table {
   margin-top: 10px;
 }
 
-.ui.rcpch.basic.table thead tr:first-child>th:first-child {
-  border-radius: 0% 0% 0% 0%;
+.ui.table thead tr:first-child>th:last-child {
+  border-radius: 0rem 0rem 0rem 0rem;
+}
+
+.ui.table thead tr:first-child>th:first-child {
+  border-radius: 0rem 0em 0em 0em;
+}
+
+.ui.table thead tr:first-child>th:only-child {
+  border-radius: 0rem 0rem 0em 0em;
 }
 
 .ui.rcpch.basic.table th {
   background-color: var(--rcpch_light_blue);
-  border-radius: 0%;
   color: var(--rcpch_white);
 }
 

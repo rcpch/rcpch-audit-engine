@@ -1,3 +1,4 @@
+from epilepsy12.view_folder.multiaxial_diagnosis_views import multiaxial_diagnosis
 from . import views
 from .view_folder import HospitalAutocomplete
 from .view_folder import SemiologyKeywordAutocomplete
@@ -89,7 +90,7 @@ htmx_paths = [
          views.nonepileptic_seizure_type, name='nonepileptic_seizure_type'),
     path('episode/<int:episode_id>/nonepileptic_seizure_subtype',
          views.nonepileptic_seizure_subtype, name='nonepileptic_seizure_subtype'),
-
+    # epilepsy syndromes
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/syndrome_present',
          views.syndrome_present, name='syndrome_present'),
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/add_syndrome',
@@ -104,6 +105,9 @@ htmx_paths = [
          views.syndrome_name, name='syndrome_name'),
     path('syndrome/<int:syndrome_id>/syndrome_diagnosis_active',
          views.syndrome_diagnosis_active, name='syndrome_diagnosis_active'),
+    # epilepsy causes
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause',
+         views.epilepsy_cause, name='epilepsy_cause'),
 
 
     # desscribe / multiaxial description htmx endpoints
