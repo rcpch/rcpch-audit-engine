@@ -33,6 +33,6 @@ def fuzzy_scan_for_keywords(phrase: str, match_list) -> list:
     keywords = []
     for index, keyword in enumerate(match_list):
         match = fuzz.partial_ratio(keyword.keyword, phrase)
-        if match >= 85:
+        if match >= 90:
             keywords.append(keyword)
     return keywords
