@@ -23,7 +23,6 @@ def scan_for_keywords(phrase: str, match_list) -> list:
     for word in filtered_words:
         return_vals.append(
             next(item for item in match_list if item.keyword == word))
-    print(return_vals)
     return return_vals
 
 
