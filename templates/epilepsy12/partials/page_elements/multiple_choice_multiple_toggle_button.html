@@ -20,81 +20,49 @@
     {% endcomment %}
 
     
-        <label class="toggle_button_label">{{label}}</label>
-        <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-            <span>
-                {% if test_positive is None %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
-                    <div class="ui rcpch_dark_blue buttons">
-                        {% for choice in choices %}
-                            <div 
-                                class="ui mini compact rcpch_dark_blue button"
-                                hx-target="{{hx_target}}"
-                                hx-post="{{hx_post}}"
-                                hx-swap="{{hx_swap}}"
-                                hx-trigger='{{hx_trigger}}'
-                                name="{{choice.0}}"
-                            >
-                            {{choice.1}}
-                            </div>
-                        {% endfor %}
-                    </div>
-                       
+<label class="toggle_button_label">{{label}}</label>
+<div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-                {% elif tests_positive|length > 0 %}
-                        
-                        <i class="rcpch_pink check circle outline icon"></i>
-                        
-                        <div class="ui rcpch_dark_blue buttons">
-                            {% for choice in choices %}
-                                {% if choice.0 in test_positive %}
-                                    <div 
-                                        class="ui mini compact positive rcpch_dark_blue button"
-                                    >{{choice.1}}</div>
-                                {% else %}
-                                    <div 
-                                        class="ui mini compact rcpch_dark_blue button"
-                                        hx-target="{{hx_target}}"
-                                        hx-post="{{hx_post}}"
-                                        hx-swap="{{hx_swap}}"
-                                        hx-trigger='{{hx_trigger}}'
-                                        name="{{choice.0}}"
-                                    >{{choice.1}}
-                                    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        
+    <span>
+
+        {% if test_positive|length > 0 %}
+            <i class="rcpch_pink check circle outline icon"></i>
+        {% else %}
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+        {% endif %}
+
+        <div class="ui rcpch_dark_blue buttons">
+                
+            {% for choice in choices %}
+                {% if choice.0 in test_positive %}
+                    <div 
+                        class="ui mini compact positive rcpch_dark_blue button"
+                        class="ui mini compact rcpch_dark_blue button"
+                        hx-target="{{hx_target}}"
+                        hx-post="{{hx_post}}"
+                        hx-swap="{{hx_swap}}"
+                        hx-trigger='{{hx_trigger}}'
+                        name="{{choice.0}}"
+                    >{{choice.1}}</div>
                 {% else %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
-                    
-                    <div class="ui rcpch_dark_blue buttons">
-                        {% for choice in choices %}
-                            {% if choice == test_positive %}
-                                <div 
-                                    class="ui mini compact positive rcpch_dark_blue button"
-                                >{{choice}}</div>
-                            {% else %}
-                                <div 
-                                    class="ui mini compact rcpch_dark_blue button"
-                                    hx-target="{{hx_target}}"
-                                    hx-post="{{hx_post}}"
-                                    hx-swap="{{hx_swap}}"
-                                    hx-trigger='{{hx_trigger}}'
-                                    name="{{choice.0}}"
-                                >{{choice.1}}
-                                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                    <div 
+                        class="ui mini compact rcpch_dark_blue button"
+                        hx-target="{{hx_target}}"
+                        hx-post="{{hx_post}}"
+                        hx-swap="{{hx_swap}}"
+                        hx-trigger='{{hx_trigger}}'
+                        name="{{choice.0}}"
+                    >{{choice.1}}
+                    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                     </div>
                 {% endif %}
-            </span>
+            {% endfor %}
         </div>
+                
+    </span>
+    
+</div>
 
     

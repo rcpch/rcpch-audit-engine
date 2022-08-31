@@ -1,6 +1,5 @@
-<div class="field">
-    {% url 'seizure_cause_main' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=seizure_cause_selection hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="click" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_main label="What is the cause of this epilepsy?" data_position="top left" %}
+<div class="field" id='epilepsy_cause_categories'>
+    {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_categories.html' with choices=epilepsy_cause_selection multiaxial_diagnosis=multiaxial_diagnosis %}
 </div>
 
 <div class="field">
@@ -10,73 +9,6 @@
 
 </div>
 
-{% if multiaxial_diagnosis.seizure_cause_main == "Gen" %}
-    
-        <h3>
-            Genetic
-        </h3>
-        {% url 'seizure_cause_subtype' multiaxial_diagnosis_id=multiaxial_diagnosis.pk subtype="Gen" as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_genetic_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_genetic label="Genetic Abnormalities"  data_position="top left" hx_default_text="Select genetic abnormality..." hx_name="seizure_cause_genetic" %}
-
-        {% if multiaxial_diagnosis.seizure_cause_genetic == 'GeA' %}
-            {% url 'seizure_cause_subtype_subtype' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_gene_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_gene_abnormality label="Single Gene Abnormalities"  data_position="top left" hx_default_text="Select gene abnormality..." hx_name="seizure_cause_gene_abnormality" %}
-        {% endif %}
-
-    
-{% elif multiaxial_diagnosis.seizure_cause_main == "Imm" %}
-    
-        <h3>
-            Immunology
-        </h3>
-        {% url 'seizure_cause_subtype' multiaxial_diagnosis_id=multiaxial_diagnosis.pk subtype="Imm" as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_immune_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_immune label="Immune Abnormalities" data_position="top left" hx_default_text="Select autoimmune abnormality..." hx_name="seizure_cause_immune" %}
-
-        {% if multiaxial_diagnosis.seizure_cause_immune == "AnM" %}
-            {% url 'seizure_cause_subtype_subtype' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_autoimmune_antibody_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_immune_antibody label="Autoantibodies" data_position="top left" hx_default_text="Select autoantibody..." hx_name="seizure_cause_immune_antibody" %}
-        {% endif %}
-    
-{% elif multiaxial_diagnosis.seizure_cause_main == "Inf" %}
-    <div class="ui message">
-        <h3>
-            Infection
-        </h3>
-        <p>
-        Further information is not gathered in Epilepsy12 currently
-        </p>
-        
-    </div>
-{% elif multiaxial_diagnosis.seizure_cause_main == "Met" %}
-    
-        <h3>
-            Metabolic
-        </h3>
-        {% url 'seizure_cause_subtype' multiaxial_diagnosis_id=multiaxial_diagnosis.pk subtype="Met" as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_metabolic_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_metabolic label="Metabolic Abnormalities" data_position="top left" hx_name="seizure_cause_metabolic" hx_default_text="Select metabolic abnormality..." %}
-    
-{% elif multiaxial_diagnosis.seizure_cause_main == "NK" %}
-    <div class="ui message">
-        <h3>
-            Not Known
-        </h3>
-    </div>
-{% elif multiaxial_diagnosis.seizure_cause_main == "Str" %}
-    
-        <h3>
-            Structural
-        </h3>
-        {% url 'seizure_cause_subtype' multiaxial_diagnosis_id=multiaxial_diagnosis.pk subtype="Str" as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/select.html' with choices=epilepsy_structural_cause_choices hx_post=hx_post hx_target="#epilepsy_causes" hx_trigger="change" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.seizure_cause_structural label="Structural Abnormalities" data_position="top left" hx_name="seizure_cause_structural" hx_default_text="Select structural abnormality..." %}
-    
-{% else %}
-    {% comment %}
-    some kind of warning should go here
-    <div class="ui warming message">
-    Uh oh!
-    </div>
-    {% endcomment%}
-{% endif %}
 
 <script>
 $('.ui.dropdown').dropdown()

@@ -108,6 +108,8 @@ htmx_paths = [
     # epilepsy causes
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause',
          views.epilepsy_cause, name='epilepsy_cause'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_categories',
+         views.epilepsy_cause_categories, name='epilepsy_cause_categories'),
 
 
     # desscribe / multiaxial description htmx endpoints

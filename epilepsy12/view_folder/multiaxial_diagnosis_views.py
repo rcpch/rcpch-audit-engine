@@ -165,7 +165,7 @@ def multiaxial_diagnosis(request, case_id):
         "episodes": episodes,
         "syndromes": syndromes,
         "keyword_choices": keyword_choices,
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
@@ -1224,6 +1224,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
     return response
 
 
+@login_required
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
@@ -1244,7 +1245,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     context = {
         "epilepsy_causes": epilepsy_causes,
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
     }
 
     response = render(
@@ -1253,41 +1254,60 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     return response
 
 
-def seizure_category(request, multiaxial_diagnosis_id):
+@login_required
+def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     """
     POST from multiple select in epilepsy_causes partial
     NOT YET PERSISTED
     """
-    ecl = '<< 363235000'
-    epilepsy_causes = fetch_ecl(ecl)
+
+    epilepsy_cause_category = request.htmx.trigger_name
+
+    if epilepsy_cause_category:
+
+        multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+            pk=multiaxial_diagnosis_id)
+        if epilepsy_cause_category in multiaxial_diagnosis.epilepsy_cause_categories:
+            multiaxial_diagnosis.epilepsy_cause_categories.remove(
+                epilepsy_cause_category)
+        else:
+            multiaxial_diagnosis.epilepsy_cause_categories.append(
+                epilepsy_cause_category)
+
+        multiaxial_diagnosis.save()
+
+    else:
+        print(
+            f"category is {epilepsy_cause_category}. This is an error that needs handling")
+        # TODO handle this error
 
     context = {
-        "epilepsy_causes": epilepsy_causes,
+        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
+        # 'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
     }
 
     response = render(
-        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html', context=context)
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_categories.html', context=context)
 
     return response
 
-    # """
-    # # Seizure causes
-    # """
+    """
+    # Seizure causes
+    """
 
     # @login_required
     # def seizure_cause_main(request, desscribe_id):
     #     """
-    # # Post request from multiple choice toggle within 'seizure_cause_main' partial.
+    # # Post request from multiple choice toggle within 'seizure_cause_category' partial.
     # # This one of Structural, Infectious, Metabolic, Genetic, Immune, Not Known
     # # These choices are stored in the EPILEPSY_CHOICES constant list,
     # # passed to the template as 'seizure_cause_selection'
-    # # Updates the model, setting other fields to None
+    # # Updates the model storing all categories in an ArrayField
     # # and returns the epilepsy partial and parameters
     # """
 
-    #     seizure_cause_main = request.htmx.trigger_name
+    # seizure_cause_category = request.htmx.trigger_name
 
     #     all_fields = seizure_cause_main_choices + seizure_cause_subtype_choices
 
