@@ -1,0 +1,4 @@
+<div class='field' >
+    {% url 'developmental_learning_or_schooling_problems' initial_assessment_id=initial_assessment.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#developmental_learning_or_schooling_problems' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.developmental_learning_or_schooling_problems label='Has the presence of developmental, learning or school problems been documented?' data_position='top left' %}
+</div>

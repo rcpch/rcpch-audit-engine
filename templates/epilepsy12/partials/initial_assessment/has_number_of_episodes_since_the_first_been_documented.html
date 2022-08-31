@@ -1,0 +1,4 @@
+<div class='field' >
+    {% url 'has_number_of_episodes_since_the_first_been_documented' initial_assessment_id=initial_assessment.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#has_number_of_episodes_since_the_first_been_documented' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.has_number_of_episodes_since_the_first_been_documented label='Has the number of episodes since the first been documented?' data_position='top left' %}
+</div>

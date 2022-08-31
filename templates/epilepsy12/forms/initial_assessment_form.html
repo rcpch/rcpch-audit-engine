@@ -2,7 +2,7 @@
 
   {% csrf_token %}
 
-  <div class='ui info message'>
+  <div class='ui rcpch_info message'>
   The initial assessment must be completed with x weeks of the reported episode.
   </div>
 
@@ -20,8 +20,6 @@
   Involving General Paediatrics
   </h5>
 
-
-
   <div id='general_paediatrics_referral_made' class="field">
     {% include 'epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html' with initial_assessment=initial_assessment %}
   </div>
@@ -33,5 +31,27 @@
   <div id='when_the_first_epileptic_episode_occurred'>
     {% include 'epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html' with initial_assessment=initial_assessment when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}
   </div>
+  
+  <div id='has_number_of_episodes_since_the_first_been_documented'>
+    {% include 'epilepsy12/partials/initial_assessment/has_number_of_episodes_since_the_first_been_documented.html' with initial_assessment=initial_assessment  %}
+  </div>
+  
+  <div id='general_examination_performed'>
+    {% include 'epilepsy12/partials/initial_assessment/general_examination_performed.html' with initial_assessment=initial_assessment  %}
+  </div>
+  
+  <div id='neurological_examination_performed'>
+    {% include 'epilepsy12/partials/initial_assessment/neurological_examination_performed.html' with initial_assessment=initial_assessment  %}
+  </div>
+  
+  <div id='developmental_learning_or_schooling_problems'>
+    {% include 'epilepsy12/partials/initial_assessment/developmental_learning_or_schooling_problems.html' with initial_assessment=initial_assessment  %}
+  </div>
+  
+  <div id='behavioural_or_emotional_problems'>
+    {% include 'epilepsy12/partials/initial_assessment/behavioural_or_emotional_problems.html' with initial_assessment=initial_assessment  %}
+  </div>
+
+
   
 </form>

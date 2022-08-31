@@ -1,0 +1,4 @@
+<div class='field' >
+    {% url 'behavioural_or_emotional_problems' initial_assessment_id=initial_assessment.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#behavioural_or_emotional_problems' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.behavioural_or_emotional_problems label='Has the presence of behavioural or emotional difficulties been documented?' data_position='top left' %}
+</div>
