@@ -1,7 +1,7 @@
 from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-from ..models import Registration
+from .registration import Registration
 from ..constants import *
 from .time_and_user_abstract_base_classes import *
 

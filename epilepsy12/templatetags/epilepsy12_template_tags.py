@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from ..general_functions import fetch_concept
 
 register = template.Library()
 
@@ -53,6 +54,12 @@ def matches_model_field(field_name, model):
             return True
         else:
             return False
+
+
+@register.filter
+def snomed_concept(concept_id):
+    concept = fetch_concept(concept_id)
+    return concept['preferredDescription']['term']
 
 
 @register.filter

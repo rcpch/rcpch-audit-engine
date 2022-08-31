@@ -38,11 +38,6 @@ urlpatterns = [
     path('epilepsy_context/<int:case_id>',
          views.epilepsy_context, name='epilepsy_context'),
 
-    #   comorbidity paths
-    path('comorbidity/<int:case_id>/create',
-         views.create_comorbidity, name="create_comorbidity"),
-    path('comorbidity/<int:case_id>/update',
-         views.update_comorbidity, name="update_comorbidity"),
     path('management/<int:case_id>', views.management, name='management'),
 
     path('docs', views.documentation, name="docs"),
@@ -110,6 +105,19 @@ htmx_paths = [
          views.epilepsy_cause, name='epilepsy_cause'),
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_categories',
          views.epilepsy_cause_categories, name='epilepsy_cause_categories'),
+    # comorbidities
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/add_comorbidity',
+         views.add_comorbidity, name='add_comorbidity'),
+    path('comorbidity/<int:comorbidity_id>/edit',
+         views.edit_comorbidity, name='edit_comorbidity'),
+    path('comorbidity/<int:comorbidity_id>/remove',
+         views.remove_comorbidity, name='remove_comorbidity'),
+    path('comorbidity/<int:comorbidity_id>/comorbidity_diagnosis_date',
+         views.comorbidity_diagnosis_date, name='comorbidity_diagnosis_date'),
+    path('comorbidity/<int:comorbidity_id>/comorbidity_diagnosis',
+         views.comorbidity_diagnosis, name='comorbidity_diagnosis'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/comorbidities',
+         views.comorbidities, name='comorbidities'),
 
 
     # desscribe / multiaxial description htmx endpoints

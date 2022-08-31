@@ -10,7 +10,7 @@ from ..constants import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, 
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
-from epilepsy12.models import episode
+from epilepsy12.models import comorbidity, episode
 from epilepsy12.view_folder.initial_assessment_views import episode_definition
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from django_htmx.http import trigger_client_event
@@ -152,6 +152,9 @@ def multiaxial_diagnosis(request, case_id):
     syndromes = Syndrome.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).all()
 
+    comorbidities = Comorbidity.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).all()
+
     keyword_choices = Keyword.objects.all()
 
     # test_fields_update_audit_progress(desscribe)
@@ -164,6 +167,7 @@ def multiaxial_diagnosis(request, case_id):
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "episodes": episodes,
         "syndromes": syndromes,
+        'comorbidities': comorbidities,
         "keyword_choices": keyword_choices,
         "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
@@ -594,17 +598,6 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
     selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
     """
     epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
-
-    # if epilepsy_or_nonepilepsy_status == 'E':
-    #     # epilepsy selected - set all nonepilepsy to none
-    #     set_epilepsy_fields_to_none(request, episode_id=episode_id)
-    # elif epilepsy_or_nonepilepsy_status == 'NE':
-    #     # nonepilepsy selected - set all epilepsy to none
-    #     set_all_nonepilepsy_fields_to_none(request, episode_id=episode_id)
-    # elif epilepsy_or_nonepilepsy_status == 'NK':
-    #     # notknown selected - set all epilepsy and nonepilepsy to none
-    #     set_epilepsy_fields_to_none(request, episode_id=episode_id)
-    #     set_all_nonepilepsy_fields_to_none(request, episode_id=episode_id)
 
     Episode.objects.filter(pk=episode_id).update(
         epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
@@ -1258,7 +1251,6 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
 def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     """
     POST from multiple select in epilepsy_causes partial
-    NOT YET PERSISTED
     """
 
     epilepsy_cause_category = request.htmx.trigger_name
@@ -1292,285 +1284,194 @@ def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
 
     return response
 
+
+"""
+Comorbidities
+"""
+
+
+def add_comorbidity(request, multiaxial_diagnosis_id):
     """
-    # Seizure causes
+    POST request from comorbidities_section partial
+    """
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+
+    comorbidity = Comorbidity.objects.create(
+        multiaxial_diagnosis=multiaxial_diagnosis,
+        comorbidity_diagnosis_date=None,
+        comorbidity_diagnosis=None
+    )
+
+    comorbidity = Comorbidity.objects.get(pk=comorbidity.pk)
+    ecl = '<< 35919005'
+    comorbidity_choices = fetch_ecl(ecl)
+
+    context = {
+        'comorbidity': comorbidity,
+        'comorbidity_choices': comorbidity_choices
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context)
+
+    # test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+def edit_comorbidity(request, comorbidity_id):
+    """
+    POST request from comorbidities.html partial on button click to edit episode
+    """
+    comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
+    ecl = '<< 35919005'
+    comorbidity_choices = fetch_ecl(ecl)
+
+    context = {
+        'comorbidity': comorbidity,
+        'comorbidity_choices': comorbidity_choices
+    }
+
+    print(comorbidity_choices)
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context)
+
+    # test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+def remove_comorbidity(request, comorbidity_id):
+    """
+    POST request from comorbidities.html partial on button click to edit episode
+    """
+    comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
+    multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
+    Comorbidity.objects.filter(pk=comorbidity_id).delete()
+
+    comorbidities = Comorbidity.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).all()
+
+    context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
+        'comorbidities': comorbidities,
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities.html', context)
+
+    # test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+def comorbidity_diagnosis_date(request, comorbidity_id):
+    """
+    POST request from comorbidity partial with comorbidity_diagnosis_date
+    """
+    comorbidity_diagnosis_date = request.POST.get(request.htmx.trigger_name)
+    Comorbidity.objects.filter(pk=comorbidity_id).update(
+        comorbidity_diagnosis_date=datetime.strptime(
+            comorbidity_diagnosis_date, "%Y-%m-%d").date(),
+        updated_at=timezone.now(),
+        updated_by=request.user
+    )
+    comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
+    ecl = '<< 35919005'
+    comorbidity_choices = fetch_ecl(ecl)
+
+    context = {
+        'comorbidity': comorbidity,
+        'comorbidity_choices': comorbidity_choices
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context)
+
+    # test_fields_update_audit_progress(desscribe)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+def comorbidity_diagnosis(request, comorbidity_id):
+    """
+    POST request on change select from comorbidity partial
+    Choices for causes fed from SNOMED server
     """
 
-    # @login_required
-    # def seizure_cause_main(request, desscribe_id):
-    #     """
-    # # Post request from multiple choice toggle within 'seizure_cause_category' partial.
-    # # This one of Structural, Infectious, Metabolic, Genetic, Immune, Not Known
-    # # These choices are stored in the EPILEPSY_CHOICES constant list,
-    # # passed to the template as 'seizure_cause_selection'
-    # # Updates the model storing all categories in an ArrayField
-    # # and returns the epilepsy partial and parameters
-    # """
+    # 35919005 |Pervasive developmental disorder (disorder)|
 
-    # seizure_cause_category = request.htmx.trigger_name
+    comorbidity_diagnosis = request.POST.get(request.htmx.trigger_name)
 
-    #     all_fields = seizure_cause_main_choices + seizure_cause_subtype_choices
+    ecl = '<< 35919005'
+    comorbidity_choices = fetch_ecl(ecl)
 
-    #     update_field = {
-    #         'updated_at': timezone.now(),
-    #         'updated_by': request.user
-    #     }
-    #     for field in all_fields:
-    #         if field.get('id') == seizure_cause_main:
-    #             update_field.update({
-    #                 'seizure_cause_main': seizure_cause_main
-    #             })
-    #         else:
-    #             if field.get('name'):
-    #                 # No Known option has no field
-    #                 update_field.update({
-    #                     field.get('name'): None
-    #                 })
+    Comorbidity.objects.filter(
+        pk=comorbidity_id).update(
+            comorbidity_diagnosis=comorbidity_diagnosis,
+            updated_at=timezone.now(),
+            updated_by=request.user
+    )
 
-    #     # update the model
-    #     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-    #         **update_field)
+    comorbidity = Comorbidity.objects.get(
+        pk=comorbidity_id)
 
-    #     # retrieve updated object instance
-    #     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
+    context = {
+        "comorbidity_choices": comorbidity_choices,
+        "comorbidity": comorbidity,
+    }
 
-    #     context = {
-    #         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
-    #         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
-    #         'desscribe': desscribe
-    #     }
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context=context)
 
-    #     response = render(
-    #         request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
+    return response
 
-    #     test_fields_update_audit_progress(desscribe)
 
-    #     # trigger a GET request from the steps template
-    #     trigger_client_event(
-    #         response=response,
-    #         name="registration_active",
-    #         params={})  # reloads the form to show the active steps
-    #     return response
+@login_required
+def comorbidities(request, multiaxial_diagnosis_id):
+    """
+    POST request from comorbidity partial to replace it with table
+    """
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+    comorbidities = Comorbidity.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).all()
 
-    # def seizure_cause_subtype(request, desscribe_id, subtype):
-    #     """
-    # # POST request from 'seizure_cause_subtype' select
-    # # within seizure_cause_main partial, a different sublist relating to the subtype
-    # # parameter, selected in the 'seizure_cause_main' partial.
-    # # The POST request is triggered by a change in any of the following:
-    # # seizure_cause_immune, seizure_cause_metabolic and seizure_cause_structural
-    # # Updates the model and returns the epilepsy partial and parameters
-    # # Set to None any unselected types
-    # """
-    #     subtype_selection = request.POST.get(request.htmx.trigger_name)
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "comorbidities": comorbidities,
+    }
 
-    #     update_fields = {
-    #         'updated_at': timezone.now(),
-    #         'updated_by': request.user
-    #     }
-    #     for seizure_cause_main_choice in seizure_cause_main_choices:
-    #         if subtype == seizure_cause_main_choice.get('id'):
-    #             update_fields.update({
-    #                 seizure_cause_main_choice.get('name'): subtype_selection
-    #             })
-    #         else:
-    #             if seizure_cause_main_choice.get('name'):
-    #                 # unknown option has no field - do not update
-    #                 update_fields.update({
-    #                     seizure_cause_main_choice.get('name'): None
-    #                 })
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidities.html', context=context)
 
-    #     DESSCRIBE.objects.filter(pk=desscribe_id).update(**update_fields)
-
-    #     # retrieve updated object instance
-    #     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-
-    #     context = {
-    #         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
-    #         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
-    #         'desscribe': desscribe
-    #     }
-
-    #     response = render(
-    #         request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
-
-    #     test_fields_update_audit_progress(desscribe)
-
-    #     # trigger a GET request from the steps template
-    #     trigger_client_event(
-    #         response=response,
-    #         name="registration_active",
-    #         params={})  # reloads the form to show the active steps
-    #     return response
-
-    # def seizure_cause_subtype_subtype(request, desscribe_id):
-    #     """
-    # # POST request from subtype selects in seizure_cause_subtype partial. These include:
-    # # seizure_cause_immune_antibody, seizure_cause_gene_abnormality
-    # # within seizure_cause_main partial.
-    # # Updates the model and returns the epilepsy partial and parameters
-    # # Set to None any unselected types
-    # """
-    #     field_name = request.htmx.trigger_name
-    #     seizure_cause_subtype_subtype = request.POST.get(field_name)
-
-    #     update_field = ({
-    #         field_name: seizure_cause_subtype_subtype,
-    #         'updated_at': timezone.now(),
-    #         'updated_by': request.user
-    #     })
-
-    #     DESSCRIBE.objects.filter(pk=desscribe_id).update(
-    #         **update_field
-    #     )
-
-    #     # retrieve updated object instance
-    #     desscribe = DESSCRIBE.objects.get(pk=desscribe_id)
-
-    #     context = {
-    #         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
-    #         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
-    #         'desscribe': desscribe
-    #     }
-
-    #     response = render(
-    #         request=request, template_name='epilepsy12/partials/desscribe/epilepsy_causes.html', context=context)
-
-    #     test_fields_update_audit_progress(desscribe)
-
-    #     # trigger a GET request from the steps template
-    #     trigger_client_event(
-    #         response=response,
-    #         name="registration_active",
-    #         params={})  # reloads the form to show the active steps
-    #     return response
-
-    # """
-    # # RIBE
-    # """
-
-    # @login_required
-    # def ribe(request, desscribe_id):
-
-    #     toggle = request.POST.get('ribe')
-
-    #     if toggle == 'on':
-    #         toggle = True
-    #     else:
-    #         toggle = False
-
-    #     desscribe = DESSCRIBE.objects.get(
-    #         pk=desscribe_id)
-
-    #     registration = desscribe.registration
-    #     case = registration.case
-    #     comorbidities = Comorbidity.objects.filter(case=case)
-
-    #     if comorbidities.count() > 0:
-    #         toggle = True
-
-    #     DESSCRIBE.objects.filter(id=desscribe_id).update(
-    #         relevant_impairments_behavioural_educational=toggle,
-    #         updated_at=timezone.now(),
-    #         updated_by=request.user
-    #     )
-
-    #     updated_desscribe = DESSCRIBE.objects.get(
-    #         pk=desscribe_id)
-
-    #     context = {
-    #         'desscribe': updated_desscribe,
-    #         'comorbidities': comorbidities,
-    #         'case_id': case.id
-    #     }
-
-    #     response = render(
-    #         request, "epilepsy12/partials/desscribe/ribe.html", context)
-
-    #     test_fields_update_audit_progress(desscribe)
-
-    #     # trigger a GET request from the steps template
-    #     trigger_client_event(
-    #         response=response,
-    #         name="registration_active",
-    #         params={})  # reloads the form to show the active steps
-    #     return response
-
-    # @ login_required
-    # def multiaxial_description(request, case_id):
-    #     """
-    # """
-    #     registration = Registration.objects.filter(case=case_id).get()
-
-    #     if DESSCRIBE.objects.filter(registration=registration).exists():
-    #         # there is already a desscribe object for this registration
-    #         desscribe = DESSCRIBE.objects.filter(registration=registration).first()
-    #     else:
-    #         # this is not yet a desscribe object for this description - create one
-    #         desscribe = DESSCRIBE.objects.create(registration=registration)
-
-    #     choices = Keyword.objects.all()
-
-    #     # test_fields_update_audit_progress(desscribe)
-
-    #     context = {
-    #         "desscribe": desscribe,
-    #         "registration": registration,
-    #         "choices": choices,
-    #         "case_id": case_id,
-    #         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-    #         "epileptic_seizure_onset_types": sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-    #         'laterality': laterality,
-    #         'focal_epilepsy_motor_manifestations': focal_epilepsy_motor_manifestations,
-    #         'focal_epilepsy_nonmotor_manifestations': focal_epilepsy_nonmotor_manifestations,
-    #         'focal_epilepsy_eeg_manifestations': focal_epilepsy_eeg_manifestations,
-    #         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
-    #         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_structural_cause_choices': sorted(EPILEPSY_STRUCTURAL_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_genetic_cause_choices': sorted(EPILEPSY_GENETIC_CAUSE_TYPES, key=itemgetter(1)),
-    #         'epilepsy_gene_cause_choices': sorted(EPILEPSY_GENE_DEFECTS, key=itemgetter(1)),
-    #         'epilepsy_metabolic_cause_choices': sorted(METABOLIC_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_immune_cause_choices': sorted(IMMUNE_CAUSES, key=itemgetter(1)),
-    #         'epilepsy_autoimmune_antibody_cause_choices': sorted(AUTOANTIBODIES, key=itemgetter(1)),
-
-    #         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-    #         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-    #         'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
-    #         'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
-    #         'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
-    #         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
-    #         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
-    #         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-
-    #         "audit_progress": registration.audit_progress,
-    #         "active_template": "multiaxial_description"
-    #     }
-
-    #     response = render(
-    #         request=request, template_name='epilepsy12/multiaxial_description.html', context=context)
-
-    #     # trigger a GET request from the steps template
-    #     trigger_client_event(
-    #         response=response,
-    #         name="registration_active",
-    #         params={})  # reloads the form to show the active steps
-
-    #     return response
+    return response
 
     # # test all fields
     # def test_fields_update_audit_progress(model_instance):

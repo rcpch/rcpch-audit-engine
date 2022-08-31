@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 {% comment %}
         This is a single choice select which is reused in multiple places.
         Note requires jquery to work.
@@ -44,7 +45,7 @@
                     <div class="default text">{{hx_default_text}}</div>
                     <div class="menu" >
                         {% for item in choices %}
-                            <div class="item" data-value="{{item.id}}">{{item.preferredTerm}}</div>
+                            <div class="item" data-value="{{item.conceptId}}">{{item.preferredTerm}}</div>
                         {% endfor %}
                     </div>
             </div>

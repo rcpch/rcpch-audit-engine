@@ -3,7 +3,7 @@ from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .case import Case
+from .multiaxial_diagnosis import MultiaxialDiagnosis
 
 
 class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
@@ -15,25 +15,25 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     The date of onset/diagnosis field has been actively removed as not found helpful
     """
 
-    comorbidity = models.CharField(
-        max_length=3,
-        choices=COMORBIDITIES
-    )
-    comorbidity_free_text = models.CharField(  # this is a free text field for 'other' diagnoses not included in the lists provided
+    comorbidity_diagnosis_date = models.DateField(  # this is a free text field for 'other' diagnoses not included in the lists provided
         max_length=50,
-        default=None
+        default=None,
+        null=True
     )
-    comorbidity_snomed_code = models.CharField(  # TODO #11 Need to tag Snomed CT terms to all comorbidites @marcusbaw @colindunkley
-        max_length=50
-    )  # this is a new field - decision not to act on this currently: rare for a formal diagnosis to be give so
+
+    comorbidity_diagnosis = models.CharField(  # this is a free text field for 'other' diagnoses not included in the lists provided
+        max_length=50,
+        default=None,
+        null=True
+    )
 
     # relationships
-    case = models.ForeignKey(
-        Case,
+    multiaxial_diagnosis = models.ForeignKey(
+        MultiaxialDiagnosis,
         on_delete=models.CASCADE,
         null=False,
         blank=False,
-        related_name='comorbidities'
+        related_name='multiaxial_diagnosis'
     )
 
     class Meta:
@@ -41,4 +41,4 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         verbose_name_plural = "comorbidities"
 
     def __str__(self) -> str:
-        return self.comorbidity
+        return self.comorbidity_diagnosis

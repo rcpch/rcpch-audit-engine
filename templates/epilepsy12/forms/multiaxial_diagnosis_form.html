@@ -92,6 +92,34 @@
         </div>
 
     </div>
+    
+    <div class="ui rcpch_pink segment">
+
+        <h5 class="ui header">
+            <span class='desscribe_letters'>
+                <div class="ui rcpch_pink circular label">R</div>
+                <div class="ui rcpch_pink circular label">I</div>
+                <div class="ui rcpch_pink circular label">B</div>
+                <div class="ui rcpch_pink circular label">E</div>
+            </span>
+            <div class='content'>
+                Comorbidities
+                <div class='sub header'>
+                Are there any relevant impairments (behavioural or educational)?
+                </div>
+            </div>
+        </h5>
+
+        <div id='comorbidities'>
+            <div class='field'>
+                {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities.html' with comorbidities=comorbidities %}
+            </div>
+            
+        </div>
+
+
+    </div>
+
 
     
     
