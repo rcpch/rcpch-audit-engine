@@ -298,6 +298,10 @@ htmx_paths = [
          views.is_there_a_family_history_of_epilepsy, name="is_there_a_family_history_of_epilepsy"),
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_neonatal_seizures',
          views.previous_neonatal_seizures, name="previous_neonatal_seizures"),
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/experienced_prolonged_generalized_convulsive_seizures',
+         views.experienced_prolonged_generalized_convulsive_seizures, name="experienced_prolonged_generalized_convulsive_seizures"),
+    path('htmx/epilepsy_context/<int:epilepsy_context_id>/experienced_prolonged_focal_seizures',
+         views.experienced_prolonged_focal_seizures, name="experienced_prolonged_focal_seizures"),
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/diagnosis_of_epilepsy_withdrawn',
          views.diagnosis_of_epilepsy_withdrawn, name="diagnosis_of_epilepsy_withdrawn"),
 
