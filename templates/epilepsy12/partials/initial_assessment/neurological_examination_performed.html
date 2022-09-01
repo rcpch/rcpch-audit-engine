@@ -1,4 +1,0 @@
-<div class='field' >
-    {% url 'neurological_examination_performed' initial_assessment_id=initial_assessment.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#neurological_examination_performed' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.neurological_examination_performed label='Has a neurological examination been performed?' data_position='top left' %}
-</div>

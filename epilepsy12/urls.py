@@ -63,6 +63,8 @@ htmx_paths = [
          views.seizure_onset_date_confidence, name='seizure_onset_date_confidence'),
     path('episode/<int:episode_id>/definition',
          views.definition, name='definition'),
+    path('htmx/episode/<int:episode_id>/episode_definition',
+         views.episode_definition, name="episode_definition"),
     path('episode/<int:episode_id>/has_description_of_the_episode_or_episodes_been_gathered',
          views.has_description_of_the_episode_or_episodes_been_gathered, name='has_description_of_the_episode_or_episodes_been_gathered'),
     path('episode/<int:episode_id>/description',
@@ -296,8 +298,6 @@ htmx_paths = [
          views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
     path('htmx/registration/<int:initial_assessment_id>/diagnostic_status',
          views.diagnostic_status, name="diagnostic_status"),
-    path('htmx/registration/<int:initial_assessment_id>/episode_definition',
-         views.episode_definition, name="episode_definition"),
 
     # epilepsy context htmx
     path('htmx/epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',

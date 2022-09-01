@@ -10,8 +10,6 @@ from ..constants import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, 
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
-from epilepsy12.models import comorbidity, episode
-from epilepsy12.view_folder.initial_assessment_views import episode_definition
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from django_htmx.http import trigger_client_event
 from ..general_functions import fuzzy_scan_for_keywords
@@ -443,6 +441,45 @@ def definition(request, episode_id):
     # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def episode_definition(request, initial_assessment_id):
+
+    episode_definition = request.POST.get(
+        'episode_definition')
+    # validation here TODO
+
+    try:
+        InitialAssessment.objects.filter(
+            pk=initial_assessment_id).update(
+                episode_definition=episode_definition,
+                updated_at=timezone.now(),
+                updated_by=request.user)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    initial_assessment = InitialAssessment.objects.get(
+        pk=initial_assessment_id)
+
+    context = {
+        "initial_assessment": initial_assessment,
+        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "episode_definition_selection": EPISODE_DEFINITION,
+    }
+
+    test_fields_update_audit_progress(initial_assessment)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+
+# trigger a GET request from the steps template
     trigger_client_event(
         response=response,
         name="registration_active",
