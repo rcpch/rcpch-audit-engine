@@ -178,6 +178,7 @@ def allocate_lead_site(request, registration_id):
     return response
 
 
+@login_required
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -209,6 +210,7 @@ def edit_lead_site(request, registration_id, site_id):
     return response
 
 
+@login_required
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -237,6 +239,7 @@ def transfer_lead_site(request, registration_id, site_id):
     return response
 
 
+@login_required
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -264,6 +267,7 @@ def cancel_lead_site(request, registration_id, site_id):
     return response
 
 
+@login_required
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
@@ -328,6 +332,7 @@ def update_lead_site(request, registration_id, site_id, update):
     return response
 
 
+@login_required
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial

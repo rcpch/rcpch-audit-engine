@@ -101,6 +101,8 @@ htmx_paths = [
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_categories',
          views.epilepsy_cause_categories, name='epilepsy_cause_categories'),
     # comorbidities
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/relevant_impairments_behavioural_educational',
+         views.relevant_impairments_behavioural_educational, name='relevant_impairments_behavioural_educational'),
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/add_comorbidity',
          views.add_comorbidity, name='add_comorbidity'),
     path('comorbidity/<int:comorbidity_id>/edit',

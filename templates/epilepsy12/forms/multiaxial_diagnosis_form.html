@@ -109,18 +109,11 @@
                 </div>
             </div>
         </h5>
-
-        <div id='comorbidities'>
-            <div class='field'>
-                {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities.html' with comorbidities=comorbidities %}
-            </div>
-            
+        
+        <div id='comorbidity_section' class='field'>
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity_section.html' with comorbidities=comorbidities %}
         </div>
-
-
+        
     </div>
 
-
-    
-    
 </form>

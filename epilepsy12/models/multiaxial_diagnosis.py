@@ -41,13 +41,6 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         default=list
     )
 
-    class Meta:
-        verbose_name = "Multiaxial diagnosis"
-        verbose_name_plural = "Multiaxial diagnoses"
-
-
-# IBE
-
     relevant_impairments_behavioural_educational = models.BooleanField(
         "Are there any relevant impairments: behavioural or educational, emotional problems?",
         max_length=50,

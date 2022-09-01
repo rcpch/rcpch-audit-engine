@@ -631,49 +631,6 @@ Epilepsy status
 """
 
 
-# @login_required
-# def epilepsy_or_nonepilepsy_status(request, episode_id):
-#     """
-#     Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
-#     The episode_id is also passed in allowing update of the model.
-#     Selections for epilepsy set all nonepilepsy related fields to None, and selections for
-#     nonepilepsy set all epilepsy fields to None. Selections to not known set all
-#     selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
-#     """
-#     epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
-
-#     Episode.objects.filter(pk=episode_id).update(
-#         epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
-#         updated_at=timezone.now(),
-#         updated_by=request.user
-#     )
-#     episode = Episode.objects.get(pk=episode_id)
-
-#     template = 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html'
-#     context = {
-#         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-#         'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-#         # 'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-#         'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
-#         'LATERALITY': LATERALITY,
-#         'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
-#         'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
-#         'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
-#         'episode': episode
-#     }
-
-#     response = render(request=request, template_name=template, context=context)
-
-#     # test_fields_update_audit_progress(desscribe)
-
-#     # trigger a GET request from the steps template
-#     trigger_client_event(
-#         response=response,
-#         name="registration_active",
-#         params={})  # reloads the form to show the active steps
-#     return response
-
-
 @login_required
 def epilepsy_or_nonepilepsy_status(request, episode_id):
     """
@@ -1332,6 +1289,49 @@ Comorbidities
 """
 
 
+def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
+    """
+    POST request from 
+    """
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+    if request.htmx.trigger_name == 'button-true':
+        multiaxial_diagnosis.relevant_impairments_behavioural_educational = True
+        multiaxial_diagnosis.save()
+    elif request.htmx.trigger_name == 'button-false':
+        # save and delete any associated comorbidities
+        multiaxial_diagnosis.relevant_impairments_behavioural_educational = False
+        multiaxial_diagnosis.updated_at = timezone.now()
+        multiaxial_diagnosis.updated_by = request.user
+        if Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).exists():
+            Comorbidity.objects.filter(
+                multiaxial_diagnosis=multiaxial_diagnosis).delete()
+        multiaxial_diagnosis.save()
+    else:
+        print(
+            "Some kind of error - this will need to be raised and returned to template")
+        return HttpResponse("Error")
+
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
+
+    context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
+        'comorbidities': Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).all(),
+        # 'comorbidity_choices': comorbidity_choices
+    }
+
+    response = render(
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity_section.html', context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
 def add_comorbidity(request, multiaxial_diagnosis_id):
     """
     POST request from comorbidities_section partial
@@ -1355,7 +1355,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     }
 
     response = render(
-        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context)
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context)
 
     # test_fields_update_audit_progress(desscribe)
 
@@ -1381,10 +1381,8 @@ def edit_comorbidity(request, comorbidity_id):
         'comorbidity_choices': comorbidity_choices
     }
 
-    print(comorbidity_choices)
-
     response = render(
-        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context)
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context)
 
     # test_fields_update_audit_progress(desscribe)
 
@@ -1414,7 +1412,7 @@ def remove_comorbidity(request, comorbidity_id):
     }
 
     response = render(
-        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities.html', context)
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html', context)
 
     # test_fields_update_audit_progress(desscribe)
 
@@ -1448,7 +1446,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     }
 
     response = render(
-        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context)
+        request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context)
 
     # test_fields_update_audit_progress(desscribe)
 
@@ -1490,7 +1488,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
     }
 
     response = render(
-        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidity.html', context=context)
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context=context)
 
     return response
 
@@ -1511,138 +1509,150 @@ def comorbidities(request, multiaxial_diagnosis_id):
     }
 
     response = render(
-        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidities.html', context=context)
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html', context=context)
 
     return response
 
-    # # test all fields
-    # def test_fields_update_audit_progress(model_instance):
-    #     all_completed_fields = total_fields_completed(model_instance)
-    #     all_fields = total_fields_expected(model_instance)
-    #     AuditProgress.objects.filter(registration=model_instance.registration).update(
-    #         multiaxial_description_total_expected_fields=all_fields,
-    #         multiaxial_description_total_completed_fields=all_completed_fields,
-    #         multiaxial_description_complete=all_completed_fields == all_fields
-    #     )
+    # test all fields
+# def test_fields_update_audit_progress(model_instance):
+#     all_completed_fields = total_fields_completed(model_instance)
+#     all_fields = total_fields_expected(model_instance)
+#     AuditProgress.objects.filter(registration=model_instance.registration).update(
+#         multiaxial_description_total_expected_fields=all_fields,
+#         multiaxial_description_total_completed_fields=all_completed_fields,
+#         multiaxial_description_complete=all_completed_fields == all_fields
+#     )
 
-    # def total_fields_expected(model_instance):
-    #     # a minimum total fields would be:
-    #     # description
-    #     # description_keywords
-    #     # epilepsy_or_nonepilepsy_status
-    #     # were_any_of_the_epileptic_seizures_convulsive
-    #     # prolonged_generalized_convulsive_seizures
-    #     # experienced_prolonged_focal_seizures
-    #     # epileptic_seizure_onset_type
-    #     # nonepileptic_seizure_type
-    #     # focal_onset_impaired_awareness
-    #     # focal_onset_automatisms
-    #     # focal_onset_atonic
-    #     # focal_onset_clonic
-    #     # focal_onset_left
-    #     # focal_onset_right
-    #     # focal_onset_epileptic_spasms
-    #     # focal_onset_hyperkinetic
-    #     # focal_onset_myoclonic
-    #     # focal_onset_tonic
-    #     # focal_onset_autonomic
-    #     # focal_onset_behavioural_arrest
-    #     # focal_onset_cognitive
-    #     # focal_onset_emotional
-    #     # focal_onset_sensory
-    #     # focal_onset_centrotemporal
-    #     # focal_onset_temporal
-    #     # focal_onset_frontal
-    #     # focal_onset_parietal
-    #     # focal_onset_occipital
-    #     # focal_onset_gelastic
-    #     # focal_onset_focal_to_bilateral_tonic_clonic
-    #     # focal_onset_other
-    #     # epileptic_generalised_onset
-    #     # epileptic_generalised_onset_other_details
-    #     # nonepileptic_seizure_unknown_onset
-    #     # nonepileptic_seizure_unknown_onset_other_details
-    #     # nonepileptic_seizure_syncope
-    #     # nonepileptic_seizure_behavioural
-    #     # nonepileptic_seizure_sleep
-    #     # nonepileptic_seizure_paroxysmal
-    #     # nonepileptic_seizure_migraine
-    #     # nonepileptic_seizure_miscellaneous
-    #     # nonepileptic_seizure_other
-    #     # syndrome_present
-    #     # syndrome
-    #     # seizure_cause_main
-    #     # seizure_cause_structural
-    #     # seizure_cause_genetic
-    #     # seizure_cause_gene_abnormality
-    #     # seizure_cause_genetic_other
-    #     # seizure_cause_chromosomal_abnormality
-    #     # seizure_cause_infectious
-    #     # seizure_cause_metabolic
-    #     # seizure_cause_metabolic_other
-    #     # seizure_cause_immune
-    #     # seizure_cause_immune_antibody
-    #     # seizure_cause_immune_antibody_other
-    #     # relevant_impairments_behavioural_educational
+# def total_fields_expected(model_instance):
+    """
+    A minimum total fields would be:
+    1. The correct number of fields for each instance of Episode associated with this MultiaxialDescription
+    2. At least one of these must have Epilepsy as its diagnosis
+    3. syndrome_present
+    4. if syndrome_present, for each instance of Syndrome, a date of diagnosis and a SNOMED code
+    5. if cause known, a category (at least one) and an epilepsy_cause (snomed code)
+    6. if there are relevant_impairments_behavioural_educational, at least one instance of this class, fully completed
 
-    #     cumulative_fields = 0
-    #     if model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'NE':
-    #         # nonepilepsy - includes epileptic_generalised_onset
-    #         cumulative_fields += 1
-    #         if model_instance.nonepileptic_seizure_type:
-    #             # options of the types always lead to the option of a single subtype
-    #             cumulative_fields += 2
 
-    #     elif model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'E':
-    #         # epilepsy selected - epilepsy_or_nonepilepsy_status and were_any_of_the_epileptic_seizures_convulsive
-    #         cumulative_fields += 2
-    #         if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
-    #             # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
-    #             # TODO #75 ask @cdunkley if it is acceptable for radiobuttons to be optional
-    #             cumulative_fields += 0
-    #         elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
-    #             # includes prolonged_generalized_convulsive_seizures
-    #             cumulative_fields += 2
-    #         else:
-    #             # either unclassified or unknown onset
-    #             cumulative_fields += 1
-    #     else:
-    #         # diagnosis is uncertain - only 2 answers expected for E
-    #         cumulative_fields += 2
+epilepsy_cause
+    """
 
-    #     # test S
-    #     if syndrome_present:
-    #         # includes syndrome
-    #         cumulative_fields += 3
-    #     else:
-    #         cumulative_fields += 1
+    # description
+    # description_keywords
+    # epilepsy_or_nonepilepsy_status
+    # were_any_of_the_epileptic_seizures_convulsive
+    # prolonged_generalized_convulsive_seizures
+    # experienced_prolonged_focal_seizures
+    # epileptic_seizure_onset_type
+    # nonepileptic_seizure_type
+    # focal_onset_impaired_awareness
+    # focal_onset_automatisms
+    # focal_onset_atonic
+    # focal_onset_clonic
+    # focal_onset_left
+    # focal_onset_right
+    # focal_onset_epileptic_spasms
+    # focal_onset_hyperkinetic
+    # focal_onset_myoclonic
+    # focal_onset_tonic
+    # focal_onset_autonomic
+    # focal_onset_behavioural_arrest
+    # focal_onset_cognitive
+    # focal_onset_emotional
+    # focal_onset_sensory
+    # focal_onset_centrotemporal
+    # focal_onset_temporal
+    # focal_onset_frontal
+    # focal_onset_parietal
+    # focal_onset_occipital
+    # focal_onset_gelastic
+    # focal_onset_focal_to_bilateral_tonic_clonic
+    # focal_onset_other
+    # epileptic_generalised_onset
+    # epileptic_generalised_onset_other_details
+    # nonepileptic_seizure_unknown_onset
+    # nonepileptic_seizure_unknown_onset_other_details
+    # nonepileptic_seizure_syncope
+    # nonepileptic_seizure_behavioural
+    # nonepileptic_seizure_sleep
+    # nonepileptic_seizure_paroxysmal
+    # nonepileptic_seizure_migraine
+    # nonepileptic_seizure_miscellaneous
+    # nonepileptic_seizure_other
+    # syndrome_present
+    # syndrome
+    # seizure_cause_main
+    # seizure_cause_structural
+    # seizure_cause_genetic
+    # seizure_cause_gene_abnormality
+    # seizure_cause_genetic_other
+    # seizure_cause_chromosomal_abnormality
+    # seizure_cause_infectious
+    # seizure_cause_metabolic
+    # seizure_cause_metabolic_other
+    # seizure_cause_immune
+    # seizure_cause_immune_antibody
+    # seizure_cause_immune_antibody_other
+    # relevant_impairments_behavioural_educational
 
-    #     # test C
-    #     if model_instance.seizure_cause_main and model_instance.seizure_cause_main in ['Inf', 'NK']:
-    #         cumulative_fields += 1
-    #     elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Gen":
-    #         if model_instance.seizure_cause_genetic == 'GeA':
-    #             # genetic abnormity included
-    #             cumulative_fields += 3
-    #         else:
-    #             cumulative_fields += 2
-    #     elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Imm":
-    #         # immune causees included
-    #         if model_instance.seizure_cause_immune == 'AnM':
-    #             # antibody mediated
-    #             cumulative_fields += 3
-    #         else:
-    #             cumulative_fields += 2
-    #     elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Met":
-    #         # metabolic causes
-    #         cumulative_fields += 2
-    #     else:
-    #         cumulative_fields += 1
+    cumulative_fields = 0
+    if model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'NE':
+        # nonepilepsy - includes epileptic_generalised_onset
+        cumulative_fields += 1
+        if model_instance.nonepileptic_seizure_type:
+            # options of the types always lead to the option of a single subtype
+            cumulative_fields += 2
 
-    #     # IBE
-    #     cumulative_fields += 1
+    elif model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'E':
+        # epilepsy selected - epilepsy_or_nonepilepsy_status and were_any_of_the_epileptic_seizures_convulsive
+        cumulative_fields += 2
+        if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
+            # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
+            # TODO #75 ask @cdunkley if it is acceptable for radiobuttons to be optional
+            cumulative_fields += 0
+        elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
+            # includes prolonged_generalized_convulsive_seizures
+            cumulative_fields += 2
+        else:
+            # either unclassified or unknown onset
+            cumulative_fields += 1
+    else:
+        # diagnosis is uncertain - only 2 answers expected for E
+        cumulative_fields += 2
 
-    #     return cumulative_fields
+    # test S
+    if syndrome_present:
+        # includes syndrome
+        cumulative_fields += 3
+    else:
+        cumulative_fields += 1
+
+    # test C
+    if model_instance.seizure_cause_main and model_instance.seizure_cause_main in ['Inf', 'NK']:
+        cumulative_fields += 1
+    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Gen":
+        if model_instance.seizure_cause_genetic == 'GeA':
+            # genetic abnormity included
+            cumulative_fields += 3
+        else:
+            cumulative_fields += 2
+    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Imm":
+        # immune causees included
+        if model_instance.seizure_cause_immune == 'AnM':
+            # antibody mediated
+            cumulative_fields += 3
+        else:
+            cumulative_fields += 2
+    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Met":
+        # metabolic causes
+        cumulative_fields += 2
+    else:
+        cumulative_fields += 1
+
+    # IBE
+    cumulative_fields += 1
+
+    return cumulative_fields
 
     # def total_fields_completed(model_instance):
     #     # counts the number of completed fields
