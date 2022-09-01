@@ -147,6 +147,11 @@ def multiaxial_diagnosis(request, case_id):
     episodes = Episode.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).order_by('seizure_onset_date').all()
 
+    there_are_epileptic_episodes = Episode.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis,
+        epilepsy_or_nonepilepsy_status='E'
+    ).exists()
+
     syndromes = Syndrome.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).all()
 
@@ -172,6 +177,7 @@ def multiaxial_diagnosis(request, case_id):
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
+        'there_are_epileptic_episodes': there_are_epileptic_episodes
     }
 
     response = render(

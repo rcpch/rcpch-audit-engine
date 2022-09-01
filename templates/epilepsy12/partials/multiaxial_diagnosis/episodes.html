@@ -49,6 +49,8 @@
         </tbody>
     </table>
 {% else %}
-There are no documented episodes so far...
+    {% if not there_are_epileptic_episodes %}
+        There are no documented epileptic episodes so far. At least one epileptic episode must be entered to be include in Epilepsy12.
+    {% endif %}
 {% endif %}
 </div>

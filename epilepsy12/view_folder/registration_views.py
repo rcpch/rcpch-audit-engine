@@ -610,7 +610,7 @@ def total_fields_completed(model_instance):
         if (
             field.name is not None and
             field.name not in ['id', 'site', 'initialassessment', 'management', 'investigations', 'assessment', 'epilepsy_context',
-                               'epilepsycontext', 'registration', 'audit_progress', 'created_at', 'created_by', 'updated_by', 'updated_at', 'case', 'episode', 'syndrome', 'multiaxialdiagnosis']
+                               'epilepsycontext', 'registration', 'audit_progress', 'created_at', 'created_by', 'updated_by', 'updated_at', 'case', 'episode', 'syndrome', 'multiaxialdiagnosis', 'registration_close_date', 'cohort']
         ):
             if getattr(model_instance, field.name) is not None:
                 counter += 1

@@ -15,8 +15,6 @@ from django_htmx.http import trigger_client_event
 def epilepsy_context(request, case_id):
 
     registration = Registration.objects.filter(case=case_id).first()
-    comorbidities = Comorbidity.objects.filter(
-        case=case_id).all()
 
     epilepsy_context, created = EpilepsyContext.objects.get_or_create(
         registration=registration)
@@ -29,8 +27,7 @@ def epilepsy_context(request, case_id):
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
         "audit_progress": epilepsy_context.registration.audit_progress,
-        "active_template": "epilepsy_context",
-        "comorbidities": comorbidities
+        "active_template": "epilepsy_context"
     }
 
     response = render(

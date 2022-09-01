@@ -514,22 +514,18 @@ def total_fields_expected(model_instance):
     general_paediatrics_referral_made
     date_of_referral_to_general_paediatrics
     first_paediatric_assessment_in_acute_or_nonacute_setting
-    has_description_of_the_episode_or_episodes_been_gathered
-    when_the_first_epileptic_episode_occurred_confidence
-    when_the_first_epileptic_episode_occurred
     has_number_of_episodes_since_the_first_been_documented
     general_examination_performed
     neurological_examination_performed
     developmental_learning_or_schooling_problems
     behavioural_or_emotional_problems
     diagnostic_status
-    episode_definition
 
     if general_paediatrics_referral_made then add an additional field for the date
 
     """
 
-    cumulative_fields = 13
+    cumulative_fields = 9
     if model_instance.date_of_referral_to_general_paediatrics:
         cumulative_fields += 1
 

@@ -1,3 +1,4 @@
+from queue import Empty
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from epilepsy12.models.audit_progress import AuditProgress
@@ -42,7 +43,6 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     referring_clinician = models.CharField(
         max_length=50,
-        default=None,
         null=True
     )
 
