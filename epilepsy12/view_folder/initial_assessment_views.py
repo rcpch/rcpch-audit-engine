@@ -222,49 +222,6 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
     return response
 
 
-# @login_required
-# def has_description_of_the_episode_or_episodes_been_gathered(request, initial_assessment_id):
-#     """
-#     POST request multiple choice toggle in when_the_first_epileptic_episode_occurred partial
-#     """
-
-#     if request.htmx.trigger_name == 'button-true':
-#         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-#             has_description_of_the_episode_or_episodes_been_gathered=True,
-#             updated_at=timezone.now(),
-#             updated_by=request.user
-#         )
-#     elif request.htmx.trigger_name == 'button-false':
-#         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-#             has_description_of_the_episode_or_episodes_been_gathered=False,
-#             updated_at=timezone.now(),
-#             updated_by=request.user
-#         )
-#     else:
-#         print("Some mistake happened")
-#         # TODO need to handle this
-
-#     initial_assessment = InitialAssessment.objects.get(
-#         pk=initial_assessment_id)
-
-#     context = {
-#         "initial_assessment": initial_assessment,
-#         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-#         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-#         "episode_definition_selection": EPISODE_DEFINITION,
-#     }
-
-#     response = render(
-#         request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
-
-#     # trigger a GET request from the steps template
-#     trigger_client_event(
-#         response=response,
-#         name="registration_active",
-#         params={})  # reloads the form to show the active steps
-#     return response
-
-
 def has_number_of_episodes_since_the_first_been_documented(request, initial_assessment_id):
     """
     POST request from toggle in has_number_of_episodes_since_the_first_been_documented partial
