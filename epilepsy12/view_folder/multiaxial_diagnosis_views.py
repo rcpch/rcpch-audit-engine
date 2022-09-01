@@ -4,6 +4,7 @@ from operator import itemgetter
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from epilepsy12.models import episode
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
 from ..constants import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES, GENERALISED_SEIZURE_TYPE
@@ -370,7 +371,24 @@ def seizure_onset_date(request, episode_id):
         'episode': episode,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
-        'keyword_selection': keywords
+        'keyword_selection': keywords,
+        'epilepsy_or_nonepilepsy_status_choices': sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+        'LATERALITY': LATERALITY,
+        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
     }
 
     response = render(
@@ -400,7 +418,24 @@ def seizure_onset_date_confidence(request, episode_id):
         'episode': episode,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
-        'keyword_selection': keywords
+        'keyword_selection': keywords,
+        'epilepsy_or_nonepilepsy_status_choices': sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+        'LATERALITY': LATERALITY,
+        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
     }
 
     response = render(
@@ -417,7 +452,7 @@ def seizure_onset_date_confidence(request, episode_id):
 
 
 @login_required
-def definition(request, episode_id):
+def episode_definition(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
@@ -438,7 +473,24 @@ def definition(request, episode_id):
         'episode': episode,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
-        'keyword_selection': keywords
+        'keyword_selection': keywords,
+        'epilepsy_or_nonepilepsy_status_choices': sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+        'LATERALITY': LATERALITY,
+        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
     }
 
     response = render(
@@ -447,45 +499,6 @@ def definition(request, episode_id):
     # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-def episode_definition(request, initial_assessment_id):
-
-    episode_definition = request.POST.get(
-        'episode_definition')
-    # validation here TODO
-
-    try:
-        InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(
-                episode_definition=episode_definition,
-                updated_at=timezone.now(),
-                updated_by=request.user)
-    except Exception as error:
-        print(error)
-        return HttpResponse(error)
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-
-    context = {
-        "initial_assessment": initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
-    }
-
-    test_fields_update_audit_progress(initial_assessment)
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
-
-# trigger a GET request from the steps template
     trigger_client_event(
         response=response,
         name="registration_active",
@@ -522,7 +535,24 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
         'episode': episode,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
-        'keyword_selection': keywords
+        'keyword_selection': keywords,
+        'epilepsy_or_nonepilepsy_status_choices': sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+        'LATERALITY': LATERALITY,
+        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+        'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+        'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+        'syncopes': sorted(NON_EPILEPTIC_SYNCOPES, key=itemgetter(1)),
+        'behavioural': sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, key=itemgetter(1)),
+        'sleep': sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, key=itemgetter(1)),
+        'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
+        'migraines': sorted(MIGRAINES, key=itemgetter(1)),
+        'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
+
+        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
     }
 
     response = render(
@@ -1175,15 +1205,65 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 # POST request from the syndrome partial in the multiaxial_description_form
 # Updates model and returns the syndrome partial
 """
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
     if request.htmx.trigger_name == 'button-true':
-        MultiaxialDiagnosis.objects.filter(id=multiaxial_diagnosis_id).update(
-            syndrome_present=True,
+        multiaxial_diagnosis.syndrome_present = True
+        multiaxial_diagnosis.updated_at = timezone.now()
+        multiaxial_diagnosis.updated_by = request.user
+        multiaxial_diagnosis.save()
+    elif request.htmx.trigger_name == 'button-false':
+        multiaxial_diagnosis.syndrome_present = False
+        multiaxial_diagnosis.updated_at = timezone.now()
+        multiaxial_diagnosis.updated_by = request.user
+        multiaxial_diagnosis.save()
+        # delete any associated syndromes
+        if Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).exists():
+            Syndrome.objects.filter(
+                multiaxial_diagnosis=multiaxial_diagnosis).delete()
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
+
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).all()
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        # "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        "syndromes": syndromes
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/syndrome_section.html', context=context)
+
+    # test_fields_update_audit_progress(multiaxial_diagnosis)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+def epilepsy_cause_known(request, multiaxial_diagnosis_id):
+    """
+# POST request from the syndrome partial in the multiaxial_description_form
+# Updates model and returns the syndrome partial
+"""
+    if request.htmx.trigger_name == 'button-true':
+        MultiaxialDiagnosis.objects.filter(pk=multiaxial_diagnosis_id).update(
+            epilepsy_cause_known=True,
             updated_at=timezone.now(),
             updated_by=request.user
         )
     elif request.htmx.trigger_name == 'button-false':
-        MultiaxialDiagnosis.objects.filter(id=multiaxial_diagnosis_id).update(
-            syndrome_present=False,
+        MultiaxialDiagnosis.objects.filter(pk=multiaxial_diagnosis_id).update(
+            epilepsy_cause_known=False,
+            epilepsy_cause=None,
+            epilepsy_cause_categories=[],
             updated_at=timezone.now(),
             updated_by=request.user
         )
@@ -1193,18 +1273,18 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
-    syndromes = Syndrome.objects.filter(
-        multiaxial_diagnosis=multiaxial_diagnosis).all()
+
+    ecl = '<< 363235000'
+    epilepsy_causes = fetch_ecl(ecl)
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        # "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
-        "syndromes": syndromes
-
+        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_causes": epilepsy_causes
     }
 
     response = render(
-        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/syndrome_section.html', context=context)
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_section.html', context=context)
 
     # test_fields_update_audit_progress(multiaxial_diagnosis)
 

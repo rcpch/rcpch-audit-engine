@@ -1,0 +1,10 @@
+<div class='field'>
+    {% url 'epilepsy_cause_known' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#epilepsy_cause_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.epilepsy_cause_known label='Is there a known cause?' data_position='top left' %}
+</div>
+
+{% if multiaxial_diagnosis.epilepsy_cause_known %}
+    <div class='field' id='epilepsy_causes'>
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html' with multiaxial_diagnosis=multiaxial_diagnosis epilepsy_causes=epilepsy_causes %}
+    </div>
+{% endif %}

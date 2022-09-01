@@ -23,6 +23,13 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     )
 
     # Cause
+    epilepsy_cause_known = models.BooleanField(
+        "Is there an identifiable cause?",
+        null=True,
+        blank=True,
+        default=None
+    )
+
     epilepsy_cause = models.CharField(
         "main identified cause of seizure(s)",
         max_length=50,
