@@ -49,7 +49,7 @@
                         
                         <div class="ui rcpch_dark_blue buttons">
                             {% for choice in choices %}
-                                {% if choice.0 in test_positive %}
+                                {% if choice.0 == test_positive %}
                                     <div 
                                         class="ui mini compact positive rcpch_dark_blue button"
                                     >{{choice.1}}</div>

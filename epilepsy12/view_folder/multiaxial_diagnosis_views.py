@@ -588,47 +588,47 @@ Epilepsy status
 """
 
 
-@login_required
-def epilepsy_or_nonepilepsy_status(request, episode_id):
-    """
-    Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
-    The episode_id is also passed in allowing update of the model.
-    Selections for epilepsy set all nonepilepsy related fields to None, and selections for
-    nonepilepsy set all epilepsy fields to None. Selections to not known set all 
-    selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
-    """
-    epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
+# @login_required
+# def epilepsy_or_nonepilepsy_status(request, episode_id):
+#     """
+#     Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
+#     The episode_id is also passed in allowing update of the model.
+#     Selections for epilepsy set all nonepilepsy related fields to None, and selections for
+#     nonepilepsy set all epilepsy fields to None. Selections to not known set all
+#     selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
+#     """
+#     epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
 
-    Episode.objects.filter(pk=episode_id).update(
-        epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
-    episode = Episode.objects.get(pk=episode_id)
+#     Episode.objects.filter(pk=episode_id).update(
+#         epilepsy_or_nonepilepsy_status=epilepsy_or_nonepilepsy_status,
+#         updated_at=timezone.now(),
+#         updated_by=request.user
+#     )
+#     episode = Episode.objects.get(pk=episode_id)
 
-    template = 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html'
-    context = {
-        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        # 'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
-        'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
-        'LATERALITY': LATERALITY,
-        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
-        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
-        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
-        'episode': episode
-    }
+#     template = 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html'
+#     context = {
+#         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+#         'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
+#         # 'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
+#         'GENERALISED_SEIZURE_TYPE': sorted(GENERALISED_SEIZURE_TYPE, key=itemgetter(1)),
+#         'LATERALITY': LATERALITY,
+#         'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
+#         'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
+#         'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
+#         'episode': episode
+#     }
 
-    response = render(request=request, template_name=template, context=context)
+#     response = render(request=request, template_name=template, context=context)
 
-    # test_fields_update_audit_progress(desscribe)
+#     # test_fields_update_audit_progress(desscribe)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 @login_required
@@ -654,7 +654,6 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
             update_fields.update({
                 f"{field}": None
             })
-            print(field)
     elif epilepsy_or_nonepilepsy_status == 'NE':
         # nonepilepsy selected - set all epilepsy to none
         for field in EPILEPSY_FIELDS:
