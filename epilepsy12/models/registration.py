@@ -74,7 +74,7 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         verbose_name_plural = 'Registrations'
 
     def save(self, *args, **kwargs) -> None:
-        if self.registration_date and self.registration_close_date is not None:
+        if self.registration_date and self.registration_close_date is None:
             self.registration_close_date = self.registration_date_one_year_on()
             self.cohort = cohort_number_from_enrolment_date(
                 self.registration_date)
