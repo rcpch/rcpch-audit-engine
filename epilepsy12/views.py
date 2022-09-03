@@ -37,6 +37,7 @@ def hospital_reports(request):
 
     # Registration.objects.all().delete()
     # Episode.objects.all().delete()
+    print(Episode.objects.all().count())
 
     """
     !!!
