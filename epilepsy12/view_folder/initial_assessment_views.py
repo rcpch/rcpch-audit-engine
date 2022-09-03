@@ -35,7 +35,6 @@ def initial_assessment(request, case_id):
         "chronicity_selection": CHRONICITY,
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
         "audit_progress": registration.audit_progress,
         "active_template": "initial_assessment"
     }
@@ -77,7 +76,7 @@ def date_of_initial_assessment(request, initial_assessment_id):
         pk=initial_assessment_id)
 
     context = {
-        "initial_assessment": initial_assessment
+        "initial_assessment": initial_assessment,
     }
 
     test_fields_update_audit_progress(initial_assessment)

@@ -1720,6 +1720,7 @@ def total_fields_expected(model_instance):
     if model_instance.syndrome_present == None or model_instance.syndrome_present == False:
         cumulative_fields += 1
     else:
+        cumulative_fields += 1
         if Syndrome.objects.filter(
                 multiaxial_diagnosis=model_instance).exists():
             # there is at least one syndrome
@@ -1819,10 +1820,14 @@ def total_fields_completed(model_instance):
                 if field.name not in ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']:
                     if getattr(episode, field.name) is not None:
                         if field.name in FOCAL_EPILEPSY_FIELDS:
-                            counter += 1
+                            if getattr(episode, field.name):
+                                # only count if scored true
+                                counter += 1
+
                         elif field.name == 'description':
                             if len(getattr(episode, field.name)) > 0:
                                 counter += 1
+
                         else:
                             counter += 1
 
