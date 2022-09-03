@@ -567,6 +567,15 @@ ui.rcpch_chart_container.segment {
   background-color: var(--rcpch_pink);
 }
 
+.ui.rcpch_light_grey.circular.label {
+  color: white;
+  background-color: var(--rcpch_light_grey);
+}
+
+.ui.rcpch.header {
+  margin-top: 10px;
+}
+
 .ui.rcpch_pink.segment {
   border-top-color: var(--rcpch_pink);
 }

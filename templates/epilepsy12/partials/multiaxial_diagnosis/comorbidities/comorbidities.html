@@ -12,8 +12,26 @@
             <tbody>
         {% for comorbidity in comorbidities %}
             <tr>
-                <td>{{comorbidity.comorbidity_diagnosis_date}}</td>
-                <td>{{comorbidity.comorbidity_diagnosis|snomed_concept }}</td>
+                <td>
+                    {% if comorbidity.comorbidity_diagnosis_date %}
+                        {{comorbidity.comorbidity_diagnosis_date}}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    {% if comorbidity.comorbidity_diagnosis %}
+                        {{comorbidity.comorbidity_diagnosis|snomed_concept }}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
                 <td>
                     <div 
                         class="ui rcpch_light_blue buttons">
@@ -42,7 +60,10 @@
             </tbody>
         </table>
     {% else %}
-        <div class="ui rcpch_info message">
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
             There are no documented comorbidities so far...
         </div>
     {% endif %}

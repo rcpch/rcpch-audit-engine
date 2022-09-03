@@ -12,12 +12,46 @@
         <tbody>
     {% for episode in episodes %}
         <tr>
-            <td>{{episode.seizure_onset_date}}</td>
-            <td>{{episode.get_epilepsy_or_nonepilepsy_status_display}}</td>
+            <td>
+                {% if episode.seizure_onset_date %}
+                    {{episode.seizure_onset_date}}
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                    Add date...
+                {% endif %}
+            </td>
+            <td>
+                {% if episode.epilepsy_or_nonepilepsy_status is not None %}
+                    {{episode.get_epilepsy_or_nonepilepsy_status_display}}
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                    Uncompleted field
+                {% endif %}
+            </td>
             {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
-                <td>{{episode.get_epileptic_seizure_onset_type_display}}</td>
+                <td>
+                    {% if episode.epileptic_seizure_onset_type %}
+                        {{episode.get_epileptic_seizure_onset_type_display}}
+                    {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                        Uncompleted field
+                    {% endif %}
+                </td>
             {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
-                <td>{{episode.get_nonepileptic_seizure_type_display}}</td>
+                {% if episode.nonepileptic_seizure_type %}
+                        {{episode.get_nonepileptic_seizure_type_display}}
+                    {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                        Uncompleted field
+                    {% endif %}
             {% else %}
                 <td>Not applicable</td>
             {% endif %}
@@ -50,7 +84,12 @@
     </table>
 {% else %}
     {% if not there_are_epileptic_episodes %}
-        There are no documented epileptic episodes so far. At least one epileptic episode must be entered to be include in Epilepsy12.
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+            There are no documented epileptic episodes so far. At least one epileptic episode must be entered to be include in Epilepsy12.
+        </div>
     {% endif %}
 {% endif %}
 </div>

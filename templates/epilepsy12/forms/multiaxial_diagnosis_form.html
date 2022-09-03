@@ -3,18 +3,19 @@
 
     <div class="ui rcpch_pink segment">
 
-        <div class="ui header">
-            <span class='desscribe_letters'>
-                <div class='ui rcpch_pink circular label'>
-                D
-                </div>
-                <div class='ui rcpch_pink circular label'>
-                E
-                </div>
-                <div class='ui rcpch_pink circular label'>
-                S
-                </div>
-            </span>
+        <span class='desscribe_letters'>
+            <div class='ui rcpch_pink circular label'>D</div>
+            <div class='ui rcpch_pink circular label'>E</div>
+            <div class='ui rcpch_pink circular label'>S</div>
+            <div class="ui rcpch_light_grey circular label">S</div>
+            <div class="ui rcpch_light_grey circular label">C</div>
+            <div class="ui rcpch_light_grey circular label">R</div>
+            <div class="ui rcpch_light_grey circular label">I</div>
+            <div class="ui rcpch_light_grey circular label">B</div>
+            <div class="ui rcpch_light_grey circular label">E</div>                
+        </span>
+        
+        <div class="ui rcpch header">
             <div class='content'>
                 Episodes
                 <div class='sub header'>
@@ -25,7 +26,7 @@
 
         <div class='ui rcpch_info message'>
 
-        A child or young person's epilepsy may comprise one or more episodes. Add or review all episodes, completing the initial D, E, S stages of the DESSCRIBE tool.
+        A child or young person's epilepsy may comprise one or more episodes. Add or review all episodes, completing the initial D, E, S stages of the DESSCRIBE tool. There must be at least one episode which is considered to be epilepsy for this section to be included.
         </div>
 
         <div id='episodes' class='field'>
@@ -50,12 +51,19 @@
 
     <div class="ui rcpch_pink segment">
 
-        <div class="ui header">
-            <span class='desscribe_letters'>
-                <div class='ui rcpch_pink circular label'>
-                S
-                </div>
-            </span>
+        <span class='desscribe_letters'>
+            <div class="ui rcpch_light_grey circular label">D</div>
+            <div class="ui rcpch_light_grey circular label">E</div>
+            <div class="ui rcpch_light_grey circular label">S</div>
+            <div class='ui rcpch_pink circular label'>S</div>
+            <div class="ui rcpch_light_grey circular label">C</div>
+            <div class="ui rcpch_light_grey circular label">R</div>
+            <div class="ui rcpch_light_grey circular label">I</div>
+            <div class="ui rcpch_light_grey circular label">B</div>
+            <div class="ui rcpch_light_grey circular label">E</div> 
+        </span>
+
+        <div class="ui rcpch header">
             <div class='content'>
                 Syndromes
                 <div class='sub header'>
@@ -63,6 +71,7 @@
                 </div>
             </div>
         </div>
+
 
         <div class="field" id='syndrome_section'>
             
@@ -75,17 +84,26 @@
 
     <div class="ui rcpch_pink segment">
 
-        <h5 class="ui header">
-            <span class='desscribe_letters'>
-                <div class="ui rcpch_pink circular label">C</div>
-            </span>
+        <span class='desscribe_letters'>
+            <div class="ui rcpch_light_grey circular label">D</div>
+            <div class="ui rcpch_light_grey circular label">E</div>
+            <div class="ui rcpch_light_grey circular label">S</div>
+            <div class="ui rcpch_light_grey circular label">S</div>
+            <div class="ui rcpch_pink circular label">C</div>
+            <div class="ui rcpch_light_grey circular label">R</div>
+            <div class="ui rcpch_light_grey circular label">I</div>
+            <div class="ui rcpch_light_grey circular label">B</div>
+            <div class="ui rcpch_light_grey circular label">E</div>
+        </span>
+
+        <div class="ui rcpch header">
             <div class='content'>
                     Cause
                 <div class='sub header'>
                 Is there an identifiable cause?
                 </div>
             </div>
-        </h5>
+        </div>
 
         <div id="epilepsy_cause_section">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_section.html' with multiaxial_diagnosis=multiaxial_diagnosis %}
@@ -94,21 +112,27 @@
     </div>
     
     <div class="ui rcpch_pink segment">
+        
+        <span class='desscribe_letters'>
+            <div class="ui rcpch_light_grey circular label">D</div>
+            <div class="ui rcpch_light_grey circular label">E</div>
+            <div class="ui rcpch_light_grey circular label">S</div>
+            <div class="ui rcpch_light_grey circular label">S</div>
+            <div class="ui rcpch_light_grey circular label">C</div>
+            <div class="ui rcpch_pink circular label">R</div>
+            <div class="ui rcpch_pink circular label">I</div>
+            <div class="ui rcpch_pink circular label">B</div>
+            <div class="ui rcpch_pink circular label">E</div>
+        </span>
 
-        <h5 class="ui header">
-            <span class='desscribe_letters'>
-                <div class="ui rcpch_pink circular label">R</div>
-                <div class="ui rcpch_pink circular label">I</div>
-                <div class="ui rcpch_pink circular label">B</div>
-                <div class="ui rcpch_pink circular label">E</div>
-            </span>
+        <div class="ui rcpch header">
             <div class='content'>
                 Comorbidities
                 <div class='sub header'>
                 Are there any relevant impairments (behavioural or educational)?
                 </div>
             </div>
-        </h5>
+        </div>
         
         <div id='comorbidity_section' class='field'>
             {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity_section.html' with comorbidities=comorbidities %}

@@ -141,7 +141,7 @@
         {% endif %}
     {% endif %}
     
-    {% if audit_progress.multiaxial_diagnosis %}
+    {% if audit_progress.multiaxial_diagnosis_complete %}
       {% if active_template == "multiaxial_diagnosis" %}
 
         <a class="active completed step" href="{% url 'multiaxial_diagnosis' case_id %}">
@@ -353,10 +353,10 @@
       {% endwith %}
     {% endif %}
     
-    {% if active_template == "multiaxial_description" %}
+    {% if active_template == "multiaxial_diagnosis" %}
       
-          {% with numerator=audit_progress.multiaxial_description_total_completed_fields %}
-          {% with denominator=audit_progress.multiaxial_description_total_expected_fields %}
+          {% with numerator=audit_progress.multiaxial_diagnosis_total_completed_fields %}
+          {% with denominator=audit_progress.multiaxial_diagnosis_total_expected_fields %}
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}

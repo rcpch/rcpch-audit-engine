@@ -35,8 +35,9 @@ def characters_left(description):
 
 @register.simple_tag
 def percentage_of_total(numerator, denominator):
-    if (denominator > 0):
-        return round(numerator/denominator*100)
+    if numerator and denominator:
+        if (int(denominator) > 0):
+            return round(int(numerator)/int(denominator)*100)
 
 
 @register.filter

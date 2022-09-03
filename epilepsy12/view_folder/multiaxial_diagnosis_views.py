@@ -1,13 +1,12 @@
 from django.utils import timezone
 from datetime import datetime
 from operator import itemgetter
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from epilepsy12.models import episode
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
-from ..constants import AUTOANTIBODIES, EPILEPSY_CAUSES, EPILEPSY_GENE_DEFECTS, EPILEPSY_GENETIC_CAUSE_TYPES, EPILEPSY_STRUCTURAL_CAUSE_TYPES, IMMUNE_CAUSES, METABOLIC_CAUSES, GENERALISED_SEIZURE_TYPE
+from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
 from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
@@ -105,7 +104,7 @@ FOCAL_EPILEPSY_FIELDS = [
     "focal_onset_focal_to_bilateral_tonic_clonic",
 ]
 
-EPILEPSY_FIELDS = ['were_any_of_the_epileptic_seizures_convulsive'] + \
+EPILEPSY_FIELDS = ['were_any_of_the_epileptic_seizures_convulsive', 'epileptic_seizure_onset_type'] + \
     FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
 
 NONEPILEPSY_FIELDS = [
@@ -125,16 +124,10 @@ ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
 @login_required
 def multiaxial_diagnosis(request, case_id):
     """
+    Called on load of form. If no instance exists, one is created.
+
     """
     registration = Registration.objects.filter(case=case_id).get()
-    """
-    if Episode.objects.filter(registration=registration).exists():
-        # there is already a desscribe object for this registration
-        desscribe = Episode.objects.filter(registration=registration).first()
-    else:
-        # this is not yet a desscribe object for this description - create one
-        desscribe = Episode.objects.create(registration=registration)
-    """
     if MultiaxialDiagnosis.objects.filter(registration=registration).exists():
         multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter(
             registration=registration).get()
@@ -161,12 +154,13 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    # test_fields_update_audit_progress(desscribe)
-
     ecl = '<< 363235000 '
     epilepsy_causes = fetch_ecl(ecl)
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     context = {
+        "case_id": registration.case_id,
         "registration": registration,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "episodes": episodes,
@@ -189,7 +183,6 @@ def multiaxial_diagnosis(request, case_id):
         response=response,
         name="registration_active",
         params={})  # reloads the form to show the active steps
-
     return response
 
 
@@ -248,6 +241,8 @@ def add_episode(request, multiaxial_diagnosis_id):
 
     keywords = Keyword.objects.all()
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     context = {
         'episode': new_episode,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
@@ -273,13 +268,11 @@ def add_episode(request, multiaxial_diagnosis_id):
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
 
-    # test_fields_update_audit_progress(desscribe)
-
-    # # trigger a GET request from the steps template
-    # trigger_client_event(
-    #     response=response,
-    #     name="registration_active",
-    #     params={})  # reloads the form to show the active steps
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -291,6 +284,8 @@ def edit_episode(request, episode_id):
     episode = Episode.objects.get(pk=episode_id)
 
     keywords = Keyword.objects.all()
+
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
@@ -318,8 +313,6 @@ def edit_episode(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -341,11 +334,21 @@ def remove_episode(request, episode_id):
     episodes = Episode.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).order_by('seizure_onset_date')
 
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
+
     context = {
         'episodes': episodes
     }
 
-    return render(request=request,  template_name='epilepsy12/partials/multiaxial_diagnosis/episodes.html', context=context)
+    response = render(
+        request=request,  template_name='epilepsy12/partials/multiaxial_diagnosis/episodes.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -364,6 +367,7 @@ def seizure_onset_date(request, episode_id):
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     keywords = Keyword.objects.all()
 
@@ -393,6 +397,12 @@ def seizure_onset_date(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -411,6 +421,7 @@ def seizure_onset_date_confidence(request, episode_id):
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     keywords = Keyword.objects.all()
 
@@ -440,8 +451,6 @@ def seizure_onset_date_confidence(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -466,6 +475,7 @@ def episode_definition(request, episode_id):
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     keywords = Keyword.objects.all()
 
@@ -495,8 +505,6 @@ def episode_definition(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -530,6 +538,7 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
@@ -557,8 +566,6 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/episode.html', context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -598,6 +605,7 @@ def edit_description(request, episode_id):
         Episode.objects.update_or_create(
             pk=episode_id, defaults=update_field)
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
@@ -606,8 +614,6 @@ def edit_description(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/description_labels.html', context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -636,6 +642,7 @@ def delete_description_keyword(request, episode_id, description_keyword_id):
         updated_by=request.user)
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
     keywords = Keyword.objects.all()
 
     context = {
@@ -645,8 +652,6 @@ def delete_description_keyword(request, episode_id, description_keyword_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/description_labels.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -667,7 +672,7 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
     Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
     The episode_id is also passed in allowing update of the model.
     Selections for epilepsy set all nonepilepsy related fields to None, and selections for
-    nonepilepsy set all epilepsy fields to None. Selections to not known set all 
+    nonepilepsy set all epilepsy fields to None. Selections to not known set all
     selections to none. The epilepsy_or_nonepilepsy_status partial is returned.
     """
     epilepsy_or_nonepilepsy_status = request.htmx.trigger_name
@@ -690,7 +695,7 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
             update_fields.update({
                 f"{field}": None
             })
-    elif epilepsy_or_nonepilepsy_status == 'NK':
+    elif epilepsy_or_nonepilepsy_status == 'U':
         # notknown selected - set all epilepsy and nonepilepsy to none
         for field in ALL_FIELDS:
             update_fields.update({
@@ -699,6 +704,7 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
 
     Episode.objects.filter(pk=episode_id).update(**update_fields)
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     template = 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_or_nonepilepsy_status.html'
     context = {
@@ -722,8 +728,6 @@ def epilepsy_or_nonepilepsy_status(request, episode_id):
     }
 
     response = render(request=request, template_name=template, context=context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -759,11 +763,13 @@ def were_any_of_the_epileptic_seizures_convulsive(request, episode_id):
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
         'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
         "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
+        "GENERALISED_SEIZURE_TYPE": sorted(GENERALISED_SEIZURE_TYPE),
         'LATERALITY': LATERALITY,
         'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
         'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
@@ -772,8 +778,6 @@ def were_any_of_the_epileptic_seizures_convulsive(request, episode_id):
 
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy.html', context=context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -789,7 +793,7 @@ def epileptic_seizure_onset_type(request, episode_id):
     Defines type of onset if considered to be epilepsy
     Accepts POST request from epilepsy partial and returns the same having
     updated the model with the selection
-    If focal onset, sent general onset fields to none, or both 
+    If focal onset, sent general onset fields to none, or both
     to none if not known
     """
 
@@ -827,6 +831,7 @@ def epileptic_seizure_onset_type(request, episode_id):
 
     # retrieve updated object instance
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
@@ -841,8 +846,6 @@ def epileptic_seizure_onset_type(request, episode_id):
 
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy.html', context=context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -891,6 +894,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
     Episode.objects.filter(pk=episode_id).update(**update_fields)
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
@@ -902,8 +906,6 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 
     response = render(
         request=request, template_name="epilepsy12/partials/multiaxial_diagnosis/focal_onset_epilepsy.html", context=context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -924,6 +926,7 @@ def epileptic_generalised_onset(request, episode_id):
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'episode': episode,
@@ -940,7 +943,6 @@ def epileptic_generalised_onset(request, episode_id):
         response=response,
         name="registration_active",
         params={})  # reloads the form to show the active steps
-
     return response
 
 
@@ -958,6 +960,7 @@ def nonepilepsy_generalised_onset(request, episode_id):
         updated_at=timezone.now(),
         updated_by=request.user)
     episode = Episode.objects.get(id=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
 
     context = {
         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
@@ -974,8 +977,6 @@ def nonepilepsy_generalised_onset(request, episode_id):
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html', context)
 
-    # test_fields_update_audit_progress(episode)
-
     # trigger a GET request from the steps template
     trigger_client_event(
         response=response,
@@ -987,7 +988,7 @@ def nonepilepsy_generalised_onset(request, episode_id):
 def nonepileptic_seizure_type(request, episode_id):
     """
     POST request from select element within nonepilepsy partial
-    Returns one of the select options: 
+    Returns one of the select options:
     nonepileptic_seizure_type
     nonepileptic_seizure_syncope
     nonepileptic_seizure_behavioural
@@ -1019,6 +1020,8 @@ def nonepileptic_seizure_type(request, episode_id):
     )
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
+
     context = {
         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
@@ -1033,8 +1036,6 @@ def nonepileptic_seizure_type(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html', context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1071,6 +1072,8 @@ def nonepileptic_seizure_subtype(request, episode_id):
     Episode.objects.filter(pk=episode_id).update(**update_fields)
 
     episode = Episode.objects.get(pk=episode_id)
+    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
+
     context = {
         'nonepilepsy_onset_types': NON_EPILEPSY_SEIZURE_ONSET,
         'nonepilepsy_types': sorted(NON_EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
@@ -1085,8 +1088,6 @@ def nonepileptic_seizure_subtype(request, episode_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html', context)
-
-    # test_fields_update_audit_progress(episode)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1112,6 +1113,8 @@ def add_syndrome(request, multiaxial_diagnosis_id):
         syndrome_diagnosis_active=None
     )
 
+    test_fields_update_audit_progress(syndrome.multiaxial_diagnosis)
+
     context = {
         'syndrome': syndrome,
         "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
@@ -1119,8 +1122,6 @@ def add_syndrome(request, multiaxial_diagnosis_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/syndrome.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1141,6 +1142,8 @@ def edit_syndrome(request, syndrome_id):
     HTMX post request from episodes.html partial on button click to add new episode
     """
     syndrome = Syndrome.objects.get(pk=syndrome_id)
+
+    test_fields_update_audit_progress(syndrome.multiaxial_diagnosis)
 
     keywords = Keyword.objects.all()
 
@@ -1170,8 +1173,6 @@ def edit_syndrome(request, syndrome_id):
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/syndrome.html', context)
 
-    # test_fields_update_audit_progress(desscribe)
-
     # trigger a GET request from the steps template
     trigger_client_event(
         response=response,
@@ -1196,7 +1197,17 @@ def remove_syndrome(request, syndrome_id):
         'syndromes': syndromes
     }
 
-    return render(request=request,  template_name='epilepsy12/partials/multiaxial_diagnosis/syndromes.html', context=context)
+    response = render(
+        request=request,  template_name='epilepsy12/partials/multiaxial_diagnosis/syndromes.html', context=context)
+
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 @login_required
@@ -1213,6 +1224,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
         multiaxial_diagnosis.updated_by = request.user
         multiaxial_diagnosis.save()
     elif request.htmx.trigger_name == 'button-false':
+
         multiaxial_diagnosis.syndrome_present = False
         multiaxial_diagnosis.updated_at = timezone.now()
         multiaxial_diagnosis.updated_by = request.user
@@ -1225,6 +1237,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
         print("Some mistake happened")
         # TODO need to handle this
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
     syndromes = Syndrome.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).all()
 
@@ -1236,8 +1249,6 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/syndrome_section.html', context=context)
-
-    # test_fields_update_audit_progress(multiaxial_diagnosis)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1274,6 +1285,8 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     ecl = '<< 363235000'
     epilepsy_causes = fetch_ecl(ecl)
 
@@ -1285,8 +1298,6 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_section.html', context=context)
-
-    # test_fields_update_audit_progress(multiaxial_diagnosis)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1314,6 +1325,8 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     context = {
         "epilepsy_causes": epilepsy_causes,
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1323,6 +1336,11 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html', context=context)
 
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -1352,6 +1370,8 @@ def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
             f"category is {epilepsy_cause_category}. This is an error that needs handling")
         # TODO handle this error
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     context = {
         "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1361,6 +1381,11 @@ def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_categories.html', context=context)
 
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -1371,7 +1396,7 @@ Comorbidities
 
 def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
     """
-    POST request from 
+    POST request from
     """
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
@@ -1393,13 +1418,11 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
             "Some kind of error - this will need to be raised and returned to template")
         return HttpResponse("Error")
 
-    # ecl = '<< 35919005'
-    # comorbidity_choices = fetch_ecl(ecl)
+    test_fields_update_audit_progress(multiaxial_diagnosis)
 
     context = {
         'multiaxial_diagnosis': multiaxial_diagnosis,
         'comorbidities': Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).all(),
-        # 'comorbidity_choices': comorbidity_choices
     }
 
     response = render(
@@ -1429,6 +1452,8 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     ecl = '<< 35919005'
     comorbidity_choices = fetch_ecl(ecl)
 
+    test_fields_update_audit_progress(comorbidity.multiaxial_diagnosis)
+
     context = {
         'comorbidity': comorbidity,
         'comorbidity_choices': comorbidity_choices
@@ -1436,8 +1461,6 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1456,6 +1479,8 @@ def edit_comorbidity(request, comorbidity_id):
     ecl = '<< 35919005'
     comorbidity_choices = fetch_ecl(ecl)
 
+    test_fields_update_audit_progress(comorbidity.multiaxial_diagnosis)
+
     context = {
         'comorbidity': comorbidity,
         'comorbidity_choices': comorbidity_choices
@@ -1463,8 +1488,6 @@ def edit_comorbidity(request, comorbidity_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1486,6 +1509,8 @@ def remove_comorbidity(request, comorbidity_id):
     comorbidities = Comorbidity.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).all()
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     context = {
         'multiaxial_diagnosis': multiaxial_diagnosis,
         'comorbidities': comorbidities,
@@ -1493,8 +1518,6 @@ def remove_comorbidity(request, comorbidity_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1517,6 +1540,8 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
         updated_by=request.user
     )
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
+    test_fields_update_audit_progress(comorbidity.multiaxial_diagnosis)
+
     ecl = '<< 35919005'
     comorbidity_choices = fetch_ecl(ecl)
 
@@ -1527,8 +1552,6 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
     response = render(
         request, 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context)
-
-    # test_fields_update_audit_progress(desscribe)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -1562,6 +1585,8 @@ def comorbidity_diagnosis(request, comorbidity_id):
     comorbidity = Comorbidity.objects.get(
         pk=comorbidity_id)
 
+    test_fields_update_audit_progress(comorbidity.multiaxial_diagnosis)
+
     context = {
         "comorbidity_choices": comorbidity_choices,
         "comorbidity": comorbidity,
@@ -1570,6 +1595,11 @@ def comorbidity_diagnosis(request, comorbidity_id):
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html', context=context)
 
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -1583,6 +1613,8 @@ def comorbidities(request, multiaxial_diagnosis_id):
     comorbidities = Comorbidity.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis).all()
 
+    test_fields_update_audit_progress(multiaxial_diagnosis)
+
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "comorbidities": comorbidities,
@@ -1591,31 +1623,227 @@ def comorbidities(request, multiaxial_diagnosis_id):
     response = render(
         request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html', context=context)
 
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
     return response
 
-    # test all fields
-# def test_fields_update_audit_progress(model_instance):
-#     all_completed_fields = total_fields_completed(model_instance)
-#     all_fields = total_fields_expected(model_instance)
-#     AuditProgress.objects.filter(registration=model_instance.registration).update(
-#         multiaxial_description_total_expected_fields=all_fields,
-#         multiaxial_description_total_completed_fields=all_completed_fields,
-#         multiaxial_description_complete=all_completed_fields == all_fields
-#     )
+# test all fields
 
-# def total_fields_expected(model_instance):
+
+def test_fields_update_audit_progress(model_instance):
+    all_completed_fields = total_fields_completed(model_instance)
+    all_fields = total_fields_expected(model_instance)
+    AuditProgress.objects.filter(registration=model_instance.registration).update(
+        multiaxial_diagnosis_total_expected_fields=all_fields,
+        multiaxial_diagnosis_total_completed_fields=all_completed_fields,
+        multiaxial_diagnosis_complete=all_completed_fields == all_fields
+    )
+
+
+def total_fields_expected(model_instance):
     """
     A minimum total fields would be:
     1. The correct number of fields for each instance of Episode associated with this MultiaxialDescription
     2. At least one of these must have Epilepsy as its diagnosis
     3. syndrome_present
-    4. if syndrome_present, for each instance of Syndrome, a date of diagnosis and a SNOMED code
+    4. if syndrome_present, for each instance of Syndrome, a date of diagnosis and a SNOMED code, whether active or not
     5. if cause known, a category (at least one) and an epilepsy_cause (snomed code)
     6. if there are relevant_impairments_behavioural_educational, at least one instance of this class, fully completed
-
-
-epilepsy_cause
     """
+    cumulative_fields = 0
+
+    # episode instance - if none of the episodes are epileptic in nature, none are scored
+    if Episode.objects.filter(
+            multiaxial_diagnosis=model_instance,
+            epilepsy_or_nonepilepsy_status='E').exists():
+        # at least one episode of epilepsy - count the fields
+        episodes = Episode.objects.filter(
+            multiaxial_diagnosis=model_instance).all()
+        for episode in episodes:
+            # essential fields are:
+            # seizure_onset_date
+            # seizure_onset_date_confidence
+            # episode_definition
+            cumulative_fields += 3
+            if episode.has_description_of_the_episode_or_episodes_been_gathered:
+                # essential fields if description has been gathered are:
+                # has_description_of_the_episode_or_episodes_been_gathered
+                # description
+                # (keywords may not be present and not mandatory)
+                cumulative_fields += 2
+            else:
+                # has_description_of_the_episode_or_episodes_been_gathered is false or None
+                cumulative_fields += 1
+            if episode.epilepsy_or_nonepilepsy_status is None or episode.epilepsy_or_nonepilepsy_status == 'U':
+                # diagnosis of epilepsy is uncertain or this field is not scored yet. Minimum score +1
+                cumulative_fields += 1
+            elif episode.epilepsy_or_nonepilepsy_status == 'E':
+                # this is epilepsy
+                # minimum fields are this field and were_any_of_the_epileptic_seizures_convulsive
+                cumulative_fields += 2
+                if episode.epileptic_seizure_onset_type is None or episode.epileptic_seizure_onset_type in ['UO', 'UC']:
+                    # onset at this point is unscored, unknown or unclassified
+                    cumulative_fields += 1
+                elif episode.epileptic_seizure_onset_type == 'GO':
+                    # generalised onset - score this and epileptic_seizure_onset_type
+                    cumulative_fields += 2
+                elif episode.epileptic_seizure_onset_type == 'FO':
+                    # focal onset - score this and focal onset radio buttons
+                    # there are 4 groups of these: allow one only from each group
+                    # TODO #75 ask @cdunkley if it is acceptable for only one radiobutton to be scored per group
+                    cumulative_fields += 5
+                else:
+                    # this will be an error if gets this far
+                    cumulative_fields += 0
+            elif episode.epilepsy_or_nonepilepsy_status == 'NE':
+                # nonepilepsy selected
+                # includes this and nonepileptic_seizure_unknown_onset
+                cumulative_fields += 2
+                if episode.nonepileptic_seizure_type is None or episode.nonepileptic_seizure_type == 'Oth':
+                    # seizure type unselected or 'Other' - minimum score at this point is 1
+                    cumulative_fields += 1
+                else:
+                    # some other nonepileptic_seizure_type selected - score this and the subsequent subtype
+                    cumulative_fields += 2
+            else:
+                # TODO should never get this far - so an error will have happend that needs catching
+                cumulative_fields += 0
+    else:
+        # no episodes saved. Minimum fields are one episode
+        # minimum fields are 7: this is the minimum score an epileptic episode can have
+        cumulative_fields += 7
+
+    # syndromes
+    if model_instance.syndrome_present == None or model_instance.syndrome_present == False:
+        cumulative_fields += 1
+    else:
+        if Syndrome.objects.filter(
+                multiaxial_diagnosis=model_instance).exists():
+            # there is at least one syndrome
+            # for each syndrome ensure all fields are filled
+            syndromes = Syndrome.objects.filter(
+                multiaxial_diagnosis=model_instance).all()
+            for syndrome in syndromes:
+                # these 3 fields must be complete:
+                # syndrome_diagnosis_date
+                # syndrome_name
+                # syndrome_diagnosis_active
+                cumulative_fields += 3
+        else:
+            # no syndrome scored yet: minimum is 3
+            cumulative_fields += 3
+
+    #
+    if model_instance.epilepsy_cause_known == False or model_instance.epilepsy_cause_known == None:
+        # unknown cause or as yet unscored
+        cumulative_fields += 1
+    else:
+        # minimum expected fields if cause is known
+        # epilepsy_cause_known
+        # epilepsy_cause
+        # epilepsy_cause_categories (length of array must be > 0 to be counted)
+        cumulative_fields += 3
+
+    if model_instance.relevant_impairments_behavioural_educational == False or model_instance.relevant_impairments_behavioural_educational is None:
+        # there are no RIBE or RIBE still unscored. Minimum score 1
+        cumulative_fields += 1
+    else:
+        cumulative_fields += 1
+
+        if Comorbidity.objects.filter(
+                multiaxial_diagnosis=model_instance).exists():
+            # there is at least one comorbidity
+            comorbidities = Comorbidity.objects.filter(
+                multiaxial_diagnosis=model_instance).all()
+            # loop through all listed comorbidities
+            for comorbidity in comorbidities:
+                # mandatory fields:
+                # comorbidity_diagnosis_date
+                # comorbidity_diagnosis
+                cumulative_fields += 2
+        else:
+            # there are comorbidities yet
+            # minimum fields are 2
+            cumulative_fields += 2
+
+    # return the total number of scoreable fields, based on current user entry
+    return cumulative_fields
+
+
+def total_fields_completed(model_instance):
+    # counts the number of completed fields
+    multiaxial_diagnosis_fields = model_instance._meta.get_fields()
+    if Episode.objects.filter(
+            multiaxial_diagnosis=model_instance).exists():
+        episode_instance = Episode.objects.filter(
+            multiaxial_diagnosis=model_instance).first()
+        episode_fields = episode_instance._meta.get_fields()
+    episodes = Episode.objects.filter(
+        multiaxial_diagnosis=model_instance).all()
+    if Syndrome.objects.filter(
+            multiaxial_diagnosis=model_instance).exists():
+        syndrome_instance = Syndrome.objects.filter(
+            multiaxial_diagnosis=model_instance).first()
+        syndrome_fields = syndrome_instance._meta.get_fields()
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=model_instance).all()
+    if Comorbidity.objects.filter(
+            multiaxial_diagnosis=model_instance).exists():
+        comorbidity_instance = Comorbidity.objects.filter(
+            multiaxial_diagnosis=model_instance).first()
+        comorbidity_fields = comorbidity_instance._meta.get_fields()
+    comorbidities = Comorbidity.objects.filter(
+        multiaxial_diagnosis=model_instance).all()
+
+    counter = 0
+
+    # loop through all fieldsin multiaxial diagnosis instance
+    for field in multiaxial_diagnosis_fields:
+        if field.name not in ['id', 'registration', 'multiaxial_diagnosis', 'episode', 'syndrome', 'comorbidity', 'created_by', 'created_at', 'updated_by', 'updated_at']:
+            if getattr(model_instance, field.name) is not None:
+                if field.name == 'epilepsy_cause_categories':
+                    if (len(getattr(model_instance, field.name)) > 0):
+                        # one or more categories selected
+                        counter += 1
+                else:
+                    counter += 1
+
+    if len(episodes) > 0:
+        # loop through every instance of episodes
+        for episode in episodes:
+            # for each episode instance score each field
+            for field in episode_fields:
+                if field.name not in ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']:
+                    if getattr(episode, field.name) is not None:
+                        if field.name in FOCAL_EPILEPSY_FIELDS:
+                            counter += 1
+                        elif field.name == 'description':
+                            if len(getattr(episode, field.name)) > 0:
+                                counter += 1
+                        else:
+                            counter += 1
+
+    if len(syndromes) > 0:
+        # loop through every instance of episodes
+        for syndrome in syndromes:
+            # for each syndrome instance score each field
+            for field in syndrome_fields:
+                if field.name not in ['id', 'multiaxial_diagnosis', 'created_by', 'created_at', 'updated_by', 'updated_at']:
+                    if getattr(syndrome, field.name) is not None:
+                        counter += 1
+
+    if len(comorbidities) > 0:
+        # loop through every instance of comorbidities
+        for comorbidity in comorbidities:
+            for field in comorbidity_fields:
+                if field.name not in ['id', 'multiaxial_diagnosis', 'created_by', 'created_at', 'updated_by', 'updated_at']:
+                    if getattr(comorbidity, field.name) is not None and field.name:
+                        counter += 1
+
+    return counter
 
     # description
     # description_keywords
@@ -1674,82 +1902,3 @@ epilepsy_cause
     # seizure_cause_immune_antibody
     # seizure_cause_immune_antibody_other
     # relevant_impairments_behavioural_educational
-
-    cumulative_fields = 0
-    if model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'NE':
-        # nonepilepsy - includes epileptic_generalised_onset
-        cumulative_fields += 1
-        if model_instance.nonepileptic_seizure_type:
-            # options of the types always lead to the option of a single subtype
-            cumulative_fields += 2
-
-    elif model_instance.epilepsy_or_nonepilepsy_status and model_instance.epilepsy_or_nonepilepsy_status == 'E':
-        # epilepsy selected - epilepsy_or_nonepilepsy_status and were_any_of_the_epileptic_seizures_convulsive
-        cumulative_fields += 2
-        if model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'FO':
-            # includes experienced_prolonged_focal_seizures and 4 of all the focal_onset options
-            # TODO #75 ask @cdunkley if it is acceptable for radiobuttons to be optional
-            cumulative_fields += 0
-        elif model_instance.epileptic_seizure_onset_type and model_instance.epileptic_seizure_onset_type == 'GO':
-            # includes prolonged_generalized_convulsive_seizures
-            cumulative_fields += 2
-        else:
-            # either unclassified or unknown onset
-            cumulative_fields += 1
-    else:
-        # diagnosis is uncertain - only 2 answers expected for E
-        cumulative_fields += 2
-
-    # test S
-    if syndrome_present:
-        # includes syndrome
-        cumulative_fields += 3
-    else:
-        cumulative_fields += 1
-
-    # test C
-    if model_instance.seizure_cause_main and model_instance.seizure_cause_main in ['Inf', 'NK']:
-        cumulative_fields += 1
-    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Gen":
-        if model_instance.seizure_cause_genetic == 'GeA':
-            # genetic abnormity included
-            cumulative_fields += 3
-        else:
-            cumulative_fields += 2
-    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Imm":
-        # immune causees included
-        if model_instance.seizure_cause_immune == 'AnM':
-            # antibody mediated
-            cumulative_fields += 3
-        else:
-            cumulative_fields += 2
-    elif model_instance.seizure_cause_main and model_instance.seizure_cause_main == "Met":
-        # metabolic causes
-        cumulative_fields += 2
-    else:
-        cumulative_fields += 1
-
-    # IBE
-    cumulative_fields += 1
-
-    return cumulative_fields
-
-    # def total_fields_completed(model_instance):
-    #     # counts the number of completed fields
-    #     fields = model_instance._meta.get_fields()
-    #     counter = 0
-    #     for field in fields:
-    #         if (
-    #                 getattr(model_instance, field.name) is not None
-    #                 and field.name not in ['id', 'registration', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']):
-    #             if field.name == 'description':
-    #                 if len(getattr(model_instance, field.name)) > 0:
-    #                     counter += 1
-    #             elif field.name in FOCAL_EPILEPSY_FIELDS:
-    #                 # see #75 - focal epilepsy types currently optional
-    #                 counter += 0
-    #             else:
-    #                 counter += 1
-    #     return counter
-
-    # """

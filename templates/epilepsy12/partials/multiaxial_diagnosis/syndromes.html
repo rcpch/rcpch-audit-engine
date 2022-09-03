@@ -1,49 +1,81 @@
 <div>
-{% if syndromes|length > 0 %}
-    <table class="ui rcpch basic table">
-        <thead>
-            <tr>
-                <th>Syndrome Identification/Onset Date</th>
-                <th>Name</th>
-                <th>Diagnosis Active</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
+    {% if syndromes|length > 0 %}
+        <table class="ui rcpch basic table">
+            <thead>
+                <tr>
+                    <th>Syndrome Diagnosis Date</th>
+                    <th>Name</th>
+                    <th>Diagnosis Active</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
 
-    {% for syndrome in syndromes %}
-        <tr>
-            <td>{{syndrome.syndrome_diagnosis_date}}</td>
-            <td>{{syndrome.get_syndrome_name_display}}</td>
-            <td>{{syndrome.syndrome_diagnosis_active}}</td>
-            <td>
-                <div 
-                    class="ui rcpch_light_blue buttons">
-                    <button 
-                        class="ui rcpch_primary button"
-                        hx-post='{% url "edit_syndrome" syndrome.pk %}'
-                        hx-target='#syndrome'
-                        hx-trigger='click'
-                        hx-swap='innerHTML'
-                    >
-                        Edit
-                    </button>
-                    <button 
-                        class="ui rcpch_red icon button"
-                        hx-post='{% url "remove_syndrome" syndrome_id=syndrome.pk %}'
-                        hx-target='#syndromes'
-                        hx-trigger='click'
-                        hx-swap='innerHTML'
-                    >
-                        <i class='trash alternate outline icon'></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-There are no documented syndromes so far...
-{% endif %}
+        {% for syndrome in syndromes %}
+            <tr>
+                <td>
+                    {% if syndrome.syndrome_diagnosis_date %}
+                        {{syndrome.syndrome_diagnosis_date}}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        Uncompleted field
+                    {% endif %}
+                </td>
+                <td>
+                    {% if syndrome.syndrome_name is not None %}
+                        {{syndrome.get_syndrome_name_display}}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        Uncompleted field
+                    {% endif %}
+                </td>
+                <td>
+                    {% if syndrome.syndrome_diagnosis_active is not None %}
+                        {{syndrome.syndrome_diagnosis_active}}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        Uncompleted field
+                    {% endif %}
+                </td>
+                <td>
+                    <div 
+                        class="ui rcpch_light_blue buttons">
+                        <button 
+                            class="ui rcpch_primary button"
+                            hx-post='{% url "edit_syndrome" syndrome.pk %}'
+                            hx-target='#syndrome'
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            Edit
+                        </button>
+                        <button 
+                            class="ui rcpch_red icon button"
+                            hx-post='{% url "remove_syndrome" syndrome_id=syndrome.pk %}'
+                            hx-target='#syndromes'
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            <i class='trash alternate outline icon'></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+            There are no documented syndromes so far...
+        </div>
+    {% endif %}
 </div>
