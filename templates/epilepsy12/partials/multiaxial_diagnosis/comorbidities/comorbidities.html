@@ -1,0 +1,81 @@
+{% load epilepsy12_template_tags %}
+<div>
+    {% if comorbidities|length > 0 %}
+        <table class="ui rcpch basic table">
+            <thead>
+                <tr>
+                    <th>Diagnosis Date</th>
+                    <th>Comorbidity</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for comorbidity in comorbidities %}
+            <tr>
+                <td>
+                    {% if comorbidity.comorbidity_diagnosis_date %}
+                        {{comorbidity.comorbidity_diagnosis_date}}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    {% if comorbidity.comorbidity_diagnosis %}
+                        {{comorbidity.comorbidity_diagnosis|snomed_concept }}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    <div 
+                        class="ui rcpch_light_blue buttons">
+                        <button 
+                            class="ui rcpch_primary button"
+                            hx-post='{% url "edit_comorbidity" comorbidity_id=comorbidity.pk %}'
+                            hx-target='#comorbidities'
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            Edit
+                        </button>
+                        <button 
+                            class="ui rcpch_red icon button"
+                            hx-post='{% url "remove_comorbidity" comorbidity_id=comorbidity.pk %}'
+                            hx-target='#comorbidities'
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            <i class='trash alternate outline icon'></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+            There are no documented comorbidities so far...
+        </div>
+    {% endif %}
+    <div class='field'>
+        <button 
+            class="ui rcpch_primary button"
+            hx-post="{% url 'add_comorbidity' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
+            hx-target="#comorbidities"
+            hx-swap='innerHTML'
+            hx-trigger='click'
+        >
+        Add a new Comorbidity
+        </button>
+    </div>
+</div>

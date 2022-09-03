@@ -7,12 +7,10 @@ from ..constants import *
 # TODO #12 Mixin breaks build currently
 class TimeStampAbstractBaseClass(models.Model):
     created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=f"record created on {timezone.now}",
+        auto_now_add=True
     )
     updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name=f"record updated on {timezone.now}",
+        auto_now=True
     )
 
     class Meta:
@@ -24,14 +22,14 @@ class UserStampAbstractBaseClass(models.Model):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="created%(app_label)s_%(class)s_related",
+        related_name="craeted_%(class)s",
         verbose_name="record created by user in %(class)",
         null=True
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="updated%(app_label)s_%(class)s_related",
+        related_name="updated_%(class)s",
         verbose_name="record updated by user in %(class)",
         null=True
     )

@@ -5,7 +5,7 @@ from django.views import generic
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.ethnicities import ETHNICITIES
-from epilepsy12.models import desscribe
+from epilepsy12.models import episode
 from epilepsy12.models.case import Case
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
@@ -36,21 +36,30 @@ def hospital_reports(request):
     """
 
     # Registration.objects.all().delete()
+    # Episode.objects.all().delete()
+    print(Episode.objects.all().count())
 
     """
     !!!
     """
 
-    initial_assessment = InitialAssessment.objects.all()
-    epilepsy_context = EpilepsyContext.objects.all()
-    desscribe = DESSCRIBE.objects.all()
-    assessment = Assessment.objects.all()
-    management = Management.objects.all()
-    registration = Registration.objects.all()
+    # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
+    initial_assessment = InitialAssessment.objects.filter()
+    site = Site.objects.filter()
+    epilepsy_context = EpilepsyContext.objects.filter()
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
+    episode = Episode.objects.filter()
+    syndrome = Syndrome.objects.filter()
+    comorbidity = Comorbidity.objects.filter()
+    assessment = Assessment.objects.filter()
+    investigations = Investigations.objects.filter()
+    management = Management.objects.filter()
+    registration = Registration.objects.filter()
 
-    all_models = list(chain(initial_assessment, epilepsy_context,
-                      desscribe, assessment, management, registration))[:5]
-    all_models.sort(key=lambda x: x.updated_at, reverse=True)
+    all_models = sorted(
+        chain(registration, initial_assessment, site, epilepsy_context, multiaxial_diagnosis,
+              episode, syndrome, comorbidity, assessment, investigations, management),
+        key=lambda x: x.updated_at, reverse=True)[:5]
 
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(
@@ -121,13 +130,15 @@ def hospital_reports(request):
     total_referred_to_surgery = Assessment.objects.filter(
         childrens_epilepsy_surgical_service_referral_made=True).count()
 
+    total_percent = round((total_registrations/total_cases)*100)
+
     return render(request=request, template_name=template_name, context={
         'user': request.user,
         'hospital': hospital_object,
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
         'cases_aggregated_by_gender': cases_aggregated_by_gender,
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
-        'percent_completed_registrations': round((total_registrations/total_cases)*100),
+        'percent_completed_registrations': total_percent,
         'total_registrations': total_registrations,
         'total_cases': total_cases,
         'total_referred_to_paediatrics': total_referred_to_paediatrics,
@@ -179,34 +190,3 @@ def registration_active(request, case_id, active_template):
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
-
-
-"""
-{{ form.as_p }}
-  <button class="ui button" type="submit">Log In</button>
-
-
-  /* rcpch login  */
-.ui.rcpch.input>input {
-  font-family: Montserrat-Regular;
-  border: 3px solid var(--rcpch_light_blue);
-  border-radius: 0%;
-}
-
-.ui.rcpch.input.focus>input,
-.ui.rcpch.input>input:focus {
-  border-color: var(--rcpch_dark_blue);
-  border-radius: 0%;
-}
-
-.ui.input.focus>input::-webkit-input-placeholder,
-.ui.input>input:focus::-webkit-input-placeholder {
-  border-color: red;
-}
-
-.ui.rcpch.input>input:active,
-.ui.rcpch.input.down input {
-  border-color: var(--rcpch_dark_blue);
-  border-radius: 0%;
-}
-"""

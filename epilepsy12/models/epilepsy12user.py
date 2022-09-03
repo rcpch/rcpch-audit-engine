@@ -123,7 +123,14 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         title = self.get_title_display()
-        return f"{title} {self.first_name} {self.surname}"
+        concatenated_name = ''
+        if title:
+            concatenated_name += f'{title} '
+        if self.first_name:
+            concatenated_name += f'{self.first_name} '
+        if self.surname:
+            concatenated_name += f'{self.surname}'
+        return concatenated_name
 
     def get_short_name(self):
         return self.first_name
@@ -136,3 +143,10 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
+
+    class Meta:
+        verbose_name = "Epilepsy12 User",
+        verbose_name_plural = "Epilepsy12 Users"
+
+    def __str__(self) -> str:
+        return self.get_full_name()

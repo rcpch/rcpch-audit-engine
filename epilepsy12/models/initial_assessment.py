@@ -47,18 +47,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True,
         default=None
     )
-    when_the_first_epileptic_episode_occurred_confidence = models.CharField(
-        "how accurate is the date of the first epileptic episode?",
-        max_length=3,
-        choices=DATE_ACCURACY,
-        default=None,
-        null=True
-    )
-    when_the_first_epileptic_episode_occurred = models.DateField(
-        "what is the date that the first epileptic episode occurred?",
-        null=True,
-        default=None
-    )
     has_number_of_episodes_since_the_first_been_documented = models.BooleanField(
         "has the frequency of episodes since the first recorded been documented?",
         null=True,
@@ -84,6 +72,7 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True,
         default=None
     )
+
     diagnostic_status = models.CharField(  # This currently essential - used to exclude nonepilepic kids
         max_length=1,
         choices=DIAGNOSTIC_STATUS,
@@ -91,72 +80,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         default=None,
         null=True
     )
-    episode_definition = models.CharField(
-        max_length=1,
-        choices=EPISODE_DEFINITION,
-        verbose_name="Episode definition. Part of case definition and defines if represents a cluster or discrete episodes.",
-        default=None,
-        null=True
-    )
-
-    @property
-    def epilepsy_decimal_years(self):
-        # this is a calculated field - it relies on the availability of the date of the first seizure
-        # "Years elapsed since first seizure.",
-        if (self.when_the_first_epileptic_episode_occurred):
-            today = date.today()
-
-            today = date.today()
-        calculated_age = relativedelta.relativedelta(
-            today, self.when_the_first_epileptic_episode_occurred)
-        months = calculated_age.months
-        years = calculated_age.years
-        weeks = calculated_age.weeks
-        days = calculated_age.days
-        final = ''
-        if years == 1:
-            final += f'{calculated_age.years} year'
-            if (months/12) - years == 1:
-                final += f'{months} month'
-            elif (months/12)-years > 1:
-                final += f'{math.floor((months*12)-years)} months'
-            else:
-                return final
-
-        elif years > 1:
-            final += f'{calculated_age.years} years'
-            if (months/12) - years == 1:
-                final += f', {months} month'
-            elif (months/12)-years > 1:
-                final += f', {math.floor((months*12)-years)} months'
-            else:
-                return final
-        else:
-            # under a year of age
-            if months == 1:
-                final += f'{months} month'
-            elif months > 0:
-                final += f'{months} months, '
-                if weeks >= (months*4):
-                    if (weeks-(months*4)) == 1:
-                        final += '1 week'
-                    else:
-                        final += f'{math.floor(weeks-(months*4))} weeks'
-            else:
-                if weeks > 0:
-                    if weeks == 1:
-                        final += f'{math.floor(weeks)} week'
-                    else:
-                        final += f'{math.floor(weeks)} weeks'
-                else:
-                    if days > 0:
-                        if days == 1:
-                            final += f'{math.floor(days)} day'
-                        if days > 1:
-                            final += f'{math.floor(days)} days'
-                    else:
-                        final += 'Happy birthday'
-        return final
 
     # relationships
     registration = models.OneToOneField(
@@ -167,8 +90,8 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     class Meta:
         indexes = [models.Index(fields=['date_of_initial_assessment'])]
-        verbose_name = 'initial assessment'
-        verbose_name_plural = 'initial assessments'
+        verbose_name = 'First Paediatric Assessment'
+        verbose_name_plural = 'First Paediatric Assessments'
 
     def save(
             self,

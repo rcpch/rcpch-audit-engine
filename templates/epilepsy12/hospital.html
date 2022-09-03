@@ -67,16 +67,28 @@
                     {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" %}
                 </div>
                 <div class="four wide column">
-                    {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
-                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases %}
+                    {% if total_cases is not None and total_cases > 0%}
+                        {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
+                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases %}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
                 </div>
                 <div class="four wide column">
-                    {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
-                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases %}
+                    {% if total_cases is not None and total_cases > 0%}
+                        {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
+                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases %}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
                 </div>
                 <div class="four wide column">
-                    {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
-                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases %}
+                    {% if total_cases is not None and total_cases > 0%}
+                        {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
+                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases %}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
                 </div>
             
 
@@ -85,7 +97,7 @@
     </div>
     <div class="ui bottom attached message" id="bottom_attached_message">
         <div>
-            <a href="{% url 'cases' %}"><button class="ui rcpch_dark_blue button">All Registered Children</button></a>
+            <a href="{% url 'cases' %}"><button class="ui rcpch_primary button">All Registered Children</button></a>
         </div>
     </div>
 
@@ -95,10 +107,11 @@
                 <div class="column">
                     <div class="ui inverted segment" id="chat">
                         <h5 class="header">
-                            Events
+                            Activity
                         </h5>
 
                         <div class="ui feed">
+                        {% if all_models|length > 0%}
 
                             {% for model in all_models %}
 
@@ -112,7 +125,7 @@
                                         <div class="summary">
                                             <a class="user">
                                                 {{model.updated_by}}
-                                            </a> updated a record in {{model | to_class_name }} for {{model.registration.case}}
+                                            </a> updated a record in {{model|to_class_name }} for {{model.registration.case}}
                                             <div class="date">
                                                 {{model.updated_at}}
                                             </div>
@@ -127,7 +140,9 @@
 
                             {% endfor %}
 
-
+                        {% else %}
+                        <div class='ui rcpch_info message'>No one has made any changes yet...</div>
+                        {% endif %}
                         </div>
                     </div>
 

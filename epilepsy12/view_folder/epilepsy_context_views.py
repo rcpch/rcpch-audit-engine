@@ -15,8 +15,6 @@ from django_htmx.http import trigger_client_event
 def epilepsy_context(request, case_id):
 
     registration = Registration.objects.filter(case=case_id).first()
-    comorbidities = Comorbidity.objects.filter(
-        case=case_id).all()
 
     epilepsy_context, created = EpilepsyContext.objects.get_or_create(
         registration=registration)
@@ -29,8 +27,7 @@ def epilepsy_context(request, case_id):
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
         "audit_progress": epilepsy_context.registration.audit_progress,
-        "active_template": "epilepsy_context",
-        "comorbidities": comorbidities
+        "active_template": "epilepsy_context"
     }
 
     response = render(
@@ -205,6 +202,86 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
     return response
 
 
+def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
+    """
+    HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
+
+    experienced_prolonged_generalized_convulsive_seizures = request.htmx.trigger_name
+    # validation here TODO
+
+    try:
+        EpilepsyContext.objects.filter(
+            pk=epilepsy_context_id).update(
+                experienced_prolonged_generalized_convulsive_seizures=experienced_prolonged_generalized_convulsive_seizures,
+                updated_at=timezone.now(),
+                updated_by=request.user)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    test_fields_update_audit_progress(epilepsy_context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/epilepsy_context/experienced_prolonged_generalized_convulsive_seizures.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
+    """
+    HTMX callback from the experienced_prolonged_focal_seizures partial, 
+    parent of single_choice_multiple_toggle
+    Updates the model and returns the same partial
+    """
+
+    experienced_prolonged_focal_seizures = request.htmx.trigger_name
+    # validation here TODO
+
+    try:
+        EpilepsyContext.objects.filter(
+            pk=epilepsy_context_id).update(
+                experienced_prolonged_focal_seizures=experienced_prolonged_focal_seizures,
+                updated_at=timezone.now(),
+                updated_by=request.user)
+    except Exception as error:
+        print(error)
+        return HttpResponse(error)
+
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    test_fields_update_audit_progress(epilepsy_context)
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/epilepsy_context/experienced_prolonged_focal_seizures.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -286,6 +363,6 @@ def total_fields_expected(model_instance):
 
     """
 
-    cumulative_fields = 5
+    cumulative_fields = 7
 
     return cumulative_fields

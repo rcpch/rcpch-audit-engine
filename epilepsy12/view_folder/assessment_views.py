@@ -266,6 +266,8 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
             site_is_actively_involved_in_epilepsy_care=True
         ).get()
         site.site_is_general_paediatric_centre = True
+        site.updated_at = timezone.now(),
+        site.updated_by = request.user
         site.save()
         Site.objects.get(pk=site_id).delete()
 
@@ -462,7 +464,9 @@ def paediatric_neurologist_referral_made(request, assessment_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Assessment.objects.filter(pk=assessment_id).update(
-                paediatric_neurologist_referral_made=True)
+                paediatric_neurologist_referral_made=True,
+                updated_at=timezone.now(),
+                updated_by=request.user)
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
                 paediatric_neurologist_referral_made=False,
@@ -935,7 +939,10 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Assessment.objects.filter(pk=assessment_id).update(
-                childrens_epilepsy_surgical_service_referral_criteria_met=True)
+                childrens_epilepsy_surgical_service_referral_criteria_met=True,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
                 childrens_epilepsy_surgical_service_referral_criteria_met=False,
@@ -1181,7 +1188,6 @@ def epilepsy_surgery_centre(request, assessment_id):
     assessment_id passed to hospital_list partial from
     epilepsy_surgery partial which is its parent
     """
-    print(request.POST)
     epilepsy_surgery_centre = HospitalTrust.objects.get(pk=request.POST.get(
         'epilepsy_surgery_centre'))
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -1484,7 +1490,10 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
         # no selection - get the name of the button
         if request.htmx.trigger_name == 'button-true':
             Assessment.objects.filter(pk=assessment_id).update(
-                epilepsy_specialist_nurse_referral_made=True)
+                epilepsy_specialist_nurse_referral_made=True,
+                updated_at=timezone.now(),
+                updated_by=request.user
+            )
         elif request.htmx.trigger_name == 'button-false':
             Assessment.objects.filter(pk=assessment_id).update(
                 epilepsy_specialist_nurse_referral_made=False,
@@ -1833,7 +1842,6 @@ def total_fields_completed(model_instance):
         if (
                 getattr(model_instance, field.name) is not None
                 and field.name not in ['id', 'registration', 'created_by', 'created_at', 'updated_by', 'updated_at']):
-            print(field.name)
             counter += 1
     # must include centres allocated also
     sites = Site.objects.filter(
@@ -1857,5 +1865,5 @@ def test_fields_update_audit_progress(model_instance):
     AuditProgress.objects.filter(registration=model_instance.registration).update(
         assessment_total_expected_fields=all_fields,
         assessment_total_completed_fields=all_completed_fields,
-        assessment_complete=all_completed_fields == all_fields
+        assessment_complete=all_completed_fields == all_fields,
     )

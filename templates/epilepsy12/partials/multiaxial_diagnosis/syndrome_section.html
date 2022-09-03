@@ -1,0 +1,28 @@
+{% url 'syndrome_present' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present label='Is there an identifiable epilepsy syndrome?' data_position='top left' %}
+
+{% if multiaxial_diagnosis.syndrome_present %}
+
+    <div class='ui rcpch_info message'>
+    A child or young person's epilepsy may fulfill criteria for an epilepsy syndrome. This list may evolve over time.
+    </div>
+
+    <div id='syndromes' class='field'>
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/syndromes.html' with syndromes=syndromes %}
+    </div>
+
+    <div class="field" id='syndrome'>
+
+        <button 
+            class="ui rcpch_primary button"
+            hx-post="{% url 'add_syndrome' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
+            hx-target="#syndrome"
+            hx-swap='innerHTML'
+            hx-trigger='click'
+        >
+        Add a new Syndrome
+        </button>
+
+    </div>
+
+{% endif %}

@@ -1,0 +1,16 @@
+        {% if episode.description_keywords|length > 0 %}
+            
+                {% for keyword in episode.description_keywords %}
+                    {% url 'delete_description_keyword' episode.pk forloop.counter0 as hx_post %}
+                    <div 
+                        class='ui rcpch_light_blue label'
+                    >{{keyword}}
+                        <i class='icon close' 
+                            hx-post='{{hx_post}}' 
+                            hx-target='#description_results' 
+                            hx-trigger='click' 
+                            hx-swap='innerHTML'></i>
+                    </div>
+                {% endfor %}
+            
+        {% endif %}

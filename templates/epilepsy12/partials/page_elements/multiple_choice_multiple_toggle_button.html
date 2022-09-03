@@ -1,0 +1,68 @@
+{% comment %}
+        This is a single choice multiple option toggle button which is reused in multiple places following
+        an audit design decision to constrain as many fields as possible
+        to boolean values. This means that each selection has 3 potential values: 
+        unselected, true and false. Unselected is important because 
+        the epilepsy team want default values to be unselected, 
+        encouraging users actively to choose if a given field is true or false.
+        This also means that unselected fields can be counted and register that model as incomplete
+        This toggle button accepts the following parameters:
+            choices: these are the choices available
+            hx_post: the url posted to including parameters
+            hx_target: the id of the html element to target the server response
+            hx_trigger: usually 'click' but can be any event
+            hx_swap: usually 'innerHTML'
+            test_positive: the model boolean field 
+            label: this is the label text
+            data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
+        The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
+        Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
+    {% endcomment %}
+
+    
+<label class="toggle_button_label">{{label}}</label>
+<div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <span>
+
+        {% if test_positive|length > 0 %}
+            <i class="rcpch_pink check circle outline icon"></i>
+        {% else %}
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+        {% endif %}
+
+        <div class="ui rcpch_dark_blue buttons">
+                
+            {% for choice in choices %}
+                {% if choice.0 in test_positive %}
+                    <div 
+                        class="ui mini compact positive rcpch_dark_blue button"
+                        class="ui mini compact rcpch_dark_blue button"
+                        hx-target="{{hx_target}}"
+                        hx-post="{{hx_post}}"
+                        hx-swap="{{hx_swap}}"
+                        hx-trigger='{{hx_trigger}}'
+                        name="{{choice.0}}"
+                    >{{choice.1}}</div>
+                {% else %}
+                    <div 
+                        class="ui mini compact rcpch_dark_blue button"
+                        hx-target="{{hx_target}}"
+                        hx-post="{{hx_post}}"
+                        hx-swap="{{hx_swap}}"
+                        hx-trigger='{{hx_trigger}}'
+                        name="{{choice.0}}"
+                    >{{choice.1}}
+                    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+                
+    </span>
+    
+</div>
+
+    

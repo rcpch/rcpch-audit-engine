@@ -2,7 +2,7 @@
 
   {% csrf_token %}
 
-  <div class='ui info message'>
+  <div class='ui rcpch_info message'>
   The initial assessment must be completed with x weeks of the reported episode.
   </div>
 
@@ -20,14 +20,12 @@
   Involving General Paediatrics
   </h5>
 
-
-
   <div id='general_paediatrics_referral_made' class="field">
     {% include 'epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html' with initial_assessment=initial_assessment %}
   </div>
 
   <h5 class='header'>
-    The first episode
+    Information gathered at the first paediatric assessment
   </h5>
 
   <div id='when_the_first_epileptic_episode_occurred'>

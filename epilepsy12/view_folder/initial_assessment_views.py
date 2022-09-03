@@ -35,7 +35,6 @@ def initial_assessment(request, case_id):
         "chronicity_selection": CHRONICITY,
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
         "audit_progress": registration.audit_progress,
         "active_template": "initial_assessment"
     }
@@ -77,7 +76,7 @@ def date_of_initial_assessment(request, initial_assessment_id):
         pk=initial_assessment_id)
 
     context = {
-        "initial_assessment": initial_assessment
+        "initial_assessment": initial_assessment,
     }
 
     test_fields_update_audit_progress(initial_assessment)
@@ -143,26 +142,22 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
     same partial.
     """
 
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-
-    general_paediatrics_referral_made = not initial_assessment.general_paediatrics_referral_made
-
-    if general_paediatrics_referral_made:
-        InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(
-                general_paediatrics_referral_made=True,
-                updated_at=timezone.now(),
-                updated_by=request.user
+    if request.htmx.trigger_name == 'button-true':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            general_paediatrics_referral_made=True,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            general_paediatrics_referral_made=False,
+            date_of_referral_to_general_paediatrics=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
         )
     else:
-        InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(
-                general_paediatrics_referral_made=False,
-                date_of_referral_to_general_paediatrics=None,
-                updated_at=timezone.now(),
-                updated_by=request.user
-        )
+        print("Some mistake happened")
+        # TODO need to handle this
 
     initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
@@ -226,145 +221,34 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
     return response
 
 
-def when_the_first_epileptic_episode_occurred(request, initial_assessment_id):
-
-    when_the_first_epileptic_episode_occurred = request.POST.get(
-        'when_the_first_epileptic_episode_occurred')
-
-    if when_the_first_epileptic_episode_occurred:
-        new_date = datetime.strptime(
-            when_the_first_epileptic_episode_occurred, "%Y-%m-%d").date()
-        # TODO validation goes here
-
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                when_the_first_epileptic_episode_occurred=new_date,
-                updated_at=timezone.now(),
-                updated_by=request.user
-            )
-        except Exception as error:
-            message = error
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-
-    context = {
-        'initial_assessment_id': initial_assessment_id,
-        'initial_assessment': initial_assessment,
-        "chronicity_selection": CHRONICITY,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
-    }
-
-    test_fields_update_audit_progress(initial_assessment)
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-def when_the_first_epileptic_episode_occurred_confidence(request, initial_assessment_id):
-    """
-    HTMX callback from when_the_first_epileptic_episode_occurred
-    """
-    when_the_first_epileptic_episode_occurred_confidence = request.htmx.trigger_name
-
-    if when_the_first_epileptic_episode_occurred_confidence:
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                when_the_first_epileptic_episode_occurred_confidence=when_the_first_epileptic_episode_occurred_confidence,
-                updated_at=timezone.now(),
-                updated_by=request.user
-            )
-        except Exception as error:
-            message = error
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-
-    context = {
-        'initial_assessment_id': initial_assessment_id,
-        'initial_assessment': initial_assessment,
-        "chronicity_selection": CHRONICITY,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
-    }
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-def has_description_of_the_episode_or_episodes_been_gathered(request, initial_assessment_id):
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-    has_description_of_the_episode_or_episodes_been_gathered = not initial_assessment.has_description_of_the_episode_or_episodes_been_gathered
-
-    try:
-        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            has_description_of_the_episode_or_episodes_been_gathered=has_description_of_the_episode_or_episodes_been_gathered)
-    except Exception as error:
-        return HttpResponse(error)
-
-    new_initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-
-    context = {
-        "initial_assessment": new_initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
-    }
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
 def has_number_of_episodes_since_the_first_been_documented(request, initial_assessment_id):
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-    has_number_of_episodes_since_the_first_been_documented = not initial_assessment.has_number_of_episodes_since_the_first_been_documented
-
-    try:
+    """
+    POST request from toggle in has_number_of_episodes_since_the_first_been_documented partial
+    """
+    if request.htmx.trigger_name == 'button-true':
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            has_number_of_episodes_since_the_first_been_documented=has_number_of_episodes_since_the_first_been_documented,
+            has_number_of_episodes_since_the_first_been_documented=True,
             updated_at=timezone.now(),
             updated_by=request.user
         )
-    except Exception as error:
-        return HttpResponse(error)
+    elif request.htmx.trigger_name == 'button-false':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            has_number_of_episodes_since_the_first_been_documented=False,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
 
     new_initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     context = {
         "initial_assessment": new_initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
+        # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     response = render(
@@ -379,27 +263,33 @@ def has_number_of_episodes_since_the_first_been_documented(request, initial_asse
 
 
 def general_examination_performed(request, initial_assessment_id):
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-    general_examination_performed = not initial_assessment.general_examination_performed
-
-    try:
+    """
+    POST request from toggle in has_general_examination_performed partial
+    """
+    if request.htmx.trigger_name == 'button-true':
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            general_examination_performed=general_examination_performed,
+            general_examination_performed=True,
             updated_at=timezone.now(),
-            updated_by=request.user)
-    except Exception as error:
-        return HttpResponse(error)
+            updated_by=request.user
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            general_examination_performed=False,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
 
     new_initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     context = {
         "initial_assessment": new_initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
+        # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     response = render(
@@ -414,27 +304,33 @@ def general_examination_performed(request, initial_assessment_id):
 
 
 def neurological_examination_performed(request, initial_assessment_id):
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-    neurological_examination_performed = not initial_assessment.neurological_examination_performed
-
-    try:
+    """
+    POST request from toggle in neurological_examination_performed partial
+    """
+    if request.htmx.trigger_name == 'button-true':
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            neurological_examination_performed=neurological_examination_performed,
+            neurological_examination_performed=True,
             updated_at=timezone.now(),
-            updated_by=request.user)
-    except Exception as error:
-        return HttpResponse(error)
+            updated_by=request.user
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            neurological_examination_performed=False,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
 
     new_initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     context = {
         "initial_assessment": new_initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
+        # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     response = render(
@@ -449,27 +345,33 @@ def neurological_examination_performed(request, initial_assessment_id):
 
 
 def developmental_learning_or_schooling_problems(request, initial_assessment_id):
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-    developmental_learning_or_schooling_problems = not initial_assessment.developmental_learning_or_schooling_problems
-
-    try:
+    """
+    POST request from toggle in developmental_learning_or_schooling_problems partial
+    """
+    if request.htmx.trigger_name == 'button-true':
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            developmental_learning_or_schooling_problems=developmental_learning_or_schooling_problems,
+            developmental_learning_or_schooling_problems=True,
             updated_at=timezone.now(),
-            updated_by=request.user)
-    except Exception as error:
-        return HttpResponse(error)
+            updated_by=request.user
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            developmental_learning_or_schooling_problems=False,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
 
     new_initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     context = {
         "initial_assessment": new_initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
+        # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     response = render(
@@ -484,27 +386,33 @@ def developmental_learning_or_schooling_problems(request, initial_assessment_id)
 
 
 def behavioural_or_emotional_problems(request, initial_assessment_id):
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-    behavioural_or_emotional_problems = not initial_assessment.behavioural_or_emotional_problems
-
-    try:
+    """
+    POST request from toggle in developmental_learning_or_schooling_problems partial
+    """
+    if request.htmx.trigger_name == 'button-true':
         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            behavioural_or_emotional_problems=behavioural_or_emotional_problems,
+            behavioural_or_emotional_problems=True,
             updated_at=timezone.now(),
-            updated_by=request.user)
-    except Exception as error:
-        return HttpResponse(error)
+            updated_by=request.user
+        )
+    elif request.htmx.trigger_name == 'button-false':
+        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+            behavioural_or_emotional_problems=False,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+    else:
+        print("Some mistake happened")
+        # TODO need to handle this
 
     new_initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     context = {
         "initial_assessment": new_initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
+        # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     response = render(
@@ -531,45 +439,6 @@ def diagnostic_status(request, initial_assessment_id):
                 updated_at=timezone.now(),
                 updated_by=request.user
         )
-    except Exception as error:
-        print(error)
-        return HttpResponse(error)
-
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
-
-    context = {
-        "initial_assessment": initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
-    }
-
-    test_fields_update_audit_progress(initial_assessment)
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
-
-# trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-def episode_definition(request, initial_assessment_id):
-
-    episode_definition = request.POST.get(
-        'episode_definition')
-    # validation here TODO
-
-    try:
-        InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(
-                episode_definition=episode_definition,
-                updated_at=timezone.now(),
-                updated_by=request.user)
     except Exception as error:
         print(error)
         return HttpResponse(error)
@@ -624,7 +493,6 @@ def completed_fields(model_instance):
     developmental_learning_or_schooling_problems
     behavioural_or_emotional_problems
     diagnostic_status
-    episode_definition
     """
     fields = model_instance._meta.get_fields()
     counter = 0
@@ -633,7 +501,6 @@ def completed_fields(model_instance):
             getattr(model_instance, field.name) is not None
             and field.name not in ['id', 'registration', 'created_at', 'updated_at', 'created_by', 'updated_by']
         ):
-            print(field.name)
             counter += 1
     return counter
 
@@ -646,22 +513,18 @@ def total_fields_expected(model_instance):
     general_paediatrics_referral_made
     date_of_referral_to_general_paediatrics
     first_paediatric_assessment_in_acute_or_nonacute_setting
-    has_description_of_the_episode_or_episodes_been_gathered
-    when_the_first_epileptic_episode_occurred_confidence
-    when_the_first_epileptic_episode_occurred
     has_number_of_episodes_since_the_first_been_documented
     general_examination_performed
     neurological_examination_performed
     developmental_learning_or_schooling_problems
     behavioural_or_emotional_problems
     diagnostic_status
-    episode_definition
 
     if general_paediatrics_referral_made then add an additional field for the date
 
     """
 
-    cumulative_fields = 13
+    cumulative_fields = 9
     if model_instance.date_of_referral_to_general_paediatrics:
         cumulative_fields += 1
 

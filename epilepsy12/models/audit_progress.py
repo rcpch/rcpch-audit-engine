@@ -64,16 +64,16 @@ class AuditProgress(models.Model):
         default=0,
         null=True
     )
-    multiaxial_description_complete = models.BooleanField(
+    multiaxial_diagnosis_complete = models.BooleanField(
         null=True,
         default=False
     )
-    multiaxial_description_total_expected_fields = models.SmallIntegerField(
+    multiaxial_diagnosis_total_expected_fields = models.SmallIntegerField(
         "Total Number of fields expected",
         default=0,
         null=True
     )
-    multiaxial_description_total_completed_fields = models.SmallIntegerField(
+    multiaxial_diagnosis_total_completed_fields = models.SmallIntegerField(
         "Total Number of fields completed",
         default=0,
         null=True

@@ -1,0 +1,42 @@
+
+
+<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <div class="ui rcpch_pink segment">
+
+            <h5 class="ui header">
+                <div class='content'>
+                    When
+                    <div class='sub header'>
+                    When was the comorbidity diagnosed?
+                    </div>
+                </div>
+            </h5>
+    
+        <div class="field">
+            {% url 'comorbidity_diagnosis_date' comorbidity_id=comorbidity.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label='When was the comorbidity diagnosed?' input_date_field_name='comorbidity_diagnosis_date' %}
+        </div>
+
+        <div class="field">
+            {% url 'comorbidity_diagnosis' comorbidity_id=comorbidity.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidity_diagnosis' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidity_diagnosis label='Select a comorbidity' data_position='top left' %}
+        </div>
+
+        <div class='field'>
+            <button class='ui rcpch_primary button'
+                hx-trigger='click'
+                hx-post='{% url "comorbidities" multiaxial_diagnosis_id=comorbidity.multiaxial_diagnosis.pk %}'
+                hx-swap='innerHTML'
+                name='comorbidity_return'
+                hx-target='#comorbidities'
+            >
+            Comorbidity entry complete for {{comorbidity.multiaxial_diagnosis.registration.case}}
+            </div>
+        </div>
+
+    </div>
+    
+    
+
+</div>

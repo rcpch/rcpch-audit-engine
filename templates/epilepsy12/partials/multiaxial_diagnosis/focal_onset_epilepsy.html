@@ -1,0 +1,55 @@
+<div class="ui grid">
+
+    <div class="four wide column">
+        <h5>
+        Laterality (patient)
+        </h5>
+            <div class="container">
+                <div class="radio-tile-group">
+                {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/radio_button_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=LATERALITY hx_field_list_name="LATERALITY"  %}
+                </div>
+            </div>
+    
+    </div>
+
+    <div class="four wide column">
+        <h5>
+        Motor manifestations
+        </h5>
+
+            {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/radio_button_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS" %}
+    </div>
+
+    <div class="four wide column">
+
+        <h5>
+        Non-motor manifestations
+        </h5>
+
+            <div class="container">
+                <div class="radio-tile-group">
+                    {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/radio_button_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS" %}
+                </div>
+            </div>
+    
+    </div>
+
+    <div class="four wide column">
+
+        <h5>
+        EEG manifestations
+        </h5>
+
+            <div class="container">
+                <div class="radio-tile-group">
+                    {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/radio_button_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_EEG_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_EEG_MANIFESTATIONS" %}
+                </div>
+            </div>
+    
+    </div>
+
+</div>

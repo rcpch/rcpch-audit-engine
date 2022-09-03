@@ -1,0 +1,95 @@
+<div>
+{% if episodes|length > 0 %}
+    <table class="ui rcpch basic table">
+        <thead>
+            <tr>
+                <th>Episode date</th>
+                <th>Epilepsy Status</th>
+                <th>Onset</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for episode in episodes %}
+        <tr>
+            <td>
+                {% if episode.seizure_onset_date %}
+                    {{episode.seizure_onset_date}}
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                    Add date...
+                {% endif %}
+            </td>
+            <td>
+                {% if episode.epilepsy_or_nonepilepsy_status is not None %}
+                    {{episode.get_epilepsy_or_nonepilepsy_status_display}}
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                    Uncompleted field
+                {% endif %}
+            </td>
+            {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
+                <td>
+                    {% if episode.epileptic_seizure_onset_type %}
+                        {{episode.get_epileptic_seizure_onset_type_display}}
+                    {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                        Uncompleted field
+                    {% endif %}
+                </td>
+            {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
+                {% if episode.nonepileptic_seizure_type %}
+                        {{episode.get_nonepileptic_seizure_type_display}}
+                    {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                        Uncompleted field
+                    {% endif %}
+            {% else %}
+                <td>Not applicable</td>
+            {% endif %}
+            <td>
+                <div 
+                    class="ui rcpch_light_blue buttons">
+                    <button 
+                        class="ui rcpch_primary button"
+                        hx-post='{% url "edit_episode" episode.pk %}'
+                        hx-target='#episode'
+                        hx-trigger='click'
+                        hx-swap='innerHTML'
+                    >
+                        Edit
+                    </button>
+                    <button 
+                        class="ui rcpch_red icon button"
+                        hx-post='{% url "remove_episode" episode_id=episode.pk %}'
+                        hx-target='#episodes'
+                        hx-trigger='click'
+                        hx-swap='innerHTML'
+                    >
+                        <i class='trash alternate outline icon'></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    {% if not there_are_epileptic_episodes %}
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+            There are no documented epileptic episodes so far. At least one epileptic episode must be entered to be include in Epilepsy12.
+        </div>
+    {% endif %}
+{% endif %}
+</div>

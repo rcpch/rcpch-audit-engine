@@ -1,7 +1,6 @@
-from http.client import HTTPResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from datetime import date, datetime
+from datetime import date
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
@@ -20,7 +19,7 @@ def register(request, case_id):
             initial_assessment_complete=False,
             assessment_complete=False,
             epilepsy_context_complete=False,
-            multiaxial_description_complete=False,
+            multiaxial_diagnosis_complete=False,
             management_complete=False,
             investigations_complete=False,
             registration_total_expected_fields=4,
@@ -31,8 +30,8 @@ def register(request, case_id):
             assessment_total_completed_fields=0,
             epilepsy_context_total_expected_fields=0,
             epilepsy_context_total_completed_fields=0,
-            multiaxial_description_total_expected_fields=0,
-            multiaxial_description_total_completed_fields=0,
+            multiaxial_diagnosis_total_expected_fields=0,
+            multiaxial_diagnosis_total_completed_fields=0,
             investigations_total_expected_fields=0,
             investigations_total_completed_fields=0,
             management_total_expected_fields=0,
@@ -178,6 +177,7 @@ def allocate_lead_site(request, registration_id):
     return response
 
 
+@login_required
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -209,6 +209,7 @@ def edit_lead_site(request, registration_id, site_id):
     return response
 
 
+@login_required
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -237,6 +238,7 @@ def transfer_lead_site(request, registration_id, site_id):
     return response
 
 
+@login_required
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -264,6 +266,7 @@ def cancel_lead_site(request, registration_id, site_id):
     return response
 
 
+@login_required
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
@@ -328,6 +331,7 @@ def update_lead_site(request, registration_id, site_id, update):
     return response
 
 
+@login_required
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -609,22 +613,8 @@ def total_fields_completed(model_instance):
     for field in fields:
         if (
             field.name is not None and
-            field.name != 'id' and
-            field.name != 'site' and
-            field.name != 'initial_assessment'
-            and field.name != 'initialassessment'
-            and field.name != 'management'
-            and field.name != 'investigations'
-            and field.name != 'assessment'
-            and field.name != 'epilepsy_context'
-            and field.name != 'epilepsycontext'
-            and field.name != 'registration'
-            and field.name != 'audit_progress'
-            and field.name != 'created_at'
-            and field.name != 'created_by'
-            and field.name != 'updated_by'
-            and field.name != 'updated_at'
-            and field.name != 'case'
+            field.name not in ['id', 'site', 'initialassessment', 'management', 'investigations', 'assessment', 'epilepsy_context',
+                               'epilepsycontext', 'registration', 'audit_progress', 'created_at', 'created_by', 'updated_by', 'updated_at', 'case', 'episode', 'syndrome', 'multiaxialdiagnosis', 'registration_close_date', 'cohort']
         ):
             if getattr(model_instance, field.name) is not None:
                 counter += 1

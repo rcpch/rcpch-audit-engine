@@ -46,6 +46,21 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         default=None,
     )
 
+    experienced_prolonged_generalized_convulsive_seizures = models.CharField(
+        "Has the child at any point in time experienced prolonged generalised convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+        max_length=2,
+        default=None,
+        null=True,
+        choices=OPT_OUT_UNCERTAIN,
+    )
+    experienced_prolonged_focal_seizures = models.CharField(
+        "Has the child at any point in time experienced prolonged generalised convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+        max_length=2,
+        default=None,
+        null=True,
+        choices=OPT_OUT_UNCERTAIN,
+    )
+
     # relationships
     registration = models.OneToOneField(
         Registration,
@@ -55,8 +70,8 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = 'epilepsy context'
-        verbose_name_plural = 'epilepsy contexts'
+        verbose_name = 'Epilepsy Context'
+        verbose_name_plural = 'Epilepsy Contexts'
 
     def save(
             self,

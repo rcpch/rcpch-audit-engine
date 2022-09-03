@@ -56,6 +56,110 @@ def snomed_search(search_term):
     return serialised
 
 
+def fetch_all_epilepsy():
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint=<<84757009&offset=0&limit=1000'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def fetch_all_hereditary_epilepsy():
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def fetch_ecl(ecl):
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint={ecl}&offset=0&limit=1000'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def search_ecl(search, ecl):
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search}&constraint={ecl}&offset=0&limit=1000'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def search_all_epilepsy(search):
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search}\&constraint=<<84757009&offset=0&limit=1000'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def search_all_hereditary_epilepsy(search):
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search}\&constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
+def snomed_search_congenital_neurology(search_term):
+    # developmental hereditary disorder | 363070008
+    # 57148006 |Congenital anomaly of brain (disorder)| +
+    # 35919005 |Pervasive developmental disorder (disorder)| +
+    # 363235000 |Hereditary disorder of nervous system (disorder)| +
+
+    # 39367000 |Inflammatory disease of the central nervous system (disorder)|
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_term}\&constraint=<84757009'
+
+    response = requests.get(search_url)
+
+    if response.status_code == 404:
+        print("Could not get SNOMED data from server...")
+        return None
+
+    serialised = response.json()
+
+    return serialised
+
+
 def snomed_medicine_search(search_term):
     search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_term}\&constraint=<373873005'
 

@@ -141,18 +141,17 @@
         {% endif %}
     {% endif %}
     
-    
-    {% if audit_progress.multiaxial_description_complete %}
-      {% if active_template == "multiaxial_description" %}
+    {% if audit_progress.multiaxial_diagnosis_complete %}
+      {% if active_template == "multiaxial_diagnosis" %}
 
-        <a class="active completed step" href="{% url 'multiaxial_description' case_id %}">
+        <a class="active completed step" href="{% url 'multiaxial_diagnosis' case_id %}">
           <div class="content">
               <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
         </a>
       {% else %}
-        <a class="completed step" href="{% url 'multiaxial_description' case_id %}">
+        <a class="completed step" href="{% url 'multiaxial_diagnosis' case_id %}">
           <div class="content">
               <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
@@ -160,23 +159,23 @@
         </a>
       {% endif %}
     {% else %}
-        {% if active_template == "multiaxial_description" %}
+        {% if active_template == "multiaxial_diagnosis" %}
 
-          <a href="{% url 'multiaxial_description' case_id %}" class="active step">
+          <a href="{% url 'multiaxial_diagnosis' case_id %}" class="active step">
             <div class="content">
               <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
           </a>
         {% elif active_template == "none" %}
-          <a href="{% url 'multiaxial_description' case_id %}" class="disabled step">
+          <a href="{% url 'multiaxial_diagnosis' case_id %}" class="disabled step">
             <div class="content">
               <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
             </div>
           </a>
         {% else %}
-          <a href="{% url 'multiaxial_description' case_id %}" class="step">
+          <a href="{% url 'multiaxial_diagnosis' case_id %}" class="step">
             <div class="content">
               <div class="title">Multiaxial Diagnosis</div>
               <div class="description">DESSCRIBE definition</div>
@@ -354,10 +353,10 @@
       {% endwith %}
     {% endif %}
     
-    {% if active_template == "multiaxial_description" %}
+    {% if active_template == "multiaxial_diagnosis" %}
       
-          {% with numerator=audit_progress.multiaxial_description_total_completed_fields %}
-          {% with denominator=audit_progress.multiaxial_description_total_expected_fields %}
+          {% with numerator=audit_progress.multiaxial_diagnosis_total_completed_fields %}
+          {% with denominator=audit_progress.multiaxial_diagnosis_total_expected_fields %}
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}

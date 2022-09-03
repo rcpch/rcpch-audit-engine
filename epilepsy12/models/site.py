@@ -55,8 +55,8 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = 'site'
-        verbose_name_plural = 'sites'
+        verbose_name = 'Site'
+        verbose_name_plural = 'Sites'
 
     def __str__(self) -> str:
         return self.hospital_trust.ParentName

@@ -12,13 +12,8 @@
 {% endcomment %}
 
     <div class="field">
-        {% if date_value is None %}
-            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
-                <label>{{label}}</label>
-            </span>
-        {% else %}
-            <label>{{label}}</label>
-        {% endif %}
+        
+        <label>{{label}}</label>
         <div class='ui left icon input'>
             <input 
                 type="date"
@@ -37,4 +32,5 @@
                 <i class="rcpch_pink check circle outline icon"></i>
             {% endif %}
         </div>
+        
     </div>

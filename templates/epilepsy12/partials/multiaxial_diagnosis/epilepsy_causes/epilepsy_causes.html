@@ -1,0 +1,14 @@
+<div class="field" id='epilepsy_cause_categories'>
+    {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_cause_categories.html' with choices=epilepsy_cause_selection multiaxial_diagnosis=multiaxial_diagnosis %}
+</div>
+
+<div class="field">
+
+    {% url "epilepsy_cause" multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=epilepsy_causes hx_post=hx_post hx_name='epilepsy_cause' hx_default_text='Select a cause' hx_swap='innerHTML' hx_target='#epilepsy_causes' hx_trigger='change' test_positive=multiaxial_diagnosis.epilepsy_cause %}
+
+</div>
+
+<script>
+$('.ui.dropdown').dropdown()
+</script>
