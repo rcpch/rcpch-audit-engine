@@ -70,8 +70,8 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = 'epilepsy context'
-        verbose_name_plural = 'epilepsy contexts'
+        verbose_name = 'Epilepsy Context'
+        verbose_name_plural = 'Epilepsy Contexts'
 
     def save(
             self,

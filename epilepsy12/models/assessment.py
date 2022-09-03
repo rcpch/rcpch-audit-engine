@@ -138,8 +138,8 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "assessment",
-        verbose_name_plural = "assessments"
+        verbose_name = "Milestones",
+        verbose_name_plural = "Milestones"
 
     def __str__(self) -> str:
         return "assessment"

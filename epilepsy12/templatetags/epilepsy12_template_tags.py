@@ -95,5 +95,17 @@ def to_class_name(value):
         return 'Investigations'
     elif value.__class__.__name__ == "Management":
         return 'Management'
+    elif value.__class__.__name__ == "Site":
+        return 'Site'
+    elif value.__class__.__name__ == "Episode":
+        return 'Episode'
+    elif value.__class__.__name__ == "Syndrome":
+        return 'Syndrome'
+    elif value.__class__.__name__ == "Comorbidity":
+        return 'Comorbidity'
+    elif value.__class__.__name__ == "Epilepsy12User":
+        return 'Epilepsy12 User'
+    elif value.__class__.__name__ == "Antiepilepsy Medicine":
+        return 'Antiepilepsy Medicine'
     else:
         return 'Error'

@@ -90,8 +90,8 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     class Meta:
         indexes = [models.Index(fields=['date_of_initial_assessment'])]
-        verbose_name = 'initial assessment'
-        verbose_name_plural = 'initial assessments'
+        verbose_name = 'First Paediatric Assessment'
+        verbose_name_plural = 'First Paediatric Assessments'
 
     def save(
             self,

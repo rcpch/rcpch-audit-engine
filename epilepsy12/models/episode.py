@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from .multiaxial_diagnosis import MultiaxialDiagnosis
@@ -286,3 +287,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         MultiaxialDiagnosis,
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        verbose_name = "Nonepilepsy",
+        verbose_name_plural = "Nonepilepsies"
+
+    def __str__(self) -> str:
+        return self.pk

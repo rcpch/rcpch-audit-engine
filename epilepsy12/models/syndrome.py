@@ -43,3 +43,7 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     def __str__(self) -> str:
         return self.syndrome_name
+
+    class Meta:
+        verbose_name = 'Syndrome'
+        verbose_name_plural = 'Syndromes'

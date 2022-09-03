@@ -37,8 +37,8 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "comorbidity"
-        verbose_name_plural = "comorbidities"
+        verbose_name = "Comorbidity"
+        verbose_name_plural = "Comorbidities"
 
     def __str__(self) -> str:
         return self.comorbidity_diagnosis

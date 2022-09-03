@@ -1,7 +1,6 @@
-from http.client import HTTPResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from datetime import date, datetime
+from datetime import date
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event

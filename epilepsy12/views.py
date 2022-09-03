@@ -5,6 +5,7 @@ from django.views import generic
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.ethnicities import ETHNICITIES
+from epilepsy12.models import episode
 from epilepsy12.models.case import Case
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
@@ -41,16 +42,23 @@ def hospital_reports(request):
     !!!
     """
 
-    initial_assessment = InitialAssessment.objects.all()
-    epilepsy_context = EpilepsyContext.objects.all()
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.all()
-    assessment = Assessment.objects.all()
-    management = Management.objects.all()
-    registration = Registration.objects.all()
+    # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
+    initial_assessment = InitialAssessment.objects.filter()
+    site = Site.objects.filter()
+    epilepsy_context = EpilepsyContext.objects.filter()
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
+    episode = Episode.objects.filter()
+    syndrome = Syndrome.objects.filter()
+    comorbidity = Comorbidity.objects.filter()
+    assessment = Assessment.objects.filter()
+    investigations = Investigations.objects.filter()
+    management = Management.objects.filter()
+    registration = Registration.objects.filter()
 
-    all_models = list(chain(initial_assessment, epilepsy_context,
-                      multiaxial_diagnosis, assessment, management, registration))[:5]
-    all_models.sort(key=lambda x: x.updated_at, reverse=True)
+    all_models = sorted(
+        chain(registration, initial_assessment, site, epilepsy_context, multiaxial_diagnosis,
+              episode, syndrome, comorbidity, assessment, investigations, management),
+        key=lambda x: x.updated_at, reverse=True)[:5]
 
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(

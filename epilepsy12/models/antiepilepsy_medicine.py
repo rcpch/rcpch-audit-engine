@@ -71,8 +71,8 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
 
     class Meta:
-        verbose_name = "antiepilepsy medicine",
-        verbose_name_plural = "antiepilepsy medicines"
+        verbose_name = "Antiepilepsy Medicine",
+        verbose_name_plural = "Antiepilepsy Medicines"
 
     @property
     def length_of_treatment(self):

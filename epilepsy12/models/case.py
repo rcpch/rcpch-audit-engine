@@ -152,8 +152,8 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         return super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'case'
-        verbose_name_plural = 'cases'
+        verbose_name = 'Patient'
+        verbose_name_plural = 'Patients'
 
     def __str__(self) -> str:
         return self.first_name + " " + self.surname
