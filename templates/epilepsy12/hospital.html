@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load epilepsy12_template_tags %}
+{% csrf_token %}
 {% block content %}
 <div class="ui container">
     <div class="ui attached inverted segment" id="hospital_segment">
