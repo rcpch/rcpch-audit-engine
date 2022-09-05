@@ -140,7 +140,9 @@ def allocate_lead_site(request, registration_id):
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_childrens_epilepsy_surgery_centre=False,
             site_is_paediatric_neurology_centre=False,
-            site_is_general_paediatric_centre=True
+            site_is_general_paediatric_centre=True,
+            created_at=timezone.now(),
+            created_by=request.user
         )
 
     # retrieve the current active site
