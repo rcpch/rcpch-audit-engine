@@ -173,4 +173,5 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['https://epilepsy12-dev.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = [
+    'https://epilepsy12-dev.azurewebsites.net', 'https://epilepsy12.rcpch.tech']
