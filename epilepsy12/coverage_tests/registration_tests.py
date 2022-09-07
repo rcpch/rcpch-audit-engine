@@ -52,4 +52,23 @@ class RegistrationTests(TestCase):
             r.eligibility_criteria_met,
             None
         )
+
+        self.assertEqual(
+            r.referring_clinician,
+            None
+        )
     
+        self.assertEqual(
+            r.registration_close_date,
+            None
+        )
+
+        self.assertEqual(
+            r.registration_date,
+            None
+        )
+
+        self.assertEqual(
+            r.cohort,
+            None
+        )
