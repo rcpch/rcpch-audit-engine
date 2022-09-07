@@ -12,8 +12,9 @@ class Epilepsy12UserTests(TestCase):
             username="epilepsy12user",
             password="epilepsy12password",
             first_name="John",
+            surname="Gastaut",
             role=1,
-            hospital_trust="St Elsewhere"
+            hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
         )
         self.assertEqual(
             superuser.email,
@@ -33,7 +34,7 @@ class Epilepsy12UserTests(TestCase):
         )
         self.assertEqual(
             superuser.hospital_trust,
-            "St Elsewhere"
+            "Walton Community Hospital - Virgin Care Services Ltd"
         )
         self.assertTrue(
             superuser.is_superuser,
@@ -46,7 +47,7 @@ class Epilepsy12UserTests(TestCase):
         )
         self.assertEqual(
             str(superuser),
-            "testuser@epilepsy12.com"
+            "John Gastaut"
         )
 
         with self.assertRaises(ValueError):
@@ -57,7 +58,7 @@ class Epilepsy12UserTests(TestCase):
                 password="epilepsy12password",
                 first_name="John",
                 role="Audit Analyst",
-                hospital_trust="St Elsewhere",
+                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd",
                 is_superuser=False
             )
 
@@ -69,7 +70,7 @@ class Epilepsy12UserTests(TestCase):
                 password="epilepsy12password",
                 first_name="John",
                 role=1,
-                hospital_trust="St Elsewhere",
+                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd",
                 is_staff=False
             )
 
@@ -81,7 +82,7 @@ class Epilepsy12UserTests(TestCase):
                 password="epilepsy12password",
                 first_name="John",
                 role=1,
-                hospital_trust="St Elsewhere",
+                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd",
                 is_active=False
             )
 
@@ -97,7 +98,7 @@ class Epilepsy12UserTests(TestCase):
             first_name="Henry",
             surname="Gastaut",
             role=1,
-            hospital_trust="St Elsewhere"
+            hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
         )
 
         self.assertEqual(
@@ -122,7 +123,7 @@ class Epilepsy12UserTests(TestCase):
         )
         self.assertEqual(
             user.hospital_trust,
-            "St Elsewhere"
+            "Walton Community Hospital - Virgin Care Services Ltd"
         )
         self.assertFalse(
             user.is_staff,
@@ -132,7 +133,7 @@ class Epilepsy12UserTests(TestCase):
         )
         self.assertEqual(
             str(user),
-            "testuser@epilepsy12.com"
+            "Dr Henry Gastaut"
         )
         self.assertEqual(
             user.get_full_name(),
@@ -156,12 +157,12 @@ class Epilepsy12UserTests(TestCase):
                 title=4,
                 password="epilepsy12password",
                 role=1,
-                hospital_trust="St Elsewhere"
+                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
             )
         with self.assertRaises(ValueError):
             # no hospital trust
             db.objects.create_user(
-                email="testuser@epilepsy12.com",
+                email="testuser2@epilepsy12.com",
                 username="epilepsy12user",
                 first_name="Henry",
                 surname="Gastaut",
@@ -173,12 +174,12 @@ class Epilepsy12UserTests(TestCase):
         with self.assertRaises(ValueError):
             # no username
             db.objects.create_user(
-                email="testuser@epilepsy12.com",
+                email="testuser3@epilepsy12.com",
                 username="",
                 first_name="Henry",
                 surname="Gastaut",
                 title=4,
                 password="epilepsy12password",
                 role=1,
-                hospital_trust="St Elsewhere"
+                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
             )
