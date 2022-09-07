@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App - rcpch-e12-devtest
 on:
   push:
     branches:
-      - digital-ocean-devtest
+      - live
   workflow_dispatch:
 
 jobs:

@@ -124,10 +124,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         on_delete=models.PROTECT,
         null=True
     )
-
-    def __str__(self):
-        return self.email
-
+    
     def get_full_name(self):
         title = self.get_title_display()
         concatenated_name = ''
