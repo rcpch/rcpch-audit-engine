@@ -118,9 +118,6 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    def __str__(self):
-        return self.email
-
     def get_full_name(self):
         title = self.get_title_display()
         concatenated_name = ''
