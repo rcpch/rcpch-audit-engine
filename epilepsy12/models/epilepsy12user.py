@@ -119,12 +119,12 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    hospital_employer = models.OneToOneField(
+    hospital_employer = models.OneToMany(
         HospitalTrust,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True
     )
-    
+
     def get_full_name(self):
         title = self.get_title_display()
         concatenated_name = ''
