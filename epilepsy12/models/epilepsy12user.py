@@ -119,7 +119,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    hospital_employer = models.OneToMany(
+    hospital_employer = models.ForeignKey(
         HospitalTrust,
         on_delete=models.CASCADE,
         null=True
