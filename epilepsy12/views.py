@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import episode
 from epilepsy12.models.case import Case
@@ -63,7 +64,7 @@ def hospital_reports(request):
 
     template_name = 'epilepsy12/hospital.html'
     hospital_object = HospitalTrust.objects.get(
-        OrganisationName=request.user.hospital_trust)
+        OrganisationName=request.user.hospital_employer)
 
     deprivation_quintiles = (
         (1, 1),
@@ -190,3 +191,7 @@ def registration_active(request, case_id, active_template):
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
+
+
+def rcpch_403(request, exception):
+    return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
