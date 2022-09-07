@@ -4,7 +4,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from epilepsy12.constants.user_types import ROLES, TITLES
+from epilepsy12.constants.user_types import PERMISSIONS, ROLES, TITLES
+from epilepsy12.models.hospital_trust import HospitalTrust
 
 
 class Epilepsy12UserManager(BaseUserManager):
@@ -95,6 +96,9 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(
         default=False
     )
+    is_rcpch_audit_team_member = models.BooleanField(
+        default=False
+    )
     date_joined = models.DateTimeField(
         default=timezone.now
     )
@@ -103,20 +107,23 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         null=True
     )
-    hospital_trust = models.CharField(
-        help_text=_("Enter the main hospital trust where you work."),
-        max_length=100
-    )
     twitter_handle = models.CharField(
         max_length=255,
         null=True,
         blank=True
     )
 
-    REQUIRED_FIELDS = ['role', 'hospital_trust', 'username', 'first_name']
+    REQUIRED_FIELDS = ['role', 'hospital_trust',
+                       'username', 'first_name', 'surname']
     USERNAME_FIELD = 'email'
 
     objects = Epilepsy12UserManager()
+
+    hospital_employer = models.OneToOneField(
+        HospitalTrust,
+        on_delete=models.PROTECT,
+        null=True
+    )
 
     def __str__(self):
         return self.email
@@ -145,8 +152,9 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         return True
 
     class Meta:
-        verbose_name = "Epilepsy12 User",
+        verbose_name = "Epilepsy12 User"
         verbose_name_plural = "Epilepsy12 Users"
+        permissions = PERMISSIONS  # a full list of permissions is in constants/user_types.py
 
     def __str__(self) -> str:
         return self.get_full_name()

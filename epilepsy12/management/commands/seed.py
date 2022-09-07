@@ -1,12 +1,16 @@
-import math
+from logging import exception
+from unicodedata import name
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from random import randint, getrandbits, choice
 from datetime import date
 from django.core.management.base import BaseCommand
 from epilepsy12.constants.ethnicities import ETHNICITIES
 
 from epilepsy12.constants.names import DUMMY_NAMES
+from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, PATIENT_ACCESS, PATIENT_ACCESS_PERMISSIONS, PERMISSIONS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_VIEW_ONLY, TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS
 from ...models import HospitalTrust, Keyword, Case
-from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE
+from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE, ROLES
 from ...general_functions import random_postcodes
 
 
@@ -29,6 +33,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
+        elif (options['mode'] == 'seed_groups_and_permissions'):
+            self.stdout.write('setting up groups and permissions...')
+            run_dummy_groups_permissions_seed()
         else:
             self.stdout.write('No options supplied...')
         self.stdout.write(image())
@@ -135,6 +142,88 @@ def run_dummy_cases_seed():
         added += 1
         print(f"Saved {first_name} {surname}...")
     print(f"Saved {added} cases.")
+
+
+def run_dummy_groups_permissions_seed():
+    group_names = (
+
+    )
+
+    # allocate permissions
+    # inspiration from this 'my fish is bigger than yours' post: https://stackoverflow.com/questions/22250352/programmatically-create-a-django-group-with-permissions
+    for group in group_names:
+        print(f'Creating group: {group}')
+        new_group, created = Group.objects.update_or_create(name=group)
+        if group == EPILEPSY12_AUDIT_TEAM_VIEW_ONLY:
+            # logged in user can view all national data but not logs
+            case_ct = ContentType.objects.get_for_model(Case)
+
+            for permission in EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS:
+                print(f'Adding permission: {permission[1]}')
+                permission = Permission.objects.create(
+                    codename=permission[0],
+                    name=permission[1],
+                    content_type=case_ct
+                )
+                new_group.permissions.add(permission)
+
+        elif group == EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS:
+            # logged in user can edit but not delete national data. Cannot view or edit logs or permissions.
+            for permission in EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS:
+                print(f'Adding permission: {permission[1]}')
+                permission = Permission.objects.create(
+                    codename=permission[0],
+                    name=permission[1],
+                    content_type=case_ct
+                )
+                new_group.permissions.add(permission)
+
+        elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
+            # logged in user can view all data relating to their trust(s) but not logs
+            for permission in TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS:
+                print(f'Adding permission: {permission[1]}')
+                permission = Permission.objects.create(
+                    codename=permission[0],
+                    name=permission[1],
+                    content_type=case_ct
+                )
+                new_group.permissions.add(permission)
+
+        elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
+            # logged in user can edit but not delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and hospital trusts, groups and permissions
+            for permission in TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS:
+                print(f'Adding permission: {permission[1]}')
+                permission = Permission.objects.create(
+                    codename=permission[0],
+                    name=permission[1],
+                    content_type=case_ct
+                )
+                new_group.permissions.add(permission)
+
+        elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
+            # logged in user can delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and hospital trusts, groups and permissions
+            for permission in TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS:
+                print(f'Adding permission: {permission[1]}')
+                permission = Permission.objects.create(
+                    codename=permission[0],
+                    name=permission[1],
+                    content_type=case_ct
+                )
+                new_group.permissions.add(permission)
+
+        elif group == PATIENT_ACCESS:
+            # logged in user can view their own audit data, consent to participation and remove that consent/opt out. Opting out would delete all data relating to them, except the epilepsy12 unique identifier
+            for permission in PATIENT_ACCESS_PERMISSIONS:
+                print(f'Adding permission: {permission[1]}')
+                permission = Permission.objects.create(
+                    codename=permission[0],
+                    name=permission[1],
+                    content_type=case_ct
+                )
+                new_group.permissions.add(permission)
+        else:
+            # some kind of error
+            raise NameError('Error: Group does not exist')
 
 
 def image():

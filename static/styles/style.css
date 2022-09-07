@@ -40,6 +40,7 @@
   --rcpch_black: #000000;
   /* secondary colours */
   --rcpch_red: #e60700;
+  --rcpch_light_red: #ffe7e6;
   --rcpch_orange: #ff8000;
   --rcpch_yellow: #fdc300;
   --rcpch_gold: #c2a712;
@@ -827,6 +828,14 @@ ui.rcpch_chart_container.segment {
   background-color: var(--rcpch_lightest_blue);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+.ui.rcpch_warning.message {
+  border-radius: 0%;
+  color: var(--rcpch_red);
+  background-color: var(--rcpch_light_red);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(90, 3, 0, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+  box-shadow: 0px 0px 0px 1px rgba(90, 3, 0, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
 }
 
 .ui.rcpch_footer.message {

@@ -6,6 +6,7 @@ from django.db.models import Q
 from django_htmx.http import trigger_client_event
 from ..models import Registration, Site
 from ..models import Case, AuditProgress, HospitalTrust
+from ..decorator import editor_access_for_this_child
 
 
 @login_required
@@ -104,6 +105,8 @@ Lead site allocation, deletion, updating and transfer
 """
 
 
+@login_required
+@editor_access_for_this_child()
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
@@ -180,6 +183,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_required
+@editor_access_for_this_child()
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -212,6 +216,7 @@ def edit_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@editor_access_for_this_child()
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -241,6 +246,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@editor_access_for_this_child()
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -269,6 +275,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@editor_access_for_this_child()
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
@@ -334,6 +341,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_required
+@editor_access_for_this_child()
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
