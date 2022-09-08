@@ -106,7 +106,7 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
-@editor_access_for_this_child()
+@editor_access_for_this_child('registration_id')
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
@@ -183,7 +183,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@editor_access_for_this_child('registration_id', 'site_id')
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -216,7 +216,7 @@ def edit_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@editor_access_for_this_child('registration_id', 'site_id')
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -246,7 +246,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@editor_access_for_this_child('registration_id', 'site_id')
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -275,7 +275,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@editor_access_for_this_child('registration_id', 'site_id')
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
@@ -341,7 +341,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_required
-@editor_access_for_this_child()
+@editor_access_for_this_child('registration_id', 'site_id')
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -419,6 +419,7 @@ Validation process
 
 
 @login_required
+@editor_access_for_this_child('registration_id')
 def confirm_eligible(request, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child
@@ -485,6 +486,7 @@ def registration_status(request, registration_id):
 
 
 @login_required
+@editor_access_for_this_child('case_id')
 def registration_date(request, case_id):
     """
     This defines registration in the audit. 
@@ -527,6 +529,7 @@ def registration_date(request, case_id):
 
 
 @login_required
+@editor_access_for_this_child('registration_id')
 def referring_clinician(request, registration_id):
     """
     Call back from POST request on key up in input partial in registration_form
@@ -560,6 +563,8 @@ def referring_clinician(request, registration_id):
     return response
 
 
+@login_required
+@editor_access_for_this_child('registration_id', 'site_id')
 def editable(request, registration_id, editable):
     """
     Callback from input partial - enables and disables buttons in input partial

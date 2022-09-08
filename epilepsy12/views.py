@@ -13,6 +13,7 @@ from django.db.models import Case as DJANGO_CASE
 from .models import AuditProgress
 from itertools import chain
 from .view_folder import *
+from django_htmx.http import HttpResponseClientRedirect
 
 user = get_user_model()
 
@@ -194,4 +195,15 @@ def registration_active(request, case_id, active_template):
 
 
 def rcpch_403(request, exception):
+    # this view is necessary to trigger a page refresh
+    # it is called on raise PermissionDenied()
+    # If a 403 template were to be returned at this point as in standard django,
+    # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
+    # from django-htmx middleware forces a redirect. Neat.
+    redirect = reverse_lazy('redirect_403')
+    return HttpResponseClientRedirect(redirect)
+
+
+def redirect_403(request):
+    # return the custom 403 template. There is not context to add.
     return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})

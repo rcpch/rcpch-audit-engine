@@ -33,7 +33,12 @@ def editor_access_for_this_child(*outer_args, **outer_kwargs):
     def decorator(fn):
 
         def decorated(request, **view_parameters):
-            case = Case.objects.get(pk=view_parameters.get('case_id'))
+            if view_parameters.get('registration_id') is not None:
+                case = Case.objects.get(
+                    registration=view_parameters.get('registration_id'))
+            if view_parameters.get('case_id') is not None:
+                case = Case.objects.get(pk=view_parameters.get('case_id'))
+
             view_only = request.user.groups.filter(name__in=[
                                                    'for_epilepsy12_audit_team_view_only', 'trust_audit_team_view_only', 'patient_access']).exists()
 
