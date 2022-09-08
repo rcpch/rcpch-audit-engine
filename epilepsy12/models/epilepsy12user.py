@@ -14,7 +14,7 @@ class Epilepsy12UserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, email, password, username, first_name, hospital_trust, role, **extra_fields):
+    def create_user(self, email, password, username, first_name, hospital_employer, role, is_rcpch_audit_team_member, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
@@ -22,7 +22,7 @@ class Epilepsy12UserManager(BaseUserManager):
             raise ValueError(_('You must provide an email address'))
         if not username:
             raise ValueError(_('You must provide a username'))
-        if not hospital_trust:
+        if not hospital_employer and not is_rcpch_audit_team_member:
             raise ValueError(
                 _('You must provide the name of your main hospital trust.'))
         if not role:
@@ -30,7 +30,7 @@ class Epilepsy12UserManager(BaseUserManager):
                 _('You must provide your role in the Epilepsy12 audit.'))
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, first_name=first_name,
-                          role=role, hospital_trust=hospital_trust,  **extra_fields)
+                          role=role, hospital_employer=hospital_employer,  **extra_fields)
         user.set_password(password)
         user.save()
         return user
@@ -113,7 +113,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
-    REQUIRED_FIELDS = ['role', 'hospital_trust',
+    REQUIRED_FIELDS = ['role', 'hospital_employer',
                        'username', 'first_name', 'surname']
     USERNAME_FIELD = 'email'
 
