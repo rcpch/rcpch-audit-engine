@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from epilepsy12.constants.ethnicities import ETHNICITIES
 
 from epilepsy12.constants.names import DUMMY_NAMES
-from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, PATIENT_ACCESS, PATIENT_ACCESS_PERMISSIONS, PERMISSIONS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_VIEW_ONLY, TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS
+from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, GROUPS, PATIENT_ACCESS, PATIENT_ACCESS_PERMISSIONS, PERMISSIONS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_VIEW_ONLY, TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS
 from ...models import HospitalTrust, Keyword, Case
 from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE, ROLES
 from ...general_functions import random_postcodes
@@ -145,123 +145,71 @@ def run_dummy_cases_seed():
 
 
 def run_dummy_groups_permissions_seed():
-    group_names = (
+    groups_success = create_groups()
 
-    )
 
-    # allocate permissions
-    # inspiration from this 'my fish is bigger than yours' post: https://stackoverflow.com/questions/22250352/programmatically-create-a-django-group-with-permissions
-    for group in group_names:
-        print(f'Creating group: {group}')
-        new_group, created = Group.objects.update_or_create(name=group)
-        if group == EPILEPSY12_AUDIT_TEAM_VIEW_ONLY:
-            # logged in user can view all national data but not logs
-            case_ct = ContentType.objects.get_for_model(Case)
-
-            for permission in EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS:
-                print(f'Adding permission: {permission[1]}')
-                permission = Permission.objects.create(
-                    codename=permission[0],
-                    name=permission[1],
-                    content_type=case_ct
-                )
-                new_group.permissions.add(permission)
-
-        elif group == EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS:
-            # logged in user can edit but not delete national data. Cannot view or edit logs or permissions.
-            for permission in EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS:
-                print(f'Adding permission: {permission[1]}')
-                permission = Permission.objects.create(
-                    codename=permission[0],
-                    name=permission[1],
-                    content_type=case_ct
-                )
-                new_group.permissions.add(permission)
-
-        elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
-            # logged in user can view all data relating to their trust(s) but not logs
-            for permission in TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS:
-                print(f'Adding permission: {permission[1]}')
-                permission = Permission.objects.create(
-                    codename=permission[0],
-                    name=permission[1],
-                    content_type=case_ct
-                )
-                new_group.permissions.add(permission)
-
-        elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
-            # logged in user can edit but not delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and hospital trusts, groups and permissions
-            for permission in TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS:
-                print(f'Adding permission: {permission[1]}')
-                permission = Permission.objects.create(
-                    codename=permission[0],
-                    name=permission[1],
-                    content_type=case_ct
-                )
-                new_group.permissions.add(permission)
-
-        elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
-            # logged in user can delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and hospital trusts, groups and permissions
-            for permission in TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS:
-                print(f'Adding permission: {permission[1]}')
-                permission = Permission.objects.create(
-                    codename=permission[0],
-                    name=permission[1],
-                    content_type=case_ct
-                )
-                new_group.permissions.add(permission)
-
-        elif group == PATIENT_ACCESS:
-            # logged in user can view their own audit data, consent to participation and remove that consent/opt out. Opting out would delete all data relating to them, except the epilepsy12 unique identifier
-            for permission in PATIENT_ACCESS_PERMISSIONS:
-                print(f'Adding permission: {permission[1]}')
-                permission = Permission.objects.create(
-                    codename=permission[0],
-                    name=permission[1],
-                    content_type=case_ct
-                )
-                new_group.permissions.add(permission)
-        else:
-            # some kind of error
-            raise NameError('Error: Group does not exist')
+def create_groups():
+    error = False
+    for group in GROUPS:
+        if not Group.objects.filter(name=group).exists():
+            print(f'Creating group: {group}')
+            try:
+                Group.objects.create(name=group)
+            except Exception as error:
+                print(error)
+                error = True
+    return error
 
 
 def image():
     return """
 
-                                .^~^      ^777777!~:       ^!???7~:       
-                                ^JJJ:.:!^ 7#BGPPPGBGY:   !5BBGPPGBBY.     
-                                 :~!!?J~. !BBJ    YBB?  ?BB5~.  .~J^      
-                              .:~7?JJ?:   !BBY^~~!PBB~ .GBG:              
-                              .~!?JJJJ^   !BBGGGBBBY^  .PBG^              
-                                 ?J~~7?:  !BBJ.:?BB5^   ~GBG?^:^~JP7      
-                                :?:   .   !BBJ   ~PBG?.  :?PBBBBBG5!   
-                                ..::...     .::. ...:^::. .. .:^~~^:.       
-                                !GPGGGGPY7.   :!?JJJJ?7~..PGP:    !GGJ      
-                                7BBY~~!YBBY  !JJ?!^^^!??::GBG:    7BBJ      
-                                7BB?   .GBG.^JJ7.     .. .GBG!^^^^JBBJ      
-                                7BB577?5BBJ ~JJ!         .GBBGGGGGGBBJ      
-                                7BBGPPP5J~  :JJJ^.   .^^ .GBG^.::.?BBJ      
-                                7#B?         :7JJ?77?JJ?^:GBB:    7##Y      
-                                ~YY!           :~!77!!^. .JYJ.    ~YY7      
+                                .^~^      ^777777!~:       ^!???7~:
+                                ^JJJ:.:!^ 7#BGPPPGBGY:   !5BBGPPGBBY.
+                                 :~!!?J~. !BBJ    YBB?  ?BB5~.  .~J^
+                              .:~7?JJ?:   !BBY^~~!PBB~ .GBG:
+                              .~!?JJJJ^   !BBGGGBBBY^  .PBG^
+                                 ?J~~7?:  !BBJ.:?BB5^   ~GBG?^:^~JP7
+                                :?:   .   !BBJ   ~PBG?.  :?PBBBBBG5!
+                                ..::...     .::. ...:^::. .. .:^~~^:.
+                                !GPGGGGPY7.   :!?JJJJ?7~..PGP:    !GGJ
+                                7BBY~~!YBBY  !JJ?!^^^!??::GBG:    7BBJ
+                                7BB?   .GBG.^JJ7.     .. .GBG!^^^^JBBJ
+                                7BB577?5BBJ ~JJ!         .GBBGGGGGGBBJ
+                                7BBGPPP5J~  :JJJ^.   .^^ .GBG^.::.?BBJ
+                                7#B?         :7JJ?77?JJ?^:GBB:    7##Y
+                                ~YY!           :~!77!!^. .JYJ.    ~YY7
 
 
-    @@@@@@@@ @@@@@@@@%  *@@@@ @@@@@   .@@@@@@@% @@@@@@@@%   -@@@@@@@. *@@@%  @@@@=    :::   .::::::.   
-    @@@@@@@@ @@@@@@@@@% *@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@ :@@@@@@@@@  @@@@  @@@@.  .::::  .::::::::.  
-    @@@@@@@@ @@@@@@@@@@:+@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@-%@@@%-@@@@- %@@@: @@@# .::::::  ::::::::::  
-    @@@@%=== @@@@+ +@@@**@@@@ @@@@@   .@@@@%=+= @@@@* %@@@+%@@@# @@@@+ :@@@=.@@@=::::::::  ::::. ::::. 
-    @@@@#    @@@@+ =@@@**@@@@ @@@@@   .@@@@%    @@@@* *@@@+%@@@# @@@@*  @@@**@@@ ......::  ..:: ..:.:  
-    @@@@*    @@@@+ +@@@**@@@@ @@@@@   .@@@@%    @@@@* *@@@+%@@@@:       %@@@%@@@    :....  .... :.:..  
-    @@@@#--: @@@@+ +@@@**@@@@ @@@@@   .@@@@%--- @@@@* #@@@+=@@@@@#      +@@@@@@*    .....       .....  
-    @@@@@@@# @@@@@@@@@@-+@@@@ @@@@@   .@@@@@@@% @@@@@@%@@@= @@@@@@@-    :@@@@@@     .....      ......  
-    @@@@@@@# @@@@@@@@@@ +@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@  .%@@@@@@+    @@@@@@     .....      .....   
-    @@@@@@@# @@@@@@@@@: +@@@@ @@@@@   .@@@@@@@% @@@@@@@@@     *@@@@@@    %@@@@@     .....     .....    
-    @@@@*    @@@@*.     +@@@@ @@@@@   .@@@@#    @@@@*.         .%@@@@+   #@@@@*     .....    ......    
-    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@#    @@@@*      @@@@# @@@@#   -@@@@-     .....    .....     
-    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@#    @@@@*      @@@@* @@@@@    @@@@:     .....   .....      
-    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@%    @@@@*      %@@@# @@@@@    @@@@.     .....   .....       
-    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*      %@@@%:@@@@#    @@@@.     .....  ..........            
+    @@@@@@@@ @@@@@@@@%  *@@@@ @@@@@   .@@@@@@@% @@@@@@@@%   -@@@@@@@. *@@@%  @@@@=    :::   .::::::.
+    @@@@@@@@ @@@@@@@@@% *@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@ :@@@@@@@@@  @@@@  @@@@.  .::::  .::::::::.
+    # .::::::  ::::::::::
+    @@@@@@@@ @@@@@@@@@@:+@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@-%@@@%-@@@@- %@@@: @@@
+    # @@@@+ :@@@=.@@@=::::::::  ::::. ::::.
+    @@@@%=== @@@@+ +@@@**@@@@ @@@@@   .@@@@%=+= @@@@* %@@@+%@@@
+    #    @@@@+ =@@@**@@@@ @@@@@   .@@@@%    @@@@* *@@@+%@@@# @@@@*  @@@**@@@ ......::  ..:: ..:.:
+    @@@@
+    @@@@*    @@@@+ +@@@**@@@@ @@@@@   .@@@@%    @@@@* *@@@+%@@@@:       %@@@%@@@    :....  .... :.:..
+    #--: @@@@+ +@@@**@@@@ @@@@@   .@@@@%--- @@@@* #@@@+=@@@@@#      +@@@@@@*    .....       .....
+    @@@@
+    # @@@@@@@@@@-+@@@@ @@@@@   .@@@@@@@% @@@@@@%@@@= @@@@@@@-    :@@@@@@     .....      ......
+    @@@@@@@
+    # @@@@@@@@@@ +@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@  .%@@@@@@+    @@@@@@     .....      .....
+    @@@@@@@
+    # @@@@@@@@@: +@@@@ @@@@@   .@@@@@@@% @@@@@@@@@     *@@@@@@    %@@@@@     .....     .....
+    @@@@@@@
+    #    @@@@*.         .%@@@@+   #@@@@*     .....    ......
+    @@@@*    @@@@*.     +@@@@ @@@@@   .@@@@
+    #    @@@@*      @@@@# @@@@#   -@@@@-     .....    .....
+    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@
+    #    @@@@*      @@@@* @@@@@    @@@@:     .....   .....
+    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@
+    # @@@@@    @@@@.     .....   .....
+    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@%    @@@@*      %@@@
+    #    @@@@.     .....  ..........
+    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*      %@@@%:@@@@
     @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*      +@@@@@@@@@-    @@@@.     .....  ..........
-    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*       #@@@@@@@+     @@@@.     .....  ..........                        
+    #@@@@@@@+     @@@@.     .....  ..........
+    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*
 
                 """

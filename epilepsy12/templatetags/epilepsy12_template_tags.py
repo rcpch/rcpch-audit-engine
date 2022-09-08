@@ -109,3 +109,14 @@ def to_class_name(value):
         return 'Antiepilepsy Medicine'
     else:
         return 'Error'
+
+
+@register.filter('has_group')
+def has_group(user, group_name):
+    # thanks to Lucas Simon for this efficiency
+    # https://stackoverflow.com/questions/1052531/get-user-group-in-a-template
+    """
+    Check if user has permission
+    """
+    groups = user.groups.all().values_list('name', flat=True)
+    return True if group_name in groups else False
