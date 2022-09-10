@@ -53,7 +53,7 @@ def register(request, case_id):
 
     lead_site = None
 
-    registered_sites = Site.objects.filter(registration=registration)
+    registered_sites = Site.objects.filter(case=case)
     for registered_site in registered_sites:
         if registered_site.site_is_primary_centre_of_epilepsy_care and registered_site.site_is_actively_involved_in_epilepsy_care:
             lead_site = registered_site
@@ -63,7 +63,7 @@ def register(request, case_id):
     previously_registered_sites = None
     if previously_registered > 0:
         previously_registered_sites = Site.objects.filter(
-            registration=registration, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
+            case=case, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
 
     form_complete = test_fields_update_audit_progress(
         model_instance=registration,
@@ -118,7 +118,7 @@ def allocate_lead_site(request, registration_id):
 
     # test if site exists
     if Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         hospital_trust=selected_hospital_trust,
         site_is_actively_involved_in_epilepsy_care=True
     ).exists():
@@ -126,7 +126,7 @@ def allocate_lead_site(request, registration_id):
         # update the status therefore to include the lead role
 
         Site.objects.filter(
-            registration=registration,
+            case=registration.case,
             hospital_trust=selected_hospital_trust,
             site_is_actively_involved_in_epilepsy_care=True
         ).update(
@@ -138,7 +138,7 @@ def allocate_lead_site(request, registration_id):
         # this site may still be associated with this registration but not actively
         # it is therefore safe to create a new record
         Site.objects.create(
-            registration=registration,
+            case=registration.case,
             hospital_trust=selected_hospital_trust,
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
@@ -151,7 +151,7 @@ def allocate_lead_site(request, registration_id):
 
     # retrieve the current active site
     site = Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         hospital_trust=selected_hospital_trust,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True,
@@ -311,10 +311,10 @@ def update_lead_site(request, registration_id, site_id, update):
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user,
-            registration=registration)
+            case=registration.case)
 
     site = Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
@@ -354,7 +354,7 @@ def delete_lead_site(request, registration_id, site_id):
     # test first to see if this site is associated with other roles
     # either past or present
     if Site.objects.filter(
-        Q(registration=registration) &
+        Q(case=registration.case) &
         Q(pk=site_id) &
         Q(
             Q(site_is_childrens_epilepsy_surgery_centre=True) |
@@ -376,7 +376,7 @@ def delete_lead_site(request, registration_id, site_id):
         Site.objects.filter(pk=site_id).delete()
 
     lead_site = Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
@@ -405,7 +405,9 @@ def previous_sites(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
     previous_sites = Site.objects.filter(
-        registration=registration, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True)
+        case=registration.case,
+        site_is_actively_involved_in_epilepsy_care=False,
+        site_is_primary_centre_of_epilepsy_care=True)
 
     context = {
         'previously_registered_sites': previous_sites,
@@ -448,7 +450,7 @@ def confirm_eligible(request, registration_id):
 
     registration = Registration.objects.filter(pk=registration_id).get()
 
-    if registration.eligibility_criteria_met and Site.objects.filter(registration=registration, site_is_primary_centre_of_epilepsy_care=True).exists():
+    if registration.eligibility_criteria_met and Site.objects.filter(case=registration.case, site_is_primary_centre_of_epilepsy_care=True).exists():
         # activate registration button if eligibility and lead centre set
         trigger_client_event(
             response=response,
@@ -600,7 +602,7 @@ def total_fields_completed(model_instance):
     if model_instance.eligibility_criteria_met:
         counter += 1
     if Site.objects.filter(
-        registration=model_instance,
+        case=model_instance.case,
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True
     ).exists():
@@ -635,7 +637,7 @@ def total_fields_completed(model_instance):
             if getattr(model_instance, field.name) is not None:
                 counter += 1
     if Site.objects.filter(
-        registration=model_instance,
+        case=model_instance.case,
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True
     ).exists():
