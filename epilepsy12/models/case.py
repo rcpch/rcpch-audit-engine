@@ -154,6 +154,17 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     class Meta:
         verbose_name = 'Patient'
         verbose_name_plural = 'Patients'
+        permissions = [
+            CAN_VIEW_CHILD_NHS_NUMBER,
+            CAN_VIEW_CHILD_DATE_OF_BIRTH,
+            CAN_DELETE_CHILD_CASE_DATA,
+            CAN_UPDATE_CHILD_CASE_DATA,
+            CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
+            CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
+            CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
+            CAN_VIEW_CHILD_CASE_DATA,
+            CAN_CONSENT_TO_AUDIT_PARTICIPATION
+        ]
 
     def __str__(self) -> str:
-        return self.first_name + " " + self.surname
+        return f'{self.first_name} {self.surname}'

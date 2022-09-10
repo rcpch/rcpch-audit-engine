@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from epilepsy12.constants.user_types import PERMISSIONS, ROLES, TITLES
+from epilepsy12.constants.user_types import CAN_CONSENT_TO_AUDIT_PARTICIPATION, PERMISSIONS, ROLES, TITLES
 from epilepsy12.models.hospital_trust import HospitalTrust
 
 
@@ -151,7 +151,6 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = "Epilepsy12 User"
         verbose_name_plural = "Epilepsy12 Users"
-        permissions = PERMISSIONS  # a full list of permissions is in constants/user_types.py
 
     def __str__(self) -> str:
         return self.get_full_name()

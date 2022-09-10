@@ -144,12 +144,7 @@ def run_dummy_cases_seed():
     print(f"Saved {added} cases.")
 
 
-def run_dummy_groups_permissions_seed():
-    groups_success = create_groups()
-
-
 def create_groups():
-    error = False
     for group in GROUPS:
         if not Group.objects.filter(name=group).exists():
             print(f'Creating group: {group}')
@@ -158,7 +153,11 @@ def create_groups():
             except Exception as error:
                 print(error)
                 error = True
-    return error
+
+
+def add_permission_to_group(group_name):
+    if group_name in ['epilepsy12_audit_team_view_only', 'trust_audit_team_view_only', 'patient_access']:
+        # view only for each model
 
 
 def image():

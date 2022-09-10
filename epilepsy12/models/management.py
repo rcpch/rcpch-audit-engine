@@ -115,8 +115,8 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "Management Plan",
+        verbose_name = "Management Plan"
         verbose_name_plural = "Management Plans"
 
     def __str__(self) -> str:
-        return self.pk
+        return f"Management Plans for {self.registration.case}"

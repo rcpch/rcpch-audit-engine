@@ -70,4 +70,4 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         verbose_name_plural = "DESSCRIBE assessments"
 
     def __str__(self) -> str:
-        return "Multaxial diagnosis for "+self.registration.case
+        return f"Multaxial diagnosis for {self.registration.case}"

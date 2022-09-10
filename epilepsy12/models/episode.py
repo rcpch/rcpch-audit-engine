@@ -289,8 +289,8 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "Nonepilepsy",
-        verbose_name_plural = "Nonepilepsies"
+        verbose_name = "Episode",
+        verbose_name_plural = "Episodes"
 
     def __str__(self) -> str:
-        return self.pk
+        return f"{self.get_epilepsy_or_nonepilepsy_status_display()} type seizure for  {self.multiaxial_diagnosis.registration.case}"

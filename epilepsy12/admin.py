@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from guardian.admin import GuardedModelAdmin
 
 # Register your models here.
 from .models import *
@@ -67,10 +68,14 @@ class Epilepsy12UserAdmin(UserAdmin):
     )
 
 
+class CaseAdmin(GuardedModelAdmin):
+    pass
+
+
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine)
 admin.site.register(Assessment)
-admin.site.register(Case)
+admin.site.register(Case, CaseAdmin)
 admin.site.register(Comorbidity)
 admin.site.register(EpilepsyContext)
 admin.site.register(Investigations)

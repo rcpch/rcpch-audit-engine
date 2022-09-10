@@ -89,4 +89,4 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         verbose_name_plural = 'Investigation Milestones'
 
     def __str__(self) -> str:
-        return self.pk
+        return f"Investigations for {self.registration.case}"
