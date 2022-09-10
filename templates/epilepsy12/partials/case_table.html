@@ -22,12 +22,12 @@
                 {% endif %}
             </th>
             <th id="table_header" class="collapsing">Gender
-                {% if sort_flag and sort_flag == "sort_by_gender_down" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
-                {% elif sort_flag and sort_flag == "sort_by_gender_up" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_gender_down" hx-target="#case_table" hx-get="{% url 'sort_by_gender_down' %}" hx-trigger="click"></i>
+                {% if sort_flag and sort_flag == "sort_by_sex_down" %}
+                  <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table" hx-get="{% url 'sort_by_sex_up' %}" hx-trigger="click"></i>
+                {% elif sort_flag and sort_flag == "sort_by_sex_up" %}
+                  <i class="sort icon" id="sort_button" name="sort_by_sex_down" hx-target="#case_table" hx-get="{% url 'sort_by_sex_down' %}" hx-trigger="click"></i>
                 {% else %}
-                  <i class="sort icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
+                  <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table" hx-get="{% url 'sort_by_sex_up' %}" hx-trigger="click"></i>
                 {% endif %}
             </th>
             <th id="table_header" class="collapsing">Ethnicity
@@ -68,7 +68,7 @@
                 <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
               </td>
               <td class="fluid">{{case.first_name}} {{case.surname}}</td>
-              <td>{{case.get_gender_display}}</td>
+              <td>{{case.get_sex_display}}</td>
               <td>{{case.get_ethnicity_display}}</td>
               <td>{{case.nhs_number}}</td>
               <td id="centredData">{{case.index_of_multiple_deprivation_quintile}}</td>

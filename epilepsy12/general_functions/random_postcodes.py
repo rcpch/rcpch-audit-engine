@@ -18,4 +18,5 @@ def generate_postcodes(requested_number: int):
         serialised = response.json()
         postcode = serialised['result']['postcode']
         postcodes.append(postcode)
+
     return postcodes

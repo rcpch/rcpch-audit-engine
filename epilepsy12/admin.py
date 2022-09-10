@@ -68,21 +68,21 @@ class Epilepsy12UserAdmin(UserAdmin):
     )
 
 
-class CaseAdmin(GuardedModelAdmin):
+class RegistrationAdmin(GuardedModelAdmin):
     pass
 
 
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine)
 admin.site.register(Assessment)
-admin.site.register(Case, CaseAdmin)
+admin.site.register(Case)
 admin.site.register(Comorbidity)
 admin.site.register(EpilepsyContext)
 admin.site.register(Investigations)
 admin.site.register(HospitalTrust)
 admin.site.register(InitialAssessment)
 admin.site.register(Management)
-admin.site.register(Registration)
+admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(Keyword)
 admin.site.register(Site)
 admin.site.register(AuditProgress)

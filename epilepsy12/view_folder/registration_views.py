@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from datetime import date
 from django.utils import timezone
 from django.db.models import Q
@@ -10,6 +10,7 @@ from ..decorator import editor_access_for_this_child
 
 
 @login_required
+@permission_required('registration.view_registration')
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)

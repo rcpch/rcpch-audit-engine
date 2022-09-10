@@ -79,8 +79,8 @@ def hospital_reports(request):
                            for k, v in ETHNICITIES]
     imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
                      for k, v in deprivation_quintiles]
-    gender_long_list = [When(gender=k, then=Value(v))
-                        for k, v in SEX_TYPE]
+    sex_long_list = [When(sex=k, then=Value(v))
+                     for k, v in SEX_TYPE]
 
     cases_aggregated_by_ethnicity = (
         Case.objects
@@ -95,17 +95,17 @@ def hospital_reports(request):
             ethnicities=Count('ethnicity')).order_by('ethnicities')
     )
 
-    cases_aggregated_by_gender = (
+    cases_aggregated_by_sex = (
         Case.objects
-        .values('gender')
+        .values('sex')
         .annotate(
-            gender_display=DJANGO_CASE(
-                *gender_long_list, output_field=CharField()
+            sex_display=DJANGO_CASE(
+                *sex_long_list, output_field=CharField()
             )
         )
-        .values('gender_display')
+        .values('sex_display')
         .annotate(
-            genders=Count('gender')).order_by('genders')
+            sexes=Count('sex')).order_by('sexes')
     )
 
     cases_aggregated_by_deprivation = (
@@ -138,7 +138,7 @@ def hospital_reports(request):
         'user': request.user,
         'hospital': hospital_object,
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
-        'cases_aggregated_by_gender': cases_aggregated_by_gender,
+        'cases_aggregated_by_sex': cases_aggregated_by_sex,
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
         'percent_completed_registrations': total_percent,
         'total_registrations': total_registrations,

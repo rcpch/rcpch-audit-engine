@@ -43,6 +43,10 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_rcpch_audit_team_member', True)
+        hospital_trust = HospitalTrust.objects.filter(
+            OrganisationID=41042).get()
+        extra_fields.setdefault('hospital_employer', hospital_trust)
 
         if extra_fields.get('is_active') is not True:
             raise ValueError(_('Superuser must have is_active=True.'))
@@ -113,8 +117,8 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
-    REQUIRED_FIELDS = ['role', 'hospital_employer',
-                       'username', 'first_name', 'surname']
+    REQUIRED_FIELDS = ['role',
+                       'username', 'first_name', 'surname', 'is_rcpch_audit_team_member']
     USERNAME_FIELD = 'email'
 
     objects = Epilepsy12UserManager()

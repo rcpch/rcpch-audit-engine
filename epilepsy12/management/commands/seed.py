@@ -8,8 +8,10 @@ from django.core.management.base import BaseCommand
 from epilepsy12.constants.ethnicities import ETHNICITIES
 
 from epilepsy12.constants.names import DUMMY_NAMES
+# from epilepsy12.constants.postcodes import POSTCODES
 from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, GROUPS, PATIENT_ACCESS, PATIENT_ACCESS_PERMISSIONS, PERMISSIONS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_VIEW_ONLY, TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS
-from ...models import HospitalTrust, Keyword, Case
+from epilepsy12.models import hospital_trust
+from ...models import HospitalTrust, Keyword, Case, Site
 from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE, ROLES
 from ...general_functions import random_postcodes
 
@@ -35,7 +37,7 @@ class Command(BaseCommand):
             run_dummy_cases_seed()
         elif (options['mode'] == 'seed_groups_and_permissions'):
             self.stdout.write('setting up groups and permissions...')
-            run_dummy_groups_permissions_seed()
+            create_groups()
         else:
             self.stdout.write('No options supplied...')
         self.stdout.write(image())
@@ -111,18 +113,25 @@ def delete_hospitals():
 
 def run_dummy_cases_seed():
     added = 0
-    postcode_list = random_postcodes.generate_postcodes(requested_number=51)
-    for index in range(len(DUMMY_NAMES)):
+    postcode_list = random_postcodes.generate_postcodes(requested_number=100)
+
+    for index in range(len(DUMMY_NAMES)-1):
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         locked = bool(getrandbits(1))
         nhs_number = randint(1000000000, 9999999999)
-        first_name = DUMMY_NAMES[index]['name']['firstname']['name']
-        surname = DUMMY_NAMES[index]['name']['lastname']['name']
-        gender = next(iter([x[0] for x in SEX_TYPE if DUMMY_NAMES[index]
-                      ['name']['firstname']['gender_formatted'].capitalize() in x]), None)
+        first_name = DUMMY_NAMES[index]['firstname']
+        surname = DUMMY_NAMES[index]['lastname']
+        gender_object = DUMMY_NAMES[index]['gender']
+        if gender_object == 'm':
+            sex = 1
+        else:
+            sex = 2
         date_of_birth = random_date
         postcode = postcode_list[index]
         ethnicity = choice(ETHNICITIES)[0]
+
+        hospital_trust = HospitalTrust.objects.filter(
+            OrganisationName='King\'s College Hospital').get()
 
         try:
             new_case = Case(
@@ -130,17 +139,28 @@ def run_dummy_cases_seed():
                 nhs_number=nhs_number,
                 first_name=first_name,
                 surname=surname,
-                gender=gender,
+                sex=sex,
                 date_of_birth=date_of_birth,
                 postcode=postcode,
                 ethnicity=ethnicity
             )
             new_case.save()
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error saving case: {e}")
+
+        try:
+            new_site = Site.objects.create(
+                hospital_trust=hospital_trust,
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True
+            )
+            new_site.save()
+            new_site.case.add(new_case)
+        except Exception as e:
+            print(f"Error saving site: {e}")
 
         added += 1
-        print(f"Saved {first_name} {surname}...")
+        print(f"Saved {new_case.first_name} {new_case.surname} at {new_site.hospital_trust.ParentName}({new_site.hospital_trust.OrganisationName})...")
     print(f"Saved {added} cases.")
 
 
@@ -153,11 +173,6 @@ def create_groups():
             except Exception as error:
                 print(error)
                 error = True
-
-
-def add_permission_to_group(group_name):
-    if group_name in ['epilepsy12_audit_team_view_only', 'trust_audit_team_view_only', 'patient_access']:
-        # view only for each model
 
 
 def image():
@@ -180,35 +195,6 @@ def image():
                                 ~YY!           :~!77!!^. .JYJ.    ~YY7
 
 
-    @@@@@@@@ @@@@@@@@%  *@@@@ @@@@@   .@@@@@@@% @@@@@@@@%   -@@@@@@@. *@@@%  @@@@=    :::   .::::::.
-    @@@@@@@@ @@@@@@@@@% *@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@ :@@@@@@@@@  @@@@  @@@@.  .::::  .::::::::.
-    # .::::::  ::::::::::
-    @@@@@@@@ @@@@@@@@@@:+@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@-%@@@%-@@@@- %@@@: @@@
-    # @@@@+ :@@@=.@@@=::::::::  ::::. ::::.
-    @@@@%=== @@@@+ +@@@**@@@@ @@@@@   .@@@@%=+= @@@@* %@@@+%@@@
-    #    @@@@+ =@@@**@@@@ @@@@@   .@@@@%    @@@@* *@@@+%@@@# @@@@*  @@@**@@@ ......::  ..:: ..:.:
-    @@@@
-    @@@@*    @@@@+ +@@@**@@@@ @@@@@   .@@@@%    @@@@* *@@@+%@@@@:       %@@@%@@@    :....  .... :.:..
-    #--: @@@@+ +@@@**@@@@ @@@@@   .@@@@%--- @@@@* #@@@+=@@@@@#      +@@@@@@*    .....       .....
-    @@@@
-    # @@@@@@@@@@-+@@@@ @@@@@   .@@@@@@@% @@@@@@%@@@= @@@@@@@-    :@@@@@@     .....      ......
-    @@@@@@@
-    # @@@@@@@@@@ +@@@@ @@@@@   .@@@@@@@% @@@@@@@@@@  .%@@@@@@+    @@@@@@     .....      .....
-    @@@@@@@
-    # @@@@@@@@@: +@@@@ @@@@@   .@@@@@@@% @@@@@@@@@     *@@@@@@    %@@@@@     .....     .....
-    @@@@@@@
-    #    @@@@*.         .%@@@@+   #@@@@*     .....    ......
-    @@@@*    @@@@*.     +@@@@ @@@@@   .@@@@
-    #    @@@@*      @@@@# @@@@#   -@@@@-     .....    .....
-    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@
-    #    @@@@*      @@@@* @@@@@    @@@@:     .....   .....
-    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@
-    # @@@@@    @@@@.     .....   .....
-    @@@@*    @@@@+      +@@@@ @@@@@   .@@@@%    @@@@*      %@@@
-    #    @@@@.     .....  ..........
-    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*      %@@@%:@@@@
-    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*      +@@@@@@@@@-    @@@@.     .....  ..........
-    #@@@@@@@+     @@@@.     .....  ..........
-    @@@@@@@@ @@@@+      +@@@@ @@@@@@@@.@@@@@@@@ @@@@*
+                                           Epilepsy12 2022
 
                 """

@@ -61,7 +61,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         "surname",
         max_length=100
     )
-    gender = models.IntegerField(
+    sex = models.IntegerField(
         choices=SEX_TYPE
     )
     date_of_birth = DateField(
