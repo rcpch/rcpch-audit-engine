@@ -932,8 +932,21 @@ ui.rcpch_chart_container.segment {
 .ui.top.attached.rcpch_dark_blue.clearing.segment {
   color: var(--rcpch_white);
   background-color: var(--rcpch_dark_blue);
+  border-radius: 0%;
+  border-width: medium;
+  border-color: var(--rcpch_dark_blue);
 }
 
 .ui.top.attached.rcpch_dark_blue.clearing.segment>h5 {
   color: white;
+}
+
+.ui.raised.attached.segment {
+  border-radius: 0%;
+  border-width: medium;
+  border-color: var(--rcpch_dark_blue);
+}
+
+.ui.bottom.attached.rcpch_footer.message {
+  border-radius: 0%;
 }
