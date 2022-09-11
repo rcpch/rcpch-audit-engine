@@ -1,23 +1,24 @@
 <form class="ui form" method="post">
     {% csrf_token %}
     <div class="ui rcpch_important message">
+
         <h5>Eligibility Criteria</h5>
         <h5>Inclusion</h5>
-        <p>The following criteria must <b>all</b> be fulfilled before registering for Epilepsy12</p>
+        <p>The following criteria must <b>ALL</b> be fulfilled to verify registration for Epilepsy12</p>
         <ul>
-          <li>Is a patient in the NHS (of either an NHS Trust in England or an NHS Health Board in Wales)</li>
-          <li>Has had two or more seizure episodes at least 24 hours apart, <i>OR</i> has been diagnosed with epilepsy for another reason</li>
-          <li>Has been referred to a paediatric service* for a first assessment</li>
-          <li>If the child had a previous EEG or paediatric assessments for similar episode(s) or epilepsy prior to this initial assessment</li>
-          <li>Has been referred for an initial EEG**, <i>OR</i> a first EEG was indicated although the child was not actually referred</li>
+          <li>Is a patient within NHS England or Wales</li>
+          <p><b>AND</b></p>
+          <li>Has had a first paediatric assessment* for an episode(s) that was ultimately deemed to be epileptic</li>
+          <p><b>AND</b></p>
+          <li>Has had two or more epileptic seizure episodes at least 24 hours apart <b>OR</b> diagnosed with epilepsy for any other reason</li>
         </ul> 
         <h5>Exclusion</h5>
-        <p>The child or young person has NOT:</p>
+        <p>The child or young person has had <b>ONE OR MORE</b> of the following exclusion criteria:</p>
         <ul>
-          <li>requested to opt out</li>
-          <li>previously been diagnosed with epilepsy</li>
-          <li>previously had a paediatric first assessment or EEG for earlier seizure episodes</li>
-          <li>previously been registered in the Epilepsy12 audit.</li>
+          <li>previously been diagnosed with epilepsy before the first paediatric assessment</li>
+          <li>previously had a paediatric assessment for earlier seizure episodes considered to be epileptic</li>
+          <li>previously been registered in the Epilepsy12 audit</li>
+          <li>has gone on to have ongoing care within the first year of care for their epilepsy provided by adult or non-NHS services by an inpatient our outpatient, hospital or community paediatric service, or a dedicated paediatric team based in ED.</li>
         </ul>
         <p>* paediatric service, or a dedicated paediatric team based in A&E. They should not have been referred or assessed by an adult service/team.</p>
         <p>** EEG for paroxysmal episodes considered as first EEG.  If previous EEG was for other reasons e.g. HIE, encephalitis then this EEG would not count as first EEG</p>
