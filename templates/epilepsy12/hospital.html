@@ -28,7 +28,9 @@
             </div>
 
             <div class="twelve wide column">
-
+                    <h1 class='header'>
+                    UK Level Summary
+                    </h1>
                     <div id="ethnicity_piechart" class="ui rcpch_chart_container segment">
                         {% if cases_aggregated_by_ethnicity %}
                             {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}

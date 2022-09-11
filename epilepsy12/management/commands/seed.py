@@ -130,8 +130,15 @@ def run_dummy_cases_seed():
         postcode = postcode_list[index]
         ethnicity = choice(ETHNICITIES)[0]
 
-        hospital_trust = HospitalTrust.objects.filter(
-            OrganisationName='King\'s College Hospital').get()
+        if index < 33:
+            hospital_trust = HospitalTrust.objects.filter(
+                OrganisationName="King's College Hospital").get()
+        elif index >= 33 and index < 66:
+            hospital_trust = HospitalTrust.objects.filter(
+                OrganisationName="Addenbrooke's").get()
+        else:
+            hospital_trust = HospitalTrust.objects.filter(
+                OrganisationName='Great North Childrens Hospital').get()
 
         try:
             new_case = Case(
@@ -152,10 +159,10 @@ def run_dummy_cases_seed():
             new_site = Site.objects.create(
                 hospital_trust=hospital_trust,
                 site_is_actively_involved_in_epilepsy_care=True,
-                site_is_primary_centre_of_epilepsy_care=True
+                site_is_primary_centre_of_epilepsy_care=True,
+                case=new_case
             )
             new_site.save()
-            new_site.case.add(new_case)
         except Exception as e:
             print(f"Error saving site: {e}")
 

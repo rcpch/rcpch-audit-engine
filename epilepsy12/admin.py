@@ -50,7 +50,16 @@ class Epilepsy12UserAdmin(UserAdmin):
                 'fields': (
                     'is_active',
                     'is_staff',
-                    'is_rcpch_audit_team_member'
+                    'is_rcpch_audit_team_member',
+                    'is_superuser',
+                )
+            }
+        ),
+        (
+            'Group Permissions', {
+                'classes': ('collapse',),
+                'fields': (
+                    'groups', 'user_permissions',
                 )
             }
         ),
@@ -72,10 +81,14 @@ class RegistrationAdmin(GuardedModelAdmin):
     pass
 
 
+class CaseAdmin(GuardedModelAdmin):
+    pass
+
+
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine)
 admin.site.register(Assessment)
-admin.site.register(Case)
+admin.site.register(Case, CaseAdmin)
 admin.site.register(Comorbidity)
 admin.site.register(EpilepsyContext)
 admin.site.register(Investigations)

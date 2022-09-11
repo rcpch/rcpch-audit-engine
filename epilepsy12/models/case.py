@@ -5,6 +5,8 @@ from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.conf import settings
 
+from epilepsy12.models.hospital_trust import HospitalTrust
+
 
 from ..constants import *
 from ..general_functions import *
@@ -85,6 +87,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         blank=True,
         editable=False,
         null=True
+    )
+
+    # relationships
+    hospital_trusts = models.ManyToManyField(
+        HospitalTrust,
+        through='Site',
+        related_name='cases',
+        through_fields=('case', 'hospital_trust')
     )
 
     @property

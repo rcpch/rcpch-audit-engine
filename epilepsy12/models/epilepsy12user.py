@@ -100,6 +100,9 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(
         default=False
     )
+    is_superuser = models.BooleanField(
+        default=False
+    )
     is_rcpch_audit_team_member = models.BooleanField(
         default=False
     )
@@ -126,6 +129,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     hospital_employer = models.ForeignKey(
         HospitalTrust,
         on_delete=models.CASCADE,
+        blank=True,
         null=True
     )
 

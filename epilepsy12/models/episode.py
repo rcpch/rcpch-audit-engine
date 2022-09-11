@@ -289,7 +289,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "Episode",
+        verbose_name = "Episode"
         verbose_name_plural = "Episodes"
 
     def __str__(self) -> str:

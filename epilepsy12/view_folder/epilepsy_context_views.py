@@ -2,7 +2,7 @@
 from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from epilepsy12.models.comorbidity import Comorbidity
 from epilepsy12.models.registration import Registration
@@ -42,6 +42,8 @@ def epilepsy_context(request, case_id):
 # HTMX
 
 
+@login_required
+@permission_required('epilepsy_context.change_epilepsy_context')
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 

@@ -43,19 +43,23 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True
     )
 
+    # relationships
+    # Site is a link table between Case and Hospital Trust in a many to many relationship
+
     hospital_trust = models.ForeignKey(
         to=HospitalTrust,
         related_name="hospital_trust",
         on_delete=models.PROTECT
     )
 
-    # Relationships
-    # registration = models.ForeignKey(
-    #     to=Registration,
-    #     on_delete=models.CASCADE
-    # )
-    case = models.ManyToManyField(
-        Case
+    case = models.ForeignKey(
+        # Note a Case instance can have only one site instance
+        # where site_is_actively_involved_in_epilepsy_care. However,
+        # it can have multiple instances where site_is_actively_involved_in_epilepsy_care
+        # is false.
+        Case,
+        on_delete=models.CASCADE,
+        related_name='cases'
     )
 
     class Meta:

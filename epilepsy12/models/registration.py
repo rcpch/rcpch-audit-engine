@@ -43,7 +43,8 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     referring_clinician = models.CharField(
         max_length=50,
-        null=True
+        null=True,
+        blank=True
     )
 
     eligibility_criteria_met = models.BooleanField(
