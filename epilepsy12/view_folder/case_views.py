@@ -127,6 +127,9 @@ def case_list(request):
                 rcpch_preference = rcpch_choices[0]
             else:
                 rcpch_preference = rcpch_choices[1]
+        else:
+            rcpch_preference = None
+            rcpch_choices = None
     else:
         full_hospital_trust = None
         rcpch_choices = None
