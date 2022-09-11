@@ -1,0 +1,4 @@
+
+
+{% url 'has_rcpch_view_preference' as hx_post %}
+{% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=rcpch_choices hx_post=hx_post hx_target="#has_rcpch_view_preference" hx_trigger="click" hx_swap="innerHTML" test_positive=has_rcpch_view_preference.0 label="" data_position="top left" %}

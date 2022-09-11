@@ -845,3 +845,12 @@ ui.rcpch_chart_container.segment {
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
 }
+
+.ui.top.attached.rcpch_dark_blue.clearing.segment {
+  color: var(--rcpch_white);
+  background-color: var(--rcpch_dark_blue);
+}
+
+.ui.top.attached.rcpch_dark_blue.clearing.segment>h5 {
+  color: white;
+}

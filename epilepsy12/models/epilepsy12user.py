@@ -44,6 +44,7 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_rcpch_audit_team_member', True)
+        extra_fields.setdefault('has_rcpch_view_preference', True)
         hospital_trust = HospitalTrust.objects.filter(
             OrganisationID=41042).get()
         extra_fields.setdefault('hospital_employer', hospital_trust)
@@ -105,6 +106,9 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     )
     is_rcpch_audit_team_member = models.BooleanField(
         default=False
+    )
+    has_rcpch_view_preference = models.BooleanField(
+        default=True
     )
     date_joined = models.DateTimeField(
         default=timezone.now

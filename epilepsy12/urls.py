@@ -13,6 +13,8 @@ urlpatterns = [
     path('case/create', views.create_case, name="create_case"),
     path('case/<int:id>/delete', views.delete_case, name="delete_case"),
     path('case/<int:case_id>/register', views.register, name='register'),
+    path('cases/has_rcpch_view_preference',
+         views.has_rcpch_view_preference, name='has_rcpch_view_preference'),
 
     #     htmx callback from steps
     path('registration/<int:case_id>/registration_active/<str:active_template>',
