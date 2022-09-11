@@ -106,8 +106,8 @@ def case_list(request):
             all_cases = Case.objects.filter(
                 hospital_trusts__OrganisationName__contains=request.user.hospital_employer).order_by('surname').all()
 
-    registered_cases = Registration.objects.filter(
-        ~Q(registration_date=None),
+    registered_cases = all_cases.filter(
+        ~Q(registration__isnull=True),
     ).all()
 
 
@@ -117,7 +117,7 @@ def case_list(request):
     page_number = request.GET.get('page', 1)
     case_list = paginator.page(page_number)
 
-    case_count = Case.objects.all().count()
+    case_count = all_cases.count()
     registered_count = registered_cases.count()
 
     context = {
