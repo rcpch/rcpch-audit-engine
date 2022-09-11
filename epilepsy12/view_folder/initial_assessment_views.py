@@ -243,13 +243,13 @@ def has_number_of_episodes_since_the_first_been_documented(request, initial_asse
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     test_fields_update_audit_progress(initial_assessment)
 
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
@@ -372,13 +372,13 @@ def developmental_learning_or_schooling_problems(request, initial_assessment_id)
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
     test_fields_update_audit_progress(initial_assessment)
 
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
