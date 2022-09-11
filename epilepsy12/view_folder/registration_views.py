@@ -1,16 +1,16 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from datetime import date
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
 from ..models import Registration, Site
 from ..models import Case, AuditProgress, HospitalTrust
-from ..decorator import editor_access_for_this_child
+from ..decorator import group_required
 
 
 @login_required
-@permission_required('registration.view_registration')
+@group_required('epilepsy12_audit_team_view_access', 'epilepsy12_audit_team_edit_access', 'trust_audit_team_view_only', 'trust_audit_team_edit_access')
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -107,7 +107,6 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
-# @editor_access_for_this_child('registration_id')
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
@@ -342,7 +341,6 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_required
-@editor_access_for_this_child('registration_id', 'site_id')
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -422,7 +420,7 @@ Validation process
 
 
 @login_required
-# @editor_access_for_this_child('registration_id')
+@group_required('epilepsy12_audit_team_edit_access', 'trust_audit_team_edit_access')
 def confirm_eligible(request, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child

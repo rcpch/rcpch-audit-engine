@@ -1,6 +1,11 @@
 from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
+
+from epilepsy12.models.hospital_trust import HospitalTrust
+from epilepsy12.models.registration import Registration
 from .models import Case, Site
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.functional import wraps
 
 
 model_primary_keys = [
@@ -70,3 +75,61 @@ def editor_access_for_this_child(*outer_args, **outer_kwargs):
                 raise PermissionDenied()
         return decorated
     return decorator
+
+
+def group_required(*group_names):
+    # decorator receives case_id or registration_id from view and group name(s) as arguments.
+    # if user is in the list of group_names supplied, access is granted, but only to
+    # to those users who are either:
+    # 1. superusers
+    # 2. RCPCH audit members
+    # 3. trust level access where their trust is the same as the child
+    def decorator(view):
+        def wrapper(request, *args, **kwargs):
+            user = request.user
+            if user.is_active and (user.is_superuser or bool(user.groups.filter(name__in=group_names))):
+                # user is in either a trust level or an RCPCH level group but in the correct group otherwise.
+                if kwargs.get('registration_id') is not None:
+                    registration = Registration.objects.get(
+                        pk=kwargs.get('registration_id'))
+                    child = registration.case
+                else:
+                    child = Case.objects.get(pk=kwargs.get('case_id'))
+                hospital = HospitalTrust.objects.filter(
+                    cases=child,
+                    site__site_is_actively_involved_in_epilepsy_care=True,
+                    site__site_is_primary_centre_of_epilepsy_care=True,
+                    ParentName=request.user.hospital_employer.ParentName
+                )
+
+                if hospital.exists() or user.is_rcpch_audit_team_member:
+                    return view(request, *args, **kwargs)
+                else:
+                    raise PermissionDenied()
+            else:
+                raise PermissionDenied()
+
+        return wrapper
+    return decorator
+
+
+# def group_required(*group_names):
+#     """
+#     Requires user membership in at least one of the groups passed in.
+
+#     Checks is_active and allows superusers to pass regardless of group
+#     membership.
+#     If have membership of trust level but viewing another trust, permission denied
+#     """
+
+#     def in_group(user):
+
+#         @wraps(view)
+#         def _wrapped_view(request, *args, **kwargs):
+#             if user.is_active and (user.is_superuser or bool(user.groups.filter(name__in=group_names))):
+#                 # user is in either a trust level or an RCPCH level group.
+#                 return _wrapped_view
+#             else:
+#                 raise PermissionDenied()
+
+#         return user_passes_test(in_group)
