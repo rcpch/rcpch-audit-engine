@@ -138,11 +138,11 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "Milestones",
+        verbose_name = "Milestones"
         verbose_name_plural = "Milestones"
 
     def __str__(self) -> str:
-        return "assessment"
+        return f"Assessment Milestones for {self.registration.case}"
 
     # TODO #14 Class function to calculate cohort based on first paediatric assessment date
     # this creates a cohort number (integer) based on where in the year they are

@@ -41,8 +41,6 @@
         {% include 'epilepsy12/partials/registration/referring_clinician.html' with registration=registration hx_editable=field_enabled%}
     </div>
 
-    {% if request.user|has_group 'trust_audit_team_edit_access' %}I have audit access{% endif %}
-
     <div id="lead_site" class="field">
       {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list %}
     </div>

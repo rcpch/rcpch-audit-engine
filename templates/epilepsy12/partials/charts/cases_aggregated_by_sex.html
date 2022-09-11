@@ -1,13 +1,13 @@
-<canvas id="cases_aggregated_by_gender_chart"></canvas>
+<canvas id="cases_aggregated_by_sex_chart"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
 <script>
-            var ctx = document.getElementById('cases_aggregated_by_gender_chart').getContext('2d');
+            var ctx = document.getElementById('cases_aggregated_by_sex_chart').getContext('2d');
             var myChart = new Chart(ctx, { 
                 type: 'pie',
                 data: {
-                    labels: [{% for data in cases_aggregated_by_gender %}'{{ data.gender_display }}',{% endfor %}], //loop through queryset, 
+                    labels: [{% for data in cases_aggregated_by_sex %}'{{ data.sex_display }}',{% endfor %}], //loop through queryset, 
                     datasets: [{
-                        data: [{% for case in cases_aggregated_by_gender %}{{ case.genders }},{% endfor %}],
+                        data: [{% for case in cases_aggregated_by_sex %}{{ case.sexes }},{% endfor %}],
                         backgroundColor: [
                             'rgba(17, 167, 242, 1.0)', 
                             'rgba(45, 49, 109, 1.0)',

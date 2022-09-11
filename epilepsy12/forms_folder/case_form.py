@@ -31,7 +31,7 @@ class CaseForm(forms.ModelForm):
             }
         )
     )
-    gender = forms.ChoiceField(
+    sex = forms.ChoiceField(
         choices=SEX_TYPE,
         widget=forms.Select(),
         required=True
@@ -76,6 +76,6 @@ class CaseForm(forms.ModelForm):
     class Meta:
         model = Case
         fields = [
-            'first_name', 'surname', 'date_of_birth', 'gender', 'nhs_number', 'postcode', 'ethnicity', 'locked', 'locked_at'
+            'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'locked', 'locked_at'
         ]
         exclude = ['locked_by']

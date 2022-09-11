@@ -1,8 +1,34 @@
 {% extends "base.html" %}  {% block content %}
 
-<h5 class="ui top attached inverted header" id="cases_list_segment_header">
-  Children and Young People
-</h5>
+<div class='ui top attached rcpch_dark_blue clearing segment'>
+  <h5 class="ui left floated header">
+    Children and Young People
+  </h5>
+  {% if request.user.is_rcpch_audit_team_member %}
+    {% if request.user.hospital_employer %}
+
+    {% comment %}
+      This is a toggle between RCPCH view and Trust view. Will involve an out of band htmx request so leaving this for now
+      <h5 class="ui right floated header" id='has_rcpch_view_preference'>
+        {% include 'epilepsy12/partials/cases/has_rcpch_view_preference.html' with rcpch_choices=rcpch_choices has_rcpch_view_preference=rcpch_preference %}
+      </h5>
+      {% endcomment %}
+      
+      <h5 class="ui right floated header">
+        Royal College of Paediatrics and Child Health
+      </h5>
+
+    {% else %}
+      <h5 class="ui right floated header">
+        Royal College of Paediatrics and Child Health
+      </h5>
+    {% endif%}
+  {% else %}
+    <h5 class="ui right floated header">
+      {{hospital_trust.OrganisationName}} ({{hospital_trust.ParentName}})
+    </h5>
+  {% endif %}
+</div>
 <div class="ui raised attached segment" id="cases_list_segment">
   <div id="case_table">
     {% include '../partials/case_table.html' with case_list=case_list paginated=paginated %}

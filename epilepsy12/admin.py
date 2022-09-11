@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from guardian.admin import GuardedModelAdmin
 
 # Register your models here.
 from .models import *
@@ -49,7 +50,16 @@ class Epilepsy12UserAdmin(UserAdmin):
                 'fields': (
                     'is_active',
                     'is_staff',
-                    'is_rcpch_audit_team_member'
+                    'is_rcpch_audit_team_member',
+                    'is_superuser',
+                )
+            }
+        ),
+        (
+            'Group Permissions', {
+                'classes': ('collapse',),
+                'fields': (
+                    'groups', 'user_permissions',
                 )
             }
         ),
@@ -67,17 +77,25 @@ class Epilepsy12UserAdmin(UserAdmin):
     )
 
 
+class RegistrationAdmin(GuardedModelAdmin):
+    pass
+
+
+class CaseAdmin(GuardedModelAdmin):
+    pass
+
+
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine)
 admin.site.register(Assessment)
-admin.site.register(Case)
+admin.site.register(Case, CaseAdmin)
 admin.site.register(Comorbidity)
 admin.site.register(EpilepsyContext)
 admin.site.register(Investigations)
 admin.site.register(HospitalTrust)
 admin.site.register(InitialAssessment)
 admin.site.register(Management)
-admin.site.register(Registration)
+admin.site.register(Registration, RegistrationAdmin)
 admin.site.register(Keyword)
 admin.site.register(Site)
 admin.site.register(AuditProgress)

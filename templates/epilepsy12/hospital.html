@@ -28,7 +28,9 @@
             </div>
 
             <div class="twelve wide column">
-
+                    <h1 class='header'>
+                    UK Level Summary
+                    </h1>
                     <div id="ethnicity_piechart" class="ui rcpch_chart_container segment">
                         {% if cases_aggregated_by_ethnicity %}
                             {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
@@ -41,9 +43,9 @@
 
             <div class="eight wide column">
 
-                <div id="cases_aggregated_by_gender" class="ui rcpch_chart_container segment">
-                    {% if cases_aggregated_by_gender %}
-                        {% include 'epilepsy12/partials/charts/cases_aggregated_by_gender.html' with cases_aggregated_by_gender=cases_aggregated_by_gender %}
+                <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container segment">
+                    {% if cases_aggregated_by_sex %}
+                        {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
                     {% else %}
                         <h5>No data yet!<h5>
                     {% endif %}

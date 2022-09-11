@@ -71,7 +71,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
 
     class Meta:
-        verbose_name = "Antiepilepsy Medicine",
+        verbose_name = "Antiepilepsy Medicine"
         verbose_name_plural = "Antiepilepsy Medicines"
 
     @property

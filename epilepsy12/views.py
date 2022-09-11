@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
-from epilepsy12.models import episode
+from epilepsy12.models import episode, hospital_trust
 from epilepsy12.models.case import Case
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
@@ -39,7 +39,6 @@ def hospital_reports(request):
 
     # Registration.objects.all().delete()
     # Episode.objects.all().delete()
-    print(Episode.objects.all().count())
 
     """
     !!!
@@ -64,8 +63,13 @@ def hospital_reports(request):
         key=lambda x: x.updated_at, reverse=True)[:5]
 
     template_name = 'epilepsy12/hospital.html'
-    hospital_object = HospitalTrust.objects.get(
-        OrganisationName=request.user.hospital_employer)
+
+    if request.user.is_rcpch_audit_team_member:
+        hospital_object = HospitalTrust.objects.filter(
+            OrganisationName='King\'s College Hospital').get()
+    else:
+        hospital_object = HospitalTrust.objects.get(
+            OrganisationName=request.user.hospital_employer)
 
     deprivation_quintiles = (
         (1, 1),
@@ -79,8 +83,8 @@ def hospital_reports(request):
                            for k, v in ETHNICITIES]
     imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
                      for k, v in deprivation_quintiles]
-    gender_long_list = [When(gender=k, then=Value(v))
-                        for k, v in SEX_TYPE]
+    sex_long_list = [When(sex=k, then=Value(v))
+                     for k, v in SEX_TYPE]
 
     cases_aggregated_by_ethnicity = (
         Case.objects
@@ -95,17 +99,17 @@ def hospital_reports(request):
             ethnicities=Count('ethnicity')).order_by('ethnicities')
     )
 
-    cases_aggregated_by_gender = (
+    cases_aggregated_by_sex = (
         Case.objects
-        .values('gender')
+        .values('sex')
         .annotate(
-            gender_display=DJANGO_CASE(
-                *gender_long_list, output_field=CharField()
+            sex_display=DJANGO_CASE(
+                *sex_long_list, output_field=CharField()
             )
         )
-        .values('gender_display')
+        .values('sex_display')
         .annotate(
-            genders=Count('gender')).order_by('genders')
+            sexes=Count('sex')).order_by('sexes')
     )
 
     cases_aggregated_by_deprivation = (
@@ -122,8 +126,11 @@ def hospital_reports(request):
         .order_by('cases_aggregated_by_deprivation')
     )
 
-    total_registrations = Registration.objects.all().count()
-    total_cases = Case.objects.all().count()
+    all_cases = Case.objects.filter(
+        hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().count()
+    all_registrations = Case.objects.filter(
+        hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().filter(
+            registration__isnull=False).count()
 
     total_referred_to_paediatrics = Assessment.objects.filter(
         consultant_paediatrician_referral_made=True).count()
@@ -132,17 +139,20 @@ def hospital_reports(request):
     total_referred_to_surgery = Assessment.objects.filter(
         childrens_epilepsy_surgical_service_referral_made=True).count()
 
-    total_percent = round((total_registrations/total_cases)*100)
+    if all_cases > 0:
+        total_percent = round((all_registrations/all_cases)*100)
+    else:
+        total_percent = 0
 
     return render(request=request, template_name=template_name, context={
         'user': request.user,
         'hospital': hospital_object,
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
-        'cases_aggregated_by_gender': cases_aggregated_by_gender,
+        'cases_aggregated_by_sex': cases_aggregated_by_sex,
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
         'percent_completed_registrations': total_percent,
-        'total_registrations': total_registrations,
-        'total_cases': total_cases,
+        'total_registrations': all_registrations,
+        'total_cases': all_cases,
         'total_referred_to_paediatrics': total_referred_to_paediatrics,
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,

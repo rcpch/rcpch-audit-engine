@@ -8,7 +8,6 @@ from .hospital_trust import HospitalTrust
 from .initial_assessment import InitialAssessment
 from .investigations import Investigations
 from .management import Management
-from .nonepilepsy import NonEpilepsy
 from .registration import Registration
 from .site import Site
 from .epilepsy12user import Epilepsy12User

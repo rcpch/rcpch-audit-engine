@@ -5,6 +5,8 @@ from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.conf import settings
 
+from epilepsy12.models.hospital_trust import HospitalTrust
+
 
 from ..constants import *
 from ..general_functions import *
@@ -61,7 +63,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         "surname",
         max_length=100
     )
-    gender = models.IntegerField(
+    sex = models.IntegerField(
         choices=SEX_TYPE
     )
     date_of_birth = DateField(
@@ -85,6 +87,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         blank=True,
         editable=False,
         null=True
+    )
+
+    # relationships
+    hospital_trusts = models.ManyToManyField(
+        HospitalTrust,
+        through='Site',
+        related_name='cases',
+        through_fields=('case', 'hospital_trust')
     )
 
     @property
@@ -154,6 +164,17 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     class Meta:
         verbose_name = 'Patient'
         verbose_name_plural = 'Patients'
+        permissions = [
+            CAN_VIEW_CHILD_NHS_NUMBER,
+            CAN_VIEW_CHILD_DATE_OF_BIRTH,
+            CAN_DELETE_CHILD_CASE_DATA,
+            CAN_UPDATE_CHILD_CASE_DATA,
+            CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
+            CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
+            CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
+            CAN_VIEW_CHILD_CASE_DATA,
+            CAN_CONSENT_TO_AUDIT_PARTICIPATION
+        ]
 
     def __str__(self) -> str:
-        return self.first_name + " " + self.surname
+        return f'{self.first_name} {self.surname}'

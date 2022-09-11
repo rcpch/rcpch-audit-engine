@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from epilepsy12.constants.user_types import PERMISSIONS, ROLES, TITLES
+from epilepsy12.constants.user_types import CAN_CONSENT_TO_AUDIT_PARTICIPATION, PERMISSIONS, ROLES, TITLES
 from epilepsy12.models.hospital_trust import HospitalTrust
 
 
@@ -43,6 +43,11 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_rcpch_audit_team_member', True)
+        extra_fields.setdefault('has_rcpch_view_preference', True)
+        hospital_trust = HospitalTrust.objects.filter(
+            OrganisationID=41042).get()
+        extra_fields.setdefault('hospital_employer', hospital_trust)
 
         if extra_fields.get('is_active') is not True:
             raise ValueError(_('Superuser must have is_active=True.'))
@@ -96,8 +101,14 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(
         default=False
     )
+    is_superuser = models.BooleanField(
+        default=False
+    )
     is_rcpch_audit_team_member = models.BooleanField(
         default=False
+    )
+    has_rcpch_view_preference = models.BooleanField(
+        default=True
     )
     date_joined = models.DateTimeField(
         default=timezone.now
@@ -113,8 +124,8 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
-    REQUIRED_FIELDS = ['role', 'hospital_employer',
-                       'username', 'first_name', 'surname']
+    REQUIRED_FIELDS = ['role',
+                       'username', 'first_name', 'surname', 'is_rcpch_audit_team_member']
     USERNAME_FIELD = 'email'
 
     objects = Epilepsy12UserManager()
@@ -122,6 +133,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     hospital_employer = models.ForeignKey(
         HospitalTrust,
         on_delete=models.CASCADE,
+        blank=True,
         null=True
     )
 
@@ -151,7 +163,6 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = "Epilepsy12 User"
         verbose_name_plural = "Epilepsy12 Users"
-        permissions = PERMISSIONS  # a full list of permissions is in constants/user_types.py
 
     def __str__(self) -> str:
         return self.get_full_name()

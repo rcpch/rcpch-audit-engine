@@ -36,7 +36,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
-                          "127.0.0.1,localhost").split(",")
+                          "127.0.0.1,localhost,0.0.0.0").split(",")
 
 # Development mode allows the use of alternate settings when running locally
 # Defaults to False. Set to true in an environment variable if needed.
@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'epilepsy12',
     # third party
     'widget_tweaks',
-    'django_htmx'
+    'django_htmx',
+    'guardian',
 ]
 
 MIDDLEWARE = [
@@ -173,3 +174,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = [
     'https://epilepsy12-dev.azurewebsites.net', 'https://epilepsy12.rcpch.tech']
+
+# django-guardian
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)

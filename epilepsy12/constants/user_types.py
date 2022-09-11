@@ -63,7 +63,7 @@ GROUPS = (
     PATIENT_ACCESS,
 )
 
-
+# Case
 CAN_VIEW_CHILD_NHS_NUMBER = (
     'can_view_child_nhs_number', 'Can view a child\'s NHS Number')
 CAN_VIEW_CHILD_DATE_OF_BIRTH = (
@@ -80,6 +80,8 @@ CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT = ('can_opt_out_child_from_inclusion_i
                                              'Can sanction an opt out from participating in the audit. Note all the child\'s date except Epilepsy12 unique identifier are irretrievably deleted.')
 CAN_VIEW_CHILD_CASE_DATA = ('can_view_child_case_data',
                             'Can view a child\'s demographic and case information.')
+
+# Registration
 CAN_APPROVE_ELIGIBILITY = ('can_approve_eligibility',
                            'Can approve eligibility for Epilepsy12.')
 CAN_REMOVE_APPROVAL_OF_ELIGIBILITY = ('can_remove_approval_of_eligibility',
@@ -94,10 +96,15 @@ CAN_REGISTER_CHILD_IN_EPILEPSY12 = ('can_register_child_in_epilepsy12',
                                     'Can register child in Epilepsy12. (A cohort number is automatically allocaeted)')
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = ('can_unregister_child_in_epilepsy12',
                                       'Can unregister a child in Epilepsy. Their record and previously entered data is untouched.')
+
+# First Paediatric Assessment
 CAN_VIEW_FIRST_PAEDIATRIC_ASSESSMENT_FIELDS = ('can_view_first_paediatric_assessment_fields',
                                                'Can view all information gathered at first assessment.')
-CAN_EDIT_FIRST_PAEDIATRIC_ASSESSMENT_FIELDS = ('can_edit_first_paediatric_assessment_fields',
+CAN_EDIT_FIRST_PAEDIATRIC_ASSESSMENT_FIELDS = ('can_edit_but_not_delete_first_paediatric_assessment_fields',
                                                'Can edit all information gathered at first assessment.')
+CAN_DELETE_FIRST_PAEDIATRIC_ASSESSMENT_FIELDS = ('can_delete_first_paediatric_assessment_fields',
+                                                 'Can delete all information gathered at first assessment.')
+
 CAN_VIEW_EPILEPSY_CONTEXT_FIELDS = ('can_view_epilepsy_context_fields',
                                     'Can view all fiedls related to epilepsy context.')
 CAN_EDIT_EPILEPSY_CONTEXT_FIELDS = ('can_edit_epilepsy_context_fields',
