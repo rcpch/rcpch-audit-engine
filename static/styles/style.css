@@ -811,6 +811,20 @@ ui.rcpch_chart_container.segment {
   border-radius: 0rem;
 }
 
+.ui.rcpch.input>input {
+  border-radius: 0%;
+  border-width: medium;
+  border-color: var(--rcpch_light_blue);
+  color: var(--rcpch_dark_blue);
+}
+
+.ui.rcpch.input>input:focus {
+  border-radius: 0%;
+  border-width: medium;
+  border-color: var(--rcpch_light_blue);
+  color: var(--rcpch_dark_blue);
+}
+
 .ui.rcpch.icon.input>input:focus {
   color: var(rcpch_light_blue);
 }
@@ -886,6 +900,14 @@ ui.rcpch_chart_container.segment {
 .ui.rcpch_info.message {
   border-radius: 0%;
   color: var(--rcpch_light_blue);
+  background-color: var(--rcpch_lightest_blue);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+  box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+.ui.rcpch_important.message {
+  border-radius: 0%;
+  color: var(--rcpch_charcoal);
   background-color: var(--rcpch_lightest_blue);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
