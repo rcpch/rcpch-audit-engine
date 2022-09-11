@@ -193,6 +193,7 @@ def general_paediatric_centre(request, assessment_id):
         )
     else:
         site = Site.objects.create(
+            case=assessment.registration.case,
             hospital_trust=general_paediatric_centre,
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_childrens_epilepsy_surgery_centre=False,
@@ -201,7 +202,6 @@ def general_paediatric_centre(request, assessment_id):
             site_is_general_paediatric_centre=True,
         )
         site.save()
-        site.case.add(assessment.registration.case)
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
@@ -673,6 +673,7 @@ def paediatric_neurology_centre(request, assessment_id):
         )
     else:
         site = Site.objects.create(
+            case=assessment.registration.case,
             hospital_trust=paediatric_neurology_centre,
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_childrens_epilepsy_surgery_centre=False,
@@ -681,7 +682,6 @@ def paediatric_neurology_centre(request, assessment_id):
             site_is_general_paediatric_centre=False,
         )
         site.save()
-        site.case.add(assessment.registration.case)
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
@@ -1228,6 +1228,7 @@ def epilepsy_surgery_centre(request, assessment_id):
         )
     else:
         site = Site.objects.create(
+            case=assessment.registration.case,
             hospital_trust=epilepsy_surgery_centre,
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_childrens_epilepsy_surgery_centre=True,
@@ -1236,7 +1237,6 @@ def epilepsy_surgery_centre(request, assessment_id):
             site_is_general_paediatric_centre=False,
         )
         site.save()
-        site.case.add(case=assessment.registration.case)
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
