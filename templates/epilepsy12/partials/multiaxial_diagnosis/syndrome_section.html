@@ -1,5 +1,10 @@
+{% load epilepsy12_template_tags %}
 {% url 'syndrome_present' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present label='Is there an identifiable epilepsy syndrome?' data_position='top left' %}
+{% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present label='Is there an identifiable epilepsy syndrome?' data_position='top left' disabled=True %}
+{% else %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present label='Is there an identifiable epilepsy syndrome?' data_position='top left' disabled=False %}
+{% endif %}
 
 {% if multiaxial_diagnosis.syndrome_present %}
 
@@ -13,8 +18,12 @@
 
     <div class="field" id='syndrome'>
 
-        <button 
-            class="ui rcpch_primary button"
+        <button
+            {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                class="ui rcpch_primary disabled button"
+            {% else %}
+                class="ui rcpch_primary button"
+            {% endif %}
             hx-post="{% url 'add_syndrome' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
             hx-target="#syndrome"
             hx-swap='innerHTML'

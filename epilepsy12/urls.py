@@ -1,6 +1,8 @@
+from django.views.generic.base import RedirectView
+from django.conf.urls.static import static
 from . import views
 from .views import SignUpView
-from django.urls import path
+from django.urls import path, re_path
 
 urlpatterns = [
     path('403', views.redirect_403, name='redirect_403'),

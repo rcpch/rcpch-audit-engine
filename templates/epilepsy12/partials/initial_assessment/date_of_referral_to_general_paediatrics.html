@@ -1,2 +1,7 @@
-    {% url 'date_of_referral_to_general_paediatrics' initial_assessment_id=initial_assessment.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#date_of_referral_to_general_paediatrics' hx_trigger='change' label='Date of referral to general paediatrics' date_value=initial_assessment.date_of_referral_to_general_paediatrics data_position='top left' input_date_field_name='date_of_referral_to_general_paediatrics' %}
+{% load epilepsy12_template_tags %}
+{% url 'date_of_referral_to_general_paediatrics' initial_assessment_id=initial_assessment.pk as hx_post %}
+{% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#date_of_referral_to_general_paediatrics' hx_trigger='change' label='Date of referral to general paediatrics' date_value=initial_assessment.date_of_referral_to_general_paediatrics data_position='top left' input_date_field_name='date_of_referral_to_general_paediatrics' disabled=True %}
+{% else %}
+    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#date_of_referral_to_general_paediatrics' hx_trigger='change' label='Date of referral to general paediatrics' date_value=initial_assessment.date_of_referral_to_general_paediatrics data_position='top left' input_date_field_name='date_of_referral_to_general_paediatrics' disabled=False %}
+{% endif %}

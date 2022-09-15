@@ -14,6 +14,7 @@
         hx_default_text: default text of an unselected element
         data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
         hx_editable
+        show_buttons - show or hide the edit button
     The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
     Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
 {% endcomment %}
@@ -54,42 +55,46 @@
             {% else %}
                 <i class="rcpch_light_blue dot circle outline icon"></i>
             {% endif %}
+    
+            {% if show_buttons %}
             
-            <div class="ui buttons">
-                {% if hx_editable %}
+                <div class="ui buttons">
+                    {% if hx_editable %}
+                        
+                        <button 
+                            class="ui rcpch_primary button"
+                            hx-post="{{hx_post}}"
+                            hx-target="{{hx_target}}"
+                            hx-swap="{{hx_swap}}"
+                            name='{{hx_name}}'
+                            hx-trigger="click"
+                        >Update {{label}}</button>
+
+                        <button 
+                            class="ui rcpch_negative button"
+                            hx-post="{% url 'editable' model_instance_id 'disable' %}"
+                            hx-target="{{hx_target}}"
+                            hx-swap="{{hx_swap}}"
+                            hx-trigger="click"
+                            name='{{hx_name}}'
+                        >Cancel</button>
+
+                    {% else %}
+
+                        <button 
+                            class="ui rcpch_primary button"
+                            hx-post="{% url 'editable' model_instance_id 'enable' %}"
+                            hx-target="{{hx_target}}"
+                            hx-swap="{{hx_swap}}"
+                            hx-trigger="click"
+                            name='{{hx_name}}'
+                        >Edit</button>
                     
-                    <button 
-                        class="ui rcpch_primary button"
-                        hx-post="{{hx_post}}"
-                        hx-target="{{hx_target}}"
-                        hx-swap="{{hx_swap}}"
-                        name='{{hx_name}}'
-                        hx-trigger="click"
-                    >Update {{label}}</button>
+                    {% endif %}
+                    
+                </div>
 
-                    <button 
-                        class="ui rcpch_negative button"
-                        hx-post="{% url 'editable' model_instance_id 'disable' %}"
-                        hx-target="{{hx_target}}"
-                        hx-swap="{{hx_swap}}"
-                        hx-trigger="click"
-                        name='{{hx_name}}'
-                    >Cancel</button>
-
-                {% else %}
-
-                    <button 
-                        class="ui rcpch_primary button"
-                        hx-post="{% url 'editable' model_instance_id 'enable' %}"
-                        hx-target="{{hx_target}}"
-                        hx-swap="{{hx_swap}}"
-                        hx-trigger="click"
-                        name='{{hx_name}}'
-                    >Edit</button>
-                
-                {% endif %}
-                
-            </div>
+            {% endif %}
 
         </div>
 

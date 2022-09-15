@@ -95,12 +95,21 @@ def group_required(*group_names):
                     child = registration.case
                 else:
                     child = Case.objects.get(pk=kwargs.get('case_id'))
-                hospital = HospitalTrust.objects.filter(
-                    cases=child,
-                    site__site_is_actively_involved_in_epilepsy_care=True,
-                    site__site_is_primary_centre_of_epilepsy_care=True,
-                    ParentName=request.user.hospital_employer.ParentName
-                )
+
+                if user.is_rcpch_audit_team_member:
+                    hospital = HospitalTrust.objects.filter(
+                        cases=child,
+                        site__site_is_actively_involved_in_epilepsy_care=True,
+                        site__site_is_primary_centre_of_epilepsy_care=True,
+                    )
+                else:
+                    # filter for object where hospital where case is registered is the same as that of user
+                    hospital = HospitalTrust.objects.filter(
+                        cases=child,
+                        site__site_is_actively_involved_in_epilepsy_care=True,
+                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        ParentName=request.user.hospital_employer.ParentName
+                    )
 
                 if hospital.exists() or user.is_rcpch_audit_team_member:
                     return view(request, *args, **kwargs)
@@ -111,25 +120,3 @@ def group_required(*group_names):
 
         return wrapper
     return decorator
-
-
-# def group_required(*group_names):
-#     """
-#     Requires user membership in at least one of the groups passed in.
-
-#     Checks is_active and allows superusers to pass regardless of group
-#     membership.
-#     If have membership of trust level but viewing another trust, permission denied
-#     """
-
-#     def in_group(user):
-
-#         @wraps(view)
-#         def _wrapped_view(request, *args, **kwargs):
-#             if user.is_active and (user.is_superuser or bool(user.groups.filter(name__in=group_names))):
-#                 # user is in either a trust level or an RCPCH level group.
-#                 return _wrapped_view
-#             else:
-#                 raise PermissionDenied()
-
-#         return user_passes_test(in_group)

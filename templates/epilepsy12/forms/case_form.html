@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <form class="ui form" method="post">
   {% csrf_token %}
     <div class="two fields">
@@ -18,6 +19,7 @@
         {% endif %}
       </div>
     </div>
+    {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
     <div class="field">
       <label>Date of Birth</label>
       {{form.date_of_birth}} {% if form.date_of_birth.errors %}
@@ -26,6 +28,7 @@
       </div>
       {% endif %}
     </div>
+    {% endif %}
     <div class="two fields">
       <div class="field">
         <label>Sex</label>
@@ -45,26 +48,28 @@
     </div>
     <div class="two fields">
       <div class="field">
-        <label>Postcode
+        <label>Postcode 
         <i class="question circle icon link" id="postcodeIdPopup"></i>
         <div class="ui flowing popup top left transition hidden">
             <p>Post code at the time of registration in Epilepsy12</p>
         </div>
         </label>
-        {{form.postcode}} {% if form.postcode.errors %}
+        {{form.postcode}}  {% if form.postcode.errors %}
         <div class="ui pointing red basic label">
           {{form.postcode.errors}}
         </div>
         {% endif %}
       </div>
-      <div class="field">
-        <label>NHS/CHI Number</label>
-        {{form.nhs_number}} {% if form.nhs_number.errors %}
-        <div class="ui pointing red basic label">
-          {{form.nhs_number.errors}}
+      {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
+        <div class="field">
+          <label>NHS/CHI Number</label>
+          {{form.nhs_number}} {% if form.nhs_number.errors %}
+          <div class="ui pointing red basic label">
+            {{form.nhs_number.errors}}
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
-      </div>
+      {% endif %}
     </div>
     <div class="field">
       <label>Ethnicity</label>
@@ -72,7 +77,11 @@
       <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
       {% endif %}
     </div>
-    <button type="submit" class="ui green button" name="update">Save</button>
+    {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
+      <button type="submit" class="ui green button" name="update">Save</button>
+    {% endif %}
+    {% if request.user|has_group:"trust_audit_team_full_access, epilepsy12_audit_team_full_access" %}
     <button type="submit" class="ui red button" name="delete">Delete</button>
+    {% endif %}
     <button type="submit" class="ui blue button">Cancel</button>
   </form>

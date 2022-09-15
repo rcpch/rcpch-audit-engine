@@ -12,6 +12,7 @@
             label: this is the label text
             hx_default_text: default text of an unselected element
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
+            disabled: this is set to true if a view only user sees the form
         The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
         Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
     {% endcomment %}
@@ -21,9 +22,11 @@
                 {{label}}
             </label>
 
-            <div 
-                class="ui rcpch_light_blue fluid selection dropdown"
-            >
+            {% if disabled %}
+                <div class="ui rcpch_light_blue fluid selection disabled dropdown">
+            {% else %}
+                <div class="ui rcpch_light_blue fluid selection dropdown">
+            {% endif %}
             
                     {% if test_positive %}
                         <i class="rcpch_pink check circle outline icon"></i>
@@ -34,7 +37,7 @@
                     {% endif %}
 
                     <i class="dropdown icon"></i>
-                    <input type="hidden" 
+                    <input type="hidden"
                         name={{hx_name}}
                         hx-post="{{hx_post}}"
                         hx-target="{{hx_target}}"

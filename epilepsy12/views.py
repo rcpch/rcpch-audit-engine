@@ -64,13 +64,13 @@ def hospital_reports(request):
 
     template_name = 'epilepsy12/hospital.html'
 
-    if request.user.is_rcpch_audit_team_member:
-        hospital_object = HospitalTrust.objects.filter(
-            OrganisationName='King\'s College Hospital').get()
-    else:
+    if request.user.hospital_employer is not None:
         hospital_object = HospitalTrust.objects.get(
             OrganisationName=request.user.hospital_employer)
+    else:
+        hospital_object = None
 
+    # national aggregate queries on all cases
     deprivation_quintiles = (
         (1, 1),
         (2, 2),
@@ -126,11 +126,16 @@ def hospital_reports(request):
         .order_by('cases_aggregated_by_deprivation')
     )
 
-    all_cases = Case.objects.filter(
-        hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().count()
-    all_registrations = Case.objects.filter(
-        hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().filter(
-            registration__isnull=False).count()
+    # query to return all cases and registrations of hospital of logged in user if clinician
+    if request.user.hospital_employer:
+        all_cases = Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().count()
+        all_registrations = Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().filter(
+                registration__isnull=False).count()
+    else:
+        all_registrations = Registration.objects.all().count()
+        all_cases = Case.objects.all().count()
 
     total_referred_to_paediatrics = Assessment.objects.filter(
         consultant_paediatrician_referral_made=True).count()
