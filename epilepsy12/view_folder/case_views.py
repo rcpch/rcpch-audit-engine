@@ -2,9 +2,9 @@ from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Q, Count
+from django.db.models import Q
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Registration, HospitalTrust, Epilepsy12User
+from epilepsy12.models import HospitalTrust, Epilepsy12User
 from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
