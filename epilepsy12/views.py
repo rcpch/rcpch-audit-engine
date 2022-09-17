@@ -199,24 +199,25 @@ def signup(request, *args, **kwargs):
             """
             Allocate Roles
             """
-            if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
+            logged_in_user.is_superuser = False
+            if logged_in_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
                 logged_in_user.is_staff = True
-            elif user.role == AUDIT_CENTRE_CLINICIAN:
+            elif logged_in_user.role == AUDIT_CENTRE_CLINICIAN:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
                 logged_in_user.is_staff = True
-            elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
+            elif logged_in_user.role == AUDIT_CENTRE_ADMINISTRATOR:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
                 logged_in_user.is_staff = True
-            elif user.role == RCPCH_AUDIT_LEAD:
+            elif logged_in_user.role == RCPCH_AUDIT_LEAD:
                 group = Group.objects.get(
                     name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            elif user.role == RCPCH_AUDIT_ANALYST:
+            elif logged_in_user.role == RCPCH_AUDIT_ANALYST:
                 group = Group.objects.get(
                     name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            elif user.role == RCPCH_AUDIT_ADMINISTRATOR:
+            elif logged_in_user.role == RCPCH_AUDIT_ADMINISTRATOR:
                 group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-            elif user.role == RCPCH_AUDIT_PATIENT_FAMILY:
+            elif logged_in_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
                 group = Group.objects.get(name=PATIENT_ACCESS)
             else:
                 # no group
