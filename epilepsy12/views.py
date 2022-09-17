@@ -1,16 +1,17 @@
+from django.contrib.auth.models import Group
 from django.shortcuts import render
-from django.contrib.auth.forms import UserCreationForm
+# from django.contrib.auth.forms import UserCreationForm
+from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views import generic
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
-from epilepsy12.models import episode, hospital_trust
 from epilepsy12.models.case import Case
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
-from .models import AuditProgress
 from itertools import chain
 from .view_folder import *
 from django_htmx.http import HttpResponseClientRedirect
@@ -180,10 +181,59 @@ def documentation(request):
     return render(request, template_name, {})
 
 
-class SignUpView(generic.CreateView):
-    form_class = UserCreationForm
-    success_url = reverse_lazy("login")
-    template_name = "registration/signup.html"
+def signup(request, *args, **kwargs):
+    """
+    Part of the registration process. Signing up for a new account, returns empty form as a GET request
+    or validates the form, creates an account and allocates a group if part of a POST request. It is not possible 
+    to create a superuser account through this route.
+    """
+    user = request.user
+    if user.is_authenticated:
+        return HttpResponse(f'{user} is already logged in!')
+
+    if request.method == 'POST':
+        form = Epilepsy12UserCreationForm(request.POST)
+        if form.is_valid():
+            logged_in_user = form.save()
+            logged_in_user.is_active = True
+            """
+            Allocate Roles
+            """
+            if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
+                logged_in_user.is_staff = True
+            elif user.role == AUDIT_CENTRE_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+                logged_in_user.is_staff = True
+            elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+                logged_in_user.is_staff = True
+            elif user.role == RCPCH_AUDIT_LEAD:
+                group = Group.objects.get(
+                    name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+            elif user.role == RCPCH_AUDIT_ANALYST:
+                group = Group.objects.get(
+                    name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
+            elif user.role == RCPCH_AUDIT_ADMINISTRATOR:
+                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+            elif user.role == RCPCH_AUDIT_PATIENT_FAMILY:
+                group = Group.objects.get(name=PATIENT_ACCESS)
+            else:
+                # no group
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+            logged_in_user.groups.add(group)
+
+            logged_in_user.save()
+            login(request, logged_in_user,
+                  backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, "Sign up successful.")
+            return redirect('hospital_reports')
+        for msg in form.error_messages:
+            messages.error(
+                request, f"Registration Unsuccessful: {form.error_messages[msg]}")
+
+    form = Epilepsy12UserCreationForm()
+    return render(request=request, template_name='registration/signup.html', context={'form': form})
 
 
 # HTMX generic partials
