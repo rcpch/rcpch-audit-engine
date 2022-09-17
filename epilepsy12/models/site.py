@@ -48,7 +48,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     hospital_trust = models.ForeignKey(
         to=HospitalTrust,
-        related_name="hospital_trust",
+        related_name="site",
         on_delete=models.PROTECT
     )
 
@@ -59,7 +59,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         # is false.
         Case,
         on_delete=models.CASCADE,
-        related_name='cases'
+        related_name='site'
     )
 
     class Meta:

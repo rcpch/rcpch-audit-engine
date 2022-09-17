@@ -1,2 +1,7 @@
+{% load epilepsy12_template_tags %}
 {% url 'referring_clinician' registration_id=registration.pk as hx_post %}
-{% include 'epilepsy12/partials/page_elements/input.html' with hx_post=hx_post hx_target='#referring_clinician' hx_trigger="keyup" hx_swap='innerHTML' label='Referring Clinician' hx_default_text='Colin Dunkley' test_positive=registration.referring_clinician hx_name='referring_clinician' data_position='top left' hx_editable=hx_editable model_instance_id=registration.pk %}
+{% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+    {% include 'epilepsy12/partials/page_elements/input.html' with hx_post=hx_post hx_target='#referring_clinician' hx_trigger="keyup" hx_swap='innerHTML' label='Referring Clinician' hx_default_text='Colin Dunkley' test_positive=registration.referring_clinician hx_name='referring_clinician' data_position='top left' hx_editable=hx_editable model_instance_id=registration.pk show_buttons=False %}
+{% else %}
+    {% include 'epilepsy12/partials/page_elements/input.html' with hx_post=hx_post hx_target='#referring_clinician' hx_trigger="keyup" hx_swap='innerHTML' label='Referring Clinician' hx_default_text='Colin Dunkley' test_positive=registration.referring_clinician hx_name='referring_clinician' data_position='top left' hx_editable=hx_editable model_instance_id=registration.pk show_buttons=True %}
+{% endif %}

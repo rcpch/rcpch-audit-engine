@@ -1,4 +1,4 @@
-
+{% load epilepsy12_template_tags %}
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <div class="three fields" 
         hx-get="{% url 'registration_status' registration_id=registration.pk %}"
@@ -21,6 +21,9 @@
                         hx-target="#registration_date_results" 
                         hx-swap='innerHTML'
                         hx-trigger="click">
+                        {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                        disabled
+                        {% endif %}
                         <div class="fluid ui button" id="action_button">Register Now</div>
                     </div>
                 {% else %}

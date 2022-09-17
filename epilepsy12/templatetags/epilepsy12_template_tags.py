@@ -112,11 +112,16 @@ def to_class_name(value):
 
 
 @register.filter('has_group')
-def has_group(user, group_name):
+def has_group(user, group_names_string):
     # thanks to Lucas Simon for this efficiency
     # https://stackoverflow.com/questions/1052531/get-user-group-in-a-template
     """
     Check if user has permission
     """
+    result = [x.strip() for x in group_names_string.split(',')]
     groups = user.groups.all().values_list('name', flat=True)
-    return True if group_name in groups else False
+    match = False
+    for group in groups:
+        if group in result:
+            match = True
+    return match

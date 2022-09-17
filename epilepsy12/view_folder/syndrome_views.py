@@ -3,6 +3,7 @@ from datetime import datetime
 from operator import itemgetter
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from ..decorator import group_required
 from django_htmx.http import trigger_client_event
 
 from epilepsy12.models.syndrome import Syndrome
@@ -43,6 +44,8 @@ def syndrome_diagnosis_date(request, syndrome_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def syndrome_name(request, syndrome_id):
     """
     HTMX post request from syndrome.html partial on syndrome name change
@@ -73,6 +76,8 @@ def syndrome_name(request, syndrome_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def syndrome_diagnosis_active(request, syndrome_id):
     """
     HTMX post request from syndrome.html partial on syndrome name change

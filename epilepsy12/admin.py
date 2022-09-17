@@ -1,3 +1,4 @@
+from atexit import unregister
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from guardian.admin import GuardedModelAdmin
@@ -76,13 +77,40 @@ class Epilepsy12UserAdmin(UserAdmin):
         }),
     )
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            form.base_fields['is_superuser'].disabled = True
+            form.base_fields['is_rcpch_audit_team_member'].disabled = True
+            form.base_fields['groups'].disabled = True
+        if request.user.groups.filter(name='trust_audit_team_edit_access'):
+            form.base_fields['groups'].disabled = True
+            form.base_fields['username'].disabled = True
+            form.base_fields['first_name'].disabled = True
+            form.base_fields['surname'].disabled = True
+            form.base_fields['title'].disabled = True
+            form.base_fields['email'].disabled = True
+            form.base_fields['is_staff'].disabled = True
+        return form
+
 
 class RegistrationAdmin(GuardedModelAdmin):
     pass
 
 
 class CaseAdmin(GuardedModelAdmin):
-    pass
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    # to disable view and add you can do this
+    def has_view_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
 
 
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)

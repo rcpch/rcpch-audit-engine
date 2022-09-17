@@ -768,6 +768,7 @@ ui.rcpch_chart_container.segment {
 .ui.rcpch.form input[type="time"],
 .ui.rcpch.form input[type="text"],
 .ui.rcpch.form input[type="file"],
+.ui.rcpch.form input[type="select"],
 .ui.rcpch.form input[type="url"] {
   font-family: Montserrat-Regular;
   margin: 0em;
@@ -848,6 +849,13 @@ ui.rcpch_chart_container.segment {
 .ui.rcpch_light_blue.circular.search.link.icon {
   color: var(--rcpch_light_blue);
   background: var(--rcpch_light_blue);
+}
+
+.ui.rcpch.dropdown {
+  border: 3px solid rgba(17, 167, 242, 1) !important;
+  -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_lightest_blue) inset !important;
+  box-shadow: 0px 0px 0px 100px var(--rcpch_lightest_blue) inset !important;
+  border-radius: 0%;
 }
 
 /* desscribe letters */

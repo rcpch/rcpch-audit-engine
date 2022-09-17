@@ -23,7 +23,7 @@
       href="{% static 'styles/semantic.min.css' %}"
       type="text/css"
     />
-    <link rel="shortcut icon" type='image/png' href="{% static 'favicon.png' %}"/>
+    <link rel="shortcut icon" type='image/png' href="{% static 'images/favicon.ico' %}"/>
     <link rel="stylesheet" href="{% static 'styles/style.css' %}">
     
   </head>
@@ -56,11 +56,14 @@
           <div class="right menu">
           {% if user.is_authenticated %}
               <a class="item" href={% url 'logout' %}>
-                Logout {{ user.username }}
+                Log out {{ user.username }}
               </a>
           {% else %}
             <a class="item" href="{% url 'login' %}">
-              Log In
+              Sign in
+            </a>
+            <a class="item" href="{% url 'signup' %}">
+              Sign up
             </a>
           {% endif %}
           </div>

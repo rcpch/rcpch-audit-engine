@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <form class="ui form" method="post">
     {% csrf_token %}
     <div class="ui rcpch_important message">
@@ -32,6 +33,9 @@
                 hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" 
                 hx-target='#eligibility_result'
                 hx-trigger="click">I confirm all criteria are present
+                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                disabled
+                {% endif %}
               </button>
             </div>
           {% endif %}
@@ -39,11 +43,15 @@
     </div>
     
     <div class="field" id="referring_clinician">
-        {% include 'epilepsy12/partials/registration/referring_clinician.html' with registration=registration hx_editable=field_enabled%}
+        {% include 'epilepsy12/partials/registration/referring_clinician.html' with registration=registration hx_editable=field_enabled %}
     </div>
 
     <div id="lead_site" class="field">
-      {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list %}
+      {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=False %}
+      {% else %}
+        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=True %}
+      {% endif %}
     </div>
 
     <div id="previous_sites" class="ui segment">

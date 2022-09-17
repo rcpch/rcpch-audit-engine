@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from ..decorator import group_required
 from epilepsy12.general_functions.fetch_snomed import fetch_concept, snomed_medicine_search
 from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AuditProgress, AntiEpilepsyMedicine
 from django_htmx.http import trigger_client_event
@@ -76,6 +77,7 @@ Fields relating to rescue medication begin here
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def has_an_aed_been_given(request, management_id):
     # HTMX call back from management template
     # POST request on toggle button click
@@ -114,6 +116,7 @@ def has_an_aed_been_given(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def antiepilepsy_medicine_search(request, management_id):
     """
     HTMX callback from management template
@@ -141,6 +144,7 @@ def antiepilepsy_medicine_search(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def save_selected_antiepilepsy_medicine(request, management_id):
     """
     HTMX callback from antiepilepsy_medicine_select template
@@ -201,6 +205,7 @@ def save_selected_antiepilepsy_medicine(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def is_a_pregnancy_prevention_programme_in_place(request, management_id):
     """
     This is an HTMX callback from antiepilepsy_medicine_list template on click of toggle is_a_pregnancy_prevention_programme_in_place
@@ -248,6 +253,7 @@ Fields relating to rescue medication begin here
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def rescue_medication_prescribed(request, management_id):
     """
     HTMX call from management template
@@ -283,6 +289,7 @@ def rescue_medication_prescribed(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def rescue_medicine_search(request, management_id):
     """
     HTMX callback from management template
@@ -312,6 +319,7 @@ def rescue_medicine_search(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def save_selected_rescue_medicine(request, management_id):
     """
     HTMX callback from rescue_medicine_select template
@@ -368,6 +376,7 @@ Fields relating to individual care plans begin here
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_in_place(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -431,6 +440,7 @@ def individualised_care_plan_in_place(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_date(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -462,6 +472,7 @@ def individualised_care_plan_date(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -510,6 +521,7 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_includes_service_contact_details(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -558,6 +570,7 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_include_first_aid(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -604,6 +617,7 @@ def individualised_care_plan_include_first_aid(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -648,6 +662,7 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_includes_general_participation_risk(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -693,6 +708,7 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_addresses_water_safety(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -740,6 +756,7 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_addresses_sudep(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -789,6 +806,7 @@ def individualised_care_plan_addresses_sudep(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_includes_aihp(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -838,6 +856,7 @@ def individualised_care_plan_includes_aihp(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_includes_ehcp(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -886,6 +905,7 @@ def individualised_care_plan_includes_ehcp(request, management_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template

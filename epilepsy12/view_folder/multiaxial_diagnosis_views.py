@@ -4,6 +4,7 @@ from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from ..decorator import group_required
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
 from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
@@ -187,6 +188,7 @@ def multiaxial_diagnosis(request, case_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def add_episode(request, multiaxial_diagnosis_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
@@ -277,6 +279,7 @@ def add_episode(request, multiaxial_diagnosis_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def edit_episode(request, episode_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
@@ -323,6 +326,7 @@ def edit_episode(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
 def remove_episode(request, episode_id):
     """
     POST request on button click from episodes partial in multiaxial_diagnosis form
@@ -352,6 +356,7 @@ def remove_episode(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def seizure_onset_date(request, episode_id):
     """
     HTMX post request from episode.html partial on date change
@@ -407,6 +412,7 @@ def seizure_onset_date(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def seizure_onset_date_confidence(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
@@ -461,6 +467,7 @@ def seizure_onset_date_confidence(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def episode_definition(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
@@ -515,6 +522,7 @@ def episode_definition(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
@@ -581,6 +589,7 @@ Description fields
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def edit_description(request, episode_id):
     """
     This function is triggered by an htmx post request from the partials/episode/description.html form for the desscribe description.
@@ -624,6 +633,7 @@ def edit_description(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def delete_description_keyword(request, episode_id, description_keyword_id):
     """
     This function is triggered by an htmx post request from the partials/desscribe/description.html form for the desscribe description_keyword.
@@ -667,6 +677,7 @@ Epilepsy status
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epilepsy_or_nonepilepsy_status(request, episode_id):
     """
     Function triggered by a click in the epilepsy_or_nonepilepsy_status partial leading to a post request.
@@ -743,6 +754,7 @@ Epilepsy fields
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def were_any_of_the_epileptic_seizures_convulsive(request, episode_id):
     """
     Post request from multiple choice toggle within epilepsy partial.
@@ -788,6 +800,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epileptic_seizure_onset_type(request, episode_id):
     """
     Defines type of onset if considered to be epilepsy
@@ -856,6 +869,7 @@ def epileptic_seizure_onset_type(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def focal_onset_epilepsy_checked_changed(request, episode_id):
     """
     Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
@@ -915,6 +929,8 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epileptic_generalised_onset(request, episode_id):
     """
     POST request from epileptic_generalised_onset field in generalised_onset_epilepsy
@@ -952,8 +968,11 @@ Nonepilepsy
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def nonepilepsy_generalised_onset(request, episode_id):
-
+    """
+    POST request from toggle
+    """
     nonepilepsy_generalised_onset = request.htmx.trigger_name
     Episode.objects.filter(id=episode_id).update(
         nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset,
@@ -985,6 +1004,8 @@ def nonepilepsy_generalised_onset(request, episode_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def nonepileptic_seizure_type(request, episode_id):
     """
     POST request from select element within nonepilepsy partial
@@ -1045,6 +1066,8 @@ def nonepileptic_seizure_type(request, episode_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def nonepileptic_seizure_subtype(request, episode_id):
     """
     POST request from the nonepileptic_seizure_subtype partial select component
@@ -1098,6 +1121,7 @@ def nonepileptic_seizure_subtype(request, episode_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def add_syndrome(request, multiaxial_diagnosis_id):
     """
     HTMX post request from syndromes.html partial on button click to add new syndrome
@@ -1137,6 +1161,7 @@ Syndromes
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def edit_syndrome(request, syndrome_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
@@ -1182,6 +1207,7 @@ def edit_syndrome(request, syndrome_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
 def remove_syndrome(request, syndrome_id):
     """
     POST request on button click from episodes partial in multiaxial_diagnosis form
@@ -1211,6 +1237,7 @@ def remove_syndrome(request, syndrome_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def syndrome_present(request, multiaxial_diagnosis_id):
     """
 # POST request from the syndrome partial in the multiaxial_description_form
@@ -1259,6 +1286,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     """
 # POST request from the syndrome partial in the multiaxial_description_form
@@ -1308,6 +1336,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
@@ -1345,6 +1374,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     """
     POST from multiple select in epilepsy_causes partial
@@ -1394,6 +1424,8 @@ Comorbidities
 """
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
     """
     POST request from
@@ -1435,6 +1467,8 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def add_comorbidity(request, multiaxial_diagnosis_id):
     """
     POST request from comorbidities_section partial
@@ -1471,6 +1505,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def edit_comorbidity(request, comorbidity_id):
     """
     POST request from comorbidities.html partial on button click to edit episode
@@ -1498,6 +1533,7 @@ def edit_comorbidity(request, comorbidity_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
 def remove_comorbidity(request, comorbidity_id):
     """
     POST request from comorbidities.html partial on button click to edit episode
@@ -1528,6 +1564,7 @@ def remove_comorbidity(request, comorbidity_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def comorbidity_diagnosis_date(request, comorbidity_id):
     """
     POST request from comorbidity partial with comorbidity_diagnosis_date
@@ -1562,6 +1599,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def comorbidity_diagnosis(request, comorbidity_id):
     """
     POST request on change select from comorbidity partial
@@ -1604,6 +1642,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def comorbidities(request, multiaxial_diagnosis_id):
     """
     POST request from comorbidity partial to replace it with table

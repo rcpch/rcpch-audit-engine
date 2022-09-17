@@ -1,8 +1,13 @@
+{% load epilepsy12_template_tags %}
 <div class="ui segment">
     
     <div class="field">
         {% url 'consultant_paediatrician_referral_made' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label="Has a referral been made to a consultant paediatrician with expertise in epilepsy?" data_position="top left" %}
+        {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label="Has a referral been made to a consultant paediatrician with expertise in epilepsy?" data_position="top left" disabled=True %}
+        {% else %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label="Has a referral been made to a consultant paediatrician with expertise in epilepsy?" data_position="top left" disabled=False %}
+        {% endif %}
     </div>
 
     {% if assessment.consultant_paediatrician_referral_made %}
