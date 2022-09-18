@@ -33,7 +33,7 @@
       {% block nav %}
         <div class="ui secondary pointing menu">
             <a {% if request.resolver_match.url_name|is_in:'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
-              <img id="nav-rcpch" src="{% static 'images/epilepsy12-logo-1.png' %}" class="item">
+              <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
             </a>
             {% if user.is_authenticated %}
               <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
@@ -108,6 +108,8 @@
           </div>
         
     </div>
+
+    {% include 'epilepsy12/footer.html'%}
           
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'htmx_1.7/htmx.min.js' %}"></script>

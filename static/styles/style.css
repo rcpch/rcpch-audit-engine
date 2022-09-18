@@ -79,6 +79,7 @@ ul {
   color: var(--rcpch_charcoal);
 }
 
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -105,7 +106,6 @@ ul {
   color: #3366cc;
   border-width: 5px;
   border-color: #3366cc;
-  line-height: 45px;
   font-family: Montserrat-Regular;
 }
 
@@ -114,10 +114,6 @@ ul {
   height: auto;
   padding: 0;
   font-family: Montserrat-Regular;
-}
-
-.ui.secondary.pointing.menu .item {
-  line-height: 50px;
 }
 
 /* epilepsy12 landing */
@@ -961,4 +957,58 @@ ui.primary.button.changelink a {
 
 .ui.bottom.attached.rcpch_footer.message {
   border-radius: 0%;
+}
+
+footer {
+  margin-top: auto;
+  background-color: #191919;
+  color: white;
+  clear: both;
+  padding-top: 30px;
+}
+
+h2 {
+  display: block;
+  margin-block-start: 1.33em;
+  margin-block-end: 1.33em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  color: white;
+}
+
+.standard-footer__icon {
+  border: 2px solid #fff;
+  border-radius: 50%;
+  height: 2.25rem;
+  margin-right: 0.66667em;
+  margin-bottom: 10px;
+  overflow: visible;
+  padding: 0.5em;
+  width: 2.25rem;
+}
+
+.list-unstyled {
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+footer a,
+footer a:hover {
+  color: inherit;
+}
+
+a:-webkit-any-link {
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+
+*,
+::after,
+::before {
+  box-sizing: border-box;
 }
