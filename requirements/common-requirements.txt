@@ -10,6 +10,6 @@ dj_database_url
 django-widget-tweaks
 django-htmx
 whitenoise
-
+django-semantic-admin
 
 # RCPCH imports

@@ -1,7 +1,6 @@
-from atexit import unregister
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
+from semantic_admin import SemanticModelAdmin
 # Register your models here.
 from .models import *
 
@@ -113,3 +112,4 @@ admin.site.register(Syndrome)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'
+admin.site.index_title = 'Epilepsy12'

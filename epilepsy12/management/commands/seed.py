@@ -41,7 +41,7 @@ def run_semiology_keywords_seed():
     for index, semiology_keyword in enumerate(KEYWORDS):
         if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
             print(
-                f'{Keyword.objects.filter(keyword=semiology_keyword["title"])} exists...')
+                f'Keywords already exist. Skipping this step...')
             return
         new_keyword = Keyword(
             keyword=semiology_keyword["title"],
@@ -61,6 +61,9 @@ def run_semiology_keywords_seed():
 def run_hospitals_seed():
     # this adds all the English hospitals from JSON in the constants folder
     # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
+    if HospitalTrust.objects.all().exists():
+        print('Hospital table already exists. Skipping this step...')
+        return
     added = 0
     for index, hospital in enumerate(ALL_HOSPITALS):
         if hospital["Sector"] == "NHS Sector":
@@ -88,9 +91,7 @@ def run_hospitals_seed():
                 Website=hospital["Website"],
                 Fax=hospital["Fax"]
             )
-            if HospitalTrust.objects.filter(OrganisationID=hospital["OrganisationID"]):
-                print(f'{hospital["OrganisationName"]} already exists...')
-                return
+
             try:
                 hospital_trust.save()
             except Exception as error:
@@ -112,6 +113,12 @@ def delete_hospitals():
 
 def run_dummy_cases_seed():
     added = 0
+
+    # there should not be any cases yet, but sometimes seed gets run more than once
+    if Case.objects.all().exists():
+        print(f'Cases already exist. Skipping this step...')
+        return
+
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
 
     for index in range(len(DUMMY_NAMES)-1):
@@ -138,11 +145,6 @@ def run_dummy_cases_seed():
         else:
             hospital_trust = HospitalTrust.objects.filter(
                 OrganisationName='Great North Childrens Hospital').get()
-
-        # there should not be any cases yet, but sometimes seed gets run more than once
-        if Case.objects.filter(surname=surname).exists():
-            print(f'{first_name} {surname} already exists...')
-            return
 
         try:
             new_case = Case(
@@ -184,6 +186,8 @@ def create_groups():
             except Exception as error:
                 print(error)
                 error = True
+        else:
+            print(f'{group} already exists. Skipping...')
 
 
 def image():
