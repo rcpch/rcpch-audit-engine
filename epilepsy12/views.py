@@ -45,6 +45,15 @@ def hospital_reports(request):
     !!!
     """
 
+    """
+    Remove duplicates
+    """
+    for duplicates in Epilepsy12User.objects.values("email").annotate(
+        records=Count("email")
+    ).filter(records__gt=1):
+        for epilepsy12user in Epilepsy12User.objects.filter(name=duplicates["email"])[1:]:
+            epilepsy12user.delete()
+
     # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
     initial_assessment = InitialAssessment.objects.filter()
     site = Site.objects.filter()
@@ -222,9 +231,9 @@ def signup(request, *args, **kwargs):
             else:
                 # no group
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
-            logged_in_user.groups.add(group)
 
             logged_in_user.save()
+            group.user_set(logged_in_user)
             login(request, logged_in_user,
                   backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, "Sign up successful.")

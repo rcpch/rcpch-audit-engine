@@ -45,6 +45,7 @@ DEVELOPMENT_MODE = os.getenv("E12_DEVELOPMENT_MODE", "False") == "True"
 # Application definition
 
 INSTALLED_APPS = [
+    "semantic_admin",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,8 +56,7 @@ INSTALLED_APPS = [
     'epilepsy12',
     # third party
     'widget_tweaks',
-    'django_htmx',
-    'guardian',
+    'django_htmx'
 ]
 
 MIDDLEWARE = [
@@ -176,8 +176,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_TRUSTED_ORIGINS = [
     'https://epilepsy12-dev.azurewebsites.net', 'https://epilepsy12.rcpch.tech']
 
-# django-guardian
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
-    'guardian.backends.ObjectPermissionBackend',
 )

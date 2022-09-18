@@ -756,6 +756,10 @@ ui.rcpch_chart_container.segment {
   border-radius: 50%;
 }
 
+ui.primary.button.changelink a {
+  border-radius: 0%;
+}
+
 
 .ui.rcpch.form input:not([type]),
 .ui.rcpch.form input[type="date"],

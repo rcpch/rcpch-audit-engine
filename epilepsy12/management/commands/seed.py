@@ -1,18 +1,10 @@
-from logging import exception
-from unicodedata import name
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
 from random import randint, getrandbits, choice
 from datetime import date
+from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
-from epilepsy12.constants.ethnicities import ETHNICITIES
-
-from epilepsy12.constants.names import DUMMY_NAMES
-# from epilepsy12.constants.postcodes import POSTCODES
-from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, GROUPS, PATIENT_ACCESS, PATIENT_ACCESS_PERMISSIONS, PERMISSIONS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, TRUST_AUDIT_TEAM_VIEW_ONLY, TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS
-from epilepsy12.models import hospital_trust
+from ...constants import ETHNICITIES, DUMMY_NAMES, GROUPS
 from ...models import HospitalTrust, Keyword, Case, Site
-from ...constants import ALL_HOSPITALS, KEYWORDS, SEX_TYPE, ROLES
+from ...constants import ALL_HOSPITALS, KEYWORDS
 from ...general_functions import random_postcodes
 
 
@@ -47,6 +39,10 @@ class Command(BaseCommand):
 def run_semiology_keywords_seed():
     added = 0
     for index, semiology_keyword in enumerate(KEYWORDS):
+        if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
+            print(
+                f'Keywords already exist. Skipping this step...')
+            return
         new_keyword = Keyword(
             keyword=semiology_keyword["title"],
             category=semiology_keyword["category"]
@@ -65,6 +61,9 @@ def run_semiology_keywords_seed():
 def run_hospitals_seed():
     # this adds all the English hospitals from JSON in the constants folder
     # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
+    if HospitalTrust.objects.all().exists():
+        print('Hospital table already exists. Skipping this step...')
+        return
     added = 0
     for index, hospital in enumerate(ALL_HOSPITALS):
         if hospital["Sector"] == "NHS Sector":
@@ -92,6 +91,7 @@ def run_hospitals_seed():
                 Website=hospital["Website"],
                 Fax=hospital["Fax"]
             )
+
             try:
                 hospital_trust.save()
             except Exception as error:
@@ -113,6 +113,12 @@ def delete_hospitals():
 
 def run_dummy_cases_seed():
     added = 0
+
+    # there should not be any cases yet, but sometimes seed gets run more than once
+    if Case.objects.all().exists():
+        print(f'Cases already exist. Skipping this step...')
+        return
+
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
 
     for index in range(len(DUMMY_NAMES)-1):
@@ -180,6 +186,8 @@ def create_groups():
             except Exception as error:
                 print(error)
                 error = True
+        else:
+            print(f'{group} already exists. Skipping...')
 
 
 def image():

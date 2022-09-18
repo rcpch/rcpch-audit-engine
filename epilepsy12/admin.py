@@ -1,8 +1,6 @@
-from atexit import unregister
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from guardian.admin import GuardedModelAdmin
-
+from semantic_admin import SemanticModelAdmin
 # Register your models here.
 from .models import *
 
@@ -94,36 +92,17 @@ class Epilepsy12UserAdmin(UserAdmin):
         return form
 
 
-class RegistrationAdmin(GuardedModelAdmin):
-    pass
-
-
-class CaseAdmin(GuardedModelAdmin):
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    # to disable view and add you can do this
-    def has_view_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request):
-        return False
-
-
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
 admin.site.register(AntiEpilepsyMedicine)
 admin.site.register(Assessment)
-admin.site.register(Case, CaseAdmin)
+admin.site.register(Case)
 admin.site.register(Comorbidity)
 admin.site.register(EpilepsyContext)
 admin.site.register(Investigations)
 admin.site.register(HospitalTrust)
 admin.site.register(InitialAssessment)
 admin.site.register(Management)
-admin.site.register(Registration, RegistrationAdmin)
+admin.site.register(Registration)
 admin.site.register(Keyword)
 admin.site.register(Site)
 admin.site.register(AuditProgress)
@@ -133,3 +112,4 @@ admin.site.register(Syndrome)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'
+admin.site.index_title = 'Epilepsy12'
