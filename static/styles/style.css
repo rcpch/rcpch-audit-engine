@@ -967,7 +967,7 @@ footer {
   padding-top: 30px;
 }
 
-h2 {
+footer h2 {
   display: block;
   margin-block-start: 1.33em;
   margin-block-end: 1.33em;
@@ -982,8 +982,6 @@ h2 {
   border-radius: 50%;
   height: 2.25rem;
   margin-right: 0.66667em;
-  margin-bottom: 10px;
-  overflow: visible;
   padding: 0.5em;
   width: 2.25rem;
 }
@@ -1004,11 +1002,15 @@ a:-webkit-any-link {
   cursor: pointer;
   text-decoration: none;
   color: white;
+  display: inline-flex;
+  align-self: center;
 }
 
+a label {
+  padding-top: 0.5em;
+}
 
-*,
-::after,
-::before {
-  box-sizing: border-box;
+.padded_column {
+  margin-left: 20px;
+  padding-bottom: 10px;
 }

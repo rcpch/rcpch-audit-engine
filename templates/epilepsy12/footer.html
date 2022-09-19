@@ -1,33 +1,41 @@
 {% load static %}
 <footer>
 
-    <div class="ui grid container">
+    <div class="ui fluid grid container">
 
-            <div class="row">
+            
 
-                <div class="four wide left aligned column">
+                <div class="four wide fluid column">
+                    <div class='rcpch_full_logo'>
                     <img src="{% static 'images/rcpch-logo-mono.8cb184509440.png' %}" alt="Leading the way in Children's Health">
+                    </div>
                 </div>
 
                 <div class="four wide column">
                     <h2>Find us on social media</h2>
                     <ul class='list-unstyled' >
-                        <li>
-                            <a href="https://twitter.com/Epilepsy_12" target="_blank">
+                        <li class='rcpch_links'>
+                            <a href="https://twitter.com/Epilepsy_12" target="_blank" >
                                 <svg aria-hidden="true" class='standard-footer__icon' role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg>
+                            <label>
                                 Epilepsy12 on Twitter
+                            </label>
                             </a>
                         </li>
                         <li>
-                        <a href="https://www.facebook.com/RCPCH/" target="_blank">
+                        <a href="https://www.facebook.com/RCPCH/" target="_blank" class='rcpch_links'>
                             <svg aria-hidden="true" class='standard-footer__icon' role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 512"><path fill="currentColor" d="M76.7 512V283H0v-91h76.7v-71.7C76.7 42.4 124.3 0 193.8 0c33.3 0 61.9 2.5 70.2 3.6V85h-48.2c-37.8 0-45.1 18-45.1 44.3V192H256l-11.7 91h-73.6v229"></path></svg>
+                            <label>
                             RCPCH on Facebook
+                            </label>
                         </a>
                         </li>
                         <li>
-                        <a href="https://www.linkedin.com/company/royal-college-of-paediatrics-and-child-health" target="_blank">
+                        <a href="https://www.linkedin.com/company/royal-college-of-paediatrics-and-child-health" target="_blank" class='rcpch_links'>
                             <svg aria-hidden="true" class='standard-footer__icon' role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M100.3 480H7.4V180.9h92.9V480zM53.8 140.1C24.1 140.1 0 115.5 0 85.8 0 56.1 24.1 32 53.8 32c29.7 0 53.8 24.1 53.8 53.8 0 29.7-24.1 54.3-53.8 54.3zM448 480h-92.7V334.4c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7V480h-92.8V180.9h89.1v40.8h1.3c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3V480z"></path></svg>
-                            RCPCH on LinkedIn
+                            <label>
+                                RCPCH on LinkedIn
+                            </label>
                         </a>
                         </li>
                     </ul>
@@ -37,8 +45,13 @@
                     <h2>Links</h2>
                     <ul class='list-unstyled'>
                         <li>
-                        <a href="https://qicentral.rcpch.ac.uk/" target="_blank">
-                            QI Central
+                        <a href="https://epilepsy12.rcpch.ac.uk/" target="_blank">
+                            Epilepsy12
+                        </a>
+                        </li>
+                        <li>
+                        <a href="https://www.youngepilepsy.org.uk/" target="_blank">
+                            Young Epilepsy
                         </a>
                         </li>
                     </ul>
@@ -46,13 +59,13 @@
 
                 <div class="four wide column">
                     <h2>About us</h2>
-                    <p>Data Portal is a platform of the Royal College of Paediatrics and Child Health. Founded in 1996 and with members in the UK and internationally, we play a major role in postgraduate medical education, professional standards, research and policy.</p>
+                    <p>Epilepsy12 is a platform of the Royal College of Paediatrics and Child Health. Founded in 1996 and with members in the UK and internationally, we play a major role in postgraduate medical education, professional standards, research and policy.</p>
                     <a href="https://www.rcpch.ac.uk/about-us" class="btn btn-light" target="_blank">
                     Visit RCPCH website
                     </a>
                 </div>
 
-            </div>
+            
 
         
 
@@ -60,32 +73,36 @@
 
     <hr>
 
-    <div class='ui container'>
+    <div class='ui fluid container'>
 
-        <ul class='list-unstyled'>
-        <li>
-            <a href="https://www.rcpch.ac.uk/about-us/website-terms-conditions" target="_blank">
-                Terms, conditions and cookies
-            </a>
-        </li>
-        <li>
-            <a href="https://www.rcpch.ac.uk/about-us/accessibility-website" target="_blank">
-                Accessibility
-            </a>
-        </li>
-        <li>
-            <a href="https://www.rcpch.ac.uk/about-us/rights-permissions-copyrighted-material" target="_blank">
-                Rights and permissions for reuse of our content
-            </a>
-        </li>
-        </ul>
+        <div class='padded_column'>
 
-        <div class="copyright">
-        <p>
-        Copyright © 2021-2022 RCPCH<br>
-        RCPCH is a registered charity in England and Wales (1057744) and in Scotland (SC038299)<br>
-        Built by <a href="https://eastface.co.uk/" target="_blank">Eastface Technology</a>
-        </p>
+            <ul class='list-unstyled'>
+                <li>
+                    <a href="https://www.rcpch.ac.uk/about-us/website-terms-conditions" target="_blank">
+                        Terms, conditions and cookies
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.rcpch.ac.uk/about-us/accessibility-website" target="_blank">
+                        Accessibility
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.rcpch.ac.uk/about-us/rights-permissions-copyrighted-material" target="_blank">
+                        Rights and permissions for reuse of our content
+                    </a>
+                </li>
+            </ul>
+
+            <div class="copyright">
+                <p>
+                Copyright © 2021-2022 RCPCH<br>
+                RCPCH is a registered charity in England and Wales (1057744) and in Scotland (SC038299)<br>
+                Built by the RCPCH Incubator</a>
+                </p>
+            </div>
+
         </div>
 
     </div>

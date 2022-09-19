@@ -1,3 +1,7 @@
+from django.conf import settings
+from django.http import FileResponse, HttpRequest, HttpResponse
+from django.views.decorators.cache import cache_control
+from django.views.decorators.http import require_GET
 from django.contrib.auth.models import Group
 from django.shortcuts import render
 # from django.contrib.auth.forms import UserCreationForm
@@ -285,3 +289,10 @@ def rcpch_403(request, exception):
 def redirect_403(request):
     # return the custom 403 template. There is not context to add.
     return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
+
+
+@require_GET
+@cache_control(max_age=60 * 60 * 24, immutable=True, public=True)  # one day
+def favicon(request: HttpRequest) -> HttpResponse:
+    file = (settings.BASE_DIR / "static" / "images/favicon.png").open("rb")
+    return FileResponse(file)
