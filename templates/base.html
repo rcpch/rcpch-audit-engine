@@ -29,46 +29,65 @@
   </head>
 
   <body id="root">
-    <div class="ui container">
-      {% block nav %}
-        <div class="ui secondary pointing menu">
-            <a {% if request.resolver_match.url_name|is_in:'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
-              <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
-            </a>
-            {% if user.is_authenticated %}
-              <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
-                Database Management
-              </a>
-            
-            <a {% if request.resolver_match.url_name|is_in:"hospital_reports,cases,register,initial_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
-              Clinician Access
-            </a>
-            {% endif %}
-            <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
-              Patient Access
-            </a>
-            <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
-              Documentation
-            </a>
-            <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'tsandcs' %}>
-              Terms and Conditions
-            </a>
-          <div class="right menu">
-          {% if user.is_authenticated %}
-              <a class="item" href={% url 'logout' %}>
-                Log out {{ user.username }}
-              </a>
-          {% else %}
-            <a class="item" href="{% url 'login' %}">
-              Sign in
-            </a>
-            <a class="item" href="{% url 'signup' %}">
-              Sign up
-            </a>
-          {% endif %}
+
+      <div class="ui container">
+
+        {% block nav %}
+
+          <div class="ui text menu">
+            <div class="right menu">
+              {% if user.is_authenticated %}
+                  <a class="item" href={% url 'logout' %}>
+                    Log out {{ user.username }}
+                  </a>
+              {% else %}
+                <a class="item" href="{% url 'login' %}">
+                  Sign in
+                </a>
+                <a class="item" href="{% url 'signup' %}">
+                  Sign up
+                </a>
+              {% endif %}
+            </div>
           </div>
-        </div>
-      {% endblock %}
+
+          <div class="ui secondary pointing menu">
+
+              <a {% if request.resolver_match.url_name|is_in:'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
+                <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
+              </a>
+
+              <div class='right menu'>
+                {% if user.is_authenticated %}
+                  <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
+                    Database Management
+                  </a>
+                
+                <a {% if request.resolver_match.url_name|is_in:"hospital_reports,cases,register,initial_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
+                  Clinician Access
+                </a>
+                {% endif %}
+                <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
+                  Patient Access
+                </a>
+                <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
+                  Documentation
+                </a>
+                <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'tsandcs' %}>
+                  Terms and Conditions
+                </a>
+              </div>
+
+          </div>
+
+      
+        {% endblock %}
+
+      </div>
+
+
+    <div class='ui fluid container'>
+
         
         {% if messages %}
           <div class="ui green message">
@@ -82,34 +101,39 @@
         {% block content %}
         {% endblock %}
         
-        <div class="ui rcpch_warning message">This site is currently under development.</div>
-        
-        
-          <div class="ui container">
 
-            <div class="ui grid">
-
-              <div class="eight wide column">
-                  <a href="https://github.com/rcpch/epilepsy12-server">
-                    <i class="github icon"></i>
-                    Follow us on Github
-                  </a>
-              </div>
-
-              <div class="eight wide right aligned column">
-                <a href='{% url "tsandcs" %}'>
-                  <i class="copyright icon" id="logo"></i>
-                  RCPCH 2021. All Rights Reserved
-                  </a>
-              </div>
-
-            </div>
-
-          </div>
-        
     </div>
+        
+        
+    <div class="ui container">
+        
+        <div class="ui rcpch_warning message">This site is currently under development.</div>
 
-    {% include 'epilepsy12/footer.html'%}
+        <div class="ui grid">
+
+          <div class="eight wide column">
+              <a href="https://github.com/rcpch/epilepsy12-server">
+                <i class="github icon"></i>
+                Follow us on Github
+              </a>
+          </div>
+
+          <div class="eight wide right aligned column">
+            <a href='{% url "tsandcs" %}'>
+              <i class="copyright icon"></i>
+              RCPCH 2021. All Rights Reserved
+              </a>
+          </div>
+
+        </div>
+
+    </div>
+        
+    <div class='ui fluid container'>
+
+      {% include 'epilepsy12/footer.html'%}
+
+    </div>
           
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'htmx_1.7/htmx.min.js' %}"></script>

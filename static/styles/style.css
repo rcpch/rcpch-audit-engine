@@ -55,7 +55,7 @@
 }
 
 body {
-  color: white;
+  color: black;
   font-family: Montserrat-Regular;
 }
 
@@ -65,6 +65,11 @@ h3,
 h4,
 h5 {
   font-family: "Arial";
+  color: black;
+}
+
+p {
+  font-family: Montserrat-Regular;
   color: black;
 }
 
@@ -97,6 +102,10 @@ ul {
   font-family: Montserrat-Regular;
 }
 
+.ui.secondary.pointing.menu {
+  margin-bottom: 1rem;
+}
+
 #patient {
   color: pink;
 }
@@ -116,24 +125,7 @@ ul {
   font-family: Montserrat-Regular;
 }
 
-/* epilepsy12 landing */
 
-#landing_card {
-  border-radius: 0%;
-  background-color: #0d0d58;
-}
-
-#landing_card .content .header {
-  color: white;
-}
-
-#landing_card .meta .category {
-  color: white;
-}
-
-#epilepsy12landinginfo {
-  background-color: #11a7f2;
-}
 
 #tsandcssegment {
   background-color: #11a7f2;
@@ -145,7 +137,7 @@ ul {
   font-family: Montserrat-Regular;
 }
 
-ui.rcpch_chart_container.segment {
+.ui.rcpch_chart_container.segment {
   border-radius: 0%;
   height: 200px;
   width: auto;
@@ -160,6 +152,27 @@ ui.rcpch_chart_container.segment {
   background-color: #11a7f2;
   border-radius: 0%;
   font-family: Montserrat-Regular;
+}
+
+.ui.rcpch_dark_blue.card {
+  background-color: var(--rcpch_dark_blue);
+  border-radius: 0%;
+  font-family: Montserrat-Regular;
+  color: white;
+}
+
+.ui.rcpch_dark_blue.card .content .header {
+  background-color: var(--rcpch_dark_blue);
+  border-radius: 0%;
+  font-family: Montserrat-Regular;
+  color: white;
+}
+
+.ui.rcpch_dark_blue.card .category {
+  background-color: var(--rcpch_dark_blue);
+  border-radius: 0%;
+  font-family: Montserrat-Regular;
+  color: white;
 }
 
 .ui.white.card {
@@ -1017,4 +1030,25 @@ a label {
 
 .padded_container {
   padding: 1rem;
+}
+
+.image-container {
+  position: absolute;
+  min-height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.centred_rcpch_title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rcpch_logos {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
