@@ -82,7 +82,17 @@ def hospital_reports(request):
         hospital_object = HospitalTrust.objects.get(
             OrganisationName=request.user.hospital_employer)
     else:
-        hospital_object = None
+        hospital_object = {
+            'ParentName': 'Royal College of Paediatrics and Child Health',
+            'Address1': '5-11, Theobalds Road',
+            'Address2': '',
+            'Address3': '',
+            'City': 'London',
+            'Postcode': 'WC1X 8SH',
+            'Phone': '020 70926000',
+            'Email': 'epilepsy12@rcpch.ac.uk',
+            'Website': 'www.rcpch.ac.uk',
+        }
 
     # national aggregate queries on all cases
     deprivation_quintiles = (
@@ -237,7 +247,7 @@ def signup(request, *args, **kwargs):
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
 
             logged_in_user.save()
-            group.user_set(logged_in_user)
+            logged_in_user.groups.add(group)
             login(request, logged_in_user,
                   backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, "Sign up successful.")

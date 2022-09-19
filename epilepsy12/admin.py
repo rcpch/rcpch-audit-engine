@@ -71,16 +71,21 @@ class Epilepsy12UserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'title', 'first_name', 'surname', 'password1', 'password2', 'is_staff', 'is_active', 'is_rcpch_audit_team_member', 'role', 'hospital_employer')
+            'fields': ('email', 'username', 'title', 'first_name', 'surname', 'password1', 'password2', 'is_staff', 'is_active', 'is_rcpch_audit_team_member', 'role', 'hospital_employer', 'is_superuser', 'groups')
         }),
     )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
+        form.base_fields['hospital_employer'].required = False
         if not request.user.is_superuser:
             form.base_fields['is_superuser'].disabled = True
             form.base_fields['is_rcpch_audit_team_member'].disabled = True
             form.base_fields['groups'].disabled = True
+        else:
+            form.base_fields['is_superuser'].disabled = False
+            form.base_fields['is_rcpch_audit_team_member'].disabled = False
+            form.base_fields['groups'].disabled = False
         if request.user.groups.filter(name='trust_audit_team_edit_access'):
             form.base_fields['groups'].disabled = True
             form.base_fields['username'].disabled = True

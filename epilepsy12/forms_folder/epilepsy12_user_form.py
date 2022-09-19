@@ -21,7 +21,8 @@ class Epilepsy12UserCreationForm(UserCreationForm):
 
     hospital_employer = forms.ModelChoiceField(
         queryset=HospitalTrust.objects.all(),
-        widget=forms.Select(attrs={'class': 'ui fluid search rcpch dropdown'})
+        widget=forms.Select(attrs={'class': 'ui fluid search rcpch dropdown'}),
+        required=False
     )
 
     first_name = forms.CharField(
