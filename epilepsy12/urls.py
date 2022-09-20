@@ -5,7 +5,7 @@ from . import views
 from django.urls import path, re_path
 
 urlpatterns = [
-    path("favicon.ico", views.favicon),
+    path("favicon", views.favicon),
     path("signup/", views.signup, name="signup"),
     path('403', views.redirect_403, name='redirect_403'),
     path('', views.index, name="index"),

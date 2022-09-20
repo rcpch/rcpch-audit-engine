@@ -304,5 +304,6 @@ def redirect_403(request):
 @require_GET
 @cache_control(max_age=60 * 60 * 24, immutable=True, public=True)  # one day
 def favicon(request: HttpRequest) -> HttpResponse:
-    file = (settings.BASE_DIR / "static" / "images/favicon.png").open("rb")
+    file = (settings.BASE_DIR / "static" /
+            "images/favicon-16x16.png").open("rb")
     return FileResponse(file)
