@@ -58,26 +58,26 @@
                   <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
                 </span>
               </a>
-                  <h3>Epilepsy12 Audit Platform</h3>
+                  <h3>Epilepsy12 audit platform</h3>
 
               <div class='right menu'>
                 {% if user.is_authenticated %}
                   <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
-                    Database Management
+                    Database management
                   </a>
                 
                 <a {% if request.resolver_match.url_name|is_in:"hospital_reports,cases,register,initial_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
-                  Clinician Access
+                  Clinician access
                 </a>
                 {% endif %}
                 <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
-                  Patient Access
+                  Patient access
                 </a>
                 <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
                   Documentation
                 </a>
                 <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'tsandcs' %}>
-                  Terms and Conditions
+                  Terms and conditions
                 </a>
               </div>
 
@@ -127,7 +127,7 @@
           <div class="eight wide right aligned column">
             <a href='{% url "tsandcs" %}'>
               <i class="copyright icon"></i>
-              <p>RCPCH 2021. All Rights Reserved</p>
+              <p>RCPCH 2021. All rights reserved</p>
               </a>
           </div>
       </div>
