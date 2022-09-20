@@ -231,6 +231,10 @@ ul {
   color: white;
 }
 
+.ui.rcpch_dark_blue.card .content i {
+  color: white;
+}
+
 .ui.rcpch_dark_blue.card .category {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
