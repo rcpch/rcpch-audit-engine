@@ -30,7 +30,7 @@
 
   <body id="root">
 
-      <div class="ui container">
+      <div class="ui fluid rcpch container">
 
         {% block nav %}
 
@@ -54,8 +54,11 @@
           <div class="ui secondary pointing menu">
 
               <a {% if request.resolver_match.url_name|is_in:'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
-                <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
+                <span>
+                  <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
+                </span>
               </a>
+                  <h3>Epilepsy12 Audit Platform</h3>
 
               <div class='right menu'>
                 {% if user.is_authenticated %}

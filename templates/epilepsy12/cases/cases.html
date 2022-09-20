@@ -1,76 +1,81 @@
-{% extends "base.html" %}  {% block content %}
+{% extends "base.html" %}  
+{% block content %}
 
-<div class='ui top attached rcpch_dark_blue clearing segment'>
-  <h5 class="ui left floated header">
-    Children and Young People
-  </h5>
-  {% if request.user.is_rcpch_audit_team_member %}
-    {% if request.user.hospital_employer %}
+  <div class="ui container">
 
-    {% comment %}
-      This is a toggle between RCPCH view and Trust view. Will involve an out of band htmx request so leaving this for now
-      <h5 class="ui right floated header" id='has_rcpch_view_preference'>
-        {% include 'epilepsy12/partials/cases/has_rcpch_view_preference.html' with rcpch_choices=rcpch_choices has_rcpch_view_preference=rcpch_preference %}
+    <div class='ui top attached rcpch_dark_blue clearing segment'>
+      <h5 class="ui left floated header">
+        Children and Young People
       </h5>
-      {% endcomment %}
-      
-      <h5 class="ui right floated header">
-        Royal College of Paediatrics and Child Health
-      </h5>
+      {% if request.user.is_rcpch_audit_team_member %}
+        {% if request.user.hospital_employer %}
 
-    {% else %}
-      <h5 class="ui right floated header">
-        Royal College of Paediatrics and Child Health
-      </h5>
-    {% endif%}
-  {% else %}
-    <h5 class="ui right floated header">
-      {{hospital_trust.OrganisationName}} ({{hospital_trust.ParentName}})
-    </h5>
-  {% endif %}
-</div>
-<div class="ui raised attached segment">
-  <div id="case_table">
-    {% include '../partials/case_table.html' with case_list=case_list paginated=paginated %}
-  </div>
-  
-  <div class="ui grid">
-    
-      <div class="twelve wide column">
-          <a href="{% url 'create_case'%}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
+        {% comment %}
+          This is a toggle between RCPCH view and Trust view. Will involve an out of band htmx request so leaving this for now
+          <h5 class="ui right floated header" id='has_rcpch_view_preference'>
+            {% include 'epilepsy12/partials/cases/has_rcpch_view_preference.html' with rcpch_choices=rcpch_choices has_rcpch_view_preference=rcpch_preference %}
+          </h5>
+          {% endcomment %}
           
-          <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
-            <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' %}" hx-swap="innerHTML">
-            <i class="ui rcpch_light_blue circular search link icon"></i>
-          </div>
-          
-          
+          <h5 class="ui right floated header">
+            Royal College of Paediatrics and Child Health
+          </h5>
+
+        {% else %}
+          <h5 class="ui right floated header">
+            Royal College of Paediatrics and Child Health
+          </h5>
+        {% endif%}
+      {% else %}
+        <h5 class="ui right floated header">
+          {{hospital_trust.OrganisationName}} ({{hospital_trust.ParentName}})
+        </h5>
+      {% endif %}
+    </div>
+    <div class="ui raised attached segment">
+      <div id="case_table">
+        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated %}
       </div>
       
-      <div class="four wide column">
-          <div class="ui two mini statistics">
-            <div class="blue statistic">
-              <div class="value">
-                {{total_cases}}
+      <div class="ui grid">
+        
+          <div class="twelve wide column">
+              <a href="{% url 'create_case'%}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
+              
+              <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
+                <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' %}" hx-swap="innerHTML">
+                <i class="ui rcpch_light_blue circular search link icon"></i>
               </div>
-              <div class="label">
-                Total
+              
+              
+          </div>
+          
+          <div class="four wide column">
+              <div class="ui two mini statistics">
+                <div class="blue statistic">
+                  <div class="value">
+                    {{total_cases}}
+                  </div>
+                  <div class="label">
+                    Total
+                  </div>
+                </div>
+                <div class="blue statistic">
+                  <div class="value">
+                    {{total_registrations}}
+                  </div>
+                  <div class="label">
+                    Registered
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="blue statistic">
-              <div class="value">
-                {{total_registrations}}
-              </div>
-              <div class="label">
-                Registered
-              </div>
-            </div>
           </div>
       </div>
+    </div>
+    <div class="ui bottom attached rcpch_footer message">
+      <i class="warning info circle icon"></i>
+      These are all the children and young people registered in all audits since 2022.
+    </div>
+
   </div>
-</div>
-<div class="ui bottom attached rcpch_footer message">
-  <i class="warning info circle icon"></i>
-  These are all the children and young people registered in all audits since 2022.
-</div>
 {% endblock %}
