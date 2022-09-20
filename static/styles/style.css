@@ -1013,18 +1013,15 @@ ul {
 footer {
   margin-top: auto;
   background-color: #191919;
-  color: white;
   clear: both;
   padding-top: 30px;
 }
 
+footer p {
+  color: white;
+}
+
 footer h2 {
-  display: block;
-  margin-block-start: 1.33em;
-  margin-block-end: 1.33em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  font-weight: bold;
   color: white;
 }
 
