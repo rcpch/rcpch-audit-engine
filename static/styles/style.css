@@ -157,6 +157,34 @@ ul {
   font-family: Montserrat-Bold;
 }
 
+/* hero */
+
+.rcpch_hero img {
+  filter: brightness(50%);
+}
+
+.centred_rcpch_title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.centred_rcpch_title h1.ui.header .content {
+  color: white;
+  font-size: larger;
+}
+
+.centred_rcpch_title h1.ui.header .sub.header {
+  color: white;
+  font-size: medium;
+}
+
+.rcpch_logos img {
+  margin-top: 3rem;
+  filter: contrast(100%);
+}
+
 
 /* links */
 
@@ -1072,13 +1100,6 @@ a label {
   min-height: 100%;
   width: 100%;
   overflow: hidden;
-}
-
-.centred_rcpch_title {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .rcpch_logos {
