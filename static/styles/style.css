@@ -149,7 +149,7 @@ ul {
 
 .ui.text.menu .right.menu {
   font-family: Montserrat-Regular;
-  font-size: large;
+  font-size: 1.5vw;
   background-color: var(--rcpch_light_blue);
 }
 
@@ -158,31 +158,55 @@ ul {
 }
 
 /* hero */
+.rcpch_hero {
+  display: inline-block;
+  text-align: center;
+  position: relative;
+}
 
-.rcpch_hero img {
+
+.rcpch_hero .wallpaper {
   filter: brightness(50%);
+  min-width: none;
+  max-width: 100%;
+  height: auto;
 }
 
-.centred_rcpch_title {
+.rcpch_hero .epilepsy12_logo {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  filter: brightness(100%);
+  top: 0;
+  right: 0;
+  left: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2vw;
+  min-width: none;
+  max-width: 300px;
+  width: 100%;
+  height: auto;
 }
 
-.centred_rcpch_title h1.ui.header .content {
+
+.rcpch_hero .centred_rcpch_title h1.ui.header .content {
   color: white;
-  font-size: larger;
+  font-size: 3vw;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-top: 12vw;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  text-align: center;
 }
 
 .centred_rcpch_title h1.ui.header .sub.header {
   color: white;
-  font-size: medium;
-}
-
-.rcpch_logos img {
-  margin-top: 3rem;
-  filter: contrast(100%);
+  font-size: 2vw;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
 
@@ -1051,10 +1075,17 @@ footer {
 
 footer p {
   color: white;
+  font-size: 1vw;
 }
 
 footer h2 {
   color: white;
+  font-size: 2vw;
+}
+
+footer img {
+  min-width: none;
+  max-width: 100%;
 }
 
 .standard-footer__icon {
@@ -1071,6 +1102,7 @@ footer h2 {
   list-style: none;
   display: flex;
   flex-direction: column;
+  font-size: 1vw;
 }
 
 footer a,
