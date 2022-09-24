@@ -119,32 +119,21 @@ def case_list(request, hospital_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
-    if request.user.hospital_employer:
-        full_hospital_trust = HospitalTrust.objects.filter(
-            OrganisationName=hospital_trust.OrganisationName).get()
-        if request.user.is_rcpch_audit_team_member:
-            rcpch_choices = (
-                (0, 'Royal College of Paediatrics and Child Health'),
-                (1, f'{hospital_trust.OrganisationName}')
-            )
-            if request.user.has_rcpch_view_preference:
-                rcpch_preference = rcpch_choices[0][0]
-            else:
-                rcpch_preference = rcpch_choices[1][0]
-        else:
-            rcpch_preference = None
-            rcpch_choices = None
+    rcpch_choices = (
+        (0, 'All UK Children'),
+        (1, f'{hospital_trust.OrganisationName} Cohort')
+    )
+    if request.user.has_rcpch_view_preference:
+        rcpch_preference = rcpch_choices[0][0]
     else:
-        full_hospital_trust = None
-        rcpch_choices = None
-        rcpch_preference = None
+        rcpch_preference = rcpch_choices[1][0]
 
     context = {
         'case_list': case_list,
         'total_cases': case_count,
         'total_registrations': registered_count,
         'sort_flag': sort_flag,
-        'hospital_trust': full_hospital_trust,
+        'hospital_trust': hospital_trust,
         'rcpch_choices': rcpch_choices,
         'rcpch_preference': rcpch_preference
     }
@@ -182,13 +171,12 @@ def has_rcpch_view_preference(request, hospital_id):
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
     rcpch_choices = (
-        (0, 'Royal College of Paediatrics and Child Health'),
-        (1, f'{hospital_trust.OrganisationName}')
+        (0, 'All UK Children'),
+        (1, f'{hospital_trust.OrganisationName} Cohort')
     )
 
     if (int(request.htmx.trigger_name) == 1):
-        # Epilepsy12User.objects.filter(pk=request.user.pk).update(
-        #     has_rcpch_view_preference=False)
+
         request.user.has_rcpch_view_preference = False
         request.user.save()
         rcpch_preference = rcpch_choices[1][0]
@@ -196,8 +184,7 @@ def has_rcpch_view_preference(request, hospital_id):
     elif (int(request.htmx.trigger_name) == 0):
         request.user.has_rcpch_view_preference = True
         request.user.save()
-        # Epilepsy12User.objects.filter(pk=request.user.pk).update(
-        #     has_rcpch_view_preference=True)
+
         rcpch_preference = rcpch_choices[0][0]
 
     context = {

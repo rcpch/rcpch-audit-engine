@@ -1,3 +1,4 @@
+from select import select
 from django.conf import settings
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.views.decorators.cache import cache_control
@@ -94,7 +95,8 @@ def hospital_reports(request):
         # therefore set selected hospital to first of hospital on the list
 
         selected_hospital = HospitalTrust.objects.filter(
-            Sector="NHS Sector").order_by('OrganisationName').first(),
+            Sector="NHS Sector"
+        ).order_by('OrganisationName').first()
 
         all_registrations = Registration.objects.all().count()
         all_cases = Case.objects.all().count()

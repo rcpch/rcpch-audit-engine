@@ -149,7 +149,7 @@ ul {
 
 .ui.text.menu .right.menu {
   font-family: Montserrat-Regular;
-  font-size: 1.5vw;
+  font-size: 1.125vw;
   background-color: var(--rcpch_light_blue);
 }
 
@@ -228,7 +228,7 @@ ul {
   border-radius: 0%;
   height: 200px;
   width: auto;
-  background-color: var(--rcpch_mid_grey);
+  background-color: var(--rcpch_light_grey);
 }
 
 #bottom_attached_message {
