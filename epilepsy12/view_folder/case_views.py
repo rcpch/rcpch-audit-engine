@@ -3,17 +3,18 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
+from epilepsy12.decorator import group_required
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import HospitalTrust, Epilepsy12User
 from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
+from django_htmx.http import trigger_client_event
 
 
 @login_required
-@permission_required('epilepsy12.view_case')
-def case_list(request):
+def case_list(request, hospital_id):
     """
     Returns a list of all children registered under the user's service.
     Path is protected to those logged in only
@@ -32,9 +33,11 @@ def case_list(request):
 
     filter_term = request.GET.get('filtered_case_list')
 
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
     if filter_term:
         all_cases = Case.objects.filter(
-            Q(hospital_trusts__OrganisationName__contains=request.user.hospital_employer) &
+            Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
             Q(first_name__icontains=filter_term) |
             Q(surname__icontains=filter_term) |
             Q(nhs_number__icontains=filter_term)
@@ -42,11 +45,12 @@ def case_list(request):
     else:
 
         # filter cases by hospital trust if logged in user is not RCPCH audit staff
-        if request.user.is_rcpch_audit_team_member:
+        # RCPCH Staff members that are also clinicians can choose which view
+        if request.user.is_rcpch_audit_team_member and request.user.has_rcpch_view_preference:
             filtered_cases = Case.objects.all()
         else:
             filtered_cases = Case.objects.filter(
-                hospital_trusts__OrganisationName__contains=request.user.hospital_employer
+                hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName
             )
 
         if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
@@ -117,16 +121,16 @@ def case_list(request):
 
     if request.user.hospital_employer:
         full_hospital_trust = HospitalTrust.objects.filter(
-            OrganisationName=request.user.hospital_employer).get()
+            OrganisationName=hospital_trust.OrganisationName).get()
         if request.user.is_rcpch_audit_team_member:
             rcpch_choices = (
-                ('rcpch', 'Royal College of Paediatrics and Child Health'),
-                ('trust', f'{full_hospital_trust.OrganisationName}')
+                (0, 'Royal College of Paediatrics and Child Health'),
+                (1, f'{hospital_trust.OrganisationName}')
             )
             if request.user.has_rcpch_view_preference:
-                rcpch_preference = rcpch_choices[0]
+                rcpch_preference = rcpch_choices[0][0]
             else:
-                rcpch_preference = rcpch_choices[1]
+                rcpch_preference = rcpch_choices[1][0]
         else:
             rcpch_preference = None
             rcpch_choices = None
@@ -152,7 +156,7 @@ def case_list(request):
 
 
 @login_required
-@permission_required('epilepsy12.change_case')
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def create_case(request):
     form = CaseForm(request.POST or None)
     if request.method == "POST":
@@ -170,40 +174,88 @@ def create_case(request):
 
 
 @login_required
-def has_rcpch_view_preference(request):
+def has_rcpch_view_preference(request, hospital_id):
     """
     Toggle visible only to clinicians who are also RCPCH audit team members
     Can toggle between their own trust and RCPCH view
     """
-    if (request.htmx.trigger_name == 'trust'):
-        Epilepsy12User.objects.filter(pk=request.user.pk).update(
-            has_rcpch_view_preference=False)
-    elif (request.htmx.trigger_name == 'rcpch'):
-        Epilepsy12User.objects.filter(pk=request.user.pk).update(
-            has_rcpch_view_preference=True)
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
-    if request.user.hospital_employer:
-        full_hospital_trust = HospitalTrust.objects.filter(
-            OrganisationName=request.user.hospital_employer).get()
-        if request.user.is_rcpch_audit_team_member:
-            rcpch_choices = (
-                ('rcpch', 'Royal College of Paediatrics and Child Health'),
-                ('trust', f'{full_hospital_trust.OrganisationName}')
-            )
-            if request.user.has_rcpch_view_preference:
-                rcpch_preference = rcpch_choices[0]
-            else:
-                rcpch_preference = rcpch_choices[1]
+    rcpch_choices = (
+        (0, 'Royal College of Paediatrics and Child Health'),
+        (1, f'{hospital_trust.OrganisationName}')
+    )
+
+    if (int(request.htmx.trigger_name) == 1):
+        # Epilepsy12User.objects.filter(pk=request.user.pk).update(
+        #     has_rcpch_view_preference=False)
+        request.user.has_rcpch_view_preference = False
+        request.user.save()
+        rcpch_preference = rcpch_choices[1][0]
+
+    elif (int(request.htmx.trigger_name) == 0):
+        request.user.has_rcpch_view_preference = True
+        request.user.save()
+        # Epilepsy12User.objects.filter(pk=request.user.pk).update(
+        #     has_rcpch_view_preference=True)
+        rcpch_preference = rcpch_choices[0][0]
+
     context = {
         'rcpch_choices': rcpch_choices,
-        'rcpch_preference': rcpch_preference
+        'rcpch_preference': rcpch_preference,
+        'hospital_trust': hospital_trust
     }
 
-    return render(request, template_name='epilepsy12/partials/cases/has_rcpch_view_preference.html', context=context)
+    response = render(
+        request, template_name='epilepsy12/partials/cases/has_rcpch_view_preference.html', context=context)
+
+    # trigger a GET request to rerender the case list
+    trigger_client_event(
+        response=response,
+        name="case_list",
+        params={})  # reloads the form to show the updated cases
+
+    # trigger a GET request to rerender the case list statistics
+    trigger_client_event(
+        response=response,
+        name="case_statistics",
+        params={})  # reloads the form to show the updated cases
+
+    return response
+
+
+def case_statistics(request, hospital_id):
+    """
+    GET request from cases template to update stats on toggle between RCPCH view and hospital view
+    """
+
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    if request.user.has_rcpch_view_preference:
+        total_cases = Case.objects.all()
+    else:
+        total_cases = Case.objects.filter(
+            Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName)
+        )
+
+    registered_cases = total_cases.filter(
+        ~Q(registration__isnull=True),
+    ).all()
+
+    context = {
+        'total_cases': total_cases.count(),
+        'total_registrations': registered_cases.count(),
+        'hospital_trust': hospital_trust
+    }
+
+    response = render(
+        request, template_name='epilepsy12/partials/cases/case_statistics.html', context=context)
+
+    return response
 
 
 @login_required
-@permission_required('epilepsy12.change_case')
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def update_case(request, id):
     case = get_object_or_404(Case, id=id)
     form = CaseForm(instance=case)
@@ -236,7 +288,7 @@ def update_case(request, id):
 
 
 @login_required
-@permission_required('epilepsy12.change_case')
+@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
 def delete_case(request, id):
     case = get_object_or_404(Case, id=id)
     case.delete()

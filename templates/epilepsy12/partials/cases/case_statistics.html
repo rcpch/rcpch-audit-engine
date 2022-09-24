@@ -1,0 +1,24 @@
+<div class="ui two mini statistics"
+    hx-get="{% url 'case_statistics' hospital_id=hospital_trust.pk %}"
+    hx-swap='innerHTML'
+    name='case_statistics'
+    hx-trigger='case_statistics from:body'
+    hx-target='#case_statistics'
+>
+    <div class="blue statistic">
+        <div class="value">
+        {{total_cases}}
+        </div>
+        <div class="label">
+        Total
+        </div>
+    </div>
+    <div class="blue statistic">
+        <div class="value">
+        {{total_registrations}}
+        </div>
+        <div class="label">
+        Registered
+        </div>
+    </div>
+</div>

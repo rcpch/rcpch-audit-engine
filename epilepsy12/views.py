@@ -92,17 +92,7 @@ def hospital_reports(request):
     else:
         # current user is a member of the RCPCH audit team and also not affiliated with a hospital
         # therefore set selected hospital to first of hospital on the list
-        # hospital_object = {
-        #     'ParentName': 'Royal College of Paediatrics and Child Health',
-        #     'Address1': '5-11, Theobalds Road',
-        #     'Address2': '',
-        #     'Address3': '',
-        #     'City': 'London',
-        #     'Postcode': 'WC1X 8SH',
-        #     'Phone': '020 70926000',
-        #     'Email': 'epilepsy12@rcpch.ac.uk',
-        #     'Website': 'www.rcpch.ac.uk',
-        # }
+
         selected_hospital = HospitalTrust.objects.filter(
             Sector="NHS Sector").order_by('OrganisationName').first(),
 

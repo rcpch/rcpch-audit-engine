@@ -1,6 +1,12 @@
 {% load epilepsy12_template_tags %}
 {% if case_list.end_index > 0 %}
-      <table class="ui rcpch table" >
+      <table class="ui rcpch table" 
+        hx-target='#case_table'
+        hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}"
+        hx-trigger='case_list from:body'
+        hx-swap='innerHTML'
+        name='case_table'
+      >
         <thead>
           <tr>
             <th >ID
@@ -81,10 +87,10 @@
             <tr>
               <th colspan="10" class="right aligned">
                   {% if case_list.has_previous %}
-                    <div class="ui rcpch_primary button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Previous 10</div>
+                    <div class="ui rcpch_primary button" hx-target="#case_table" hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Previous 10</div>
                   {% endif %}
                   {% if case_list.has_next %}
-                    <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Next 10</div>
+                    <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' hospital_id=hospital_trust.pk  %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Next 10</div>
                   {% endif %}
               </th>
             </tr>
