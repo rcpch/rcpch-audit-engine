@@ -79,22 +79,37 @@ def hospital_reports(request):
     template_name = 'epilepsy12/hospital.html'
 
     if request.user.hospital_employer is not None:
-        hospital_object = HospitalTrust.objects.get(
+        # current user is affiliated with an existing hospital - set viewable trust to this
+        selected_hospital = HospitalTrust.objects.get(
             OrganisationName=request.user.hospital_employer)
-    else:
-        hospital_object = {
-            'ParentName': 'Royal College of Paediatrics and Child Health',
-            'Address1': '5-11, Theobalds Road',
-            'Address2': '',
-            'Address3': '',
-            'City': 'London',
-            'Postcode': 'WC1X 8SH',
-            'Phone': '020 70926000',
-            'Email': 'epilepsy12@rcpch.ac.uk',
-            'Website': 'www.rcpch.ac.uk',
-        }
 
-    # national aggregate queries on all cases
+        # query to return all cases and registrations of hospital of logged in user if clinician
+        all_cases = Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().count()
+        all_registrations = Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().filter(
+                registration__isnull=False).count()
+    else:
+        # current user is a member of the RCPCH audit team and also not affiliated with a hospital
+        # therefore set selected hospital to first of hospital on the list
+        # hospital_object = {
+        #     'ParentName': 'Royal College of Paediatrics and Child Health',
+        #     'Address1': '5-11, Theobalds Road',
+        #     'Address2': '',
+        #     'Address3': '',
+        #     'City': 'London',
+        #     'Postcode': 'WC1X 8SH',
+        #     'Phone': '020 70926000',
+        #     'Email': 'epilepsy12@rcpch.ac.uk',
+        #     'Website': 'www.rcpch.ac.uk',
+        # }
+        selected_hospital = HospitalTrust.objects.filter(
+            Sector="NHS Sector").order_by('OrganisationName').first(),
+
+        all_registrations = Registration.objects.all().count()
+        all_cases = Case.objects.all().count()
+
+    # aggregate queries on trust level cases
     deprivation_quintiles = (
         (1, 1),
         (2, 2),
@@ -111,7 +126,8 @@ def hospital_reports(request):
                      for k, v in SEX_TYPE]
 
     cases_aggregated_by_ethnicity = (
-        Case.objects
+        Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=selected_hospital)
         .values('ethnicity')
         .annotate(
             ethnicity_display=DJANGO_CASE(
@@ -124,7 +140,8 @@ def hospital_reports(request):
     )
 
     cases_aggregated_by_sex = (
-        Case.objects
+        Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=selected_hospital)
         .values('sex')
         .annotate(
             sex_display=DJANGO_CASE(
@@ -137,7 +154,8 @@ def hospital_reports(request):
     )
 
     cases_aggregated_by_deprivation = (
-        Case.objects
+        Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=selected_hospital)
         .values('index_of_multiple_deprivation_quintile')
         .annotate(
             index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
@@ -149,17 +167,6 @@ def hospital_reports(request):
             cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
         .order_by('cases_aggregated_by_deprivation')
     )
-
-    # query to return all cases and registrations of hospital of logged in user if clinician
-    if request.user.hospital_employer:
-        all_cases = Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().count()
-        all_registrations = Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().filter(
-                registration__isnull=False).count()
-    else:
-        all_registrations = Registration.objects.all().count()
-        all_cases = Case.objects.all().count()
 
     total_referred_to_paediatrics = Assessment.objects.filter(
         consultant_paediatrician_referral_made=True).count()
@@ -175,7 +182,8 @@ def hospital_reports(request):
 
     return render(request=request, template_name=template_name, context={
         'user': request.user,
-        'hospital': hospital_object,
+        'selected_hospital': selected_hospital,
+        'hospital_list': HospitalTrust.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
         'cases_aggregated_by_sex': cases_aggregated_by_sex,
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
@@ -186,6 +194,109 @@ def hospital_reports(request):
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
         'all_models': all_models
+    })
+
+
+@login_required
+def selected_hospital_summary(request):
+    """
+    POST request from selected_hospital_summary.html on hospital select
+    """
+
+    selected_hospital = HospitalTrust.objects.get(
+        pk=request.POST.get('selected_hospital_summary'))
+
+    # query to return all cases and registrations of selected hospital
+    all_cases = Case.objects.filter(
+        hospital_trusts__OrganisationName__contains=selected_hospital).all().count()
+    all_registrations = Case.objects.filter(
+        hospital_trusts__OrganisationName__contains=selected_hospital).all().filter(
+            registration__isnull=False).count()
+
+    # aggregate queries on trust level cases
+    deprivation_quintiles = (
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5)
+    )
+
+    ethnicity_long_list = [When(ethnicity=k, then=Value(v))
+                           for k, v in ETHNICITIES]
+    imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
+                     for k, v in deprivation_quintiles]
+    sex_long_list = [When(sex=k, then=Value(v))
+                     for k, v in SEX_TYPE]
+
+    cases_aggregated_by_ethnicity = (
+        Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=selected_hospital)
+        .values('ethnicity')
+        .annotate(
+            ethnicity_display=DJANGO_CASE(
+                *ethnicity_long_list, output_field=CharField()
+            )
+        )
+        .values('ethnicity_display')
+        .annotate(
+            ethnicities=Count('ethnicity')).order_by('ethnicities')
+    )
+
+    cases_aggregated_by_sex = (
+        Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=selected_hospital)
+        .values('sex')
+        .annotate(
+            sex_display=DJANGO_CASE(
+                *sex_long_list, output_field=CharField()
+            )
+        )
+        .values('sex_display')
+        .annotate(
+            sexes=Count('sex')).order_by('sexes')
+    )
+
+    cases_aggregated_by_deprivation = (
+        Case.objects.filter(
+            hospital_trusts__OrganisationName__contains=selected_hospital)
+        .values('index_of_multiple_deprivation_quintile')
+        .annotate(
+            index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
+                *imd_long_list, output_field=PositiveSmallIntegerField()
+            )
+        )
+        .values('index_of_multiple_deprivation_quintile_display')
+        .annotate(
+            cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
+        .order_by('cases_aggregated_by_deprivation')
+    )
+
+    total_referred_to_paediatrics = Assessment.objects.filter(
+        consultant_paediatrician_referral_made=True).count()
+    total_referred_to_neurology = Assessment.objects.filter(
+        paediatric_neurologist_referral_made=True).count()
+    total_referred_to_surgery = Assessment.objects.filter(
+        childrens_epilepsy_surgical_service_referral_made=True).count()
+
+    if all_cases > 0:
+        total_percent = round((all_registrations/all_cases)*100)
+    else:
+        total_percent = 0
+
+    return render(request=request, template_name='epilepsy12/partials/selected_hospital_summary.html', context={
+        'user': request.user,
+        'selected_hospital': selected_hospital,
+        'hospital_list': HospitalTrust.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
+        'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
+        'cases_aggregated_by_sex': cases_aggregated_by_sex,
+        'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
+        'percent_completed_registrations': total_percent,
+        'total_registrations': all_registrations,
+        'total_cases': all_cases,
+        'total_referred_to_paediatrics': total_referred_to_paediatrics,
+        'total_referred_to_neurology': total_referred_to_neurology,
+        'total_referred_to_surgery': total_referred_to_surgery,
     })
 
 

@@ -239,6 +239,12 @@ ul {
   background-color: #11a7f2;
   border-radius: 0%;
   font-family: Montserrat-Regular;
+  color: black;
+}
+
+.ui.rcpch_light_blue.card .content .description {
+  font-family: Montserrat-Regular;
+  color: black;
 }
 
 .ui.rcpch_dark_blue.card {
@@ -284,34 +290,6 @@ ul {
 
 #stats_box {
   background-color: white;
-}
-
-/* general navigation */
-#continue_button {
-  background-color: #e00087;
-  border-radius: 0%;
-  color: white;
-  font-weight: bold;
-  font-family: Montserrat-Regular;
-}
-
-#continue_button:hover {
-  background-color: #9E1F66;
-}
-
-#negative_button {
-  border-radius: 0%;
-  color: white;
-  font-weight: bold;
-  background-color: #e60700;
-  font-family: Montserrat-Regular;
-}
-
-#action_button {
-  background-color: #3366cc;
-  color: white;
-  border-radius: 0%;
-  font-family: Montserrat-Regular;
 }
 
 /* children */
@@ -496,7 +474,7 @@ ul {
 
 .ui.rcpch_light_blue.button {
   border-radius: 0% !important;
-  color: white;
+  color: black;
   background-color: var(--rcpch_light_blue);
 }
 
@@ -517,7 +495,7 @@ ul {
 
 .ui.rcpch_primary.button {
   border-radius: 0% !important;
-  color: white;
+  color: black;
   background-color: var(--rcpch_light_blue);
   border-color: var(--rcpch_light_blue);
 }
@@ -996,7 +974,7 @@ ul {
 
 .ui.rcpch.table th {
   background-color: var(--rcpch_light_blue);
-  color: var(--rcpch_white);
+  color: var(--rcpch_black);
   font-family: Arial, Helvetica, sans-serif;
 }
 

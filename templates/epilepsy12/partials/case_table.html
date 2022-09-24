@@ -5,7 +5,7 @@
           <tr>
             <th >ID
                 {% if sort_flag and sort_flag == "sort_by_id_down" %}
-                  <i class="sort icon" id="sort_button" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
+                  <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
                 {% elif sort_flag and sort_flag == "sort_by_id_up" %}
                   <i class="sort icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table" hx-get="{% url 'sort_by_id_down' %}" hx-trigger="click"></i>
                 {% else %}

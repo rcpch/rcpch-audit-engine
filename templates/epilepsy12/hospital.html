@@ -3,110 +3,14 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %}
 {% block content %}
-<div class="ui rcpch container">
-    <div class="ui attached inverted segment" id="hospital_segment">
-        <div class="ui grid">
+<div class="ui rcpch container" >
 
-            <div class="four wide column">
-                <div class="ui rcpch_light_blue card">
-                    <div class="content">
-                        <div class="header" id="description">
-                            {{ hospital.ParentName }}
-                        </div>
-                        <div class="description" id="description">
-                            {{ hospital.Address1 }}<br>
-                            {{ hospital.Address2 }}<br>
-                            {{ hospital.Address3 }}<br>
-                            {{ hospital.City }}<br>
-                            {{ hospital.Postcode }}<br>
-                            <span><i class="phone icon"></i>{{ hospital.Phone }}</span><br>
-                            <span><i class="envelope outline icon"></i>{{ hospital.Email }}</span><br>
-                            <span><i class="internet explorer icon"></i>{{ hospital.Website }}</span><br>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="twelve wide column">
-                    <h1 class='header'>
-                    UK level summary
-                    </h1>
-                    <div id="ethnicity_piechart" class="ui rcpch_chart_container segment">
-                        {% if cases_aggregated_by_ethnicity %}
-                            {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
-                        {% else %}
-                            <h5>No data yet!<h5>
-                        {% endif %}
-                    </div>
-                
-            </div>
-
-            <div class="eight wide column">
-
-                <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container segment">
-                    {% if cases_aggregated_by_sex %}
-                        {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
-                    {% else %}
-                        <h5>No data yet!<h5>
-                    {% endif %}
-                </div>
-                
-            </div>
-
-            <div class="eight wide column">
-
-                <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container segment">
-                    {% if cases_aggregated_by_deprivation %}
-                        {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
-                    {% else %}
-                        <h5>No data yet!<h5>
-                    {% endif %}
-                </div>
-            
-            </div>
-
-            
-                <div class="four wide column">
-                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" %}
-                </div>
-                <div class="four wide column">
-                    {% if total_cases is not None and total_cases > 0%}
-                        {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
-                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases %}
-                    {% else %}
-                        <h5>No data yet!<h5>
-                    {% endif %}
-                </div>
-                <div class="four wide column">
-                    {% if total_cases is not None and total_cases > 0%}
-                        {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
-                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases %}
-                    {% else %}
-                        <h5>No data yet!<h5>
-                    {% endif %}
-                </div>
-                <div class="four wide column">
-                    {% if total_cases is not None and total_cases > 0%}
-                        {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
-                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases %}
-                    {% else %}
-                        <h5>No data yet!<h5>
-                    {% endif %}
-                </div>
-            
-
+        <div id='rcpch_hospital_select'>
+            {% include 'epilepsy12/partials/selected_hospital_summary.html' with hospital_list=hospital_list selected_hospital=selected_hospital hospital_list=hospital_list cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity cases_aggregated_by_sex=cases_aggregated_by_sex cases_aggregated_by_deprivation=cases_aggregated_by_deprivation percent_completed_registrations=percent_completed_registrations total_registrations=total_registrations total_cases=total_cases total_referred_to_paediatrics=total_referred_to_paediatrics total_referred_to_neurology=total_referred_to_neurology total_referred_to_surgery=total_referred_to_surgery %}
         </div>
-        
-    </div>
-    <div class="ui bottom attached message" id="bottom_attached_message">
-        <div>
-            <a href="{% url 'cases' %}"><button class="ui rcpch_primary button">All Registered Children</button></a>
-        </div>
-    </div>
 
-    
         <div class="row">
-            <div class="two columns">
+            <div class="two stackable columns">
                 <div class="column">
                     <div class="ui inverted segment" id="chat">
                         <h5 class="header">
