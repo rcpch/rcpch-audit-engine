@@ -2,6 +2,7 @@ from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
 
 from epilepsy12.models.hospital_trust import HospitalTrust
+from epilepsy12.models.management import Management
 from epilepsy12.models.registration import Registration
 from .models import Case, Site
 from django.contrib.auth.decorators import user_passes_test
@@ -93,6 +94,10 @@ def group_required(*group_names):
                     registration = Registration.objects.get(
                         pk=kwargs.get('registration_id'))
                     child = registration.case
+                elif kwargs.get('management_id') is not None:
+                    management = Management.objects.get(
+                        pk=kwargs.get('management_id'))
+                    child = management.registration.case
                 else:
                     child = Case.objects.get(pk=kwargs.get('case_id'))
 
