@@ -1,8 +1,5 @@
-from dateutil import relativedelta
-from datetime import date
-import math
 from django.db import models
-from ..constants import *
+from ..constants import CHRONICITY, DIAGNOSTIC_STATUS
 from .time_and_user_abstract_base_classes import *
 
 # other tables

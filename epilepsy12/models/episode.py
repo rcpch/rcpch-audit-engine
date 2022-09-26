@@ -2,7 +2,7 @@ from tabnanny import verbose
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from .multiaxial_diagnosis import MultiaxialDiagnosis
-from ..constants import *
+from ..constants import DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, MIGRAINES, EPIS_MISC, GENERALISED_SEIZURE_TYPE
 from .time_and_user_abstract_base_classes import *
 
 

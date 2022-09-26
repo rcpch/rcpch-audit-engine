@@ -3,7 +3,7 @@
 
         <div class="field">
             {% url 'rescue_medication_prescribed' management_id=management.pk as hx_post %}
-            {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
+            {% if not perms.epilepsy12.change_management %}
                 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#rescue_medicines" hx_trigger="click" label="Has a rescue medicine been prescribed?" disabled=False %}
             {% else %}
                 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#rescue_medicines" hx_trigger="click" label="Has a rescue medicine been prescribed?" disabled=True %}

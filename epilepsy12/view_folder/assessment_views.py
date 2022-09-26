@@ -2,13 +2,16 @@ from django.utils import timezone
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
+
+from epilepsy12.constants.user_types import CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE
 from ..models import Registration, AuditProgress, Assessment, Case, HospitalTrust, Site
 from django_htmx.http import trigger_client_event
 
 
 @login_required
+@permission_required(CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE[0], raise_exception=True)
 def consultant_paediatrician_referral_made(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -246,7 +249,7 @@ def general_paediatric_centre(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def edit_general_paediatric_centre(request, assessment_id, site_id):
     """
     HTMX call back from consultant_paediatrician partial template. This is a POST request on button click.
@@ -329,7 +332,7 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
     return response
 
 
-@ login_required
+@login_required
 def update_general_paediatric_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from consultant_paediatrician partial on click of Update or Cancel
@@ -385,7 +388,7 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
     return response
 
 
-@ login_required
+@login_required
 def delete_general_paediatric_centre(request, assessment_id, site_id):
     """
     HTMX call back from hospitals_select partial template.
@@ -464,7 +467,8 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 """
 
 
-@ login_required
+@login_required
+@permission_required(CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE[0], raise_exception=True)
 def paediatric_neurologist_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -527,7 +531,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def paediatric_neurologist_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -587,7 +591,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def paediatric_neurologist_input_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -726,7 +730,7 @@ def paediatric_neurology_centre(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template. This is a POST request on button click.
@@ -805,7 +809,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     return response
 
 
-@ login_required
+@login_required
 def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from paediatric_neurology partial on click of Update or Cancel
@@ -860,7 +864,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
     return response
 
 
-@ login_required
+@login_required
 def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -943,7 +947,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 """
 
 
-@ login_required
+@login_required
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1007,7 +1011,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     return response
 
 
-@ login_required
+@login_required
 def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -1086,7 +1090,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1142,7 +1146,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1202,7 +1206,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 # children epilepsy surgery centre selection
 
 
-@ login_required
+@login_required
 def epilepsy_surgery_centre(request, assessment_id):
     """
     HTMX call back from hospital_list partial.
@@ -1282,7 +1286,7 @@ def epilepsy_surgery_centre(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -1364,7 +1368,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     return response
 
 
-@ login_required
+@login_required
 def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from epilepsy_surgery partial on click of Update or Cancel
@@ -1419,7 +1423,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
     return response
 
 
-@ login_required
+@login_required
 def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -1500,7 +1504,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 """
 
 
-@ login_required
+@login_required
 def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1560,7 +1564,7 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1593,7 +1597,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def epilepsy_specialist_nurse_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1629,7 +1633,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
     return response
 
 
-@ login_required
+@login_required
 def were_any_of_the_epileptic_seizures_convulsive(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -1670,7 +1674,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, registration_id):
     return response
 
 
-@ login_required
+@login_required
 def prolonged_generalized_convulsive_seizures(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -1711,7 +1715,7 @@ def prolonged_generalized_convulsive_seizures(request, registration_id):
     return response
 
 
-@ login_required
+@login_required
 def experienced_prolonged_focal_seizures(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -1752,7 +1756,7 @@ def experienced_prolonged_focal_seizures(request, registration_id):
     return response
 
 
-@ login_required
+@login_required
 def assessment(request, case_id):
 
     case = Case.objects.get(pk=case_id)

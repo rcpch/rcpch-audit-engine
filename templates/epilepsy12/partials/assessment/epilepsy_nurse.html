@@ -4,7 +4,11 @@
 <div class="ui segment">
 
     {% url 'epilepsy_specialist_nurse_referral_made' assessment_id=assessment.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label="Has a referral been made to an epilepsy nurse specialist?" data_position='top left' %}
+    {% if not perms.epilepsy12.change_assessment %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label="Has a referral been made to an epilepsy nurse specialist?" data_position='top left' disabled=False %}
+    {% else %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label="Has a referral been made to an epilepsy nurse specialist?" data_position='top left' disabled=True %}
+    {% endif %}
 
     {% if assessment.epilepsy_specialist_nurse_referral_made %}
 

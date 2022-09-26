@@ -1,10 +1,9 @@
-from queue import Empty
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from epilepsy12.models.audit_progress import AuditProgress
 
 from .case import Case
-from ..constants import *
+from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
@@ -76,11 +75,12 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         permissions = [
             CAN_APPROVE_ELIGIBILITY,
             CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
-            CAN_VIEW_LEAD_CLINICIAN,
-            CAN_ALLOCATE_LEAD_CLINICIAN,
-            CAN_EDIT_LEAD_CLINICIAN,
             CAN_REGISTER_CHILD_IN_EPILEPSY12,
             CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
+            CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE,
         ]
 
     def save(self, *args, **kwargs) -> None:

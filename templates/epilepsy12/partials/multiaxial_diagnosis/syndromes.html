@@ -47,7 +47,11 @@
                     <div 
                         class="ui rcpch_light_blue buttons">
                         <button 
+                            {% if perms.epilepsy12.change_syndrome %}
                             class="ui rcpch_primary button"
+                            {% else %}
+                            class="ui rcpch_primary disabled button"
+                            {% endif %}
                             hx-post='{% url "edit_syndrome" syndrome.pk %}'
                             hx-target='#syndrome'
                             hx-trigger='click'
@@ -56,7 +60,11 @@
                             Edit
                         </button>
                         <button 
+                            {% if not perms.epilepsy12.delete_episode %}
                             class="ui rcpch_red icon button"
+                            {% else %}
+                            class="ui rcpch_red icon disabled button"
+                            {% endif %}
                             hx-post='{% url "remove_syndrome" syndrome_id=syndrome.pk %}'
                             hx-target='#syndromes'
                             hx-trigger='click'

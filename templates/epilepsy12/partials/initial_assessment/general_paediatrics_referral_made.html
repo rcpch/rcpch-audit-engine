@@ -4,10 +4,10 @@
   <div class='field' >
 
         {% url 'general_paediatrics_referral_made' initial_assessment_id=initial_assessment.pk as hx_post %}
-        {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-          {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#general_paediatrics_referral_made' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.general_paediatrics_referral_made label='Has a referral to general paediatrics been made?' data_position='top left' disabled=True %}
-        {% else %}
+        {% if not perms.epilepsy12.change_initial_assessment %}
           {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#general_paediatrics_referral_made' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.general_paediatrics_referral_made label='Has a referral to general paediatrics been made?' data_position='top left' disabled=False %}
+        {% else %}
+          {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#general_paediatrics_referral_made' hx_trigger='click' hx_swap='innerHTML' test_positive=initial_assessment.general_paediatrics_referral_made label='Has a referral to general paediatrics been made?' data_position='top left' disabled=True %}
         {% endif %}
 
   </div>

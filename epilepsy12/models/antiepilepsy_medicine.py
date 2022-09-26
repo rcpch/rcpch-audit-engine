@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ValidationError
-from ..constants import *
+from ..constants import ANTIEPILEPSY_MEDICINE_TYPES
 from .time_and_user_abstract_base_classes import *
 from .management import Management
 

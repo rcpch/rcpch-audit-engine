@@ -16,5 +16,9 @@
 
 {% if valproate_pregnancy_advice_needs_addressing %}
     {% url 'is_a_pregnancy_prevention_programme_in_place' management_id=management.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.is_a_pregnancy_prevention_programme_in_place hx_post=hx_post hx_swap="innerHTML" hx_target="#antiepilepsy_medicine_list" hx_trigger="click" label="Is a pregnancy prevention programme (PPP) in place?" %}
+    {% if not perms.epilepsy12.change_antiepilepsy_medicine %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.is_a_pregnancy_prevention_programme_in_place hx_post=hx_post hx_swap="innerHTML" hx_target="#antiepilepsy_medicine_list" hx_trigger="click" label="Is a pregnancy prevention programme (PPP) in place?" disabled=False %}
+    {% else %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.is_a_pregnancy_prevention_programme_in_place hx_post=hx_post hx_swap="innerHTML" hx_target="#antiepilepsy_medicine_list" hx_trigger="click" label="Is a pregnancy prevention programme (PPP) in place?" disabled=True %}
+    {% endif %}
 {% endif %}

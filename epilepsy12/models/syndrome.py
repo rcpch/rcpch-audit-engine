@@ -1,6 +1,6 @@
 from django.db import models
 from operator import itemgetter
-from ..constants import *
+from ..constants import SYNDROMES
 from .time_and_user_abstract_base_classes import *
 
 # other tables

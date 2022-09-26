@@ -11,7 +11,7 @@
         </div>
 
         {% url 'mri_indicated' investigations_id=investigations.pk as hx_post %}
-        {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+        {% if not perms.epilepsy12.change_investigations %}
             {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label="Is an MRI brain indicated?" data_position="top left" disabled=True %}
         {% else %}
             {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label="Is an MRI brain indicated?" data_position="top left" disabled=False %}
@@ -22,14 +22,14 @@
             <div class="three fields">
             
                 {% url 'mri_brain_requested_date' investigations_id=investigations.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                {% if not perms.epilepsy12.change_investigations %}
                     {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain request date" date_value=investigations.mri_brain_requested_date data_position='top left' input_date_field_name='mri_brain_requested_date' disabled=True %}
                 {% else %}
                     {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain request date" date_value=investigations.mri_brain_requested_date data_position='top left' input_date_field_name='mri_brain_requested_date' disabled=False %}
                 {% endif %}
 
                 {% url 'mri_brain_performed_date' investigations_id=investigations.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                {% if not perms.epilepsy12.change_investigations %}
                     {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain performed date" date_value=investigations.mri_brain_performed_date data_position='top left' input_date_field_name='mri_brain_performed_date' disabled=True %}
                 {% else %}
                     {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain performed date" date_value=investigations.mri_brain_performed_date data_position='top left' input_date_field_name='mri_brain_performed_date' disabled=False %}

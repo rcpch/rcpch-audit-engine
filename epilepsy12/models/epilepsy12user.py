@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -209,7 +209,10 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def has_perm(self, perm, obj=None):
-        return True
+        if Permission.objects.filter(user=self, codename=perm).exists() or self.is_superuser:
+            return True
+        else:
+            return False
 
     def has_module_perms(self, app_label):
         return True
