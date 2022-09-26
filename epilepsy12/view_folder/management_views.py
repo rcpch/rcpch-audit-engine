@@ -127,6 +127,8 @@ def antiepilepsy_medicine_search(request, management_id):
         'antiepilepsy_medicine_search')
     items = snomed_medicine_search(antiepilepsy_medicine_search_text)
 
+    management = Management.objects.get(pk=management_id)
+
     context = {
         'items': items,
         'management_id': management_id

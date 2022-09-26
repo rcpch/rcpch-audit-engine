@@ -2,7 +2,7 @@
 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.were_any_of_the_epileptic_seizures_convulsive label="Were any of the epileptic seizures convulsive?" data_position="top left" %}
 
 {% url 'epileptic_seizure_onset_type' episode_id=episode.pk as hx_post %}
-{% if not perms.epilepsy12.change_multiaxial_diagnosis %}
+{% if perms.epilepsy12.change_multiaxialdiagnosis %}
     {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epileptic_seizure_onset_type label="How best would describe the onset of the epileptic episode?" data_position="top left" disabled=False %}
 {% else %}
     {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epileptic_seizure_onset_type label="How best would describe the onset of the epileptic episode?" data_position="top left" disabled=True %}

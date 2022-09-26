@@ -1,12 +1,6 @@
-from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
-
-from epilepsy12.models.hospital_trust import HospitalTrust
-from epilepsy12.models.management import Management
-from epilepsy12.models.registration import Registration
-from .models import Case, Site
-from django.contrib.auth.decorators import user_passes_test
-from django.utils.functional import wraps
+from epilepsy12.models import InitialAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome
+from epilepsy12.models.comorbidity import Comorbidity
 
 
 model_primary_keys = [
@@ -98,6 +92,34 @@ def group_required(*group_names):
                     management = Management.objects.get(
                         pk=kwargs.get('management_id'))
                     child = management.registration.case
+                elif kwargs.get('investigations_id') is not None:
+                    investigations = Investigations.objects.get(
+                        pk=kwargs.get('investigations_id'))
+                    child = investigations.registration.case
+                elif kwargs.get('initial_assessment_id') is not None:
+                    initial_assessment = InitialAssessment.objects.get(
+                        pk=kwargs.get('initial_assessment_id'))
+                    child = initial_assessment.registration.case
+                elif kwargs.get('epilepsy_context_id') is not None:
+                    epilepsy_context = EpilepsyContext.objects.get(
+                        pk=kwargs.get('epilepsy_context_id'))
+                    child = epilepsy_context.registration.case
+                elif kwargs.get('multiaxial_diagnosis_id') is not None:
+                    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+                        pk=kwargs.get('multiaxial_diagnosis_id'))
+                    child = multiaxial_diagnosis.registration.case
+                elif kwargs.get('episode_id') is not None:
+                    episode = Episode.objects.get(
+                        pk=kwargs.get('episode_id'))
+                    child = episode.multiaxial_diagnosis.registration.case
+                elif kwargs.get('syndrome_id') is not None:
+                    syndrome = Syndrome.objects.get(
+                        pk=kwargs.get('syndrome_id'))
+                    child = syndrome.multiaxial_diagnosis.registration.case
+                elif kwargs.get('comorbidity_id') is not None:
+                    comorbidity = Comorbidity.objects.get(
+                        pk=kwargs.get('comorbidity_id'))
+                    child = comorbidity.multiaxial_diagnosis.registration.case
                 else:
                     child = Case.objects.get(pk=kwargs.get('case_id'))
 

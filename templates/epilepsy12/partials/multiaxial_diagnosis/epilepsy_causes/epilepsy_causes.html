@@ -6,10 +6,10 @@
 <div class="field">
 
     {% url "epilepsy_cause" multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-    {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-        {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=epilepsy_causes hx_post=hx_post hx_name='epilepsy_cause' hx_default_text='Select a cause' hx_swap='innerHTML' hx_target='#epilepsy_causes' hx_trigger='change' test_positive=multiaxial_diagnosis.epilepsy_cause disabled=True %}
-    {% else %}
+    {% if perms.epilepsy12.change_multiaxialdiagnosis %}
         {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=epilepsy_causes hx_post=hx_post hx_name='epilepsy_cause' hx_default_text='Select a cause' hx_swap='innerHTML' hx_target='#epilepsy_causes' hx_trigger='change' test_positive=multiaxial_diagnosis.epilepsy_cause disabled=False %}
+    {% else %}
+        {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=epilepsy_causes hx_post=hx_post hx_name='epilepsy_cause' hx_default_text='Select a cause' hx_swap='innerHTML' hx_target='#epilepsy_causes' hx_trigger='change' test_positive=multiaxial_diagnosis.epilepsy_cause disabled=True %}
     {% endif %}
 
 </div>
