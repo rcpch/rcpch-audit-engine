@@ -145,7 +145,7 @@ def case_list(request, hospital_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.add_case')
 def create_case(request):
     form = CaseForm(request.POST or None)
     if request.method == "POST":

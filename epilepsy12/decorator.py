@@ -120,8 +120,12 @@ def group_required(*group_names):
                     comorbidity = Comorbidity.objects.get(
                         pk=kwargs.get('comorbidity_id'))
                     child = comorbidity.multiaxial_diagnosis.registration.case
-                else:
-                    child = Case.objects.get(pk=kwargs.get('case_id'))
+                elif kwargs.get('case_id') is not None:
+                    case = Case.objects.get(
+                        pk=kwargs.get('case_id'))
+                    child = case
+                # else:
+                #     child = Case.objects.get(pk=kwargs.get('case_id'))
 
                 if user.is_rcpch_audit_team_member:
                     hospital = HospitalTrust.objects.filter(

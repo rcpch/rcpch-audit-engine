@@ -1,5 +1,6 @@
 {% load epilepsy12_template_tags %}
-<form class="ui form" method="post">
+
+<form class="ui rcpch form" method="post">
   {% csrf_token %}
     <div class="two fields">
       <div class="field">
@@ -71,12 +72,15 @@
         </div>
       {% endif %}
     </div>
+
     <div class="field">
       <label>Ethnicity</label>
-      {{form.ethnicity}} {% if form.ethnicity.errors %}
-      <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
+      {{form.ethnicity}} 
+      {% if form.ethnicity.errors %}
+        <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
       {% endif %}
     </div>
+
     {% if not perms.epilepsy12.change_case or not perms.epilepsy12.add_case %}
       <button type="submit" class="ui green button" name="update">Save</button>
     {% endif %}
@@ -85,3 +89,5 @@
     {% endif %}
     <button type="submit" class="ui blue button">Cancel</button>
   </form>
+  
+  
