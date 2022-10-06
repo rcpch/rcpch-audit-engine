@@ -38,6 +38,7 @@ def case_list(request, hospital_id):
     if filter_term:
         all_cases = Case.objects.filter(
             Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
+            Q(site_site_is_primary_centre_of_epilepsy_care=True) &
             Q(first_name__icontains=filter_term) |
             Q(surname__icontains=filter_term) |
             Q(nhs_number__icontains=filter_term)
@@ -50,7 +51,8 @@ def case_list(request, hospital_id):
             filtered_cases = Case.objects.all()
         else:
             filtered_cases = Case.objects.filter(
-                hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName
+                hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName,
+                site__site_is_primary_centre_of_epilepsy_care=True
             )
 
         if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
@@ -78,14 +80,14 @@ def case_list(request, hospital_id):
             all_cases = filtered_cases.order_by(
                 '-ethnicity').all()
             sort_flag = "sort_by_ethnicity_down"
-        elif request.htmx.trigger_name == "sort_by_gender_up" or request.GET.get('sort_flag') == "sort_by_gender_up":
+        elif request.htmx.trigger_name == "sort_by_sex_up" or request.GET.get('sort_flag') == "sort_by_sex_up":
             all_cases = filtered_cases.order_by(
-                'gender').all()
-            sort_flag = "sort_by_gender_up"
-        elif request.htmx.trigger_name == "sort_by_gender_down" or request.GET.get('sort_flag') == "sort_by_gender_down":
+                'sex').all()
+            sort_flag = "sort_by_sex_up"
+        elif request.htmx.trigger_name == "sort_by_sex_down" or request.GET.get('sort_flag') == "sort_by_sex_down":
             all_cases = filtered_cases.order_by(
                 '-sex').all()
-            sort_flag = "sort_by_gender_down"
+            sort_flag = "sort_by_sex_down"
         elif request.htmx.trigger_name == "sort_by_name_up" or request.GET.get('sort_flag') == "sort_by_name_up":
             all_cases = filtered_cases.order_by(
                 'surname').all()
