@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <div class="ui segment">
 
     <div class="ui info message">
@@ -15,10 +16,12 @@
         <li>Children who have ‘drop attacks’ as part of a more complex epilepsy</li>
         <li>Children with epilepsy associated with hypothalamic hamartoma</li>
       </ol>
-
         {% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Are ANY of these criteria present?" data_position="top left" %}
-
+    {% if perms.epilepsy12.can_confirm_childrens_epilepsy_surgical_service_referral_criteria_met %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Are ANY of these criteria present?" data_position="top left" disabled=False %}
+    {% else %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Are ANY of these criteria present?" data_position="top left" disabled=True %}
+    {% endif %}
   </div>
     
     {% if assessment.childrens_epilepsy_surgical_service_referral_criteria_met %}

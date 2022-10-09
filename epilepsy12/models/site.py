@@ -1,10 +1,6 @@
 from django.db import models
-
-from epilepsy12.models.hospital_trust import HospitalTrust
-from ..constants import *
 # other tables
-# from .registration import Registration
-from .case import Case
+from .case import Case, HospitalTrust
 from .time_and_user_abstract_base_classes import *
 
 

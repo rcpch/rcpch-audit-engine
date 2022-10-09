@@ -8,7 +8,7 @@ from django.conf import settings
 from epilepsy12.models.hospital_trust import HospitalTrust
 
 
-from ..constants import *
+from ..constants import SEX_TYPE, ETHNICITIES, CAN_VIEW_CHILD_NHS_NUMBER, CAN_VIEW_CHILD_DATE_OF_BIRTH, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_ONLY_VIEW_CHILD_CASE_DATA, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
@@ -164,15 +164,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     class Meta:
         verbose_name = 'Patient'
         verbose_name_plural = 'Patients'
+        # custom permissions for Case class
         permissions = [
             CAN_VIEW_CHILD_NHS_NUMBER,
             CAN_VIEW_CHILD_DATE_OF_BIRTH,
-            CAN_DELETE_CHILD_CASE_DATA,
-            CAN_UPDATE_CHILD_CASE_DATA,
             CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
             CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
             CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
-            CAN_VIEW_CHILD_CASE_DATA,
+            CAN_ONLY_VIEW_CHILD_CASE_DATA,
             CAN_CONSENT_TO_AUDIT_PARTICIPATION
         ]
 

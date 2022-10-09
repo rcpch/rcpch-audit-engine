@@ -33,7 +33,7 @@ class CaseForm(forms.ModelForm):
     )
     sex = forms.ChoiceField(
         choices=SEX_TYPE,
-        widget=forms.Select(),
+        widget=forms.Select(attrs={'class': 'ui fluid rcpch dropdown'}),
         required=True
     )
     nhs_number = forms.CharField(
@@ -57,13 +57,22 @@ class CaseForm(forms.ModelForm):
         )
     )
     ethnicity = forms.ChoiceField(
-        help_text="Enter the ethnicity",
         choices=ETHNICITIES,
-        widget=forms.Select(),
+        widget=forms.Select(
+            attrs={
+                'class': 'ui fluid rcpch dropdown'
+            }
+        ),
         required=True
     ),
-    locked = forms.CheckboxInput(
-    ),
+    locked = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'ui checkbox'
+            }
+        ),
+        required=False
+    )
     locked_at = forms.DateTimeField(
         help_text="Time record locked.",
         required=False

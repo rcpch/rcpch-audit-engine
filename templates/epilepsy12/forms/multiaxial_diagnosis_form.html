@@ -37,7 +37,7 @@
         <div class="field" id='episode'>
 
             <button 
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
                 class="ui rcpch_primary disabled button"
                 {% else %}
                 class="ui rcpch_primary button"

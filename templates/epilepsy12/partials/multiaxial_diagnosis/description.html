@@ -21,7 +21,10 @@
                     </span>
                 {% endif %}
 
-                <textarea 
+                <textarea
+                    {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
+                    disabled
+                    {% endif %}
                     type="text" 
                     class="ui textarea" 
                     rows="3" 

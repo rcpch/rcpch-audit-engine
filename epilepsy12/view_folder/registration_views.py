@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from datetime import date
 from django.utils import timezone
 from django.db.models import Q
@@ -512,7 +512,7 @@ def registration_date(request, case_id):
     # update the Registration with the date and the audit_progress record
     registration.save()
     # if all registration components present, update AuditProcess
-    registration = Registration.objects.filter(case=case_id).get()
+    registration = Registration.objects.filter(case=case).get()
 
     test_fields_update_audit_progress(registration, False)
 

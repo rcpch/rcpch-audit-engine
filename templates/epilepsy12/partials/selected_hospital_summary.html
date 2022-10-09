@@ -1,9 +1,8 @@
 {% load static %}
 {% load epilepsy12_template_tags %}
 
-<div class="ui container">
+<div class="ui grid container">
     
-    <div class='ui grid'>
 
         {% if request.user.is_rcpch_audit_team_member %}
             <div class='eight wide column'>
@@ -24,8 +23,8 @@
         {% endif %}
             
 
-        <div class="four wide stackable column">
-            <div class="ui rcpch_light_blue stackable card">
+        <div class="six wide stackable column">
+            <div class="ui rcpch_light_blue fluid stackable card">
                 <div class="content">
                     <div class="header">
                         {{ selected_hospital.ParentName }}
@@ -44,14 +43,15 @@
             </div>
         </div>
 
-        <div class="twelve wide stackable  column">
-                <h1 class='header'>
+        <div class="ten wide stackable column">
+                <h2 class='header'>
                 {{selected_hospital.ParentName}} summary
-                </h1>
+                </h2>
                 <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
                     {% if cases_aggregated_by_ethnicity %}
                         {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
                     {% else %}
+                        <h3>Distribution by Ethnicity</h3>
                         <h5>No data yet!<h5>
                     {% endif %}
                 </div>
@@ -64,6 +64,7 @@
                 {% if cases_aggregated_by_sex %}
                     {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
                 {% else %}
+                    <h3>Distribution by Sex</h3>
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
@@ -76,6 +77,7 @@
                 {% if cases_aggregated_by_deprivation %}
                     {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
                 {% else %}
+                    <h3>Distribution by Index of Multiple Deprivation</h3>
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
@@ -112,6 +114,5 @@
             {% endif %}
         </div>
     
-    </div>
-
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>

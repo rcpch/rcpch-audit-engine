@@ -36,7 +36,11 @@
                     <div 
                         class="ui rcpch_light_blue buttons">
                         <button 
-                            class="ui rcpch_primary button"
+                            {% if not perms.epilepsy12.change_comorbidity %}
+                                class="ui rcpch_primary disabled button"
+                            {% else %}
+                                class="ui rcpch_primary button"
+                            {% endif %}
                             hx-post='{% url "edit_comorbidity" comorbidity_id=comorbidity.pk %}'
                             hx-target='#comorbidities'
                             hx-trigger='click'
@@ -44,8 +48,12 @@
                         >
                             Edit
                         </button>
-                        <button 
-                            class="ui rcpch_red icon button"
+                        <button
+                            {% if not perms.epilepsy12.delete_comorbidity %}
+                                class="ui rcpch_red icon disabled button"
+                            {% else %}
+                                class="ui rcpch_red icon button"
+                            {% endif %}
                             hx-post='{% url "remove_comorbidity" comorbidity_id=comorbidity.pk %}'
                             hx-target='#comorbidities'
                             hx-trigger='click'
@@ -68,8 +76,12 @@
         </div>
     {% endif %}
     <div class='field'>
-        <button 
+        <button
+            {% if not perms.epilepsy12.add_comorbidity %}
+            class="ui rcpch_primary disabled button"
+            {% else %}
             class="ui rcpch_primary button"
+            {% endif %}
             hx-post="{% url 'add_comorbidity' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
             hx-target="#comorbidities"
             hx-swap='innerHTML'

@@ -1,5 +1,6 @@
 {% load epilepsy12_template_tags %}
-<form class="ui form" method="post">
+
+<form class="ui rcpch form" method="post">
   {% csrf_token %}
     <div class="two fields">
       <div class="field">
@@ -71,17 +72,22 @@
         </div>
       {% endif %}
     </div>
+
     <div class="field">
       <label>Ethnicity</label>
-      {{form.ethnicity}} {% if form.ethnicity.errors %}
-      <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
+      {{form.ethnicity}} 
+      {% if form.ethnicity.errors %}
+        <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
       {% endif %}
     </div>
-    {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
+
+    {% if not perms.epilepsy12.change_case or not perms.epilepsy12.add_case %}
       <button type="submit" class="ui green button" name="update">Save</button>
     {% endif %}
-    {% if request.user|has_group:"trust_audit_team_full_access, epilepsy12_audit_team_full_access" %}
+    {% if not perms.epilepsy12.delete_case %}
     <button type="submit" class="ui red button" name="delete">Delete</button>
     {% endif %}
     <button type="submit" class="ui blue button">Cancel</button>
   </form>
+  
+  

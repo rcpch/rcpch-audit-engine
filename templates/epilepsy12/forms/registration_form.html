@@ -33,7 +33,7 @@
                 hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" 
                 hx-target='#eligibility_result'
                 hx-trigger="click">I confirm all criteria are present
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
                 disabled
                 {% endif %}
               </button>
@@ -47,7 +47,7 @@
     </div>
 
     <div id="lead_site" class="field">
-      {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+      {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
         {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=False %}
       {% else %}
         {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=True %}

@@ -1,5 +1,4 @@
 from django.db import models
-from ..constants import *
 from ..general_functions import calculate_time_elapsed
 
 from .registration import Registration

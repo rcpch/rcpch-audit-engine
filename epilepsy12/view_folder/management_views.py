@@ -127,6 +127,8 @@ def antiepilepsy_medicine_search(request, management_id):
         'antiepilepsy_medicine_search')
     items = snomed_medicine_search(antiepilepsy_medicine_search_text)
 
+    management = Management.objects.get(pk=management_id)
+
     context = {
         'items': items,
         'management_id': management_id
@@ -451,7 +453,7 @@ def individualised_care_plan_date(request, management_id):
     # TODO date validation needed
     Management.objects.filter(pk=management_id).update(
         individualised_care_plan_date=datetime.strptime(
-            request.POST.get('input_date_field'), "%Y-%m-%d").date(),
+            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d").date(),
         updated_at=timezone.now(),
         updated_by=request.user)
     management = Management.objects.get(pk=management_id)
@@ -480,30 +482,25 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
     This inverts the boolean field value, and returns the same partial.
     """
 
-    if Management.objects.filter(pk=management_id, individualised_care_plan_has_parent_carer_child_agreement=None).exists():
-        # no selection - get the name of the button
-        if request.htmx.trigger_name == 'button-true':
-            Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_has_parent_carer_child_agreement=True,
-                updated_at=timezone.now(),
-                updated_by=request.user)
-        elif request.htmx.trigger_name == 'button-false':
-            Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_has_parent_carer_child_agreement=False,
-                updated_at=timezone.now(),
-                updated_by=request.user)
-        else:
-            print(
-                "Some kind of error - this will need to be raised and returned to template")
-            return HttpResponse("Error")
-    else:
+    if request.htmx.trigger_name == 'button-true':
         Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_has_parent_carer_child_agreement=Q(
-                individualised_care_plan_has_parent_carer_child_agreement=False),
+            individualised_care_plan_has_parent_carer_child_agreement=True,
             updated_at=timezone.now(),
             updated_by=request.user)
 
+    elif request.htmx.trigger_name == 'button-false':
+
+        Management.objects.filter(pk=management_id).update(
+            individualised_care_plan_has_parent_carer_child_agreement=False,
+            updated_at=timezone.now(),
+            updated_by=request.user)
+    else:
+        print(
+            "Some kind of error - this will need to be raised and returned to template")
+        return HttpResponse("Error")
+
     management = Management.objects.get(pk=management_id)
+
     context = {
         'management': management
     }

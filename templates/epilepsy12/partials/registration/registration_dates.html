@@ -21,7 +21,7 @@
                         hx-target="#registration_date_results" 
                         hx-swap='innerHTML'
                         hx-trigger="click">
-                        {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
+                        {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
                         disabled
                         {% endif %}
                         <div class="fluid ui button" id="action_button">Register Now</div>
