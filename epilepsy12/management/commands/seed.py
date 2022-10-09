@@ -597,6 +597,7 @@ def add_permissions_to_existing_groups():
     for group in GROUPS:
         print(f'...adding permissions to {group}...')
         # add permissions to group
+        newGroup = Group.objects.filter(name=group).get()
 
         if group == EPILEPSY12_AUDIT_TEAM_VIEW_ONLY:
             # custom permissions
