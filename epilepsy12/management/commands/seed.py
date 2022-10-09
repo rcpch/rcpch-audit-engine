@@ -442,6 +442,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_groups_and_permissions'):
             self.stdout.write('setting up groups and permissions...')
             create_groups()
+        elif (options['mode'] == 'add_permissions_to_existing_groups'):
+            self.stdout.write('adding permissions to groups...')
+            add_permissions_to_existing_groups()
+
         else:
             self.stdout.write('No options supplied...')
         self.stdout.write(image())
@@ -587,6 +591,66 @@ def run_dummy_cases_seed():
         added += 1
         print(f"Saved {new_case.first_name} {new_case.surname} at {new_site.hospital_trust.ParentName}({new_site.hospital_trust.OrganisationName})...")
     print(f"Saved {added} cases.")
+
+
+def add_permissions_to_existing_groups():
+    for group in GROUPS:
+        print(f'...adding permissions to {group}...')
+        # add permissions to group
+
+        if group == EPILEPSY12_AUDIT_TEAM_VIEW_ONLY:
+            # custom permissions
+            add_permissions_to_group(
+                EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+
+        elif group == EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS:
+            # custom permissions
+            add_permissions_to_group(
+                EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
+
+        elif group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
+            # custom permissions
+            add_permissions_to_group(
+                EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
+            add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
+
+        elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
+            # custom permissions
+            add_permissions_to_group(
+                TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+
+        elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
+            # custom permissions
+            add_permissions_to_group(
+                TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
+
+        elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
+            # custom permissions
+            add_permissions_to_group(
+                TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
+            add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
+
+        elif group == PATIENT_ACCESS:
+            # custom permissions
+            add_permissions_to_group(
+                PATIENT_ACCESS_PERMISSIONS, newGroup)
+            # basic permissions
+            add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+
+        else:
+            print("Error: group does not exist!")
 
 
 def create_groups():
