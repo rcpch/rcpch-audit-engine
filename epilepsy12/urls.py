@@ -343,8 +343,6 @@ htmx_paths = [
          views.individualised_care_plan_addresses_water_safety, name='individualised_care_plan_addresses_water_safety'),
     path('management/<int:management_id>/individualised_care_plan_addresses_sudep',
          views.individualised_care_plan_addresses_sudep, name='individualised_care_plan_addresses_sudep'),
-    path('management/<int:management_id>/individualised_care_plan_includes_aihp',
-         views.individualised_care_plan_includes_aihp, name='individualised_care_plan_includes_aihp'),
     path('management/<int:management_id>/individualised_care_plan_includes_ehcp',
          views.individualised_care_plan_includes_ehcp, name='individualised_care_plan_includes_ehcp'),
     path('management/<int:management_id>/has_individualised_care_plan_been_updated_in_the_last_year',
