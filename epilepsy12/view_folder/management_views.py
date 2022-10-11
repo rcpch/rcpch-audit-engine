@@ -416,7 +416,7 @@ def individualised_care_plan_in_place(request, management_id):
             individualised_care_plan_includes_general_participation_risk=None,
             individualised_care_plan_addresses_water_safety=None,
             individualised_care_plan_addresses_sudep=None,
-            individualised_care_plan_includes_aihp=None,
+            # individualised_care_plan_includes_aihp=None,
             individualised_care_plan_includes_ehcp=None,
             has_individualised_care_plan_been_updated_in_the_last_year=None,
             updated_at=timezone.now(),
@@ -804,56 +804,6 @@ def individualised_care_plan_addresses_sudep(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def individualised_care_plan_includes_aihp(request, management_id):
-    """
-    This is an HTMX callback from the individualised_care_plan partial template
-    It is triggered by a toggle in the partial generating a post request
-    This inverts the boolean field value, and returns the same partial.
-    """
-
-    if Management.objects.filter(pk=management_id, individualised_care_plan_includes_aihp=None).exists():
-        # no selection - get the name of the button
-        if request.htmx.trigger_name == 'button-true':
-            Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_aihp=True,
-                updated_at=timezone.now(),
-                updated_by=request.user)
-        elif request.htmx.trigger_name == 'button-false':
-            Management.objects.filter(pk=management_id).update(
-                individualised_care_plan_includes_aihp=False,
-                updated_at=timezone.now(),
-                updated_by=request.user)
-        else:
-            print(
-                "Some kind of error - this will need to be raised and returned to template")
-            return HttpResponse("Error")
-    else:
-        Management.objects.filter(pk=management_id).update(
-            individualised_care_plan_includes_aihp=Q(
-                individualised_care_plan_includes_aihp=False),
-            updated_at=timezone.now(),
-            updated_by=request.user)
-
-    management = Management.objects.get(pk=management_id)
-    context = {
-        'management': management
-    }
-    test_fields_update_audit_progress(management)
-
-    response = render(
-        request=request, template_name='epilepsy12/partials/management/individualised_care_plan.html', context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def individualised_care_plan_includes_ehcp(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -970,7 +920,7 @@ def total_fields_expected(model_instance):
     # individualised_care_plan_includes_general_participation_risk
     # individualised_care_plan_addresses_water_safety
     # individualised_care_plan_addresses_sudep
-    # individualised_care_plan_includes_aihp
+
     # individualised_care_plan_includes_ehcp
     # has_individualised_care_plan_been_updated_in_the_last_year
 
@@ -994,7 +944,7 @@ def total_fields_expected(model_instance):
         cumulative_fields += 1
 
     if model_instance.individualised_care_plan_in_place and model_instance.individualised_care_plan_in_place is not None:
-        cumulative_fields += 12
+        cumulative_fields += 11
     else:
         cumulative_fields += 1
 

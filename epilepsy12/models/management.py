@@ -88,12 +88,6 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True,
         blank=True,
     )
-    individualised_care_plan_includes_aihp = models.BooleanField(
-        "Does the individualised care plan include AIHP?",
-        default=None,
-        null=True,
-        blank=True,
-    )
     individualised_care_plan_includes_ehcp = models.BooleanField(
         "Does the individualised care plan include an educational health care plan (EHCP)?",
         default=None,
