@@ -1,6 +1,7 @@
 from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from epilepsy12.decorator import group_required
@@ -10,7 +11,7 @@ from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
-from django_htmx.http import trigger_client_event
+from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 
 @login_required
@@ -33,7 +34,12 @@ def case_list(request, hospital_id):
 
     filter_term = request.GET.get('filtered_case_list')
 
+    # get currently selected hospital
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    # get all hospitals which are in the same parent trust
+    hospital_children = HospitalTrust.objects.filter(
+        ParentName=hospital_trust.ParentName).all()
 
     if filter_term:
         all_cases = Case.objects.filter(
@@ -123,7 +129,7 @@ def case_list(request, hospital_id):
 
     rcpch_choices = (
         (0, 'All UK Children'),
-        (1, f'{hospital_trust.OrganisationName} Cohort')
+        (1, f'{hospital_trust.ParentName} Cohort')
     )
     if request.user.has_rcpch_view_preference:
         rcpch_preference = rcpch_choices[0][0]
@@ -136,8 +142,10 @@ def case_list(request, hospital_id):
         'total_registrations': registered_count,
         'sort_flag': sort_flag,
         'hospital_trust': hospital_trust,
+        'hospital_children': hospital_children,
         'rcpch_choices': rcpch_choices,
-        'rcpch_preference': rcpch_preference
+        'rcpch_preference': rcpch_preference,
+        'hospital_id': hospital_id
     }
     if request.htmx:
         return render(request=request, template_name='epilepsy12/partials/case_table.html', context=context)
@@ -164,6 +172,34 @@ def create_case(request):
     return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
+# @login_required
+def child_hospital_select(request, hospital_id):
+    """
+    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
+    """
+
+    selected_hospital_id = request.POST.get('child_hospital_select')
+
+    # get currently selected hospital
+    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
+
+    # get all hospitals which are in the same parent trust
+    hospital_children = HospitalTrust.objects.filter(
+        ParentName=hospital_trust.ParentName).all()
+
+    # context = {
+
+    #     'hospital_trust': hospital_trust,
+    #     'hospital_children': hospital_children,
+    # }
+
+    # response = render(
+    #     request=request, template_name='epilepsy12/partials/cases/hospital_children.html', context=context)
+
+    # return response
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_trust.pk}))
+
+
 @login_required
 def has_rcpch_view_preference(request, hospital_id):
     """
@@ -172,9 +208,13 @@ def has_rcpch_view_preference(request, hospital_id):
     """
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
+    # get all hospitals which are in the same parent trust
+    hospital_children = HospitalTrust.objects.filter(
+        ParentName=hospital_trust.ParentName).all()
+
     rcpch_choices = (
         (0, 'All UK Children'),
-        (1, f'{hospital_trust.OrganisationName} Cohort')
+        (1, f'{hospital_trust.ParentName} Cohort')
     )
 
     if (int(request.htmx.trigger_name) == 1):
@@ -192,7 +232,8 @@ def has_rcpch_view_preference(request, hospital_id):
     context = {
         'rcpch_choices': rcpch_choices,
         'rcpch_preference': rcpch_preference,
-        'hospital_trust': hospital_trust
+        'hospital_trust': hospital_trust,
+        'hospital_children': hospital_children
     }
 
     response = render(
@@ -245,8 +286,8 @@ def case_statistics(request, hospital_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def update_case(request, id):
-    case = get_object_or_404(Case, id=id)
+def update_case(request, hospital_id, case_id):
+    case = get_object_or_404(Case, id=case_id)
     form = CaseForm(instance=case)
 
     if request.method == "POST":
@@ -278,7 +319,24 @@ def update_case(request, id):
 
 @login_required
 @group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
-def delete_case(request, id):
-    case = get_object_or_404(Case, id=id)
+def delete_case(request, hospital_id, case_id):
+    case = get_object_or_404(Case, id=case_id)
     case.delete()
     return redirect('cases')
+
+
+@login_required
+def opt_out(request, case_id):
+    """
+    This child has opted out of Epilepsy12
+    Their unique E12 ID will be retained but all associated fields will be set to None, and associated records deleted except their 
+    leading trust will be retained but set to inactive.
+    """
+    case = Case.objects.get(pk=case_id)
+    case.nhs_number = None
+    case.first_name = None
+    case.surname = None
+    case.sex = None
+    case.date_of_birth = None
+    case.postcode = None
+    case.ethnicity = None

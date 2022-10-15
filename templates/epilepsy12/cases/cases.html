@@ -10,12 +10,13 @@
       {% if request.user.is_rcpch_audit_team_member %}        
 
           <h5 class="ui right floated header" id='has_rcpch_view_preference'>
-            {% include 'epilepsy12/partials/cases/has_rcpch_view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices rcpch_preference=rcpch_preference %}
+              {% include 'epilepsy12/partials/cases/has_rcpch_view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices rcpch_preference=rcpch_preference %}
           </h5>
-
+          
       {% else %}
-        <h5 class="ui right floated header">
-          {{hospital_trust.OrganisationName}} ({{hospital_trust.ParentName}})
+          <h5 class="ui right floated header">
+            {{hospital_trust.OrganisationName}} ({{hospital_trust.ParentName}})
+            {% include 'epilepsy12/partials/cases/hospital_children.html' with hospital_trust=hospital_trust hospital_children=hospital_children %}
         </h5>
       {% endif %}
     </div>
@@ -28,7 +29,7 @@
         
           <div class="twelve wide column">
 
-              <a href="{% url 'create_case'%}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
+              <a href="{% url 'create_case' hospital_id %}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
               
               <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
                 <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' %}" hx-swap="innerHTML">

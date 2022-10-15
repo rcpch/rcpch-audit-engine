@@ -1,0 +1,4 @@
+<div id='child_hospital'>
+{% url 'child_hospital_select' hospital_id=hospital_trust.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/rcpch_hospitals_select.html' with hospital_list=hospital_children test_positive=hospital_trust.pk hx_default_text='Select Hospital to view' hx_target='#child_hospital' hx_swap='innerHTML' hx_post=hx_post hx_name='child_hospital_select' label='Select Hospital' hx_trigger='change' %}
+</div>

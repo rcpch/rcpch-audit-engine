@@ -70,17 +70,17 @@
         </td>
         <td>
           <div class='ui buttons'>
-            <a href="{% url 'update_case' id=case.id%}"><button class="ui rcpch_primary icon button" tabindexed="0"><i
+            <a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}"><button class="ui rcpch_primary icon button" tabindexed="0"><i
                   class="edit outline icon"></i></button></a>
-            <a href="{% url 'delete_case' id=case.id%}"><button class="ui rcpch_danger icon button" tabindexed="1"><i
+            <a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><button class="ui rcpch_danger icon button" tabindexed="1"><i
                   class="trash alternate outline icon"></i></button></a>
             {% if case.registration.registration_date %}
             {% if case.locked %}
             <button class="ui rcpch_positive button" tabindexed="2" disabled
-              onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
+              onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
             {% else %}
             <button class="ui rcpch_positive button" tabindexed="2"
-              onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
+              onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
             {% endif %}
             {% else %}
             {% if case.locked %}

@@ -84,7 +84,7 @@
     {% if not perms.epilepsy12.change_case or not perms.epilepsy12.add_case %}
       <button type="submit" class="ui green button" name="update">Save</button>
     {% endif %}
-    {% if not perms.epilepsy12.delete_case %}
+    {% if perms.epilepsy12.delete_case %}
     <button type="submit" class="ui red button" name="delete">Delete</button>
     {% endif %}
     <button type="submit" class="ui blue button">Cancel</button>
