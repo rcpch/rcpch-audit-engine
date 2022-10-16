@@ -134,7 +134,7 @@ def group_required(*group_names):
                         site__site_is_primary_centre_of_epilepsy_care=True,
                     )
                 else:
-                    # filter for object where hospital where case is registered is the same as that of user
+                    # filter for object where trust (not just hospital) where case is registered is the same as that of user
                     hospital = HospitalTrust.objects.filter(
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,

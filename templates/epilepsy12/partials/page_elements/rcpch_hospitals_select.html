@@ -12,7 +12,7 @@ hospital_list: a filtered list of hospitals
 test_positive: currently selected hospital id
 {% endcomment %}
 
-<div class="field">
+<div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <div 
             class="ui rcpch_light_blue search selection fluid dropdown"
