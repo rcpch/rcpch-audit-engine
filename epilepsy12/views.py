@@ -1,4 +1,3 @@
-from select import select
 from django.conf import settings
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.views.decorators.cache import cache_control
@@ -14,7 +13,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
-from epilepsy12.models.case import Case
+from epilepsy12.models import Case, Epilepsy12User
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
 from django.db.models import Case as DJANGO_CASE
 from itertools import chain

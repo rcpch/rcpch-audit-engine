@@ -125,3 +125,11 @@ def has_group(user, group_names_string):
         if group in result:
             match = True
     return match
+
+
+@register.simple_tag
+def none_masked(field):
+    if field is None:
+        return "##########"
+    else:
+        return field
