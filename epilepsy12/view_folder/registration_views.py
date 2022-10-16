@@ -495,7 +495,7 @@ def registration_status(request, registration_id):
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def registration_date(request, case_id):
     """
-    This defines registration in the audit. 
+    This defines registration in the audit and refers to the date of first paediatric assessment. 
     Call back from POST request on button press of register button
     in registration_dates partial.
     This sets the registration date, and in turn, the cohort number
