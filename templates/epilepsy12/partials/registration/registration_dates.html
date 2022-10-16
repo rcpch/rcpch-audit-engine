@@ -8,7 +8,8 @@
         {% if registration.registration_date %}
         
                 <div class="field">
-                    <button class="ui rcpch_primary disabled fluid button">Registered {{registration.registration_date}}</button>
+                    <label>Date of first paediatric assessment</label>
+                    <button class="ui rcpch_primary disabled fluid button">{{registration.registration_date}}</button>
                 </div>
                 
         {% else %}
@@ -46,7 +47,7 @@
                     {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' label='Date of First Paediatric Assessment' date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=True %}
                 </div>
             {% endif %}
-            
+
         {% endif %}
         <div class="field">
             <label>Epilepsy12 Submission Deadline</label>

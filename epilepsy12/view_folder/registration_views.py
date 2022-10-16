@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
-from datetime import date
+from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
@@ -501,12 +501,14 @@ def registration_date(request, case_id):
     This sets the registration date, and in turn, the cohort number
     It also triggers htmx 'registration_active' to enable the steps
     """
-    registration_date = date.today()
+    # registration_date = date.today()
     case = Case.objects.get(pk=case_id)
+    first_paediatric_assessment_date = datetime.strptime(
+        request.POST.get('registration_date'), "%Y-%m-%d").date()
 
     # update the AuditProgress
     registration = Registration.objects.get(case=case_id)
-    registration.registration_date = registration_date
+    registration.registration_date = first_paediatric_assessment_date
     registration.audit_progress.registration_complete = True
 
     # update the Registration with the date and the audit_progress record
