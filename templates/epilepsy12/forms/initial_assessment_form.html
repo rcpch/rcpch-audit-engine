@@ -7,9 +7,11 @@
   The initial assessment must be completed with x weeks of the reported episode.
   </div>
 
+  {% comment %}
   <div id='date_of_initial_assessment' class='field'>
     {% include 'epilepsy12/partials/initial_assessment/date_of_initial_assessment.html' with initial_assessment=initial_assessment %}
   </div>
+  {% endcomment %}
   
   <div id='first_paediatric_assessment_in_acute_or_nonacute_setting' class='field'>
     {% url 'first_paediatric_assessment_in_acute_or_nonacute_setting' initial_assessment_id=initial_assessment.pk as hx_post %}
@@ -21,13 +23,15 @@
   </div>
 
 
+  {% comment %}
   <h5 class='header'>
   Involving General Paediatrics
   </h5>
-
+  
   <div id='general_paediatrics_referral_made' class="field">
     {% include 'epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html' with initial_assessment=initial_assessment %}
   </div>
+  {% endcomment %}
 
   <h5 class='header'>
     Information gathered at the first paediatric assessment
