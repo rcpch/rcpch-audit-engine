@@ -71,10 +71,10 @@
           <td>{% none_masked case.nhs_number %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
-              <a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}"><button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0"><i
-                class="edit outline icon"></i></button></a>
-              <a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1"><i
-                class="trash alternate outline icon"></i></button></a>
+              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+                class="edit outline icon"></i></a></button>
+              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
+                class="trash alternate outline icon"></i></a></button>
               {% if case.registration.registration_date %}
                 {% if case.locked %}
                 <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
@@ -94,7 +94,7 @@
               {% endif %}
             </div>
           </td>
-          <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1"><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}"><i
+          <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
             class="sign-out icon"></i></a></button></td>
         </tr>
 
