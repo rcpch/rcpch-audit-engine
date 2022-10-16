@@ -181,8 +181,8 @@ htmx_paths = [
          views.delete_lead_site, name="delete_lead_site"),
     path('registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
-    path('registration/<int:registration_id>/referring_clinician',
-         views.referring_clinician, name="referring_clinician"),
+    #     path('registration/<int:registration_id>/referring_clinician',
+    #          views.referring_clinician, name="referring_clinician"),
 
     path('registration/<int:registration_id>/<str:editable>/',
          views.editable, name="editable"),

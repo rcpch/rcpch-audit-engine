@@ -1,5 +1,6 @@
 {% load epilepsy12_template_tags %}
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <h5>First paediatric assessment date</h5>
     <div class="three fields" 
         hx-get="{% url 'registration_status' registration_id=registration.pk %}"
         hx-swap="outerHTML"

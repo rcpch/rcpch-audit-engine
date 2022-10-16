@@ -536,39 +536,39 @@ def registration_date(request, case_id):
     return response
 
 
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def referring_clinician(request, registration_id):
-    """
-    Call back from POST request on key up in input partial in registration_form
-    """
+# @login_required
+# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+# def referring_clinician(request, registration_id):
+#     """
+#     Call back from POST request on key up in input partial in registration_form
+#     """
 
-    referring_clinician = request.POST.get(request.htmx.trigger_name)
-    registration = Registration.objects.filter(pk=registration_id).update(
-        referring_clinician=referring_clinician,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+#     referring_clinician = request.POST.get(request.htmx.trigger_name)
+#     registration = Registration.objects.filter(pk=registration_id).update(
+#         referring_clinician=referring_clinician,
+#         updated_at=timezone.now(),
+#         updated_by=request.user
+#     )
 
-    registration = Registration.objects.get(pk=registration_id)
+#     registration = Registration.objects.get(pk=registration_id)
 
-    context = {
-        'registration': registration,
-    }
+#     context = {
+#         'registration': registration,
+#     }
 
-    test_fields_update_audit_progress(registration, False)
+#     test_fields_update_audit_progress(registration, False)
 
-    response = render(
-        request=request,
-        template_name='epilepsy12/partials/registration/referring_clinician.html',
-        context=context)
+#     response = render(
+#         request=request,
+#         template_name='epilepsy12/partials/registration/referring_clinician.html',
+#         context=context)
 
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
 
-    return response
+#     return response
 
 
 @login_required
@@ -620,12 +620,12 @@ def total_fields_expected(model_instance):
     """
     Returns the total number of fields that need to be scored to all the form to be complete
     In the Registration/Validation form this is:
-    registration_date
-    referring_clinician
+    registration_date *REFACTOR first paediatric assessment date
+    referring_clinician *DEPRECATED*
     eligibility_criteria_met
     lead centre
     """
-    return 4
+    return 3
 
 
 def total_fields_completed(model_instance):
