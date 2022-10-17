@@ -27,73 +27,109 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
         null=True
     )
     consultant_paediatrician_referral_made = models.BooleanField(
-        "Has a referral been made to a consultant paediatrician with an interest in epilepsy?",
+        help_text={
+            'label': 'Has a referral been made to a consultant paediatrician with expertise in epilepsies?',
+            'reference': 'Has a referral been made to a consultant paediatrician with expertise in epilepsies?',
+        },
         blank=True,
         default=None,
         null=True
     )
     consultant_paediatrician_referral_date = models.DateField(
-        "Date of referral to a consultant paediatrician with expertise in epilepsy.",
+        help_text={
+            'label': "Date of referral to a consultant paediatrician with expertise in epilepsies.",
+            'reference': 'Has a referral been made to a consultant paediatrician with expertise in epilepsies?',
+        },
         blank=True,
         null=True,
         default=None
     )
     consultant_paediatrician_input_date = models.DateField(
-        "Date seen by a consultant paediatrician with expertise in epilepsy.",
+        help_text={
+            'label': 'Date seen by a consultant paediatrician with expertise in epilepsies.',
+            'reference': 'Date seen by a consultant paediatrician with expertise in epilepsies.'
+        },
         blank=True,
         default=None,
         null=True
     )
     paediatric_neurologist_referral_made = models.BooleanField(
-        "Has a referral to a consultant paediatric neurologist been made?",
+        help_text={
+            'label': "Has a referral to a consultant paediatric neurologist been made?",
+            'reference': "Has a referral to a consultant paediatric neurologist been made?"
+        },
         blank=True,
         default=None,
         null=True
     )
     paediatric_neurologist_referral_date = models.DateField(
-        "Date of referral to a consultant paediatric neurologist.",
+        help_text={
+            'label': "Date of referral to a consultant paediatric neurologist.",
+            'reference': "Date of referral to a consultant paediatric neurologist.",
+        },
         blank=True,
         default=None,
         null=True
     )
     paediatric_neurologist_input_date = models.DateField(
-        "Date seen by consultant paediatric neurologist.",
+        help_text={
+            'label': "Date seen by consultant paediatric neurologist.",
+            'reference': "Date seen by consultant paediatric neurologist.",
+        },
         blank=True,
         null=True,
         default=None
     )
     childrens_epilepsy_surgical_service_referral_made = models.BooleanField(
-        "Has a referral to a children's epilepsy surgery service been made?",
+        help_text={
+            'label': "Has a referral to a children's epilepsy surgery service been made?",
+            'reference': "Has a referral to a children's epilepsy surgery service been made?",
+        },
         blank=True,
         default=None,
         null=True
     )
     childrens_epilepsy_surgical_service_referral_date = models.DateField(
-        "Date of referral to a children's epilepsy surgery service",
+        help_text={
+            'label': "Date of referral to a children's epilepsy surgery service",
+            'reference': "Date of referral to a children's epilepsy surgery service",
+        },
         blank=True,
         default=None,
         null=True
     )
     childrens_epilepsy_surgical_service_input_date = models.DateField(
-        "Date seen by children's epilepsy surgery service",
+        help_text={
+            'label': "Date seen by children's epilepsy surgery service",
+            'reference': "Date seen by children's epilepsy surgery service",
+        },
         blank=True,
         default=None,
         null=True
     )
     epilepsy_specialist_nurse_referral_made = models.BooleanField(
-        "Has a referral to an epilepsy nurse specialist been made?",
+        help_text={
+            'label': "Has a referral to an epilepsy nurse specialist been made?",
+            'reference': "Has a referral to an epilepsy nurse specialist been made?",
+        },
         blank=True,
         default=None,
         null=True
     )
     epilepsy_specialist_nurse_referral_date = models.DateField(
-        "Date of referral to an epilepsy nurse specialist",
+        help_text={
+            'label': "Date of referral to an epilepsy nurse specialist",
+            'reference': "Date of referral to an epilepsy nurse specialist",
+        },
         blank=True,
         default=None,
         null=True
     )
     epilepsy_specialist_nurse_input_date = models.DateField(
-        "Date seen by an epilepsy nurse specialist",
+        help_text={
+            'label': "Date seen by an epilepsy nurse specialist",
+            'reference': "Date seen by an epilepsy nurse specialist",
+        },
         blank=True,
         default=None,
         null=True
