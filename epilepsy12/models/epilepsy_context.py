@@ -1,12 +1,16 @@
 
 from django.db import models
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from ..constants import OPT_OUT_UNCERTAIN
 from .time_and_user_abstract_base_classes import *
 
 from .registration import Registration
 
+from ..general_functions import *
 
-class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+
+class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records contextual information that defines epilepsy risk.
     It references the InitialAssessment class, as each case optionally has a single epilepsy context.

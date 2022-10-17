@@ -1,11 +1,13 @@
-from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from .registration import Registration
 from .time_and_user_abstract_base_classes import *
+from ..general_functions import *
 
 
-class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     Replace the DESSCRIBE class 
     One MultiaxialDiagnosis relates to one Registration

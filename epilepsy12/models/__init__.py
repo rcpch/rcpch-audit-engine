@@ -16,3 +16,4 @@ from .audit_progress import AuditProgress
 from .episode import Episode
 from .syndrome import Syndrome
 from .multiaxial_diagnosis import MultiaxialDiagnosis
+from .help_text_mixin import HelpTextMixin

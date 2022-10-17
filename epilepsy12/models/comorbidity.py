@@ -1,11 +1,15 @@
 from django.db import models
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .multiaxial_diagnosis import MultiaxialDiagnosis
 
+from ..general_functions import *
 
-class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+
+class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records information on all mental health, behavioural and developmental comorbidities
     [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]

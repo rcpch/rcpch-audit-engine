@@ -1,11 +1,13 @@
 from django.db import models
-from ..general_functions import calculate_time_elapsed
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
+from ..general_functions import *
 
 from .registration import Registration
 from .time_and_user_abstract_base_classes import *
 
 
-class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
 
     eeg_indicated = models.BooleanField(
         "Is an EEG indicated?",

@@ -1,11 +1,14 @@
 from django.db import models
 from django.forms import ValidationError
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from ..constants import ANTIEPILEPSY_MEDICINE_TYPES
 from .time_and_user_abstract_base_classes import *
 from .management import Management
+from ..general_functions import *
 
 
-class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records information about antiepilepsy medicines. 
     It references the Episode class, as one episode can involve several antiepilepsy medicines.
