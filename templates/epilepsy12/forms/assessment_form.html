@@ -4,9 +4,11 @@
   <h5 class="header">
     General Paediatrics
   </h5>
-  
+
   <div id="general_paediatric" class="field">
-    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=assessment historical_general_paediatric_sites=historical_general_paediatric_sites active_general_paediatric_site=active_general_paediatric_site hospital_list=hospital_list %}
+    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=assessment
+    historical_general_paediatric_sites=historical_general_paediatric_sites
+    active_general_paediatric_site=active_general_paediatric_site hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">
@@ -14,7 +16,9 @@
   </h5>
 
   <div id="paediatric_neurology" class="field">
-    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site hospital_list=hospital_list %}
+    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=assessment
+    historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site
+    hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">
@@ -22,9 +26,11 @@
   </h5>
 
   <div id="childrens_epilepsy_surgical_service" class="field">
-    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=assessment sites=sites historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site hospital_list=hospital_list %}
+    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=assessment sites=sites
+    historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site
+    hospital_list=hospital_list %}
   </div>
-  
+
   <h5 class="header">
     Epilepsy Nurse Specialist
   </h5>
@@ -34,31 +40,30 @@
   </div>
 
 
-<h5>
+  <h5>
 
-{% comment %}
-table for {{registration.case.first_name}} {{registration.surname}}
-registration id: {{registration.pk}}
-assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}}
-</h5>
-<table class="ui table">
-  <th>Name</th>
-  <th>Is Lead</th>
-  <th>Neuro</th>
-  <th>Surgery</th>
-  <th>Paeds</th>
-  <th>Active</th>
-{% for site in all_my_sites %}
-  <tr>
-    <td>{{site.hospital_trust.OrganisationName}}</td>
-    <td>{{site.site_is_primary_centre_of_epilepsy_care}}</td>
-    <td>{{site.site_is_paediatric_neurology_centre}}</td>
-    <td>{{site.site_is_childrens_epilepsy_surgery_centre}}</td>
-    <td>{{site.site_is_general_paediatric_centre}}</td>
-    <td>{{site.site_is_actively_involved_in_epilepsy_care}}</td>
-  </tr>
-{% endfor%}
-</table>
-{% endcomment %}
+    {% comment %}
+    table for {{registration.case.first_name}} {{registration.surname}}
+    registration id: {{registration.pk}}
+    assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}}
+  </h5>
+  <table class="ui table">
+    <th>Name</th>
+    <th>Is Lead</th>
+    <th>Neuro</th>
+    <th>Surgery</th>
+    <th>Paeds</th>
+    <th>Active</th>
+    {% for site in all_my_sites %}
+    <tr>
+      <td>{{site.hospital_trust.OrganisationName}}</td>
+      <td>{{site.site_is_primary_centre_of_epilepsy_care}}</td>
+      <td>{{site.site_is_paediatric_neurology_centre}}</td>
+      <td>{{site.site_is_childrens_epilepsy_surgery_centre}}</td>
+      <td>{{site.site_is_general_paediatric_centre}}</td>
+      <td>{{site.site_is_actively_involved_in_epilepsy_care}}</td>
+    </tr>
+    {% endfor%}
+  </table>
+  {% endcomment %}
 </form>
-

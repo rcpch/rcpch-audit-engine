@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     
     <div class="ui segment">
@@ -11,7 +12,11 @@
         <div class="field">
 
             {% url 'eeg_indicated' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label="Is an EEG indicated?" data_position="top left" %}   
+            {% if not perms.epilepsy12.change_investigations %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label="Is an EEG indicated?" data_position="top left" disabled=True %}   
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label="Is an EEG indicated?" data_position="top left" disabled=False %}   
+            {% endif %}
 
         </div>
 
@@ -20,10 +25,18 @@
         <div class="three fields">
             
             {% url 'eeg_request_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_request_date label="Date EEG requested?" data_position="top left" input_date_field_name='eeg_request_date' %}   
+            {% if not perms.epilepsy12.change_investigations %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_request_date label="Date EEG requested?" data_position="top left" input_date_field_name='eeg_request_date' disabled=True %}   
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_request_date label="Date EEG requested?" data_position="top left" input_date_field_name='eeg_request_date' disabled=False %}   
+            {% endif %}
             
             {% url 'eeg_performed_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label="Date EEG performed?" data_position="top left" input_date_field_name='eeg_performed_date' %}   
+            {% if not perms.epilepsy12.change_investigations %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label="Date EEG performed?" data_position="top left" input_date_field_name='eeg_performed_date' disabled=True %}   
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label="Date EEG performed?" data_position="top left" input_date_field_name='eeg_performed_date' disabled=False %}   
+            {% endif %}
 
             <div class="field">
                 <label>Time to EEG</label>

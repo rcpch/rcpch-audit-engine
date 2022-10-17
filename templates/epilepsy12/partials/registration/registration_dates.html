@@ -1,4 +1,4 @@
-
+{% load epilepsy12_template_tags %}
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <div class="three fields" 
         hx-get="{% url 'registration_status' registration_id=registration.pk %}"
@@ -9,7 +9,7 @@
             <label>Registration Date</label>
             {% if registration.registration_date %}
                 <div class="field">
-                    <button class="fluid ui disabled button" id="action_button">Registered {{registration.registration_date}}</button>
+                    <button class="ui rcpch_primary disabled fluid button">Registered {{registration.registration_date}}</button>
                 </div>
             {% else %}
                 {% if registration.eligibility_criteria_met %}
@@ -21,6 +21,9 @@
                         hx-target="#registration_date_results" 
                         hx-swap='innerHTML'
                         hx-trigger="click">
+                        {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
+                        disabled
+                        {% endif %}
                         <div class="fluid ui button" id="action_button">Register Now</div>
                     </div>
                 {% else %}
@@ -34,11 +37,15 @@
         </div>
         <div class="field">
             <label>Registration Close Date</label>
-            <input type="text" readonly="" placeholder="{{registration.registration_close_date}}"/>
+            <div class='ui rcpch input'>
+                <input type="text" readonly="" placeholder="{{registration.registration_close_date}}"/>
+            </div>
         </div>
         <div class="field">
             <label>Cohort</label>
-            <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+            <div class='ui rcpch input'>
+                <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+            </div>
         </div>
     </div>
 </div>

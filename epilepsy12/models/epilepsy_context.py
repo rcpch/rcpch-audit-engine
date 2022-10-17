@@ -1,6 +1,6 @@
 
 from django.db import models
-from ..constants import *
+from ..constants import OPT_OUT_UNCERTAIN
 from .time_and_user_abstract_base_classes import *
 
 from .registration import Registration

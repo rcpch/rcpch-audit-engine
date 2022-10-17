@@ -1,12 +1,17 @@
+from enum import unique
+from hashlib import blake2b
 from dateutil import relativedelta
 import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.conf import settings
+from django.forms import BooleanField
+
+from epilepsy12.models.hospital_trust import HospitalTrust
 
 
-from ..constants import *
+from ..constants import SEX_TYPE, ETHNICITIES, CAN_VIEW_CHILD_NHS_NUMBER, CAN_VIEW_CHILD_DATE_OF_BIRTH, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_ONLY_VIEW_CHILD_CASE_DATA, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
@@ -47,6 +52,9 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # )
     nhs_number = models.CharField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
         "NHS Number",
+        unique=True,
+        blank=True,
+        null=True,
         max_length=10
         # validators=[MinLengthValidator(  # should be other validation before saving - need to strip out spaces
         #     limit_value=10,
@@ -55,27 +63,39 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )  # TODO #13 NHS Number must be hidden - use case_uuid as proxy
     first_name = CharField(
         "first name",
-        max_length=100
+        max_length=100,
+        blank=True,
+        null=True,
     )
     surname = CharField(
         "surname",
-        max_length=100
+        max_length=100,
+        blank=True,
+        null=True,
     )
-    gender = models.IntegerField(
-        choices=SEX_TYPE
+    sex = models.IntegerField(
+        choices=SEX_TYPE,
+        blank=True,
+        null=True,
     )
     date_of_birth = DateField(
-        "date of birth (YYYY-MM-DD)"
+        "date of birth (YYYY-MM-DD)",
+        blank=True,
+        null=True,
     )
     postcode = CharField(
         "postcode",
         max_length=8,
+        blank=True,
+        null=True,
         # validators=[validate_postcode]
     )
 
     ethnicity = CharField(
         max_length=4,
-        choices=ETHNICITIES
+        choices=ETHNICITIES,
+        blank=True,
+        null=True
     )
 
     index_of_multiple_deprivation_quintile = models.PositiveSmallIntegerField(
@@ -85,6 +105,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         blank=True,
         editable=False,
         null=True
+    )
+
+    # relationships
+    hospital_trusts = models.ManyToManyField(
+        HospitalTrust,
+        through='Site',
+        related_name='cases',
+        through_fields=('case', 'hospital_trust')
     )
 
     @property
@@ -147,13 +175,24 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
         # This field requires the deprivare api to be running
         # commented out for now to allow live demo to function
-        self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-            self.postcode)
+        if self.postcode:
+            self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+                self.postcode)
         return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Patient'
         verbose_name_plural = 'Patients'
+        # custom permissions for Case class
+        permissions = [
+            CAN_VIEW_CHILD_NHS_NUMBER,
+            CAN_VIEW_CHILD_DATE_OF_BIRTH,
+            CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
+            CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
+            CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
+            CAN_ONLY_VIEW_CHILD_CASE_DATA,
+            CAN_CONSENT_TO_AUDIT_PARTICIPATION
+        ]
 
     def __str__(self) -> str:
-        return self.first_name + " " + self.surname
+        return f'{self.first_name} {self.surname}'

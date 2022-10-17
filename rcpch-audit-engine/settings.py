@@ -36,7 +36,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
-                          "127.0.0.1,localhost").split(",")
+                          "127.0.0.1,localhost,0.0.0.0").split(",")
 
 # Development mode allows the use of alternate settings when running locally
 # Defaults to False. Set to true in an environment variable if needed.
@@ -45,6 +45,7 @@ DEVELOPMENT_MODE = os.getenv("E12_DEVELOPMENT_MODE", "False") == "True"
 # Application definition
 
 INSTALLED_APPS = [
+    "semantic_admin",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -164,6 +165,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 STATIC_ROOT = str(BASE_DIR.joinpath("staticfiles"))
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+WHITENOISE_ROOT = os.path.join(STATIC_ROOT, 'root')
 
 
 # Default primary key field type
@@ -173,3 +175,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = [
     'https://epilepsy12-dev.azurewebsites.net', 'https://epilepsy12.rcpch.tech']
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # this is default
+)

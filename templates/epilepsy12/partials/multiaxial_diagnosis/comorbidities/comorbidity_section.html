@@ -1,5 +1,10 @@
+{% load epilepsy12_template_tags %}
 {% url 'relevant_impairments_behavioural_educational' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#comorbidity_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.relevant_impairments_behavioural_educational label='Are there any relevant impairments (behavioural or educational)?' data_position='top left' %}
+{% if not perms.epilepsy12.change_comorbidity %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#comorbidity_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.relevant_impairments_behavioural_educational label='Are there any relevant impairments (behavioural or educational)?' data_position='top left' disabled=True %}
+{% else %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#comorbidity_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.relevant_impairments_behavioural_educational label='Are there any relevant impairments (behavioural or educational)?' data_position='top left' disabled=False %}
+{% endif %}
 
 {% if multiaxial_diagnosis.relevant_impairments_behavioural_educational %}
     <div class='field' id='comorbidities'>

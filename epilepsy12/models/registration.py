@@ -1,10 +1,9 @@
-from queue import Empty
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from epilepsy12.models.audit_progress import AuditProgress
 
 from .case import Case
-from ..constants import *
+from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
@@ -43,7 +42,8 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     referring_clinician = models.CharField(
         max_length=50,
-        null=True
+        null=True,
+        blank=True
     )
 
     eligibility_criteria_met = models.BooleanField(
@@ -72,6 +72,16 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     class Meta:
         verbose_name = 'Registration'
         verbose_name_plural = 'Registrations'
+        permissions = [
+            CAN_APPROVE_ELIGIBILITY,
+            CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
+            CAN_REGISTER_CHILD_IN_EPILEPSY12,
+            CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
+            CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE,
+        ]
 
     def save(self, *args, **kwargs) -> None:
         if self.registration_date and self.registration_close_date is None:
@@ -79,3 +89,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
             self.cohort = cohort_number_from_enrolment_date(
                 self.registration_date)
         return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        if self.registration_date:
+            return f'Epilepsy12 registration for {self.case} on {self.registration_date}'
+        else:
+            return f'Epilepsy12 registration for {self.case} incomplete.'

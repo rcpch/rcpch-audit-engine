@@ -2,7 +2,7 @@ from tabnanny import verbose
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from .multiaxial_diagnosis import MultiaxialDiagnosis
-from ..constants import *
+from ..constants import DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, MIGRAINES, EPIS_MISC, GENERALISED_SEIZURE_TYPE
 from .time_and_user_abstract_base_classes import *
 
 
@@ -289,8 +289,8 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "Nonepilepsy",
-        verbose_name_plural = "Nonepilepsies"
+        verbose_name = "Episode"
+        verbose_name_plural = "Episodes"
 
     def __str__(self) -> str:
-        return self.pk
+        return f"{self.get_epilepsy_or_nonepilepsy_status_display()} type seizure for  {self.multiaxial_diagnosis.registration.case}"

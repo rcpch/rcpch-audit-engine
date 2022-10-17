@@ -1,0 +1,7 @@
+
+
+{% url 'has_rcpch_view_preference' hospital_id=hospital_trust.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/rcpch_multiple_toggle.html' with choices=rcpch_choices hx_post=hx_post hx_target="#has_rcpch_view_preference" hx_trigger="click" hx_swap="innerHTML" test_positive=rcpch_preference label="" data_position="top left" %}
+{% if rcpch_preference == 1 %}
+    {% include 'epilepsy12/partials/cases/hospital_children.html' with hospital_trust=hospital_trust hospital_children=hospital_children %}
+{% endif %}

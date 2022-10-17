@@ -1,18 +1,21 @@
 from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
+from epilepsy12.decorator import group_required
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Registration, HospitalTrust, Site
+from epilepsy12.models import HospitalTrust, Site, hospital_trust
 from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
+from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 
 @login_required
-def case_list(request):
+def case_list(request, hospital_id):
     """
     Returns a list of all children registered under the user's service.
     Path is protected to those logged in only
@@ -30,67 +33,89 @@ def case_list(request):
     sort_flag = None
 
     filter_term = request.GET.get('filtered_case_list')
+
+    # get currently selected hospital
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    # get all hospitals which are in the same parent trust
+    hospital_children = HospitalTrust.objects.filter(
+        ParentName=hospital_trust.ParentName).all()
+
     if filter_term:
         all_cases = Case.objects.filter(
+            Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
+            Q(site_site_is_primary_centre_of_epilepsy_care=True) &
             Q(first_name__icontains=filter_term) |
             Q(surname__icontains=filter_term) |
             Q(nhs_number__icontains=filter_term)
         ).order_by('surname').all()
     else:
+
+        # filter cases by hospital trust if logged in user is not RCPCH audit staff
+        # RCPCH Staff members that are also clinicians can choose which view
+        if request.user.is_rcpch_audit_team_member and request.user.has_rcpch_view_preference:
+            filtered_cases = Case.objects.all()
+        else:
+            # filters all primary centres, irrespective of if active or inactive
+            filtered_cases = Case.objects.filter(
+                hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName,
+                site__site_is_primary_centre_of_epilepsy_care=True
+            )
+
         if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
             # this is to sort on IMD
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 'index_of_multiple_deprivation_quintile').all()
             sort_flag = "sort_by_imd_up"
         elif request.htmx.trigger_name == "sort_by_imd_down" or request.GET.get('sort_flag') == "sort_by_imd_down":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 '-index_of_multiple_deprivation_quintile').all()
             sort_flag = "sort_by_imd_down"
         elif request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 'nhs_number').all()
             sort_flag = "sort_by_nhs_number_up"
         elif request.htmx.trigger_name == "sort_by_nhs_number_down" or request.GET.get('sort_flag') == "sort_by_nhs_number_down":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 '-nhs_number').all()
             sort_flag = "sort_by_nhs_number_down"
         elif request.htmx.trigger_name == "sort_by_ethnicity_up" or request.GET.get('sort_flag') == "sort_by_ethnicity_up":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 'ethnicity').all()
             sort_flag = "sort_by_ethnicity_up"
         elif request.htmx.trigger_name == "sort_by_ethnicity_down" or request.GET.get('sort_flag') == "sort_by_ethnicity_down":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 '-ethnicity').all()
             sort_flag = "sort_by_ethnicity_down"
-        elif request.htmx.trigger_name == "sort_by_gender_up" or request.GET.get('sort_flag') == "sort_by_gender_up":
-            all_cases = Case.objects.all().order_by(
-                'gender').all()
-            sort_flag = "sort_by_gender_up"
-        elif request.htmx.trigger_name == "sort_by_gender_down" or request.GET.get('sort_flag') == "sort_by_gender_down":
-            all_cases = Case.objects.all().order_by(
-                '-gender').all()
-            sort_flag = "sort_by_gender_down"
+        elif request.htmx.trigger_name == "sort_by_sex_up" or request.GET.get('sort_flag') == "sort_by_sex_up":
+            all_cases = filtered_cases.order_by(
+                'sex').all()
+            sort_flag = "sort_by_sex_up"
+        elif request.htmx.trigger_name == "sort_by_sex_down" or request.GET.get('sort_flag') == "sort_by_sex_down":
+            all_cases = filtered_cases.order_by(
+                '-sex').all()
+            sort_flag = "sort_by_sex_down"
         elif request.htmx.trigger_name == "sort_by_name_up" or request.GET.get('sort_flag') == "sort_by_name_up":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 'surname').all()
             sort_flag = "sort_by_name_up"
         elif request.htmx.trigger_name == "sort_by_name_down" or request.GET.get('sort_flag') == "sort_by_name_down":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 '-surname').all()
             sort_flag = "sort_by_name_down"
         elif request.htmx.trigger_name == "sort_by_id_up" or request.GET.get('sort_flag') == "sort_by_id_up":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 'id').all()
             sort_flag = "sort_by_id_up"
         elif request.htmx.trigger_name == "sort_by_id_down" or request.GET.get('sort_flag') == "sort_by_id_down":
-            all_cases = Case.objects.all().order_by(
+            all_cases = filtered_cases.order_by(
                 '-id').all()
             sort_flag = "sort_by_id_down"
         else:
-            all_cases = Case.objects.all().order_by('surname').all()
+            all_cases = filtered_cases.order_by('surname').all()
 
-    registered_cases = Registration.objects.filter(
-        ~Q(registration_date=None),
+    registered_cases = all_cases.filter(
+        ~Q(registration__isnull=True),
     ).all()
 
 
@@ -100,14 +125,28 @@ def case_list(request):
     page_number = request.GET.get('page', 1)
     case_list = paginator.page(page_number)
 
-    case_count = Case.objects.all().count()
+    case_count = all_cases.count()
     registered_count = registered_cases.count()
+
+    rcpch_choices = (
+        (0, 'All UK Children'),
+        (1, f'{hospital_trust.ParentName} Cohort')
+    )
+    if request.user.has_rcpch_view_preference:
+        rcpch_preference = rcpch_choices[0][0]
+    else:
+        rcpch_preference = rcpch_choices[1][0]
 
     context = {
         'case_list': case_list,
         'total_cases': case_count,
         'total_registrations': registered_count,
-        'sort_flag': sort_flag
+        'sort_flag': sort_flag,
+        'hospital_trust': hospital_trust,
+        'hospital_children': hospital_children,
+        'rcpch_choices': rcpch_choices,
+        'rcpch_preference': rcpch_preference,
+        'hospital_id': hospital_id
     }
     if request.htmx:
         return render(request=request, template_name='epilepsy12/partials/case_table.html', context=context)
@@ -117,7 +156,12 @@ def case_list(request):
 
 
 @login_required
+@permission_required('epilepsy12.add_case')
 def create_case(request):
+    """
+    Django function based - returns django form to create a new case, or saves a new case if a
+    POST request. The only instance where htmx not used.
+    """
     form = CaseForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
@@ -133,9 +177,112 @@ def create_case(request):
     return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
+# @login_required
+def child_hospital_select(request, hospital_id):
+    """
+    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
+    """
+
+    selected_hospital_id = request.POST.get('child_hospital_select')
+
+    # get currently selected hospital
+    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
+
+    # trigger page reload with new hospital
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_trust.pk}))
+
+
 @login_required
-def update_case(request, id):
-    case = get_object_or_404(Case, id=id)
+def has_rcpch_view_preference(request, hospital_id):
+    """
+    Toggle visible only to clinicians who are also RCPCH audit team members
+    Can toggle between their own trust and RCPCH view
+    """
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    # get all hospitals which are in the same parent trust
+    hospital_children = HospitalTrust.objects.filter(
+        ParentName=hospital_trust.ParentName).all()
+
+    rcpch_choices = (
+        (0, 'All UK Children'),
+        (1, f'{hospital_trust.ParentName} Cohort')
+    )
+
+    if (int(request.htmx.trigger_name) == 1):
+
+        request.user.has_rcpch_view_preference = False
+        request.user.save()
+        rcpch_preference = rcpch_choices[1][0]
+
+    elif (int(request.htmx.trigger_name) == 0):
+        request.user.has_rcpch_view_preference = True
+        request.user.save()
+
+        rcpch_preference = rcpch_choices[0][0]
+
+    context = {
+        'rcpch_choices': rcpch_choices,
+        'rcpch_preference': rcpch_preference,
+        'hospital_trust': hospital_trust,
+        'hospital_children': hospital_children
+    }
+
+    response = render(
+        request, template_name='epilepsy12/partials/cases/has_rcpch_view_preference.html', context=context)
+
+    # trigger a GET request to rerender the case list
+    trigger_client_event(
+        response=response,
+        name="case_list",
+        params={})  # reloads the form to show the updated cases
+
+    # trigger a GET request to rerender the case list statistics
+    trigger_client_event(
+        response=response,
+        name="case_statistics",
+        params={})  # reloads the form to show the updated cases
+
+    return response
+
+
+def case_statistics(request, hospital_id):
+    """
+    GET request from cases template to update stats on toggle between RCPCH view and hospital view
+    """
+
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    if request.user.has_rcpch_view_preference:
+        total_cases = Case.objects.all()
+    else:
+        total_cases = Case.objects.filter(
+            Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName)
+        )
+
+    registered_cases = total_cases.filter(
+        ~Q(registration__isnull=True),
+    ).all()
+
+    context = {
+        'total_cases': total_cases.count(),
+        'total_registrations': registered_cases.count(),
+        'hospital_trust': hospital_trust
+    }
+
+    response = render(
+        request, template_name='epilepsy12/partials/cases/case_statistics.html', context=context)
+
+    return response
+
+
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+def update_case(request, hospital_id, case_id):
+    """
+    Django function based view. Receives POST request to update view or delete
+    """
+    case = get_object_or_404(Case, id=case_id)
     form = CaseForm(instance=case)
 
     if request.method == "POST":
@@ -166,7 +313,44 @@ def update_case(request, id):
 
 
 @login_required
-def delete_case(request, id):
-    case = get_object_or_404(Case, id=id)
+@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
+def delete_case(request, hospital_id, case_id):
+    case = get_object_or_404(Case, id=case_id)
     case.delete()
     return redirect('cases')
+
+
+@login_required
+def opt_out(request, hospital_id, case_id):
+    """
+    This child has opted out of Epilepsy12
+    Their unique E12 ID will be retained but all associated fields will be set to None, and associated records deleted except their 
+    leading trust will be retained but set to inactive.
+    """
+
+    # hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    case = Case.objects.get(pk=case_id)
+    case.nhs_number = None
+    case.first_name = None
+    case.surname = None
+    case.sex = None
+    case.date_of_birth = None
+    case.postcode = None
+    case.ethnicity = None
+    case.locked = True
+
+    case.save()
+
+    # delete all related records - this should cascade to all tables
+    case.registration.delete()
+
+    # delete all related sites except the primary centre of care, which becomes inactive
+    all_sites = case.site.all()
+    for site in all_sites:
+        if site.site_is_primary_centre_of_epilepsy_care:
+            site.site_is_actively_involved_in_epilepsy_care = False
+            site.save()
+        else:
+            Site.objects.get(pk=site.pk).delete()
+
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))

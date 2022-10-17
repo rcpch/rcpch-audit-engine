@@ -3,6 +3,7 @@ from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from ..decorator import group_required
 from epilepsy12.constants import *
 from epilepsy12.models.audit_progress import AuditProgress
 from django_htmx.http import trigger_client_event
@@ -51,7 +52,8 @@ def initial_assessment(request, case_id):
 
 
 # htmx
-
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def date_of_initial_assessment(request, initial_assessment_id):
     """
     HTMX call back from date_of_initial_assessment partial
@@ -92,6 +94,8 @@ def date_of_initial_assessment(request, initial_assessment_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_assessment_id):
     """
     HTMX callback from first_paediatric_assessment_in_acute_or_nonacute_setting partial, itself
@@ -135,6 +139,8 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_as
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def general_paediatrics_referral_made(request, initial_assessment_id):
     """
     HTMX callback from general_paediatrics_referral_made_partial, itself the parent of a toggle_button 
@@ -163,7 +169,8 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
         pk=initial_assessment_id)
 
     context = {
-        'initial_assessment': initial_assessment
+        'initial_assessment': initial_assessment,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
     }
 
     test_fields_update_audit_progress(initial_assessment)
@@ -179,6 +186,8 @@ def general_paediatrics_referral_made(request, initial_assessment_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
     """
     HTMX call back from date_of_initial_assessment partial
@@ -205,7 +214,8 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
         pk=initial_assessment_id)
 
     context = {
-        "initial_assessment": initial_assessment
+        "initial_assessment": initial_assessment,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
     }
 
     test_fields_update_audit_progress(initial_assessment)
@@ -221,6 +231,8 @@ def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def has_number_of_episodes_since_the_first_been_documented(request, initial_assessment_id):
     """
     POST request from toggle in has_number_of_episodes_since_the_first_been_documented partial
@@ -241,13 +253,15 @@ def has_number_of_episodes_since_the_first_been_documented(request, initial_asse
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
+    test_fields_update_audit_progress(initial_assessment)
+
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
@@ -262,6 +276,8 @@ def has_number_of_episodes_since_the_first_been_documented(request, initial_asse
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def general_examination_performed(request, initial_assessment_id):
     """
     POST request from toggle in has_general_examination_performed partial
@@ -282,13 +298,15 @@ def general_examination_performed(request, initial_assessment_id):
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
+    test_fields_update_audit_progress(initial_assessment)
+
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
@@ -303,6 +321,8 @@ def general_examination_performed(request, initial_assessment_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def neurological_examination_performed(request, initial_assessment_id):
     """
     POST request from toggle in neurological_examination_performed partial
@@ -323,13 +343,15 @@ def neurological_examination_performed(request, initial_assessment_id):
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
+    test_fields_update_audit_progress(initial_assessment)
+
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
@@ -344,6 +366,8 @@ def neurological_examination_performed(request, initial_assessment_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def developmental_learning_or_schooling_problems(request, initial_assessment_id):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
@@ -364,13 +388,15 @@ def developmental_learning_or_schooling_problems(request, initial_assessment_id)
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
+    test_fields_update_audit_progress(initial_assessment)
+
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
@@ -385,6 +411,8 @@ def developmental_learning_or_schooling_problems(request, initial_assessment_id)
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def behavioural_or_emotional_problems(request, initial_assessment_id):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
@@ -405,13 +433,15 @@ def behavioural_or_emotional_problems(request, initial_assessment_id):
         print("Some mistake happened")
         # TODO need to handle this
 
-    new_initial_assessment = InitialAssessment.objects.get(
+    initial_assessment = InitialAssessment.objects.get(
         pk=initial_assessment_id)
 
+    test_fields_update_audit_progress(initial_assessment)
+
     context = {
-        "initial_assessment": new_initial_assessment,
+        "initial_assessment": initial_assessment,
         # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        # "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
@@ -426,6 +456,8 @@ def behavioural_or_emotional_problems(request, initial_assessment_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def diagnostic_status(request, initial_assessment_id):
 
     diagnostic_status = request.POST.get(
@@ -450,7 +482,7 @@ def diagnostic_status(request, initial_assessment_id):
         "initial_assessment": initial_assessment,
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        "episode_definition_selection": EPISODE_DEFINITION,
+        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     test_fields_update_audit_progress(initial_assessment)

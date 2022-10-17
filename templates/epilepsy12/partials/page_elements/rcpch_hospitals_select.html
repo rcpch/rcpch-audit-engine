@@ -1,0 +1,41 @@
+{% comment %}
+This partial template is a dropdown of all the hospital trusts
+It relies on a little bit of jquery unfortunately because that is semantic-ui
+Parameters:
+hx_name: [paediatric_neurology_centre, epilepsy_surgery_centre]
+hx_url: the url complete with parameters to POST
+label: received from the parent - text for the button
+hx_target: the id of the html element to be replaced 
+hx_default_text: placeholder text for the search select dropdown
+hx_post: url to post to
+hospital_list: a filtered list of hospitals
+test_positive: currently selected hospital id
+{% endcomment %}
+
+<div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+        <div 
+            class="ui rcpch_light_blue search selection fluid dropdown"
+        >
+                <i class="dropdown icon"></i>
+                <input type="hidden" 
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="{{hx_swap}}"
+                    hx-trigger="{{hx_trigger}}"
+                    name='{{hx_name}}'
+                    value="{{test_positive}}"
+                >
+                <div class="default text">{{hx_default_text}}</div>
+                <div class="menu" >
+                    {% for item in hospital_list %}
+                        <div class="item" data-value="{{item.pk}}">{{item.OrganisationName}}</div>
+                    {% endfor %}
+                </div>
+        </div>
+    
+
+</div>
+<script>
+$('.ui.rcpch_light_blue.search.selection.dropdown').dropdown();
+</script>

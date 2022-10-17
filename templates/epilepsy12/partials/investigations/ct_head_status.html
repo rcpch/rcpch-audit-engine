@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <div class="ui segment">
@@ -11,7 +12,11 @@
                 <div class="field">
 
                         {% url 'ct_head_scan_status' investigations_id=investigations.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ct_head_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.ct_head_scan_status label="Has a CT head been performed?" data_position="top left" %}
+                        {% if not perms.epilepsy12.change_investigations %}
+                                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ct_head_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.ct_head_scan_status label="Has a CT head been performed?" data_position="top left" disabled=True %}
+                        {% else %}
+                                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ct_head_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.ct_head_scan_status label="Has a CT head been performed?" data_position="top left" disabled=False %}
+                        {% endif %}
 
                 </div>
 

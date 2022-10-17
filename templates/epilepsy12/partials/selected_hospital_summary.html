@@ -1,0 +1,118 @@
+{% load static %}
+{% load epilepsy12_template_tags %}
+
+<div class="ui grid container">
+    
+
+        {% if request.user.is_rcpch_audit_team_member %}
+            <div class='eight wide column'>
+                <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                    {% url 'selected_hospital_summary' as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/rcpch_hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#rcpch_hospital_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_hospital_summary" test_positive=selected_hospital.pk label="Select a hospital trust to view" hx_default_text="Search general paediatric hospitals..." data_position="top left" %}
+                </div>
+            </div>
+            <div class='eight wide right aligned column'>
+                <div class='field' style="padding-top: 0.75rem;">
+                    <a href="{% url 'cases' hospital_id=selected_hospital.pk %}"><button class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Children</button></a>
+                </div>
+            </div>
+        {% else %}
+            <div class='two column row'>
+                <a href="{% url 'cases' hospital_id=selected_hospital.pk %}"><button class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Children</button></a>
+            </div>
+        {% endif %}
+            
+
+        <div class="six wide stackable column">
+            <div class="ui rcpch_light_blue fluid stackable card">
+                <div class="content">
+                    <div class="header">
+                        {{ selected_hospital.ParentName }}
+                    </div>
+                    <div class="description">
+                        {{ selected_hospital.Address1 }}<br>
+                        {{ selected_hospital.Address2 }}<br>
+                        {{ selected_hospital.Address3 }}<br>
+                        {{ selected_hospital.City }}<br>
+                        {{ selected_hospital.Postcode }}<br>
+                        <span><i class="phone icon"></i>{{ selected_hospital.Phone }}</span><br>
+                        <span><i class="envelope outline icon"></i>{{ selected_hospital.Email }}</span><br>
+                        <span><i class="internet explorer icon"></i>{{ selected_hospital.Website }}</span><br>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ten wide stackable column">
+                <h2 class='header'>
+                {{selected_hospital.ParentName}} summary
+                </h2>
+                <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
+                    {% if cases_aggregated_by_ethnicity %}
+                        {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                    {% else %}
+                        <h3>Distribution by Ethnicity</h3>
+                        <h5>No data yet!<h5>
+                    {% endif %}
+                </div>
+            
+        </div>
+
+        <div class="eight wide stackable  column">
+
+            <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container stackable segment">
+                {% if cases_aggregated_by_sex %}
+                    {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
+                {% else %}
+                    <h3>Distribution by Sex</h3>
+                    <h5>No data yet!<h5>
+                {% endif %}
+            </div>
+            
+        </div>
+
+        <div class="eight wide stackable column">
+
+            <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container stackable segment">
+                {% if cases_aggregated_by_deprivation %}
+                    {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                {% else %}
+                    <h3>Distribution by Index of Multiple Deprivation</h3>
+                    <h5>No data yet!<h5>
+                {% endif %}
+            </div>
+
+        </div>
+
+
+        <div class="four wide stackable column">
+            {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" %}
+        </div>
+        
+        <div class="four wide column">
+            {% if total_cases is not None and total_cases > 0%}
+                {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases %}
+            {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+        <div class="four wide stackable column">
+            {% if total_cases is not None and total_cases > 0%}
+                {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases %}
+            {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+        <div class="four wide stackable column">
+            {% if total_cases is not None and total_cases > 0%}
+                {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases %}
+            {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+    
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>

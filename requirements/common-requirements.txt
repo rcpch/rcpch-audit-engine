@@ -5,11 +5,11 @@ python-dateutil
 # third party imports
 django
 psycopg2-binary
-django-autocomplete-light
 rapidfuzz
 dj_database_url
 django-widget-tweaks
 django-htmx
 whitenoise
+django-semantic-admin
 
 # RCPCH imports

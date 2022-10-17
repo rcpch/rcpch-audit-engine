@@ -10,47 +10,51 @@
                             
                             <i class="rcpch_pink check circle outline icon"></i>
 
-                            <div class="ui buttons">
+                            {% if show_buttons %}
 
-                                {% if edit or transfer %}
+                                <div class="ui buttons">
 
-                                    <button 
-                                        class="ui rcpch_warning button"
-                                        hx-post="{% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                        hx-target="#lead_site"
-                                        hx-swap="innerHTML"
-                                        hx-trigger="click"
-                                    >Cancel</button>
+                                    {% if edit or transfer %}
 
-                                {% else %}
+                                        <button 
+                                            class="ui rcpch_warning button"
+                                            hx-post="{% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                            hx-target="#lead_site"
+                                            hx-swap="innerHTML"
+                                            hx-trigger="click"
+                                        >Cancel</button>
 
-                                    <button 
-                                        class="ui rcpch_primary button"
-                                        hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                        hx-target="#lead_site"
-                                        hx-swap="innerHTML"
-                                        hx-trigger="click"
-                                    >Edit</button>
-                                    
-                                    <button 
-                                        class="ui rcpch_primary button"
-                                        hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                        hx-target="#lead_site"
-                                        hx-swap="innerHTML"
-                                        hx-trigger="click"
-                                    >Transfer</button>
+                                    {% else %}
 
-                                    <button 
-                                        class="ui rcpch_danger button"
-                                        hx-post="{% url 'delete_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                        hx-target="#lead_site"
-                                        hx-swap="innerHTML"
-                                        hx-trigger="click"
-                                    >Delete</button>
+                                        <button 
+                                            class="ui rcpch_primary button"
+                                            hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                            hx-target="#lead_site"
+                                            hx-swap="innerHTML"
+                                            hx-trigger="click"
+                                        >Edit</button>
+                                        
+                                        <button 
+                                            class="ui rcpch_primary button"
+                                            hx-post="{% url 'transfer_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                            hx-target="#lead_site"
+                                            hx-swap="innerHTML"
+                                            hx-trigger="click"
+                                        >Transfer</button>
 
-                                {% endif %}
+                                        <button 
+                                            class="ui rcpch_danger button"
+                                            hx-post="{% url 'delete_lead_site' registration_id=registration.pk site_id=site.pk %}"
+                                            hx-target="#lead_site"
+                                            hx-swap="innerHTML"
+                                            hx-trigger="click"
+                                        >Delete</button>
 
-                            </div>    
+                                    {% endif %}
+
+                                </div>    
+                            
+                            {% endif %}
                             
                         </div>
 

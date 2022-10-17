@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.db.models import Q
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from ..decorator import group_required
 from epilepsy12.models import Investigations, Registration, AuditProgress, Site
 from django_htmx.http import trigger_client_event
 
@@ -38,7 +39,8 @@ def investigations(request, case_id):
 
 
 # htmx
-
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def eeg_indicated(request, investigations_id):
     """
     This is an HTMX callback from the eeg_information.html partial template
@@ -92,6 +94,8 @@ def eeg_indicated(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def eeg_request_date(request, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
@@ -131,6 +135,8 @@ def eeg_request_date(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def eeg_performed_date(request, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
@@ -167,6 +173,8 @@ def eeg_performed_date(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def twelve_lead_ecg_status(request, investigations_id):
     """
     This is an HTMX callback from the ecg_status.html partial template
@@ -200,6 +208,8 @@ def twelve_lead_ecg_status(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def ct_head_scan_status(request, investigations_id):
     """
     This is an HTMX callback from the ct_head_status.html partial template
@@ -234,6 +244,8 @@ def ct_head_scan_status(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def mri_indicated(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
@@ -287,6 +299,8 @@ def mri_indicated(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def mri_brain_requested_date(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
@@ -321,6 +335,8 @@ def mri_brain_requested_date(request, investigations_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def mri_brain_performed_date(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template

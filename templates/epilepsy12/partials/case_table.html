@@ -1,138 +1,129 @@
 {% load epilepsy12_template_tags %}
-{% if case_list.end_index > 0 %}
-      <table class="ui compact single line table" >
-        <thead>
-          <tr>
-            <th id="table_header" class="collapsing">ID
-                {% if sort_flag and sort_flag == "sort_by_id_down" %}
-                  <i class="sort icon" id="sort_button" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
-                {% elif sort_flag and sort_flag == "sort_by_id_up" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table" hx-get="{% url 'sort_by_id_down' %}" hx-trigger="click"></i>
-                {% else %}
-                  <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table" hx-get="{% url 'sort_by_id_up' %}" hx-trigger="click"></i>
-                {% endif %}
-            </th>
-            <th id="table_header" class="collapsing">Name
-                {% if sort_flag and sort_flag == "sort_by_name_down" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table" hx-get="{% url 'sort_by_name_up' %}" hx-trigger="click"></i>
-                {% elif sort_flag and sort_flag == "sort_by_name_up" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table" hx-get="{% url 'sort_by_name_down' %}" hx-trigger="click"></i>
-                {% else %}
-                  <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table" hx-get="{% url 'sort_by_name_up' %}" hx-trigger="click"></i>
-                {% endif %}
-            </th>
-            <th id="table_header" class="collapsing">Gender
-                {% if sort_flag and sort_flag == "sort_by_gender_down" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
-                {% elif sort_flag and sort_flag == "sort_by_gender_up" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_gender_down" hx-target="#case_table" hx-get="{% url 'sort_by_gender_down' %}" hx-trigger="click"></i>
-                {% else %}
-                  <i class="sort icon" id="sort_button" name="sort_by_gender_up" hx-target="#case_table" hx-get="{% url 'sort_by_gender_up' %}" hx-trigger="click"></i>
-                {% endif %}
-            </th>
-            <th id="table_header" class="collapsing">Ethnicity
-                {% if sort_flag and sort_flag == "sort_by_ethnicity_down" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_ethnicity_up" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_up' %}" hx-trigger="click"></i>
-                {% elif sort_flag and sort_flag == "sort_by_ethnicity_up" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_ethnicity_down" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_down' %}" hx-trigger="click"></i>
-                {% else %}
-                  <i class="sort icon" id="sort_button" name="sort_by_ethnicity_up" hx-target="#case_table" hx-get="{% url 'sort_by_ethnicity_up' %}" hx-trigger="click"></i>
-                {% endif %}
-            </th>
-            <th id="table_header" class="collapsing">NHS Number
-                {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_up' %}" hx-trigger="click"></i>
-                {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
-                  <i class="sort icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_down' %}" hx-trigger="click"></i>
-                {% else %}
-                  <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table" hx-get="{% url 'sort_by_nhs_number_up' %}" hx-trigger="click"></i>
-                {% endif %}
-            </th>
-            <th id="table_header" class="collapsing">IMD (quintile)
-                  {% if sort_flag and sort_flag == "sort_by_imd_down" %}
-                    <i class="sort icon" id="sort_button" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
-                  {% elif sort_flag and sort_flag == "sort_by_imd_up" %}
-                    <i class="sort icon" id="sort_button" name="sort_by_imd_down" hx-target="#case_table" hx-get="{% url 'sort_by_imd_down' %}" hx-trigger="click"></i>
-                  {% else %}
-                    <i class="sort icon" id="sort_button" name="sort_by_imd_up" hx-target="#case_table" hx-get="{% url 'sort_by_imd_up' %}" hx-trigger="click"></i>
-                  {% endif %}
-            </th>
-            <th id="table_header" colspan="1"></th>
-            <th id="table_header" colspan="1" id="centredData">Opt Out</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for case in case_list %}
+<div hx-target='#case_table' hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}" hx-trigger='case_list from:body'
+  hx-swap='innerHTML' name='case_table'>
+  {% if case_list.end_index > 0 %}
+  <table class="ui rcpch table">
+    <thead>
+      <tr>
+        {% comment %}
+        <th>ID
+          {% if sort_flag and sort_flag == "sort_by_id_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_id_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_id_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_id_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_id_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
+        {% endcomment %}
+        <th>Name
+          {% if sort_flag and sort_flag == "sort_by_name_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_name_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
+        <th>Sex
+          {% if sort_flag and sort_flag == "sort_by_sex_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_sex_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_sex_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_sex_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
+        <th>NHS Number
+          {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_nhs_number_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
+        <th class='two wide'></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case in case_list %}
+        {%if case.locked %}
+          <tr class='disabled'>
+        {% else %}
             <tr>
-              <td>
-                <a href="{% url 'update_case' id=case.id%}">{{ case.id }}</a>
-              </td>
-              <td class="fluid">{{case.first_name}} {{case.surname}}</td>
-              <td>{{case.get_gender_display}}</td>
-              <td>{{case.get_ethnicity_display}}</td>
-              <td>{{case.nhs_number}}</td>
-              <td id="centredData">{{case.index_of_multiple_deprivation_quintile}}</td>
-              <td class="single line">
-                <div class="ui grid">
-                  <div class="row">
-                    <div class="ui three wide column">
-                      <a href="{% url 'update_case' id=case.id%}"><button class="ui mini icon button" id="action_button" tabindexed="0"><i class="edit outline icon"></i></button></a>
-                    </div>
-                    <div class="ui three wide column">
-                      <a href="{% url 'delete_case' id=case.id%}"><button class="ui mini icon button" id="negative_button" tabindexed="1"><i class="trash alternate outline icon"></i></button></a>
-                    </div>
-                    <div class="ui ten wide column">
-                      {% if case.registration.registration_date %}
-                          {% percent_complete case.registration as percentComplete %}
-                          {% if case.locked %}
-                            <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
-                          {% else %}
-                            <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' case.id %}'">Enter Data</button>
-                          {% endif %}
-                      {% else %}
-                        {% if case.locked %}
-                          <button class="ui mini button" id="action_button" tabindexed="2" disabled onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
-                        {% else %}
-                          <button class="ui mini button" id="action_button" tabindexed="2" onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
-                        {% endif %}
-                      {% endif %}
-                    </div>
-                  </div>
-                  {% if case.registration.registration_date %}
-                      <div class="row">
-                        <div class="ui sixteen wide column">
-                          <div class="ui small blue progress" data-value={{percentComplete}} data-total="52" id="casecompletionprogress">
-                            <div class="bar">
-                              <div class="progress"></div>
-                            </div>
-                            <div class="label">{{percentComplete}} of 52 items completed</div>
-                          </div>
-                        </div>
-                      </div>
-                  {% endif %}
-                </div>
-              </td>
-              <td id="centredData">
-                {% if case.locked %}<i class="user times icon" />{% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-          
-          <tfoot class="full-width">
-            <tr>
-              <th colspan="10" class="right aligned" id="cases_list_segment_footer">
-                  {% if case_list.has_previous %}
-                    <div class="ui tiny button" id="continue_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Previous 20</div>
-                  {% endif %}
-                  {% if case_list.has_next %}
-                    <div class="ui tiny button" id="continue_button" name="next_button" hx-target="#case_table" hx-get="{% url 'cases' %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}" hx-swap="innerHTML">Next 20</div>
-                  {% endif %}
-              </th>
-            </tr>
-          </tfoot>
-  
-        </tbody>
-      </table>
-{% else %}
-  <p>There are no cases yet</p>
-{% endif %}
+        {% endif %}
+          <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
+          <td>{% none_masked case.get_sex_display %}</td>
+          <td>{% none_masked case.nhs_number %}</td>
+          <td class='two wide'>
+            <div class='ui buttons'>
+              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+                class="edit outline icon"></i></a></button>
+              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
+                class="trash alternate outline icon"></i></a></button>
+              {% if case.registration.registration_date %}
+                {% if case.locked %}
+                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
+                onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
+                {% else %}
+                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2"
+                onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
+                {% endif %}
+              {% else %}
+                {% if case.locked %}
+                <button class="ui rcpch_primary button" tabindexed="2" disabled
+                onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
+                {% else %}
+                <button class="ui rcpch_primary button" tabindexed="2"
+                onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+          <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+            class="sign-out icon"></i></a></button></td>
+        </tr>
+
+      {% endfor %}
+
+    <tfoot>
+      <tr>
+        <th colspan="10" class="right aligned">
+          {% if case_list.has_previous %}
+          <div class="ui rcpch_primary button" hx-target="#case_table"
+            hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}"
+            hx-swap="innerHTML">Previous 10</div>
+          {% endif %}
+          {% if case_list.has_next %}
+          <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
+            hx-get="{% url 'cases' hospital_id=hospital_trust.pk  %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}"
+            hx-swap="innerHTML">Next 10</div>
+          {% endif %}
+        </th>
+      </tr>
+    </tfoot>
+
+    </tbody>
+  </table>
+  {% else %}
+  <div class='ui container'>
+    <div class='padded_container'>
+      <div class='ui rcpch_info message'>There are no children registered yet</div>
+    </div>
+  </div>
+  {% endif %}
+</div>

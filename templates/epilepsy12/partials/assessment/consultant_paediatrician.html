@@ -1,8 +1,13 @@
+{% load epilepsy12_template_tags %}
 <div class="ui segment">
     
     <div class="field">
         {% url 'consultant_paediatrician_referral_made' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label="Has a referral been made to a consultant paediatrician with expertise in epilepsy?" data_position="top left" %}
+        {% if not perms.epilepsy12.change_assessment %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label="Has a referral been made to a consultant paediatrician with expertise in epilepsy?" data_position="top left" disabled=True %}
+        {% else %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label="Has a referral been made to a consultant paediatrician with expertise in epilepsy?" data_position="top left" disabled=False %}
+        {% endif %}
     </div>
 
     {% if assessment.consultant_paediatrician_referral_made %}
@@ -36,7 +41,11 @@
                             <div class="ui buttons">
 
                                 <button 
-                                    class="ui rcpch_danger button"
+                                    {% if not perms.epilepsy12.can_delete_general_paediatric_centre %}
+                                        class="ui rcpch_danger disabled button"
+                                    {% else %}
+                                        class="ui rcpch_danger button"
+                                    {% endif %}
                                     hx-post="{% url 'delete_general_paediatric_centre' site_id=active_general_paediatric_site.pk assessment_id=assessment.pk %}"
                                     hx-target="#general_paediatric"
                                     hx-swap="innerHTML"
@@ -46,15 +55,23 @@
                                 {% if general_paediatric_edit_active %}
 
                                     <button 
-                                        class="ui rcpch_primary button"
+                                        {% if not perms.epilepsy12.can_update_general_paediatric_centre %}
+                                            class="ui rcpch_primary disabled button"
+                                        {% else %}
+                                            class="ui rcpch_primary button"
+                                        {% endif %}
                                         hx-post="{% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='edit' %}"
                                         hx-target="#general_paediatric"
                                         hx-swap="innerHTML"
                                         hx-trigger="click"
                                     >Edit</button>
 
-                                    <button 
-                                        class="ui rcpch_warning button"
+                                    <button
+                                        {% if not perms.epilepsy12.can_update_general_paediatric_centre %}
+                                            class="ui rcpch_warning disabled button"
+                                        {% else %}
+                                            class="ui rcpch_warning button"
+                                        {% endif %}
                                         hx-post="{% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='cancel' %}"
                                         hx-target="#general_paediatric"
                                         hx-swap="innerHTML"

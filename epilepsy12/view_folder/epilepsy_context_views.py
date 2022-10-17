@@ -3,8 +3,8 @@ from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from ..decorator import group_required
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
-from epilepsy12.models.comorbidity import Comorbidity
 from epilepsy12.models.registration import Registration
 from ..models import EpilepsyContext
 from epilepsy12.models.audit_progress import AuditProgress
@@ -42,6 +42,8 @@ def epilepsy_context(request, case_id):
 # HTMX
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -82,6 +84,8 @@ def previous_febrile_seizure(request, epilepsy_context_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -122,6 +126,8 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -162,6 +168,8 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -202,6 +210,8 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 
@@ -242,6 +252,8 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_focal_seizures partial, 
@@ -282,6 +294,8 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -346,7 +360,6 @@ def completed_fields(model_instance):
         if (
                 getattr(model_instance, field.name) is not None
                 and field.name not in ['id', 'registration', 'updated_at', 'updated_by', 'created_at', 'created_by']):
-            print(field.name)
             counter += 1
     return counter
 

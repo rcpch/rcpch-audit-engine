@@ -1,15 +1,16 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from datetime import date
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
 from ..models import Registration, Site
 from ..models import Case, AuditProgress, HospitalTrust
-from ..decorator import editor_access_for_this_child
+from ..decorator import group_required
 
 
 @login_required
+@group_required('epilepsy12_audit_team_view_only', 'epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_view_only', 'trust_audit_team_edit_access', 'trust_audit_team_view_access')
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -52,7 +53,7 @@ def register(request, case_id):
 
     lead_site = None
 
-    registered_sites = Site.objects.filter(registration=registration)
+    registered_sites = Site.objects.filter(case=case)
     for registered_site in registered_sites:
         if registered_site.site_is_primary_centre_of_epilepsy_care and registered_site.site_is_actively_involved_in_epilepsy_care:
             lead_site = registered_site
@@ -62,7 +63,7 @@ def register(request, case_id):
     previously_registered_sites = None
     if previously_registered > 0:
         previously_registered_sites = Site.objects.filter(
-            registration=registration, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
+            case=case, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
 
     form_complete = test_fields_update_audit_progress(
         model_instance=registration,
@@ -106,7 +107,7 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
-@editor_access_for_this_child()
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
@@ -117,7 +118,7 @@ def allocate_lead_site(request, registration_id):
 
     # test if site exists
     if Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         hospital_trust=selected_hospital_trust,
         site_is_actively_involved_in_epilepsy_care=True
     ).exists():
@@ -125,7 +126,7 @@ def allocate_lead_site(request, registration_id):
         # update the status therefore to include the lead role
 
         Site.objects.filter(
-            registration=registration,
+            case=registration.case,
             hospital_trust=selected_hospital_trust,
             site_is_actively_involved_in_epilepsy_care=True
         ).update(
@@ -137,7 +138,7 @@ def allocate_lead_site(request, registration_id):
         # this site may still be associated with this registration but not actively
         # it is therefore safe to create a new record
         Site.objects.create(
-            registration=registration,
+            case=registration.case,
             hospital_trust=selected_hospital_trust,
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
@@ -150,7 +151,7 @@ def allocate_lead_site(request, registration_id):
 
     # retrieve the current active site
     site = Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         hospital_trust=selected_hospital_trust,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True,
@@ -183,7 +184,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -216,7 +217,7 @@ def edit_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -246,7 +247,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -275,7 +276,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@editor_access_for_this_child()
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
@@ -310,10 +311,10 @@ def update_lead_site(request, registration_id, site_id, update):
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user,
-            registration=registration)
+            case=registration.case)
 
     site = Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
@@ -341,7 +342,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_required
-@editor_access_for_this_child()
+@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -353,7 +354,7 @@ def delete_lead_site(request, registration_id, site_id):
     # test first to see if this site is associated with other roles
     # either past or present
     if Site.objects.filter(
-        Q(registration=registration) &
+        Q(case=registration.case) &
         Q(pk=site_id) &
         Q(
             Q(site_is_childrens_epilepsy_surgery_centre=True) |
@@ -375,7 +376,7 @@ def delete_lead_site(request, registration_id, site_id):
         Site.objects.filter(pk=site_id).delete()
 
     lead_site = Site.objects.filter(
-        registration=registration,
+        case=registration.case,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
@@ -400,11 +401,14 @@ def delete_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_view_access', 'epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_view_only', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def previous_sites(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
     previous_sites = Site.objects.filter(
-        registration=registration, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True)
+        case=registration.case,
+        site_is_actively_involved_in_epilepsy_care=False,
+        site_is_primary_centre_of_epilepsy_care=True)
 
     context = {
         'previously_registered_sites': previous_sites,
@@ -419,6 +423,7 @@ Validation process
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def confirm_eligible(request, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child
@@ -446,7 +451,7 @@ def confirm_eligible(request, registration_id):
 
     registration = Registration.objects.filter(pk=registration_id).get()
 
-    if registration.eligibility_criteria_met and Site.objects.filter(registration=registration, site_is_primary_centre_of_epilepsy_care=True).exists():
+    if registration.eligibility_criteria_met and Site.objects.filter(case=registration.case, site_is_primary_centre_of_epilepsy_care=True).exists():
         # activate registration button if eligibility and lead centre set
         trigger_client_event(
             response=response,
@@ -471,6 +476,8 @@ def confirm_eligible(request, registration_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def registration_status(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -485,6 +492,7 @@ def registration_status(request, registration_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def registration_date(request, case_id):
     """
     This defines registration in the audit. 
@@ -504,7 +512,7 @@ def registration_date(request, case_id):
     # update the Registration with the date and the audit_progress record
     registration.save()
     # if all registration components present, update AuditProcess
-    registration = Registration.objects.filter(case=case_id).get()
+    registration = Registration.objects.filter(case=case).get()
 
     test_fields_update_audit_progress(registration, False)
 
@@ -527,6 +535,7 @@ def registration_date(request, case_id):
 
 
 @login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def referring_clinician(request, registration_id):
     """
     Call back from POST request on key up in input partial in registration_form
@@ -560,6 +569,8 @@ def referring_clinician(request, registration_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def editable(request, registration_id, editable):
     """
     Callback from input partial - enables and disables buttons in input partial
@@ -594,7 +605,7 @@ def total_fields_completed(model_instance):
     if model_instance.eligibility_criteria_met:
         counter += 1
     if Site.objects.filter(
-        registration=model_instance,
+        case=model_instance.case,
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True
     ).exists():
@@ -629,7 +640,7 @@ def total_fields_completed(model_instance):
             if getattr(model_instance, field.name) is not None:
                 counter += 1
     if Site.objects.filter(
-        registration=model_instance,
+        case=model_instance.case,
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True
     ).exists():

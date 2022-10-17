@@ -1,7 +1,11 @@
 <div class="field">
 
     {% url 'epilepsy_or_nonepilepsy_status' episode_id=episode.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label="Is a diagnosis of epilepsy definite, or uncertain?" data_position="top left" %}
+    {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
+        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label="Is a diagnosis of epilepsy definite, or uncertain?" data_position="top left" disabled=False %}
+    {% else %}
+        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label="Is a diagnosis of epilepsy definite, or uncertain?" data_position="top left" disabled=False %}
+    {% endif %}
     
 </div>
 

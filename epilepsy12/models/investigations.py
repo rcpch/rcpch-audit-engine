@@ -1,5 +1,4 @@
 from django.db import models
-from ..constants import *
 from ..general_functions import calculate_time_elapsed
 
 from .registration import Registration
@@ -89,4 +88,4 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         verbose_name_plural = 'Investigation Milestones'
 
     def __str__(self) -> str:
-        return self.pk
+        return f"Investigations for {self.registration.case}"

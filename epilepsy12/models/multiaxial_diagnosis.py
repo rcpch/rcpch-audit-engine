@@ -2,7 +2,6 @@ from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from .registration import Registration
-from ..constants import *
 from .time_and_user_abstract_base_classes import *
 
 
@@ -70,4 +69,4 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         verbose_name_plural = "DESSCRIBE assessments"
 
     def __str__(self) -> str:
-        return "Multaxial diagnosis for "+self.registration.case
+        return f"Multaxial diagnosis for {self.registration.case}"

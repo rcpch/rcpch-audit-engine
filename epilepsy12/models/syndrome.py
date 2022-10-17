@@ -1,6 +1,6 @@
 from django.db import models
 from operator import itemgetter
-from ..constants import *
+from ..constants import SYNDROMES
 from .time_and_user_abstract_base_classes import *
 
 # other tables
@@ -42,7 +42,7 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     def __str__(self) -> str:
-        return self.syndrome_name
+        return f'{self.get_syndrome_name_display()}'
 
     class Meta:
         verbose_name = 'Syndrome'

@@ -1,17 +1,36 @@
+from django.views.generic.base import RedirectView
+from django.conf.urls.static import static
 from . import views
-from .views import SignUpView
-from django.urls import path
+# from .views import SignUpView
+from django.urls import path, re_path
 
 urlpatterns = [
+    path("favicon", views.favicon),
+    path("signup/", views.signup, name="signup"),
+    path('403', views.redirect_403, name='redirect_403'),
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
     path('tsandcs', views.tsandcs, name="tsandcs"),
     path('hospital', views.hospital_reports, name="hospital_reports"),
-    path('cases/', views.case_list, name="cases"),
-    path('case/<int:id>/update', views.update_case, name="update_case"),
-    path('case/create', views.create_case, name="create_case"),
-    path('case/<int:id>/delete', views.delete_case, name="delete_case"),
-    path('case/<int:case_id>/register', views.register, name='register'),
+    path('hospital/<int:hospital_id>/cases/', views.case_list, name="cases"),
+    path('hospital/<int:hospital_id>/case/<int:case_id>/update',
+         views.update_case, name="update_case"),
+    path('hospital/<int:hospital_id>/case/create',
+         views.create_case, name="create_case"),
+    path('hospital/<int:hospital_id>/case/<int:case_id>/delete',
+         views.delete_case, name="delete_case"),
+    path('case/<int:case_id>/register',
+         views.register, name='register'),
+    path('hospital/<int:hospital_id>/case/<int:case_id>/opt-out',
+         views.opt_out, name='opt_out'),
+    path('hospital/<int:hospital_id>/cases/has_rcpch_view_preference',
+         views.has_rcpch_view_preference, name='has_rcpch_view_preference'),
+    path('hospital/<int:hospital_id>/cases/hospital_select',
+         views.child_hospital_select, name='child_hospital_select'),
+    path('selected_hospital_summary', views.selected_hospital_summary,
+         name='selected_hospital_summary'),
+    path('hospital/<int:hospital_id>/case_statistics',
+         views.case_statistics, name='case_statistics'),
 
     #     htmx callback from steps
     path('registration/<int:case_id>/registration_active/<str:active_template>',
@@ -35,7 +54,6 @@ urlpatterns = [
 
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
-    path("signup/", SignUpView.as_view(), name="signup"),
 
     path('investigations/<int:case_id>',
          views.investigations, name='investigations'),
@@ -119,29 +137,29 @@ htmx_paths = [
     # case table endpoints
     path('htmx/filter_case_list', views.case_list,
          name="filter_case_list"),
-    path('htmx/sort_by_imd_up', views.case_list,
+    path('htmx/sort_by_imd_up/<int:hospital_id>', views.case_list,
          name="sort_by_imd_up"),
     path('htmx/sort_by_imd_down', views.case_list,
          name="sort_by_imd_down"),
-    path('htmx/sort_by_nhs_number_up', views.case_list,
+    path('htmx/sort_by_nhs_number_up/<int:hospital_id>', views.case_list,
          name="sort_by_nhs_number_up"),
-    path('htmx/sort_by_nhs_number_down', views.case_list,
+    path('htmx/sort_by_nhs_number_down/<int:hospital_id>', views.case_list,
          name="sort_by_nhs_number_down"),
-    path('htmx/sort_by_ethnicity_up', views.case_list,
+    path('htmx/sort_by_ethnicity_up/<int:hospital_id>', views.case_list,
          name="sort_by_ethnicity_up"),
-    path('htmx/sort_by_ethnicity_down', views.case_list,
+    path('htmx/sort_by_ethnicity_down/<int:hospital_id>', views.case_list,
          name="sort_by_ethnicity_down"),
-    path('htmx/sort_by_gender_up', views.case_list,
-         name="sort_by_gender_up"),
-    path('htmx/sort_by_gender_down', views.case_list,
-         name="sort_by_gender_down"),
-    path('htmx/sort_by_name_up', views.case_list,
+    path('htmx/sort_by_sex_up/<int:hospital_id>', views.case_list,
+         name="sort_by_sex_up"),
+    path('htmx/sort_by_sex_down/<int:hospital_id>', views.case_list,
+         name="sort_by_sex_down"),
+    path('htmx/sort_by_name_up/<int:hospital_id>', views.case_list,
          name="sort_by_name_up"),
-    path('htmx/sort_by_name_down', views.case_list,
+    path('htmx/sort_by_name_down/<int:hospital_id>', views.case_list,
          name="sort_by_name_down"),
-    path('htmx/sort_by_id_up', views.case_list,
+    path('htmx/sort_by_id_up/<int:hospital_id>', views.case_list,
          name="sort_by_id_up"),
-    path('htmx/sort_by_id_down', views.case_list,
+    path('htmx/sort_by_id_down/<int:hospital_id>', views.case_list,
          name="sort_by_id_down"),
 
     #     registration endpoints
@@ -333,8 +351,6 @@ htmx_paths = [
          views.individualised_care_plan_addresses_water_safety, name='individualised_care_plan_addresses_water_safety'),
     path('management/<int:management_id>/individualised_care_plan_addresses_sudep',
          views.individualised_care_plan_addresses_sudep, name='individualised_care_plan_addresses_sudep'),
-    path('management/<int:management_id>/individualised_care_plan_includes_aihp',
-         views.individualised_care_plan_includes_aihp, name='individualised_care_plan_includes_aihp'),
     path('management/<int:management_id>/individualised_care_plan_includes_ehcp',
          views.individualised_care_plan_includes_ehcp, name='individualised_care_plan_includes_ehcp'),
     path('management/<int:management_id>/has_individualised_care_plan_been_updated_in_the_last_year',

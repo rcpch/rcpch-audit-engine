@@ -23,9 +23,11 @@
 
         <span>
 
-            <div 
-                class="ui rcpch_light_blue search selection fluid dropdown"
-            >
+            {% if disabled %}
+                <div class="ui rcpch_light_blue search selection fluid disabled dropdown">
+            {% else %}
+                <div class="ui rcpch_light_blue search selection fluid dropdown">
+            {% endif %}
                     {% if test_positive %}
                         <i class="rcpch_pink check circle outline icon"></i>
                     {% else %}

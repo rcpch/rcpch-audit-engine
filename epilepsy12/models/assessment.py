@@ -1,9 +1,7 @@
 from django.db import models
 
-from epilepsy12.models.site import Site
-
 from ..general_functions import calculate_time_elapsed
-from ..constants import *
+from ..constants import CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE, CAN_ONLY_VIEW_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE, CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE, CAN_DELETE_TERTIARY_NEUROLOGY_CENTRE, CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET, CAN_ALLOCATE_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_EDIT_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_DELETE_CHILDRENS_EPILEPSY_SURGERY_CENTRE
 from .time_and_user_abstract_base_classes import *
 
 # other tables
@@ -138,11 +136,29 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        verbose_name = "Milestones",
+        verbose_name = "Milestones"
         verbose_name_plural = "Milestones"
+        permissions = (
+            CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE,
+            CAN_ONLY_VIEW_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
+
+            CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE,
+
+            CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE,
+            CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE,
+            CAN_DELETE_TERTIARY_NEUROLOGY_CENTRE,
+
+            CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET,
+            CAN_ALLOCATE_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
+            CAN_EDIT_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
+            CAN_DELETE_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
+        )
 
     def __str__(self) -> str:
-        return "assessment"
+        return f"Assessment Milestones for {self.registration.case}"
 
     # TODO #14 Class function to calculate cohort based on first paediatric assessment date
     # this creates a cohort number (integer) based on where in the year they are
