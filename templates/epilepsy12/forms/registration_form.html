@@ -41,9 +41,11 @@
         
     </div>
     
+    {% comment %}
     <div class="field" id="referring_clinician">
         {% include 'epilepsy12/partials/registration/referring_clinician.html' with registration=registration hx_editable=field_enabled %}
     </div>
+    {% endcomment %}
 
     <div id="lead_site" class="field">
       {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}

@@ -181,8 +181,8 @@ htmx_paths = [
          views.delete_lead_site, name="delete_lead_site"),
     path('registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
-    path('registration/<int:registration_id>/referring_clinician',
-         views.referring_clinician, name="referring_clinician"),
+    #     path('registration/<int:registration_id>/referring_clinician',
+    #          views.referring_clinician, name="referring_clinician"),
 
     path('registration/<int:registration_id>/<str:editable>/',
          views.editable, name="editable"),
@@ -259,14 +259,14 @@ htmx_paths = [
          views.registration_status, name="registration_status"),
 
     # initial assessment endpoints
-    path('registration/<int:initial_assessment_id>/date_of_initial_assessment',
-         views.date_of_initial_assessment, name="date_of_initial_assessment"),
+    #     path('registration/<int:initial_assessment_id>/date_of_initial_assessment',
+    #          views.date_of_initial_assessment, name="date_of_initial_assessment"),
     path('registration/<int:initial_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting',
          views.first_paediatric_assessment_in_acute_or_nonacute_setting, name="first_paediatric_assessment_in_acute_or_nonacute_setting"),
-    path('registration/<int:initial_assessment_id>/general_paediatrics_referral_made',
-         views.general_paediatrics_referral_made, name="general_paediatrics_referral_made"),
-    path('initial_assessment/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
-         views.date_of_referral_to_general_paediatrics, name="date_of_referral_to_general_paediatrics"),
+    #     path('registration/<int:initial_assessment_id>/general_paediatrics_referral_made',
+    #          views.general_paediatrics_referral_made, name="general_paediatrics_referral_made"),
+    #     path('initial_assessment/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
+    #          views.date_of_referral_to_general_paediatrics, name="date_of_referral_to_general_paediatrics"),
 
     path('registration/<int:initial_assessment_id>/has_number_of_episodes_since_the_first_been_documented',
          views.has_number_of_episodes_since_the_first_been_documented, name="has_number_of_episodes_since_the_first_been_documented"),
@@ -278,8 +278,8 @@ htmx_paths = [
          views.developmental_learning_or_schooling_problems, name="developmental_learning_or_schooling_problems"),
     path('registration/<int:initial_assessment_id>/behavioural_or_emotional_problems',
          views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
-    path('registration/<int:initial_assessment_id>/diagnostic_status',
-         views.diagnostic_status, name="diagnostic_status"),
+    #     path('registration/<int:initial_assessment_id>/diagnostic_status',
+    #          views.diagnostic_status, name="diagnostic_status"),
 
     # epilepsy context htmx
     path('epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',

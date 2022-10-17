@@ -1122,3 +1122,7 @@ a label {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.rcpch.question.circle.icon {
+  color: var(--rcpch_light_blue);
+}
