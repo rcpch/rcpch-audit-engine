@@ -15,7 +15,7 @@
         <div class="ui rcpch_lightest_blue message">
 
             {% url 'consultant_paediatrician_referral_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="change" label=assessment.get_consultant_paediatrician_referral_date_help_label_text reference=assessment.getconsultant_paediatrician_referral_date_help_reference_text date_value=assessment.consultant_paediatrician_referral_date input_date_field_name="consultant_paediatrician_referral_date" data_position="top left" %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="change" label=assessment.get_consultant_paediatrician_referral_date_help_label_text reference=assessment.get_consultant_paediatrician_referral_date_help_reference_text date_value=assessment.consultant_paediatrician_referral_date input_date_field_name="consultant_paediatrician_referral_date" data_position="top left" %}
             
             {% url 'consultant_paediatrician_input_date' assessment_id=assessment.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="change" label=assessment.get_consultant_paediatrician_input_date_help_label_text reference=assessment.get_consultant_paediatrician_input_date_help_reference_text date_value=assessment.consultant_paediatrician_input_date input_date_field_name="consultant_paediatrician_input_date" data_position="top left" %}
@@ -24,8 +24,6 @@
                 <label class='toggle_button_label'>Time to Review</label>
                 <input class="ui input" type="text" value="{{assessment.consultant_paediatrician_wait}}" disabled/>
             </div>
-
-            {% comment%}New Code here{% endcomment%}
 
             {% if active_general_paediatric_site %}
 
@@ -126,9 +124,6 @@
                 
 
             {% endif %}
-
-
-            {% comment%}Ends here{% endcomment%}
 
         </div>
 
