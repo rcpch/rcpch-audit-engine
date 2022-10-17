@@ -3,10 +3,6 @@
 
   {% csrf_token %}
 
-  <div class='ui rcpch_info message'>
-  The initial assessment must be completed with x weeks of the reported episode.
-  </div>
-
   {% comment %}
   <div id='date_of_initial_assessment' class='field'>
     {% include 'epilepsy12/partials/initial_assessment/date_of_initial_assessment.html' with initial_assessment=initial_assessment %}
@@ -16,12 +12,11 @@
   <div id='first_paediatric_assessment_in_acute_or_nonacute_setting' class='field'>
     {% url 'first_paediatric_assessment_in_acute_or_nonacute_setting' initial_assessment_id=initial_assessment.pk as hx_post %}
     {% if not perms.epilepsy12.change_initial_assessment %}
-      {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_in_acute_or_nonacute_setting' hx_trigger='click' label='Is the first paediatric assessment in an acute or nonacute setting?' test_positive=initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting data_position='top left' choices=chronicity_selection disabled=True %}
+      {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_in_acute_or_nonacute_setting' hx_trigger='click' label=initial_assessment.get_first_paediatric_assessment_in_acute_or_nonacute_setting_help_label_text reference=initial_assessment.get_first_paediatric_assessment_in_acute_or_nonacute_setting_help_reference_text test_positive=initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting data_position='top left' choices=chronicity_selection disabled=True %}
     {% else %} 
-      {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_in_acute_or_nonacute_setting' hx_trigger='click' label='Is the first paediatric assessment in an acute or nonacute setting?' test_positive=initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting data_position='top left' choices=chronicity_selection disabled=False %} 
+      {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target='#first_paediatric_assessment_in_acute_or_nonacute_setting' hx_trigger='click' label=initial_assessment.get_first_paediatric_assessment_in_acute_or_nonacute_setting_help_label_text reference=initial_assessment.get_first_paediatric_assessment_in_acute_or_nonacute_setting_help_reference_text test_positive=initial_assessment.first_paediatric_assessment_in_acute_or_nonacute_setting data_position='top left' choices=chronicity_selection disabled=False %} 
     {% endif %}
   </div>
-
 
   {% comment %}
   <h5 class='header'>
@@ -33,9 +28,9 @@
   </div>
   {% endcomment %}
 
-  <h5 class='header'>
+  {% comment %} <h5 class='header'>
     Information gathered at the first paediatric assessment
-  </h5>
+  </h5> {% endcomment %}
 
   <div id='when_the_first_epileptic_episode_occurred'>
     {% include 'epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html' with initial_assessment=initial_assessment when_the_first_epileptic_episode_occurred_confidence_selection=when_the_first_epileptic_episode_occurred_confidence_selection diagnostic_status_selection=diagnostic_status_selection %}

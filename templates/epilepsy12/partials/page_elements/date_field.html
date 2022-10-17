@@ -4,7 +4,8 @@
         hx_post: the url posted to including parameters
         hx_target: the id of the html element to target the server response
         hx_trigger: usually 'change' but can be any event
-        label: this is the label text
+        label: this is the label text (accessed from the help text in the model)
+        reference: this is the reference text (accessed from the help text in the model)
         date_value: date value
         data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
         input_date_field_name: the name of the input element - should match the field name being updated
@@ -14,7 +15,9 @@
 
     <div class="field">
         
-        <label>{{label}}</label>
+        <label>{{label}}
+            <i class="question circle icon link" data-tooltip='{{reference}}'></i>
+        </label>
         <div class='ui left icon input'>
             <input 
                 {% if disabled %}disabled{% endif %}
