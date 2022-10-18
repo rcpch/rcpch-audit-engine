@@ -1,8 +1,8 @@
 # Epilepsy Type Selectors
 
 EPILEPSY_DIAGNOSIS_STATUS = (
-    ("E", "Epilepsy"),
-    ("NE", "Non-epilepsy"),
+    ("E", "Epileptic"),
+    ("NE", "Non-epileptic"),
     ("U", "Uncertain")
 )
 

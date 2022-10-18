@@ -65,6 +65,15 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, He
         default=None,
     )
 
+    were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
+        help_text={
+            'label': "Were any of the epileptic seizures convulsive?",
+            'reference': "Were any of the epileptic seizures convulsive?",
+        },
+        default=None,
+        null=True
+    )
+
     experienced_prolonged_generalized_convulsive_seizures = models.CharField(
         help_text={
             'label': "Has the child at any point in time experienced prolonged generalised seizures?",

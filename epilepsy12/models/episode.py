@@ -19,8 +19,8 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     """
     seizure_onset_date = models.DateField(
         help_text={
-            'label': 'When did the episode happen?',
-            'reference': "Date the episode occurred or was witnessed.",
+            'label': 'When did the first episode of this type happen?',
+            'reference': "Date the first episode of this type occurred or was witnessed.",
         },
         blank=True,
         default=None,
@@ -99,14 +99,14 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         null=True
     )
 
-    were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
-        help_text={
-            'label': "Were any of the epileptic seizures convulsive?",
-            'reference': "Were any of the epileptic seizures convulsive?",
-        },
-        default=None,
-        null=True
-    )
+    # were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
+    #     help_text={
+    #         'label': "Were any of the epileptic seizures convulsive?",
+    #         'reference': "Were any of the epileptic seizures convulsive?",
+    #     },
+    #     default=None,
+    #     null=True
+    # )
 
     """
     Onset of Seizures

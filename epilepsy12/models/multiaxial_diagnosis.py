@@ -29,8 +29,8 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     # Cause
     epilepsy_cause_known = models.BooleanField(
         help_text={
-            'label': "Is there an identifiable cause?",
-            'reference': "Is there an identifiable cause?",
+            'label': "Has a cause for the epilepsy been identified?",
+            'reference': "Has a cause for the epilepsy been identified?",
         },
         null=True,
         blank=True,
@@ -39,8 +39,8 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     epilepsy_cause = models.CharField(
         help_text={
-            'label': "What is the main identified cause of the seizure(s)?",
-            'reference': "What is the main identified cause of the seizure(s)?",
+            'label': "What is the main identified cause of the epilepsy?",
+            'reference': "What is the main identified cause of the epilepsy?",
         },
         max_length=50,
         default=None,
@@ -63,8 +63,8 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     relevant_impairments_behavioural_educational = models.BooleanField(
         help_text={
-            'label': "Are there any relevant impairments (behavioural or educational)?",
-            'reference': "Are there any relevant impairments (behavioural or educational)?",
+            'label': "Are there any relevant impairment, behavioural, educational or emotional problems?",
+            'reference': "Are there any relevant impairment, behavioural, educational or emotional problems?",
         },
         max_length=50,
         default=None,

@@ -21,11 +21,6 @@
         {% url 'syndrome_name' syndrome_id=syndrome.pk as hx_post %}
         {% include 'epilepsy12/partials/page_elements/select.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="innerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." test_positive=syndrome.syndrome_name label=syndrome.get_syndrome_name_help_label_text reference=syndrome.get_syndrome_name_help_reference_text data_position='top left' %}
     </div>
-    
-    <div class="field">
-        {% url 'syndrome_diagnosis_active' syndrome_id=syndrome.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with  hx_post=hx_post hx_target="#syndrome" hx_trigger='click' hx_swap="innerHTML" test_positive=syndrome.syndrome_diagnosis_active test_positive=syndrome.syndrome_diagnosis_active label=syndrome.get_syndrome_diagnosis_active_help_label_text reference=syndrome.get_syndrome_diagnosis_active_help_reference_text data_position='top left' %}
-    </div>
 
     <div class='field'>
         <a href='{% url "multiaxial_diagnosis" case_id=syndrome.multiaxial_diagnosis.registration.case.pk %}'><button class='ui rcpch_primary button'>Syndrome entry complete for {{syndrome.multiaxial_diagnosis.registration.case}}</div></a>
