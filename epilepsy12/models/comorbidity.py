@@ -18,13 +18,21 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
     The date of onset/diagnosis field has been actively removed as not found helpful
     """
 
-    comorbidity_diagnosis_date = models.DateField(  # this is a free text field for 'other' diagnoses not included in the lists provided
+    comorbidity_diagnosis_date = models.DateField(
+        help_text={
+            'label': 'What is the date of diagnosis?',
+            'reference': 'What is the date of diagnosis?',
+        },
         max_length=50,
         default=None,
         null=True
     )
 
-    comorbidity_diagnosis = models.CharField(  # this is a free text field for 'other' diagnoses not included in the lists provided
+    comorbidity_diagnosis = models.CharField(
+        help_text={
+            'label': 'What is the comorbidity?',
+            'reference': 'What is the comorbidity?',
+        },
         max_length=50,
         default=None,
         null=True
