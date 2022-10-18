@@ -14,6 +14,10 @@ class Migration(migrations.Migration):
             model_name='investigations',
             name='mri_brain_performed_date',
         ),
+        migrations.RemoveField(
+            model_name='syndrome',
+            name='syndrome_diagnosis_active',
+        ),
         migrations.AddField(
             model_name='investigations',
             name='mri_brain_reported_date',
