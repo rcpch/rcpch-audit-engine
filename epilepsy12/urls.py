@@ -302,8 +302,8 @@ htmx_paths = [
          views.mri_indicated, name="mri_indicated"),
     path('investigations/<int:investigations_id>/mri_brain_requested_date',
          views.mri_brain_requested_date, name="mri_brain_requested_date"),
-    path('investigations/<int:investigations_id>/mri_brain_performed_date',
-         views.mri_brain_performed_date, name="mri_brain_performed_date"),
+    path('investigations/<int:investigations_id>/mri_brain_reported_date',
+         views.mri_brain_reported_date, name="mri_brain_reported_date"),
 
     # management
     path('management/<int:management_id>/has_an_aed_been_given',
