@@ -19,21 +19,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, 
 
     """
 
-    # date_of_initial_assessment = models.DateField(
-    #     "On what date did the initial assessment occur?",
-    #     null=True,
-    #     default=None
-    # )
-    # general_paediatrics_referral_made = models.BooleanField(
-    #     "date of referral to general paediatrics",
-    #     null=True,
-    #     default=None
-    # )
-    # date_of_referral_to_general_paediatrics = models.DateField(
-    #     "date of referral to general paediatrics",
-    #     null=True,
-    #     default=None
-    # )
     first_paediatric_assessment_in_acute_or_nonacute_setting = models.IntegerField(
         help_text={
             'label': "Is the first paediatric assessment in an acute or nonacute setting?",
@@ -43,14 +28,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, 
         null=True,
         default=None
     )
-    # has_description_of_the_episode_or_episodes_been_gathered = models.BooleanField(
-    #     help_text={
-    #         'label': ,
-    #         'reference': "has a description of the episode(s) been gathered?"
-    #     },
-    #     null=True,
-    #     default=None
-    # )
     has_number_of_episodes_since_the_first_been_documented = models.BooleanField(
         help_text={
             'label': 'The approximate frequency or number of episodes since the first episode',
@@ -92,14 +69,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, 
         default=None
     )
 
-    # diagnostic_status = models.CharField(  # This currently essential - used to exclude nonepilepic kids
-    #     max_length=1,
-    #     choices=DIAGNOSTIC_STATUS,
-    #     verbose_name="Status of epilepsy diagnosis. Must have epilepsy or probable epilepsy to be included.",
-    #     default=None,
-    #     null=True
-    # )
-
     # relationships
     registration = models.OneToOneField(
         Registration,
@@ -108,7 +77,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, 
     )
 
     class Meta:
-        # indexes = [models.Index(fields=['date_of_initial_assessment'])]
         verbose_name = 'First Paediatric Assessment'
         verbose_name_plural = 'First Paediatric Assessments'
 
