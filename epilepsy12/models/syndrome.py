@@ -17,14 +17,20 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     """
 
     syndrome_diagnosis_date = models.DateField(
-        "The date the syndrome diagnosis was made.",
+        help_text={
+            'label': "The date the syndrome diagnosis was made.",
+            'reference': "The date the syndrome diagnosis was made.",
+        },
         blank=True,
         default=None,
         null=True
     )
 
     syndrome_name = models.IntegerField(
-        "Select an identifiable epilepsy syndrome?",
+        help_text={
+            'label': "Select an identifiable epilepsy syndrome?",
+            'reference': "Select an identifiable epilepsy syndrome?",
+        },
         choices=sorted(SYNDROMES, key=itemgetter(1)),
         null=True,
         blank=True,
@@ -32,7 +38,10 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     )
 
     syndrome_diagnosis_active = models.BooleanField(
-        "Is the diagnosis of the syndrome still active?",
+        help_text={
+            'label': "Is the diagnosis of the syndrome still relevant?",
+            'reference': "Is the diagnosis of the syndrome still relevant?",
+        },
         null=True,
         default=None
     )
