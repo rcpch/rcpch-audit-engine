@@ -10,54 +10,79 @@ from .time_and_user_abstract_base_classes import *
 class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
 
     eeg_indicated = models.BooleanField(
-        "Is an EEG indicated?",
+        help_text={
+            'label': "Is an EEG indicated?",
+            'reference': "Is an EEG indicated?",
+        },
         default=None,
         null=True,
         blank=True
     )
     eeg_request_date = models.DateField(
-        "Date EEG requested",
+        help_text={
+            'label': "Date EEG requested",
+            'reference': "Date EEG requested",
+        },
         default=None,
         null=True,
         blank=True
     )
 
     eeg_performed_date = models.DateField(
-        "Date EEG performed",
+        help_text={
+            'label': "Date EEG performed",
+            'reference': "Date EEG performed",
+        },
         default=None,
         null=True,
         blank=True
     )
 
     twelve_lead_ecg_status = models.BooleanField(
+        help_text={
+            'label': "Has a 12-Lead ECG been performed",
+            'reference': "Has a 12-Lead ECG been performed",
+        },
         default=None,
         null=True,
         blank=True
     )
 
     ct_head_scan_status = models.BooleanField(
-        "Has a CT head been performed?",
+        help_text={
+            'label': "Has a CT head been performed?",
+            'reference': "Has a CT head been performed?",
+        },
         default=None,
         null=True,
         blank=True
     )
 
     mri_indicated = models.BooleanField(
-        "Is an MRI brain indicated?",
+        help_text={
+            'label': "Is an MRI brain indicated?",
+            'reference': "Is an MRI brain indicated?",
+        },
         default=None,
         null=True,
         blank=True
     )
 
     mri_brain_requested_date = models.DateField(
-        "MRI brain requested date",
+        help_text={
+            'label': "MRI brain requested date",
+            'reference': "MRI brain requested date",
+        },
         default=None,
         null=True,
         blank=True
     )
 
     mri_brain_performed_date = models.DateField(
-        "MRI brain performed date",
+        help_text={
+            'label': "MRI brain performed date",
+            'reference': "MRI brain performed date",
+        },
         default=None,
         null=True,
         blank=True
