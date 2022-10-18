@@ -1,60 +1,86 @@
 
 from django.db import models
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from ..constants import OPT_OUT_UNCERTAIN
 from .time_and_user_abstract_base_classes import *
 
 from .registration import Registration
 
+from ..general_functions import *
 
-class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+
+class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records contextual information that defines epilepsy risk.
     It references the InitialAssessment class, as each case optionally has a single epilepsy context.
     """
 
     previous_febrile_seizure = models.CharField(
-        "has there been a previous febrile seizure?",
+        help_text={
+            'label': "At any point in time has the child had febrile seizure(s)?",
+            'reference': "At any point in time has the child had febrile seizure(s)?",
+        },
         max_length=2,
         choices=OPT_OUT_UNCERTAIN,
         default=None,
         null=True
     )
     previous_acute_symptomatic_seizure = models.CharField(
-        "has there been a previous acute symptomatic seizure?",
+        help_text={
+            'label': "At any point in time has the child had acute symptomatic seizure(s)?",
+            'reference': "At any point in time has the child had acute symptomatic seizure(s)?"
+        },
         max_length=2,
         choices=OPT_OUT_UNCERTAIN,
         default=None,
         null=True
     )
     is_there_a_family_history_of_epilepsy = models.CharField(
-        "is there a family history of epilepsy?",
+        help_text={
+            'label': "Is there a family history of epilepsy?",
+            'reference': "Is there a family history of epilepsy?"
+        },
         max_length=3,
         choices=OPT_OUT_UNCERTAIN,
         default=None,
         null=True
     )
     previous_neonatal_seizures = models.CharField(
-        "were there seizures in the neonatal period?",
+        help_text={
+            'label': 'Were there seizures in the neonatal period?',
+            'reference': 'Were there seizures in the neonatal period?'
+        },
         max_length=2,
         choices=OPT_OUT_UNCERTAIN,
         default=None,
         null=True
     )
     diagnosis_of_epilepsy_withdrawn = models.BooleanField(
-        "has the diagnosis of epilepsy been withdrawn?",
+        help_text={
+            'label': "has the diagnosis of epilepsy been withdrawn?",
+            'reference': 'In the first year after first assessment, has a diagnosis of epilepsy been withdrawn because it has been subsequently deemed incorrect?'
+        },
         null=True,
         default=None,
     )
 
     experienced_prolonged_generalized_convulsive_seizures = models.CharField(
-        "Has the child at any point in time experienced prolonged generalised convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+        help_text={
+            'label': "Has the child at any point in time experienced prolonged generalised seizures?",
+            'reference': "Has the child at any point in time experienced prolonged generalised convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+        },
         max_length=2,
         default=None,
         null=True,
         choices=OPT_OUT_UNCERTAIN,
     )
     experienced_prolonged_focal_seizures = models.CharField(
-        "Has the child at any point in time experienced prolonged generalised convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+        help_text={
+            'label': "Has the child at any point in time experienced prolonged focal seizures?",
+            'reference': "Has the child at any point in time experienced prolonged focal convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+        },
+
         max_length=2,
         default=None,
         null=True,

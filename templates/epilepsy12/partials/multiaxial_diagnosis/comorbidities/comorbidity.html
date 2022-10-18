@@ -15,12 +15,12 @@
     
         <div class="field">
             {% url 'comorbidity_diagnosis_date' comorbidity_id=comorbidity.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label='When was the comorbidity diagnosed?' input_date_field_name='comorbidity_diagnosis_date' %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label=comorbidity.get_comorbidity_diagnosis_date_help_label_text reference=comorbidity.get_comorbidity_diagnosis_date_help_reference_text input_date_field_name='comorbidity_diagnosis_date' %}
         </div>
 
         <div class="field">
             {% url 'comorbidity_diagnosis' comorbidity_id=comorbidity.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidity_diagnosis' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidity_diagnosis label='Select a comorbidity' data_position='top left' %}
+            {% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidity_diagnosis' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidity_diagnosis label=comorbidity.get_comorbidity_diagnosis_help_label_text reference=comorbidity.get_comorbidity_diagnosis_help_reference_text data_position='top left' %}
         </div>
 
         <div class='field'>

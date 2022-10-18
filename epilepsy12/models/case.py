@@ -1,12 +1,10 @@
-from enum import unique
-from hashlib import blake2b
 from dateutil import relativedelta
 import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.conf import settings
-from django.forms import BooleanField
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 
 from epilepsy12.models.hospital_trust import HospitalTrust
 
@@ -16,7 +14,7 @@ from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 
 
-class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class holds information about each child or young person
     Each case is unique

@@ -20,7 +20,7 @@
     {% endcomment %}
 
     
-<label class="toggle_button_label">{{label}}</label>
+<label class="toggle_button_label">{{label}}<span data-tooltip='{{reference}}'><i class="rcpch question circle icon"></i></span></label>
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
     <span>

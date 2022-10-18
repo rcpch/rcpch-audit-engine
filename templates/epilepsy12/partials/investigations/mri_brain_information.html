@@ -3,18 +3,12 @@
 <div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
     <div class="ui segment">
-        
-        <div class="ui rcpch_info message">
-            <p>Indications for a brain MRI:</p>
-            <li>Focal seizure</li>
-            <li>Laterality on EEG</li>
-        </div>
 
         {% url 'mri_indicated' investigations_id=investigations.pk as hx_post %}
         {% if not perms.epilepsy12.change_investigations %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label="Is an MRI brain indicated?" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label=investigations.get_mri_indicated_help_label_text reference=investigations.get_mri_indicated_help_reference_text data_position="top left" disabled=True %}
         {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label="Is an MRI brain indicated?" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.mri_indicated label=investigations.get_mri_indicated_help_label_text reference=investigations.get_mri_indicated_help_reference_text data_position="top left" disabled=False %}
         {% endif %}
 
         {% if investigations.mri_indicated %}
@@ -23,16 +17,16 @@
             
                 {% url 'mri_brain_requested_date' investigations_id=investigations.pk as hx_post %}
                 {% if not perms.epilepsy12.change_investigations %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain request date" date_value=investigations.mri_brain_requested_date data_position='top left' input_date_field_name='mri_brain_requested_date' disabled=True %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label=investigations.get_mri_brain_requested_date_help_label_text reference=investigations.get_mri_brain_requested_date_help_reference_text date_value=investigations.mri_brain_requested_date data_position='top left' input_date_field_name='mri_brain_requested_date' disabled=True %}
                 {% else %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain request date" date_value=investigations.mri_brain_requested_date data_position='top left' input_date_field_name='mri_brain_requested_date' disabled=False %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label=investigations.get_mri_brain_requested_date_help_label_text reference=investigations.get_mri_brain_requested_date_help_reference_text date_value=investigations.mri_brain_requested_date data_position='top left' input_date_field_name='mri_brain_requested_date' disabled=False %}
                 {% endif %}
 
                 {% url 'mri_brain_performed_date' investigations_id=investigations.pk as hx_post %}
                 {% if not perms.epilepsy12.change_investigations %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain performed date" date_value=investigations.mri_brain_performed_date data_position='top left' input_date_field_name='mri_brain_performed_date' disabled=True %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label=investigations.get_mri_brain_performed_date_help_label_text reference=investigations.get_mri_brain_performed_date_help_reference_text date_value=investigations.mri_brain_performed_date data_position='top left' input_date_field_name='mri_brain_performed_date' disabled=True %}
                 {% else %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label="MRI brain performed date" date_value=investigations.mri_brain_performed_date data_position='top left' input_date_field_name='mri_brain_performed_date' disabled=False %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#mri_brain_information" hx_trigger="change" label=investigations.get_mri_brain_performed_date_help_label_text reference=investigations.get_mri_brain_performed_date_help_reference_text date_value=investigations.mri_brain_performed_date data_position='top left' input_date_field_name='mri_brain_performed_date' disabled=False %}
                 {% endif %}
 
                 <div class="ui field">

@@ -1,11 +1,15 @@
 from django.db import models
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .multiaxial_diagnosis import MultiaxialDiagnosis
 
+from ..general_functions import *
 
-class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+
+class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records information on all mental health, behavioural and developmental comorbidities
     [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]
@@ -14,13 +18,21 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     The date of onset/diagnosis field has been actively removed as not found helpful
     """
 
-    comorbidity_diagnosis_date = models.DateField(  # this is a free text field for 'other' diagnoses not included in the lists provided
+    comorbidity_diagnosis_date = models.DateField(
+        help_text={
+            'label': 'What is the date of diagnosis?',
+            'reference': 'What is the date of diagnosis?',
+        },
         max_length=50,
         default=None,
         null=True
     )
 
-    comorbidity_diagnosis = models.CharField(  # this is a free text field for 'other' diagnoses not included in the lists provided
+    comorbidity_diagnosis = models.CharField(
+        help_text={
+            'label': 'What is the comorbidity?',
+            'reference': 'What is the comorbidity?',
+        },
         max_length=50,
         default=None,
         null=True

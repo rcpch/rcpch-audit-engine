@@ -1,11 +1,13 @@
-from operator import itemgetter
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from .registration import Registration
 from .time_and_user_abstract_base_classes import *
+from ..general_functions import *
 
 
-class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     Replace the DESSCRIBE class 
     One MultiaxialDiagnosis relates to one Registration
@@ -15,7 +17,10 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     # Syndrome
 
     syndrome_present = models.BooleanField(
-        "Is there an identifiable epilepsy syndrome?",
+        help_text={
+            'label': "Is there an identifiable epilepsy syndrome?",
+            'reference': "Is there an identifiable epilepsy syndrome?",
+        },
         null=True,
         blank=True,
         default=None
@@ -23,14 +28,20 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     # Cause
     epilepsy_cause_known = models.BooleanField(
-        "Is there an identifiable cause?",
+        help_text={
+            'label': "Is there an identifiable cause?",
+            'reference': "Is there an identifiable cause?",
+        },
         null=True,
         blank=True,
         default=None
     )
 
     epilepsy_cause = models.CharField(
-        "main identified cause of seizure(s)",
+        help_text={
+            'label': "What is the main identified cause of the seizure(s)?",
+            'reference': "What is the main identified cause of the seizure(s)?",
+        },
         max_length=50,
         default=None,
         blank=True,
@@ -39,16 +50,22 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     epilepsy_cause_categories = ArrayField(
         models.CharField(
-            help_text="add a category",
             max_length=500
         ),
+        help_text={
+            'label': "Which category/categories best apply to this epilepsy?",
+            'reference': "Which category/categories best apply to this epilepsy?",
+        },
         blank=True,
         null=True,
         default=list
     )
 
     relevant_impairments_behavioural_educational = models.BooleanField(
-        "Are there any relevant impairments: behavioural or educational, emotional problems?",
+        help_text={
+            'label': "Are there any relevant impairments (behavioural or educational)?",
+            'reference': "Are there any relevant impairments (behavioural or educational)?",
+        },
         max_length=50,
         default=None,
         blank=True,
