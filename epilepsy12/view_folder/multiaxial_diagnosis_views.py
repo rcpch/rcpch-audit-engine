@@ -105,7 +105,7 @@ FOCAL_EPILEPSY_FIELDS = [
     "focal_onset_focal_to_bilateral_tonic_clonic",
 ]
 
-EPILEPSY_FIELDS = ['were_any_of_the_epileptic_seizures_convulsive', 'epileptic_seizure_onset_type'] + \
+EPILEPSY_FIELDS = ['epileptic_seizure_onset_type'] + \
     FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
 
 NONEPILEPSY_FIELDS = [
@@ -205,7 +205,6 @@ def add_episode(request, multiaxial_diagnosis_id):
         description='',
         description_keywords=None,
         epilepsy_or_nonepilepsy_status=None,
-        were_any_of_the_epileptic_seizures_convulsive=None,
         epileptic_seizure_onset_type=None,
         nonepileptic_seizure_type=None,
         epileptic_generalised_onset=None,
@@ -755,52 +754,6 @@ Epilepsy fields
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def were_any_of_the_epileptic_seizures_convulsive(request, episode_id):
-    """
-    Post request from multiple choice toggle within epilepsy partial.
-    Updates the model and returns the epilepsy partial and parameters
-    """
-
-    if request.htmx.trigger_name == 'button-true':
-        were_any_of_the_epileptic_seizures_convulsive = True
-    elif request.htmx.trigger_name == 'button-false':
-        were_any_of_the_epileptic_seizures_convulsive = False
-    else:
-        were_any_of_the_epileptic_seizures_convulsive = None
-
-    Episode.objects.filter(pk=episode_id).update(
-        were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
-
-    episode = Episode.objects.get(pk=episode_id)
-    test_fields_update_audit_progress(episode.multiaxial_diagnosis)
-
-    context = {
-        'episode': episode,
-        'epileptic_seizure_onset_types': sorted(EPILEPSY_SEIZURE_TYPE, key=itemgetter(1)),
-        "epilepsy_or_nonepilepsy_status_choices": sorted(EPILEPSY_DIAGNOSIS_STATUS, key=itemgetter(1)),
-        "GENERALISED_SEIZURE_TYPE": sorted(GENERALISED_SEIZURE_TYPE),
-        'LATERALITY': LATERALITY,
-        'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS,
-        'FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS': FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS,
-        'FOCAL_EPILEPSY_EEG_MANIFESTATIONS': FOCAL_EPILEPSY_EEG_MANIFESTATIONS,
-    }
-
-    response = render(
-        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/epilepsy.html', context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def epileptic_seizure_onset_type(request, episode_id):
     """
     Defines type of onset if considered to be epilepsy
@@ -890,11 +843,14 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
         # TODO this is an error that needs handling
         focal_fields = ()
 
+    episode = Episode.objects.get(pk=episode_id)
+
     update_fields = {}
     for item in focal_fields:
         if request.htmx.trigger == item.get('name'):
+            item_status = getattr(episode, item.get('name'))
             update_fields.update({
-                item.get('name'): True
+                item.get('name'): not item_status
             })
         else:
             update_fields.update({
@@ -1134,7 +1090,6 @@ def add_syndrome(request, multiaxial_diagnosis_id):
         multiaxial_diagnosis=multiaxial_diagnosis,
         syndrome_diagnosis_date=None,
         syndrome_name=None,
-        syndrome_diagnosis_active=None
     )
 
     test_fields_update_audit_progress(syndrome.multiaxial_diagnosis)
@@ -1721,8 +1676,8 @@ def total_fields_expected(model_instance):
                 cumulative_fields += 1
             elif episode.epilepsy_or_nonepilepsy_status == 'E':
                 # this is epilepsy
-                # minimum fields are this field and were_any_of_the_epileptic_seizures_convulsive
-                cumulative_fields += 2
+                # minimum fields are this field
+                cumulative_fields += 1
                 if episode.epileptic_seizure_onset_type is None or episode.epileptic_seizure_onset_type in ['UO', 'UC']:
                     # onset at this point is unscored, unknown or unclassified
                     cumulative_fields += 1
@@ -1892,7 +1847,6 @@ def total_fields_completed(model_instance):
     # description
     # description_keywords
     # epilepsy_or_nonepilepsy_status
-    # were_any_of_the_epileptic_seizures_convulsive
     # prolonged_generalized_convulsive_seizures
     # experienced_prolonged_focal_seizures
     # epileptic_seizure_onset_type

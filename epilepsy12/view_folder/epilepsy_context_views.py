@@ -212,6 +212,46 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
+    """
+    Post request from multiple choice toggle within epilepsy partial.
+    Updates the model and returns the epilepsy partial and parameters
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        were_any_of_the_epileptic_seizures_convulsive = True
+    elif request.htmx.trigger_name == 'button-false':
+        were_any_of_the_epileptic_seizures_convulsive = False
+    else:
+        were_any_of_the_epileptic_seizures_convulsive = None
+
+    EpilepsyContext.objects.filter(pk=epilepsy_context_id).update(
+        were_any_of_the_epileptic_seizures_convulsive=were_any_of_the_epileptic_seizures_convulsive,
+        updated_at=timezone.now(),
+        updated_by=request.user
+    )
+
+    epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
+    test_fields_update_audit_progress(epilepsy_context)
+
+    context = {
+        "epilepsy_context": epilepsy_context,
+        "uncertain_choices": OPT_OUT_UNCERTAIN
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 

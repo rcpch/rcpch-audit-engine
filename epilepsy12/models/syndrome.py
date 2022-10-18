@@ -37,15 +37,6 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
         default=None
     )
 
-    syndrome_diagnosis_active = models.BooleanField(
-        help_text={
-            'label': "Is the diagnosis of the syndrome still relevant?",
-            'reference': "Is the diagnosis of the syndrome still relevant?",
-        },
-        null=True,
-        default=None
-    )
-
     # relationships
 
     multiaxial_diagnosis = models.ForeignKey(
