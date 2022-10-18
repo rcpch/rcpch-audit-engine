@@ -52,46 +52,46 @@ def initial_assessment(request, case_id):
 
 
 # htmx
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def date_of_initial_assessment(request, initial_assessment_id):
-    """
-    HTMX call back from date_of_initial_assessment partial
-    """
-    date_of_initial_assessment = request.POST.get(request.htmx.trigger_name)
-    # validation here TODO
+# @login_required
+# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+# def date_of_initial_assessment(request, initial_assessment_id):
+#     """
+#     HTMX call back from date_of_initial_assessment partial
+#     """
+#     date_of_initial_assessment = request.POST.get(request.htmx.trigger_name)
+#     # validation here TODO
 
-    new_date = datetime.strptime(
-        date_of_initial_assessment, "%Y-%m-%d").date()
+#     new_date = datetime.strptime(
+#         date_of_initial_assessment, "%Y-%m-%d").date()
 
-    # save date
-    try:
-        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            updated_at=timezone.now(),
-            updated_by=request.user,
-            date_of_initial_assessment=new_date)
-    except Exception as error:
-        print(error)
-        return HttpResponse(error)
+#     # save date
+#     try:
+#         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+#             updated_at=timezone.now(),
+#             updated_by=request.user,
+#             date_of_initial_assessment=new_date)
+#     except Exception as error:
+#         print(error)
+#         return HttpResponse(error)
 
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
+#     initial_assessment = InitialAssessment.objects.get(
+#         pk=initial_assessment_id)
 
-    context = {
-        "initial_assessment": initial_assessment,
-    }
+#     context = {
+#         "initial_assessment": initial_assessment,
+#     }
 
-    test_fields_update_audit_progress(initial_assessment)
+#     test_fields_update_audit_progress(initial_assessment)
 
-    response = render(
-        request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 @login_required
