@@ -27,7 +27,7 @@
 
         <div class="field">
             {% url 'nonepileptic_seizure_subtype' episode_id=episode.id as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=behavioural hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of behavioural episode?' hx_default_text='Select a behavoural type...' test_positive=episode.nonepileptic_seizure_behavioural hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_behavioural' %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=behavioural hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="change" hx_swap="innerHTML" label='How best describes the <i>type</i> of behavioural episode?' hx_default_text='Select a behavioural type...' test_positive=episode.nonepileptic_seizure_behavioural hx_swap="innerHTML" data_position='top left' hx_name='nonepileptic_seizure_behavioural' %}
         </div>
 
     {% elif episode.nonepileptic_seizure_type == 'SRC' %}

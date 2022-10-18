@@ -1,6 +1,6 @@
 {% url 'epileptic_generalised_onset' episode_id=episode.pk as hx_post %}
 {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
     {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target="#generalised_epilepsy" hx_trigger="change" hx_swap="innerHTML" choices=GENERALISED_SEIZURE_TYPE test_positive=episode.epileptic_generalised_onset label="How best describes the onset of the generalised epileptic seizures?" hx_default_text='Generalised onset type' hx_name='epileptic_generalised_onset' data_position="top left" disabled=False %}
-{% elif %}
-    {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target="#generalised_epilepsy" hx_trigger="change" hx_swap="innerHTML" choices=GENERALISED_SEIZURE_TYPE test_positive=episode.epileptic_generalised_onset label="How best describes the onset of the generalised epileptic seizures?" hx_default_text='Generalised onset type' hx_name='epileptic_generalised_onset' data_position="top left" disabled=True %}
 {% else %}
+    {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target="#generalised_epilepsy" hx_trigger="change" hx_swap="innerHTML" choices=GENERALISED_SEIZURE_TYPE test_positive=episode.epileptic_generalised_onset label="How best describes the onset of the generalised epileptic seizures?" hx_default_text='Generalised onset type' hx_name='epileptic_generalised_onset' data_position="top left" disabled=True %}
+{% endif %}

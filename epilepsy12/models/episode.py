@@ -18,14 +18,20 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     For each episode there is one D (description), E (epilepsy definition), S (seizure type).
     """
     seizure_onset_date = models.DateField(
-        "Date episode occurred or was witnessed.",
+        help_text={
+            'label': 'When did the episode happen?',
+            'reference': "Date the episode occurred or was witnessed.",
+        },
         blank=True,
         default=None,
         null=True
     )
 
     seizure_onset_date_confidence = models.CharField(
-        "how accurate is the date of this episode?",
+        help_text={
+            'label': 'Confidence in reported date of episode',
+            'reference': "How accurate is the date of this episode?",
+        },
         max_length=3,
         choices=DATE_ACCURACY,
         default=None,
@@ -33,6 +39,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     )
 
     episode_definition = models.CharField(
+        help_text={
+            'label': 'Episode definition',
+            'reference': "Episode definition. Part of case definition and defines if represents a cluster or discrete episodes.",
+        },
         max_length=1,
         choices=EPISODE_DEFINITION,
         verbose_name="Episode definition. Part of case definition and defines if represents a cluster or discrete episodes.",
@@ -41,19 +51,28 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     )
 
     has_number_of_episodes_since_the_first_been_documented = models.BooleanField(
-        "has the frequency of episodes since the first recorded been documented?",
+        help_text={
+            'label': "Has the frequency of episodes since the first recorded been documented?",
+            'reference': "Has the frequency of episodes since the first recorded been documented?",
+        },
         null=True,
         default=None
     )
 
     has_description_of_the_episode_or_episodes_been_gathered = models.BooleanField(
-        "has a description of the episode or episodes been gathered?",
+        help_text={
+            'label': "Has a description of the episode or episodes been gathered?",
+            'reference': "Has a description of the episode or episodes been gathered?",
+        },
         null=True,
         default=None
     )
 
     description = models.CharField(
-        help_text="What is the episode(s) like and is the description adequate?",
+        help_text={
+            'label': "What is the episode(s) like and is the description adequate?",
+            'reference': "What is the episode(s) like and is the description adequate?",
+        },
         max_length=5000,
         default="",
         blank=True,
@@ -69,7 +88,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     )
 
     epilepsy_or_nonepilepsy_status = models.CharField(
-        "Is a diagnosis of epilepsy definite, or uncertain.",
+        help_text={
+            'label': "Is a diagnosis of epilepsy definite, or uncertain.",
+            'reference': "Is a diagnosis of epilepsy definite, or uncertain.",
+        },
         max_length=3,
         choices=EPILEPSY_DIAGNOSIS_STATUS,
         blank=True,
@@ -78,7 +100,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     )
 
     were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
-        "Were any of the epileptic seizures convulsive?",
+        help_text={
+            'label': "Were any of the epileptic seizures convulsive?",
+            'reference': "Were any of the epileptic seizures convulsive?",
+        },
         default=None,
         null=True
     )
@@ -90,13 +115,20 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     # onset type
 
     epileptic_seizure_onset_type = models.CharField(
-        "If epileptic, what is the seizure type (s)?",
+        help_text={
+            'label': "How best would describe the onset of the epileptic episode?",
+            'reference': "How best would describe the onset of the epileptic episode?",
+        },
         max_length=3,
         choices=EPILEPSY_SEIZURE_TYPE,
         default=None,
         null=True
     )
     nonepileptic_seizure_type = models.CharField(
+        help_text={
+            'label': "How best describes the generalised nature of the nonepileptic episode(s)?",
+            'reference': "How best describes the generalised nature of the nonepileptic episode(s)?",
+        },
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_TYPE,
         default=None,
