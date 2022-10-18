@@ -2,8 +2,8 @@
 <div class="field">
     {% url 'epilepsy_cause_categories' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
     {% if perms.epilepsy12.change_multiaxialdiagnosis %}
-        {% include 'epilepsy12/partials/page_elements/multiple_choice_multiple_toggle_button.html' with choices=epilepsy_cause_selection hx_post=hx_post hx_target="#epilepsy_cause_categories" hx_trigger="click" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.epilepsy_cause_categories label="Which category/categories best apply to this epilepsy?" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/multiple_choice_multiple_toggle_button.html' with choices=epilepsy_cause_selection hx_post=hx_post hx_target="#epilepsy_cause_categories" hx_trigger="click" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.epilepsy_cause_categories label=multiaxial_diagnosis.get_epilepsy_cause_categories_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_categories_help_reference_text data_position="top left" disabled=False %}
     {% else %}
-        {% include 'epilepsy12/partials/page_elements/multiple_choice_multiple_toggle_button.html' with choices=epilepsy_cause_selection hx_post=hx_post hx_target="#epilepsy_cause_categories" hx_trigger="click" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.epilepsy_cause_categories label="Which category/categories best apply to this epilepsy?" data_position="top left" disabled=True %}
+        {% include 'epilepsy12/partials/page_elements/multiple_choice_multiple_toggle_button.html' with choices=epilepsy_cause_selection hx_post=hx_post hx_target="#epilepsy_cause_categories" hx_trigger="click" hx_swap="innerHTML" test_positive=multiaxial_diagnosis.epilepsy_cause_categories label=multiaxial_diagnosis.get_epilepsy_cause_categories_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_categories_help_reference_text data_position="top left" disabled=True %}
     {% endif %}
 </div>

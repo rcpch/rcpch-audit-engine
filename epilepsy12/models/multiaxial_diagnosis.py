@@ -50,12 +50,12 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     epilepsy_cause_categories = ArrayField(
         models.CharField(
-            help_text={
-                'label': "Which category/categories best apply to this epilepsy?",
-                'reference': "Which category/categories best apply to this epilepsy?",
-            },
             max_length=500
         ),
+        help_text={
+            'label': "Which category/categories best apply to this epilepsy?",
+            'reference': "Which category/categories best apply to this epilepsy?",
+        },
         blank=True,
         null=True,
         default=list
