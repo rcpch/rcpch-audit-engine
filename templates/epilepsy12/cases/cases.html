@@ -32,7 +32,7 @@
               <a href="{% url 'create_case' hospital_id %}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
               
               <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
-                <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' %}" hx-swap="innerHTML">
+                <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' hospital_id=hospital_trust.pk %}" hx-swap="innerHTML">
                 <i class="ui rcpch_light_blue circular search link icon"></i>
               </div>
               

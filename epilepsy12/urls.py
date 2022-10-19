@@ -131,7 +131,7 @@ htmx_paths = [
          views.comorbidities, name='comorbidities'),
 
     # case table endpoints
-    path('htmx/filter_case_list', views.case_list,
+    path('htmx/filter_case_list/<hospital_id>', views.case_list,
          name="filter_case_list"),
     path('htmx/sort_by_imd_up/<int:hospital_id>', views.case_list,
          name="sort_by_imd_up"),
