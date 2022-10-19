@@ -22,7 +22,6 @@
           <li>has gone on to have ongoing care within the first year of care for their epilepsy provided by adult or non-NHS services by an inpatient our outpatient, hospital or community paediatric service, or a dedicated paediatric team based in ED.</li>
         </ul>
         <p>* paediatric service, or a dedicated paediatric team based in A&E. They should not have been referred or assessed by an adult service/team.</p>
-        <p>** EEG for paroxysmal episodes considered as first EEG.  If previous EEG was for other reasons e.g. HIE, encephalitis then this EEG would not count as first EEG</p>
         
           {% if registration.eligibility_criteria_met %}
             {% include 'epilepsy12/partials/registration/is_eligible_label.html' with has_error=False message="Eligibility Criteria Confirmed." %}
@@ -42,10 +41,6 @@
         
     </div>
     
-    <div class="field" id="referring_clinician">
-        {% include 'epilepsy12/partials/registration/referring_clinician.html' with registration=registration hx_editable=field_enabled %}
-    </div>
-
     <div id="lead_site" class="field">
       {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
         {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=False %}

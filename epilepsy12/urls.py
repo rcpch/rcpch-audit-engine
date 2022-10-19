@@ -82,8 +82,6 @@ htmx_paths = [
          views.delete_description_keyword, name='delete_description_keyword'),
     path('episode/<int:episode_id>/epilepsy_or_nonepilepsy_status',
          views.epilepsy_or_nonepilepsy_status, name='epilepsy_or_nonepilepsy_status'),
-    path('episode/<int:episode_id>/were_any_of_the_epileptic_seizures_convulsive',
-         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
     path('episode/<int:episode_id>/epileptic_seizure_onset_type',
          views.epileptic_seizure_onset_type, name='epileptic_seizure_onset_type'),
     path('episode/<int:episode_id>/focal_onset_epilepsy_checked_changed',
@@ -109,8 +107,6 @@ htmx_paths = [
          views.syndrome_diagnosis_date, name='syndrome_diagnosis_date'),
     path('syndrome/<int:syndrome_id>/syndrome_name',
          views.syndrome_name, name='syndrome_name'),
-    path('syndrome/<int:syndrome_id>/syndrome_diagnosis_active',
-         views.syndrome_diagnosis_active, name='syndrome_diagnosis_active'),
     # epilepsy causes
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/epilepsy_cause_known',
          views.epilepsy_cause_known, name='epilepsy_cause_known'),
@@ -181,8 +177,6 @@ htmx_paths = [
          views.delete_lead_site, name="delete_lead_site"),
     path('registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
-    path('registration/<int:registration_id>/referring_clinician',
-         views.referring_clinician, name="referring_clinician"),
 
     path('registration/<int:registration_id>/<str:editable>/',
          views.editable, name="editable"),
@@ -259,14 +253,9 @@ htmx_paths = [
          views.registration_status, name="registration_status"),
 
     # initial assessment endpoints
-    path('registration/<int:initial_assessment_id>/date_of_initial_assessment',
-         views.date_of_initial_assessment, name="date_of_initial_assessment"),
+
     path('registration/<int:initial_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting',
          views.first_paediatric_assessment_in_acute_or_nonacute_setting, name="first_paediatric_assessment_in_acute_or_nonacute_setting"),
-    path('registration/<int:initial_assessment_id>/general_paediatrics_referral_made',
-         views.general_paediatrics_referral_made, name="general_paediatrics_referral_made"),
-    path('initial_assessment/<int:initial_assessment_id>/date_of_referral_to_general_paediatrics',
-         views.date_of_referral_to_general_paediatrics, name="date_of_referral_to_general_paediatrics"),
 
     path('registration/<int:initial_assessment_id>/has_number_of_episodes_since_the_first_been_documented',
          views.has_number_of_episodes_since_the_first_been_documented, name="has_number_of_episodes_since_the_first_been_documented"),
@@ -278,8 +267,6 @@ htmx_paths = [
          views.developmental_learning_or_schooling_problems, name="developmental_learning_or_schooling_problems"),
     path('registration/<int:initial_assessment_id>/behavioural_or_emotional_problems',
          views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
-    path('registration/<int:initial_assessment_id>/diagnostic_status',
-         views.diagnostic_status, name="diagnostic_status"),
 
     # epilepsy context htmx
     path('epilepsy_context/<int:epilepsy_context_id>/previous_febrile_seizure',
@@ -290,6 +277,8 @@ htmx_paths = [
          views.is_there_a_family_history_of_epilepsy, name="is_there_a_family_history_of_epilepsy"),
     path('epilepsy_context/<int:epilepsy_context_id>/previous_neonatal_seizures',
          views.previous_neonatal_seizures, name="previous_neonatal_seizures"),
+    path('epilepsy_context/<int:epilepsy_context_id>/were_any_of_the_epileptic_seizures_convulsive',
+         views.were_any_of_the_epileptic_seizures_convulsive, name="were_any_of_the_epileptic_seizures_convulsive"),
     path('epilepsy_context/<int:epilepsy_context_id>/experienced_prolonged_generalized_convulsive_seizures',
          views.experienced_prolonged_generalized_convulsive_seizures, name="experienced_prolonged_generalized_convulsive_seizures"),
     path('epilepsy_context/<int:epilepsy_context_id>/experienced_prolonged_focal_seizures',
@@ -313,8 +302,8 @@ htmx_paths = [
          views.mri_indicated, name="mri_indicated"),
     path('investigations/<int:investigations_id>/mri_brain_requested_date',
          views.mri_brain_requested_date, name="mri_brain_requested_date"),
-    path('investigations/<int:investigations_id>/mri_brain_performed_date',
-         views.mri_brain_performed_date, name="mri_brain_performed_date"),
+    path('investigations/<int:investigations_id>/mri_brain_reported_date',
+         views.mri_brain_reported_date, name="mri_brain_reported_date"),
 
     # management
     path('management/<int:management_id>/has_an_aed_been_given',

@@ -8,24 +8,24 @@
                 <div class='content'>
                     When
                     <div class='sub header'>
-                    When did the event(s) happen?
+                        When did the first episode of this type happen?
                     </div>
                 </div>
             </h5>
     
         <div class="field">
             {% url 'seizure_onset_date' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episode' hx_trigger='change' hx_swap="innerHTML" date_value=episode.seizure_onset_date label='When did the episode happen?' input_date_field_name='seizure_onset_date' %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episode' hx_trigger='change' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' %}
         </div>
 
         <div class="field">
             {% url 'seizure_onset_date_confidence' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=seizure_onset_date_confidence_selection hx_post=hx_post hx_target='#episode' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.seizure_onset_date_confidence label='Confidence in reported date of episode' data_position='top left' %}
+            {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=seizure_onset_date_confidence_selection hx_post=hx_post hx_target='#episode' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.seizure_onset_date_confidence label=episode.get_seizure_onset_date_confidence_help_label_text reference=episode.get_seizure_onset_date_confidence_help_reference_text data_position='top left' %}
         </div>
         
         <div class='field'>
             {% url 'episode_definition' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#episode' hx_swap='innerHTML' hx_trigger='change' choices=episode_definition_selection test_positive=episode.episode_definition data_position='top left' label='Episode definition' hx_default_text='Select an episode definition...' hx_name='episode_definition' %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#episode' hx_swap='innerHTML' hx_trigger='change' choices=episode_definition_selection test_positive=episode.episode_definition data_position='top left' label=episode.get_episode_definition_help_label_text reference=episode.get_episode_definition_help_reference_text hx_default_text='Select an episode definition...' hx_name='episode_definition' %}
         </div>
     
     </div>
@@ -46,7 +46,7 @@
 
         <div class="field">
             {% url 'has_description_of_the_episode_or_episodes_been_gathered' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#episode' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.has_description_of_the_episode_or_episodes_been_gathered label='Has a description of the episode(s) been gathered?' data_position='top left' %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#episode' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.has_description_of_the_episode_or_episodes_been_gathered label=episode.get_has_description_of_the_episode_or_episodes_been_gathered_help_label_text reference=episode.get_has_description_of_the_episode_or_episodes_been_gathered_help_reference_text data_position='top left' %}
         </div>
 
         {% if episode.has_description_of_the_episode_or_episodes_been_gathered %}
@@ -68,7 +68,7 @@
             <div class='content'>
                     Epilepsy
                 <div class='sub header'>
-                Is it epilepsy?
+                Is this episode(s) epileptic?
                 </div>
             </div>
         </h5>

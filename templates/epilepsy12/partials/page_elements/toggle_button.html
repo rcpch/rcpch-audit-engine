@@ -13,13 +13,14 @@
             hx_trigger: usually 'click' but can be any event
             hx_swap: usually 'innerHTML'
             test_positive: the model boolean field 
-            label: this is the label text
+            label: this is the label text pulled in from the the model help text
+            reference: this is the reference text pulled in from the the model help text
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
             disabled: buttons are disabled if users have view-only access
     {% endcomment %}
 
     
-        <label class="toggle_button_label">{{label}}</label>
+    <label class="toggle_button_label">{{label}}&nbsp;<span data-tooltip='{{reference}}'><i class="rcpch question circle icon"></i></span></label>
         <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
             <span>
                 {% if test_positive is None %}

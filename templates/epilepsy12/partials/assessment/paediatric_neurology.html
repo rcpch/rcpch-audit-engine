@@ -3,9 +3,9 @@
     
     {% url 'paediatric_neurologist_referral_made' assessment_id=assessment.pk as hx_post %}
     {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.paediatric_neurologist_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="click" label="Has a referral been made to a consultant paediatric neurologist?" data_position="top left" disabled=True %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.paediatric_neurologist_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="click" label=assessment.get_paediatric_neurologist_referral_made_help_label_text reference=assessment.get_paediatric_neurologist_referral_made_help_reference_text data_position="top left" disabled=True %}
     {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.paediatric_neurologist_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="click" label="Has a referral been made to a consultant paediatric neurologist?" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.paediatric_neurologist_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="click" label=assessment.get_paediatric_neurologist_referral_made_help_label_text reference=assessment.get_paediatric_neurologist_referral_made_help_reference_text data_position="top left" disabled=False %}
     {% endif %}
 
     {% if assessment.paediatric_neurologist_referral_made %}
@@ -13,17 +13,15 @@
         <div class="ui rcpch_lightest_blue message">
 
             {% url 'paediatric_neurologist_referral_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label="Date of referral to a consultant paediatric neurologist." date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label=assessment.get_paediatric_neurologist_referral_date_help_label_text reference=assessment.get_paediatric_neurologist_referral_date_help_reference_text date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" %}
             
             {% url 'paediatric_neurologist_input_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label="Date seen by a consultant paediatric neurologist." date_value=assessment.paediatric_neurologist_input_date input_date_field_name="paediatric_neurologist_input_date" %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label=assessment.get_paediatric_neurologist_input_date_help_label_text reference=assessment.get_paediatric_neurologist_input_date_help_reference_text date_value=assessment.paediatric_neurologist_input_date input_date_field_name="paediatric_neurologist_input_date" %}
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>
                 <input class="ui input" type="text" value="{{assessment.paediatric_neurologist_wait}}" disabled/>
             </div>
-
-            {% comment%}New Code here{% endcomment%}
 
             {% if active_neurology_site %}
 
@@ -111,8 +109,6 @@
 
                         {% endif %}
 
-
-            {% comment%}Ends here{% endcomment%}
 
         </div>
 

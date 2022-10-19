@@ -1,4 +1,5 @@
 from django.db import models
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from ..constants import CHRONICITY, DIAGNOSTIC_STATUS
 from .time_and_user_abstract_base_classes import *
 
@@ -6,7 +7,7 @@ from .time_and_user_abstract_base_classes import *
 from .registration import Registration
 
 
-class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records information about the initial assessment.
     Whilst other information about the child and their epilepsy may be captured across the audit year
@@ -18,64 +19,54 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
 
     """
 
-    date_of_initial_assessment = models.DateField(
-        "On what date did the initial assessment occur?",
-        null=True,
-        default=None
-    )
-    general_paediatrics_referral_made = models.BooleanField(
-        "date of referral to general paediatrics",
-        null=True,
-        default=None
-    )
-    date_of_referral_to_general_paediatrics = models.DateField(
-        "date of referral to general paediatrics",
-        null=True,
-        default=None
-    )
     first_paediatric_assessment_in_acute_or_nonacute_setting = models.IntegerField(
-        "Is the first paediatric assessment in an acute or nonacute setting?",
+        help_text={
+            'label': "Is the first paediatric assessment in an acute or nonacute setting?",
+            'reference': "Is the first paediatric assessment in an acute or nonacute setting?"
+        },
         choices=CHRONICITY,
         null=True,
         default=None
     )
-    has_description_of_the_episode_or_episodes_been_gathered = models.BooleanField(
-        "has a description of the episode or episodes been gathered?",
-        null=True,
-        default=None
-    )
     has_number_of_episodes_since_the_first_been_documented = models.BooleanField(
-        "has the frequency of episodes since the first recorded been documented?",
+        help_text={
+            'label': 'The approximate frequency or number of episodes since the first episode',
+            'reference': "Has the approximate frequency or number of episodes since the first recorded episode been documented?"
+        },
         null=True,
         default=None
     )
     general_examination_performed = models.BooleanField(
-        "has a general clinical examination been performed?",
+        help_text={
+            'label': 'General examination',
+            'reference': "has a general paediatric examination been performed?"
+        },
         null=True,
         default=None
     )
     neurological_examination_performed = models.BooleanField(
-        "has a neurological examination been performed?",
+        help_text={
+            'label': 'Neurological examination',
+            'reference': "Has a neurological examination been performed?"
+        },
         null=True,
         default=None
     )
     developmental_learning_or_schooling_problems = models.BooleanField(
-        "has the presence or absence of developmental, learning or school-based problems been recorded?",
+        help_text={
+            'label': 'Presence or absence of learning, developmental or educational difficulties',
+            'reference': "Has the presence or absence of developmental, learning or school-based problems been recorded?",
+        },
         null=True,
         default=None
     )
     behavioural_or_emotional_problems = models.BooleanField(
-        "are there any behaviour or emotional comorbid conditions present?",
+        help_text={
+            'label': 'Presence or absence of emotional or behavioural problems',
+            'reference': "Has the presence or absence of emotional or behavioural problems been documented?",
+        },
         null=True,
         default=None
-    )
-
-    diagnostic_status = models.CharField(  # This currently essential - used to exclude nonepilepic kids
-        max_length=1,
-        choices=DIAGNOSTIC_STATUS,
-        verbose_name="Status of epilepsy diagnosis. Must have epilepsy or probable epilepsy to be included.",
-        default=None,
-        null=True
     )
 
     # relationships
@@ -86,7 +77,6 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     )
 
     class Meta:
-        indexes = [models.Index(fields=['date_of_initial_assessment'])]
         verbose_name = 'First Paediatric Assessment'
         verbose_name_plural = 'First Paediatric Assessments'
 

@@ -638,6 +638,14 @@ ul {
   transform: scale(1.1, 1.1);
 }
 
+.radio-tile-group .input-container .radio-button:checked+.radio-tile:hover {
+
+  border: 2px solid var(--rcpch_dark_blue);
+  color: white;
+  -webkit-transform: scale(1.0, 1.0);
+  transform: scale(1.0, 1.0);
+}
+
 .radio-tile-group .input-container .radio-button:checked+.radio-tile .radio-tile-label {
   color: var(--rcpch_black);
 }
@@ -1121,4 +1129,8 @@ a label {
   top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.rcpch.question.circle.icon {
+  color: var(--rcpch_light_blue);
 }

@@ -2,9 +2,9 @@
 
     {% url 'epilepsy_or_nonepilepsy_status' episode_id=episode.pk as hx_post %}
     {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label="Is a diagnosis of epilepsy definite, or uncertain?" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label=episode.get_epilepsy_or_nonepilepsy_status_help_label_text reference=episode.get_epilepsy_or_nonepilepsy_status_help_reference_text data_position="top left" disabled=False %}
     {% else %}
-        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label="Is a diagnosis of epilepsy definite, or uncertain?" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epilepsy_or_nonepilepsy_status_choices hx_post=hx_post hx_target="#epilepsy_or_nonepilepsy_status" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epilepsy_or_nonepilepsy_status label=episode.get_epilepsy_or_nonepilepsy_status_help_label_text reference=episode.get_epilepsy_or_nonepilepsy_status_help_reference_text data_position="top left" disabled=False %}
     {% endif %}
     
 </div>
@@ -41,11 +41,6 @@
         </div>
         <div class='ui info message'>
             This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
-        </div>
-    {% elif episode.epilepsy_or_nonepilepsy_status == 'U' %}
-        <div class="ui negative message">
-            <h5>Epilepsy Diagnosis Unclear</h5>
-            <p>Data collected will not be included in reporting against national epilepsy standards</p>
         </div>
     {% endif %}
 

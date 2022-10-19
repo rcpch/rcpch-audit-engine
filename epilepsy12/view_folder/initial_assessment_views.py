@@ -52,46 +52,46 @@ def initial_assessment(request, case_id):
 
 
 # htmx
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def date_of_initial_assessment(request, initial_assessment_id):
-    """
-    HTMX call back from date_of_initial_assessment partial
-    """
-    date_of_initial_assessment = request.POST.get(request.htmx.trigger_name)
-    # validation here TODO
+# @login_required
+# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+# def date_of_initial_assessment(request, initial_assessment_id):
+#     """
+#     HTMX call back from date_of_initial_assessment partial
+#     """
+#     date_of_initial_assessment = request.POST.get(request.htmx.trigger_name)
+#     # validation here TODO
 
-    new_date = datetime.strptime(
-        date_of_initial_assessment, "%Y-%m-%d").date()
+#     new_date = datetime.strptime(
+#         date_of_initial_assessment, "%Y-%m-%d").date()
 
-    # save date
-    try:
-        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            updated_at=timezone.now(),
-            updated_by=request.user,
-            date_of_initial_assessment=new_date)
-    except Exception as error:
-        print(error)
-        return HttpResponse(error)
+#     # save date
+#     try:
+#         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+#             updated_at=timezone.now(),
+#             updated_by=request.user,
+#             date_of_initial_assessment=new_date)
+#     except Exception as error:
+#         print(error)
+#         return HttpResponse(error)
 
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
+#     initial_assessment = InitialAssessment.objects.get(
+#         pk=initial_assessment_id)
 
-    context = {
-        "initial_assessment": initial_assessment,
-    }
+#     context = {
+#         "initial_assessment": initial_assessment,
+#     }
 
-    test_fields_update_audit_progress(initial_assessment)
+#     test_fields_update_audit_progress(initial_assessment)
 
-    response = render(
-        request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/initial_assessment/date_of_initial_assessment.html', context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 @login_required
@@ -139,96 +139,96 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, initial_as
     return response
 
 
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def general_paediatrics_referral_made(request, initial_assessment_id):
-    """
-    HTMX callback from general_paediatrics_referral_made_partial, itself the parent of a toggle_button 
-    partial instance. The name of the post request toggles this field in the model and returns the 
-    same partial.
-    """
+# @login_required
+# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+# def general_paediatrics_referral_made(request, initial_assessment_id):
+#     """
+#     HTMX callback from general_paediatrics_referral_made_partial, itself the parent of a toggle_button
+#     partial instance. The name of the post request toggles this field in the model and returns the
+#     same partial.
+#     """
 
-    if request.htmx.trigger_name == 'button-true':
-        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            general_paediatrics_referral_made=True,
-            updated_at=timezone.now(),
-            updated_by=request.user
-        )
-    elif request.htmx.trigger_name == 'button-false':
-        InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-            general_paediatrics_referral_made=False,
-            date_of_referral_to_general_paediatrics=None,
-            updated_at=timezone.now(),
-            updated_by=request.user
-        )
-    else:
-        print("Some mistake happened")
-        # TODO need to handle this
+#     if request.htmx.trigger_name == 'button-true':
+#         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+#             general_paediatrics_referral_made=True,
+#             updated_at=timezone.now(),
+#             updated_by=request.user
+#         )
+#     elif request.htmx.trigger_name == 'button-false':
+#         InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+#             general_paediatrics_referral_made=False,
+#             date_of_referral_to_general_paediatrics=None,
+#             updated_at=timezone.now(),
+#             updated_by=request.user
+#         )
+#     else:
+#         print("Some mistake happened")
+#         # TODO need to handle this
 
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
+#     initial_assessment = InitialAssessment.objects.get(
+#         pk=initial_assessment_id)
 
-    context = {
-        'initial_assessment': initial_assessment,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-    }
+#     context = {
+#         'initial_assessment': initial_assessment,
+#         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+#     }
 
-    test_fields_update_audit_progress(initial_assessment)
+#     test_fields_update_audit_progress(initial_assessment)
 
-    response = render(
-        request=request, template_name='epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html', context=context)
+#     response = render(
+#         request=request, template_name='epilepsy12/partials/initial_assessment/general_paediatrics_referral_made.html', context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
-    """
-    HTMX call back from date_of_initial_assessment partial
-    """
-    date_of_referral_to_general_paediatrics = request.POST.get(
-        'date_of_referral_to_general_paediatrics')
+# @login_required
+# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+# def date_of_referral_to_general_paediatrics(request, initial_assessment_id):
+#     """
+#     HTMX call back from date_of_initial_assessment partial
+#     """
+#     date_of_referral_to_general_paediatrics = request.POST.get(
+#         'date_of_referral_to_general_paediatrics')
 
-    if date_of_referral_to_general_paediatrics:
-        new_date = datetime.strptime(
-            date_of_referral_to_general_paediatrics, "%Y-%m-%d").date()
-        try:
-            InitialAssessment.objects.filter(pk=initial_assessment_id).update(
-                date_of_referral_to_general_paediatrics=new_date,
-                updated_at=timezone.now(),
-                updated_by=request.user
-            )
-        except Exception as error:
-            message = error
+#     if date_of_referral_to_general_paediatrics:
+#         new_date = datetime.strptime(
+#             date_of_referral_to_general_paediatrics, "%Y-%m-%d").date()
+#         try:
+#             InitialAssessment.objects.filter(pk=initial_assessment_id).update(
+#                 date_of_referral_to_general_paediatrics=new_date,
+#                 updated_at=timezone.now(),
+#                 updated_by=request.user
+#             )
+#         except Exception as error:
+#             message = error
 
-    else:
-        message = "no dice"
+#     else:
+#         message = "no dice"
 
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
+#     initial_assessment = InitialAssessment.objects.get(
+#         pk=initial_assessment_id)
 
-    context = {
-        "initial_assessment": initial_assessment,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-    }
+#     context = {
+#         "initial_assessment": initial_assessment,
+#         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+#     }
 
-    test_fields_update_audit_progress(initial_assessment)
+#     test_fields_update_audit_progress(initial_assessment)
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/date_of_referral_to_general_paediatrics.html", context=context)
+#     response = render(
+#         request=request, template_name="epilepsy12/partials/initial_assessment/date_of_referral_to_general_paediatrics.html", context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+#     # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 @login_required
@@ -456,46 +456,46 @@ def behavioural_or_emotional_problems(request, initial_assessment_id):
     return response
 
 
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def diagnostic_status(request, initial_assessment_id):
+# @login_required
+# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+# def diagnostic_status(request, initial_assessment_id):
 
-    diagnostic_status = request.POST.get(
-        'diagnostic_status')
-    # validation here TODO
+#     diagnostic_status = request.POST.get(
+#         'diagnostic_status')
+#     # validation here TODO
 
-    try:
-        InitialAssessment.objects.filter(
-            pk=initial_assessment_id).update(
-                diagnostic_status=diagnostic_status,
-                updated_at=timezone.now(),
-                updated_by=request.user
-        )
-    except Exception as error:
-        print(error)
-        return HttpResponse(error)
+#     try:
+#         InitialAssessment.objects.filter(
+#             pk=initial_assessment_id).update(
+#                 diagnostic_status=diagnostic_status,
+#                 updated_at=timezone.now(),
+#                 updated_by=request.user
+#         )
+#     except Exception as error:
+#         print(error)
+#         return HttpResponse(error)
 
-    initial_assessment = InitialAssessment.objects.get(
-        pk=initial_assessment_id)
+#     initial_assessment = InitialAssessment.objects.get(
+#         pk=initial_assessment_id)
 
-    context = {
-        "initial_assessment": initial_assessment,
-        "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
-        "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        # "episode_definition_selection": EPISODE_DEFINITION,
-    }
+#     context = {
+#         "initial_assessment": initial_assessment,
+#         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
+#         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
+#         # "episode_definition_selection": EPISODE_DEFINITION,
+#     }
 
-    test_fields_update_audit_progress(initial_assessment)
+#     test_fields_update_audit_progress(initial_assessment)
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
+#     response = render(
+#         request=request, template_name="epilepsy12/partials/initial_assessment/when_the_first_epileptic_episode_occurred.html", context=context)
 
-# trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+# # trigger a GET request from the steps template
+#     trigger_client_event(
+#         response=response,
+#         name="registration_active",
+#         params={})  # reloads the form to show the active steps
+#     return response
 
 
 def test_fields_update_audit_progress(model_instance):
@@ -512,19 +512,19 @@ def test_fields_update_audit_progress(model_instance):
 def completed_fields(model_instance):
     """
     Test for all these completed fields
-    date_of_initial_assessment
-    general_paediatrics_referral_made
-    date_of_referral_to_general_paediatrics
+    date_of_initial_assessment - DEPRECATED: MOVED TO REGISTRATION
+    general_paediatrics_referral_made - DEPRECATED: MOVED TO ASSESSMENTS
+    date_of_referral_to_general_paediatrics - DEPRECATED: MOVED TO ASSESSMENTS
     first_paediatric_assessment_in_acute_or_nonacute_setting
-    has_description_of_the_episode_or_episodes_been_gathered
-    when_the_first_epileptic_episode_occurred_confidence
-    when_the_first_epileptic_episode_occurred
+    has_description_of_the_episode_or_episodes_been_gathered - DEPRECATED: MOVED TO EPISODES
+    when_the_first_epileptic_episode_occurred_confidence - DEPRECATED: MOVED TO EPISODES
+    when_the_first_epileptic_episode_occurred - DEPRECATED - MOVED TO EPISODES
     has_number_of_episodes_since_the_first_been_documented
     general_examination_performed
     neurological_examination_performed
     developmental_learning_or_schooling_problems
     behavioural_or_emotional_problems
-    diagnostic_status
+    diagnostic_status - DEPRECATED #138
     """
     fields = model_instance._meta.get_fields()
     counter = 0
@@ -533,6 +533,7 @@ def completed_fields(model_instance):
             getattr(model_instance, field.name) is not None
             and field.name not in ['id', 'registration', 'created_at', 'updated_at', 'created_by', 'updated_by']
         ):
+            print(field.name)
             counter += 1
     return counter
 
@@ -541,23 +542,23 @@ def total_fields_expected(model_instance):
     """
     a minimum total fields would be:
 
-    date_of_initial_assessment
-    general_paediatrics_referral_made
-    date_of_referral_to_general_paediatrics
+    date_of_initial_assessment - DEPRECATED: MOVED TO REGISTRATION
+    general_paediatrics_referral_made - DEPRECATED: MOVED TO ASSESSMENTS
+    date_of_referral_to_general_paediatrics - DEPRECATED: MOVED TO ASSESSMENTS
     first_paediatric_assessment_in_acute_or_nonacute_setting
     has_number_of_episodes_since_the_first_been_documented
     general_examination_performed
     neurological_examination_performed
     developmental_learning_or_schooling_problems
     behavioural_or_emotional_problems
-    diagnostic_status
+    diagnostic_status - DEPRECATED #138
 
-    if general_paediatrics_referral_made then add an additional field for the date
+    if general_paediatrics_referral_made then add an additional field for the date - DEPRECATED
 
     """
 
-    cumulative_fields = 9
-    if model_instance.date_of_referral_to_general_paediatrics:
-        cumulative_fields += 1
+    cumulative_fields = 6
+    # if model_instance.date_of_referral_to_general_paediatrics:
+    #     cumulative_fields += 1
 
     return cumulative_fields

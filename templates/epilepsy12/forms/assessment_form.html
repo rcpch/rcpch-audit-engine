@@ -2,13 +2,11 @@
   {% csrf_token %}
 
   <h5 class="header">
-    General Paediatrics
+    Consultant paediatrician with expertise in epilepsies
   </h5>
 
   <div id="general_paediatric" class="field">
-    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=assessment
-    historical_general_paediatric_sites=historical_general_paediatric_sites
-    active_general_paediatric_site=active_general_paediatric_site hospital_list=hospital_list %}
+    {% include 'epilepsy12/partials/assessment/consultant_paediatrician.html' with assessment=assessment historical_general_paediatric_sites=historical_general_paediatric_sites active_general_paediatric_site=active_general_paediatric_site hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">
@@ -16,9 +14,7 @@
   </h5>
 
   <div id="paediatric_neurology" class="field">
-    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=assessment
-    historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site
-    hospital_list=hospital_list %}
+    {% include 'epilepsy12/partials/assessment/paediatric_neurology.html' with assessment=assessment historical_neurology_sites=historical_neurology_sites active_neurology_site=active_neurology_site hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">
@@ -26,9 +22,7 @@
   </h5>
 
   <div id="childrens_epilepsy_surgical_service" class="field">
-    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=assessment sites=sites
-    historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site
-    hospital_list=hospital_list %}
+    {% include 'epilepsy12/partials/assessment/epilepsy_surgery.html' with assessment=assessment sites=sites historical_surgical_sites=historical_surgical_sites active_surgical_site=active_surgical_site hospital_list=hospital_list %}
   </div>
 
   <h5 class="header">

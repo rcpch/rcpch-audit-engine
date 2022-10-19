@@ -1,11 +1,15 @@
 from django.db import models
+
+from epilepsy12.models.help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
 # other tables
 from .registration import Registration
 
+from ..general_functions import *
 
-class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+
+class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class stores information on steps in managment.
     Each Case has only a single initial assessment (the first)

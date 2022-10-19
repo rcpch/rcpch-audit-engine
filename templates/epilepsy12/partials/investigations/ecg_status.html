@@ -3,19 +3,13 @@
 
     <div class="ui segment">
 
-        <div class="ui rcpch_info message">
-                <p>Indications for a 12-Lead ECG:</p>
-                <li>Everyone gets one of these</li>
-                <li>That's it</li>
-        </div>
-
         <div class="field">
 
                 {% url 'twelve_lead_ecg_status' investigations_id=investigations.pk as hx_post %}
                 {% if not perms.epilepsy12.change_investigations %}
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ecg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.twelve_lead_ecg_status label="Has an ECG been performed?" data_position="top left" disabled=True %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ecg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.twelve_lead_ecg_status label=investigations.get_twelve_lead_ecg_status_help_label_text reference=investigations.get_twelve_lead_ecg_status_help_reference_text data_position="top left" disabled=True %}
                 {% else %}
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ecg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.twelve_lead_ecg_status label="Has an ECG been performed?" data_position="top left" disabled=False %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#ecg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.twelve_lead_ecg_status label=investigations.get_twelve_lead_ecg_status_help_label_text reference=investigations.get_twelve_lead_ecg_status_help_reference_text data_position="top left" disabled=False %}
                 {% endif %}
 
         </div>

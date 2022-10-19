@@ -5,7 +5,6 @@
                 <tr>
                     <th>Syndrome Diagnosis Date</th>
                     <th>Name</th>
-                    <th>Diagnosis Active</th>
                     <th></th>
                 </tr>
             </thead>
@@ -26,16 +25,6 @@
                 <td>
                     {% if syndrome.syndrome_name is not None %}
                         {{syndrome.get_syndrome_name_display}}
-                    {% else %}
-                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                            <i class="rcpch_light_blue dot circle outline icon"></i>
-                        </span>
-                        Uncompleted field
-                    {% endif %}
-                </td>
-                <td>
-                    {% if syndrome.syndrome_diagnosis_active is not None %}
-                        {{syndrome.syndrome_diagnosis_active}}
                     {% else %}
                         <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
