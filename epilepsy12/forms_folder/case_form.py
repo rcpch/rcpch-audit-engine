@@ -87,4 +87,3 @@ class CaseForm(forms.ModelForm):
         fields = [
             'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'locked', 'locked_at'
         ]
-        exclude = ['locked_by']

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from epilepsy12.decorator import group_required
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import HospitalTrust, Site, hospital_trust
+from epilepsy12.models import HospitalTrust, Site
 from ..models import Case
 from django.contrib import messages
 from ..general_functions import fetch_snomed
@@ -297,11 +297,11 @@ def update_case(request, hospital_id, case_id):
     if request.method == "POST":
         if ('delete') in request.POST:
             case.delete()
-            return redirect('cases')
+            return redirect('cases', hospital_id=hospital_id)
         form = CaseForm(request.POST, instance=case)
         if form.is_valid:
             obj = form.save()
-            if (case.locked != form.locked):
+            if (case.locked != obj.locked):
                 # locked status has changed
                 if (form.locked):
                     obj.locked_by = request.user
@@ -309,10 +309,12 @@ def update_case(request, hospital_id, case_id):
                 else:
                     obj.locked_by = None
                     obj.locked_at = None
+            obj.updated_at = timezone.now(),
+            obj.updated_by = request.user
             obj.save()
             messages.success(
                 request, "You successfully updated the child's details")
-            return redirect('cases')
+            return redirect('cases', hospital_id=hospital_id)
 
     context = {
         "form": form
