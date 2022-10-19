@@ -178,7 +178,7 @@ def create_case(request, hospital_id):
                 case=obj
             )
             messages.success(request, "You successfully created the case")
-            return redirect('cases')
+            return redirect('cases', hospital_id=hospital_id)
 
     context = {
         "form": form
