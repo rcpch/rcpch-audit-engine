@@ -44,7 +44,7 @@ def case_list(request, hospital_id):
     if filter_term:
         all_cases = Case.objects.filter(
             Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
-            Q(site_site_is_primary_centre_of_epilepsy_care=True) &
+            Q(site__site_is_primary_centre_of_epilepsy_care=True) &
             Q(first_name__icontains=filter_term) |
             Q(surname__icontains=filter_term) |
             Q(nhs_number__icontains=filter_term)
