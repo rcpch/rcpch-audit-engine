@@ -157,7 +157,7 @@ def case_list(request, hospital_id):
 
 @login_required
 @permission_required('epilepsy12.add_case')
-def create_case(request):
+def create_case(request, hospital_id):
     """
     Django function based - returns django form to create a new case, or saves a new case if a
     POST request. The only instance where htmx not used.
@@ -167,7 +167,16 @@ def create_case(request):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.created_at = datetime.now()
+            hospital = HospitalTrust.objects.get(pk=hospital_id)
+            # save the new child
             obj.save()
+            # allocate the child to the hospital supplied as primary E12 centre
+            Site.objects.create(
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+                hospital_trust=hospital,
+                case=obj
+            )
             messages.success(request, "You successfully created the case")
             return redirect('cases')
 

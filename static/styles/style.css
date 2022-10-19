@@ -372,6 +372,10 @@ ul {
   color: #fff;
 }
 
+.info.circle.icon {
+  color: #fff;
+}
+
 .ui.rcpch_lightest_blue.message {
   background-color: var(--rcpch_lightest_blue);
   color: var(--rcpch_black);
