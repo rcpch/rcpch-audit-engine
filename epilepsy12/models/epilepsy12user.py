@@ -1,10 +1,11 @@
+from random import choices
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-from epilepsy12.constants.user_types import ROLES, TITLES, AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
+from epilepsy12.constants.user_types import ROLES, TITLES, AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, VIEW_PREFERENCES
 from epilepsy12.models.hospital_trust import HospitalTrust
 
 from ..general_functions import *
@@ -73,7 +74,8 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_rcpch_audit_team_member', True)
-        extra_fields.setdefault('has_rcpch_view_preference', True)
+        # national view preference
+        extra_fields.setdefault('view_preference', 2)
 
         if extra_fields.get('is_active') is not True:
             raise ValueError(_('Superuser must have is_active=True.'))
@@ -163,8 +165,11 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     is_rcpch_audit_team_member = models.BooleanField(
         default=False
     )
-    has_rcpch_view_preference = models.BooleanField(
-        default=True
+    view_preference = models.SmallIntegerField(
+        choices=VIEW_PREFERENCES,
+        default=0,  # hospital view is default
+        blank=False,
+        null=False
     )
     date_joined = models.DateTimeField(
         default=timezone.now

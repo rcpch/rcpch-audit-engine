@@ -9,8 +9,8 @@
       </h5>
       {% if request.user.is_rcpch_audit_team_member %}        
 
-          <h5 class="ui right floated header" id='has_rcpch_view_preference'>
-              {% include 'epilepsy12/partials/cases/has_rcpch_view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices rcpch_preference=rcpch_preference %}
+          <h5 class="ui right floated header" id='view_preference'>
+              {% include 'epilepsy12/partials/cases/view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices %}
           </h5>
           
       {% else %}
