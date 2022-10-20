@@ -604,6 +604,7 @@ def total_fields_completed(model_instance):
                                'epilepsycontext', 'registration', 'audit_progress', 'created_at', 'created_by', 'updated_by', 'updated_at', 'case', 'episode', 'syndrome', 'multiaxialdiagnosis', 'registration_close_date', 'cohort']
         ):
             if getattr(model_instance, field.name) is not None:
+                print(field.name)
                 counter += 1
     if Site.objects.filter(
         case=model_instance.case,

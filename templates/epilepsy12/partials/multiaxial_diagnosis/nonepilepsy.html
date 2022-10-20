@@ -1,6 +1,6 @@
 <div class="field">
     {% url 'nonepilepsy_generalised_onset' episode_id=episode.id as hx_post %}
-    {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
+    {% if perms.epilepsy12.change_multiaxial_diagnosis %}
         {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" label='How best describes the generalised nature of the nonepileptic episode(s)?' test_positive=episode.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left' disabled=False %}
     {% else %}
         {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" label='How best describes the generalised nature of the nonepileptic episode(s)?' test_positive=episode.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left' disabled=True %}
