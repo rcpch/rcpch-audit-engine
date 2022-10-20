@@ -16,7 +16,6 @@ EPISODE_DEFINITION = (
     ("a", "This was a single episode"),
     ("b", "This was a cluster within 24 hours"),
     ("c", "These were 2 or more episodes more than 24 hours apart"),
-    ("d", "The patient was diagnosed as having epilepsy for another reason")
 )
 
 EPIS_TYPE = (
