@@ -42,21 +42,54 @@ def case_list(request, hospital_id):
         ParentName=hospital_trust.ParentName).all()
 
     if filter_term:
-        all_cases = Case.objects.filter(
-            Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True) &
-            Q(first_name__icontains=filter_term) |
-            Q(surname__icontains=filter_term) |
-            Q(nhs_number__icontains=filter_term)
-        ).order_by('surname').all()
+        # filter_term is called if filtering by search box
+        if request.user.view_preference == 0:
+            # user has requested hospital level view
+            all_cases = Case.objects.filter(
+                Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
+                Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+                Q(first_name__icontains=filter_term) |
+                Q(surname__icontains=filter_term) |
+                Q(nhs_number__icontains=filter_term)
+            ).order_by('surname').all()
+        elif request.user.view_preference == 1:
+            # user has requested trust level view
+            all_cases = Case.objects.filter(
+                Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName) &
+                Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+                Q(first_name__icontains=filter_term) |
+                Q(surname__icontains=filter_term) |
+                Q(nhs_number__icontains=filter_term)
+            ).order_by('surname').all()
+        elif request.user.view_preference == 2:
+            # user has requested national level view
+            all_cases = Case.objects.filter(
+                Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+                Q(first_name__icontains=filter_term) |
+                Q(surname__icontains=filter_term) |
+                Q(nhs_number__icontains=filter_term)
+            ).order_by('surname').all()
+
     else:
 
-        # filter cases by hospital trust if logged in user is not RCPCH audit staff
-        # RCPCH Staff members that are also clinicians can choose which view
-        if request.user.is_rcpch_audit_team_member and request.user.has_rcpch_view_preference:
+        """
+        Cases are filtered based on user preference (request.user.view_preference), where 0 is hospital level,
+        1 is trust level and 2 is national level
+        Only RCPCH audit staff have this final option.
+        """
+
+        if request.user.view_preference == 2:
+            # this is an RCPCH audit team member requesting national view
             filtered_cases = Case.objects.all()
+        elif request.user.view_preference == 1:
+
+            # filters all primary Trust level centres, irrespective of if active or inactive
+            filtered_cases = Case.objects.filter(
+                hospital_trusts__ParentName__contains=hospital_trust.ParentName,
+                site__site_is_primary_centre_of_epilepsy_care=True
+            )
         else:
-            # filters all primary centres, irrespective of if active or inactive
+            # filters all primary centres at hospital level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
                 hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName,
                 site__site_is_primary_centre_of_epilepsy_care=True
@@ -129,13 +162,10 @@ def case_list(request, hospital_id):
     registered_count = registered_cases.count()
 
     rcpch_choices = (
-        (0, 'All UK Children'),
-        (1, f'{hospital_trust.ParentName} Cohort')
+        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
+        (1, f'Trust View ({hospital_trust.ParentName})'),
+        (2, 'National View'),
     )
-    if request.user.has_rcpch_view_preference:
-        rcpch_preference = rcpch_choices[0][0]
-    else:
-        rcpch_preference = rcpch_choices[1][0]
 
     context = {
         'case_list': case_list,
@@ -145,7 +175,6 @@ def case_list(request, hospital_id):
         'hospital_trust': hospital_trust,
         'hospital_children': hospital_children,
         'rcpch_choices': rcpch_choices,
-        'rcpch_preference': rcpch_preference,
         'hospital_id': hospital_id
     }
     if request.htmx:
@@ -202,43 +231,35 @@ def child_hospital_select(request, hospital_id):
 
 
 @login_required
-def has_rcpch_view_preference(request, hospital_id):
+def view_preference(request, hospital_id):
     """
-    Toggle visible only to clinicians who are also RCPCH audit team members
-    Can toggle between their own trust and RCPCH view
+    POST request from Toggle in has rcpch_view_preference.html template
+    Users can toggle between national, trust and hospital views.
+    Only RCPCH staff can request a national view.
     """
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
-    # get all hospitals which are in the same parent trust
+    rcpch_choices = (
+        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
+        (1, f'Trust View ({hospital_trust.ParentName})'),
+        (2, 'National View'),
+    )
+
+    request.user.view_preference = int(request.htmx.trigger_name)
+    request.user.save()
+
+    # this is the list of all hospitals in the selected hospital's trust
     hospital_children = HospitalTrust.objects.filter(
         ParentName=hospital_trust.ParentName).all()
 
-    rcpch_choices = (
-        (0, 'All UK Children'),
-        (1, f'{hospital_trust.ParentName} Cohort')
-    )
-
-    if (int(request.htmx.trigger_name) == 1):
-
-        request.user.has_rcpch_view_preference = False
-        request.user.save()
-        rcpch_preference = rcpch_choices[1][0]
-
-    elif (int(request.htmx.trigger_name) == 0):
-        request.user.has_rcpch_view_preference = True
-        request.user.save()
-
-        rcpch_preference = rcpch_choices[0][0]
-
     context = {
         'rcpch_choices': rcpch_choices,
-        'rcpch_preference': rcpch_preference,
         'hospital_trust': hospital_trust,
         'hospital_children': hospital_children
     }
 
     response = render(
-        request, template_name='epilepsy12/partials/cases/has_rcpch_view_preference.html', context=context)
+        request, template_name='epilepsy12/partials/cases/view_preference.html', context=context)
 
     # trigger a GET request to rerender the case list
     trigger_client_event(
@@ -262,9 +283,16 @@ def case_statistics(request, hospital_id):
 
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
-    if request.user.has_rcpch_view_preference:
+    if request.user.view_preference == 2:
+        # user requesting national view - return all cases in the UK
         total_cases = Case.objects.all()
-    else:
+    elif request.user.view_preference == 1:
+        # user requesting trust view - return all cases in the same trust
+        total_cases = Case.objects.filter(
+            Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName)
+        )
+    elif request.user.view_preference == 0:
+        # user requesting trust view - return all cases in the same hospital
         total_cases = Case.objects.filter(
             Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName)
         )
