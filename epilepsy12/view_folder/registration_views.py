@@ -568,8 +568,6 @@ def total_fields_completed(model_instance):
     counter = 0
     if model_instance.registration_date is not None:
         counter += 1
-    if model_instance.referring_clinician is not None or model_instance.referring_clinician != '':
-        counter += 1
     if model_instance.eligibility_criteria_met:
         counter += 1
     if Site.objects.filter(
