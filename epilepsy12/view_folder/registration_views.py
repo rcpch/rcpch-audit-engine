@@ -24,7 +24,7 @@ def register(request, case_id):
             multiaxial_diagnosis_complete=False,
             management_complete=False,
             investigations_complete=False,
-            registration_total_expected_fields=4,
+            registration_total_expected_fields=3,
             registration_total_completed_fields=0,
             initial_assessment_total_expected_fields=0,
             initial_assessment_total_completed_fields=0,
@@ -65,6 +65,7 @@ def register(request, case_id):
         previously_registered_sites = Site.objects.filter(
             case=case, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
 
+    # test if registration_date and lead_centre exist, and eligibility criteria met
     form_complete = test_fields_update_audit_progress(
         model_instance=registration,
         return_comparison=True
@@ -458,8 +459,8 @@ def confirm_eligible(request, registration_id):
             name="registration_status",
             params={})  # updates the registration status bar with date in the client
 
-    # if all registration components present, update AuditProcess
-    if registration.eligibility_criteria_met and registration.registration_date is not None:
+    # if all registration components present (eligibility, registration_date and lead_centre), update AuditProcess
+    if registration.eligibility_criteria_met and registration.registration_date is not None and Site.objects.filter(case=registration.case, site_is_primary_centre_of_epilepsy_care=True).exists():
         # registration now complete
         AuditProgress.objects.filter(pk=registration.audit_progress.pk).update(
             registration_complete=True,
@@ -534,41 +535,6 @@ def registration_date(request, case_id):
         params={})  # reloads the form to show the active steps
 
     return response
-
-
-# @login_required
-# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-# def referring_clinician(request, registration_id):
-#     """
-#     Call back from POST request on key up in input partial in registration_form
-#     """
-
-#     referring_clinician = request.POST.get(request.htmx.trigger_name)
-#     registration = Registration.objects.filter(pk=registration_id).update(
-#         referring_clinician=referring_clinician,
-#         updated_at=timezone.now(),
-#         updated_by=request.user
-#     )
-
-#     registration = Registration.objects.get(pk=registration_id)
-
-#     context = {
-#         'registration': registration,
-#     }
-
-#     test_fields_update_audit_progress(registration, False)
-
-#     response = render(
-#         request=request,
-#         template_name='epilepsy12/partials/registration/referring_clinician.html',
-#         context=context)
-
-#     trigger_client_event(
-#         response=response,
-#         name="registration_active",
-#         params={})  # reloads the form to show the active steps
-
-#     return response
 
 
 @login_required
