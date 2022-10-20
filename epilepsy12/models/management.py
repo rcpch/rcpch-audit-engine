@@ -21,85 +21,127 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     """
 
     has_an_aed_been_given = models.BooleanField(
-        "Has an antiepilepsy medicine been prescribed?",
+        help_text={
+            'label': "Has an antiseizure medicine been given?",
+            'reference': "Has an antiseizure medicine been given?",
+        },
         default=None,
         null=True,
         blank=True
     )
     has_rescue_medication_been_prescribed = models.BooleanField(
-        "Has a rescue medicine been prescribed?",
+        help_text={
+            'label': "Has a rescue medicine been prescribed?",
+            'reference': "Has a rescue medicine been prescribed?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
-        "Is there a pregnancy prevention programme (PPP) in place?",
+        help_text={
+            'label': "Is there a pregnancy prevention programme (PPP) in place?",
+            'reference': "Is there a pregnancy prevention programme (PPP) in place?",
+        },
         default=None,
         null=True,
         blank=True
     )
     individualised_care_plan_in_place = models.BooleanField(
-        "Has an individualised care plan been put in place?",
+        help_text={
+            'label': 'Has care planning (either an individualised epilepsy document or copy clinic letter including care planning information) commenced?',
+            'reference': 'Has care planning (either an individualised epilepsy document or copy clinic letter including care planning information) commenced?',
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_date = models.DateField(
-        "On what date was the individualised care plan put in place?",
+        help_text={
+            'label': "On what date was the individualised care plan put in place?",
+            'reference': "On what date was the individualised care plan put in place?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_has_parent_carer_child_agreement = models.BooleanField(
-        "Has the parent or carer and child agreement to an individualised care plan been documented?",
+        help_text={
+            'label': "Parent or carer and child agreement",
+            'reference': "Has the parent or carer and child agreement to an individualised care plan been documented?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_includes_service_contact_details = models.BooleanField(
-        "Does the individualised care plan include service contact details?",
+        help_text={
+            'label': 'Service contact details',
+            'reference': "Does the individualised care plan include service contact details?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_include_first_aid = models.BooleanField(
-        "Does the individualised care plan include first aid advice?",
+        help_text={
+            'label': 'First aid advice',
+            'reference': "Does the individualised care plan include first aid advice?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_parental_prolonged_seizure_care = models.BooleanField(
-        "Does the individualised care plan include parental advice on managing prolonged seizures?",
+        help_text={
+            'label': 'Parental advice on managing prolonged seizures',
+            'reference': "Does the individualised care plan include parental advice on managing prolonged seizures?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_includes_general_participation_risk = models.BooleanField(
-        "Does the individualised care plan include general participation and risk assessment?",
+        help_text={
+            'label': 'General participation and risk assessment',
+            'reference': "Does the individualised care plan include general participation and risk assessment?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_addresses_water_safety = models.BooleanField(
-        "Does the individualised care plan address water safety?",
+        help_text={
+            'label': 'Water safety',
+            'reference': "Does the individualised care plan address water safety?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_addresses_sudep = models.BooleanField(
-        "Does the individualised care plan address sudden unexplained death in epilepsy?",
+        help_text={
+            'label': 'Sudden unexplained death in epilepsy (SUDEP)',
+            'reference': "Does the individualised care plan address sudden unexplained death in epilepsy?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     individualised_care_plan_includes_ehcp = models.BooleanField(
-        "Does the individualised care plan include an educational health care plan (EHCP)?",
+        help_text={
+            'label': 'An educational health care plan (EHCP)',
+            'reference': "Does the individualised care plan include an educational health care plan (EHCP)?",
+        },
         default=None,
         null=True,
         blank=True,
     )
     has_individualised_care_plan_been_updated_in_the_last_year = models.BooleanField(
-        "Has the individualised care plan been updated in the last year?",
+        help_text={
+            'label': 'Being updated as necessary',
+            'reference': "Has the individualised care plan been updated in the last year?",
+        },
         default=None,
         null=True,
         blank=True,
