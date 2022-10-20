@@ -4,9 +4,9 @@
     <div class="field">
         {% url 'individualised_care_plan_in_place' management_id=management.pk as hx_post %}
         {% if perms.epilepsy12.change_management %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#individualised_care_plan" test_positive=management.individualised_care_plan_in_place hx_swap="innerHTML" hx_trigger="click" label="Has care planning (either an individualised epilepsy document or copy clinic letter including care planning information) commenced?" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#individualised_care_plan" test_positive=management.individualised_care_plan_in_place hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_in_place_help_label_text reference=management.get_individualised_care_plan_in_place_help_reference_text data_position="top left" disabled=False %}
         {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#individualised_care_plan" test_positive=management.individualised_care_plan_in_place hx_swap="innerHTML" hx_trigger="click" label="Has care planning (either an individualised epilepsy document or copy clinic letter including care planning information) commenced?" data_position="top left" disabled=True %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#individualised_care_plan" test_positive=management.individualised_care_plan_in_place hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_in_place_help_label_text reference=management.get_individualised_care_plan_in_place_help_reference_text data_position="top left" disabled=True %}
         {% endif %}
     </div>
 
@@ -14,9 +14,9 @@
     <div class="field">
         {% url 'individualised_care_plan_date' management_id=management.pk as hx_post %}
         {% if perms.epilepsy12.change_management %}
-        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date input_date_field_name='individualised_care_plan_date' label="On what date was the individualised care plan put in place?" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date input_date_field_name='individualised_care_plan_date' label=management.get_individualised_care_plan_date_help_label_text reference=management.get_individualised_care_plan_date_help_reference_text data_position="top left" disabled=False %}
         {% else %}
-        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date input_date_field_name='individualised_care_plan_date' label="On what date was the individualised care plan put in place?" data_position="top left" disabled=True %}
+        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date input_date_field_name='individualised_care_plan_date' label=management.get_individualised_care_plan_date_help_label_text reference=management.get_individualised_care_plan_date_help_reference_text data_position="top left" disabled=True %}
         {% endif %}
     </div>
     {% endif %}
@@ -31,18 +31,18 @@
         <div class="field">
             {% url 'individualised_care_plan_has_parent_carer_child_agreement' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_has_parent_carer_child_agreement hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Parent or carer and child agreement" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_has_parent_carer_child_agreement hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_has_parent_carer_child_agreement_help_label_text reference=management.get_individualised_care_plan_has_parent_carer_child_agreement_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_has_parent_carer_child_agreement hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Parent or carer and child agreement" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_has_parent_carer_child_agreement hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_has_parent_carer_child_agreement_help_label_text reference=management.get_individualised_care_plan_has_parent_carer_child_agreement_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
 
         <div class="field">
             {% url 'individualised_care_plan_includes_service_contact_details' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_service_contact_details hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Service contact details" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_service_contact_details hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_includes_service_contact_details_help_label_text reference=management.get_individualised_care_plan_includes_service_contact_details_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_service_contact_details hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Service contact details" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_service_contact_details hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_includes_service_contact_details_help_label_text reference=management.get_individualised_care_plan_includes_service_contact_details_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
 
@@ -54,18 +54,18 @@
         <div class="field">
             {% url 'individualised_care_plan_include_first_aid' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_include_first_aid hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="First aid advice" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_include_first_aid hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_include_first_aid_help_label_text reference=management.get_individualised_care_plan_include_first_aid_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_include_first_aid hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="First aid advice" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_include_first_aid hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_include_first_aid_help_label_text reference=management.get_individualised_care_plan_include_first_aid_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
 
         <div class="field">
             {% url 'individualised_care_plan_parental_prolonged_seizure_care' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_parental_prolonged_seizure_care hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Parental advice on managing prolonged seizures" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_parental_prolonged_seizure_care hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_parental_prolonged_seizure_care_help_label_text reference=management.get_individualised_care_plan_parental_prolonged_seizure_care_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_parental_prolonged_seizure_care hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Parental advice on managing prolonged seizures" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_parental_prolonged_seizure_care hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_parental_prolonged_seizure_care_help_label_text reference=management.get_individualised_care_plan_parental_prolonged_seizure_care_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
 
@@ -77,18 +77,18 @@
         <div class="field">
             {% url 'individualised_care_plan_includes_general_participation_risk' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_general_participation_risk hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="General participation and risk assessment" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_general_participation_risk hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_includes_general_participation_risk_help_label_text reference=management.get_individualised_care_plan_includes_general_participation_risk_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_general_participation_risk hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="General participation and risk assessment" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_general_participation_risk hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_includes_general_participation_risk_help_label_text reference=management.get_individualised_care_plan_includes_general_participation_risk_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
 
         <div class="field">
             {% url 'individualised_care_plan_addresses_water_safety' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_water_safety hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Water safety" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_water_safety hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_addresses_water_safety_help_label_text reference=management.get_individualised_care_plan_addresses_water_safety_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_water_safety hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Water safety" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_water_safety hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_addresses_water_safety_help_label_text reference=management.get_individualised_care_plan_addresses_water_safety_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
     
@@ -100,18 +100,18 @@
         <div class="field">
             {% url 'individualised_care_plan_addresses_sudep' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_sudep hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Sudden unexplained death in epilepsy" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_sudep hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_addresses_sudep_help_label_text reference=management.get_individualised_care_plan_addresses_sudep_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_sudep hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Sudden unexplained death in epilepsy" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_addresses_sudep hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_addresses_sudep_help_label_text reference=management.get_individualised_care_plan_addresses_sudep_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
 
         <div class="field">
             {% url 'individualised_care_plan_includes_ehcp' management_id=management.pk as hx_post %}
             {% if perms.epilepsy12.change_management %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_ehcp hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="An educational health care plan (EHCP)" data_position="top left" disabled=False %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_ehcp hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_includes_ehcp_help_label_text reference=management.get_individualised_care_plan_includes_ehcp_help_reference_text data_position="top left" disabled=False %}
             {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_ehcp hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="An educational health care plan (EHCP)" data_position="top left" disabled=True %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.individualised_care_plan_includes_ehcp hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_individualised_care_plan_includes_ehcp_help_label_text reference=management.get_individualised_care_plan_includes_ehcp_help_reference_text data_position="top left" disabled=True %}
             {% endif %}
         </div>
     
@@ -120,9 +120,9 @@
     <div class="field">
         {% url 'has_individualised_care_plan_been_updated_in_the_last_year' management_id=management.pk as hx_post %}
         {% if perms.epilepsy12.change_management %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_individualised_care_plan_been_updated_in_the_last_year hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Being updated as necessary" data_position="top left" disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_individualised_care_plan_been_updated_in_the_last_year hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_has_individualised_care_plan_been_updated_in_the_last_year_help_label_text reference=management.get_has_individualised_care_plan_been_updated_in_the_last_year_help_reference_text data_position="top left" disabled=False %}
         {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_individualised_care_plan_been_updated_in_the_last_year hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label="Being updated as necessary" data_position="top left" disabled=True %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_individualised_care_plan_been_updated_in_the_last_year hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="click" label=management.get_has_individualised_care_plan_been_updated_in_the_last_year_help_label_text reference=management.get_has_individualised_care_plan_been_updated_in_the_last_year_help_reference_text data_position="top left" disabled=True %}
         {% endif %}
     </div>
 
