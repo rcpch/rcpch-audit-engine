@@ -14,7 +14,7 @@ class Epilepsy12UserAdmin(UserAdmin):
     model = Epilepsy12User
     search_fields = ('email', 'username', 'surname',
                      'role', 'hospital_employer', 'is_active',)
-    list_display = ("username", "email", "title", "first_name", "surname",
+    list_display = ('id', "username", "email", "title", "first_name", "surname",
                     "is_active", "twitter_handle", "role", "hospital_employer", "is_rcpch_audit_team_member")
     list_filter = ("is_active", "role", "hospital_employer",)
     fieldsets = (

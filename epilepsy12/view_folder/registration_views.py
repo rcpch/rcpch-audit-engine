@@ -585,7 +585,6 @@ def total_fields_expected(model_instance):
     Returns the total number of fields that need to be scored to all the form to be complete
     In the Registration/Validation form this is:
     registration_date *REFACTOR first paediatric assessment date
-    referring_clinician *DEPRECATED*
     eligibility_criteria_met
     lead centre
     """
@@ -604,7 +603,6 @@ def total_fields_completed(model_instance):
                                'epilepsycontext', 'registration', 'audit_progress', 'created_at', 'created_by', 'updated_by', 'updated_at', 'case', 'episode', 'syndrome', 'multiaxialdiagnosis', 'registration_close_date', 'cohort']
         ):
             if getattr(model_instance, field.name) is not None:
-                print(field.name)
                 counter += 1
     if Site.objects.filter(
         case=model_instance.case,

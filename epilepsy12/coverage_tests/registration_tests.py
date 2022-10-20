@@ -54,11 +54,6 @@ class RegistrationTests(TestCase):
         )
 
         self.assertEqual(
-            r.referring_clinician,
-            None
-        )
-    
-        self.assertEqual(
             r.registration_close_date,
             None
         )
