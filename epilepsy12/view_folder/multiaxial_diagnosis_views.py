@@ -827,8 +827,10 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
     """
     Function triggered by a change in any checkbox/toggle in the focal_onset_epilepsy template leading to a post request.
     The episode_id is also passed in allowing update of the model.
-    The id of the radio button clicked holds the name of the field in the desscribe model to update
-    the name of the radiobutton group clicked holds the name of the list from which to select model fields to update
+    The id of the radio button/checkbox clicked holds the name of the field in the desscribe model to update
+    the name of the radiobutton/checkbox group clicked holds the name of the list from which to select model fields to update
+    Laterality choices are radiobuttons (as can be either left or right, not both)
+    All other choices are checkboxes and multiselect is enabled here
     """
 
     if request.htmx.trigger_name == 'FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS':
@@ -847,15 +849,24 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 
     update_fields = {}
     for item in focal_fields:
+        item_status = getattr(episode, item.get('name'))
         if request.htmx.trigger == item.get('name'):
-            item_status = getattr(episode, item.get('name'))
+            # selects or deselects the chosen option - allows user to reverse previous selection
             update_fields.update({
                 item.get('name'): not item_status
             })
         else:
-            update_fields.update({
-                item.get('name'): False
-            })
+            if request.htmx.trigger_name == 'LATERALITY':
+                # sets the opposite side to that selected as false
+                update_fields.update({
+                    item.get('name'): False
+                })
+            else:
+                # leaves all other selections the same - allows therefore multiselect
+                update_fields.update({
+                    item.get('name'): item_status
+                })
+
     update_fields.update({
         'updated_at': timezone.now(),
         'updated_by': request.user
