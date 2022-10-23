@@ -1,4 +1,4 @@
-
+{% comment %}
 <div class="two fields">
     <div class="field">
         <label>Antiepilepsy Medicines</label>
@@ -23,3 +23,6 @@
         >Save Medicine</div>
     </div>
 </div>
+{% endcomment %}
+{% url 'save_selected_antiepilepsy_medicine' management_id=management_id as hx_post %}
+{% include 'epilepsy12/partials/page_elements/snomed_select.html' with choices=snomed_items hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='save_selected_antiepilepsy_medicine' test_positive= label hx_default_text data_position %}

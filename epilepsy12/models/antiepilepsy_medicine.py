@@ -14,46 +14,67 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     It references the Episode class, as one episode can involve several antiepilepsy medicines.
     """
     antiepilepsy_medicine_type = models.IntegerField(
-        "antiepilepsy medicine name",
+        help_text={
+            'label': "Antiseizure medicine name",
+            'reference': "Please enter antiseizure medicine name.",
+        },
         choices=ANTIEPILEPSY_MEDICINE_TYPES,
         default=None,
         null=True,
         blank=True
     )
     is_rescue_medicine = models.BooleanField(
-        "Is the medicine a rescue medicine?",
+        help_text={
+            'label': "Is the medicine a rescue medicine?",
+            'reference': "Is the medicine a rescue medicine?",
+        },
         default=None,
         null=True,
         blank=True
     )
     antiepilepsy_medicine_snomed_code = models.CharField(
-        "antiepilepsy medicine SNOMED-CT code",
+        help_text={
+            'label': "Antiseizure medicine SNOMED-CT code",
+            'reference': "Antiseizure medicine SNOMED-CT code",
+        },
         max_length=50,
         default=None,
         null=True,
         blank=True
     )
     antiepilepsy_medicine_snomed_preferred_name = models.CharField(
-        "antiepilepsy medicine SNOMED-CT preferred name",
+        help_text={
+            'label': "Antiseizure medicine SNOMED-CT preferred name",
+            'reference': "Antiseizure medicine SNOMED-CT preferred name",
+        },
         max_length=50,
         default=None,
         null=True,
         blank=True
     )
     antiepilepsy_medicine_start_date = models.DateField(
-        "antiepilepsy medicine start date",
+        help_text={
+            'label': "Antiepilepsy medicine start date",
+            'reference': "Antiepilepsy medicine start date",
+        },
         default=None,
         null=True,
         blank=True
     )
     antiepilepsy_medicine_stop_date = models.DateField(
-        "antiepilepsy medicine start date",
+        help_text={
+            'label': "Antiseizure medicine discontinued date",
+            'reference': "Antiseizure medicine discontinued date",
+        },
         default=None,
         null=True,
         blank=True
     )
     antiepilepsy_medicine_risk_discussed = models.BooleanField(
-        "have the risks related to the antiepilepsy medicine been discussed?",
+        help_text={
+            'label': "Antiseizure medication risks discussed?",
+            'reference': "Have the risks related to the antiseizure medicine been discussed with the child/young person and their family?",
+        },
         default=False,
         null=True,
         blank=True

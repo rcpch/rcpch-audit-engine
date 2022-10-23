@@ -1,0 +1,93 @@
+{% load epilepsy12_template_tags %}
+<div>
+    {% if antiepilepsy_medicines|length > 0 %}
+        <table class="ui rcpch basic table">
+            <thead>
+                <tr>
+                    <th>Start Date</th>
+                    <th>Antiseizure Medicine</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for antiepilepsy_medicine in antiepilepsy_medicines %}
+            <tr>
+                <td>
+                    {% if antiepilepsy_medicine.antiepilepsy_medicine_start_date %}
+                        {{ antiepilepsy_medicine.antiepilepsy_medicine_start_date }}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    {% if antiepilepsy_medicine.antiepilepsy_medicine_type %}
+                        {{antiepilepsy_medicine.get_antiepilepsy_medicine_type_display }}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    <div 
+                        class="ui rcpch_light_blue buttons">
+                        <button 
+                            {% if not perms.epilepsy12.change_antiepilepsy_medicine %}
+                                class="ui rcpch_primary disabled button"
+                            {% else %}
+                                class="ui rcpch_primary button"
+                            {% endif %}
+                            hx-post='{% url "edit_antiepilepsy_medicine" antiepilepsy_medicine_id=antiepilepsy_medicine.pk %}'
+                            hx-target='#antiepilepsy_medicine_list'
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            Edit
+                        </button>
+                        <button
+                            {% if not perms.epilepsy12.delete_antiepilepsy_medicine %}
+                                class="ui rcpch_red icon disabled button"
+                            {% else %}
+                                class="ui rcpch_red icon button"
+                            {% endif %}
+                            hx-post='{% url "remove_antiepilepsy_medicine" antiepilepsy_medicine_id=antiepilepsy_medicine.pk %}'
+                            hx-target='#antiepilepsy_medicine_list'
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            <i class='trash alternate outline icon'></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+            There are no documented antiseizure medicines so far...
+        </div>
+    {% endif %}
+    <div class='field'>
+        <button
+            {% if not perms.epilepsy12.add_antiepilepsy_medicine %}
+            class="ui rcpch_primary disabled button"
+            {% else %}
+            class="ui rcpch_primary button"
+            {% endif %}
+            hx-post="{% url 'add_antiepilepsy_medicine' management_id=management_id %}"
+            hx-target="#antiepilepsy_medicine_list"
+            hx-swap='innerHTML'
+            hx-trigger='click'
+        >
+        Add a new antiseizure medicine
+        </button>
+    </div>
+</div>

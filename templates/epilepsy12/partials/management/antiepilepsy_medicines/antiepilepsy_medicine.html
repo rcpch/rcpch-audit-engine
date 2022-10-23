@@ -1,0 +1,47 @@
+<div class='ui segment'>
+    <h5 class='field'>
+        Add a new medicine
+    </h5>
+    <div class='two fields'>
+    
+        <div class='field'>
+            {% url 'antiepilepsy_medicine_start_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False %}
+        </div>
+        
+        <div class='field'>
+            {% url 'antiepilepsy_medicine_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False %}
+        </div>
+    </div>
+
+    <div class='two fields'>
+
+        <div class='field'>
+            {% url 'antiepilepsy_medicine_type' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='antiepilepsy_medicine_type' test_positive=antiepilepsy_medicine.antiepilepsy_medicine_type label=antiepilepsy_medicine.get_antiepilepsy_medicine_type_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_type_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
+        </div>
+        
+        <div class='field'>
+            {% url 'antiepilepsy_medicine_risk_discussed' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='antiepilepsy_medicine_risk_discussed' test_positive=antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed label=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_reference_text data_position='top left' disabled=False %}
+        </div>
+    
+    </div>
+
+    <div class='field'>
+        <div 
+            class='ui rcpch_primary button'
+            hx-post='{% url "close_antiepilepsy_medicine" antiepilepsy_medicine_id=antiepilepsy_medicine.pk %}'
+            hx-target='#antiepilepsy_medicine_list'
+            hx-trigger='click'
+        >Return to medication list</div>
+    </div>
+</div>
+
+{% comment %}
+antiepilepsy_medicine_snomed_preferred_name
+antiepilepsy_medicine_start_date
+antiepilepsy_medicine_stop_date
+antiepilepsy_medicine_risk_discussed
+{% endcomment %}
