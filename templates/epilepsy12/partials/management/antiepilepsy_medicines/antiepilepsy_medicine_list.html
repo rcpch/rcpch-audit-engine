@@ -1,0 +1,110 @@
+{% load epilepsy12_template_tags %}
+<div>
+    {% if medicines|length > 0 %}
+        <table class="ui rcpch basic table">
+            <thead>
+                <tr>
+                    <th>Start Date</th>
+                    <th>Medicine</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for medicine in medicines %}
+            <tr>
+                <td>
+                    {% if medicine.antiepilepsy_medicine_start_date %}
+                        {{ medicine.antiepilepsy_medicine_start_date }}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    {% if medicine.medicine_name %}
+                        {{medicine.medicine_name }}
+                    {% else %}
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
+                        None
+                    {% endif %}
+                </td>
+                <td>
+                    <div 
+                        class="ui rcpch_light_blue buttons">
+                        <button 
+                            {% if not perms.epilepsy12.change_medicine %}
+                                class="ui rcpch_primary disabled button"
+                            {% else %}
+                                class="ui rcpch_primary button"
+                            {% endif %}
+                            hx-post='{% url "edit_antiepilepsy_medicine" antiepilepsy_medicine_id=medicine.pk %}'
+                            {% if medicine.is_rescue_medicine %}
+                                hx-target='#rescue_medicine_list'
+                            {% else %}
+                                hx-target='#antiepilepsy_medicine_list'
+                            {% endif %}
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            Edit
+                        </button>
+                        <button
+                            {% if not perms.epilepsy12.delete_medicine %}
+                                class="ui rcpch_red icon disabled button"
+                            {% else %}
+                                class="ui rcpch_red icon button"
+                            {% endif %}
+                            hx-post='{% url "remove_antiepilepsy_medicine" antiepilepsy_medicine_id=medicine.pk %}'
+                            {% if medicine.is_rescue_medicine %}
+                                hx-target='#rescue_medicine_list'
+                            {% else %}
+                                hx-target='#antiepilepsy_medicine_list'
+                            {% endif %}
+                            hx-trigger='click'
+                            hx-swap='innerHTML'
+                        >
+                            <i class='trash alternate outline icon'></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class='field'>
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+            There are no documented medicines so far...
+        </div>
+    {% endif %}
+    <div class='field'>
+        <button
+            {% if not perms.epilepsy12.add_medicine %}
+            class="ui rcpch_primary disabled button"
+            {% else %}
+            class="ui rcpch_primary button"
+            {% endif %}
+            {% if is_rescue_medicine %}
+                hx-post="{% url 'add_antiepilepsy_medicine' management_id=management_id is_rescue_medicine='is_rescue_medicine' %}"
+                hx-target="#rescue_medicine_list"
+            {% else %}
+                hx-post="{% url 'add_antiepilepsy_medicine' management_id=management_id is_rescue_medicine='is_antiepilepsy_medicine' %}"
+                hx-target="#antiepilepsy_medicine_list"
+            {% endif %}
+            hx-swap='innerHTML'
+            hx-trigger='click'
+        >
+        {% if is_rescue_medicine %}
+        Add a new rescue medicine
+        {% else %}
+        Add a new antiseizure medicine
+        {% endif %}
+        </button>
+    </div>
+</div>

@@ -30,13 +30,14 @@ ANTIEPILEPSY_MEDICINE_TYPES = (
     (27, "Topiramate"),
     (28, "Vigabatrin"),
     (29, "Zonisamide"),
-    ("O", "Other")
+    (0, "Other")
 )
 
 BENZODIAZEPINE_TYPES = (
-    ("BMZ", "Buccal midazolam"),
-    ("RDZ", "Rectal diazepam"),
-    ("Oth", "Other")
+    (1000, "Buccal midazolam"),
+    (1001, "Rectal diazepam"),
+    (1002, "Other"),
+    (1003, "Lorazepam")
 )
 
 ANTIEPILEPSY_MEDICINES = {
@@ -46,7 +47,8 @@ ANTIEPILEPSY_MEDICINES = {
     (3, "Clobazam"),
     (4, "Clonazepam"),
     (5, "Eslicarbazepine acetate"),
-    (6, "Ethosuximide;Gabapentin"),
+    (6, "Ethosuximide"),
+    (31, "Gabapentin"),
     (7, "Lacosamide"),
     (8, "Lamotrigine"),
     (9, "Levetiracetam"),

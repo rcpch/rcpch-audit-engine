@@ -1,12 +1,16 @@
 from django.utils import timezone
 from datetime import datetime
+from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from epilepsy12.constants.common import SEX_TYPE
+
+from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
 from ..decorator import group_required
-from epilepsy12.general_functions.fetch_snomed import fetch_concept, snomed_medicine_search
-from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AuditProgress, AntiEpilepsyMedicine
+from epilepsy12.general_functions.fetch_snomed import fetch_concept, fetch_ecl, snomed_medicine_search
+from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AuditProgress, AntiEpilepsyMedicine, antiepilepsy_medicine
 from django_htmx.http import trigger_client_event
 
 
@@ -32,11 +36,13 @@ def management(request, case_id):
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False).all()
 
-    valproate_pregnancy_advice_needs_addressing = False
+    # valproate_pregnancy_advice_needs_addressing = False
 
-    if antiepilepsy_medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
+    # snomed_items = fetch_ecl('<373873005')
+
+    # if antiepilepsy_medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
+    #     # patient is female and valproate has been prescribed
+    #     valproate_pregnancy_advice_needs_addressing = True
 
     test_fields_update_audit_progress(management)
 
@@ -46,7 +52,7 @@ def management(request, case_id):
         "management": management,
         "rescue_medicines": rescue_medicines,
         "antiepilepsy_medicines": antiepilepsy_medicines,
-        "valproate_pregnancy_advice_needs_addressing": valproate_pregnancy_advice_needs_addressing,
+        # 'snomed_items': snomed_items,
         "audit_progress": registration.audit_progress,
         "active_template": "management"
     }
@@ -85,117 +91,105 @@ def has_an_aed_been_given(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    has_an_aed_been_given = not management.has_an_aed_been_given
+    if request.htmx.trigger_name == 'button-true':
+        has_an_aed_been_given = True
+    elif request.htmx.trigger_name == 'button-false':
+        has_an_aed_been_given = False
+        # delete any AEMs that exist
+        if AntiEpilepsyMedicine.objects.filter(
+            management=management,
+            is_rescue_medicine=False
+        ).exists():
+            AntiEpilepsyMedicine.objects.filter(
+                management=management,
+                is_rescue_medicine=False
+            ).delete()
 
     management.has_an_aed_been_given = has_an_aed_been_given
     management.save()
 
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
-
-    valproate_pregnancy_advice_needs_addressing = False
-
-    if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
-
-    context = {
-        'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
-        'management': management
-    }
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/management/aeds.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    test_fields_update_audit_progress(management)
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def antiepilepsy_medicine_search(request, management_id):
-    """
-    HTMX callback from management template
-    GET request filtering query to SNOMED server using keyup from input
-    Returns snomed list of terms
-    """
-    antiepilepsy_medicine_search_text = request.GET.get(
-        'antiepilepsy_medicine_search')
-    items = snomed_medicine_search(antiepilepsy_medicine_search_text)
-
-    management = Management.objects.get(pk=management_id)
-
-    context = {
-        'items': items,
-        'management_id': management_id
-    }
-    response = render(
-        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicine_select.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    test_fields_update_audit_progress(management)
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def save_selected_antiepilepsy_medicine(request, management_id):
-    """
-    HTMX callback from antiepilepsy_medicine_select template
-    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
-    rescue medicine currently selected.
-    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
-    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
-    """
-
-    management = Management.objects.get(pk=management_id)
-    snomed_concept = fetch_concept(request.POST.get(
-        'selected_antiepilepsy_medicine')
+    antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management,
+        is_rescue_medicine=False
     )
 
-    concept_id = snomed_concept['concept']['id']
+    # if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
+    #     # patient is female and valproate has been prescribed
+    #     valproate_pregnancy_advice_needs_addressing = True
 
-    if snomed_concept["preferredDescription"]:
-        name = snomed_concept["preferredDescription"]["term"]
+    context = {
+        'management': management,
+        'antiepilepsy_medicines': antiepilepsy_medicines
+    }
+
+    response = render(
+        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicines.html", context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    test_fields_update_audit_progress(management)
+    return response
+
+
+@login_required
+def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
+    """
+    Callback POST request from aed_list.html partial to add new AEM to antiepilepsy_medicine model
+    """
+
+    management = Management.objects.get(pk=management_id)
+
+    # snomed_concept = fetch_concept(request.POST.get(
+    #     'add_antiepilepsy_medicine')
+    # )
+    # concept_id = snomed_concept['concept']['id']
+
+    # if snomed_concept["preferredDescription"]:
+    #     name = snomed_concept["preferredDescription"]["term"]
+    # else:
+    #     name = "No SNOMED preferred term"
+    if is_rescue_medicine == 'is_rescue_medicine':
+        is_rescue = True
     else:
-        name = "No SNOMED preferred term"
+        is_rescue = False
 
-    AntiEpilepsyMedicine.objects.create(
-        antiepilepsy_medicine_type=None,
-        is_rescue_medicine=False,
-        antiepilepsy_medicine_snomed_code=concept_id,
-        antiepilepsy_medicine_snomed_preferred_name=name,
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.create(
+        medicine_id=None,
+        medicine_name=None,
+        is_rescue_medicine=is_rescue,
+        antiepilepsy_medicine_snomed_code=None,
+        antiepilepsy_medicine_snomed_preferred_name=None,
         antiepilepsy_medicine_start_date=None,
         antiepilepsy_medicine_stop_date=None,
         antiepilepsy_medicine_risk_discussed=None,
-        is_a_pregnancy_prevention_programme_in_place=False,
         management=management
     )
 
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
+    if is_rescue:
 
-    valproate_pregnancy_advice_needs_addressing = False
+        context = {
+            'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
+            'antiepilepsy_medicine': antiepilepsy_medicine,
+            'management_id': management_id,
+            'is_rescue_medicine': is_rescue
+        }
 
-    if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
+    else:
 
-    context = {
-        'management': management,
-        'antiepilepsy_medicines': medicines,
-        'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
-    }
-    test_fields_update_audit_progress(management)
+        context = {
+            'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+            'antiepilepsy_medicine': antiepilepsy_medicine,
+            'management_id': management_id,
+            'is_rescue_medicine': is_rescue
+        }
+
     response = render(
-        request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -207,38 +201,328 @@ def save_selected_antiepilepsy_medicine(request, management_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def is_a_pregnancy_prevention_programme_in_place(request, management_id):
+def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
-    This is an HTMX callback from antiepilepsy_medicine_list template on click of toggle is_a_pregnancy_prevention_programme_in_place
-    (relating to field in the management model).
-    The toggle is only offered if patient is female and one of the drugs selected is valproate
-    Selecting the toggle calls this function which persists the selection in the management model and returns the partial template
+    POST request from either the rescue_medicine_list or the epilepsy_medicine_list
+    Returns the epilepsy_medicine_list template filtered with a list of medicines depending whether are rescue
+    or antiepilepsy medicines
     """
 
-    Management.objects.filter(pk=management_id).update(
-        is_a_pregnancy_prevention_programme_in_place=Q(
-            is_a_pregnancy_prevention_programme_in_place=False),
-        updated_at=timezone.now(),
-        updated_by=request.user)
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+    management = antiepilepsy_medicine.management
+    is_rescue_medicine = antiepilepsy_medicine.is_rescue_medicine
 
-    management = Management.objects.get(pk=management_id)
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
+    # delete record
+    antiepilepsy_medicine.delete()
 
-    valproate_pregnancy_advice_needs_addressing = False
-
-    if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
+    antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management,
+        is_rescue_medicine=is_rescue_medicine
+    ).all()
 
     context = {
-        'management': management,
-        'antiepilepsy_medicines': medicines,
-        'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
+        'medicines': antiepilepsy_medicines,
+        'management_id': management.pk,
+        'is_rescue_medicine': is_rescue_medicine
     }
-    test_fields_update_audit_progress(management)
+
     response = render(
-        request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html',
+        context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
+    """
+    Call back from onclick of edit button in antiepilepsy_medicine_list partial
+    returns the antiepilepsy_medicine partial form populated with the medicine fields for editing
+    """
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    context = {
+        'choices': choices,
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
+
+    return response
+
+
+@login_required
+def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
+    """
+    Call back from onclick of edit button in antiepilepsy_medicine_list partial
+    returns the antiepilepsy_medicine partial form populated with the medicine fields for editing
+    """
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+
+    is_rescue_medicine = antiepilepsy_medicine.is_rescue_medicine
+
+    # if all the fields are none this was not completed - delete the record
+    if (
+        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None and antiepilepsy_medicine.antiepilepsy_medicine_stop_date is None and antiepilepsy_medicine.medicine_id is None and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
+    ):
+        antiepilepsy_medicine.delete()
+
+    antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=antiepilepsy_medicine.management,
+        is_rescue_medicine=is_rescue_medicine
+    )
+
+    context = {
+        'medicines': antiepilepsy_medicines,
+        'management_id': antiepilepsy_medicine.management.pk,
+        'is_rescue_medicine': is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html',
+        context=context)
+
+    return response
+
+
+@login_required
+def medicine_id(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to update medicine_name
+    """
+
+    # get the medicine to update
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = BENZODIAZEPINE_TYPES
+    else:
+        choices = ANTIEPILEPSY_MEDICINES
+
+    # get id of medicine - TODO this should be the SNOMEDCTID
+    medicine_id = request.POST.get('medicine_id')
+
+    # look up the medicine name from the constant
+    medicine_name = None
+    for medicine in choices:
+        if int(medicine_id) == int(medicine[0]):
+            medicine_name = medicine[1]
+
+    antiepilepsy_medicine.medicine_name = medicine_name
+    antiepilepsy_medicine.medicine_id = medicine_id
+
+    if int(antiepilepsy_medicine.medicine_id) == 21 and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
+        # sodium valproate selected and patient is female
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+    else:
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+
+    antiepilepsy_medicine.save()
+
+    context = {
+        'choices': sorted(choices, key=itemgetter(1)),
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_start_date
+    """
+
+    antiepilepsy_medicine_start_date = request.POST.get(
+        'antiepilepsy_medicine_start_date')
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+    antiepilepsy_medicine.antiepilepsy_medicine_start_date = datetime.strptime(
+        antiepilepsy_medicine_start_date, "%Y-%m-%d").date()
+    antiepilepsy_medicine.updated_at = timezone.now(),
+    antiepilepsy_medicine.updated_by = request.user
+    antiepilepsy_medicine.save()
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    context = {
+        'choices': choices,
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_stop_date
+    """
+
+    antiepilepsy_medicine_stop_date = request.POST.get(
+        'antiepilepsy_medicine_stop_date')
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+    antiepilepsy_medicine.antiepilepsy_medicine_stop_date = datetime.strptime(
+        antiepilepsy_medicine_stop_date, "%Y-%m-%d").date()
+    antiepilepsy_medicine.updated_at = timezone.now(),
+    antiepilepsy_medicine.updated_by = request.user
+    antiepilepsy_medicine.save()
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    context = {
+        'choices': choices,
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_risk_discussed
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        antiepilepsy_medicine_risk_discussed = True
+    elif request.htmx.trigger_name == 'button-false':
+        antiepilepsy_medicine_risk_discussed = False
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+    antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed = antiepilepsy_medicine_risk_discussed
+    antiepilepsy_medicine.updated_at = timezone.now(),
+    antiepilepsy_medicine.updated_by = request.user
+    antiepilepsy_medicine.save()
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    context = {
+        'choices': choices,
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to update is_a_pregnancy_prevention_programme_in_place
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        is_a_pregnancy_prevention_programme_in_place = True
+    elif request.htmx.trigger_name == 'button-false':
+        is_a_pregnancy_prevention_programme_in_place = False
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+    antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = is_a_pregnancy_prevention_programme_in_place
+    antiepilepsy_medicine.updated_at = timezone.now(),
+    antiepilepsy_medicine.updated_by = request.user
+    antiepilepsy_medicine.save()
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    context = {
+        'choices': choices,
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+    }
+
+    response = render(
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -256,7 +540,7 @@ Fields relating to rescue medication begin here
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def rescue_medication_prescribed(request, management_id):
+def has_rescue_medication_been_prescribed(request, management_id):
     """
     HTMX call from management template
     POST request on toggle button click
@@ -267,101 +551,36 @@ def rescue_medication_prescribed(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    has_rescue_medication_been_prescribed = not management.has_rescue_medication_been_prescribed
+    if request.htmx.trigger_name == 'button-true':
+        has_rescue_medication_been_prescribed = True
+    elif request.htmx.trigger_name == 'button-false':
+        has_rescue_medication_been_prescribed = False
+        # delete any associated rescue medicines
+        if AntiEpilepsyMedicine.objects.filter(
+            management=management,
+            is_rescue_medicine=True
+        ).exists():
+            AntiEpilepsyMedicine.objects.filter(
+                management=management,
+                is_rescue_medicine=True
+            ).delete()
 
     management.has_rescue_medication_been_prescribed = has_rescue_medication_been_prescribed
     management.save()
 
     management = Management.objects.get(pk=management_id)
+    rescue_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management,
+        is_rescue_medicine=True
+    ).all()
 
     context = {
-        'management': management
+        'management': management,
+        'rescue_medicines': rescue_medicines,
     }
     test_fields_update_audit_progress(management)
     response = render(
-        request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def rescue_medicine_search(request, management_id):
-    """
-    HTMX callback from management template
-    GET request filtering query to SNOMED server using keyup from input
-    Returns snomed list of terms
-    """
-    rescue_medicine_search_text = request.GET.get('rescue_medicine_search')
-    items = snomed_medicine_search(rescue_medicine_search_text)
-
-    management = Management.objects.get(pk=management_id)
-
-    context = {
-        'items': items,
-        'management_id': management_id
-    }
-    test_fields_update_audit_progress(management)
-    response = render(
-        request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def save_selected_rescue_medicine(request, management_id):
-    """
-    HTMX callback from rescue_medicine_select template
-    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
-    rescue medicine currently selected.
-    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
-    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
-    """
-
-    management = Management.objects.get(pk=management_id)
-    snomed_concept = fetch_concept(request.POST.get(
-        'selected_rescue_medicine')
-    )
-
-    if snomed_concept["preferredDescription"]["term"]:
-        name = snomed_concept["preferredDescription"]["term"]
-    else:
-        name = "No SNOMED preferred term"
-
-    AntiEpilepsyMedicine.objects.create(
-        antiepilepsy_medicine_type=None,
-        is_rescue_medicine=True,
-        antiepilepsy_medicine_snomed_code=request.POST.get(
-            'selected_rescue_medicine'),
-        antiepilepsy_medicine_snomed_preferred_name=name,
-        antiepilepsy_medicine_start_date=None,
-        antiepilepsy_medicine_stop_date=None,
-        antiepilepsy_medicine_risk_discussed=None,
-        is_a_pregnancy_prevention_programme_in_place=False,
-        management=management
-    )
-
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
-
-    context = {
-        'rescue_medicines': medicines
-    }
-    test_fields_update_audit_progress(management)
-    response = render(
-        request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
+        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicines/rescue_medicines.html", context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
