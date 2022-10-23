@@ -308,8 +308,8 @@ htmx_paths = [
     # management
     path('management/<int:management_id>/has_an_aed_been_given',
          views.has_an_aed_been_given, name="has_an_aed_been_given"),
-    path('management/<int:management_id>/rescue_medication_prescribed',
-         views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
+    path('management/<int:management_id>/has_rescue_medication_been_prescribed',
+         views.has_rescue_medication_been_prescribed, name="has_rescue_medication_been_prescribed"),
 
     path('management/<int:management_id>/rescue_medicine_search',
          views.rescue_medicine_search, name='rescue_medicine_search'),
@@ -317,7 +317,7 @@ htmx_paths = [
          views.save_selected_rescue_medicine, name='save_selected_rescue_medicine'),
 
     # antiepilepsy medicines
-    path('management/<int:management_id>/add_antiepilepsy_medicine',
+    path('management/<int:management_id>/add_antiepilepsy_medicine/is_rescue/<str:is_rescue_medicine>',
          views.add_antiepilepsy_medicine, name='add_antiepilepsy_medicine'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/remove_antiepilepsy_medicine',
          views.remove_antiepilepsy_medicine, name='remove_antiepilepsy_medicine'),
@@ -325,8 +325,8 @@ htmx_paths = [
          views.edit_antiepilepsy_medicine, name='edit_antiepilepsy_medicine'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/close',
          views.close_antiepilepsy_medicine, name='close_antiepilepsy_medicine'),
-    path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_type',
-         views.antiepilepsy_medicine_type, name='antiepilepsy_medicine_type'),
+    path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/medicine_id',
+         views.medicine_id, name='medicine_id'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_start_date',
          views.antiepilepsy_medicine_start_date, name='antiepilepsy_medicine_start_date'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_stop_date',

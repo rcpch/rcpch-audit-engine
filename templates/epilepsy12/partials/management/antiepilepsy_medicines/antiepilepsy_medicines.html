@@ -10,7 +10,7 @@
 
     {% if management.has_an_aed_been_given %}
         <div id='antiepilepsy_medicine_list'>
-            {% include 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html' with management_id=management.pk antiepilepsy_medicines=antiepilepsy_medicines %}
+            {% include 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html' with management_id=management.pk medicines=antiepilepsy_medicines is_rescue_medicine=False %}
         </div>
     {% endif %}
 

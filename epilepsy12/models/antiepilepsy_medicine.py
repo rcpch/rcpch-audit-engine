@@ -1,8 +1,6 @@
 from django.db import models
 from django.forms import ValidationError
-from operator import itemgetter
 from epilepsy12.models.help_text_mixin import HelpTextMixin
-from ..constants import ANTIEPILEPSY_MEDICINES
 from .time_and_user_abstract_base_classes import *
 from .management import Management
 from ..general_functions import *
@@ -13,15 +11,24 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     This class records information about antiepilepsy medicines. 
     It references the Episode class, as one episode can involve several antiepilepsy medicines.
     """
-    antiepilepsy_medicine_type = models.IntegerField(
+    medicine_id = models.IntegerField(
         help_text={
-            'label': "Antiseizure medicine name",
-            'reference': "Please enter antiseizure medicine name.",
+            'label': "Medicine ID",
+            'reference': "Please enter the medicine.",
         },
-        choices=sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         default=None,
         null=True,
         blank=True
+    )
+    medicine_name = models.CharField(
+        max_length=200,
+        help_text={
+            'label': "Medicine name",
+            'reference': "Please enter the medicine name.",
+        },
+        default=None,
+        null=True,
+        blank=True,
     )
     is_rescue_medicine = models.BooleanField(
         help_text={
@@ -34,7 +41,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_snomed_code = models.CharField(
         help_text={
-            'label': "Antiseizure medicine SNOMED-CT code",
+            'label': "Antiseizure/rescue medicine SNOMED-CT code",
             'reference': "Antiseizure medicine SNOMED-CT code",
         },
         max_length=50,
@@ -44,7 +51,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_snomed_preferred_name = models.CharField(
         help_text={
-            'label': "Antiseizure medicine SNOMED-CT preferred name",
+            'label': "Antiseizure/rescue medicine SNOMED-CT preferred name",
             'reference': "Antiseizure medicine SNOMED-CT preferred name",
         },
         max_length=50,
@@ -54,7 +61,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_start_date = models.DateField(
         help_text={
-            'label': "Antiepilepsy medicine start date",
+            'label': "Medicine start date",
             'reference': "Antiepilepsy medicine start date",
         },
         default=None,
@@ -63,7 +70,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_stop_date = models.DateField(
         help_text={
-            'label': "Antiseizure medicine discontinued date",
+            'label': "Medicine discontinued date",
             'reference': "Antiseizure medicine discontinued date",
         },
         default=None,
@@ -72,7 +79,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_risk_discussed = models.BooleanField(
         help_text={
-            'label': "Antiseizure medication risks discussed?",
+            'label': "Medication risks discussed?",
             'reference': "Have the risks related to the antiseizure medicine been discussed with the child/young person and their family?",
         },
         default=None,

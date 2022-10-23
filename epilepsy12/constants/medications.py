@@ -34,9 +34,10 @@ ANTIEPILEPSY_MEDICINE_TYPES = (
 )
 
 BENZODIAZEPINE_TYPES = (
-    ("BMZ", "Buccal midazolam"),
-    ("RDZ", "Rectal diazepam"),
-    ("Oth", "Other")
+    (1000, "Buccal midazolam"),
+    (1001, "Rectal diazepam"),
+    (1002, "Other"),
+    (1003, "Lorazepam")
 )
 
 ANTIEPILEPSY_MEDICINES = {

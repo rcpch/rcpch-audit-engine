@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.common import SEX_TYPE
 
-from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES
+from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
 from ..decorator import group_required
 from epilepsy12.general_functions.fetch_snomed import fetch_concept, fetch_ecl, snomed_medicine_search
 from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AuditProgress, AntiEpilepsyMedicine, antiepilepsy_medicine
@@ -96,21 +96,22 @@ def has_an_aed_been_given(request, management_id):
     management.has_an_aed_been_given = has_an_aed_been_given
     management.save()
 
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
+    antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management,
+        is_rescue_medicine=False
+    )
 
-    valproate_pregnancy_advice_needs_addressing = False
-
-    if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
+    # if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
+    #     # patient is female and valproate has been prescribed
+    #     valproate_pregnancy_advice_needs_addressing = True
 
     context = {
-        'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
-        'management': management
+        'management': management,
+        'antiepilepsy_medicines': antiepilepsy_medicines
     }
 
     response = render(
-        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicines.html", context=context)
+        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicines.html", context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -122,7 +123,7 @@ def has_an_aed_been_given(request, management_id):
 
 
 @login_required
-def add_antiepilepsy_medicine(request, management_id):
+def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     """
     Callback POST request from aed_list.html partial to add new AEM to antiepilepsy_medicine model
     """
@@ -138,10 +139,15 @@ def add_antiepilepsy_medicine(request, management_id):
     #     name = snomed_concept["preferredDescription"]["term"]
     # else:
     #     name = "No SNOMED preferred term"
+    if is_rescue_medicine == 'is_rescue_medicine':
+        is_rescue = True
+    else:
+        is_rescue = False
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.create(
-        antiepilepsy_medicine_type=None,
-        is_rescue_medicine=False,
+        medicine_id=None,
+        medicine_name=None,
+        is_rescue_medicine=is_rescue,
         antiepilepsy_medicine_snomed_code=None,
         antiepilepsy_medicine_snomed_preferred_name=None,
         antiepilepsy_medicine_start_date=None,
@@ -150,11 +156,23 @@ def add_antiepilepsy_medicine(request, management_id):
         management=management
     )
 
-    context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
-        'antiepilepsy_medicine': antiepilepsy_medicine,
-        'management_id': management_id
-    }
+    if is_rescue:
+
+        context = {
+            'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
+            'antiepilepsy_medicine': antiepilepsy_medicine,
+            'management_id': management_id,
+            'is_rescue_medicine': is_rescue
+        }
+
+    else:
+
+        context = {
+            'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+            'antiepilepsy_medicine': antiepilepsy_medicine,
+            'management_id': management_id,
+            'is_rescue_medicine': is_rescue
+        }
 
     response = render(
         request=request,
@@ -172,22 +190,29 @@ def add_antiepilepsy_medicine(request, management_id):
 
 @login_required
 def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
+    """
+    POST request from either the rescue_medicine_list or the epilepsy_medicine_list
+    Returns the epilepsy_medicine_list template filtered with a list of medicines depending whether are rescue
+    or antiepilepsy medicines
+    """
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
     management = antiepilepsy_medicine.management
+    is_rescue_medicine = antiepilepsy_medicine.is_rescue_medicine
 
     # delete record
     antiepilepsy_medicine.delete()
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management,
-        is_rescue_medicine=False
+        is_rescue_medicine=is_rescue_medicine
     ).all()
 
     context = {
-        'antiepilepsy_medicines': antiepilepsy_medicines,
-        'management_id': management.pk
+        'medicines': antiepilepsy_medicines,
+        'management_id': management.pk,
+        'is_rescue_medicine': is_rescue_medicine
     }
 
     response = render(
@@ -214,9 +239,15 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
     context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
     }
 
     response = render(
@@ -236,21 +267,23 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
+    is_rescue_medicine = antiepilepsy_medicine.is_rescue_medicine
+
     # if all the fields are none this was not completed - delete the record
     if (
-        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None
-        and antiepilepsy_medicine.antiepilepsy_medicine_type is None
-        and antiepilepsy_medicine.antiepilepsy_medicine_type is None
-        and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
+        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None and antiepilepsy_medicine.antiepilepsy_medicine_stop_date is None and antiepilepsy_medicine.medicine_id is None and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
     ):
         antiepilepsy_medicine.delete()
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
-        management=antiepilepsy_medicine.management)
+        management=antiepilepsy_medicine.management,
+        is_rescue_medicine=is_rescue_medicine
+    )
 
     context = {
-        'antiepilepsy_medicines': antiepilepsy_medicines,
-        'management_id': antiepilepsy_medicine.management.pk
+        'medicines': antiepilepsy_medicines,
+        'management_id': antiepilepsy_medicine.management.pk,
+        'is_rescue_medicine': is_rescue_medicine
     }
 
     response = render(
@@ -262,18 +295,33 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 
 @login_required
-def antiepilepsy_medicine_type(request, antiepilepsy_medicine_id):
+def medicine_id(request, antiepilepsy_medicine_id):
     """
-    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_type
+    POST callback from antiepilepsy_medicine.html partial to update medicine_name
     """
 
-    antiepilepsy_medicine_type = request.POST.get('antiepilepsy_medicine_type')
-
+    # get the medicine to update
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
-    antiepilepsy_medicine.antiepilepsy_medicine_type = antiepilepsy_medicine_type
 
-    if int(antiepilepsy_medicine.antiepilepsy_medicine_type) == 21 and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = BENZODIAZEPINE_TYPES
+    else:
+        choices = ANTIEPILEPSY_MEDICINES
+
+    # get id of medicine - TODO this should be the SNOMEDCTID
+    medicine_id = request.POST.get('medicine_id')
+
+    # look up the medicine name from the constant
+    medicine_name = None
+    for medicine in choices:
+        if int(medicine_id) == int(medicine[0]):
+            medicine_name = medicine[1]
+
+    antiepilepsy_medicine.medicine_name = medicine_name
+    antiepilepsy_medicine.medicine_id = medicine_id
+
+    if int(antiepilepsy_medicine.medicine_id) == 21 and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
         # sodium valproate selected and patient is female
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
@@ -284,8 +332,9 @@ def antiepilepsy_medicine_type(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.save()
 
     context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
-        'antiepilepsy_medicine': antiepilepsy_medicine
+        'choices': sorted(choices, key=itemgetter(1)),
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
     }
 
     response = render(
@@ -319,9 +368,15 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.updated_by = request.user
     antiepilepsy_medicine.save()
 
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
     context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
     }
 
     response = render(
@@ -345,7 +400,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     """
 
     antiepilepsy_medicine_stop_date = request.POST.get(
-        'antiepilepsy_medicine_start_date')
+        'antiepilepsy_medicine_stop_date')
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
@@ -355,9 +410,15 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.updated_by = request.user
     antiepilepsy_medicine.save()
 
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
     context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
     }
 
     response = render(
@@ -392,9 +453,15 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.updated_by = request.user
     antiepilepsy_medicine.save()
 
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
     context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
     }
 
     response = render(
@@ -429,9 +496,15 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     antiepilepsy_medicine.updated_by = request.user
     antiepilepsy_medicine.save()
 
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
     context = {
-        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
     }
 
     response = render(
@@ -455,7 +528,7 @@ Fields relating to rescue medication begin here
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def rescue_medication_prescribed(request, management_id):
+def has_rescue_medication_been_prescribed(request, management_id):
     """
     HTMX call from management template
     POST request on toggle button click
@@ -466,15 +539,23 @@ def rescue_medication_prescribed(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    has_rescue_medication_been_prescribed = not management.has_rescue_medication_been_prescribed
+    if request.htmx.trigger_name == 'button-true':
+        has_rescue_medication_been_prescribed = True
+    elif request.htmx.trigger_name == 'button-false':
+        has_rescue_medication_been_prescribed = False
 
     management.has_rescue_medication_been_prescribed = has_rescue_medication_been_prescribed
     management.save()
 
     management = Management.objects.get(pk=management_id)
+    rescue_medicines = AntiEpilepsyMedicine.objects.filter(
+        management=management,
+        is_rescue_medicine=True
+    ).all()
 
     context = {
-        'management': management
+        'management': management,
+        'rescue_medicines': rescue_medicines
     }
     test_fields_update_audit_progress(management)
     response = render(
@@ -541,7 +622,8 @@ def save_selected_rescue_medicine(request, management_id):
         name = "No SNOMED preferred term"
 
     AntiEpilepsyMedicine.objects.create(
-        antiepilepsy_medicine_type=None,
+        medicine_id=None,
+        medicine_name=None,
         is_rescue_medicine=True,
         antiepilepsy_medicine_snomed_code=request.POST.get(
             'selected_rescue_medicine'),
