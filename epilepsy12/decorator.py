@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from epilepsy12.models import InitialAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome
+from epilepsy12.models import InitialAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
 from epilepsy12.models.comorbidity import Comorbidity
 
 
@@ -120,6 +120,10 @@ def group_required(*group_names):
                     comorbidity = Comorbidity.objects.get(
                         pk=kwargs.get('comorbidity_id'))
                     child = comorbidity.multiaxial_diagnosis.registration.case
+                elif kwargs.get('antiepilepsy_medicine_id') is not None:
+                    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+                        pk=kwargs.get('antiepilepsy_medicine_id'))
+                    child = antiepilepsy_medicine.management.registration.case
                 elif kwargs.get('case_id') is not None:
                     case = Case.objects.get(
                         pk=kwargs.get('case_id'))

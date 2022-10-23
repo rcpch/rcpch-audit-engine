@@ -1,12 +1,13 @@
-from urllib import response
 from django.utils import timezone
 from datetime import datetime
+from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from epilepsy12.constants.common import SEX_TYPE
 
-from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINE_TYPES
+from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES
 from ..decorator import group_required
 from epilepsy12.general_functions.fetch_snomed import fetch_concept, fetch_ecl, snomed_medicine_search
 from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AuditProgress, AntiEpilepsyMedicine, antiepilepsy_medicine
@@ -35,13 +36,13 @@ def management(request, case_id):
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False).all()
 
-    valproate_pregnancy_advice_needs_addressing = False
+    # valproate_pregnancy_advice_needs_addressing = False
 
-    snomed_items = fetch_ecl('<373873005')
+    # snomed_items = fetch_ecl('<373873005')
 
-    if antiepilepsy_medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
+    # if antiepilepsy_medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
+    #     # patient is female and valproate has been prescribed
+    #     valproate_pregnancy_advice_needs_addressing = True
 
     test_fields_update_audit_progress(management)
 
@@ -51,8 +52,7 @@ def management(request, case_id):
         "management": management,
         "rescue_medicines": rescue_medicines,
         "antiepilepsy_medicines": antiepilepsy_medicines,
-        'snomed_items': snomed_items,
-        "valproate_pregnancy_advice_needs_addressing": valproate_pregnancy_advice_needs_addressing,
+        # 'snomed_items': snomed_items,
         "audit_progress": registration.audit_progress,
         "active_template": "management"
     }
@@ -151,7 +151,7 @@ def add_antiepilepsy_medicine(request, management_id):
     )
 
     context = {
-        'choices': ANTIEPILEPSY_MEDICINE_TYPES,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'management_id': management_id
     }
@@ -215,7 +215,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     context = {
-        'choices': ANTIEPILEPSY_MEDICINE_TYPES,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
     }
 
@@ -272,11 +272,20 @@ def antiepilepsy_medicine_type(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
     antiepilepsy_medicine.antiepilepsy_medicine_type = antiepilepsy_medicine_type
+
+    if int(antiepilepsy_medicine.antiepilepsy_medicine_type) == 21 and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
+        # sodium valproate selected and patient is female
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+    else:
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+
     antiepilepsy_medicine.save()
 
     context = {
-        'choices': ANTIEPILEPSY_MEDICINE_TYPES,
-        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'antiepilepsy_medicine': antiepilepsy_medicine
     }
 
     response = render(
@@ -296,7 +305,7 @@ def antiepilepsy_medicine_type(request, antiepilepsy_medicine_id):
 @login_required
 def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     """
-    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_type
+    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_start_date
     """
 
     antiepilepsy_medicine_start_date = request.POST.get(
@@ -311,7 +320,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.save()
 
     context = {
-        'choices': ANTIEPILEPSY_MEDICINE_TYPES,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
     }
 
@@ -332,7 +341,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
 @login_required
 def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     """
-    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_type
+    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_stop_date
     """
 
     antiepilepsy_medicine_stop_date = request.POST.get(
@@ -347,7 +356,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.save()
 
     context = {
-        'choices': ANTIEPILEPSY_MEDICINE_TYPES,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
     }
 
@@ -368,12 +377,13 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
 @login_required
 def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     """
-    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_type
+    POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_risk_discussed
     """
 
-    antiepilepsy_medicine_risk_discussed = False
     if request.htmx.trigger_name == 'button-true':
         antiepilepsy_medicine_risk_discussed = True
+    elif request.htmx.trigger_name == 'button-false':
+        antiepilepsy_medicine_risk_discussed = False
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
@@ -383,7 +393,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.save()
 
     context = {
-        'choices': ANTIEPILEPSY_MEDICINE_TYPES,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
     }
 
@@ -401,129 +411,33 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     return response
 
 
-# @login_required
-# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-# def antiepilepsy_medicine_search(request, management_id):
-#     """
-#     HTMX callback from management template
-#     GET request filtering query to SNOMED server using keyup from input
-#     Returns snomed list of terms
-#     """
-#     antiepilepsy_medicine_search_text = request.GET.get(
-#         'antiepilepsy_medicine_search')
-#     items = snomed_medicine_search(antiepilepsy_medicine_search_text)
-
-#     management = Management.objects.get(pk=management_id)
-
-#     context = {
-#         'items': items,
-#         'management_id': management_id
-#     }
-#     response = render(
-#         request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicine_select.html", context=context)
-
-#     # trigger a GET request from the steps template
-#     trigger_client_event(
-#         response=response,
-#         name="registration_active",
-#         params={})  # reloads the form to show the active steps
-#     test_fields_update_audit_progress(management)
-#     return response
-
-
-# @login_required
-# @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-# def save_selected_antiepilepsy_medicine(request, management_id):
-#     """
-#     HTMX callback from antiepilepsy_medicine_select template
-#     POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of
-#     rescue medicine currently selected.
-#     This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
-#     Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
-#     """
-
-#     management = Management.objects.get(pk=management_id)
-#     snomed_concept = fetch_concept(request.POST.get(
-#         'selected_antiepilepsy_medicine')
-#     )
-
-#     concept_id = snomed_concept['concept']['id']
-
-#     if snomed_concept["preferredDescription"]:
-#         name = snomed_concept["preferredDescription"]["term"]
-#     else:
-#         name = "No SNOMED preferred term"
-
-#     AntiEpilepsyMedicine.objects.create(
-#         antiepilepsy_medicine_type=None,
-#         is_rescue_medicine=False,
-#         antiepilepsy_medicine_snomed_code=concept_id,
-#         antiepilepsy_medicine_snomed_preferred_name=name,
-#         antiepilepsy_medicine_start_date=None,
-#         antiepilepsy_medicine_stop_date=None,
-#         antiepilepsy_medicine_risk_discussed=None,
-#         management=management
-#     )
-
-#     medicines = AntiEpilepsyMedicine.objects.filter(management=management)
-
-#     valproate_pregnancy_advice_needs_addressing = False
-
-#     if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-#         # patient is female and valproate has been prescribed
-#         valproate_pregnancy_advice_needs_addressing = True
-
-#     context = {
-#         'management': management,
-#         'antiepilepsy_medicines': medicines,
-#         'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
-#     }
-#     test_fields_update_audit_progress(management)
-#     response = render(
-#         request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
-
-#     # trigger a GET request from the steps template
-#     trigger_client_event(
-#         response=response,
-#         name="registration_active",
-#         params={})  # reloads the form to show the active steps
-
-#     return response
-
-
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def is_a_pregnancy_prevention_programme_in_place(request, management_id):
+def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
     """
-    This is an HTMX callback from antiepilepsy_medicine_list template on click of toggle is_a_pregnancy_prevention_programme_in_place
-    (relating to field in the management model).
-    The toggle is only offered if patient is female and one of the drugs selected is valproate
-    Selecting the toggle calls this function which persists the selection in the management model and returns the partial template
+    POST callback from antiepilepsy_medicine.html partial to update is_a_pregnancy_prevention_programme_in_place
     """
 
-    Management.objects.filter(pk=management_id).update(
-        is_a_pregnancy_prevention_programme_in_place=Q(
-            is_a_pregnancy_prevention_programme_in_place=False),
-        updated_at=timezone.now(),
-        updated_by=request.user)
+    if request.htmx.trigger_name == 'button-true':
+        is_a_pregnancy_prevention_programme_in_place = True
+    elif request.htmx.trigger_name == 'button-false':
+        is_a_pregnancy_prevention_programme_in_place = False
 
-    management = Management.objects.get(pk=management_id)
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
-
-    valproate_pregnancy_advice_needs_addressing = False
-
-    if medicines.filter(antiepilepsy_medicine_snomed_code=10049011000001109).exists() and management.registration.case.gender == 2:
-        # patient is female and valproate has been prescribed
-        valproate_pregnancy_advice_needs_addressing = True
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+    antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = is_a_pregnancy_prevention_programme_in_place
+    antiepilepsy_medicine.updated_at = timezone.now(),
+    antiepilepsy_medicine.updated_by = request.user
+    antiepilepsy_medicine.save()
 
     context = {
-        'management': management,
-        'antiepilepsy_medicines': medicines,
-        'valproate_pregnancy_advice_needs_addressing': valproate_pregnancy_advice_needs_addressing,
+        'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+        'antiepilepsy_medicine': antiepilepsy_medicine,
     }
-    test_fields_update_audit_progress(management)
+
     response = render(
-        request=request, template_name="epilepsy12/partials/medicines/antiepilepsy_medicine_list.html", context=context)
+        request=request,
+        template_name='epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html',
+        context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -635,7 +549,8 @@ def save_selected_rescue_medicine(request, management_id):
         antiepilepsy_medicine_start_date=None,
         antiepilepsy_medicine_stop_date=None,
         antiepilepsy_medicine_risk_discussed=None,
-        is_a_pregnancy_prevention_programme_in_place=False,
+        is_a_pregnancy_prevention_programme_in_place=None,
+        is_a_pregnancy_prevention_programme_needed=False,
         management=management
     )
 

@@ -1,8 +1,8 @@
 from django.db import models
 from django.forms import ValidationError
-
+from operator import itemgetter
 from epilepsy12.models.help_text_mixin import HelpTextMixin
-from ..constants import ANTIEPILEPSY_MEDICINE_TYPES
+from ..constants import ANTIEPILEPSY_MEDICINES
 from .time_and_user_abstract_base_classes import *
 from .management import Management
 from ..general_functions import *
@@ -18,7 +18,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
             'label': "Antiseizure medicine name",
             'reference': "Please enter antiseizure medicine name.",
         },
-        choices=ANTIEPILEPSY_MEDICINE_TYPES,
+        choices=sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
         default=None,
         null=True,
         blank=True
@@ -75,7 +75,25 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
             'label': "Antiseizure medication risks discussed?",
             'reference': "Have the risks related to the antiseizure medicine been discussed with the child/young person and their family?",
         },
-        default=False,
+        default=None,
+        null=True,
+        blank=True
+    )
+    is_a_pregnancy_prevention_programme_needed = models.BooleanField(
+        help_text={
+            'label': "Is a pregnancy prevention programme indicated?",
+            'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+        },
+        default=None,
+        null=True,
+        blank=True
+    )
+    is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
+        help_text={
+            'label': "Is a pregnancy prevention programme (PPP) in place?",
+            'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+        },
+        default=None,
         null=True,
         blank=True
     )

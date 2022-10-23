@@ -38,15 +38,6 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
         null=True,
         blank=True,
     )
-    is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
-        help_text={
-            'label': "Is there a pregnancy prevention programme (PPP) in place?",
-            'reference': "Is there a pregnancy prevention programme (PPP) in place?",
-        },
-        default=None,
-        null=True,
-        blank=True
-    )
     individualised_care_plan_in_place = models.BooleanField(
         help_text={
             'label': 'Has care planning (either an individualised epilepsy document or copy clinic letter including care planning information) commenced?',

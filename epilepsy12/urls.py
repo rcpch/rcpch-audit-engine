@@ -310,10 +310,7 @@ htmx_paths = [
          views.has_an_aed_been_given, name="has_an_aed_been_given"),
     path('management/<int:management_id>/rescue_medication_prescribed',
          views.rescue_medication_prescribed, name="rescue_medication_prescribed"),
-    #     path('management/<int:management_id>/antiepilepsy_medicine_search',
-    #          views.antiepilepsy_medicine_search, name='antiepilepsy_medicine_search'),
-    #     path('management/<int:management_id>/save_selected_antiepilepsy_medicine',
-    #          views.save_selected_antiepilepsy_medicine, name='save_selected_antiepilepsy_medicine'),
+
     path('management/<int:management_id>/rescue_medicine_search',
          views.rescue_medicine_search, name='rescue_medicine_search'),
     path('management/<int:management_id>/save_selected_rescue_medicine',
@@ -336,13 +333,10 @@ htmx_paths = [
          views.antiepilepsy_medicine_stop_date, name='antiepilepsy_medicine_stop_date'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_risk_discussed',
          views.antiepilepsy_medicine_risk_discussed, name='antiepilepsy_medicine_risk_discussed'),
-
-
-
-
-
-    path('management/<int:management_id>/is_a_pregnancy_prevention_programme_in_place',
+    path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/is_a_pregnancy_prevention_programme_in_place',
          views.is_a_pregnancy_prevention_programme_in_place, name='is_a_pregnancy_prevention_programme_in_place'),
+
+
 
     path('management/<int:management_id>/individualised_care_plan_in_place',
          views.individualised_care_plan_in_place, name='individualised_care_plan_in_place'),
