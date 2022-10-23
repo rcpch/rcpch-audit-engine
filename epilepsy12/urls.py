@@ -311,11 +311,6 @@ htmx_paths = [
     path('management/<int:management_id>/has_rescue_medication_been_prescribed',
          views.has_rescue_medication_been_prescribed, name="has_rescue_medication_been_prescribed"),
 
-    path('management/<int:management_id>/rescue_medicine_search',
-         views.rescue_medicine_search, name='rescue_medicine_search'),
-    path('management/<int:management_id>/save_selected_rescue_medicine',
-         views.save_selected_rescue_medicine, name='save_selected_rescue_medicine'),
-
     # antiepilepsy medicines
     path('management/<int:management_id>/add_antiepilepsy_medicine/is_rescue/<str:is_rescue_medicine>',
          views.add_antiepilepsy_medicine, name='add_antiepilepsy_medicine'),

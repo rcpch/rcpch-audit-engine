@@ -91,7 +91,19 @@ def has_an_aed_been_given(request, management_id):
 
     management = Management.objects.get(pk=management_id)
 
-    has_an_aed_been_given = not management.has_an_aed_been_given
+    if request.htmx.trigger_name == 'button-true':
+        has_an_aed_been_given = True
+    elif request.htmx.trigger_name == 'button-false':
+        has_an_aed_been_given = False
+        # delete any AEMs that exist
+        if AntiEpilepsyMedicine.objects.filter(
+            management=management,
+            is_rescue_medicine=False
+        ).exists():
+            AntiEpilepsyMedicine.objects.filter(
+                management=management,
+                is_rescue_medicine=False
+            ).delete()
 
     management.has_an_aed_been_given = has_an_aed_been_given
     management.save()
@@ -543,6 +555,15 @@ def has_rescue_medication_been_prescribed(request, management_id):
         has_rescue_medication_been_prescribed = True
     elif request.htmx.trigger_name == 'button-false':
         has_rescue_medication_been_prescribed = False
+        # delete any associated rescue medicines
+        if AntiEpilepsyMedicine.objects.filter(
+            management=management,
+            is_rescue_medicine=True
+        ).exists():
+            AntiEpilepsyMedicine.objects.filter(
+                management=management,
+                is_rescue_medicine=True
+            ).delete()
 
     management.has_rescue_medication_been_prescribed = has_rescue_medication_been_prescribed
     management.save()
@@ -555,95 +576,11 @@ def has_rescue_medication_been_prescribed(request, management_id):
 
     context = {
         'management': management,
-        'rescue_medicines': rescue_medicines
+        'rescue_medicines': rescue_medicines,
     }
     test_fields_update_audit_progress(management)
     response = render(
-        request=request, template_name="epilepsy12/partials/management/rescue_medicines.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def rescue_medicine_search(request, management_id):
-    """
-    HTMX callback from management template
-    GET request filtering query to SNOMED server using keyup from input
-    Returns snomed list of terms
-    """
-    rescue_medicine_search_text = request.GET.get('rescue_medicine_search')
-    items = snomed_medicine_search(rescue_medicine_search_text)
-
-    management = Management.objects.get(pk=management_id)
-
-    context = {
-        'items': items,
-        'management_id': management_id
-    }
-    test_fields_update_audit_progress(management)
-    response = render(
-        request=request, template_name="epilepsy12/partials/management/rescue_medicine_select.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-
-    return response
-
-
-@login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-def save_selected_rescue_medicine(request, management_id):
-    """
-    HTMX callback from rescue_medicine_select template
-    POST request from select populated by SNOMED rescue medicine terms on save button click. Returned value is conceptId of 
-    rescue medicine currently selected.
-    This function uses the conceptId to fetch the preferredDescription from the SNOMED server which is also persisted
-    Returns the partial template medicines/rescue_medicine_list with a list of rescue medicines used in that child
-    """
-
-    management = Management.objects.get(pk=management_id)
-    snomed_concept = fetch_concept(request.POST.get(
-        'selected_rescue_medicine')
-    )
-
-    if snomed_concept["preferredDescription"]["term"]:
-        name = snomed_concept["preferredDescription"]["term"]
-    else:
-        name = "No SNOMED preferred term"
-
-    AntiEpilepsyMedicine.objects.create(
-        medicine_id=None,
-        medicine_name=None,
-        is_rescue_medicine=True,
-        antiepilepsy_medicine_snomed_code=request.POST.get(
-            'selected_rescue_medicine'),
-        antiepilepsy_medicine_snomed_preferred_name=name,
-        antiepilepsy_medicine_start_date=None,
-        antiepilepsy_medicine_stop_date=None,
-        antiepilepsy_medicine_risk_discussed=None,
-        is_a_pregnancy_prevention_programme_in_place=None,
-        is_a_pregnancy_prevention_programme_needed=False,
-        management=management
-    )
-
-    medicines = AntiEpilepsyMedicine.objects.filter(management=management)
-
-    context = {
-        'rescue_medicines': medicines
-    }
-    test_fields_update_audit_progress(management)
-    response = render(
-        request=request, template_name="epilepsy12/partials/medicines/rescue_medicine_list.html", context=context)
+        request=request, template_name="epilepsy12/partials/management/antiepilepsy_medicines/rescue_medicines.html", context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(

@@ -3,9 +3,9 @@
 
     {% url 'has_rescue_medication_been_prescribed' management_id=management.pk as hx_post %}
     {% if perms.epilepsy12.change_management %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#aeds" hx_trigger="click" label=management.get_has_rescue_medication_been_prescribed_help_label_text reference=management.get_has_rescue_medication_been_prescribed_help_reference_text disabled=False %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#rescue_medicines" hx_trigger="click" label=management.get_has_rescue_medication_been_prescribed_help_label_text reference=management.get_has_rescue_medication_been_prescribed_help_reference_text disabled=False %}
     {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#aeds" hx_trigger="click" label=management.get_has_rescue_medication_been_prescribed_help_label_text reference=management.get_has_rescue_medication_been_prescribed_help_reference_text disabled=True %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#rescue_medicines" hx_trigger="click" label=management.get_has_rescue_medication_been_prescribed_help_label_text reference=management.get_has_rescue_medication_been_prescribed_help_reference_text disabled=True %}
     {% endif %}
 
     {% if management.has_rescue_medication_been_prescribed %}
