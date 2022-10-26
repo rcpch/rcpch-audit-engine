@@ -142,6 +142,10 @@
         <div id='comorbidity_section' class='field'>
             {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity_section.html' with comorbidities=comorbidities %}
         </div>
+
+        <div id='mental_health_section' class='field'>
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html' with multiaxial_diagnosis=multiaxial_diagnosis mental_health_issues_choices=mental_health_issues_choices %}
+        </div>
         
     </div>
 

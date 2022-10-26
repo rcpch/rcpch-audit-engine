@@ -130,6 +130,13 @@ htmx_paths = [
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/comorbidities',
          views.comorbidities, name='comorbidities'),
 
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_screen',
+         views.mental_health_screen, name='mental_health_screen'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue_identified',
+         views.mental_health_issue_identified, name='mental_health_issue_identified'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue',
+         views.mental_health_issue, name='mental_health_issue'),
+
     # case table endpoints
     path('htmx/filter_case_list/<hospital_id>', views.case_list,
          name="filter_case_list"),
