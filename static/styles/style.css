@@ -1101,7 +1101,7 @@ footer .icon {
 
 footer a,
 footer a:hover {
-  color: inherit;
+  color: var(--rcpch_light_blue);
 }
 
 a:-webkit-any-link {
