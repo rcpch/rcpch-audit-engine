@@ -1,0 +1,19 @@
+<div class='two fields'>
+    <div class='field'>
+        {% url 'has_been_referred_for_mental_health_support' management_id=management.pk as hx_post %}
+        {% if perms.epilepsy12.change_management %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_support' hx_trigger='click' hx_swap='innerHTML' test_positive=management.has_been_referred_for_mental_health_support label=management.get_has_been_referred_for_mental_health_support_help_label_text reference=management.get_has_been_referred_for_mental_health_support_help_reference_text data_position='top left' disabled=False %}
+        {% else %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_support' hx_trigger='click' hx_swap='innerHTML' test_positive=management.has_been_referred_for_mental_health_support label=management.get_has_been_referred_for_mental_health_support_help_label_text reference=management.get_has_been_referred_for_mental_health_support_help_reference_text data_position='top left' disabled=True %}
+        {% endif %}
+    </div>
+
+    <div class='field'>
+        {% url 'has_support_for_mental_health_support' management_id=management.pk as hx_post %}
+        {% if perms.epilepsy12.change_management %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_support' hx_trigger='click' hx_swap='innerHTML' test_positive=management.has_support_for_mental_health_support label=management.get_has_support_for_mental_health_support_help_label_text reference=management.get_has_support_for_mental_health_support_help_reference_text data_position='top left' disabled=False %}
+        {% else %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_support' hx_trigger='click' hx_swap='innerHTML' test_positive=management.has_support_for_mental_health_support label=management.get_has_support_for_mental_health_support_help_label_text reference=management.get_has_support_for_mental_health_support_help_reference_text data_position='top left' disabled=True %}
+        {% endif %}
+    </div>
+</div>

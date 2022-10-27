@@ -362,6 +362,10 @@ htmx_paths = [
          views.individualised_care_plan_includes_ehcp, name='individualised_care_plan_includes_ehcp'),
     path('management/<int:management_id>/has_individualised_care_plan_been_updated_in_the_last_year',
          views.has_individualised_care_plan_been_updated_in_the_last_year, name='has_individualised_care_plan_been_updated_in_the_last_year'),
+    path('management/<int:management_id>/has_been_referred_for_mental_health_support',
+         views.has_been_referred_for_mental_health_support, name='has_been_referred_for_mental_health_support'),
+    path('management/<int:management_id>/has_support_for_mental_health_support',
+         views.has_support_for_mental_health_support, name='has_support_for_mental_health_support'),
 ]
 
 
