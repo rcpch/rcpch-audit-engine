@@ -1078,6 +1078,10 @@ footer img {
   max-width: 100%;
 }
 
+footer .icon {
+  color: white;
+}
+
 .standard-footer__icon {
   border: 2px solid #fff;
   border-radius: 50%;

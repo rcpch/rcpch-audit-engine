@@ -61,6 +61,9 @@
                   <h3>Epilepsy12 audit platform</h3>
 
               <div class='right menu'>
+                <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'index' %}>
+                  Home
+                </a>
                 {% if user.is_authenticated %}
                   <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
                     Database management
@@ -116,20 +119,6 @@
           <div class="ui rcpch_warning message">This site is currently under development.</div>
         </div>
         
-
-          <div class="eight wide column">
-              <a href="https://github.com/rcpch/epilepsy12-server">
-                <i class="github icon"></i>
-                <p>Follow us on Github</p>
-              </a>
-          </div>
-
-          <div class="eight wide right aligned column">
-            <a href='{% url "tsandcs" %}'>
-              <i class="copyright icon"></i>
-              <p>RCPCH 2021. All rights reserved</p>
-              </a>
-          </div>
       </div>
         
 
