@@ -118,19 +118,21 @@ ul {
 }
 
 .ui.secondary.pointing.menu .item {
-  line-height: 3rem;
+  line-height: 2.5rem;
 }
 
 .ui.secondary.pointing.menu .item:hover {
   border-color: var(--rcpch_light_blue);
   border-width: 5px;
+  line-height: 2.25rem;
   color: var(--rcpch_light_blue);
-  font-family: Montserrat-Bold;
+  font-family: Montserrat-Regular;
 }
 
 #active_menu_item {
   color: var(--rcpch_strong_blue);
   border-width: 5px;
+  line-height: 2.25rem;
   border-color: var(--rcpch_strong_blue);
   font-family: Montserrat-Regular;
 }
@@ -141,10 +143,11 @@ ul {
   height: auto;
   padding: 0;
   font-family: Montserrat-Regular;
+  border-width: 0;
 }
 
 #nav-rcpch:hover {
-  border-color: transparent;
+  border-width: 0;
 }
 
 .ui.text.menu .right.menu {
