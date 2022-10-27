@@ -4,6 +4,8 @@ from operator import itemgetter
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+
+from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 from ..decorator import group_required
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
@@ -173,7 +175,8 @@ def multiaxial_diagnosis(request, case_id):
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
-        'there_are_epileptic_episodes': there_are_epileptic_episodes
+        'there_are_epileptic_episodes': there_are_epileptic_episodes,
+        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
     }
 
     response = render(
@@ -1634,6 +1637,109 @@ def comorbidities(request, multiaxial_diagnosis_id):
         name="registration_active",
         params={})  # reloads the form to show the active steps
     return response
+
+
+def mental_health_screen(request, multiaxial_diagnosis_id):
+    """
+    POST request callback for mental_health_screen toggle
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        mental_health_screen = True
+    elif request.htmx.trigger_name == 'button-false':
+        mental_health_screen = False
+    else:
+        raise Exception
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+    multiaxial_diagnosis.mental_health_screen = mental_health_screen
+    multiaxial_diagnosis.updated_at = timezone.now(),
+    multiaxial_diagnosis.updated_by = request.user
+    multiaxial_diagnosis.save()
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def mental_health_issue_identified(request, multiaxial_diagnosis_id):
+    """
+    POST request callback for mental_health_issue_identified toggle
+    """
+
+    if request.htmx.trigger_name == 'button-true':
+        mental_health_issue_identified = True
+    elif request.htmx.trigger_name == 'button-false':
+        mental_health_issue_identified = False
+    else:
+        raise Exception
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+    multiaxial_diagnosis.mental_health_issue_identified = mental_health_issue_identified
+    if not mental_health_issue_identified:
+        multiaxial_diagnosis.mental_health_issue = None
+    multiaxial_diagnosis.updated_at = timezone.now(),
+    multiaxial_diagnosis.updated_by = request.user
+    multiaxial_diagnosis.save()
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
+
+def mental_health_issue(request, multiaxial_diagnosis_id):
+    """
+    POST callback from mental_health_issue multiple toggle
+    """
+
+    mental_health_issue = request.htmx.trigger_name
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        pk=multiaxial_diagnosis_id)
+    multiaxial_diagnosis.mental_health_issue = mental_health_issue
+    multiaxial_diagnosis.updated_at = timezone.now(),
+    multiaxial_diagnosis.updated_by = request.user
+    multiaxial_diagnosis.save()
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+    }
+
+    response = render(
+        request=request, template_name='epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html', context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
+
 
 # test all fields
 

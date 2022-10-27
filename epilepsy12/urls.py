@@ -130,6 +130,13 @@ htmx_paths = [
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/comorbidities',
          views.comorbidities, name='comorbidities'),
 
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_screen',
+         views.mental_health_screen, name='mental_health_screen'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue_identified',
+         views.mental_health_issue_identified, name='mental_health_issue_identified'),
+    path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue',
+         views.mental_health_issue, name='mental_health_issue'),
+
     # case table endpoints
     path('htmx/filter_case_list/<hospital_id>', views.case_list,
          name="filter_case_list"),
@@ -355,6 +362,10 @@ htmx_paths = [
          views.individualised_care_plan_includes_ehcp, name='individualised_care_plan_includes_ehcp'),
     path('management/<int:management_id>/has_individualised_care_plan_been_updated_in_the_last_year',
          views.has_individualised_care_plan_been_updated_in_the_last_year, name='has_individualised_care_plan_been_updated_in_the_last_year'),
+    path('management/<int:management_id>/has_been_referred_for_mental_health_support',
+         views.has_been_referred_for_mental_health_support, name='has_been_referred_for_mental_health_support'),
+    path('management/<int:management_id>/has_support_for_mental_health_support',
+         views.has_support_for_mental_health_support, name='has_support_for_mental_health_support'),
 ]
 
 

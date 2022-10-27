@@ -138,6 +138,26 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
         blank=True,
     )
 
+    has_been_referred_for_mental_health_support = models.BooleanField(
+        help_text={
+            'label': 'Has a referral for mental health support been made?',
+            'reference': "Has the child been referred for support with their mental health?",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
+    has_support_for_mental_health_support = models.BooleanField(
+        help_text={
+            'label': 'Is mental health support in place?',
+            'reference': "Is there evidence of the child receiving support for their mental health?",
+        },
+        default=None,
+        null=True,
+        blank=True,
+    )
+
     registration = models.OneToOneField(
         Registration,
         on_delete=models.CASCADE,

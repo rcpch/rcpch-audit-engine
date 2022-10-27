@@ -1,0 +1,23 @@
+
+{% url 'mental_health_screen' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+{% if perms.epilepsy12.change_multiaxial_diagnosis %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.mental_health_screen label=multiaxial_diagnosis.get_mental_health_screen_help_label_text reference=multiaxial_diagnosis.get_mental_health_screen_help_reference_text data_position='top left' disabled=False %}
+{% else %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.mental_health_screen label=multiaxial_diagnosis.get_mental_health_screen_help_label_text reference=multiaxial_diagnosis.get_mental_health_screen_help_reference_text data_position='top left' disabled=True %}
+{% endif %}
+
+{% url 'mental_health_issue_identified' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+{% if perms.epilepsy12.change_multiaxial_diagnosis %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.mental_health_issue_identified label=multiaxial_diagnosis.get_mental_health_issue_identified_help_label_text reference=multiaxial_diagnosis.get_mental_health_issue_identified_help_reference_text data_position='top left' disabled=False %}
+{% else %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.mental_health_issue_identified label=multiaxial_diagnosis.get_mental_health_issue_identified_help_label_text reference=multiaxial_diagnosis.get_mental_health_issue_identified_help_reference_text data_position='top left' disabled=True %}
+{% endif %}
+
+{% if multiaxial_diagnosis.mental_health_issue_identified %}
+    {% url 'mental_health_issue' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+    {% if perms.epilepsy12.change_multiaxial_diagnosis %}
+        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target="#mental_health_section" hx_trigger="click" hx_swap="innerHTML" choices=mental_health_issues_choices test_positive=multiaxial_diagnosis.mental_health_issue label=multiaxial_diagnosis.get_mental_health_issue_help_label_text reference=multiaxial_diagnosis.get_mental_health_issue_help_reference_text hx_default_text='Select mental health issue' hx_name='mental_health_issue' data_position="top left" disabled=False %}
+    {% else %}
+        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target="#mental_health_section" hx_trigger="click" hx_swap="innerHTML" choices=mental_health_issues_choices test_positive=multiaxial_diagnosis.mental_health_issue label=multiaxial_diagnosis.get_mental_health_issue_help_label_text reference=multiaxial_diagnosis.get_mental_health_issue_help_reference_text hx_default_text='Select mental health issue' hx_name='mental_health_issue' data_position="top left" disabled=True %}
+    {% endif %}
+{% endif %}
