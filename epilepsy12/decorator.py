@@ -190,7 +190,7 @@ def update_model(model, field_name, page_element):
                     # an error has occurred
                     print('Error has occurred')
 
-            elif page_element == 'multiple_choice_multiple_toggle_button':
+            elif page_element == 'multiple_choice_multiple_toggle_button' or page_element == 'single_choice_multiple_toggle_button':
                 # multiple_choice_multiple_toggle_button
                 field_value = request.htmx.trigger_name
 
