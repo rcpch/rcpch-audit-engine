@@ -86,7 +86,4 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, 
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        if self.date_of_initial_assessment:
-            return f"First Paediatric Assessment for {self.registration.case} on {self.date_of_initial_assessment}"
-        else:
-            return f"{self.registration.case} has not yet had First Paediatric Assessment."
+        return f"ID:{self.pk} First Paediatric Assessment for {self.registration.case} (ID: {self.registration.case.pk})"

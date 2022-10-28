@@ -23,19 +23,28 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     #         return False
 
     registration_date = models.DateField(
-        "Date on which registered for the the Epilepsy12 audit",
+        help_text={
+            'label': "Date of first paediatric assessment",
+            'reference': "Date of first paediatric assessment",
+        },
         null=True,
         default=None
     )
 
     registration_close_date = models.DateField(
-        "Date at which the registration is due to close",
+        help_text={
+            'label': "First paediatric assessment closing date",
+            'reference': "Date on which the registration is due to close",
+        },
         default=None,
         null=True
     )
 
     def registration_date_one_year_on(self):
-        "Date at which registration ends for the the Epilepsy12 audit"
+        help_text = {
+            'label': "Date at which registration ends for the the Epilepsy12 audit",
+            'reference': "Date at which registration ends for the the Epilepsy12 audit",
+        },
         if (self.registration_date):
             return self.registration_date+relativedelta(years=1)
         else:

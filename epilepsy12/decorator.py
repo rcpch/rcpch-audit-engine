@@ -1,4 +1,6 @@
 from django.core.exceptions import PermissionDenied
+from django.utils.functional import wraps
+from django.utils import timezone
 from epilepsy12.models import InitialAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
 from epilepsy12.models.comorbidity import Comorbidity
 
@@ -154,4 +156,55 @@ def group_required(*group_names):
                 raise PermissionDenied()
 
         return wrapper
+    return decorator
+
+
+def update_model(model, field_name, page_element):
+    """
+    Decorator to update the field in the model, depending on the type of page element POSTing back to the view.
+    It also updates the model with the user and the datetime updated and includes error handling
+
+    The page element is a string, corresponding to the page element type returning the value
+    page elements include:
+    - toggle_button
+    - multiple_choice_multiple_toggle_button
+    - single_choice_multiple_toggle_button
+    - select
+    - date_field
+
+    """
+    def decorator(f):
+        def wrapper(request, *args, **kwargs):
+            """
+            This is called every time the decorator function (calling function from the view) is called
+            """
+            if page_element == 'toggle_button':
+                # toggle button
+                # the trigger_name of the element here corresponds to whether true or false has been selected
+
+                if request.htmx.trigger_name == 'button-true':
+                    field_value = True
+                elif request.htmx.trigger_name == 'button-false':
+                    field_value = False
+                else:
+                    # an error has occurred
+                    print('Error has occurred')
+
+            elif page_element == 'multiple_choice_multiple_toggle_button':
+                # multiple_choice_multiple_toggle_button
+                field_value = request.htmx.trigger_name
+
+            # update the model
+            for key, value in kwargs.items():
+                updated_field = {
+                    field_name: field_value,
+                    'updated_at': timezone.now(),
+                    'updated_by': request.user
+                }
+                model.objects.filter(
+                    pk=value).update(**updated_field)
+
+            # model.objects.filter(field)
+            return f(request, *args, **kwargs)
+        return wraps(f)(wrapper)
     return decorator
