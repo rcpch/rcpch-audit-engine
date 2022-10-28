@@ -152,9 +152,7 @@ def neurological_examination_performed(request, initial_assessment_id):
 
     context = {
         "initial_assessment": initial_assessment,
-        # "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
-        # "episode_definition_selection": EPISODE_DEFINITION,
     }
 
     response = render(
