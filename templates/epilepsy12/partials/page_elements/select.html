@@ -17,10 +17,8 @@
         Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
     {% endcomment %}
     <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-        
-            <label class="rcpch_plain_label">
-                {{label}}
-            </label>
+
+        <label class='rcpch_plain_label'>{{label|safe}}&nbsp;<span data-html="{{reference|safe}}" class='rcpch_popup'><i class="rcpch question circle icon"></i></span>
 
             {% if disabled %}
                 <div class="ui rcpch_light_blue fluid search selection disabled dropdown">
@@ -59,4 +57,7 @@
 
 <script>
     $('.ui.rcpch_light_blue.selection.dropdown').dropdown();
+    $('.rcpch_popup').popup({
+        inline: true
+    });
 </script>

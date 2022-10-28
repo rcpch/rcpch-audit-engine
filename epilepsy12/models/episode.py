@@ -98,15 +98,6 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         null=True
     )
 
-    # were_any_of_the_epileptic_seizures_convulsive = models.BooleanField(
-    #     help_text={
-    #         'label': "Were any of the epileptic seizures convulsive?",
-    #         'reference': "Were any of the epileptic seizures convulsive?",
-    #     },
-    #     default=None,
-    #     null=True
-    # )
-
     """
     Onset of Seizures
     """
@@ -260,6 +251,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     # nonepileptic seizure onset
 
     nonepileptic_seizure_unknown_onset = models.CharField(
+        help_text={
+            'label': 'How best describes the generalised nature of the nonepileptic episode(s)?',
+            'reference': 'How best describes the generalised nature of the nonepileptic episode(s)?',
+        },
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_ONSET,
         default=None,
@@ -267,6 +262,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         blank=True
     )
     nonepileptic_seizure_syncope = models.CharField(
+        help_text={
+            'label': 'How best describes the <i>type</i> of syncope?',
+            'reference': 'How best describes the <i>type</i> of syncope?',
+        },
         max_length=3,
         choices=sorted(NON_EPILEPTIC_SYNCOPES),
         default=None,
@@ -274,6 +273,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         blank=True
     )
     nonepileptic_seizure_behavioural = models.CharField(
+        help_text={
+            'label': 'How best describes the <i>type</i> of behavioural episode?',
+            'reference': 'How best describes the <i>type</i> of behavioural episode?',
+        },
         max_length=3,
         choices=sorted(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS),
         default=None,
@@ -281,6 +284,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         blank=True
     )
     nonepileptic_seizure_sleep = models.CharField(
+        help_text={
+            'label': 'How best describes the <i>type</i> of sleep event?',
+            'reference': 'How best describes the <i>type</i> of sleep event?',
+        },
         max_length=3,
         choices=sorted(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS),
         default=None,
@@ -288,6 +295,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         blank=True
     )
     nonepileptic_seizure_paroxysmal = models.CharField(
+        help_text={
+            'label': 'How best describes the <i>type</i> of paroxysmal event?',
+            'reference': 'How best describes the <i>type</i> of paroxysmal event?',
+        },
         max_length=3,
         choices=sorted(NON_EPILEPSY_PAROXYSMS),
         default=None,
@@ -295,6 +306,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         blank=True
     )
     nonepileptic_seizure_migraine = models.CharField(
+        help_text={
+            'label': 'How best describes the <i>type</i> of migraine?',
+            'reference': 'How best describes the <i>type</i> of migraine?',
+        },
         max_length=3,
         choices=sorted(MIGRAINES),
         default=None,
@@ -302,6 +317,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         blank=True
     )
     nonepileptic_seizure_miscellaneous = models.CharField(
+        help_text={
+            'label': 'How best describes the <i>subtype</i>?',
+            'reference': 'How best describes the <i>subtype</i>?',
+        },
         max_length=3,
         choices=sorted(EPIS_MISC),
         default=None,
