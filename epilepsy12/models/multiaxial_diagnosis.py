@@ -1,5 +1,3 @@
-from email.policy import default
-from random import choices
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
@@ -84,16 +82,6 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         null=True
     )
 
-    mental_health_screen = models.BooleanField(
-        help_text={
-            'label': "Has a mental health concern been sought?",
-            'reference': "Is there evidence of the child being assessed for mental health problems via clinical enquiry or the use of a screening questionnaire?",
-        },
-        default=None,
-        blank=True,
-        null=True
-    )
-
     mental_health_issue_identified = models.BooleanField(
         help_text={
             'label': "Has a mental health issue been identified?",
@@ -126,8 +114,8 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     # Meta class
 
     class Meta:
-        verbose_name = "DESSCRIBE assessment"
-        verbose_name_plural = "DESSCRIBE assessments"
+        verbose_name = "Multiaxial Diagnosis"
+        verbose_name_plural = "Multiaxial diagnosis assessments"
 
     def __str__(self) -> str:
         return f"Multaxial diagnosis for {self.registration.case}"

@@ -49,15 +49,6 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         null=True
     )
 
-    has_number_of_episodes_since_the_first_been_documented = models.BooleanField(
-        help_text={
-            'label': "Has the frequency of episodes since the first recorded been documented?",
-            'reference': "Has the frequency of episodes since the first recorded been documented?",
-        },
-        null=True,
-        default=None
-    )
-
     has_description_of_the_episode_or_episodes_been_gathered = models.BooleanField(
         help_text={
             'label': "Has a description of the episode or episodes been gathered?",
@@ -129,6 +120,10 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     # generalised onset
 
     epileptic_generalised_onset = models.CharField(
+        help_text={
+            'label': "How best describes the generalised nature of the epileptic episode(s)?",
+            'reference': "How best describes the generalised nature of the epileptic episode(s)?",
+        },
         max_length=3,
         choices=sorted(GENERALISED_SEIZURE_TYPE),
         default=None,
