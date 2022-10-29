@@ -1,6 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import wraps
 from django.utils import timezone
+from datetime import datetime
 from epilepsy12.models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
 from epilepsy12.models.comorbidity import Comorbidity
 
@@ -193,6 +194,13 @@ def update_model(model, field_name, page_element):
             elif page_element == 'multiple_choice_multiple_toggle_button' or page_element == 'single_choice_multiple_toggle_button':
                 # multiple_choice_multiple_toggle_button
                 field_value = request.htmx.trigger_name
+
+            elif page_element == 'date_field':
+                field_value = datetime.strptime(request.POST.get(
+                    request.htmx.trigger_name), "%Y-%m-%d").date()
+
+            elif page_element == 'select' or page_element == 'snomed_select':
+                field_value = request.POST.get(request.htmx.trigger_name)
 
             # update the model
             for key, value in kwargs.items():
