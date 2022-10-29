@@ -204,7 +204,6 @@ def update_model(model, field_name, page_element):
                 model.objects.filter(
                     pk=value).update(**updated_field)
 
-            # model.objects.filter(field)
             return f(request, *args, **kwargs)
         return wraps(f)(wrapper)
     return decorator
