@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
-from ..decorator import group_required
+from ..decorator import group_required, update_model
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
 from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
@@ -341,19 +341,11 @@ def remove_episode(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Episode, 'seizure_onset_date', 'date_field')
 def seizure_onset_date(request, episode_id):
     """
     HTMX post request from episode.html partial on date change
     """
-    seizure_onset_date = request.POST.get(
-        request.htmx.trigger_name)
-
-    Episode.objects.filter(pk=episode_id).update(
-        seizure_onset_date=datetime.strptime(
-            seizure_onset_date, "%Y-%m-%d").date(),
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
 
     episode = Episode.objects.get(pk=episode_id)
 
@@ -395,19 +387,12 @@ def seizure_onset_date(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Episode, 'seizure_onset_date_confidence', 'single_choice_multiple_toggle_button')
 def seizure_onset_date_confidence(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
 
-    seizure_onset_date_confidence = request.htmx.trigger_name
-
-    Episode.objects.filter(pk=episode_id).update(
-        seizure_onset_date_confidence=seizure_onset_date_confidence,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
-
     episode = Episode.objects.get(pk=episode_id)
 
     keywords = Keyword.objects.all()
@@ -448,19 +433,12 @@ def seizure_onset_date_confidence(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Episode, 'episode_definition', 'select')
 def episode_definition(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
 
-    episode_definition = request.POST.get(request.htmx.trigger_name)
-
-    Episode.objects.filter(pk=episode_id).update(
-        episode_definition=episode_definition,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
-
     episode = Episode.objects.get(pk=episode_id)
 
     keywords = Keyword.objects.all()
@@ -501,27 +479,13 @@ def episode_definition(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Episode, 'has_description_of_the_episode_or_episodes_been_gathered', 'toggle_button')
 def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
 
-    if request.htmx.trigger_name == 'button-true':
-        has_description_of_the_episode_or_episodes_been_gathered = True
-    elif request.htmx.trigger_name == 'button-false':
-        has_description_of_the_episode_or_episodes_been_gathered = False
-    else:
-        raise Exception
-
     keywords = Keyword.objects.all()
-
-    Episode.objects.filter(pk=episode_id).update(
-        has_description_of_the_episode_or_episodes_been_gathered=has_description_of_the_episode_or_episodes_been_gathered,
-        description='',
-        description_keywords=[],
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
 
     episode = Episode.objects.get(pk=episode_id)
 
@@ -867,15 +831,11 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Episode, 'epileptic_generalised_onset', 'select')
 def epileptic_generalised_onset(request, episode_id):
     """
     POST request from epileptic_generalised_onset field in generalised_onset_epilepsy
     """
-    epileptic_generalised_onset = request.POST.get(request.htmx.trigger_name)
-
-    Episode.objects.filter(pk=episode_id).update(
-        epileptic_generalised_onset=epileptic_generalised_onset
-    )
 
     episode = Episode.objects.get(pk=episode_id)
 
@@ -903,15 +863,12 @@ Nonepilepsy
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Episode, 'nonepileptic_seizure_unknown_onset', 'multiple_choice_multiple_toggle_button')
 def nonepilepsy_generalised_onset(request, episode_id):
     """
     POST request from toggle
     """
-    nonepilepsy_generalised_onset = request.htmx.trigger_name
-    Episode.objects.filter(id=episode_id).update(
-        nonepileptic_seizure_unknown_onset=nonepilepsy_generalised_onset,
-        updated_at=timezone.now(),
-        updated_by=request.user)
+
     episode = Episode.objects.get(id=episode_id)
 
     context = {
@@ -1249,19 +1206,16 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(MultiaxialDiagnosis, 'epilepsy_cause', 'select')
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
     Choices for causes fed from SNOMED server
     """
 
-    epilepsy_cause = request.POST.get(request.htmx.trigger_name)
-
+    # SNOMED term populating epilepsy cause dropdown
     ecl = '<< 363235000'
     epilepsy_causes = fetch_ecl(ecl)
-
-    MultiaxialDiagnosis.objects.filter(
-        pk=multiaxial_diagnosis_id).update(epilepsy_cause=epilepsy_cause)
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
@@ -1460,17 +1414,12 @@ def remove_comorbidity(request, comorbidity_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Comorbidity, 'comorbidity_diagnosis_date', 'date_field')
 def comorbidity_diagnosis_date(request, comorbidity_id):
     """
     POST request from comorbidity partial with comorbidity_diagnosis_date
     """
-    comorbidity_diagnosis_date = request.POST.get(request.htmx.trigger_name)
-    Comorbidity.objects.filter(pk=comorbidity_id).update(
-        comorbidity_diagnosis_date=datetime.strptime(
-            comorbidity_diagnosis_date, "%Y-%m-%d").date(),
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
 
     ecl = '<< 35919005'
@@ -1493,6 +1442,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(Comorbidity, 'comorbidity_diagnosis', 'snomed_select')
 def comorbidity_diagnosis(request, comorbidity_id):
     """
     POST request on change select from comorbidity partial
@@ -1501,17 +1451,8 @@ def comorbidity_diagnosis(request, comorbidity_id):
 
     # 35919005 |Pervasive developmental disorder (disorder)|
 
-    comorbidity_diagnosis = request.POST.get(request.htmx.trigger_name)
-
     ecl = '<< 35919005'
     comorbidity_choices = fetch_ecl(ecl)
-
-    Comorbidity.objects.filter(
-        pk=comorbidity_id).update(
-            comorbidity_diagnosis=comorbidity_diagnosis,
-            updated_at=timezone.now(),
-            updated_by=request.user
-    )
 
     comorbidity = Comorbidity.objects.get(
         pk=comorbidity_id)
@@ -1557,24 +1498,16 @@ def comorbidities(request, multiaxial_diagnosis_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(MultiaxialDiagnosis, 'mental_health_screen', 'toggle_button')
 def mental_health_screen(request, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_screen toggle
     """
 
-    if request.htmx.trigger_name == 'button-true':
-        mental_health_screen = True
-    elif request.htmx.trigger_name == 'button-false':
-        mental_health_screen = False
-    else:
-        raise Exception
-
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
-    multiaxial_diagnosis.mental_health_screen = mental_health_screen
-    multiaxial_diagnosis.updated_at = timezone.now(),
-    multiaxial_diagnosis.updated_by = request.user
-    multiaxial_diagnosis.save()
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1591,26 +1524,22 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(MultiaxialDiagnosis, 'mental_health_issue_identified', 'toggle_button')
 def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_issue_identified toggle
     """
 
-    if request.htmx.trigger_name == 'button-true':
-        mental_health_issue_identified = True
-    elif request.htmx.trigger_name == 'button-false':
-        mental_health_issue_identified = False
-    else:
-        raise Exception
-
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
-    multiaxial_diagnosis.mental_health_issue_identified = mental_health_issue_identified
-    if not mental_health_issue_identified:
+
+    if not multiaxial_diagnosis.mental_health_issue_identified:
         multiaxial_diagnosis.mental_health_issue = None
-    multiaxial_diagnosis.updated_at = timezone.now(),
-    multiaxial_diagnosis.updated_by = request.user
-    multiaxial_diagnosis.save()
+        multiaxial_diagnosis.updated_at = timezone.now(),
+        multiaxial_diagnosis.updated_by = request.user
+        multiaxial_diagnosis.save()
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1627,19 +1556,16 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     return response
 
 
+@login_required
+@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@update_model(MultiaxialDiagnosis, 'mental_health_issue', 'single_choice_multiple_toggle_button')
 def mental_health_issue(request, multiaxial_diagnosis_id):
     """
     POST callback from mental_health_issue multiple toggle
     """
 
-    mental_health_issue = request.htmx.trigger_name
-
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
-    multiaxial_diagnosis.mental_health_issue = mental_health_issue
-    multiaxial_diagnosis.updated_at = timezone.now(),
-    multiaxial_diagnosis.updated_by = request.user
-    multiaxial_diagnosis.save()
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1654,60 +1580,3 @@ def mental_health_issue(request, multiaxial_diagnosis_id):
     )
 
     return response
-
-    # description
-    # description_keywords
-    # epilepsy_or_nonepilepsy_status
-    # prolonged_generalized_convulsive_seizures
-    # experienced_prolonged_focal_seizures
-    # epileptic_seizure_onset_type
-    # nonepileptic_seizure_type
-    # focal_onset_impaired_awareness
-    # focal_onset_automatisms
-    # focal_onset_atonic
-    # focal_onset_clonic
-    # focal_onset_left
-    # focal_onset_right
-    # focal_onset_epileptic_spasms
-    # focal_onset_hyperkinetic
-    # focal_onset_myoclonic
-    # focal_onset_tonic
-    # focal_onset_autonomic
-    # focal_onset_behavioural_arrest
-    # focal_onset_cognitive
-    # focal_onset_emotional
-    # focal_onset_sensory
-    # focal_onset_centrotemporal
-    # focal_onset_temporal
-    # focal_onset_frontal
-    # focal_onset_parietal
-    # focal_onset_occipital
-    # focal_onset_gelastic
-    # focal_onset_focal_to_bilateral_tonic_clonic
-    # focal_onset_other
-    # epileptic_generalised_onset
-    # epileptic_generalised_onset_other_details
-    # nonepileptic_seizure_unknown_onset
-    # nonepileptic_seizure_unknown_onset_other_details
-    # nonepileptic_seizure_syncope
-    # nonepileptic_seizure_behavioural
-    # nonepileptic_seizure_sleep
-    # nonepileptic_seizure_paroxysmal
-    # nonepileptic_seizure_migraine
-    # nonepileptic_seizure_miscellaneous
-    # nonepileptic_seizure_other
-    # syndrome_present
-    # syndrome
-    # seizure_cause_main
-    # seizure_cause_structural
-    # seizure_cause_genetic
-    # seizure_cause_gene_abnormality
-    # seizure_cause_genetic_other
-    # seizure_cause_chromosomal_abnormality
-    # seizure_cause_infectious
-    # seizure_cause_metabolic
-    # seizure_cause_metabolic_other
-    # seizure_cause_immune
-    # seizure_cause_immune_antibody
-    # seizure_cause_immune_antibody_other
-    # relevant_impairments_behavioural_educational
