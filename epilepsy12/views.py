@@ -59,7 +59,7 @@ def hospital_reports(request):
             epilepsy12user.delete()
 
     # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
-    initial_assessment = InitialAssessment.objects.filter()
+    first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
     site = Site.objects.filter()
     epilepsy_context = EpilepsyContext.objects.filter()
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
@@ -72,7 +72,7 @@ def hospital_reports(request):
     registration = Registration.objects.filter()
 
     all_models = sorted(
-        chain(registration, initial_assessment, site, epilepsy_context, multiaxial_diagnosis,
+        chain(registration, first_paediatric_assessment, site, epilepsy_context, multiaxial_diagnosis,
               episode, syndrome, comorbidity, assessment, investigations, management),
         key=lambda x: x.updated_at, reverse=True)[:5]
 

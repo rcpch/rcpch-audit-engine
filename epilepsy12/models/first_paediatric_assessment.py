@@ -7,7 +7,7 @@ from .time_and_user_abstract_base_classes import *
 from .registration import Registration
 
 
-class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
+class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records information about the initial assessment.
     Whilst other information about the child and their epilepsy may be captured across the audit year

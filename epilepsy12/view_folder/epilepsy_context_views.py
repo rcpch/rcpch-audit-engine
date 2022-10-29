@@ -1,14 +1,9 @@
-
-from django.utils import timezone
-from django.http import HttpResponse
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ..decorator import group_required, update_model
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from epilepsy12.models.registration import Registration
 from ..models import EpilepsyContext
-from epilepsy12.models.audit_progress import AuditProgress
-from django_htmx.http import trigger_client_event
+from .common_view_functions import recalculate_form_generate_response
 
 
 @login_required
@@ -19,8 +14,6 @@ def epilepsy_context(request, case_id):
     epilepsy_context, created = EpilepsyContext.objects.get_or_create(
         registration=registration)
 
-    test_fields_update_audit_progress(epilepsy_context)
-
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -30,16 +23,14 @@ def epilepsy_context(request, case_id):
         "active_template": "epilepsy_context"
     }
 
-    response = render(
-        request=request, template_name='epilepsy12/epilepsy_context.html', context=context)
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template='epilepsy12/epilepsy_context.html',
+        context=context
+    )
 
-# HTMX
+    return response
 
 
 @login_required
@@ -59,16 +50,13 @@ def previous_febrile_seizure(request, epilepsy_context_id):
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/previous_febrile_seizure.html",
+        context=context
+    )
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/previous_febrile_seizure.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -89,16 +77,13 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/previous_acute_symptomatic_seizure.html",
+        context=context
+    )
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/previous_acute_symptomatic_seizure.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -119,16 +104,13 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/is_there_a_family_history_of_epilepsy.html",
+        context=context
+    )
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/is_there_a_family_history_of_epilepsy.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -149,16 +131,13 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/previous_neonatal_seizures.html",
+        context=context
+    )
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/previous_neonatal_seizures.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -172,21 +151,19 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
-    test_fields_update_audit_progress(epilepsy_context)
 
     context = {
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    response = render(
-        request=request, template_name='epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html', context=context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template='epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html',
+        context=context
+    )
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -207,16 +184,13 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/experienced_prolonged_generalized_convulsive_seizures.html",
+        context=context
+    )
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/experienced_prolonged_generalized_convulsive_seizures.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -237,16 +211,13 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
         "uncertain_choices": OPT_OUT_UNCERTAIN
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/experienced_prolonged_focal_seizures.html",
+        context=context
+    )
 
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/experienced_prolonged_focal_seizures.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
     return response
 
 
@@ -266,62 +237,11 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
         "epilepsy_context": epilepsy_context
     }
 
-    test_fields_update_audit_progress(epilepsy_context)
-
-    response = render(
-        request=request, template_name="epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html", context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
-
-
-# test all fields
-def test_fields_update_audit_progress(model_instance):
-    all_completed_fields = completed_fields(model_instance)
-    all_fields = total_fields_expected(model_instance)
-
-    AuditProgress.objects.filter(registration=model_instance.registration).update(
-        epilepsy_context_total_expected_fields=all_fields,
-        epilepsy_context_total_completed_fields=all_completed_fields,
-        epilepsy_context_complete=all_completed_fields == all_fields
+    response = recalculate_form_generate_response(
+        model_instance=epilepsy_context,
+        request=request,
+        template="epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html",
+        context=context
     )
 
-
-def completed_fields(model_instance):
-    """
-    Test for all these completed fields
-    previous_febrile_seizure
-    previous_acute_symptomatic_seizure
-    is_there_a_family_history_of_epilepsy
-    previous_neonatal_seizures
-    diagnosis_of_epilepsy_withdrawn
-    """
-    fields = model_instance._meta.get_fields()
-    counter = 0
-    for field in fields:
-        if (
-                getattr(model_instance, field.name) is not None
-                and field.name not in ['id', 'registration', 'updated_at', 'updated_by', 'created_at', 'created_by']):
-            counter += 1
-    return counter
-
-
-def total_fields_expected(model_instance):
-    """
-    a minimum total fields would be:
-
-    previous_febrile_seizure
-    previous_acute_symptomatic_seizure
-    is_there_a_family_history_of_epilepsy
-    previous_neonatal_seizures
-    diagnosis_of_epilepsy_withdrawn
-
-    """
-
-    cumulative_fields = 7
-
-    return cumulative_fields
+    return response

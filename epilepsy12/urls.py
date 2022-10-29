@@ -37,8 +37,8 @@ urlpatterns = [
          views.registration_active, name='registration_active'),
 
     # initial assessment path
-    path('initial_assessment/<int:case_id>',
-         views.initial_assessment, name="initial_assessment"),
+    path('first_paediatric_assessment/<int:case_id>',
+         views.first_paediatric_assessment, name="first_paediatric_assessment"),
     # assessment path
     path('assessment/<int:case_id>/',
          views.assessment, name="assessment"),
@@ -261,18 +261,18 @@ htmx_paths = [
 
     # initial assessment endpoints
 
-    path('registration/<int:initial_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting',
+    path('registration/<int:first_paediatric_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting',
          views.first_paediatric_assessment_in_acute_or_nonacute_setting, name="first_paediatric_assessment_in_acute_or_nonacute_setting"),
 
-    path('registration/<int:initial_assessment_id>/has_number_of_episodes_since_the_first_been_documented',
+    path('registration/<int:first_paediatric_assessment_id>/has_number_of_episodes_since_the_first_been_documented',
          views.has_number_of_episodes_since_the_first_been_documented, name="has_number_of_episodes_since_the_first_been_documented"),
-    path('registration/<int:initial_assessment_id>/general_examination_performed',
+    path('registration/<int:first_paediatric_assessment_id>/general_examination_performed',
          views.general_examination_performed, name="general_examination_performed"),
-    path('registration/<int:initial_assessment_id>/neurological_examination_performed',
+    path('registration/<int:first_paediatric_assessment_id>/neurological_examination_performed',
          views.neurological_examination_performed, name="neurological_examination_performed"),
-    path('registration/<int:initial_assessment_id>/developmental_learning_or_schooling_problems',
+    path('registration/<int:first_paediatric_assessment_id>/developmental_learning_or_schooling_problems',
          views.developmental_learning_or_schooling_problems, name="developmental_learning_or_schooling_problems"),
-    path('registration/<int:initial_assessment_id>/behavioural_or_emotional_problems',
+    path('registration/<int:first_paediatric_assessment_id>/behavioural_or_emotional_problems',
          views.behavioural_or_emotional_problems, name="behavioural_or_emotional_problems"),
 
     # epilepsy context htmx

@@ -21,16 +21,16 @@ class AuditProgress(models.Model):
         default=0,
         null=True
     )
-    initial_assessment_complete = models.BooleanField(
+    first_paediatric_assessment_complete = models.BooleanField(
         default=False,
         null=True
     )
-    initial_assessment_total_expected_fields = models.SmallIntegerField(
+    first_paediatric_assessment_total_expected_fields = models.SmallIntegerField(
         "Total Number of fields expected",
         default=0,
         null=True
     )
-    initial_assessment_total_completed_fields = models.SmallIntegerField(
+    first_paediatric_assessment_total_completed_fields = models.SmallIntegerField(
         "Total Number of fields completed",
         default=0,
         null=True

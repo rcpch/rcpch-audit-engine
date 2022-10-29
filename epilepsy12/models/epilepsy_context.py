@@ -13,7 +13,7 @@ from ..general_functions import *
 class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records contextual information that defines epilepsy risk.
-    It references the InitialAssessment class, as each case optionally has a single epilepsy context.
+    It references the FirstPaediatricAssessment class, as each case optionally has a single epilepsy context.
     """
 
     previous_febrile_seizure = models.CharField(

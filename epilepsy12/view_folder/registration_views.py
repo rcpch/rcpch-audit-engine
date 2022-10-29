@@ -18,7 +18,7 @@ def register(request, case_id):
     if not Registration.objects.filter(case=case).exists():
         audit_progress = AuditProgress.objects.create(
             registration_complete=False,
-            initial_assessment_complete=False,
+            first_paediatric_assessment_complete=False,
             assessment_complete=False,
             epilepsy_context_complete=False,
             multiaxial_diagnosis_complete=False,
@@ -26,8 +26,8 @@ def register(request, case_id):
             investigations_complete=False,
             registration_total_expected_fields=3,
             registration_total_completed_fields=0,
-            initial_assessment_total_expected_fields=0,
-            initial_assessment_total_completed_fields=0,
+            first_paediatric_assessment_total_expected_fields=0,
+            first_paediatric_assessment_total_completed_fields=0,
             assessment_total_expected_fields=0,
             assessment_total_completed_fields=0,
             epilepsy_context_total_expected_fields=0,
@@ -599,7 +599,7 @@ def total_fields_completed(model_instance):
     for field in fields:
         if (
             field.name is not None and
-            field.name not in ['id', 'site', 'initialassessment', 'management', 'investigations', 'assessment', 'epilepsy_context',
+            field.name not in ['id', 'site', 'firstpaediatricassessment', 'management', 'investigations', 'assessment', 'epilepsy_context',
                                'epilepsycontext', 'registration', 'audit_progress', 'created_at', 'created_by', 'updated_by', 'updated_at', 'case', 'episode', 'syndrome', 'multiaxialdiagnosis', 'registration_close_date', 'cohort']
         ):
             if getattr(model_instance, field.name) is not None:

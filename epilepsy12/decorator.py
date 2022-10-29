@@ -1,14 +1,14 @@
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import wraps
 from django.utils import timezone
-from epilepsy12.models import InitialAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
+from epilepsy12.models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
 from epilepsy12.models.comorbidity import Comorbidity
 
 
 model_primary_keys = [
     {'id': 'case_id', 'model': 'Case'},
     {'id': 'registration_id', 'model': 'Registration'},
-    {'id': 'initial_assessment_id', 'model': 'InitialAssessment'},
+    {'id': 'first_paediatric_assessment', 'model': 'FirstPaediatricAssessment'},
     {'id': 'epilepsy_context_id', 'model': 'EpilepsyContext'},
     {'id': 'multiaxial_diagnosis_id', 'model': 'MultiaxialDiagnosis'},
     {'id': 'episode_id', 'model': 'Episode'},
@@ -98,10 +98,10 @@ def group_required(*group_names):
                     investigations = Investigations.objects.get(
                         pk=kwargs.get('investigations_id'))
                     child = investigations.registration.case
-                elif kwargs.get('initial_assessment_id') is not None:
-                    initial_assessment = InitialAssessment.objects.get(
-                        pk=kwargs.get('initial_assessment_id'))
-                    child = initial_assessment.registration.case
+                elif kwargs.get('first_paediatric_assessment_id') is not None:
+                    first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
+                        pk=kwargs.get('first_paediatric_assessment_id'))
+                    child = first_paediatric_assessment.registration.case
                 elif kwargs.get('epilepsy_context_id') is not None:
                     epilepsy_context = EpilepsyContext.objects.get(
                         pk=kwargs.get('epilepsy_context_id'))

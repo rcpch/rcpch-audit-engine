@@ -1,9 +1,0 @@
-{% load epilepsy12_template_tags %}
-<div class='field'>
-    {% url 'date_of_initial_assessment' initial_assessment_id=initial_assessment.pk as hx_post %}
-    {% if perms.epilepsy12.change_initial_assessment %}
-        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#date_of_initial_assessment' hx_trigger='change' label='What is the date of the first paediatric assessment?' date_value=initial_assessment.date_of_initial_assessment data_position='top left' input_date_field_name='date_of_initial_assessment' disabled=False %} 
-    {% else %}
-        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#date_of_initial_assessment' hx_trigger='change' label='What is the date of the first paediatric assessment?' date_value=initial_assessment.date_of_initial_assessment data_position='top left' input_date_field_name='date_of_initial_assessment' disabled=True %}
-    {% endif %}
-</div>

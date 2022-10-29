@@ -8,7 +8,7 @@ register = template.Library()
 @register.simple_tag
 def percent_complete(registration):
     total = 0
-    if registration.audit_progress.initial_assessment_complete:
+    if registration.audit_progress.first_paediatric_assessment_complete:
         total += 12
     if registration.audit_progress.epilepsy_context_complete:
         total += 6
@@ -83,8 +83,8 @@ def is_in(url_name, args):
 def to_class_name(value):
     if value.__class__.__name__ == "Registration":
         return 'Verification/Registration'
-    elif value.__class__.__name__ == "InitialAssessment":
-        return 'Initial Assessment'
+    elif value.__class__.__name__ == "FirstPaediatricAssessment":
+        return 'First Paediatric Assessment'
     elif value.__class__.__name__ == "EpilepsyContext":
         return 'Epilepsy Context'
     elif value.__class__.__name__ == "MultiaxialDiagnosis":
