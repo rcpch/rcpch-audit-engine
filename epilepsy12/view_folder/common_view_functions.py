@@ -1,10 +1,11 @@
 from django_htmx.http import trigger_client_event
 from django.shortcuts import render
 from django.db import IntegrityError
+from epilepsy12.models.antiepilepsy_medicine import AntiEpilepsyMedicine
 
 from epilepsy12.models.site import Site
 
-from ..models import AuditProgress, Episode, Syndrome, Comorbidity
+from ..models import AuditProgress, Episode, Syndrome, Comorbidity, Management
 
 
 def recalculate_form_generate_response(model_instance, request, context, template):
@@ -38,14 +39,15 @@ def test_fields_update_audit_progress(model_instance):
     verbose_name_underscored = model_instance._meta.verbose_name.lower().replace(' ', '_')
 
     all_completed_fields = completed_fields(model_instance)
-    all_fields = total_fields_expected(model_instance)
+    all_expected_fields = total_fields_expected(model_instance)
 
-    all_fields += number_of_completed_fields_in_related_models(model_instance)
+    all_completed_fields += number_of_completed_fields_in_related_models(
+        model_instance)
 
     update_fields = {
-        f'{verbose_name_underscored}_total_expected_fields': all_fields,
+        f'{verbose_name_underscored}_total_expected_fields': all_expected_fields,
         f'{verbose_name_underscored}_total_completed_fields': all_completed_fields,
-        f'{verbose_name_underscored}_complete': all_completed_fields == all_fields,
+        f'{verbose_name_underscored}_complete': all_completed_fields == all_expected_fields,
     }
 
     try:
@@ -61,8 +63,10 @@ def completed_fields(model_instance):
     """
     fields = model_instance._meta.get_fields()
     counter = 0
+    fields_to_avoid = avoid_fields(model_instance)
+
     for field in fields:
-        if field.name not in avoid_fields(model_instance):
+        if field.name not in fields_to_avoid:
             if getattr(model_instance, field.name) is not None:
                 if field.name == 'epilepsy_cause_categories' or field.name == 'description':
                     if len(getattr(model_instance, field.name)) > 0:
@@ -75,7 +79,7 @@ def completed_fields(model_instance):
 
 def total_fields_expected(model_instance):
     """
-    a minimum total fields would be:
+    returns as expected fields for a given model instance, based on user selections
     """
 
     model_class_name = model_instance.__class__.__name__
@@ -159,6 +163,50 @@ def total_fields_expected(model_instance):
             # add essential fields: request date, performed_date
             cumulative_score += 2
 
+    elif model_class_name == 'Management':
+        # also need to count associated records in AntiepilepsyMedicines
+        if model_instance.has_an_aed_been_given:
+            # antiepilepsy drugs
+            medicines = AntiEpilepsyMedicine.objects.filter(
+                management=model_instance,
+                is_rescue_medicine=False
+            ).all()
+            if medicines.count() > 0:
+                for medicine in medicines:
+                    # essential fields are:
+                    # medicine_name', 'antiepilepsy_medicine_start_date',
+                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
+                    cumulative_score += 4
+                    if medicine.medicine_id == 21 and model_instance.registration.case.sex == 2:
+                        # essential fields are:
+                        # 'is_a_pregnancy_prevention_programme_needed'
+                        cumulative_score += 1
+                        if medicine.is_a_pregnancy_prevention_programme_needed:
+                            # essential fields are:
+                            # 'is_a_pregnancy_prevention_programme_in_place
+                            cumulative_score += 1
+
+        if model_instance.has_rescue_medication_been_prescribed:
+            # rescue drugs
+            medicines = AntiEpilepsyMedicine.objects.filter(
+                management=model_instance,
+                is_rescue_medicine=True
+            ).all()
+            if medicines.count() > 0:
+                for medicine in medicines:
+                    # essential fields are:
+                    # medicine_name', 'antiepilepsy_medicine_start_date',
+                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
+                    cumulative_score += 4
+        if model_instance.individualised_care_plan_in_place:
+            # add essential fields:
+            # individualised_care_plan_date, individualised_care_plan_has_parent_carer_child_agreement,
+            # individualised_care_plan_includes_service_contact_details, individualised_care_plan_include_first_aid,
+            # individualised_care_plan_parental_prolonged_seizure_care, individualised_care_plan_includes_general_participation_risk,
+            # individualised_care_plan_addresses_water_safety, individualised_care_plan_addresses_sudep,
+            # individualised_care_plan_includes_ehcp, has_individualised_care_plan_been_updated_in_the_last_year
+            cumulative_score += 10
+
     return cumulative_score
 
 
@@ -173,7 +221,7 @@ def avoid_fields(model_instance):
     if model_class_name in ["FirstPaediatricAssessment",
                             "EpilepsyContext", "Assessment", "Investigations"]:
         return ['id', 'registration', 'updated_at', 'updated_by', 'created_at', 'created_by']
-    if model_class_name == 'MultiaxialDiagnosis':
+    elif model_class_name == 'MultiaxialDiagnosis':
         return ['id', 'registration', 'multiaxial_diagnosis', 'episode', 'syndrome', 'comorbidity', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'Management':
         return ['id', 'registration', 'antiepilepsymedicine', 'created_by', 'created_at', 'updated_by', 'updated_at']
@@ -181,6 +229,8 @@ def avoid_fields(model_instance):
         return ['id', 'multiaxial_diagnosis', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'Episode':
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']
+    elif model_class_name == 'AntiEpilepsyMedicine':
+        return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at']
     else:
         raise ValueError(
             f'{model_class_name} not found to return fields to avoid in form calculation.')
@@ -211,6 +261,10 @@ def scoreable_fields_for_model_class_name(model_class_name):
         return len(['childrens_epilepsy_surgical_service_referral_criteria_met', 'consultant_paediatrician_referral_made', 'paediatric_neurologist_referral_made', 'childrens_epilepsy_surgical_service_referral_made', 'epilepsy_specialist_nurse_referral_made'])
     elif model_class_name == 'Investigations':
         return len(['eeg_indicated', 'twelve_lead_ecg_status', 'ct_head_scan_status', 'mri_indicated'])
+    elif model_class_name == 'Management':
+        return len(['has_an_aed_been_given', 'has_rescue_medication_been_prescribed', 'individualised_care_plan_in_place', 'has_been_referred_for_mental_health_support', 'has_support_for_mental_health_support'])
+    elif model_class_name == 'AntiEpilepsyMedicine':
+        return len(['medicine_name', 'antiepilepsy_medicine_start_date', 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed', 'is_a_pregnancy_prevention_programme_needed', 'is_a_pregnancy_prevention_programme_in_place'])
     else:
         raise ValueError(
             f'{model_class_name} does not exist to calculate minimum number of scoreable fields.')
@@ -328,5 +382,32 @@ def number_of_completed_fields_in_related_models(model_instance):
                     cumulative_score += 1
                 elif site.site_is_paediatric_neurology_centre:
                     cumulative_score += 1
+    elif model_instance.__class__.__name__ == 'Management':
+        # also need to count associated records in AntiepilepsyMedicines
+        if model_instance.has_an_aed_been_given:
+            # antiepilepsy drugs
+            medicines = AntiEpilepsyMedicine.objects.filter(
+                management=model_instance,
+                is_rescue_medicine=False
+            ).all()
+            if medicines.count() > 0:
+                for medicine in medicines:
+                    # essential fields are:
+                    # medicine_name', 'antiepilepsy_medicine_start_date',
+                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
+                    cumulative_score += completed_fields(medicine)
+
+        if model_instance.has_rescue_medication_been_prescribed:
+            # rescue drugs
+            medicines = AntiEpilepsyMedicine.objects.filter(
+                management=model_instance,
+                is_rescue_medicine=True
+            ).all()
+            if medicines.count() > 0:
+                for medicine in medicines:
+                    # essential fields are:
+                    # medicine_name', 'antiepilepsy_medicine_start_date',
+                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
+                    cumulative_score += completed_fields(medicine)
 
     return cumulative_score
