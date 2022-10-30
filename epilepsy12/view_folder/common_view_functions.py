@@ -40,36 +40,7 @@ def test_fields_update_audit_progress(model_instance):
     all_completed_fields = completed_fields(model_instance)
     all_fields = total_fields_expected(model_instance)
 
-    if model_instance.__class__.__name__ == 'MultiaxialDiagnosis':
-        # also need to count associated records in Episode, Syndrome and Comorbidity
-        episodes = Episode.objects.filter(
-            multiaxial_diagnosis=model_instance).all()
-        syndromes = Syndrome.objects.filter(
-            multiaxial_diagnosis=model_instance).all()
-        comorbidities = Comorbidity.objects.filter(
-            multiaxial_diagnosis=model_instance).all()
-        if episodes.count() > 0:
-            for episode in episodes:
-                all_completed_fields += completed_fields(episode)
-        if syndromes.count() > 0:
-            for syndrome in syndromes:
-                all_completed_fields += completed_fields(syndrome)
-        if comorbidities.count() > 0:
-            for comorbidity in comorbidities:
-                all_completed_fields += completed_fields(comorbidity)
-    elif model_instance.__class__.__name__ == 'Assessment':
-        # also need to count associated records in Site
-        sites = Site.objects.filter(
-            case=model_instance.registration.case,
-            site_is_actively_involved_in_epilepsy_care=True).all()
-        if sites:
-            for site in sites:
-                if site.site_is_childrens_epilepsy_surgery_centre:
-                    all_completed_fields += 1
-                elif site.site_is_general_paediatric_centre:
-                    all_completed_fields += 1
-                elif site.site_is_paediatric_neurology_centre:
-                    all_completed_fields += 1
+    all_fields += number_of_completed_fields_in_related_models(model_instance)
 
     update_fields = {
         f'{verbose_name_underscored}_total_expected_fields': all_fields,
@@ -180,6 +151,14 @@ def total_fields_expected(model_instance):
             # add essential fields: date referred, date seen
             cumulative_score += 2
 
+    elif model_class_name == 'Investigations':
+        if model_instance.eeg_indicated:
+            # add essential fields: request date, performed_date
+            cumulative_score += 2
+        if model_instance.mri_indicated:
+            # add essential fields: request date, performed_date
+            cumulative_score += 2
+
     return cumulative_score
 
 
@@ -230,6 +209,8 @@ def scoreable_fields_for_model_class_name(model_class_name):
         return len(['comorbidity_diagnosis_date', 'comorbidity_diagnosis'])
     elif model_class_name == 'Assessment':
         return len(['childrens_epilepsy_surgical_service_referral_criteria_met', 'consultant_paediatrician_referral_made', 'paediatric_neurologist_referral_made', 'childrens_epilepsy_surgical_service_referral_made', 'epilepsy_specialist_nurse_referral_made'])
+    elif model_class_name == 'Investigations':
+        return len(['eeg_indicated', 'twelve_lead_ecg_status', 'ct_head_scan_status', 'mri_indicated'])
     else:
         raise ValueError(
             f'{model_class_name} does not exist to calculate minimum number of scoreable fields.')
@@ -308,3 +289,44 @@ def count_episode_fields(all_episodes):
         # increase the total by the minimum number of fields for an epileptic episode
         cumulative_score += scoreable_fields_for_model_class_name('Episode')
         return cumulative_score
+
+
+def number_of_completed_fields_in_related_models(model_instance):
+    """
+    Counts completed fields in models related to modelinstance passed in as parameter.
+    Returns an integer number of completed fields
+    If there are no related models, zero is returned.
+    """
+    cumulative_score = 0
+    if model_instance.__class__.__name__ == 'MultiaxialDiagnosis':
+        # also need to count associated records in Episode, Syndrome and Comorbidity
+        episodes = Episode.objects.filter(
+            multiaxial_diagnosis=model_instance).all()
+        syndromes = Syndrome.objects.filter(
+            multiaxial_diagnosis=model_instance).all()
+        comorbidities = Comorbidity.objects.filter(
+            multiaxial_diagnosis=model_instance).all()
+        if episodes.count() > 0:
+            for episode in episodes:
+                cumulative_score += completed_fields(episode)
+        if syndromes.count() > 0:
+            for syndrome in syndromes:
+                cumulative_score += completed_fields(syndrome)
+        if comorbidities.count() > 0:
+            for comorbidity in comorbidities:
+                cumulative_score += completed_fields(comorbidity)
+    elif model_instance.__class__.__name__ == 'Assessment':
+        # also need to count associated records in Site
+        sites = Site.objects.filter(
+            case=model_instance.registration.case,
+            site_is_actively_involved_in_epilepsy_care=True).all()
+        if sites:
+            for site in sites:
+                if site.site_is_childrens_epilepsy_surgery_centre:
+                    cumulative_score += 1
+                elif site.site_is_general_paediatric_centre:
+                    cumulative_score += 1
+                elif site.site_is_paediatric_neurology_centre:
+                    cumulative_score += 1
+
+    return cumulative_score

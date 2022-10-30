@@ -111,8 +111,8 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
     )
 
     class Meta:
-        verbose_name = 'Investigation Milestones'
-        verbose_name_plural = 'Investigation Milestones'
+        verbose_name = 'Investigations'
+        verbose_name_plural = 'Investigations'
 
     def __str__(self) -> str:
         return f"Investigations for {self.registration.case}"
