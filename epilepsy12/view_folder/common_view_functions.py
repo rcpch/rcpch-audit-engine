@@ -185,6 +185,10 @@ def total_fields_expected(model_instance):
                             # essential fields are:
                             # 'is_a_pregnancy_prevention_programme_in_place
                             cumulative_score += 1
+            else:
+                # user has said AED given but not scored yet
+                cumulative_score += scoreable_fields_for_model_class_name(
+                    'AntiEpilepsyMedicine')
 
         if model_instance.has_rescue_medication_been_prescribed:
             # rescue drugs
@@ -198,6 +202,11 @@ def total_fields_expected(model_instance):
                     # medicine_name', 'antiepilepsy_medicine_start_date',
                     # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
                     cumulative_score += 4
+            else:
+                # user has said AED given but not scored yet
+                cumulative_score += scoreable_fields_for_model_class_name(
+                    'AntiEpilepsyMedicine')
+
         if model_instance.individualised_care_plan_in_place:
             # add essential fields:
             # individualised_care_plan_date, individualised_care_plan_has_parent_carer_child_agreement,
