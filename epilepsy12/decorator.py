@@ -160,7 +160,7 @@ def group_required(*group_names):
     return decorator
 
 
-def update_model(model, field_name, page_element):
+def update_model(model, field_name, page_element, comparison_date_field_name=None, is_earliest_date=False):
     """
     Decorator to update the field in the model, depending on the type of page element POSTing back to the view.
     It also updates the model with the user and the datetime updated and includes error handling
@@ -204,6 +204,23 @@ def update_model(model, field_name, page_element):
 
             # update the model
             for key, value in kwargs.items():
+
+                if comparison_date_field_name:
+                    instance = model.objects.get(pk=value)
+                    comparison_date = getattr(
+                        instance, comparison_date_field_name)
+                    if is_earliest_date:
+                        date_valid = field_value <= comparison_date
+                        date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date}'
+                    else:
+                        date_valid = field_value >= comparison_date
+                        date_error = f'The date you chose ({field_value}) cannot not be before {comparison_date}'
+
+                    if date_valid:
+                        pass
+                    else:
+                        raise ValueError(date_error)
+
                 updated_field = {
                     field_name: field_value,
                     'updated_at': timezone.now(),

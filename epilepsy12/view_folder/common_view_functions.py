@@ -1,6 +1,8 @@
+from datetime import datetime, date
+from django.utils import timezone
 from django_htmx.http import trigger_client_event
 from django.shortcuts import render
-from django.db import IntegrityError
+from psycopg2 import DatabaseError
 from epilepsy12.models.antiepilepsy_medicine import AntiEpilepsyMedicine
 
 from epilepsy12.models.site import Site
@@ -8,10 +10,21 @@ from epilepsy12.models.site import Site
 from ..models import AuditProgress, Episode, Syndrome, Comorbidity, Management
 
 
-def recalculate_form_generate_response(model_instance, request, context, template):
+def recalculate_form_generate_response(model_instance, request, context, template, error_message=None):
     """
-    calculates form scores, creates response object and attaches htmx trigger
+    calculates form scores, creates response object and attaches htmx trigger to refresh steps widget
+    Params:
+    request
+    model instance
+    context
+    template name
+    error message - if not supplied an empty string is attached
     """
+
+    # add errors to context
+    context.update({
+        'error_message': error_message
+    })
 
     # calculate totals on form
     test_fields_update_audit_progress(model_instance)
@@ -53,7 +66,7 @@ def test_fields_update_audit_progress(model_instance):
     try:
         AuditProgress.objects.filter(
             registration=model_instance.registration).update(**update_fields)
-    except IntegrityError as error:
+    except DatabaseError as error:
         raise Exception(error)
 
 
@@ -420,3 +433,87 @@ def number_of_completed_fields_in_related_models(model_instance):
                     cumulative_score += completed_fields(medicine)
 
     return cumulative_score
+
+
+def validate_and_update_model(
+        request,
+        model_id,
+        model,
+        field_name,
+        page_element,
+        comparison_date_field_name=None,
+        is_earliest_date=False):
+    """
+    This is called from the view to update the model or return an error
+    Parameters:
+    request
+    model_id
+    model
+    field_name
+    page_element: string one of 'date_field', 'toggle_button', 'multiple_choice_single_toggle_button', 'multiple_choic_multiple_toggle_button', 'select', 'snomed_select', 'hospital_select'
+    comparison_date_field_name: string corresponding to field name for date in model
+    is_earliest_date: boolean
+    """
+    if page_element == 'toggle_button':
+        # toggle button
+        # the trigger_name of the element here corresponds to whether true or false has been selected
+
+        if request.htmx.trigger_name == 'button-true':
+            field_value = True
+        elif request.htmx.trigger_name == 'button-false':
+            field_value = False
+        else:
+            # an error has occurred
+            print('Error has occurred')
+
+    elif page_element == 'multiple_choice_multiple_toggle_button' or page_element == 'single_choice_multiple_toggle_button':
+        # multiple_choice_multiple_toggle_button
+        field_value = request.htmx.trigger_name
+
+    elif page_element == 'date_field':
+        field_value = datetime.strptime(request.POST.get(
+            request.htmx.trigger_name), "%Y-%m-%d").date()
+
+    elif page_element == 'select' or page_element == 'snomed_select':
+        field_value = request.POST.get(request.htmx.trigger_name)
+
+    # validate
+
+    if page_element == 'date_field':
+        if comparison_date_field_name:
+            instance = model.objects.get(pk=model_id)
+            comparison_date = getattr(
+                instance, comparison_date_field_name)
+            if is_earliest_date:
+                date_valid = field_value <= comparison_date
+                if not date_valid:
+                    date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date}'
+                    errors = date_error
+            else:
+                date_valid = field_value >= comparison_date
+                if not date_valid:
+                    date_error = f'The date you chose ({field_value}) cannot not be before {comparison_date}'
+                    errors = date_error
+
+            if field_value > date.today() and is_earliest_date:
+                date_error = f'The date you chose ({field_value}) cannot not be in the future.'
+                errors = date_error
+
+            if date_valid:
+                pass
+            else:
+                raise ValueError(errors)
+
+    # update the model
+
+    updated_field = {
+        field_name: field_value,
+        'updated_at': timezone.now(),
+        'updated_by': request.user
+    }
+
+    try:
+        model.objects.filter(
+            pk=model_id).update(**updated_field)
+    except DatabaseError as error:
+        raise Exception(error)

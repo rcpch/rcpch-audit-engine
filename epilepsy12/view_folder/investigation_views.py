@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from ..decorator import group_required
 from epilepsy12.models import Investigations, Registration
 from ..decorator import update_model
-from .common_view_functions import recalculate_form_generate_response
+from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
 
 
 @login_required
@@ -72,7 +72,6 @@ def eeg_indicated(request, investigations_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'eeg_request_date', 'date_field')
 def eeg_request_date(request, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
@@ -81,19 +80,35 @@ def eeg_request_date(request, investigations_id):
     It is triggered by a toggle in the partial generating a post request on change in the date field.
     This updates the model and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='eeg_request_date',
+            page_element='date_field',
+            comparison_date_field_name='eeg_performed_date',
+            is_earliest_date=True)
+
+    except ValueError as error:
+        error_message = error
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {
-        'investigations': investigations
-    }
-
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
+
+    context = {
+        'investigations': investigations,
+    }
 
     response = recalculate_form_generate_response(
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -101,7 +116,6 @@ def eeg_request_date(request, investigations_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'eeg_performed_date', 'date_field')
 def eeg_performed_date(request, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
@@ -110,6 +124,21 @@ def eeg_performed_date(request, investigations_id):
     It is triggered by a toggle in the partial generating a post request on change in the date field.
     This updates the model and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='eeg_performed_date',
+            page_element='date_field',
+            comparison_date_field_name='eeg_request_date',
+            is_earliest_date=False)
+
+    except ValueError as errors:
+        error_message = errors
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
@@ -122,7 +151,8 @@ def eeg_performed_date(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -223,13 +253,27 @@ def mri_indicated(request, investigations_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'mri_brain_requested_date', 'date_field')
 def mri_brain_requested_date(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
     It is triggered by a change in the date_input_field partial generating a post request
     This returns a date value which is stored in the model and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='mri_brain_requested_date',
+            page_element='date_field',
+            comparison_date_field_name='mri_brain_reported_date',
+            is_earliest_date=True)
+
+    except ValueError as errors:
+        error_message = errors
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
@@ -242,7 +286,8 @@ def mri_brain_requested_date(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -257,6 +302,21 @@ def mri_brain_reported_date(request, investigations_id):
     It is triggered by a change in the date_input_field partial generating a post request
     This returns a date value which is stored in the model and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='mri_brain_requested_date',
+            page_element='date_field',
+            comparison_date_field_name='mri_brain_reported_date',
+            is_earliest_date=True)
+
+    except ValueError as errors:
+        error_message = errors
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
@@ -269,7 +329,8 @@ def mri_brain_reported_date(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
