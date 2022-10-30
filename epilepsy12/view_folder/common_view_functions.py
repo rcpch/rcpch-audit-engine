@@ -2,6 +2,8 @@ from django_htmx.http import trigger_client_event
 from django.shortcuts import render
 from django.db import IntegrityError
 
+from epilepsy12.models.site import Site
+
 from ..models import AuditProgress, Episode, Syndrome, Comorbidity
 
 
@@ -55,6 +57,19 @@ def test_fields_update_audit_progress(model_instance):
         if comorbidities.count() > 0:
             for comorbidity in comorbidities:
                 all_completed_fields += completed_fields(comorbidity)
+    elif model_instance.__class__.__name__ == 'Assessment':
+        # also need to count associated records in Site
+        sites = Site.objects.filter(
+            case=model_instance.registration.case,
+            site_is_actively_involved_in_epilepsy_care=True).all()
+        if sites:
+            for site in sites:
+                if site.site_is_childrens_epilepsy_surgery_centre:
+                    all_completed_fields += 1
+                elif site.site_is_general_paediatric_centre:
+                    all_completed_fields += 1
+                elif site.site_is_paediatric_neurology_centre:
+                    all_completed_fields += 1
 
     update_fields = {
         f'{verbose_name_underscored}_total_expected_fields': all_fields,
@@ -151,6 +166,20 @@ def total_fields_expected(model_instance):
             # mental_health_issue
             cumulative_score += 1
 
+    elif model_class_name == 'Assessment':
+        if model_instance.consultant_paediatrician_referral_made:
+            # add essential fields: date referred, date seen, centre
+            cumulative_score += 3
+        if model_instance.paediatric_neurologist_referral_made:
+            # add essential fields: date referred, date seen, centre
+            cumulative_score += 3
+        if model_instance.childrens_epilepsy_surgical_service_referral_made:
+            # add essential fields: date referred, date seen, centre
+            cumulative_score += 3
+        if model_instance.epilepsy_specialist_nurse_referral_made:
+            # add essential fields: date referred, date seen
+            cumulative_score += 2
+
     return cumulative_score
 
 
@@ -159,21 +188,23 @@ def avoid_fields(model_instance):
     When looping through fields and counting them as complete/incomplete, these fields depending on the model
     should be avoided
     """
-    verbose_name_underscored = model_instance._meta.verbose_name.lower().replace(' ', '_')
+    # verbose_name_underscored = model_instance._meta.verbose_name.lower().replace(' ', '_')
+    model_class_name = model_instance.__class__.__name__
 
-    if verbose_name_underscored in ['first_paediatric_assessment', 'epilepsy_context', 'assessment', 'investigation']:
+    if model_class_name in ["FirstPaediatricAssessment",
+                            "EpilepsyContext", "Assessment", "Investigations"]:
         return ['id', 'registration', 'updated_at', 'updated_by', 'created_at', 'created_by']
-    if verbose_name_underscored == 'multiaxial_diagnosis':
+    if model_class_name == 'MultiaxialDiagnosis':
         return ['id', 'registration', 'multiaxial_diagnosis', 'episode', 'syndrome', 'comorbidity', 'created_by', 'created_at', 'updated_by', 'updated_at']
-    elif verbose_name_underscored == 'management':
+    elif model_class_name == 'Management':
         return ['id', 'registration', 'antiepilepsymedicine', 'created_by', 'created_at', 'updated_by', 'updated_at']
-    elif verbose_name_underscored in ['syndrome', 'comorbidity']:
+    elif model_class_name in ['Syndrome', 'Comorbidity']:
         return ['id', 'multiaxial_diagnosis', 'created_by', 'created_at', 'updated_by', 'updated_at']
-    elif verbose_name_underscored == 'episode':
+    elif model_class_name == 'Episode':
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']
     else:
         raise ValueError(
-            f'{verbose_name_underscored} not found to return fields to avoid in form calculation.')
+            f'{model_class_name} not found to return fields to avoid in form calculation.')
 
 
 def scoreable_fields_for_model_class_name(model_class_name):
@@ -197,6 +228,8 @@ def scoreable_fields_for_model_class_name(model_class_name):
         return len(['syndrome_diagnosis_date', 'syndrome_name'])
     elif model_class_name == 'Comorbidity':
         return len(['comorbidity_diagnosis_date', 'comorbidity_diagnosis'])
+    elif model_class_name == 'Assessment':
+        return len(['childrens_epilepsy_surgical_service_referral_criteria_met', 'consultant_paediatrician_referral_made', 'paediatric_neurologist_referral_made', 'childrens_epilepsy_surgical_service_referral_made', 'epilepsy_specialist_nurse_referral_made'])
     else:
         raise ValueError(
             f'{model_class_name} does not exist to calculate minimum number of scoreable fields.')
