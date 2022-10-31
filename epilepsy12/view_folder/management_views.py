@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
 from ..decorator import group_required
 from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine
-from .common_view_functions import recalculate_form_generate_response
+from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
 from ..decorator import update_model
 
 
@@ -336,11 +336,24 @@ def medicine_id(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@update_model(AntiEpilepsyMedicine, 'antiepilepsy_medicine_start_date', 'date_field')
 def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_start_date
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=AntiEpilepsyMedicine,
+            model_id=antiepilepsy_medicine_id,
+            field_name='antiepilepsy_medicine_start_date',
+            page_element='date_field',
+            comparison_date_field_name='antiepilepsy_medicine_stop_date',
+            is_earliest_date=True
+        )
+    except ValueError as error:
+        error_message = error
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
@@ -362,18 +375,32 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
         model_instance=antiepilepsy_medicine.management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@update_model(AntiEpilepsyMedicine, 'antiepilepsy_medicine_stop_date', 'date_field')
 def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_stop_date
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=AntiEpilepsyMedicine,
+            model_id=antiepilepsy_medicine_id,
+            field_name='antiepilepsy_medicine_stop_date',
+            page_element='date_field',
+            comparison_date_field_name='antiepilepsy_medicine_start_date',
+            is_earliest_date=False
+        )
+    except ValueError as error:
+        error_message = error
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
@@ -395,7 +422,8 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
         model_instance=antiepilepsy_medicine.management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -572,7 +600,6 @@ def individualised_care_plan_in_place(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_in_place', 'date_field')
 def individualised_care_plan_date(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -580,7 +607,18 @@ def individualised_care_plan_date(request, management_id):
     This persists the care plan date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_date',
+            page_element='date_field'
+        )
+    except ValueError as error:
+        error_message = error
+
     management = Management.objects.get(pk=management_id)
 
     context = {
@@ -593,7 +631,8 @@ def individualised_care_plan_date(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
