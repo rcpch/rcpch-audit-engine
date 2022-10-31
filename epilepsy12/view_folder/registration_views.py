@@ -219,8 +219,6 @@ def transfer_lead_site(request, registration_id, site_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName').all()
 
-    test_fields_update_audit_progress(registration)
-
     context = {
         "hospital_list": hospital_list,
         "registration": registration,
@@ -453,15 +451,6 @@ def confirm_eligible(request, registration_id):
         }
 
     registration = Registration.objects.filter(pk=registration_id).get()
-
-    # # if all registration components present (eligibility, registration_date and lead_centre), update AuditProcess
-    # if registration.eligibility_criteria_met and registration.registration_date is not None and Site.objects.filter(case=registration.case, site_is_primary_centre_of_epilepsy_care=True).exists():
-    #     # registration now complete
-    #     AuditProgress.objects.filter(pk=registration.audit_progress.pk).update(
-    #         registration_complete=True,
-    #         updated_at=timezone.now(),
-    #         updated_by=request.user
-    #     )
 
     template_name = 'epilepsy12/partials/registration/is_eligible_label.html'
 
