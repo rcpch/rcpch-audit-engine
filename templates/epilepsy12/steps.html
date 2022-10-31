@@ -54,17 +54,17 @@
         {% endif %}
     {% endif %}
 
-    {% if audit_progress.initial_assessment_complete %}
-        {% if active_template == "initial_assessment" %}
+    {% if audit_progress.first_paediatric_assessment_complete %}
+        {% if active_template == "first_paediatric_assessment" %}
 
-          <a class="active completed step" href="{% url 'initial_assessment' case_id %}">
+          <a class="active completed step" href="{% url 'first_paediatric_assessment' case_id %}">
             <div class="content">
               <div class="title">First paediatric assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
         {% else %}
-          <a class="completed step" href="{% url 'initial_assessment' case_id %}">
+          <a class="completed step" href="{% url 'first_paediatric_assessment' case_id %}">
             <div class="content">
               <div class="title">First paediatric assessment</div>
               <div class="description">The first visit</div>
@@ -72,23 +72,23 @@
           </a>
         {% endif %}
     {% else %}
-        {% if active_template == "initial_assessment" %}
+        {% if active_template == "first_paediatric_assessment" %}
 
-          <a href="{% url 'initial_assessment' case_id %}" class="active step">
+          <a href="{% url 'first_paediatric_assessment' case_id %}" class="active step">
             <div class="content">
               <div class="title">First paediatric assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
         {% elif active_template == "none" %}
-          <a href="{% url 'initial_assessment' case_id %}" class="disabled step">
+          <a href="{% url 'first_paediatric_assessment' case_id %}" class="disabled step">
             <div class="content">
               <div class="title">First paediatric assessment</div>
               <div class="description">The first visit</div>
             </div>
           </a>
         {% else %}
-          <a href="{% url 'initial_assessment' case_id %}" class="step">
+          <a href="{% url 'first_paediatric_assessment' case_id %}" class="step">
             <div class="content">
               <div class="title">First paediatric assessment</div>
               <div class="description">The first visit</div>
@@ -327,10 +327,10 @@
       {% endwith %}
     {% endif %}
     
-    {% if active_template == "initial_assessment" %}
+    {% if active_template == "first_paediatric_assessment" %}
       
-        {% with denominator=audit_progress.initial_assessment_total_expected_fields %}
-        {% with numerator=audit_progress.initial_assessment_total_completed_fields %}
+        {% with denominator=audit_progress.first_paediatric_assessment_total_expected_fields %}
+        {% with numerator=audit_progress.first_paediatric_assessment_total_completed_fields %}
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}

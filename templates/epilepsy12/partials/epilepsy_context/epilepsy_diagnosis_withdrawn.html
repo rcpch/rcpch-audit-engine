@@ -1,3 +1,3 @@
 {% url 'diagnosis_of_epilepsy_withdrawn' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#diagnosis_of_epilepsy_withdrawn" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.diagnosis_of_epilepsy_withdrawn label="At any stage in the first year after first assessment, has a diagnosis of epilepsy been withdrawn because it has been subsequently deemed incorrect?" data_position='top left' %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#diagnosis_of_epilepsy_withdrawn" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.diagnosis_of_epilepsy_withdrawn label=epilepsy_context.get_diagnosis_of_epilepsy_withdrawn_help_label_text reference=epilepsy_context.get_diagnosis_of_epilepsy_withdrawn_help_reference_text data_position='top left' %}
         

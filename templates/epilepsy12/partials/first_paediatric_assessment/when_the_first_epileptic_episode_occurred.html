@@ -1,0 +1,75 @@
+{% load epilepsy12_template_tags %}
+<form class="ui form">   
+
+    {% comment %} <div class='ui rcpch_info message'>
+    Details of the first episode will be captured in more detail in the multiaxial diagnosis section. Please use this section to record the elements captured at first paediatric assessment.
+    </div> {% endcomment %}
+    
+    <div class='ui grid'>
+
+        <div class='sixteen wide column'>
+            
+            <h5 class='ui header'>
+                During the time period from the patient's first paroxysmal episode considered epileptic to the first paediatric assessment select where there is documentation of the following:
+            </h5>
+        
+        </div>
+        
+
+        <div class='eight wide column'>
+                
+            {% url 'general_examination_performed' first_paediatric_assessment_id=first_paediatric_assessment.pk as hx_post %}
+            {% if perms.epilepsy12.change_first_paediatric_assessment %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.general_examination_performed label=first_paediatric_assessment.get_general_examination_performed_help_label_text reference=first_paediatric_assessment.get_general_examination_performed_help_reference_text data_position='top left' disabled=False %}
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.general_examination_performed label=first_paediatric_assessment.get_general_examination_performed_help_label_text reference=first_paediatric_assessment.get_general_examination_performed_help_reference_text data_position='top left' disabled=True  %}
+            {% endif %}
+        
+            {% url 'developmental_learning_or_schooling_problems' first_paediatric_assessment_id=first_paediatric_assessment.pk as hx_post %}
+            {% if perms.epilepsy12.change_first_paediatric_assessment %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.developmental_learning_or_schooling_problems label=first_paediatric_assessment.get_developmental_learning_or_schooling_problems_help_label_text reference=first_paediatric_assessment.get_developmental_learning_or_schooling_problems_help_reference_text data_position='top left' disabled=False %}
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.developmental_learning_or_schooling_problems label=first_paediatric_assessment.get_developmental_learning_or_schooling_problems_help_label_text reference=first_paediatric_assessment.get_developmental_learning_or_schooling_problems_help_reference_text data_position='top left' disabled=True %}
+            {% endif %}
+
+        </div>
+
+        <div class='eight wide column'>
+
+            {% url 'neurological_examination_performed' first_paediatric_assessment_id=first_paediatric_assessment.pk as hx_post %}
+            {% if perms.epilepsy12.change_first_paediatric_assessment %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.neurological_examination_performed label=first_paediatric_assessment.get_neurological_examination_performed_help_label_text reference=first_paediatric_assessment.get_neurological_examination_performed_help_reference_text data_position='top left' disabled=False %}
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.neurological_examination_performed label=first_paediatric_assessment.get_neurological_examination_performed_help_label_text reference=first_paediatric_assessment.get_neurological_examination_performed_help_reference_text data_position='top left' disabled=True %}
+            {% endif %}
+
+            {% url 'behavioural_or_emotional_problems' first_paediatric_assessment_id=first_paediatric_assessment.pk as hx_post %}
+            {% if perms.epilepsy12.change_first_paediatric_assessment %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.behavioural_or_emotional_problems label=first_paediatric_assessment.get_behavioural_or_emotional_problems_help_label_text reference=first_paediatric_assessment.get_behavioural_or_emotional_problems_help_reference_text data_position='top left' disabled=False %}
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.behavioural_or_emotional_problems label=first_paediatric_assessment.get_behavioural_or_emotional_problems_help_label_text reference=first_paediatric_assessment.get_behavioural_or_emotional_problems_help_reference_text data_position='top left' disabled=True %}
+            {% endif %}
+
+            {% url 'has_number_of_episodes_since_the_first_been_documented' first_paediatric_assessment_id=first_paediatric_assessment.pk as hx_post %}
+            {% if perms.epilepsy12.change_first_paediatric_assessment %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.has_number_of_episodes_since_the_first_been_documented label=first_paediatric_assessment.get_has_number_of_episodes_since_the_first_been_documented_help_label_text reference=first_paediatric_assessment.get_has_number_of_episodes_since_the_first_been_documented_help_reference_text data_position='top left' disabled=False %}
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_trigger='click' hx_swap='innerHTML' test_positive=first_paediatric_assessment.has_number_of_episodes_since_the_first_been_documented label=first_paediatric_assessment.get_has_number_of_episodes_since_the_first_been_documented_help_label_text reference=first_paediatric_assessment.get_has_number_of_episodes_since_the_first_been_documented_help_reference_text data_position='top left' disabled=True %}
+            {% endif %}
+
+        </div>
+
+        {% comment %}
+        <div class='sixteen wide column'>
+            {% url 'diagnostic_status' first_paediatric_assessment_id=first_paediatric_assessment.pk as hx_post %}
+            {% if perms.epilepsy12.change_first_paediatric_assessment %}
+                {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_swap='innerHTML' hx_trigger='change' choices=diagnostic_status_selection label='Is epilepsy suspected?' hx_default_text='Select an epilepsy status' test_positive=first_paediatric_assessment.diagnostic_status hx_name='diagnostic_status' disabled=False %}
+            {% else %}
+                {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#when_the_first_epileptic_episode_occurred' hx_swap='innerHTML' hx_trigger='change' choices=diagnostic_status_selection label='Is epilepsy suspected?' hx_default_text='Select an epilepsy status' test_positive=first_paediatric_assessment.diagnostic_status hx_name='diagnostic_status' disabled=True %}
+            {% endif %}
+        </div>
+        {% endcomment %}
+        
+    </div>
+    
+</form>

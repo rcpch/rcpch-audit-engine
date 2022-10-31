@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='initialassessment',
             name='has_description_of_the_episode_or_episodes_been_gathered',
-            field=models.BooleanField(default=None, null=True, verbose_name='has a description of the episode(s) been gathered?'),
+            field=models.BooleanField(
+                default=None, null=True, verbose_name='has a description of the episode(s) been gathered?'),
         ),
     ]

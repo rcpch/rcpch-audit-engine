@@ -174,8 +174,8 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     )
 
     class Meta:
-        verbose_name = "Milestones"
-        verbose_name_plural = "Milestones"
+        verbose_name = "Assessment"
+        verbose_name_plural = "Assessment"
         permissions = (
             CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE,
             CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE,

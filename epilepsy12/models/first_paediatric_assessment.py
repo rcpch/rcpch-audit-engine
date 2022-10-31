@@ -7,7 +7,7 @@ from .time_and_user_abstract_base_classes import *
 from .registration import Registration
 
 
-class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
+class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """
     This class records information about the initial assessment.
     Whilst other information about the child and their epilepsy may be captured across the audit year
@@ -86,7 +86,4 @@ class InitialAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, 
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        if self.date_of_initial_assessment:
-            return f"First Paediatric Assessment for {self.registration.case} on {self.date_of_initial_assessment}"
-        else:
-            return f"{self.registration.case} has not yet had First Paediatric Assessment."
+        return f"ID:{self.pk} First Paediatric Assessment for {self.registration.case} (ID: {self.registration.case.pk})"

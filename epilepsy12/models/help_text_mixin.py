@@ -5,7 +5,7 @@ class HelpTextMixin(object):
     """
     Thanks https://bradmontgomery.net/blog/django-hack-help-text-modal-instance/ for this snippet
     Returns the help text methods to the template
-    Can use {{initial_assessment.get_*field*_help_label_text}} and {{initial_assessment.get_*field*_help_reference_text}}
+    Can use {{first_paediatric_assessment.get_*field*_help_label_text}} and {{first_paediatric_assessment.get_*field*_help_reference_text}}
     in the template
     """
 

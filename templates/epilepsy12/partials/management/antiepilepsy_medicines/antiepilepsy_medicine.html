@@ -8,21 +8,26 @@
         <div class='field'>
             {% url 'antiepilepsy_medicine_start_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
             {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
             {% else %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
             {% endif %}
         </div>
         
         <div class='field'>
             {% url 'antiepilepsy_medicine_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
             {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
             {% else %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
             {% endif %}
         </div>
     </div>
+    {% if error_message %}
+        <div class='ui rcpch_warning message'>
+            {{ error_message }}
+        </div>
+    {% endif %}
 
     
     <div class='two fields'>
@@ -73,8 +78,3 @@
         >{% if is_rescue_medicine %}Return to rescue medication list{%else%}Return to antiseizure medication list{%endif%}</div>
     </div>
 </div>
-
-
-{% comment %}
-antiepilepsy_medicine_snomed_preferred_name
-{% endcomment %}

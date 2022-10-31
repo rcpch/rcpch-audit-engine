@@ -49,7 +49,7 @@
                             Edit
                         </button>
                         <button 
-                            {% if not perms.epilepsy12.delete_episode %}
+                            {% if perms.epilepsy12.delete_episode %}
                             class="ui rcpch_red icon button"
                             {% else %}
                             class="ui rcpch_red icon disabled button"

@@ -18,7 +18,7 @@ class RegistrationTests(TestCase):
         )
         audit_progress = AuditProgress.objects.create(
             registration_complete=False,
-            initial_assessment_complete=False,
+            first_paediatric_assessment_complete=False,
             assessment_complete=False,
             epilepsy_context_complete=False,
             multiaxial_diagnosis_complete=False,
@@ -26,8 +26,8 @@ class RegistrationTests(TestCase):
             investigations_complete=False,
             registration_total_expected_fields=4,
             registration_total_completed_fields=0,
-            initial_assessment_total_expected_fields=0,
-            initial_assessment_total_completed_fields=0,
+            first_paediatric_assessment_total_expected_fields=0,
+            first_paediatric_assessment_total_completed_fields=0,
             assessment_total_expected_fields=0,
             assessment_total_completed_fields=0,
             epilepsy_context_total_expected_fields=0,

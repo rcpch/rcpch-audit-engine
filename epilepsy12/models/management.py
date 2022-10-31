@@ -165,7 +165,7 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     )
 
     class Meta:
-        verbose_name = "Management Plan"
+        verbose_name = "Management"
         verbose_name_plural = "Management Plans"
 
     def __str__(self) -> str:

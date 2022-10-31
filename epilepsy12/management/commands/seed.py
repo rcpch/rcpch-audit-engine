@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 
 from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, CAN_ONLY_VIEW_CHILD_CASE_DATA, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE, CAN_ONLY_VIEW_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_VIEW_CHILD_NHS_NUMBER, CAN_VIEW_CHILD_DATE_OF_BIRTH, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE, CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE, CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET, CAN_ALLOCATE_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_EDIT_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE, CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE, CAN_DELETE_TERTIARY_NEUROLOGY_CENTRE, CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET, CAN_DELETE_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_CONSENT_TO_AUDIT_PARTICIPATION
-from epilepsy12.models import AntiEpilepsyMedicine, Assessment, AuditProgress, Comorbidity, EpilepsyContext, Episode, InitialAssessment, Investigations, Management, MultiaxialDiagnosis, Syndrome
+from epilepsy12.models import AntiEpilepsyMedicine, Assessment, AuditProgress, Comorbidity, EpilepsyContext, Episode, FirstPaediatricAssessment, Investigations, Management, MultiaxialDiagnosis, Syndrome
 from ...constants import ETHNICITIES, DUMMY_NAMES, GROUPS
 from ...models import HospitalTrust, Keyword, Case, Site, Registration
 from ...constants import ALL_HOSPITALS, KEYWORDS
@@ -15,8 +15,8 @@ from ...general_functions import random_postcodes
 caseContentType = ContentType.objects.get_for_model(Case)
 registrationContentType = ContentType.objects.get_for_model(
     Registration)
-initial_assessmentContentType = ContentType.objects.get_for_model(
-    InitialAssessment)
+first_paediatric_assessmentContentType = ContentType.objects.get_for_model(
+    FirstPaediatricAssessment)
 epilepsy_contextContentType = ContentType.objects.get_for_model(
     EpilepsyContext)
 multiaxial_diagnosisContentType = ContentType.objects.get_for_model(
@@ -47,8 +47,8 @@ VIEW_PERMISSIONS = [
      'content_type': caseContentType},
     {'codename': 'view_registration',
      'content_type': registrationContentType},
-    {'codename': 'view_initialassessment',
-     'content_type': initial_assessmentContentType},
+    {'codename': 'view_FirstPaediatricAssessment',
+     'content_type': initial_assessmfirst_paediatric_assessmentContentType},
     {'codename': 'view_epilepsycontext',
      'content_type': epilepsy_contextContentType},
     {'codename': 'view_multiaxialdiagnosis',
@@ -89,12 +89,12 @@ EDITOR_PERMISSIONS = [
      'content_type': registrationContentType},
     {'codename': 'can_approve_eligibility',
      'content_type': registrationContentType},
-    {'codename': 'view_initialassessment',
-     'content_type': initial_assessmentContentType},
-    {'codename': 'change_initialassessment',
-     'content_type': initial_assessmentContentType},
-    {'codename': 'add_initialassessment',
-     'content_type': initial_assessmentContentType},
+    {'codename': 'view_FirstPaediatricAssessment',
+     'content_type': first_paediatric_assessmentContentType},
+    {'codename': 'change_FirstPaediatricAssessment',
+     'content_type': first_paediatric_assessmentContentType},
+    {'codename': 'add_FirstPaediatricAssessment',
+     'content_type': first_paediatric_assessmentContentType},
     {'codename': 'view_epilepsycontext',
      'content_type': epilepsy_contextContentType},
     {'codename': 'change_epilepsycontext',
@@ -161,8 +161,8 @@ FULL_ACCESS_PERMISSIONS = [
     {'codename': 'delete_case', 'content_type': caseContentType},
     {'codename': 'delete_registration',
         'content_type': registrationContentType},
-    {'codename': 'delete_initialassessment',
-        'content_type': initial_assessmentContentType},
+    {'codename': 'delete_FirstPaediatricAssessment',
+        'content_type': first_paediatric_assessmentContentType},
     {'codename': 'delete_epilepsycontext',
         'content_type': epilepsy_contextContentType},
     {'codename': 'delete_multiaxialdiagnosis',
