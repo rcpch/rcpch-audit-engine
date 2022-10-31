@@ -13,7 +13,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     """
     medicine_id = models.IntegerField(
         help_text={
-            'label': "Medicine ID",
+            'label': "Medicine Name",
             'reference': "Please enter the medicine.",
         },
         default=None,

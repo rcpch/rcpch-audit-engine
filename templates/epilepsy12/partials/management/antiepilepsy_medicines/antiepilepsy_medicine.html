@@ -35,9 +35,9 @@
         <div class='field'>
             {% url 'medicine_id' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
             {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_antiepilepsy_medicine_type_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_type_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
+                {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_medicine_id_help_label_text reference=antiepilepsy_medicine.get_medicine_id_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
             {% else %}
-                {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_antiepilepsy_medicine_type_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_type_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
+                {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_medicine_id_help_label_text reference=antiepilepsy_medicine.get_medicine_id_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
             {% endif %}
         </div>
         
