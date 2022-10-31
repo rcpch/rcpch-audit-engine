@@ -185,8 +185,8 @@ htmx_paths = [
     path('registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
 
-    path('registration/<int:registration_id>/<str:editable>/',
-         views.editable, name="editable"),
+    #     path('registration/<int:registration_id>/<str:editable>/',
+    #          views.editable, name="editable"),
 
 
 

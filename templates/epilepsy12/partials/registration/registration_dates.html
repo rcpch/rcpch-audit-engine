@@ -1,11 +1,12 @@
 {% load epilepsy12_template_tags %}
-<div class="ui form" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div class="ui form" 
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    hx-get="{% url 'registration_status' registration_id=registration.pk %}"
+    hx-swap="outerHTML"
+    hx-trigger="registration_status from:body"
+    id="registration_buttons">
     <h5>First paediatric assessment date</h5>
-    <div class="three fields" 
-        hx-get="{% url 'registration_status' registration_id=registration.pk %}"
-        hx-swap="outerHTML"
-        hx-trigger="registration_status from:body"
-        id="registration_buttons">
+    <div class="three fields" >
         {% if registration.registration_date %}
         
                 <div class="field">
@@ -16,36 +17,15 @@
         {% else %}
 
             {% if registration.eligibility_criteria_met %}
-                {% comment %}
-                <div 
-                    id="register_button"
-                    class="field" 
-                    hx-post="{% url 'registration_date' case_id=case_id %}" 
-                    name='registration_date' 
-                    hx-target="#registration_date_results" 
-                    hx-swap='innerHTML'
-                    hx-trigger="click">
-                    {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
-                    disabled
-                    {% endif %}
-                    <div class="fluid ui button" id="action_button">Register Now</div>
-                </div>
-                {% endcomment %}
                 <div class='field'>
                     {% url 'registration_date' case_id=case_id as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' label='Date of First Paediatric Assessment' date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=False %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=False error_message=error_message %}
                 </div>
                 
             {% else %}
-                {% comment %}
-                <div 
-                    class="fluid disabled ui button" 
-                    id="action_button">Register Now</div>
-                </div>
-                {% endcomment %}
                 <div class="field" >
                     {% url 'registration_date' case_id=case_id as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' label='Date of First Paediatric Assessment' date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=True %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=True %}
                 </div>
             {% endif %}
 
@@ -63,4 +43,9 @@
             </div>
         </div>
     </div>
+    {% if error_message %}
+        <div class='ui rcpch_warning message'>
+            {{ error_message }}
+        </div>
+    {% endif %}
 </div>

@@ -4,6 +4,7 @@ from django_htmx.http import trigger_client_event
 from django.shortcuts import render
 from psycopg2 import DatabaseError
 from epilepsy12.models.antiepilepsy_medicine import AntiEpilepsyMedicine
+from epilepsy12.models.registration import Registration
 
 from epilepsy12.models.site import Site
 
@@ -63,9 +64,14 @@ def test_fields_update_audit_progress(model_instance):
         f'{verbose_name_underscored}_complete': all_completed_fields == all_expected_fields,
     }
 
+    if verbose_name_underscored == 'registration':
+        registration = model_instance
+    else:
+        registration = model_instance.registration
+
     try:
         AuditProgress.objects.filter(
-            registration=model_instance.registration).update(**update_fields)
+            registration=registration).update(**update_fields)
     except DatabaseError as error:
         raise Exception(error)
 
@@ -229,6 +235,10 @@ def total_fields_expected(model_instance):
             # individualised_care_plan_includes_ehcp, has_individualised_care_plan_been_updated_in_the_last_year
             cumulative_score += 10
 
+    elif model_class_name == 'Registration':
+        # further essential field is from Site - primary site of care
+        cumulative_score += 1
+
     return cumulative_score
 
 
@@ -253,9 +263,11 @@ def avoid_fields(model_instance):
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'AntiEpilepsyMedicine':
         return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at']
+    elif model_class_name == 'Registration':
+        return ['id', 'management', 'assessment', 'investigations', 'multiaxial_diagnosis', 'registration', 'epilepsycontext', 'firstpaediatricassessment', 'registration_close_date', 'registration_date_one_year_on', 'cohort', 'case', 'audit_progress', 'created_by', 'created_at', 'updated_by', 'updated_at']
     else:
         raise ValueError(
-            f'{model_class_name} not found to return fields to avoid in form calculation.')
+            f'Form scoring error: {model_class_name} not found to return fields to avoid in form calculation.')
 
 
 def scoreable_fields_for_model_class_name(model_class_name):
@@ -287,9 +299,11 @@ def scoreable_fields_for_model_class_name(model_class_name):
         return len(['has_an_aed_been_given', 'has_rescue_medication_been_prescribed', 'individualised_care_plan_in_place', 'has_been_referred_for_mental_health_support', 'has_support_for_mental_health_support'])
     elif model_class_name == 'AntiEpilepsyMedicine':
         return len(['medicine_name', 'antiepilepsy_medicine_start_date', 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed', 'is_a_pregnancy_prevention_programme_needed', 'is_a_pregnancy_prevention_programme_in_place'])
+    elif model_class_name == 'Registration':
+        return len(['registration_date', 'eligibility_criteria_met'])
     else:
         raise ValueError(
-            f'{model_class_name} does not exist to calculate minimum number of scoreable fields.')
+            f'Form scoring error: {model_class_name} does not exist to calculate minimum number of scoreable fields.')
 
 
 def count_episode_fields(all_episodes):
@@ -432,6 +446,14 @@ def number_of_completed_fields_in_related_models(model_instance):
                     # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
                     cumulative_score += completed_fields(medicine)
 
+    elif model_instance.__class__.__name__ == 'Registration':
+        # also need to count associate record in Site
+        if Site.objects.filter(
+                case=model_instance.case,
+                site_is_primary_centre_of_epilepsy_care=True,
+                site_is_actively_involved_in_epilepsy_care=True).exists():
+            cumulative_score += 1
+
     return cumulative_score
 
 
@@ -442,7 +464,7 @@ def validate_and_update_model(
         field_name,
         page_element,
         comparison_date_field_name=None,
-        is_earliest_date=False):
+        is_earliest_date=None):
     """
     This is called from the view to update the model or return an error
     Parameters:
@@ -480,14 +502,15 @@ def validate_and_update_model(
     # validate
 
     if page_element == 'date_field':
+        date_valid = None
         if comparison_date_field_name:
             instance = model.objects.get(pk=model_id)
             comparison_date = getattr(
                 instance, comparison_date_field_name)
             if is_earliest_date:
-                date_valid = field_value <= comparison_date
+                date_valid = field_value <= comparison_date and field_value <= date.today()
                 if not date_valid:
-                    date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date}'
+                    date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date} or in the future.'
                     errors = date_error
             else:
                 date_valid = field_value >= comparison_date
@@ -495,25 +518,39 @@ def validate_and_update_model(
                     date_error = f'The date you chose ({field_value}) cannot not be before {comparison_date}'
                     errors = date_error
 
-            if field_value > date.today() and is_earliest_date:
-                date_error = f'The date you chose ({field_value}) cannot not be in the future.'
-                errors = date_error
+        elif field_value > date.today() and (is_earliest_date is None or is_earliest_date):
+            # dates cannot be in the future unless they are the second of 2 dates
+            date_error = f'The date you chose ({field_value}) cannot not be in the future.'
+            errors = date_error
+            date_valid = False
+        else:
+            date_valid = True
 
-            if date_valid:
-                pass
-            else:
-                raise ValueError(errors)
+        if date_valid:
+            pass
+        else:
+            raise ValueError(errors)
 
     # update the model
 
-    updated_field = {
-        field_name: field_value,
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    }
+    # if saving a registration_date, this has to trigger the save() method to generate a cohort
+    # so update() cannot be used
+    # This feels like a bit of a hack so very open to suggestions on more Django way of doing this
+    if field_name == 'registration_date':
+        registration = Registration.objects.get(pk=model_id)
+        registration.registration_date = field_value
+        registration.updated_at = timezone.now()
+        registration.updated_by = request.user
+        registration.save()
+    else:
+        updated_field = {
+            field_name: field_value,
+            'updated_at': timezone.now(),
+            'updated_by': request.user
+        }
 
-    try:
-        model.objects.filter(
-            pk=model_id).update(**updated_field)
-    except DatabaseError as error:
-        raise Exception(error)
+        try:
+            model.objects.filter(
+                pk=model_id).update(**updated_field)
+        except DatabaseError as error:
+            raise Exception(error)
