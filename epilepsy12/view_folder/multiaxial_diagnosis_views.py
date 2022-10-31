@@ -16,7 +16,7 @@ from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
 from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome
-from .common_view_functions import recalculate_form_generate_response
+from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
 
 """
 Constants for selections
@@ -341,15 +341,25 @@ def remove_episode(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Episode, 'seizure_onset_date', 'date_field')
 def seizure_onset_date(request, episode_id):
     """
     HTMX post request from episode.html partial on date change
     """
 
-    episode = Episode.objects.get(pk=episode_id)
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Episode,
+            model_id=episode_id,
+            field_name='seizure_onset_date',
+            page_element='date_field'
+        )
+    except ValueError as error:
+        error_message = error
 
     keywords = Keyword.objects.all()
+    episode = Episode.objects.get(pk=episode_id)
 
     context = {
         'episode': episode,
@@ -371,7 +381,6 @@ def seizure_onset_date(request, episode_id):
         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-
         "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
     }
 
@@ -379,7 +388,8 @@ def seizure_onset_date(request, episode_id):
         model_instance=episode.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/episode.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1420,6 +1430,18 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     POST request from comorbidity partial with comorbidity_diagnosis_date
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Comorbidity,
+            model_id=comorbidity_id,
+            field_name='comorbidity_diagnosis_date',
+            page_element='date_field'
+        )
+    except ValueError as error:
+        error_message = error
+
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
 
     ecl = '<< 35919005'
@@ -1434,7 +1456,8 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
         model_instance=comorbidity.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response

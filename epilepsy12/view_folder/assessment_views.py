@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.constants.user_types import CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE
 from ..models import Registration, Assessment, Case, HospitalTrust, Site
 from ..decorator import update_model
-from .common_view_functions import recalculate_form_generate_response
+from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
 
 
 @login_required
@@ -58,7 +58,6 @@ def consultant_paediatrician_referral_made(request, assessment_id):
 
 
 @login_required
-@update_model(Assessment, 'consultant_paediatrician_referral_date', 'date_field')
 def consultant_paediatrician_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
@@ -66,7 +65,19 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     This persists the consultant paediatrician referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='consultant_paediatrician_referral_date',
+            page_element='date_field',
+            comparison_date_field_name='consultant_paediatrician_input_date',
+            is_earliest_date=True
+        )
+    except ValueError as error:
+        error_message = error
 
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -93,7 +104,8 @@ def consultant_paediatrician_referral_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -108,7 +120,19 @@ def consultant_paediatrician_input_date(request, assessment_id):
     This persists the consultant paediatrician input date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='consultant_paediatrician_input_date',
+            page_element='date_field',
+            comparison_date_field_name='consultant_paediatrician_referral_date',
+            is_earliest_date=False
+        )
+    except ValueError as error:
+        error_message = error
 
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -135,7 +159,8 @@ def consultant_paediatrician_input_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -456,7 +481,6 @@ def paediatric_neurologist_referral_made(request, assessment_id):
 
 
 @login_required
-@update_model(Assessment, 'paediatric_neurologist_referral_date', 'date_field')
 def paediatric_neurologist_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -464,7 +488,19 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     This persists the paediatric neurologist referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='paediatric_neurologist_referral_date',
+            page_element='date_field',
+            comparison_date_field_name='paediatric_neurologist_input_date',
+            is_earliest_date=True
+        )
+    except ValueError as error:
+        error_message = error
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
@@ -494,14 +530,14 @@ def paediatric_neurologist_referral_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@update_model(Assessment, 'paediatric_neurologist_input_date', 'date_field')
 def paediatric_neurologist_input_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -509,7 +545,19 @@ def paediatric_neurologist_input_date(request, assessment_id):
     This persists the paediatric neurologist referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='paediatric_neurologist_input_date',
+            page_element='date_field',
+            comparison_date_field_name='paediatric_neurologist_referral_date',
+            is_earliest_date=False
+        )
+    except ValueError as error:
+        error_message = error
 
     # get fresh list of all sites associated with registration
     # which are organised for the template to filtered to share all active
@@ -539,7 +587,8 @@ def paediatric_neurologist_input_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -881,7 +930,6 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
 
 
 @login_required
-@update_model(Assessment, 'childrens_epilepsy_surgical_service_referral_date', 'date_field')
 def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -889,7 +937,19 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     This persists the children's epilepsy surgery referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='childrens_epilepsy_surgical_service_referral_date',
+            page_element='date_field',
+            comparison_date_field_name='childrens_epilepsy_surgical_service_input_date',
+            is_earliest_date=True
+        )
+    except ValueError as error:
+        error_message = error
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -916,7 +976,8 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -931,7 +992,19 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     This persists the children's epilepsy surgery referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='childrens_epilepsy_surgical_service_input_date',
+            page_element='date_field',
+            comparison_date_field_name='childrens_epilepsy_surgical_service_referral_date',
+            is_earliest_date=False
+        )
+    except ValueError as error:
+        error_message = error
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -958,7 +1031,8 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1246,7 +1320,6 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 
 
 @login_required
-@update_model(Assessment, 'epilepsy_specialist_nurse_referral_date', 'date_field')
 def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1254,7 +1327,19 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     This persists the epilepsy nurse specialist referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='epilepsy_specialist_nurse_referral_date',
+            page_element='date_field',
+            comparison_date_field_name='epilepsy_specialist_nurse_input_date',
+            is_earliest_date=True
+        )
+    except ValueError as error:
+        error_message = error
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -1268,14 +1353,14 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@update_model(Assessment, 'epilepsy_specialist_nurse_input_date', 'date_field')
 def epilepsy_specialist_nurse_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1283,7 +1368,19 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
     This persists the epilepsy nurse specialist referral date value, and returns the same partial.
     """
 
-    # TODO date validation needed
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='epilepsy_specialist_nurse_input_date',
+            page_element='date_field',
+            comparison_date_field_name='epilepsy_specialist_nurse_referral_date',
+            is_earliest_date=False
+        )
+    except ValueError as error:
+        error_message = error
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -1297,7 +1394,8 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response

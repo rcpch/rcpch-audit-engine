@@ -470,11 +470,17 @@ def validate_and_update_model(
     Parameters:
     request
     model_id
-    model
+    model: the class, not the instance
     field_name
     page_element: string one of 'date_field', 'toggle_button', 'multiple_choice_single_toggle_button', 'multiple_choic_multiple_toggle_button', 'select', 'snomed_select', 'hospital_select'
     comparison_date_field_name: string corresponding to field name for date in model
     is_earliest_date: boolean
+
+    It replaces the decorator @update_model as decorators can only redirect the request, 
+    they cannot pass parameters to the function they wrap. This means that errors raised in updating the model
+    cannot be passed back to the template so the logic has been added to this function instead.
+    It is important that this function is called early on in the view function and that an updated instance of 
+    the model AFTER UPDATE is put in the context that is passed back to the template.
     """
     if page_element == 'toggle_button':
         # toggle button
@@ -502,13 +508,21 @@ def validate_and_update_model(
     # validate
 
     if page_element == 'date_field':
+        # date tests a bit involved
+        # If a comparison date field is supplied, the date itself might not yet have been set.
+        # The earlier of the two dates cannot be in the future and cannot be later than the second if supplied.
+        # The later of the two dates CAN be in the future but cannot be earlier than the first if supplied.
+        # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
         date_valid = None
         if comparison_date_field_name:
             instance = model.objects.get(pk=model_id)
             comparison_date = getattr(
                 instance, comparison_date_field_name)
             if is_earliest_date:
-                date_valid = field_value <= comparison_date and field_value <= date.today()
+                if comparison_date:
+                    date_valid = field_value <= comparison_date and field_value <= date.today()
+                else:
+                    date_valid = field_value <= date.today()
                 if not date_valid:
                     date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date} or in the future.'
                     errors = date_error
