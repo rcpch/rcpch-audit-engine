@@ -68,6 +68,8 @@ htmx_paths = [
          views.edit_episode, name='edit_episode'),
     path('episode/<int:episode_id>/delete',
          views.remove_episode, name='remove_episode'),
+    path('episode/<int:episode_id>/close',
+         views.close_episode, name='close_episode'),
     path('episode/<int:episode_id>/seizure_onset_date',
          views.seizure_onset_date, name='seizure_onset_date'),
     path('episode/<int:episode_id>/seizure_onset_date_confidence',

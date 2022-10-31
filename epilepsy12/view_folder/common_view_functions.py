@@ -79,6 +79,7 @@ def test_fields_update_audit_progress(model_instance):
 def completed_fields(model_instance):
     """
     Test for all completed fields
+    Returns an integer number of completed fields for a given model instance.
     """
     fields = model_instance._meta.get_fields()
     counter = 0

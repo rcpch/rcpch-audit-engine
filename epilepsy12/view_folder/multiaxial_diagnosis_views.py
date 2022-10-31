@@ -16,7 +16,7 @@ from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
 from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
+from .common_view_functions import completed_fields, recalculate_form_generate_response, validate_and_update_model
 
 """
 Constants for selections
@@ -326,7 +326,46 @@ def remove_episode(request, episode_id):
         multiaxial_diagnosis=multiaxial_diagnosis).order_by('seizure_onset_date')
 
     context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
         'episodes': episodes
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=episode.multiaxial_diagnosis,
+        request=request,
+        template='epilepsy12/partials/multiaxial_diagnosis/episodes.html',
+        context=context
+    )
+
+    return response
+
+
+@login_required
+def close_episode(request, episode_id):
+    """
+    Call back from onclick of close episode in episode.html
+    returns the episodes list partial
+    """
+    episode = Episode.objects.get(
+        pk=episode_id)
+    multiaxial_diagnosis = episode.multiaxial_diagnosis
+
+    # if all the fields are none this was not completed - delete the record
+    if completed_fields(episode) == 0:
+        episode.delete()
+
+    episodes = Episode.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).order_by('seizure_onset_date')
+
+    there_are_epileptic_episodes = Episode.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis,
+        epilepsy_or_nonepilepsy_status='E'
+    ).exists()
+
+    context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
+        'episodes': episodes,
+        'there_are_epileptic_episodes': there_are_epileptic_episodes
     }
 
     response = recalculate_form_generate_response(

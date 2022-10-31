@@ -31,25 +31,7 @@
         </div>
 
         <div id='episodes' class='field'>
-            {% include 'epilepsy12/partials/multiaxial_diagnosis/episodes.html' with episodes=episodes there_are_epileptic_episodes=there_are_epileptic_episodes %}
-        </div>
-
-        <div class="field" id='episode'>
-
-            <button 
-                {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-                class="ui rcpch_primary disabled button"
-                {% else %}
-                class="ui rcpch_primary button"
-                {% endif %}
-                hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
-                hx-target="#episode"
-                hx-swap='innerHTML'
-                hx-trigger='click'
-            >
-            Add a new Episode
-            </button>
-
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/episodes.html' with episodes=episodes there_are_epileptic_episodes=there_are_epileptic_episodes multiaxial_diagnosis=multiaxial_diagnosis %}
         </div>
 
     </div>
