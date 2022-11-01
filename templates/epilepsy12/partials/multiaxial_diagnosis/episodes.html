@@ -100,17 +100,17 @@
         </div>
     {% endif %}
 {% endif %}
-<button 
-                {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-                class="ui rcpch_primary disabled button"
-                {% else %}
-                class="ui rcpch_primary button"
-                {% endif %}
-                hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
-                hx-target="#episodes"
-                hx-swap='innerHTML'
-                hx-trigger='click'
-            >
-            Add a new Episode
-            </button>
+    <button 
+        {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
+        class="ui rcpch_primary disabled button"
+        {% else %}
+        class="ui rcpch_primary button"
+        {% endif %}
+        hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
+        hx-target="#episodes"
+        hx-swap='innerHTML'
+        hx-trigger='click'
+    >
+    Add a new Episode
+    </button>
 </div>

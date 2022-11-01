@@ -1029,6 +1029,10 @@ ul {
   margin-top: 10px;
 }
 
+.ui.rcpch.pink.message {
+  border-radius: 0%
+}
+
 .ui.rcpch_footer.message {
   border-color: var(--rcpch_dark_blue);
   color: var(--rcpch_white);
