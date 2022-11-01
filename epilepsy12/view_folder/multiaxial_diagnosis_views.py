@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
+from epilepsy12.models import comorbidity
 from ..decorator import group_required, update_model
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
@@ -1147,6 +1148,39 @@ def remove_syndrome(request, syndrome_id):
         multiaxial_diagnosis=multiaxial_diagnosis).order_by('syndrome_diagnosis_date')
 
     context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
+        'syndromes': syndromes
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=syndrome.multiaxial_diagnosis,
+        request=request,
+        template='epilepsy12/partials/multiaxial_diagnosis/syndromes.html',
+        context=context
+    )
+
+    return response
+
+
+@login_required
+def close_syndrome(request, syndrome_id):
+    """
+    Call back from onclick of close episode in episode.html
+    returns the episodes list partial
+    """
+    syndrome = Syndrome.objects.get(
+        pk=syndrome_id)
+    multiaxial_diagnosis = syndrome.multiaxial_diagnosis
+
+    # if all the fields are none this was not completed - delete the record
+    if completed_fields(syndrome) == 0:
+        syndrome.delete()
+
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).order_by('syndrome_diagnosis_date')
+
+    context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
         'syndromes': syndromes
     }
 
@@ -1453,6 +1487,38 @@ def remove_comorbidity(request, comorbidity_id):
 
     response = recalculate_form_generate_response(
         model_instance=multiaxial_diagnosis,
+        request=request,
+        template='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html',
+        context=context
+    )
+
+    return response
+
+
+@login_required
+def close_comorbidity(request, comorbidity_id):
+    """
+    Call back from onclick of close comorbidity in comorbidity.html
+    returns the episodes list partial
+    """
+    comorbidity = Comorbidity.objects.get(
+        pk=comorbidity_id)
+    multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
+
+    # if all the fields are none this was not completed - delete the record
+    if completed_fields(comorbidity) == 0:
+        comorbidity.delete()
+
+    comorbidities = Comorbidity.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis).order_by('comorbidity_diagnosis_date')
+
+    context = {
+        'multiaxial_diagnosis': multiaxial_diagnosis,
+        'comorbidities': comorbidities
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=comorbidity.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html',
         context=context

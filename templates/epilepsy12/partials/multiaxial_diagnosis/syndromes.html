@@ -42,7 +42,7 @@
                             class="ui rcpch_primary disabled button"
                             {% endif %}
                             hx-post='{% url "edit_syndrome" syndrome.pk %}'
-                            hx-target='#syndrome'
+                            hx-target='#syndromes'
                             hx-trigger='click'
                             hx-swap='innerHTML'
                         >
@@ -75,4 +75,17 @@
             There are no documented syndromes so far...
         </div>
     {% endif %}
+    <button
+            {% if not perms.epilepsy12.add_multiaxial_diagnosis %}
+                class="ui rcpch_primary disabled button"
+            {% else %}
+                class="ui rcpch_primary button"
+            {% endif %}
+            hx-post="{% url 'add_syndrome' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
+            hx-target="#syndromes"
+            hx-swap='innerHTML'
+            hx-trigger='click'
+        >
+        Add a new Syndrome
+    </button>
 </div>

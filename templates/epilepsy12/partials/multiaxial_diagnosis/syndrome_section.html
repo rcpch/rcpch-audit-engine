@@ -13,25 +13,7 @@
     </div>
 
     <div id='syndromes' class='field'>
-        {% include 'epilepsy12/partials/multiaxial_diagnosis/syndromes.html' with syndromes=syndromes %}
-    </div>
-
-    <div class="field" id='syndrome'>
-
-        <button
-            {% if not perms.epilepsy12.add_multiaxial_diagnosis %}
-                class="ui rcpch_primary disabled button"
-            {% else %}
-                class="ui rcpch_primary button"
-            {% endif %}
-            hx-post="{% url 'add_syndrome' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
-            hx-target="#syndrome"
-            hx-swap='innerHTML'
-            hx-trigger='click'
-        >
-        Add a new Syndrome
-        </button>
-
+        {% include 'epilepsy12/partials/multiaxial_diagnosis/syndromes.html' with syndromes=syndromes multiaxial_diagnosis=multiaxial_diagnosis %}
     </div>
 
 {% endif %}

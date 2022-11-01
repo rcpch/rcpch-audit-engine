@@ -22,8 +22,20 @@
         {% include 'epilepsy12/partials/page_elements/select.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="innerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." test_positive=syndrome.syndrome_name label=syndrome.get_syndrome_name_help_label_text reference=syndrome.get_syndrome_name_help_reference_text data_position='top left' %}
     </div>
 
+    {% comment %}
     <div class='field'>
         <a href='{% url "multiaxial_diagnosis" case_id=syndrome.multiaxial_diagnosis.registration.case.pk %}'><button class='ui rcpch_primary button'>Syndrome entry complete for {{syndrome.multiaxial_diagnosis.registration.case}}</div></a>
+    </div>
+    {% endcomment %}
+
+    <div class='field'>
+        <div 
+            class='ui rcpch_primary button'
+            hx-post='{% url "close_syndrome" syndrome_id=syndrome.pk %}'
+            hx-target='#syndromes'
+            hx-swap='innerHTML'
+            hx-trigger='click'
+        >Syndrome entry complete for {{syndrome.multiaxial_diagnosis.registration.case}}</div>
     </div>
     
     

@@ -31,7 +31,7 @@
         <div class='field'>
             <button class='ui rcpch_primary button'
                 hx-trigger='click'
-                hx-post='{% url "comorbidities" multiaxial_diagnosis_id=comorbidity.multiaxial_diagnosis.pk %}'
+                hx-post='{% url "close_comorbidity" comorbidity_id=comorbidity.pk %}'
                 hx-swap='innerHTML'
                 name='comorbidity_return'
                 hx-target='#comorbidities'
