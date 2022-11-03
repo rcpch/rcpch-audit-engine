@@ -1149,3 +1149,8 @@ a label {
 .rcpch.question.circle.icon {
   color: var(--rcpch_light_blue);
 }
+
+#wrapper.htmx-request {
+  opacity: 0.5;
+  transition: opacity 200ms linear;
+}

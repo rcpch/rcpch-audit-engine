@@ -309,10 +309,10 @@ def mri_brain_reported_date(request, investigations_id):
             request,
             investigations_id,
             Investigations,
-            field_name='mri_brain_requested_date',
+            field_name='mri_brain_reported_date',
             page_element='date_field',
-            comparison_date_field_name='mri_brain_reported_date',
-            is_earliest_date=True)
+            comparison_date_field_name='mri_brain_requested_date',
+            is_earliest_date=False)
 
     except ValueError as errors:
         error_message = errors

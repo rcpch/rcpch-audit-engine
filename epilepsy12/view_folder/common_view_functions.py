@@ -522,15 +522,17 @@ def validate_and_update_model(
             if is_earliest_date:
                 if comparison_date:
                     date_valid = field_value <= comparison_date and field_value <= date.today()
+                    date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date} or in the future.'
                 else:
                     date_valid = field_value <= date.today()
+                    date_error = f'The date you chose ({field_value}) cannot not be in the future.'
                 if not date_valid:
-                    date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date} or in the future.'
                     errors = date_error
             else:
-                date_valid = field_value >= comparison_date
-                if not date_valid:
+                if comparison_date:
+                    date_valid = field_value >= comparison_date
                     date_error = f'The date you chose ({field_value}) cannot not be before {comparison_date}'
+                if not date_valid:
                     errors = date_error
 
         elif field_value > date.today() and (is_earliest_date is None or is_earliest_date):
