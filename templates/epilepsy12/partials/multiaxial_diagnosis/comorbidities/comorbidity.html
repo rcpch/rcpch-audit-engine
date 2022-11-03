@@ -32,7 +32,7 @@
             <button class='ui rcpch_primary button'
                 hx-trigger='click'
                 hx-post='{% url "close_comorbidity" comorbidity_id=comorbidity.pk %}'
-                hx-swap='innerHTML'
+                hx-swap='innerHTML swap:500ms'
                 name='comorbidity_return'
                 hx-target='#comorbidities'
             >

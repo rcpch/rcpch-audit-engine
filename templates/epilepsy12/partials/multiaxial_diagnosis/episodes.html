@@ -78,6 +78,7 @@
                             class="ui rcpch_red icon disabled button"
                         {% endif %}
                         hx-post='{% url "remove_episode" episode_id=episode.pk %}'
+                        hx-confirm='This action is irreversible. Are you sure you want to continue?'
                         hx-target='#episodes'
                         hx-trigger='click'
                         hx-swap='innerHTML'
@@ -108,7 +109,7 @@
         {% endif %}
         hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
         hx-target="#episodes"
-        hx-swap='innerHTML'
+        hx-swap='innerHTML swap:500ms settle:500ms'
         hx-trigger='click'
     >
     Add a new Episode

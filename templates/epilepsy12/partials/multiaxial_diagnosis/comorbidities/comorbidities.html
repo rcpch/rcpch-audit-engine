@@ -84,7 +84,7 @@
             {% endif %}
             hx-post="{% url 'add_comorbidity' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
             hx-target="#comorbidities"
-            hx-swap='innerHTML'
+            hx-swap='innerHTML swap:500ms settle:500ms'
             hx-trigger='click'
         >
         Add a new Comorbidity

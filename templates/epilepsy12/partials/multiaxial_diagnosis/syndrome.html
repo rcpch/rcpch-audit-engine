@@ -30,7 +30,7 @@
                 class='ui rcpch_primary button'
                 hx-post='{% url "close_syndrome" syndrome_id=syndrome.pk %}'
                 hx-target='#syndromes'
-                hx-swap='innerHTML'
+                hx-swap='innerHTML swap:500ms'
                 hx-trigger='click'
             >Syndrome entry complete for {{syndrome.multiaxial_diagnosis.registration.case}}</div>
         </div>

@@ -1,6 +1,6 @@
 
 
-<div class="ui rcpch pink message" id='wrapper' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div class="ui rcpch pink message" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
     <div class="ui rcpch_pink segment">
 
@@ -89,7 +89,7 @@
             class='ui rcpch_primary button'
             hx-post='{% url "close_episode" episode_id=episode.pk %}'
             hx-target='#episodes'
-            hx-swap='innerHTML'
+            hx-swap='innerHTML swap:500ms'
             hx-trigger='click'
         >Episode entry complete for {{episode.multiaxial_diagnosis.registration.case}}</div>
     </div>

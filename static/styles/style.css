@@ -1150,7 +1150,16 @@ a label {
   color: var(--rcpch_light_blue);
 }
 
-#wrapper.htmx-request {
-  opacity: 0.5;
-  transition: opacity 200ms linear;
+.fade-out.htmx-swapping {
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}
+
+.fade-in.htmx-added {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 500ms ease-out;
 }
