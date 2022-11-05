@@ -278,8 +278,6 @@ def selected_hospital_summary(request):
     else:
         total_percent = 0
 
-    print(f'total registrations {all_registrations}')
-
     return render(request=request, template_name='epilepsy12/partials/selected_hospital_summary.html', context={
         'user': request.user,
         'selected_hospital': selected_hospital,
@@ -459,3 +457,8 @@ def favicon(request: HttpRequest) -> HttpResponse:
     file = (settings.BASE_DIR / "static" /
             "images/favicon-16x16.png").open("rb")
     return FileResponse(file)
+
+
+"""
+Django Rest Framework Viewsets
+"""
