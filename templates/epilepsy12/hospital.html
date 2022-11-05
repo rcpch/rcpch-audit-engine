@@ -9,6 +9,12 @@
             {% include 'epilepsy12/partials/selected_hospital_summary.html' with hospital_list=hospital_list selected_hospital=selected_hospital hospital_list=hospital_list cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity cases_aggregated_by_sex=cases_aggregated_by_sex cases_aggregated_by_deprivation=cases_aggregated_by_deprivation percent_completed_registrations=percent_completed_registrations total_registrations=total_registrations total_cases=total_cases total_referred_to_paediatrics=total_referred_to_paediatrics total_referred_to_neurology=total_referred_to_neurology total_referred_to_surgery=total_referred_to_surgery %}
         </div>
 
+        {% if request.user|has_group:'epilepsy12_audit_team_full_access' %}
+            <div class='row' id='frida_button'>
+                {% include 'epilepsy12/partials/frida_button.html' with model_list=model_list selected_model=selected_model %}
+            </div>
+        {% endif %}
+
         <div class="row">
             <div class="two stackable columns">
                 <div class="column">

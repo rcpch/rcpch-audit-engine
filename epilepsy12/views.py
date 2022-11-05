@@ -1,12 +1,13 @@
+from django.apps import apps
 from django.conf import settings
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET
 from django.contrib.auth.models import Group
 from django.shortcuts import render
-# from django.contrib.auth.forms import UserCreationForm
+import csv
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
@@ -19,6 +20,7 @@ from django.db.models import Case as DJANGO_CASE
 from itertools import chain
 from .view_folder import *
 from django_htmx.http import HttpResponseClientRedirect
+from .decorator import rcpch_full_access_only
 
 user = get_user_model()
 
@@ -184,7 +186,8 @@ def hospital_reports(request):
         'total_referred_to_paediatrics': total_referred_to_paediatrics,
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
-        'all_models': all_models
+        'all_models': all_models,
+        'model_list': ('registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
     })
 
 
@@ -403,6 +406,51 @@ def rcpch_403(request, exception):
 def redirect_403(request):
     # return the custom 403 template. There is not context to add.
     return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
+
+
+@login_required
+@rcpch_full_access_only()
+def download_select(request):
+    """
+    POST request from frida_button.html
+    """
+    model = request.POST.get('model')
+
+    context = {
+        'selected_model': model,
+        'model_list': ('registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
+        'is_selected': True
+    }
+
+    return render(request, template_name='epilepsy12/partials/frida_button.html', context=context)
+
+
+@login_required
+@rcpch_full_access_only()
+def download(request, model_name):
+    """
+    POST request to download table as csv
+    """
+
+    model_instance = apps.get_model(
+        app_label='epilepsy12', model_name=model_name)
+    field_list = []
+
+    fields = model_instance._meta.get_fields()
+    for field in fields:
+        field_list.append(field.name)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{model_name}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(field_list)
+
+    items = model_instance.objects.all().values_list(*field_list)
+    for item in items:
+        writer.writerow(item)
+
+    return response
 
 
 @require_GET
