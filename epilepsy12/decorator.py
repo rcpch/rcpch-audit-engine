@@ -160,6 +160,22 @@ def group_required(*group_names):
     return decorator
 
 
+def rcpch_full_access_only():
+    """
+    Only permits access to rcpch_audit_team_full_access group members 
+    """
+    def decorator(view):
+        def wrapper(request, *args, **kwargs):
+            user = request.user
+            print(user.groups)
+            if user.groups.filter(name='epilepsy12_audit_team_full_access').exists():
+                return view(request, *args, **kwargs)
+            else:
+                raise PermissionDenied()
+        return wrapper
+    return decorator
+
+
 def update_model(model, field_name, page_element, comparison_date_field_name=None, is_earliest_date=False):
     """
     Decorator to update the field in the model, depending on the type of page element POSTing back to the view.

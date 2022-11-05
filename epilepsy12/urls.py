@@ -372,6 +372,11 @@ htmx_paths = [
          views.has_been_referred_for_mental_health_support, name='has_been_referred_for_mental_health_support'),
     path('management/<int:management_id>/has_support_for_mental_health_support',
          views.has_support_for_mental_health_support, name='has_support_for_mental_health_support'),
+
+    path('epilepsy12/download_select',
+         views.download_select, name='download_select'),
+    path('epilepsy12/<str:model_name>/download',
+         views.download, name='download'),
 ]
 
 
