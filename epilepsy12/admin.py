@@ -118,3 +118,4 @@ admin.site.register(Syndrome)
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'
 admin.site.index_title = 'Epilepsy12'
+admin.site.site_url = '/epilepsy12/'
