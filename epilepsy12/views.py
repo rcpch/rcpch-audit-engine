@@ -1,26 +1,34 @@
+# django
 from django.apps import apps
+from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 from django.conf import settings
-from django.http import FileResponse, HttpRequest, HttpResponse
-from django.views.decorators.cache import cache_control
-from django.views.decorators.http import require_GET
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.shortcuts import render
-import csv
-from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm
-from django.contrib.auth import login
+from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_control
+from django.views.decorators.http import require_GET
+
+# django rest framework
+from rest_framework import permissions, viewsets
+
+# python
+import csv
+from itertools import chain
+
+# third party libraries
+from django_htmx.http import HttpResponseClientRedirect
+
+# epilepsy12
+from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
-from epilepsy12.models import Case, Epilepsy12User
-from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField
-from django.db.models import Case as DJANGO_CASE
-from itertools import chain
+from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
 from .view_folder import *
-from django_htmx.http import HttpResponseClientRedirect
 from .decorator import rcpch_full_access_only
+from .serializers import *
 
 user = get_user_model()
 
@@ -462,3 +470,147 @@ def favicon(request: HttpRequest) -> HttpResponse:
 """
 Django Rest Framework Viewsets
 """
+
+
+class Epilepsy12UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Epilepsy12User.objects.all().order_by('-surname')
+    serializer_class = Epilepsy12UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class CaseViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Case.objects.all().order_by('-surname')
+    serializer_class = CaseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class RegistrationViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Registration.objects.all().order_by('-registration_date')
+    serializer_class = RegistrationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class FirstPaediatricAssessmentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = FirstPaediatricAssessment.objects.all()
+    serializer_class = FirstPaediatricAssessmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class EpilepsyContextViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = EpilepsyContext.objects.all()
+    serializer_class = EpilepsyContextSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class MultiaxialDiagnosisViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = MultiaxialDiagnosis.objects.all()
+    serializer_class = MultiaxialDiagnosisSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class EpisodeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Episode.objects.all()
+    serializer_class = EpisodeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class SyndromeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Syndrome.objects.all()
+    serializer_class = SyndromeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ComorbidityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Comorbidity.objects.all()
+    serializer_class = ComorbiditySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class InvestigationsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Investigations.objects.all()
+    serializer_class = InvestigationsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class AssessmentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Assessment.objects.all()
+    serializer_class = AssessmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ManagementViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Management.objects.all()
+    serializer_class = ManagementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class AntiEpilepsyMedicineViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = AntiEpilepsyMedicine.objects.all()
+    serializer_class = AntiEpilepsyMedicineSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class SiteViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Site.objects.all()
+    serializer_class = SiteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class HospitalTrustViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = HospitalTrust.objects.all()
+    serializer_class = HospitalTrustSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class KeywordViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Keyword.objects.all()
+    serializer_class = KeywordSerializer
+    permission_classes = [permissions.IsAuthenticated]
