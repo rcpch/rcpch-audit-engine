@@ -51,12 +51,13 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'rest_framework',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'epilepsy12',
     # third party
     'widget_tweaks',
-    'django_htmx'
+    'django_htmx',
 ]
 
 MIDDLEWARE = [
@@ -179,3 +180,9 @@ CSRF_TRUSTED_ORIGINS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
 )
+
+# rest framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}

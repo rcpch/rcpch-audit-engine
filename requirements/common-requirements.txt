@@ -11,5 +11,6 @@ django-widget-tweaks
 django-htmx
 whitenoise
 django-semantic-admin
+djangorestframework
 
 # RCPCH imports

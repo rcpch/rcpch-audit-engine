@@ -48,7 +48,7 @@ VIEW_PERMISSIONS = [
     {'codename': 'view_registration',
      'content_type': registrationContentType},
     {'codename': 'view_FirstPaediatricAssessment',
-     'content_type': initial_assessmfirst_paediatric_assessmentContentType},
+     'content_type': first_paediatric_assessmentContentType},
     {'codename': 'view_epilepsycontext',
      'content_type': epilepsy_contextContentType},
     {'codename': 'view_multiaxialdiagnosis',

@@ -1,8 +1,28 @@
-from django.views.generic.base import RedirectView
-from django.conf.urls.static import static
 from . import views
-# from .views import SignUpView
-from django.urls import path, re_path
+from .view_folder import *
+from django.urls import path
+from rest_framework import routers
+from django.urls import path, include
+
+router = routers.DefaultRouter()
+
+router.register(r'epilepsy12users', views.Epilepsy12UserViewSet)
+router.register(r'registration', views.RegistrationViewSet)
+router.register(r'case', views.CaseViewSet)
+router.register(r'firstpaediatricassessment',
+                views.FirstPaediatricAssessmentViewSet)
+router.register(r'epilepsycontext', views.EpilepsyContextViewSet)
+router.register(r'multiaxialdiagnosis', views.MultiaxialDiagnosisViewSet)
+router.register(r'episode', views.EpisodeViewSet)
+router.register(r'syndrome', views.SyndromeViewSet)
+router.register(r'comorbidity', views.ComorbidityViewSet)
+router.register(r'assessment', views.AssessmentViewSet)
+router.register(r'investigations', views.InvestigationsViewSet)
+router.register(r'management', views.ManagementViewSet)
+router.register(r'antiepilepsymedicine', views.AntiEpilepsyMedicineViewSet)
+router.register(r'site', views.SiteViewSet)
+router.register(r'hospitaltrust', views.HospitalTrustViewSet)
+router.register(r'keyword', views.KeywordViewSet)
 
 urlpatterns = [
     path("favicon", views.favicon),
@@ -19,8 +39,7 @@ urlpatterns = [
          views.create_case, name="create_case"),
     path('hospital/<int:hospital_id>/case/<int:case_id>/delete',
          views.delete_case, name="delete_case"),
-    path('case/<int:case_id>/register',
-         views.register, name='register'),
+    path('case/<int:case_id>/register', views.register, name='register'),
     path('hospital/<int:hospital_id>/case/<int:case_id>/opt-out',
          views.opt_out, name='opt_out'),
     path('hospital/<int:hospital_id>/cases/view_preference',
@@ -31,36 +50,23 @@ urlpatterns = [
          name='selected_hospital_summary'),
     path('hospital/<int:hospital_id>/case_statistics',
          views.case_statistics, name='case_statistics'),
-
-    #     htmx callback from steps
     path('registration/<int:case_id>/registration_active/<str:active_template>',
-         views.registration_active, name='registration_active'),
-
-    # initial assessment path
-    path('first_paediatric_assessment/<int:case_id>',
-         views.first_paediatric_assessment, name="first_paediatric_assessment"),
-    # assessment path
-    path('assessment/<int:case_id>/',
-         views.assessment, name="assessment"),
-
+         view=views.registration_active, name='registration_active'),
+    path('first_paediatric_assessment/<int:case_id>/edit',
+         first_paediatric_assessment, name='first_paediatric_assessment'),
+    path('assessment/<int:case_id>/', assessment, name="assessment"),
     path('multiaxial_diagnosis/<int:case_id>',
-         views.multiaxial_diagnosis, name='multiaxial_diagnosis'),
-
-    # epilepsy context path
+         multiaxial_diagnosis, name='multiaxial_diagnosis'),
     path('epilepsy_context/<int:case_id>',
-         views.epilepsy_context, name='epilepsy_context'),
-
-    path('management/<int:case_id>', views.management, name='management'),
-
+         epilepsy_context, name='epilepsy_context'),
+    path('management/<int:case_id>', management, name='management'),
     path('docs', views.documentation, name="docs"),
     path('patient', views.patient, name="patient"),
-
     path('investigations/<int:case_id>',
-         views.investigations, name='investigations'),
+         investigations, name='investigations'),
 ]
 
 htmx_paths = [
-
     # episodes
     path('multiaxial_diagnosis_id/<int:multiaxial_diagnosis_id>/add_episode',
          views.add_episode, name='add_episode'),
@@ -190,11 +196,6 @@ htmx_paths = [
          views.delete_lead_site, name="delete_lead_site"),
     path('registration/<int:registration_id>/previous_sites',
          views.previous_sites, name="previous_sites"),
-
-    #     path('registration/<int:registration_id>/<str:editable>/',
-    #          views.editable, name="editable"),
-
-
 
     #     ** Assessment paths **
 
@@ -377,7 +378,15 @@ htmx_paths = [
          views.download_select, name='download_select'),
     path('epilepsy12/<str:model_name>/download',
          views.download, name='download'),
+
+]
+
+drf_routes = [
+    # rest framework paths
+    path('epilepsy12/api/v1/', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
 
 urlpatterns += htmx_paths
+urlpatterns += drf_routes
