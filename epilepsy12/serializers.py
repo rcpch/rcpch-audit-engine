@@ -9,7 +9,7 @@ class Epilepsy12UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Epilepsy12User
         fields = ['first_name', 'surname', 'title', 'email', 'username', 'bio', 'is_active', 'is_staff',
-                  'is_superuser', 'is_rcpch_audit_team_member', 'view_preference', 'date_joined', 'role', 'twitter_handle', 'groups']
+                  'is_superuser', 'is_rcpch_audit_team_member', 'view_preference', 'date_joined', 'role', 'twitter_handle']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
