@@ -383,7 +383,7 @@ htmx_paths = [
 
 drf_routes = [
     # rest framework paths
-    path('epilepsy12/api/v1/', include(router.urls)),
+    path('api/v1/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
