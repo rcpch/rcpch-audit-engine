@@ -1,40 +1,38 @@
-<div class="ui rcpch pink message">
-
-    <div class="ui rcpch_pink segment">
-
-        <h5 class="ui header">
-            <span class='desscribe_letters'>
-                <div class="ui rcpch_pink circular label">S</div>
-            </span>
-            <div class='content'>
-                    Syndrome
-                <div class='sub header'>
-                Does it fulfill criteria for an epilepsy syndrome?
-                </div>
-            </div>
-        </h5>
-
-        
-        <div class="field">
-            {% url 'syndrome_diagnosis_date' syndrome_id=syndrome.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="innerHTML" hx_name='syndrome_diagnosis_date' date_value=syndrome.syndrome_diagnosis_date label=syndrome.get_syndrome_diagnosis_date_help_label_text reference=syndrome.get_syndrome_diagnosis_date_help_reference_text input_date_field_name='syndrome_diagnosis_date' data_position='top left' %}
+<div class="ui rcpch pink message" id="syndrome">
+  <div class="ui rcpch_pink segment">
+    <h5 class="ui header">
+      <span class="desscribe_letters">
+        <div class="ui rcpch_pink circular label">S</div>
+      </span>
+      <div class="content">
+        Syndrome
+        <div class="sub header">
+          Does it fulfill criteria for an epilepsy syndrome?
         </div>
+      </div>
+    </h5>
 
-        <div class="field">
-            {% url 'syndrome_name' syndrome_id=syndrome.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="innerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." test_positive=syndrome.syndrome_name label=syndrome.get_syndrome_name_help_label_text reference=syndrome.get_syndrome_name_help_reference_text data_position='top left' %}
-        </div>
-
-        <div class='field'>
-            <div 
-                class='ui rcpch_primary button'
-                hx-post='{% url "close_syndrome" syndrome_id=syndrome.pk %}'
-                hx-target='#syndromes'
-                hx-swap='innerHTML swap:500ms'
-                hx-trigger='click'
-            >Syndrome entry complete for {{syndrome.multiaxial_diagnosis.registration.case}}</div>
-        </div>
-        
+    <div class="field">
+      {% url 'syndrome_diagnosis_date' syndrome_id=syndrome.pk as hx_post %} 
+      {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="outerHTML" hx_name='syndrome_diagnosis_date' date_value=syndrome.syndrome_diagnosis_date label=syndrome.get_syndrome_diagnosis_date_help_label_text reference=syndrome.get_syndrome_diagnosis_date_help_reference_text input_date_field_name='syndrome_diagnosis_date' data_position='top left'%}
     </div>
 
+    <div class="field">
+      {% url 'syndrome_name' syndrome_id=syndrome.pk as hx_post %} 
+      {% include 'epilepsy12/partials/page_elements/select.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="outerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." test_positive=syndrome.syndrome_name label=syndrome.get_syndrome_name_help_label_text reference=syndrome.get_syndrome_name_help_reference_text data_position='top left' %}
+    </div>
+
+    <div class="field">
+      <div
+        class="ui rcpch_primary button"
+        hx-post='{% url "close_syndrome" syndrome_id=syndrome.pk %}'
+        hx-target="#syndromes"
+        hx-swap="innerHTML swap:500ms"
+        hx-trigger="click"
+      >
+        Syndrome entry complete for
+        {{syndrome.multiaxial_diagnosis.registration.case}}
+      </div>
+    </div>
+  </div>
 </div>

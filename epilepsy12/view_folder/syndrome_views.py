@@ -17,6 +17,8 @@ def syndrome_diagnosis_date(request, syndrome_id):
     HTMX post request from syndrome.html partial on date change
     """
 
+    print("hello")
+
     syndrome_diagnosis_date = request.POST.get(
         request.htmx.trigger_name)
 
