@@ -14,12 +14,32 @@ def consultant_paediatrician_referral_made(request, assessment_id):
     """
     POST request callback from toggle_button in consultant_paediatrician partial
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='consultant_paediatrician_referral_made',
+            page_element='toggle_button',
+        )
+    except ValueError as error:
+        error_message = error
+
+    # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    if not assessment.consultant_paediatrician_referral_made:
-        assessment.consultant_paediatrician_referral_date = None
-        assessment.consultant_paediatrician_input_date = None
-        assessment.save()
+    if assessment.consultant_paediatrician_referral_made == False:
+        Assessment.objects.filter(pk=assessment_id).update(
+            consultant_paediatrician_referral_date=None,
+            consultant_paediatrician_input_date=None,
+            updated_at=timezone.now(),
+            updated_by=request.user
+        )
+
+        # refresh all objects and return
+        assessment = Assessment.objects.get(pk=assessment_id)
+
         # if any allocated sites make them historical
         if Site.objects.filter(
             case=assessment.registration.case,
@@ -51,7 +71,8 @@ def consultant_paediatrician_referral_made(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -422,7 +443,6 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required(CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE[0], raise_exception=True)
-@update_model(Assessment, 'paediatric_neurologist_referral_made', 'toggle_button')
 def paediatric_neurologist_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -431,6 +451,19 @@ def paediatric_neurologist_referral_made(request, assessment_id):
     and returns the same partial.
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model_id=assessment_id,
+            model=Assessment,
+            field_name='paediatric_neurologist_referral_made',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
+    # get new instance of Assessment
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # if there is no Paediatric neurologist - set all associated fields to None
@@ -442,6 +475,9 @@ def paediatric_neurologist_referral_made(request, assessment_id):
             updated_at=timezone.now(),
             updated_by=request.user
         )
+
+        # get new instance of Assessment
+        assessment = Assessment.objects.get(pk=assessment_id)
 
         # if any allocated sites make them historical
         if Site.objects.filter(
@@ -474,7 +510,8 @@ def paediatric_neurologist_referral_made(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -870,7 +907,6 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
 
 
 @login_required
-@update_model(Assessment, 'childrens_epilepsy_surgical_service_referral_made', 'toggle_button')
 def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -879,6 +915,19 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     and returns the same partial.
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model_id=assessment_id,
+            model=Assessment,
+            field_name='childrens_epilepsy_surgical_service_referral_made',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
+    # get new instance of Assessment
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # A surgical referral has not been made - set all fields related fields to None
@@ -889,6 +938,9 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
             updated_at=timezone.now(),
             updated_by=request.user
         )
+
+        # get new instance of Assessment
+        assessment = Assessment.objects.get(pk=assessment_id)
 
         # if any allocated sites make them historical
         if Site.objects.filter(
@@ -923,7 +975,8 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
