@@ -346,6 +346,8 @@ htmx_paths = [
          views.antiepilepsy_medicine_risk_discussed, name='antiepilepsy_medicine_risk_discussed'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/is_a_pregnancy_prevention_programme_in_place',
          views.is_a_pregnancy_prevention_programme_in_place, name='is_a_pregnancy_prevention_programme_in_place'),
+    path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/has_a_valproate_annual_risk_acknowledgement_form_been_completed',
+         views.has_a_valproate_annual_risk_acknowledgement_form_been_completed, name='has_a_valproate_annual_risk_acknowledgement_form_been_completed'),
 
 
 

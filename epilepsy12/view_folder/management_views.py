@@ -317,9 +317,11 @@ def medicine_id(request, antiepilepsy_medicine_id):
         # sodium valproate selected and patient is female
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+        antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
     else:
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+        antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
 
     antiepilepsy_medicine.save()
 
@@ -527,6 +529,45 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
 def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update is_a_pregnancy_prevention_programme_in_place
+    """
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
+        show_end_date = True
+    else:
+        show_end_date = False
+
+    context = {
+        'choices': sorted(choices, key=itemgetter(1)),
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': show_end_date
+    }
+
+    template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
+
+    response = recalculate_form_generate_response(
+        model_instance=antiepilepsy_medicine.management,
+        request=request,
+        context=context,
+        template=template_name
+    )
+
+    return response
+
+
+@login_required
+@update_model(AntiEpilepsyMedicine, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed', 'toggle_button')
+def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to update has_a_valproate_annual_risk_acknowledgement_form_been_completed
     """
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(

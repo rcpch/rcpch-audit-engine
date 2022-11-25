@@ -211,8 +211,8 @@ def total_fields_expected(model_instance):
                         cumulative_score += 1
                         if medicine.is_a_pregnancy_prevention_programme_needed:
                             # essential fields are:
-                            # 'is_a_pregnancy_prevention_programme_in_place
-                            cumulative_score += 1
+                            # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
+                            cumulative_score += 2
             else:
                 # user has said AED given but not scored yet
                 cumulative_score += scoreable_fields_for_model_class_name(
