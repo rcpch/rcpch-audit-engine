@@ -222,10 +222,16 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     else:
         choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
+    if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
+        show_end_date = True
+    else:
+        show_end_date = False
+
     context = {
-        'choices': choices,
+        'choices': sorted(choices, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
-        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': show_end_date
     }
 
     template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
@@ -317,10 +323,16 @@ def medicine_id(request, antiepilepsy_medicine_id):
 
     antiepilepsy_medicine.save()
 
+    if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
+        show_end_date = True
+    else:
+        show_end_date = False
+
     context = {
         'choices': sorted(choices, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
-        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': show_end_date
     }
 
     template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
@@ -363,10 +375,16 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     else:
         choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
+    if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
+        show_end_date = True
+    else:
+        show_end_date = False
+
     context = {
         'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
-        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': show_end_date
     }
 
     template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
@@ -377,6 +395,41 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
         context=context,
         template=template_name,
         error_message=error_message
+    )
+
+    return response
+
+
+def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to toggle antiepilepsy_medicine_end_date
+    """
+
+    error_message = ""
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id)
+
+    if antiepilepsy_medicine.is_rescue_medicine:
+        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+    else:
+        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+
+    context = {
+        'choices': choices,
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': True
+    }
+
+    template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
+
+    response = recalculate_form_generate_response(
+        model_instance=antiepilepsy_medicine.management,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
     )
 
     return response
@@ -413,7 +466,8 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     context = {
         'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
-        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': True
     }
 
     template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
@@ -444,10 +498,16 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     else:
         choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
+    if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
+        show_end_date = True
+    else:
+        show_end_date = False
+
     context = {
-        'choices': choices,
+        'choices': sorted(choices, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
-        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': show_end_date
     }
 
     template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'
@@ -477,10 +537,16 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     else:
         choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
+    if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
+        show_end_date = True
+    else:
+        show_end_date = False
+
     context = {
-        'choices': choices,
+        'choices': sorted(choices, key=itemgetter(1)),
         'antiepilepsy_medicine': antiepilepsy_medicine,
-        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine
+        'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
+        'show_end_date': show_end_date
     }
 
     template_name = 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html'

@@ -338,6 +338,8 @@ htmx_paths = [
          views.medicine_id, name='medicine_id'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_start_date',
          views.antiepilepsy_medicine_start_date, name='antiepilepsy_medicine_start_date'),
+    path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_add_stop_date',
+         views.antiepilepsy_medicine_add_stop_date, name='antiepilepsy_medicine_add_stop_date'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_stop_date',
          views.antiepilepsy_medicine_stop_date, name='antiepilepsy_medicine_stop_date'),
     path('antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_risk_discussed',

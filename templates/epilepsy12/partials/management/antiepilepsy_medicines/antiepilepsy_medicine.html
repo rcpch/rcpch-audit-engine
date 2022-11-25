@@ -15,11 +15,36 @@
         </div>
         
         <div class='field'>
-            {% url 'antiepilepsy_medicine_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
-            {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
+            {% if show_end_date %}
+                {% url 'antiepilepsy_medicine_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                {% if is_rescue_medicine %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
+                {% else %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
+                {% endif %}
             {% else %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
+                {% url 'antiepilepsy_medicine_add_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                {% if is_rescue_medicine %}
+                    <label>Medicine End Date</label>
+                    <div 
+                        class='ui rcpch_primary button'
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        name="antiepilepsy_medicine_add_stop_date"
+                        hx-post="{{hx_post}}"
+                        hx-trigger="click"
+                        hx-target="#rescue_medicine_list"
+                    >Add End Date</div>
+                {% else %}
+                    <label>Medicine End Date</label>
+                    <div 
+                        class='ui rcpch_primary button'
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        name="antiepilepsy_medicine_add_stop_date"
+                        hx-post="{{hx_post}}"
+                        hx-trigger="click"
+                        hx-target="#antiepilepsy_medicine_list"
+                    >Add End Date</div>
+                {% endif %}
             {% endif %}
         </div>
     </div>

@@ -195,8 +195,16 @@ def total_fields_expected(model_instance):
                 for medicine in medicines:
                     # essential fields are:
                     # medicine_name', 'antiepilepsy_medicine_start_date',
-                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
-                    cumulative_score += 4
+                    # 'antiepilepsy_medicine_risk_discussed'
+                    # NOTE 'antiepilepsy_medicine_stop_date' is not an essential field
+
+                    if medicine.medicine_name:
+                        cumulative_score += 1
+                    if medicine.antiepilepsy_medicine_start_date:
+                        cumulative_score += 1
+                    if medicine.antiepilepsy_medicine_risk_discussed:
+                        cumulative_score += 1
+
                     if medicine.medicine_id == 21 and model_instance.registration.case.sex == 2:
                         # essential fields are:
                         # 'is_a_pregnancy_prevention_programme_needed'
@@ -263,7 +271,7 @@ def avoid_fields(model_instance):
     elif model_class_name == 'Episode':
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'AntiEpilepsyMedicine':
-        return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at']
+        return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date']
     elif model_class_name == 'Registration':
         return ['id', 'management', 'assessment', 'investigations', 'multiaxial_diagnosis', 'registration', 'epilepsycontext', 'firstpaediatricassessment', 'registration_close_date', 'registration_date_one_year_on', 'cohort', 'case', 'audit_progress', 'created_by', 'created_at', 'updated_by', 'updated_at']
     else:
@@ -532,6 +540,9 @@ def validate_and_update_model(
                 if comparison_date:
                     date_valid = field_value >= comparison_date
                     date_error = f'The date you chose ({field_value}) cannot not be before {comparison_date}'
+                else:
+                    # no other date supplied yet
+                    date_valid = True
                 if not date_valid:
                     errors = date_error
 
