@@ -95,9 +95,19 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
         null=True,
         blank=True
     )
+    has_a_valproate_annual_risk_acknowledgement_form_been_completed = models.BooleanField(
+        help_text={
+            'label': "Has a Valproate - Annual Risk Acknowledgment Form been completed?",
+            'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
+        },
+        default=None,
+        null=True,
+        blank=True
+    )
+
     is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
         help_text={
-            'label': "Is a pregnancy prevention programme (PPP) in place?",
+            'label': "Is the Valproate Pregnancy Prevention Programme in place?",
             'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
         },
         default=None,

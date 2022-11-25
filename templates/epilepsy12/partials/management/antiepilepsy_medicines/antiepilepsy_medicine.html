@@ -79,12 +79,23 @@
     
     {% if antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed %}
     
-        <div class='field'>
-            {% url 'is_a_pregnancy_prevention_programme_in_place' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+        <div class='two fields'>
+            {% url 'is_a_pregnancy_prevention_programme_in_place' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post_ppp %}
+            {% url 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post_acknowledge %}
             {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' disabled=False %}
+                <div class='field'>
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_ppp hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' disabled=False %}
+                </div>
+                <div class='field'>
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_acknowledge hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed' test_positive=antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed label=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_label_text reference=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_reference_text data_position='top left' disabled=False %}
+                </div>
             {% else %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' disabled=False %}
+                <div class='field'>
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_ppp hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' disabled=False %}
+                </div>
+                <div class='field'>
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_acknowledge hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed' test_positive=antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed label=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_label_text reference=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_reference_text data_position='top left' disabled=False %}
+                </div>
             {% endif %}
         </div>
 
