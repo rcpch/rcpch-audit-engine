@@ -423,9 +423,9 @@ def number_of_completed_fields_in_related_models(model_instance):
             for site in sites:
                 if site.site_is_childrens_epilepsy_surgery_centre:
                     cumulative_score += 1
-                elif site.site_is_general_paediatric_centre:
+                if site.site_is_general_paediatric_centre:
                     cumulative_score += 1
-                elif site.site_is_paediatric_neurology_centre:
+                if site.site_is_paediatric_neurology_centre:
                     cumulative_score += 1
     elif model_instance.__class__.__name__ == 'Management':
         # also need to count associated records in AntiepilepsyMedicines
