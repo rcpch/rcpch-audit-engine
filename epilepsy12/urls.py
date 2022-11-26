@@ -1,5 +1,6 @@
 from . import views
 from .view_folder import *
+from .views import RegisterCase
 from django.urls import path
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
@@ -24,6 +25,7 @@ router.register(r'antiepilepsymedicine', views.AntiEpilepsyMedicineViewSet)
 router.register(r'site', views.SiteViewSet)
 router.register(r'hospitaltrust', views.HospitalTrustViewSet)
 router.register(r'keyword', views.KeywordViewSet)
+router.register(r'auditprogress', views.AuditProgressViewSet)
 
 urlpatterns = [
     path("favicon", views.favicon),
@@ -389,8 +391,11 @@ htmx_paths = [
 drf_routes = [
     # rest framework paths
     path('api/v1/', include(router.urls)),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api/v1/register_case', view=RegisterCase.as_view()),
+    # returns a Token (OAuth2 key: Token) against email and password of existing user
+    path('api/v1/api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    # returns the standard Django views for authentication of the DRF
+    path('api/v1/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 

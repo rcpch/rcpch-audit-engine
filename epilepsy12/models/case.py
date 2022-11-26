@@ -178,6 +178,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
                 self.postcode)
         return super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # Deleting a Case involves deleting any registrations associated that exist first
+        try:
+            self.registration.delete()
+        except:
+            pass
+        super(Case, self).delete(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Patient'
         verbose_name_plural = 'Patients'
