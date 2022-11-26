@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group
 from rest_framework import serializers
+from rest_framework.views import APIView
 from .models import *
 
 # AuditProgress model here not included as only relevant to the Epilepsy12 app

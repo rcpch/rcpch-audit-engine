@@ -2,6 +2,7 @@ from . import views
 from .view_folder import *
 from django.urls import path
 from rest_framework import routers
+from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
 
 router = routers.DefaultRouter()
@@ -388,6 +389,7 @@ htmx_paths = [
 drf_routes = [
     # rest framework paths
     path('api/v1/', include(router.urls)),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
