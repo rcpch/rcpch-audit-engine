@@ -496,7 +496,7 @@ class CaseViewSet(viewsets.ModelViewSet):
 
 class RegistrationViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows registrations in Epilepsy12 to be viewed or edited.
     """
     queryset = Registration.objects.all().order_by('-registration_date')
     serializer_class = RegistrationSerializer
@@ -505,7 +505,7 @@ class RegistrationViewSet(viewsets.ModelViewSet):
 
 class FirstPaediatricAssessmentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows details relating to the first paediatric assessment to be viewed or edited.
     """
     queryset = FirstPaediatricAssessment.objects.all()
     serializer_class = FirstPaediatricAssessmentSerializer
@@ -514,7 +514,7 @@ class FirstPaediatricAssessmentViewSet(viewsets.ModelViewSet):
 
 class EpilepsyContextViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows children's epilepsy risk factors to be viewed or edited.
     """
     queryset = EpilepsyContext.objects.all()
     serializer_class = EpilepsyContextSerializer
@@ -523,7 +523,7 @@ class EpilepsyContextViewSet(viewsets.ModelViewSet):
 
 class MultiaxialDiagnosisViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows a multiaxial diagnosis of the child's epilepsy to be viewed or edited.
     """
     queryset = MultiaxialDiagnosis.objects.all()
     serializer_class = MultiaxialDiagnosisSerializer
@@ -532,7 +532,7 @@ class MultiaxialDiagnosisViewSet(viewsets.ModelViewSet):
 
 class EpisodeViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows each seizure episode to be viewed or edited.
     """
     queryset = Episode.objects.all()
     serializer_class = EpisodeSerializer
@@ -541,7 +541,7 @@ class EpisodeViewSet(viewsets.ModelViewSet):
 
 class SyndromeViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows each syndrome to be viewed or edited.
     """
     queryset = Syndrome.objects.all()
     serializer_class = SyndromeSerializer
@@ -550,7 +550,7 @@ class SyndromeViewSet(viewsets.ModelViewSet):
 
 class ComorbidityViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows each comorbidity to be viewed or edited.
     """
     queryset = Comorbidity.objects.all()
     serializer_class = ComorbiditySerializer
@@ -559,7 +559,7 @@ class ComorbidityViewSet(viewsets.ModelViewSet):
 
 class InvestigationsViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows a panel of investigations for each registration to be viewed or edited.
     """
     queryset = Investigations.objects.all()
     serializer_class = InvestigationsSerializer
@@ -568,7 +568,7 @@ class InvestigationsViewSet(viewsets.ModelViewSet):
 
 class AssessmentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows key Epilepsy12 milestones to be viewed or edited.
     """
     queryset = Assessment.objects.all()
     serializer_class = AssessmentSerializer
@@ -577,7 +577,7 @@ class AssessmentViewSet(viewsets.ModelViewSet):
 
 class ManagementViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows management plans (including medications and individualised care plans) to be viewed or edited.
     """
     queryset = Management.objects.all()
     serializer_class = ManagementSerializer
@@ -586,7 +586,7 @@ class ManagementViewSet(viewsets.ModelViewSet):
 
 class AntiEpilepsyMedicineViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows antiseizure medicines to be viewed or edited.
     """
     queryset = AntiEpilepsyMedicine.objects.all()
     serializer_class = AntiEpilepsyMedicineSerializer
@@ -595,7 +595,7 @@ class AntiEpilepsyMedicineViewSet(viewsets.ModelViewSet):
 
 class SiteViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows allocated sites to be viewed or edited.
     """
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
@@ -604,7 +604,7 @@ class SiteViewSet(viewsets.ModelViewSet):
 
 class HospitalTrustViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows a list of hospital and community trusts to be viewed or edited.
     """
     queryset = HospitalTrust.objects.all()
     serializer_class = HospitalTrustSerializer
@@ -613,7 +613,7 @@ class HospitalTrustViewSet(viewsets.ModelViewSet):
 
 class KeywordViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows epilepsy semiology keywords to be viewed or edited.
     """
     queryset = Keyword.objects.all()
     serializer_class = KeywordSerializer
@@ -622,7 +622,7 @@ class KeywordViewSet(viewsets.ModelViewSet):
 
 class AuditProgressViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows a child's progress through audit completion to be viewed or edited.
     """
     queryset = AuditProgress.objects.all()
     serializer_class = AuditProgressSerializer
@@ -632,7 +632,7 @@ class AuditProgressViewSet(viewsets.ModelViewSet):
 
 
 class RegisterCase(APIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer = RegistrationSerializer
 
     def post(self, request):
@@ -728,4 +728,76 @@ class RegisterCase(APIView):
                 },
                 status=status.HTTP_200_OK
             )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CaseHospitalTrust(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer = CaseSerializer
+
+    def post(self, request):
+        # params
+        nhs_number = request.POST.get('nhs_number')
+        organisationID = request.POST.get('OrganisationID')
+        case_params = {
+            'nhs_number': request.POST.get('nhs_number'),
+            'first_name': request.POST.get('first_name'),
+            'surname': request.POST.get('surname'),
+            'date_of_birth': request.POST.get('date_of_birth'),
+            'sex': request.POST.get('sex'),
+            'ethnicity': request.POST.get('ethnicity'),
+        }
+        if nhs_number:
+            if Case.objects.filter(nhs_number=nhs_number).exists():
+                case = Case.objects.filter(nhs_number=nhs_number).get()
+                raise serializers.ValidationError(
+                    {'Case': f'{case} already exists. No record created.'})
+            else:
+                serializer = self.serializer(data=case_params)
+
+                if organisationID:
+
+                    if serializer.is_valid(raise_exception=True):
+                        if HospitalTrust.objects.filter(OrganisationID=request.POST.get('OrganisationID')).exists():
+                            hospital_trust = HospitalTrust.objects.filter(
+                                OrganisationID=request.POST.get('OrganisationID')).get()
+                        else:
+                            raise serializers.ValidationError(
+                                {'Case': f'Organisation {organisationID} does not exist. No record saved.'})
+
+                        try:
+                            case = Case.objects.create(**case_params)
+                        except Exception as error:
+                            raise serializers.ValidationError(
+                                {'Case': error})
+
+                        print(f'{case} created')
+
+                        try:
+                            Site.objects.create(
+                                case=case,
+                                hospital_trust=hospital_trust,
+                                site_is_actively_involved_in_epilepsy_care=True,
+                                site_is_primary_centre_of_epilepsy_care=True
+                            )
+                        except Exception as error:
+                            case.delete()
+                            raise serializers.ValidationError(
+                                {'Case': error})
+
+                        return Response(
+                            {
+                                "status": "success",
+                                "data": case_params
+                            },
+                            status=status.HTTP_200_OK
+                        )
+
+                else:
+                    raise serializers.ValidationError(
+                        {'Case': f'OrganisationID Not supplied. No record created.'})
+        else:
+            raise serializers.ValidationError(
+                {'Case': f'NHS number not supplied. No record created.'})
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -54,7 +54,7 @@ class RegistrationSerializer(serializers.HyperlinkedModelSerializer):
         case = serializers.PrimaryKeyRelatedField(queryset=Case.objects.all())
         audit_progress = serializers.PrimaryKeyRelatedField(
             queryset=AuditProgress.objects.all())
-        fields = ['case', 'registration_date',
+        fields = ['pk', 'case', 'registration_date',
                   'registration_close_date', 'cohort', 'eligibility_criteria_met', 'child_name']
 
 
@@ -64,7 +64,7 @@ class AuditProgressSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class EpilepsyContextSerializer(serializers.HyperlinkedModelSerializer):
+class EpilepsyContextSerializer(serializers.ModelSerializer):
     class Meta:
         model = EpilepsyContext
         registration = serializers.PrimaryKeyRelatedField(
@@ -74,19 +74,25 @@ class EpilepsyContextSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CaseSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = Case
         fields = ['locked', 'locked_at', 'locked_by', 'nhs_number', 'first_name', 'surname', 'sex',
                   'date_of_birth', 'postcode', 'ethnicity', 'index_of_multiple_deprivation_quintile']
 
 
-class FirstPaediatricAssessmentSerializer(serializers.HyperlinkedModelSerializer):
+class FirstPaediatricAssessmentSerializer(serializers.ModelSerializer):
+    child_name = serializers.CharField(
+        source='registration.case', required=False)
+
     class Meta:
         model = FirstPaediatricAssessment
         registration = serializers.PrimaryKeyRelatedField(
             queryset=Registration.objects.all())
-        fields = ['first_paediatric_assessment_in_acute_or_nonacute_setting', 'has_number_of_episodes_since_the_first_been_documented',
-                  'general_examination_performed', 'neurological_examination_performed', 'developmental_learning_or_schooling_problems', 'behavioural_or_emotional_problems']
+        audit_progress = serializers.PrimaryKeyRelatedField(
+            queryset=AuditProgress.objects.all())
+        fields = ['id', 'first_paediatric_assessment_in_acute_or_nonacute_setting', 'has_number_of_episodes_since_the_first_been_documented',
+                  'general_examination_performed', 'neurological_examination_performed', 'developmental_learning_or_schooling_problems', 'behavioural_or_emotional_problems', 'child_name']
 
 
 class MultiaxialDiagnosisSerializer(serializers.HyperlinkedModelSerializer):
@@ -160,6 +166,8 @@ class AntiEpilepsyMedicineSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SiteSerializer(serializers.HyperlinkedModelSerializer):
+    child_name = serializers.CharField(source='case')
+
     class Meta:
         model = Site
         case = serializers.PrimaryKeyRelatedField(
@@ -167,7 +175,7 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         hospital_trust = serializers.PrimaryKeyRelatedField(
             queryset=HospitalTrust.objects.all())
         fields = ['site_is_actively_involved_in_epilepsy_care', 'site_is_primary_centre_of_epilepsy_care',
-                  'site_is_childrens_epilepsy_surgery_centre', 'site_is_paediatric_neurology_centre', 'site_is_general_paediatric_centre']
+                  'site_is_childrens_epilepsy_surgery_centre', 'site_is_paediatric_neurology_centre', 'site_is_general_paediatric_centre', 'case', 'hospital_trust', 'child_name']
 
 
 class HospitalTrustSerializer(serializers.HyperlinkedModelSerializer):
