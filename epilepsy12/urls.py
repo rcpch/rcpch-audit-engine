@@ -1,7 +1,9 @@
 from . import views
 from .view_folder import *
+from .views import RegisterCase, CaseHospitalTrust
 from django.urls import path
 from rest_framework import routers
+from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
 
 router = routers.DefaultRouter()
@@ -9,7 +11,7 @@ router = routers.DefaultRouter()
 router.register(r'epilepsy12users', views.Epilepsy12UserViewSet)
 router.register(r'registration', views.RegistrationViewSet)
 router.register(r'case', views.CaseViewSet)
-router.register(r'firstpaediatricassessment',
+router.register(r'first_paediatric_assessments',
                 views.FirstPaediatricAssessmentViewSet)
 router.register(r'epilepsycontext', views.EpilepsyContextViewSet)
 router.register(r'multiaxialdiagnosis', views.MultiaxialDiagnosisViewSet)
@@ -23,6 +25,7 @@ router.register(r'antiepilepsymedicine', views.AntiEpilepsyMedicineViewSet)
 router.register(r'site', views.SiteViewSet)
 router.register(r'hospitaltrust', views.HospitalTrustViewSet)
 router.register(r'keyword', views.KeywordViewSet)
+router.register(r'auditprogress', views.AuditProgressViewSet)
 
 urlpatterns = [
     path("favicon", views.favicon),
@@ -388,7 +391,15 @@ htmx_paths = [
 drf_routes = [
     # rest framework paths
     path('api/v1/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    # Registers child to a Lead site by NHS Number
+    path('api/v1/register_case', view=RegisterCase.as_view()),
+    # Creates a new case associated with a lead site
+    path('api/v1/add_case_to_hospital_list',
+         view=CaseHospitalTrust.as_view()),
+    # returns a Token (OAuth2 key: Token) against email and password of existing user
+    path('api/v1/api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    # returns the standard Django views for authentication of the DRF
+    path('api/v1/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 

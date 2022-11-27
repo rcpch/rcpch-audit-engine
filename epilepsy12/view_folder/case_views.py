@@ -356,7 +356,7 @@ def update_case(request, hospital_id, case_id):
 def delete_case(request, hospital_id, case_id):
     case = get_object_or_404(Case, id=case_id)
     case.delete()
-    return redirect('cases')
+    return redirect('cases', hospital_id=hospital_id)
 
 
 @login_required
