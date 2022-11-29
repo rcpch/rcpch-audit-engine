@@ -2,9 +2,13 @@
 {% load i18n %}
 {% load static %}
 
+
 {% block title %}Epilepsy12API{% endblock %}
 
 {% block bootstrap_theme %}
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}" type="text/css">
 {% endblock %}
 
@@ -18,12 +22,20 @@
         </a>
 {% endblock %}
 
+{% block breadcrumbs %}
+    <ul class="breadcrumb" style="padding: 5px 0px 5px 0px; background-color: #f0fafe;">
+        {% for breadcrumb_name, breadcrumb_url in breadcrumblist %}
+        {% if forloop.last %}
+            <li class="active"><a href="{{ breadcrumb_url }}" style="background-color: #0d0d58; padding:5px; text-decoration: none; border-radius: 0; color: white;">{{ breadcrumb_name }}</a></li>
+        {% else %}
+            <li><a href="{{ breadcrumb_url }}" style="background-color: #11a7f2; padding:5px; text-decoration: none; border-radius: 0; color: white;">{{ breadcrumb_name }}</a></li>
+        {% endif %}
+            <div class='separator' style="color: black; padding: 0 10px 0 10px;">|</div>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
 <style>
-    @font-face {
-        font-family: Montserrat-Regular;
-        src: local('Montserrat-Regular'),
-         url("fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
-      }
 
     body, h1, h2, h3, h4, h5, h6, p {
         color: black;
@@ -34,4 +46,61 @@
         color: black;
         font-family: Montserrat-Regular;
     }
+
+    @font-face {
+        font-family: Montserrat-Bold;
+        src: local('Montserrat-Bold'),
+          url("fonts/Montserrat/static/Montserrat-Bold.ttf") format("truetype");
+      }
+      
+      @font-face {
+        font-family: Montserrat-Italic;
+        src: local('Montserrat-Italic'),
+          url("fonts/Montserrat/static/Montserrat-Italic.ttf") format("truetype");
+      }
+      
+      @font-face {
+        font-family: Montserrat-Regular;
+        src: local('Montserrat-Regular'),
+          url("fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
+      }
+      
+      :root {
+        --rcpch_lightest_blue: #f0fafe;
+        --rcpch_lightest_grey: #f3f3f3;
+        --rcpch_strong_blue: #3366cc;
+        /* 51,102,204 */
+        --rcpch_dark_blue: #0d0d58;
+        /* 45,49,109 */
+        --rcpch_light_blue: #11a7f2;
+        /* 17,167,242 */
+        --rcpch_pink: #e00087;
+        /* 224,0,135 */
+        /* monochrome */
+        --rcpch_white: #ffffff;
+        --rcpch_light_grey: #d9d9d9;
+        /* 217,217,217 */
+        --rcpch_mid_grey: #b3b3b3;
+        /* 179,179,179 */
+        --rcpch_dark_grey: #808080;
+        /* 128,128,128 */
+        --rcpch_charcoal: #4d4d4d;
+        /* 77,77,77 */
+        --rcpch_black: #000000;
+        /* secondary colours */
+        --rcpch_red: #e60700;
+        --rcpch_light_red: #ffe7e6;
+        --rcpch_orange: #ff8000;
+        --rcpch_yellow: #fdc300;
+        --rcpch_gold: #c2a712;
+        --rcpch_vivid_green: #c8d400;
+        --rcpch_aqua_green: #00dbaa;
+        /* SGA colours */
+        --rcpch_purple: #7159aa;
+        --rcpch_magenta: #E00087;
+        --rcpch_strong_green: #66cc33;
+      
+        --rcpch_dark_red: #9a0500;
+      }
+    
 </style>

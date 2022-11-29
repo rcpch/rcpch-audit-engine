@@ -14,6 +14,7 @@ from django.views.decorators.http import require_GET
 
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 
 # django rest framework
 from rest_framework import permissions, viewsets
@@ -493,6 +494,74 @@ class CaseViewSet(viewsets.ModelViewSet):
     serializer_class = CaseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def add_case_to_hospital_list(self, request):
+        # params
+        nhs_number = request.POST.get('nhs_number')
+        organisationID = request.POST.get('OrganisationID')
+        case_params = {
+            'nhs_number': request.POST.get('nhs_number'),
+            'first_name': request.POST.get('first_name'),
+            'surname': request.POST.get('surname'),
+            'date_of_birth': request.POST.get('date_of_birth'),
+            'sex': request.POST.get('sex'),
+            'ethnicity': request.POST.get('ethnicity'),
+        }
+        if nhs_number:
+            if Case.objects.filter(nhs_number=nhs_number).exists():
+                case = Case.objects.filter(nhs_number=nhs_number).get()
+                raise serializers.ValidationError(
+                    {'Case': f'{case} already exists. No record created.'})
+            else:
+                serializer = self.serializer(data=case_params)
+
+                if organisationID:
+
+                    if serializer.is_valid(raise_exception=True):
+                        if HospitalTrust.objects.filter(OrganisationID=request.POST.get('OrganisationID')).exists():
+                            hospital_trust = HospitalTrust.objects.filter(
+                                OrganisationID=request.POST.get('OrganisationID')).get()
+                        else:
+                            raise serializers.ValidationError(
+                                {'Case': f'Organisation {organisationID} does not exist. No record saved.'})
+
+                        try:
+                            case = Case.objects.create(**case_params)
+                        except Exception as error:
+                            raise serializers.ValidationError(
+                                {'Case': error})
+
+                        print(f'{case} created')
+
+                        try:
+                            Site.objects.create(
+                                case=case,
+                                hospital_trust=hospital_trust,
+                                site_is_actively_involved_in_epilepsy_care=True,
+                                site_is_primary_centre_of_epilepsy_care=True
+                            )
+                        except Exception as error:
+                            case.delete()
+                            raise serializers.ValidationError(
+                                {'Case': error})
+
+                        return Response(
+                            {
+                                "status": "success",
+                                "data": case_params
+                            },
+                            status=status.HTTP_200_OK
+                        )
+
+                else:
+                    raise serializers.ValidationError(
+                        {'Case': f'OrganisationID Not supplied. No record created.'})
+        else:
+            raise serializers.ValidationError(
+                {'Case': f'NHS number not supplied. No record created.'})
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RegistrationViewSet(viewsets.ModelViewSet):
     """
@@ -501,6 +570,102 @@ class RegistrationViewSet(viewsets.ModelViewSet):
     queryset = Registration.objects.all().order_by('-registration_date')
     serializer_class = RegistrationSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def register_case(self, request):
+        """
+        Create an active registration in the audit.
+        Essential parameters:
+        nhs_number: 10 digit number
+        lead_centre: OrganisationID
+        registration_date: date of first paediatric assessment
+        eligibility_criteria_met: confirmation that child is eligible for audit
+        """
+        # collect parameters:
+        registration_date = request.POST.get('registration_date')
+        eligibility_criteria_met = request.POST.get(
+            'eligibility_criteria_met')
+        nhs_number = request.POST.get('nhs_number')
+        lead_centre_id = request.POST.get('lead_centre')
+
+        # validate those params within the serializer
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+
+            # validate parameters relating to related models
+            if lead_centre_id:
+                if HospitalTrust.objects.filter(OrganisationID=lead_centre_id).exists():
+                    lead_centre = HospitalTrust.objects.get(
+                        OrganisationID=lead_centre_id)
+                else:
+                    raise serializers.ValidationError(
+                        {'lead_centre': f'A valid lead centre identifier must be supplied. No record saved.'})
+            else:
+                raise serializers.ValidationError(
+                    {'lead_centre': f'A lead centre identifier must be supplied. No record saved.'})
+
+            if nhs_number:
+                if Case.objects.filter(nhs_number=nhs_number).exists():
+                    case = Case.objects.filter(nhs_number=nhs_number).get()
+                    if Registration.objects.filter(case=case).exists():
+                        raise serializers.ValidationError(
+                            {'nhs_number': f'{case} is already registered. No record saved.'})
+                else:
+                    raise serializers.ValidationError(
+                        {'nhs_number': f'{nhs_number} is not a recognised NHS Number. No record saved.'})
+            else:
+                raise serializers.ValidationError(
+                    {'nhs_number': f'Please supply an NHS Number. No record saved.'})
+
+            # create site
+            try:
+                site = Site.objects.create(
+                    site_is_actively_involved_in_epilepsy_care=True,
+                    site_is_primary_centre_of_epilepsy_care=True,
+                    case=case,
+                    hospital_trust=lead_centre
+                )
+            except Exception as error:
+                raise serializers.ValidationError(error)
+
+            # update AuditProgress
+            try:
+                audit_progress = AuditProgress.objects.create(
+                    registration_complete=True,
+                    registration_total_expected_fields=3,
+                    registration_total_completed_fields=3
+                )
+            except Exception as error:
+                # delete the site instance as some error
+                site.delete()
+                raise serializers.ValidationError(error)
+
+            # create registration
+            try:
+                registration = Registration.objects.create(
+                    case=case,
+                    registration_date=datetime.strptime(
+                        registration_date, '%Y-%m-%d').date(),
+                    eligibility_criteria_met=eligibility_criteria_met,
+                    audit_progress=audit_progress
+                )
+            except Exception as error:
+                site.delete()
+                audit_progress.delete()
+                raise serializers.ValidationError(error)
+
+            return Response(
+                {
+                    "status": "success",
+                    "data": RegistrationSerializer(
+                        instance=registration,
+                        context={
+                            'request': request
+                        }).data
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FirstPaediatricAssessmentViewSet(viewsets.ModelViewSet):
@@ -627,177 +792,3 @@ class AuditProgressViewSet(viewsets.ModelViewSet):
     queryset = AuditProgress.objects.all()
     serializer_class = AuditProgressSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-#
-
-
-class RegisterCase(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer = RegistrationSerializer
-
-    def post(self, request):
-        """
-        Create an active registration in the audit.
-        Essential parameters:
-        nhs_number: 10 digit number
-        lead_centre: OrganisationID
-        registration_date: date of first paediatric assessment
-        eligibility_criteria_met: confirmation that child is eligible for audit
-        """
-        # collect parameters:
-        registration_date = request.POST.get('registration_date')
-        eligibility_criteria_met = request.POST.get(
-            'eligibility_criteria_met')
-        nhs_number = request.POST.get('nhs_number')
-        lead_centre_id = request.POST.get('lead_centre')
-
-        # validate those params within the serializer
-        serializer = self.serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-
-            # validate parameters relating to related models
-            if lead_centre_id:
-                if HospitalTrust.objects.filter(OrganisationID=lead_centre_id).exists():
-                    lead_centre = HospitalTrust.objects.get(
-                        OrganisationID=lead_centre_id)
-                else:
-                    raise serializers.ValidationError(
-                        {'lead_centre': f'A valid lead centre identifier must be supplied. No record saved.'})
-            else:
-                raise serializers.ValidationError(
-                    {'lead_centre': f'A lead centre identifier must be supplied. No record saved.'})
-
-            if nhs_number:
-                if Case.objects.filter(nhs_number=nhs_number).exists():
-                    case = Case.objects.filter(nhs_number=nhs_number).get()
-                    if Registration.objects.filter(case=case).exists():
-                        raise serializers.ValidationError(
-                            {'nhs_number': f'{case} is already registered. No record saved.'})
-                else:
-                    raise serializers.ValidationError(
-                        {'nhs_number': f'{nhs_number} is not a recognised NHS Number. No record saved.'})
-            else:
-                raise serializers.ValidationError(
-                    {'nhs_number': f'Please supply an NHS Number. No record saved.'})
-
-            # create site
-            try:
-                site = Site.objects.create(
-                    site_is_actively_involved_in_epilepsy_care=True,
-                    site_is_primary_centre_of_epilepsy_care=True,
-                    case=case,
-                    hospital_trust=lead_centre
-                )
-            except Exception as error:
-                raise serializers.ValidationError(error)
-
-            # update AuditProgress
-            try:
-                audit_progress = AuditProgress.objects.create(
-                    registration_complete=True,
-                    registration_total_expected_fields=3,
-                    registration_total_completed_fields=3
-                )
-            except Exception as error:
-                # delete the site instance as some error
-                site.delete()
-                raise serializers.ValidationError(error)
-
-            # create registration
-            try:
-                registration = Registration.objects.create(
-                    case=case,
-                    registration_date=datetime.strptime(
-                        registration_date, '%Y-%m-%d').date(),
-                    eligibility_criteria_met=eligibility_criteria_met,
-                    audit_progress=audit_progress
-                )
-            except Exception as error:
-                site.delete()
-                audit_progress.delete()
-                raise serializers.ValidationError(error)
-
-            return Response(
-                {
-                    "status": "success",
-                    "data": RegistrationSerializer(
-                        instance=registration,
-                        context={
-                            'request': request
-                        }).data
-                },
-                status=status.HTTP_200_OK
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CaseHospitalTrust(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer = CaseSerializer
-
-    def post(self, request):
-        # params
-        nhs_number = request.POST.get('nhs_number')
-        organisationID = request.POST.get('OrganisationID')
-        case_params = {
-            'nhs_number': request.POST.get('nhs_number'),
-            'first_name': request.POST.get('first_name'),
-            'surname': request.POST.get('surname'),
-            'date_of_birth': request.POST.get('date_of_birth'),
-            'sex': request.POST.get('sex'),
-            'ethnicity': request.POST.get('ethnicity'),
-        }
-        if nhs_number:
-            if Case.objects.filter(nhs_number=nhs_number).exists():
-                case = Case.objects.filter(nhs_number=nhs_number).get()
-                raise serializers.ValidationError(
-                    {'Case': f'{case} already exists. No record created.'})
-            else:
-                serializer = self.serializer(data=case_params)
-
-                if organisationID:
-
-                    if serializer.is_valid(raise_exception=True):
-                        if HospitalTrust.objects.filter(OrganisationID=request.POST.get('OrganisationID')).exists():
-                            hospital_trust = HospitalTrust.objects.filter(
-                                OrganisationID=request.POST.get('OrganisationID')).get()
-                        else:
-                            raise serializers.ValidationError(
-                                {'Case': f'Organisation {organisationID} does not exist. No record saved.'})
-
-                        try:
-                            case = Case.objects.create(**case_params)
-                        except Exception as error:
-                            raise serializers.ValidationError(
-                                {'Case': error})
-
-                        print(f'{case} created')
-
-                        try:
-                            Site.objects.create(
-                                case=case,
-                                hospital_trust=hospital_trust,
-                                site_is_actively_involved_in_epilepsy_care=True,
-                                site_is_primary_centre_of_epilepsy_care=True
-                            )
-                        except Exception as error:
-                            case.delete()
-                            raise serializers.ValidationError(
-                                {'Case': error})
-
-                        return Response(
-                            {
-                                "status": "success",
-                                "data": case_params
-                            },
-                            status=status.HTTP_200_OK
-                        )
-
-                else:
-                    raise serializers.ValidationError(
-                        {'Case': f'OrganisationID Not supplied. No record created.'})
-        else:
-            raise serializers.ValidationError(
-                {'Case': f'NHS number not supplied. No record created.'})
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

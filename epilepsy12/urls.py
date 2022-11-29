@@ -1,6 +1,5 @@
 from . import views
 from .view_folder import *
-from .views import RegisterCase, CaseHospitalTrust
 from django.urls import path
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
@@ -391,11 +390,6 @@ htmx_paths = [
 drf_routes = [
     # rest framework paths
     path('api/v1/', include(router.urls)),
-    # Registers child to a Lead site by NHS Number
-    path('api/v1/register_case', view=RegisterCase.as_view()),
-    # Creates a new case associated with a lead site
-    path('api/v1/add_case_to_hospital_list',
-         view=CaseHospitalTrust.as_view()),
     # returns a Token (OAuth2 key: Token) against email and password of existing user
     path('api/v1/api-token-auth/', obtain_auth_token, name='api_token_auth'),
     # returns the standard Django views for authentication of the DRF
