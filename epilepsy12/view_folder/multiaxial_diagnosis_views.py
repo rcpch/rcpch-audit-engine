@@ -156,6 +156,9 @@ def multiaxial_diagnosis(request, case_id):
     ecl = '<< 363235000 '
     epilepsy_causes = fetch_ecl(ecl)
 
+
+# TODO: #218 epilepsy cause cause selection needs to have 'Not Known' last in the list, not alphabetically sorted.
+
     context = {
         "case_id": registration.case_id,
         "registration": registration,
