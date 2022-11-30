@@ -19,12 +19,12 @@ EPISODE_DEFINITION = (
 )
 
 EPIS_TYPE = (
-    (1, "Syncope And Anoxic Seizures"),
     (2, "Behavioral Psychological And Psychiatric Disorders"),
-    (3, "Sleep Related Conditions"),
-    (4, "Paroxysmal Movement Disorders"),
     (5, "Migraine Associated Disorders"),
     (6, "Miscellaneous Events"),
+    (4, "Paroxysmal Movement Disorders"),
+    (3, "Sleep Related Conditions"),
+    (1, "Syncope And Anoxic Seizures"),
     (7, "Other")
 )
 
