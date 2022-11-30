@@ -164,7 +164,7 @@ def multiaxial_diagnosis(request, case_id):
         "syndromes": syndromes,
         'comorbidities': comorbidities,
         "keyword_choices": keyword_choices,
-        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
         'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
@@ -300,7 +300,7 @@ def edit_episode(request, episode_id):
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
 
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
     response = recalculate_form_generate_response(
@@ -421,7 +421,7 @@ def seizure_onset_date(request, episode_id):
         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
     response = recalculate_form_generate_response(
@@ -468,7 +468,7 @@ def seizure_onset_date_confidence(request, episode_id):
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
 
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
     response = recalculate_form_generate_response(
@@ -514,7 +514,7 @@ def episode_definition(request, episode_id):
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
 
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
     response = recalculate_form_generate_response(
@@ -560,7 +560,7 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
 
-        "seizure_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
     response = recalculate_form_generate_response(
@@ -1273,7 +1273,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
         "epilepsy_causes": epilepsy_causes
     }
 
@@ -1306,7 +1306,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     context = {
         "epilepsy_causes": epilepsy_causes,
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
     response = recalculate_form_generate_response(
@@ -1347,7 +1347,7 @@ def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
         # TODO handle this error
 
     context = {
-        "epilepsy_cause_selection": sorted(EPILEPSY_CAUSES, key=itemgetter(1)),
+        "epilepsy_cause_selection": EPILEPSY_CAUSES,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         # 'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
     }
