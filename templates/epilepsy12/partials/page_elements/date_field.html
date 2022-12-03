@@ -10,6 +10,7 @@
         data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
         input_date_field_name: the name of the input element - should match the field name being updated
         disabled
+        hx_confirm
     NOTE - in the view, the value of the date can be retrieved by request.POST.get(FIELD_NAME_AS_A_STRING)
 {% endcomment %}
 
@@ -23,6 +24,21 @@
             <div class='ui left icon input'>
                 <input 
                     {% if disabled %}disabled{% endif %}
+                    {% if hx_confirm %}
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: '{{hx_confirm}}',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'I confirm the date is correct'
+                          })
+                        if result.isConfirmed issueRequest()"
+                    {% endif %}
                     type="date"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-swap="{{hx_swap}}"
@@ -44,4 +60,17 @@
             </div>
         {% endif %}
 
+        
+    </div>
+    
+    
+    <div class="ui mini modal">
+        <div class="header">Confirmation Required</div>
+        <div class="content">
+          <span><p></p></span>
+        </div>
+        <div class="actions">
+          <div class="ui approve button">The date is correct</div>
+          <div class="ui cancel button">Cancel</div>
+        </div>
     </div>

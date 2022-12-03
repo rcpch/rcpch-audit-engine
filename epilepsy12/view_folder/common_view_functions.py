@@ -87,7 +87,7 @@ def completed_fields(model_instance):
 
     for field in fields:
         if field.name not in fields_to_avoid:
-            if getattr(model_instance, field.name) is not None:
+            if getattr(model_instance, field.name, ()) is not None:
                 if field.name == 'epilepsy_cause_categories' or field.name == 'description':
                     if len(getattr(model_instance, field.name)) > 0:
                         counter += 1
