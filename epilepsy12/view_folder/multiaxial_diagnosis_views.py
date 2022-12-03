@@ -170,7 +170,7 @@ def multiaxial_diagnosis(request, case_id):
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
         'there_are_epileptic_episodes': there_are_epileptic_episodes,
-        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+        "mental_health_issues_choices": NEUROPSYCHIATRIC,
     }
 
     response = recalculate_form_generate_response(
@@ -1639,7 +1639,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+        "mental_health_issues_choices": NEUROPSYCHIATRIC
     }
 
     response = recalculate_form_generate_response(
@@ -1671,7 +1671,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+        "mental_health_issues_choices": NEUROPSYCHIATRIC
     }
 
     response = recalculate_form_generate_response(
@@ -1697,7 +1697,7 @@ def mental_health_issue(request, multiaxial_diagnosis_id):
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
-        "mental_health_issues_choices": sorted(NEUROPSYCHIATRIC, key=itemgetter(1)),
+        "mental_health_issues_choices": NEUROPSYCHIATRIC,
     }
 
     response = recalculate_form_generate_response(
