@@ -13,21 +13,23 @@
                     <label>Date of first paediatric assessment</label>
                     <button class="ui rcpch_primary disabled fluid button">{{registration.registration_date}}</button>
                 </div>
-                
+
         {% else %}
 
             {% if registration.eligibility_criteria_met %}
+
                 <div class='field'>
                     {% url 'registration_date' case_id=case_id as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=False error_message=error_message %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=False error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone."%}
                 </div>
                 
             {% else %}
                 <div class="field" >
                     {% url 'registration_date' case_id=case_id as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=True %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=True error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone."%}
                 </div>
             {% endif %}
+            
 
         {% endif %}
         <div class="field">
@@ -49,3 +51,4 @@
         </div>
     {% endif %}
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
