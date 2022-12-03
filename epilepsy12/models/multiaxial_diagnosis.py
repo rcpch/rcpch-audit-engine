@@ -108,7 +108,7 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     registration = models.OneToOneField(
         Registration,
         on_delete=models.CASCADE,
-        related_name='registration'
+        related_name='multiaxialdiagnosis'
     )
 
     # Meta class
