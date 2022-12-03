@@ -16,17 +16,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     A record is created in the Registration class every time a case is registered for the audit
     """
 
-    # def close_registration_after_one_year(self):
-    #     # this currently is unlikely to work TODO #19 set locked to true if registered > 1 y
-    #     today = datetime.now
-    #     if (self.registration_date is not None):
-    #         return True
-    #     else:
-    #         return False
-
     registration_date = models.DateField(
         help_text={
-            'label': "Date of first paediatric assessment",
+            'label': "First paediatric assessment",
             'reference': "Setting this date is an irreversible step. Confirmation will be requested to complete this step.",
         },
         null=True,
