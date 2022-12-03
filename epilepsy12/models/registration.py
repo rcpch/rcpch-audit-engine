@@ -25,7 +25,7 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     registration_date = models.DateField(
         help_text={
             'label': "Date of first paediatric assessment",
-            'reference': "Date of first paediatric assessment",
+            'reference': "Setting this date is an irreversible step. Confirmation will be requested to complete this step.",
         },
         null=True,
         default=None
