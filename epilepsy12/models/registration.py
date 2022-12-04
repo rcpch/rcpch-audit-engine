@@ -77,8 +77,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     def days_remaining_before_submission(self):
         if self.audit_submission_date:
             today = datetime.now().date()
-            remaining_time = relativedelta(
-                self.audit_submission_date, today)
+            # remaining_time = relativedelta(
+            #     self.audit_submission_date, today)
+            remaining_time = self.audit_submission_date - today
             if remaining_time.days < 0:
                 return 0
             return remaining_time.days

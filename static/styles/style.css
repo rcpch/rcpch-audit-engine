@@ -42,6 +42,7 @@
   --rcpch_red: #e60700;
   --rcpch_light_red: #ffe7e6;
   --rcpch_orange: #ff8000;
+  --rcpch_light_orange: #ffdab5;
   --rcpch_yellow: #fdc300;
   --rcpch_gold: #c2a712;
   --rcpch_vivid_green: #c8d400;
@@ -1016,7 +1017,12 @@ ul {
 
 .ui.rcpch.table tr.imminent{
   box-shadow: 0px 0px 0px rgba(236, 173, 96, 0.934) inset;
-  background-color: orange;
+  background-color: var(--rcpch_light_orange);
+}
+
+.ui.rcpch.table tr.closed{
+  box-shadow: 0px 0px 0px rgba(236, 173, 96, 0.934) inset;
+  background-color: var(--rcpch_pink);
 }
 
 .ui.rcpch.table td {

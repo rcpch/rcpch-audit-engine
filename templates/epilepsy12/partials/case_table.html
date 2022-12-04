@@ -56,6 +56,7 @@
           {% endif %}
         </th>
         <th>Deadline</th>
+        <th>Cohort</th>
         <th>Days remaining</th>
         <th class='two wide'></th>
         <th></th>
@@ -66,13 +67,20 @@
         {%if case.locked %}
           <tr class='disabled'>
         {% else %}
-            <tr {% if case.registration.days_remaining_before_submission < 7 %} class='imminent' {% endif %}>
+          {% if case.registration.days_remaining_before_submission < 7 and  case.registration.days_remaining_before_submission > 0 %}
+            <tr class='imminent'>
+          {% elif case.registration.days_remaining_before_submission == 0 %}
+              <tr class='closed disabled'>
+          {% else %}
+              <tr>
+          {% endif %}
         {% endif %}
           <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td>{% none_masked case.nhs_number %}</td>
           <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
-          <td>{% none_masked case.registration.days_remaining_before_submission %}</td>
+          <td>{% if case.registration.cohort is not None %}{{ case.registration.cohort }}{% endif %}</td>
+          <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
               <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
