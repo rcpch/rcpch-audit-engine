@@ -1014,6 +1014,11 @@ ul {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.ui.rcpch.table tr.imminent{
+  box-shadow: 0px 0px 0px rgba(236, 173, 96, 0.934) inset;
+  background-color: orange;
+}
+
 .ui.rcpch.table td {
   border-color: white;
 }

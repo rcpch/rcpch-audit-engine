@@ -1,7 +1,6 @@
 
 # django
-from datetime import datetime
-from operator import methodcaller
+from datetime import datetime, date
 from django.apps import apps
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 from django.conf import settings
@@ -61,6 +60,16 @@ def hospital_reports(request):
 
     # Registration.objects.all().delete()
     # Episode.objects.all().delete()
+    # all_registration = Registration.objects.all()
+    # for reg in all_registration:
+    #     if reg.audit_submission_date:
+    #         print(f'audit close: {reg.case}: {reg.audit_submission_date}')
+    #     elif reg.registration_date:
+    #         print(
+    #             f'registration date: {reg.case}: {reg.registration_date} audit close: {reg.case}: {reg.audit_submission_date}')
+    #         reg.save()
+    #     else:
+    #         print('nothing to see here')
 
     """
     !!!
@@ -69,11 +78,11 @@ def hospital_reports(request):
     """
     Remove duplicates
     """
-    for duplicates in Epilepsy12User.objects.values("email").annotate(
-        records=Count("email")
-    ).filter(records__gt=1):
-        for epilepsy12user in Epilepsy12User.objects.filter(name=duplicates["email"])[1:]:
-            epilepsy12user.delete()
+    # for duplicates in Epilepsy12User.objects.values("email").annotate(
+    #     records=Count("email")
+    # ).filter(records__gt=1):
+    #     for epilepsy12user in Epilepsy12User.objects.filter(name=duplicates["email"])[1:]:
+    #         epilepsy12user.delete()
 
     # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
     first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()

@@ -1,5 +1,5 @@
-from dateutil.relativedelta import relativedelta, TU
-import calendar
+from dateutil.relativedelta import relativedelta
+from datetime import datetime, date
 from django.db import models
 from epilepsy12.models.audit_progress import AuditProgress
 from epilepsy12.models.help_text_mixin import HelpTextMixin
@@ -73,6 +73,16 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         null=True
     )
 
+    @property
+    def days_remaining_before_submission(self):
+        if self.audit_submission_date:
+            today = datetime.now().date()
+            remaining_time = relativedelta(
+                self.audit_submission_date, today)
+            if remaining_time.days < 0:
+                return 0
+            return remaining_time.days
+
     # relationships
     case = models.OneToOneField(
         Case,
@@ -101,7 +111,7 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         ]
 
     def save(self, *args, **kwargs) -> None:
-        if self.registration_date and self.registration_close_date is None:
+        if self.registration_date is not None:
             self.registration_close_date = self.registration_date_one_year_on()
             self.audit_submission_date = self.audit_submission_date_calculation()
             self.cohort = cohort_number_from_enrolment_date(

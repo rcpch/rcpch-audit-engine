@@ -55,6 +55,8 @@
             hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
           {% endif %}
         </th>
+        <th>Deadline</th>
+        <th>Days remaining</th>
         <th class='two wide'></th>
         <th></th>
       </tr>
@@ -64,11 +66,13 @@
         {%if case.locked %}
           <tr class='disabled'>
         {% else %}
-            <tr>
+            <tr {% if case.registration.days_remaining_before_submission < 7 %} class='imminent' {% endif %}>
         {% endif %}
           <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td>{% none_masked case.nhs_number %}</td>
+          <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
+          <td>{% none_masked case.registration.days_remaining_before_submission %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
               <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
