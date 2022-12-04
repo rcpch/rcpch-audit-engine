@@ -92,7 +92,6 @@ def completed_fields(model_instance):
                     if len(getattr(model_instance, field.name)) > 0:
                         counter += 1
                 else:
-                    print(field.name)
                     counter += 1
 
     return counter
@@ -199,12 +198,7 @@ def total_fields_expected(model_instance):
                     # 'antiepilepsy_medicine_risk_discussed'
                     # NOTE 'antiepilepsy_medicine_stop_date' is not an essential field
 
-                    if medicine.medicine_name:
-                        cumulative_score += 1
-                    if medicine.antiepilepsy_medicine_start_date:
-                        cumulative_score += 1
-                    if medicine.antiepilepsy_medicine_risk_discussed:
-                        cumulative_score += 1
+                    cumulative_score += 3
 
                     if medicine.medicine_id == 21 and model_instance.registration.case.sex == 2:
                         # essential fields are:
@@ -218,6 +212,7 @@ def total_fields_expected(model_instance):
                 # user has said AED given but not scored yet
                 cumulative_score += scoreable_fields_for_model_class_name(
                     'AntiEpilepsyMedicine')
+                print(cumulative_score)
 
         if model_instance.has_rescue_medication_been_prescribed:
             # rescue drugs
@@ -308,7 +303,7 @@ def scoreable_fields_for_model_class_name(model_class_name):
     elif model_class_name == 'Management':
         return len(['has_an_aed_been_given', 'has_rescue_medication_been_prescribed', 'individualised_care_plan_in_place', 'has_been_referred_for_mental_health_support', 'has_support_for_mental_health_support'])
     elif model_class_name == 'AntiEpilepsyMedicine':
-        return len(['medicine_name', 'antiepilepsy_medicine_start_date', 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed', 'is_a_pregnancy_prevention_programme_needed', 'is_a_pregnancy_prevention_programme_in_place'])
+        return len(['medicine_name', 'antiepilepsy_medicine_start_date', 'antiepilepsy_medicine_risk_discussed'])
     elif model_class_name == 'Registration':
         return len(['registration_date', 'eligibility_criteria_met'])
     else:
@@ -453,7 +448,7 @@ def number_of_completed_fields_in_related_models(model_instance):
                 for medicine in medicines:
                     # essential fields are:
                     # medicine_name', 'antiepilepsy_medicine_start_date',
-                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
+                    # 'antiepilepsy_medicine_risk_discussed'
                     cumulative_score += completed_fields(medicine)
 
     elif model_instance.__class__.__name__ == 'Registration':

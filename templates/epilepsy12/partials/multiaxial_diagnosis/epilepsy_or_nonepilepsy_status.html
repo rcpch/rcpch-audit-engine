@@ -32,14 +32,14 @@
         <div id="epilepsy" class="field">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/epilepsy.html' with episode=episode epileptic_seizure_onset_types=epileptic_seizure_onset_types epilepsy_generalised_onset_types=epilepsy_generalised_onset_types FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS GENERALISED_SEIZURE_TYPE=GENERALISED_SEIZURE_TYPE %}
         </div>
-        <div class='ui info message'>
+        <div class='ui rcpch_info message'>
             This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
         </div>
     {% elif episode.epilepsy_or_nonepilepsy_status == 'NE'%}
         <div id="nonepilepsy" class="field">
             {% include 'epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html' with episode=episode nonepilepsy_onset_types=nonepilepsy_onset_types nonepilepsy_types=nonepilepsy_types syncopes=syncopes behavioural=behavioural sleep=sleep paroxyms=paroxyms migraines=migraines nonepilepsy_miscellaneous=nonepilepsy_miscellaneous %}
         </div>
-        <div class='ui info message'>
+        <div class='ui rcpch_info message'>
             This completes all the information for this episode. Continue below to complete the remaining elements of DESSCRIBE.
         </div>
     {% endif %}
