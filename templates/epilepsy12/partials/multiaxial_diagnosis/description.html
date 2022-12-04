@@ -1,6 +1,6 @@
 
 <form class="ui form">
-    <div class="ui blue message">
+    <div class="ui rcpch_important message">
          Write a freehand description of each episode as recorded in the clinical records, using as much detail as you can, to a maximum of 5000 characters. Any key words that have an agreed meaning will automatically be labelled.
     </div>
     
@@ -26,7 +26,7 @@
                     disabled
                     {% endif %}
                     type="text" 
-                    class="ui textarea" 
+                    class="ui rcpch textarea"  
                     rows="3" 
                     name="description"
                     placeholder="While watching television {{episode.multiaxial_diagnosis.registration.case}} fell to the floor... ">{{episode.description}}</textarea>
