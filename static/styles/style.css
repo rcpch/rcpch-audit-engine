@@ -536,6 +536,13 @@ ul {
   transition-duration: 0.4s;
 }
 
+.ui.rcpch_primary.button .icon:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+}
+
 .ui.rcpch_negative.button {
   border-radius: 0% !important;
   color: white;
@@ -569,6 +576,13 @@ ul {
 }
 
 .ui.rcpch_danger.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: #8a0400;
+  transition-duration: 0.4s;
+}
+
+.ui.rcpch_danger.button .icon:hover {
   border-radius: 0% !important;
   color: white;
   background-color: #8a0400;
@@ -894,14 +908,12 @@ ul {
   font-family: Montserrat-Regular;
   margin: 0em;
   outline: none;
-  -webkit-appearance: none;
   border: 3px solid rgba(17, 167, 242, 1);
   border-radius: 0%;
   line-height: 1.21428571em;
   padding: 0.67857143em 1em;
   font-size: 1em;
   background: #FFFFFF;
-
   color: rgba(0, 0, 0, 0.87);
   -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
   box-shadow: 0em 0em 0em 0em transparent inset;

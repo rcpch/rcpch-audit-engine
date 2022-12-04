@@ -393,3 +393,16 @@ def opt_out(request, hospital_id, case_id):
             Site.objects.get(pk=site.pk).delete()
 
     return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
+
+
+@login_required
+def case_submit(request, hospital_id, case_id):
+    """
+    POST request callback from submit button in case_list partial.
+    Toggles case between locked and unlocked
+    """
+    case = Case.objects.get(pk=case_id)
+    case.locked = not case.locked
+    case.save()
+
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))

@@ -40,12 +40,12 @@ def register(request, case_id):
             management_total_expected_fields=0,
             management_total_completed_fields=0
         )
-        Registration.objects.create(
+        registration = Registration.objects.create(
             case=case,
             audit_progress=audit_progress
         )
-
-    registration = Registration.objects.filter(case=case).get()
+    else:
+        registration = Registration.objects.filter(case=case).get()
 
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
@@ -67,7 +67,7 @@ def register(request, case_id):
             case=case, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
 
     # test if registration_date and lead_centre exist, and eligibility criteria met
-    if registration.audit_progress.registration_complete:
+    if registration.registration_date and lead_site and registration.eligibility_criteria_met:
         active_template = "register"
     else:
         active_template = "none"

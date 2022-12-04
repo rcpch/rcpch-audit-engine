@@ -64,17 +64,17 @@
     </thead>
     <tbody>
       {% for case in case_list %}
-        {%if case.locked %}
-          <tr class='disabled'>
-        {% else %}
-          {% if case.registration.days_remaining_before_submission < 7 and  case.registration.days_remaining_before_submission > 0 %}
+        
+          {% if case.registration.days_remaining_before_submission > 7 and case.registration.audit_progress.audit_complete %}
+            <tr class="closed">
+          {% elif case.registration.days_remaining_before_submission <= 7 and case.registration.days_remaining_before_submission > 0 and case.registration.audit_progress.audit_complete %}
             <tr class='imminent'>
           {% elif case.registration.days_remaining_before_submission == 0 %}
               <tr class='closed disabled'>
           {% else %}
               <tr>
           {% endif %}
-        {% endif %}
+        
           <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td>{% none_masked case.nhs_number %}</td>
@@ -85,15 +85,17 @@
             <div class='ui buttons'>
               <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
                 class="edit outline icon"></i></a></button>
+              {% comment %}
               <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
                 class="trash alternate outline icon"></i></a></button>
+              {% endcomment %}
               {% if case.registration.registration_date %}
                 {% if case.locked %}
                 <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
-                onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
+                onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
                 {% else %}
                 <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2"
-                onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
+                onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
                 {% endif %}
               {% else %}
                 {% if case.locked %}
@@ -106,8 +108,34 @@
               {% endif %}
             </div>
           </td>
-          <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+          {% comment %}
+            <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
             class="sign-out icon"></i></a></button></td>
+          {% endcomment %}
+          {% if case.registration.audit_progress.audit_complete %}
+            {% comment %}
+              If the audit for this child is complete, the upload button is enabled only if the submission deadline has not yet passed.
+            {% endcomment %}
+            {% url 'case_submit' hospital_id=hospital_id case_id=case.id as hx_post %}
+            <td><button
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+              class="ui rcpch_primary icon button" 
+              tabindexed="1" 
+              hx-post="{{hx_post}}"
+              hx_trigger='click' 
+              hx-target="#case_table"
+              {% if case.registration.days_remaining_before_submission == 0 %}
+                disabled
+              {% else %}
+                  {% if case.locked %}
+                    data-tooltip='Unsubmit to Epilepsy12'
+                  {% else %}
+                    data-tooltip='Submit to Epilepsy12'
+                  {% endif %}
+                  {% endif %}
+                  ><i
+                  class="cloud upload icon"></i></a></button></td>
+          {% endif %}
         </tr>
 
       {% endfor %}

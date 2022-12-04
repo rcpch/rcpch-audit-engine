@@ -44,6 +44,8 @@ urlpatterns = [
     path('case/<int:case_id>/register', views.register, name='register'),
     path('hospital/<int:hospital_id>/case/<int:case_id>/opt-out',
          views.opt_out, name='opt_out'),
+    path('hospital/<int:hospital_id>/case/<int:case_id>/submit',
+         views.case_submit, name='case_submit'),
     path('hospital/<int:hospital_id>/cases/view_preference',
          views.view_preference, name='view_preference'),
     path('hospital/<int:hospital_id>/cases/hospital_select',

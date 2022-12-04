@@ -106,6 +106,20 @@ class AuditProgress(models.Model):
         null=True
     )
 
+    @property
+    def audit_complete(self):
+        if (
+                self.registration_complete and
+                self.first_paediatric_assessment_complete and
+                self.epilepsy_context_complete and
+                self.assessment_complete and
+                self.multiaxial_diagnosis_complete and
+                self.investigations_complete and
+                self.management_complete):
+            return True
+        else:
+            return False
+
     class Meta:
         verbose_name = 'Audit Progress'
         verbose_name_plural = 'Audit Progresses'
