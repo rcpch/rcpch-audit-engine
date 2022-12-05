@@ -86,13 +86,13 @@
 
 
         <div class="four wide stackable column">
-            {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" %}
+            {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" pie_size='med' %}
         </div>
         
         <div class="four wide column">
             {% if total_cases is not None and total_cases > 0%}
                 {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
-                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases pie_size='med' %}
             {% else %}
                 <h5>No data yet!<h5>
             {% endif %}
@@ -100,7 +100,7 @@
         <div class="four wide stackable column">
             {% if total_cases is not None and total_cases > 0%}
                 {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
-                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases pie_size='med' %}
             {% else %}
                 <h5>No data yet!<h5>
             {% endif %}
@@ -108,7 +108,7 @@
         <div class="four wide stackable column">
             {% if total_cases is not None and total_cases > 0%}
                 {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
-                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases pie_size='med' %}
             {% else %}
                 <h5>No data yet!<h5>
             {% endif %}

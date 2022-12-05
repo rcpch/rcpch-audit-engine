@@ -859,26 +859,32 @@ ul {
 
 .big {
   font-size: 200%;
+  font-weight: bold;
 }
 
 .med {
   font-size: 150%;
+  font-weight: bold;
 }
 
 .sml {
   font-size: 100%;
+  font-weight: bold;
 }
 
 .rcpch_pie_title {
   color: var(--rcpch_charcoal);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Arial';
+  font-weight: bold;
   padding-top: 10px;
 }
 
 .rcpch_pie_label {
   color: var(--rcpch_dark_grey);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Montserrat';
+  font-weight: bold;
   font-size: small;
+  padding: 5px;
 }
 
 /* audit icon */

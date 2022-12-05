@@ -316,12 +316,16 @@
       {% endif %}
     {% endif %}
 
+    {% comment %}
+        Progress bar
+    {% endcomment %}
+
     {% if active_template == "register" %}
       {% with denominator=audit_progress.registration_total_expected_fields %}
       {% with numerator=audit_progress.registration_total_completed_fields %}
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Verification and registration" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Verification and registration" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -334,7 +338,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="First paediatric assessment" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="First paediatric assessment" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -347,7 +351,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="The epilepsy context" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="The epilepsy context" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -360,7 +364,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Multiaxial diagnosis" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Multiaxial diagnosis" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -373,7 +377,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Milestones" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Milestones" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -386,7 +390,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Tests" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Tests" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
@@ -399,7 +403,7 @@
 
       <div id="progress">
         {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Treatment and care planning" %}
+        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Treatment and care planning" pie_size='small' %}
       </div>
       {% endwith %}
       {% endwith %}
