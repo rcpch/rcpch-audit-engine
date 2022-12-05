@@ -313,8 +313,20 @@
             <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
-      {% endif %}
-    {% endif %}
+        {% endif %}
+        {% endif %}
+        
+    
+    {% comment %}
+        Performance summary
+    {% endcomment %}
+    
+    <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
+      <div class='content'>
+        <div class="title">Performance summary</div>
+        <div class="description">Key performance indicators</div>
+      </div>
+    </a>
 
     {% comment %}
         Progress bar

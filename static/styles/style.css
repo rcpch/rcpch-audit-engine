@@ -745,6 +745,11 @@ ul {
   color: white;
 }
 
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .rcpch_summary.step:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+}
+
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .description {
   color: white;
 }

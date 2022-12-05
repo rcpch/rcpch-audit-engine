@@ -406,3 +406,28 @@ def case_submit(request, hospital_id, case_id):
     case.save()
 
     return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
+
+
+@login_required
+def case_performance_summary(request, case_id):
+
+    case = Case.objects.get(pk=case_id)
+
+    context = {
+        'case': case,
+        'case_id': case.pk,
+        'active_template': 'case_performance_summary',
+        'audit_progress': case.registration.audit_progress,
+    }
+
+    template = 'epilepsy12/case_performance_summary.html'
+
+    response = render(request=request, template_name=template, context=context)
+
+    # # trigger a GET request from the steps template
+    # trigger_client_event(
+    #     response=response,
+    #     name="registration_active",
+    #     params={})  # reloads the form to show the active steps
+
+    return response

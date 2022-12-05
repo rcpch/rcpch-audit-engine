@@ -42,6 +42,8 @@ urlpatterns = [
     path('hospital/<int:hospital_id>/case/<int:case_id>/delete',
          views.delete_case, name="delete_case"),
     path('case/<int:case_id>/register', views.register, name='register'),
+    path('case/<int:case_id>/case_performance_summary',
+         views.case_performance_summary, name='case_performance_summary'),
     path('hospital/<int:hospital_id>/case/<int:case_id>/opt-out',
          views.opt_out, name='opt_out'),
     path('hospital/<int:hospital_id>/case/<int:case_id>/submit',
