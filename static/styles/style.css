@@ -531,6 +531,8 @@ ul {
   color: black;
   background-color: var(--rcpch_light_blue);
   border-color: var(--rcpch_light_blue);
+}
+#first_paediatric_assessment_date_button{
   border-style: solid;
 }
 
