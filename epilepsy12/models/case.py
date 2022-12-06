@@ -18,16 +18,19 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     """
     This class holds information about each child or young person
     Each case is unique
-
-
-    For a record to be locked:
-    1. all mandatory fields must be complete
-    2. NHS number must be present
-    3. 1 year must have passed
-
     """
     # _id = models.ObjectIdField()
-    locked = models.BooleanField(  # this determines if the case is locked from editing ? are cases or only registrations locked?
+    locked = models.BooleanField(
+        """
+        This determines if the case is locked from editing
+        Cases can be locked under either of 2 sets of circumstances
+        1. The child has opted out of the audit 
+        - here all data relating to the child's ID is set to None but the ID retained.
+        - in the UI, blank spaces in the case_list are rendered as ######
+        2. All the fields for the child have been completed and the user has indicated the child is ready for submission.
+        - The upload button in the UI is enabled up until the submission deadline to toggle the locked status
+        3. The submission deadline has passed. The case is locked, irrespective of if fields are complete are not.
+        """
         "Locked",
         default=False,
         blank=True,

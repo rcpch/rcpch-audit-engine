@@ -135,6 +135,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
         antiepilepsy_medicine_start_date=None,
         antiepilepsy_medicine_stop_date=None,
         antiepilepsy_medicine_risk_discussed=None,
+        is_a_pregnancy_prevention_programme_needed=None,
         management=management
     )
 
@@ -319,7 +320,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
         antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
     else:
-        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = False
+        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = None
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
         antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
 

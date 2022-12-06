@@ -78,7 +78,19 @@
                             class="ui rcpch_red icon disabled button"
                         {% endif %}
                         hx-post='{% url "remove_episode" episode_id=episode.pk %}'
-                        hx-confirm='This action is irreversible. Are you sure you want to continue?'
+                        _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'Deleting this seizure episode is irreversible. Are you sure you want to continue?',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'Delete episode'
+                          })
+                        if result.isConfirmed issueRequest()"
                         hx-target='#episodes'
                         hx-trigger='click'
                         hx-swap='innerHTML'

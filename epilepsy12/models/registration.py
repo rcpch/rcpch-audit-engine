@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from datetime import datetime, date
 from django.db import models
 from epilepsy12.models.audit_progress import AuditProgress
 from epilepsy12.models.help_text_mixin import HelpTextMixin
@@ -7,6 +8,7 @@ from .case import Case
 from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE
 from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
+from ..general_functions import first_tuesday_in_january
 
 
 class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -14,17 +16,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     A record is created in the Registration class every time a case is registered for the audit
     """
 
-    # def close_registration_after_one_year(self):
-    #     # this currently is unlikely to work TODO #19 set locked to true if registered > 1 y
-    #     today = datetime.now
-    #     if (self.registration_date is not None):
-    #         return True
-    #     else:
-    #         return False
-
     registration_date = models.DateField(
         help_text={
-            'label': "Date of first paediatric assessment",
+            'label': "First paediatric assessment",
             'reference': "Setting this date is an irreversible step. Confirmation will be requested to complete this step.",
         },
         null=True,
@@ -40,11 +34,30 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         null=True
     )
 
-    def registration_date_one_year_on(self):
-        help_text = {
-            'label': "Date at which registration ends for the the Epilepsy12 audit",
-            'reference': "Date at which registration ends for the the Epilepsy12 audit",
+    audit_submission_date = models.DateField(
+        help_text={
+            'label': "Epilepsy12 submission date",
+            'reference': "Date on which the audit submission is due. It is always on the 2nd Tuesday in January.",
         },
+        default=None,
+        null=True
+    )
+
+    def audit_submission_date_calculation(self):
+        if (self.registration_date):
+            one_year_complete_year = self.registration_date_one_year_on().year
+            second_tuesday_this_year = first_tuesday_in_january(
+                datetime.today().date().year) + relativedelta(days=7)
+            if self.registration_date_one_year_on() <= second_tuesday_this_year:
+                second_tuesday = second_tuesday_this_year
+            else:
+                second_tuesday = first_tuesday_in_january(
+                    one_year_complete_year+1) + relativedelta(days=7)
+            return second_tuesday
+        else:
+            return None
+
+    def registration_date_one_year_on(self):
         if (self.registration_date):
             return self.registration_date+relativedelta(years=1)
         else:
@@ -59,6 +72,17 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         default=None,
         null=True
     )
+
+    @property
+    def days_remaining_before_submission(self):
+        if self.audit_submission_date:
+            today = datetime.now().date()
+            # remaining_time = relativedelta(
+            #     self.audit_submission_date, today)
+            remaining_time = self.audit_submission_date - today
+            if remaining_time.days < 0:
+                return 0
+            return remaining_time.days
 
     # relationships
     case = models.OneToOneField(
@@ -88,8 +112,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         ]
 
     def save(self, *args, **kwargs) -> None:
-        if self.registration_date and self.registration_close_date is None:
+        if self.registration_date is not None:
             self.registration_close_date = self.registration_date_one_year_on()
+            self.audit_submission_date = self.audit_submission_date_calculation()
             self.cohort = cohort_number_from_enrolment_date(
                 self.registration_date)
         return super().save(*args, **kwargs)

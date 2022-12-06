@@ -6,11 +6,11 @@
     hx-trigger="registration_status from:body"
     id="registration_buttons">
     <h5>First paediatric assessment date</h5>
-    <div class="three fields" >
+    <div class="four fields" >
         {% if registration.registration_date %}
         
                 <div class="field">
-                    <label>Date of first paediatric assessment</label>
+                    <label>{{registration.get_registration_date_help_label_text}}</label>
                     <button class="ui rcpch_primary disabled fluid button">{{registration.registration_date}}</button>
                 </div>
 
@@ -33,9 +33,15 @@
 
         {% endif %}
         <div class="field">
-            <label>Epilepsy12 Submission Deadline</label>
+            <label>Completed First Year</label>
             <div class='ui rcpch input'>
                 <input type="text" readonly="" placeholder="{{registration.registration_close_date}}"/>
+            </div>
+        </div>
+        <div class="field">
+            <label>Submission Deadline</label>
+            <div class='ui rcpch input'>
+                <input type="text" readonly="" placeholder="{{registration.audit_submission_date}}"/>
             </div>
         </div>
         <div class="field">

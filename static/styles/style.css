@@ -42,6 +42,7 @@
   --rcpch_red: #e60700;
   --rcpch_light_red: #ffe7e6;
   --rcpch_orange: #ff8000;
+  --rcpch_light_orange: #ffdab5;
   --rcpch_yellow: #fdc300;
   --rcpch_gold: #c2a712;
   --rcpch_vivid_green: #c8d400;
@@ -469,6 +470,10 @@ ul {
   color: var(--rcpch_light_blue);
 }
 
+.rcpch_orange.icon {
+  color: var(--rcpch_orange);
+}
+
 .ui.rcpch_red.icon.button {
   border-radius: 0%;
   background-color: var(--rcpch_red);
@@ -535,6 +540,13 @@ ul {
   transition-duration: 0.4s;
 }
 
+.ui.rcpch_primary.button .icon:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+}
+
 .ui.rcpch_negative.button {
   border-radius: 0% !important;
   color: white;
@@ -568,6 +580,13 @@ ul {
 }
 
 .ui.rcpch_danger.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: #8a0400;
+  transition-duration: 0.4s;
+}
+
+.ui.rcpch_danger.button .icon:hover {
   border-radius: 0% !important;
   color: white;
   background-color: #8a0400;
@@ -726,6 +745,11 @@ ul {
   color: white;
 }
 
+.ui.vertical.ordered.mini.top.attached.rcpch.steps .rcpch_summary.step:hover {
+  background-color: var(--rcpch_dark_blue);
+  color: white;
+}
+
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .step:hover .description {
   color: white;
 }
@@ -840,26 +864,32 @@ ul {
 
 .big {
   font-size: 200%;
+  font-weight: bold;
 }
 
 .med {
   font-size: 150%;
+  font-weight: bold;
 }
 
 .sml {
   font-size: 100%;
+  font-weight: bold;
 }
 
 .rcpch_pie_title {
   color: var(--rcpch_charcoal);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Arial';
+  font-weight: bold;
   padding-top: 10px;
 }
 
 .rcpch_pie_label {
   color: var(--rcpch_dark_grey);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Montserrat';
+  font-weight: bold;
   font-size: small;
+  padding: 5px;
 }
 
 /* audit icon */
@@ -893,14 +923,12 @@ ul {
   font-family: Montserrat-Regular;
   margin: 0em;
   outline: none;
-  -webkit-appearance: none;
   border: 3px solid rgba(17, 167, 242, 1);
   border-radius: 0%;
   line-height: 1.21428571em;
   padding: 0.67857143em 1em;
   font-size: 1em;
   background: #FFFFFF;
-
   color: rgba(0, 0, 0, 0.87);
   -webkit-box-shadow: 0em 0em 0em 0em transparent inset;
   box-shadow: 0em 0em 0em 0em transparent inset;
@@ -1012,6 +1040,16 @@ ul {
   background-color: var(--rcpch_light_blue);
   color: var(--rcpch_black);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.ui.rcpch.table tr.imminent{
+  box-shadow: 0px 0px 0px rgba(236, 173, 96, 0.934) inset;
+  background-color: var(--rcpch_light_orange);
+}
+
+.ui.rcpch.table tr.closed{
+  box-shadow: 0px 0px 0px rgba(236, 173, 96, 0.934) inset;
+  background-color: var(--rcpch_pink);
 }
 
 .ui.rcpch.table td {
@@ -1202,4 +1240,8 @@ a label {
 
 .ui.rcpch_secret.label>i {
   color: var(--rcpch_pink);
+}
+
+.ui.rcpch.textarea {
+  border-radius: 0%;
 }
