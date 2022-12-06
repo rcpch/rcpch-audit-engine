@@ -60,16 +60,17 @@ def hospital_reports(request):
 
     # Registration.objects.all().delete()
     # Episode.objects.all().delete()
-    # all_registration = Registration.objects.all()
-    # for reg in all_registration:
-    #     if reg.audit_submission_date:
-    #         print(f'audit close: {reg.case}: {reg.audit_submission_date}')
-    #     elif reg.registration_date:
-    #         print(
-    #             f'registration date: {reg.case}: {reg.registration_date} audit close: {reg.case}: {reg.audit_submission_date}')
-    #         reg.save()
-    #     else:
-    #         print('nothing to see here')
+
+    all_registration = Registration.objects.all()
+    for reg in all_registration:
+        # if reg.audit_submission_date:
+        #     print(f'audit close: {reg.case}: {reg.audit_submission_date}')
+        if reg.registration_date:
+            print(
+                f'registration date: {reg.case}: {reg.registration_date} audit close: {reg.case}: {reg.audit_submission_date}')
+            reg.save()
+        else:
+            print('nothing to see here')
 
     """
     !!!
