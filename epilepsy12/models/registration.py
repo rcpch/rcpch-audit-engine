@@ -45,14 +45,14 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
 
     def audit_submission_date_calculation(self):
         if (self.registration_date):
-            this_year = date.today().year
+            one_year_complete_year = self.registration_date_one_year_on().year
             second_tuesday_this_year = first_tuesday_in_january(
-                this_year) + relativedelta(days=7)
-            if date.today() <= second_tuesday_this_year:
+                datetime.today().date().year) + relativedelta(days=7)
+            if self.registration_date_one_year_on() <= second_tuesday_this_year:
                 second_tuesday = second_tuesday_this_year
             else:
                 second_tuesday = first_tuesday_in_january(
-                    this_year+1) + relativedelta(days=7)
+                    one_year_complete_year+1) + relativedelta(days=7)
             return second_tuesday
         else:
             return None
