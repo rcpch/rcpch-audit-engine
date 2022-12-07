@@ -92,7 +92,13 @@ def completed_fields(model_instance):
                     if len(getattr(model_instance, field.name)) > 0:
                         counter += 1
                 else:
-                    counter += 1
+                    if field.name in ['focal_onset_atonic', 'focal_onset_clonic', 'focal_onset_epileptic_spasms', 'focal_onset_hyperkinetic', 'focal_onset_myoclonic', 'focal_onset_tonic', 'focal_onset_focal_to_bilateral_tonic_clonic', 'focal_onset_automatisms', 'focal_onset_impaired_awareness', 'focal_onset_gelastic', 'focal_onset_autonomic', 'focal_onset_behavioural_arrest', 'focal_onset_cognitive', 'focal_onset_emotional', 'focal_onset_sensory', 'focal_onset_centrotemporal', 'focal_onset_temporal', 'focal_onset_frontal', 'focal_onset_parietal', 'focal_onset_occipital', 'focal_onset_right', 'focal_onset_left']:
+                        if getattr(model_instance, field.name, ()) == True:
+                            # only count the true values in the radio buttons in focal epilepsy to do with focality
+                            if field.name in ['focal_onset_right', 'focal_onset_left']:
+                                counter += 1
+                    else:
+                        counter += 1
 
     return counter
 

@@ -1,9 +1,18 @@
 <div class="ui grid">
 
     <div class="four wide column">
-        <h5>
-        Laterality (patient)
-        </h5>
+        
+            <h5>
+                {% if episode.focal_onset_right or episode.focal_onset_left %}
+                    <i class="rcpch_pink check circle outline icon"></i>
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                {% endif %}
+                Laterality (patient)
+            </h5>
+        
             <div class="container">
                 <div class="radio-tile-group">
                 {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
@@ -31,7 +40,7 @@
             <div class="container">
                 <div class="radio-tile-group">
                     {% url 'focal_onset_epilepsy_checked_changed' episode_id=episode.pk as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS" %}
+                    {% include 'epilepsy12/partials/page_elements/check_box_group.html' with hx_post=hx_post hx_target="#focal_epilepsy" hx_model=episode hx_field_list=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS hx_field_list_name="FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS"  %}
                 </div>
             </div>
     
