@@ -121,8 +121,8 @@
             </div>
 
             {% if not case.registration.audit_progress.audit_complete and not case.locked %}
-
-              <div class="ui bottom attached tiny rcpch progress" data-percent='75' id="{{case.pk}}_audit_progress_bar" _="init js $('#{{case.pk}}_audit_progress_bar').progress(); end">
+            {% percentage_of_total case.registration.audit_progress.total_completed_fields case.registration.audit_progress.total_expected_fields as total_percent %}
+              <div class="ui bottom attached tiny rcpch progress" data-percent='{{total_percent}}' id="{{case.pk}}_audit_progress_bar" _="init js $('#{{case.pk}}_audit_progress_bar').progress(); end">
                 <div class='bar'></div>
               </div>
 
@@ -155,7 +155,7 @@
             </td>
           {% else %}
             <td>
-              <h6>74%</h6>
+              <h6>{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
             </td>
           {% endif %}
             
@@ -205,6 +205,3 @@
   </div>
   {% endif %}
 </div>
-<script>
-  $('#audit_progress_bar').progress();
-</script>

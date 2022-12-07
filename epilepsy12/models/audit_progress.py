@@ -107,6 +107,59 @@ class AuditProgress(models.Model):
     )
 
     @property
+    def total_completed_fields(self):
+        total_fields = 0
+        if self.registration_total_completed_fields:
+            total_fields += self.registration_total_completed_fields
+        if self.first_paediatric_assessment_total_completed_fields:
+            total_fields += self.first_paediatric_assessment_total_completed_fields
+        if self.assessment_total_completed_fields:
+            total_fields += self.assessment_total_completed_fields
+        if self.epilepsy_context_total_completed_fields:
+            total_fields += self.epilepsy_context_total_completed_fields
+        if self.multiaxial_diagnosis_total_completed_fields:
+            total_fields += self.multiaxial_diagnosis_total_completed_fields
+        if self.investigations_total_completed_fields:
+            total_fields += self.investigations_total_completed_fields
+        if self.management_total_completed_fields:
+            total_fields += self.management_total_completed_fields
+        return total_fields
+
+    @property
+    def total_expected_fields(self):
+        total_fields = 0
+        if self.registration_total_expected_fields:
+            total_fields += self.registration_total_expected_fields
+        else:
+            total_fields += 3
+        if self.first_paediatric_assessment_total_expected_fields:
+            total_fields += self.first_paediatric_assessment_total_expected_fields
+        else:
+            total_fields += 6
+        if self.assessment_total_expected_fields:
+            total_fields += self.assessment_total_expected_fields
+        else:
+            total_fields += 5
+        if self.epilepsy_context_total_expected_fields:
+            total_fields += self.epilepsy_context_total_expected_fields
+        else:
+            total_fields += 8
+        if self.multiaxial_diagnosis_total_expected_fields:
+            total_fields += self.multiaxial_diagnosis_total_expected_fields
+        else:
+            total_fields += 10
+        if self.investigations_total_expected_fields:
+            total_fields += self.investigations_total_expected_fields
+        else:
+            total_fields += 4
+        if self.management_total_expected_fields:
+            total_fields += self.management_total_expected_fields
+        else:
+            total_fields += 5
+
+        return total_fields
+
+    @property
     def audit_complete(self):
         if (
                 self.registration_complete and
