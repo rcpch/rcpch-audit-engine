@@ -880,6 +880,11 @@ ul {
   font-weight: bold;
 }
 
+.tiny {
+  font-size: 50%;
+  font-weight: bold;
+}
+
 .rcpch_pie_title {
   color: var(--rcpch_charcoal);
   font-family: 'Arial';
@@ -1255,4 +1260,12 @@ a label {
 
 .ui.rcpch.textarea {
   border-radius: 0%;
+}
+
+.ui.bottom.attached.tiny.rcpch.progress{
+  background-color: var(--rcpch_light_grey);
+}
+
+.ui.bottom.attached.tiny.rcpch.progress .bar{
+  background-color: var(--rcpch_pink);
 }

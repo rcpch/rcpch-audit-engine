@@ -91,24 +91,44 @@
                 <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
                 onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
                 {% else %}
-                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2"
-                onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
+                <button 
+                  data-tooltip='Complete audit details.'
+                  class="ui rcpch_positive button" 
+                  tabindexed="2"
+                  onclick="location.href='{% url 'register'  case.id %}'"
+                  >Epilepsy12</button>
+                
                 {% endif %}
               {% else %}
                 {% if case.locked %}
-                <button class="ui rcpch_primary button" tabindexed="2" disabled
-                onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
+
+                <button 
+                  class="ui rcpch_primary button" 
+                  tabindexed="2" disabled
+                  onclick="location.href='{% url 'register' case_id=case.id %}'"
+                >Register</button>
+
                 {% else %}
-                <button class="ui rcpch_primary button" tabindexed="2"
-                onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
+
+                <button 
+                  class="ui rcpch_primary button" 
+                  tabindexed="2"
+                  onclick="location.href='{% url 'register' case_id=case.id %}'"
+                >Register</button>
+
                 {% endif %}
               {% endif %}
             </div>
+
+            {% if not case.registration.audit_progress.audit_complete and not case.locked %}
+
+              <div class="ui bottom attached tiny rcpch progress" data-percent='75' id="{{case.pk}}_audit_progress_bar" _="init js $('#{{case.pk}}_audit_progress_bar').progress(); end">
+                <div class='bar'></div>
+              </div>
+
+            {% endif %}
           </td>
-          {% comment %}
-            <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
-            class="sign-out icon"></i></a></button></td>
-          {% endcomment %}
+
           {% if case.registration.audit_progress.audit_complete %}
             {% comment %}
               If the audit for this child is complete, the upload button is enabled only if the submission deadline has not yet passed.
@@ -131,10 +151,12 @@
                       data-tooltip='Submit to Epilepsy12'
                     {% endif %}
                 {% endif %}
-              ><i class="cloud upload icon"></i></a></button>
+              ><i class="cloud upload icon"></i></button>
             </td>
           {% else %}
-            <td></td>
+            <td>
+              <h6>74%</h6>
+            </td>
           {% endif %}
             
             <td>
@@ -183,3 +205,6 @@
   </div>
   {% endif %}
 </div>
+<script>
+  $('#audit_progress_bar').progress();
+</script>
