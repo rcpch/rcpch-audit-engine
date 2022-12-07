@@ -4,75 +4,75 @@
   {% csrf_token %}
     <div class="two fields">
       <div class="field">
-        <label>First Name</label>
+        <label for="{{form.first_name_for_label}}">First Name</label>
         <div class="field">{{form.first_name}}</div>
         {% if form.first_name.errors %}
-        <div class="ui pointing red basic label">
-          {{form.first_name.errors}}
-        </div>
+          <div class="ui pointing red basic label">
+            {{form.first_name.errors}}
+          </div>
         {% endif %}
       </div>
       <div class="field">
         <label>Surname</label>
         <div class="field">{{form.surname}}</div>
         {% if form.surname.errors %}
-        <div class="ui pointing red basic label">{{form.surname.errors}}</div>
+          <div class="ui pointing red basic label">{{form.surname.errors}}</div>
         {% endif %}
       </div>
     </div>
-    {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
-    <div class="field">
-      <label>Date of Birth</label>
-      {{form.date_of_birth}} {% if form.date_of_birth.errors %}
-      <div class="ui pointing red basic label">
-        {{form.date_of_birth.errors}}
-      </div>
+    <div class='two fields'>
+      {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
+        <div class="field">
+          <label>Date of Birth</label>
+          {{form.date_of_birth}} 
+          {% if form.date_of_birth.errors %}
+            <div class="ui pointing red basic label">
+              {{form.date_of_birth.errors}}
+            </div>
+          {% endif %}
+        </div>
       {% endif %}
-    </div>
-    {% endif %}
-    <div class="two fields">
+    
       <div class="field">
         <label>Sex</label>
-        {{form.sex}} {% if form.sex.errors %}
-        <div class="ui pointing red basic label">{{form.sex.errors}}</div>
+        {{form.sex}} 
+        {% if form.sex.errors %}
+          <div class="ui pointing red basic label">{{form.sex.errors}}</div>
         {% endif %}
       </div>
-      <div class="field">
-        <label>Opt Out</label>
-        {{form.locked}} {% if form.locked.errors %}
-        <div class="ui pointing red basic label">{{form.locked.errors}}</div>
-        {% endif %}
-        {% if form.locked %}
-          <label>{{fom.locked_at}}</label>
-        {% endif %}
-      </div>
+
     </div>
+      
+    
     <div class="two fields">
       <div class="field">
         <label>Postcode 
-        <i class="question circle icon link" id="postcodeIdPopup"></i>
+        <i class="rcpch question circle icon link" id="postcodeIdPopup"></i>
         <div class="ui flowing popup top left transition hidden">
             <p>Post code at the time of registration in Epilepsy12</p>
         </div>
         </label>
-        {{form.postcode}}  {% if form.postcode.errors %}
-        <div class="ui pointing red basic label">
-          {{form.postcode.errors}}
+        {{form.postcode}}  
+        {% if form.postcode.errors %}
+          <div class="ui pointing red basic label">
+        {{form.postcode.errors}}
         </div>
         {% endif %}
       </div>
       {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
         <div class="field">
           <label>NHS/CHI Number</label>
-          {{form.nhs_number}} {% if form.nhs_number.errors %}
-          <div class="ui pointing red basic label">
-            {{form.nhs_number.errors}}
+          {{form.nhs_number}} 
+          {% if form.nhs_number.errors %}
+            <div class="ui pointing red basic label">
+          {{form.nhs_number.errors}}
           </div>
           {% endif %}
         </div>
       {% endif %}
     </div>
 
+    
     <div class="field">
       <label>Ethnicity</label>
       {{form.ethnicity}} 
@@ -80,14 +80,53 @@
         <div class="ui pointing red basic label">{{form.ethnicity.errors}}</div>
       {% endif %}
     </div>
+    
+    {% if case %}
+
+      <div class="ui icon rcpch_info message">
+        
+          <i class='ui exclamation circle icon'></i>
+          <p>Children, young people and their families can opt out of Epilepsy12 at any time. Should {{case}} or their family choose to do so, all records relating to {{case}}'s epilepsy care will be removed from RCPCH servers.</p>
+          <button 
+              hx-post="{% url 'opt_out' hospital_id case.pk %}" 
+              hx-trigger="click" 
+              class="ui rcpch_danger button"
+              _= "on htmx:confirm(issueRequest) 
+              halt the event 
+              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
+              if result.isConfirmed issueRequest()"
+            >Opt out of Epilepsy12</button>
+      </div>
+
+    {% else %}
+
+      <div class='ui rcpch_info icon message'>
+        <i class='ui exclamation circle icon'></i>
+        <div class='content'>
+            <div class='header'>Hospital</div>
+            <p><b>{{hospital_trust.OrganisationName}}({{hospital_trust.ParentName}})</b> will be allocated automatically as the lead Epilepsy12 centre on saving this child's information.</p>
+        </div>
+      </div>
+    
+    {% endif %}
 
     {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
-      <button type="submit" class="ui green button" name="update">Save</button>
+      <button type="submit" class="ui rcpch_primary button" name="update">Save</button>
     {% endif %}
+
     {% if perms.epilepsy12.delete_case %}
-    <button type="submit" class="ui red button" name="delete">Delete</button>
+      <button 
+        type="submit" 
+        class="ui rcpch_danger button" 
+        name="delete"
+        _= "on click(issueRequest) 
+              halt the event 
+              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
+              if result.isConfirmed issueRequest()">Delete</button>
     {% endif %}
-    <button type="submit" class="ui blue button">Cancel</button>
+    
+    <a href="{% url 'cases' hospital_id %}" class="ui rcpch_negative button">Cancel</a>
+    
   </form>
   
   

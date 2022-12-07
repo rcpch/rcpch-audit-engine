@@ -184,37 +184,6 @@ def case_list(request, hospital_id):
     return render(request, template_name, context)
 
 
-@login_required
-@permission_required('epilepsy12.add_case')
-def create_case(request, hospital_id):
-    """
-    Django function based - returns django form to create a new case, or saves a new case if a
-    POST request. The only instance where htmx not used.
-    """
-    form = CaseForm(request.POST or None)
-    if request.method == "POST":
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.created_at = datetime.now()
-            hospital = HospitalTrust.objects.get(pk=hospital_id)
-            # save the new child
-            obj.save()
-            # allocate the child to the hospital supplied as primary E12 centre
-            Site.objects.create(
-                site_is_actively_involved_in_epilepsy_care=True,
-                site_is_primary_centre_of_epilepsy_care=True,
-                hospital_trust=hospital,
-                case=obj
-            )
-            messages.success(request, "You successfully created the case")
-            return redirect('cases', hospital_id=hospital_id)
-
-    context = {
-        "form": form
-    }
-    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
-
-
 # @login_required
 def child_hospital_select(request, hospital_id):
     """
@@ -314,13 +283,90 @@ def case_statistics(request, hospital_id):
 
 
 @login_required
+def case_submit(request, hospital_id, case_id):
+    """
+    POST request callback from submit button in case_list partial.
+    Toggles case between locked and unlocked
+    """
+    case = Case.objects.get(pk=case_id)
+    case.locked = not case.locked
+    case.save()
+
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
+
+
+@login_required
+def case_performance_summary(request, case_id):
+
+    case = Case.objects.get(pk=case_id)
+
+    context = {
+        'case': case,
+        'case_id': case.pk,
+        'active_template': 'case_performance_summary',
+        'audit_progress': case.registration.audit_progress,
+    }
+
+    template = 'epilepsy12/case_performance_summary.html'
+
+    response = render(request=request, template_name=template, context=context)
+
+    return response
+
+
+"""
+Case function based views - class based views not chosen as need to accept hospital_id also in URL
+"""
+
+
+@login_required
+@permission_required('epilepsy12.add_case')
+def create_case(request, hospital_id):
+    """
+    Django function based - returns django form to create a new case, or saves a new case if a
+    POST request. The only instance where htmx not used.
+    """
+    hospital_trust = HospitalTrust.objects.filter(
+        OrganisationID=hospital_id).get()
+    form = CaseForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.created_at = datetime.now()
+            hospital = HospitalTrust.objects.get(pk=hospital_id)
+            # save the new child
+            obj.save()
+            # allocate the child to the hospital supplied as primary E12 centre
+            Site.objects.create(
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+                hospital_trust=hospital,
+                case=obj
+            )
+            messages.success(request, "You successfully created the case")
+        else:
+            messages.error(request, "Case not created")
+            return redirect('cases', hospital_id=hospital_id)
+
+    context = {
+        "hospital_id": hospital_id,
+        "hospital_trust": hospital_trust,
+        "form": form
+    }
+    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
+
+
+@login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
 def update_case(request, hospital_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
+
+    hospital_trust = HospitalTrust.objects.filter(
+        OrganisationID=hospital_id).get()
 
     if request.method == "POST":
         if ('delete') in request.POST:
@@ -345,7 +391,10 @@ def update_case(request, hospital_id, case_id):
             return redirect('cases', hospital_id=hospital_id)
 
     context = {
-        "form": form
+        "hospital_id": hospital_id,
+        "hospital_trust": hospital_trust,
+        "form": form,
+        'case': case
     }
 
     return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
@@ -393,41 +442,3 @@ def opt_out(request, hospital_id, case_id):
             Site.objects.get(pk=site.pk).delete()
 
     return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
-
-
-@login_required
-def case_submit(request, hospital_id, case_id):
-    """
-    POST request callback from submit button in case_list partial.
-    Toggles case between locked and unlocked
-    """
-    case = Case.objects.get(pk=case_id)
-    case.locked = not case.locked
-    case.save()
-
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
-
-
-@login_required
-def case_performance_summary(request, case_id):
-
-    case = Case.objects.get(pk=case_id)
-
-    context = {
-        'case': case,
-        'case_id': case.pk,
-        'active_template': 'case_performance_summary',
-        'audit_progress': case.registration.audit_progress,
-    }
-
-    template = 'epilepsy12/case_performance_summary.html'
-
-    response = render(request=request, template_name=template, context=context)
-
-    # # trigger a GET request from the steps template
-    # trigger_client_event(
-    #     response=response,
-    #     name="registration_active",
-    #     params={})  # reloads the form to show the active steps
-
-    return response

@@ -1068,14 +1068,18 @@ ul {
 
 .ui.rcpch_info.message {
   border-radius: 0%;
-  color: var(--rcpch_light_blue);
+  color: var(--rcpch_dark_blue);
   background-color: var(--rcpch_lightest_blue);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
 }
 
+.ui.rcpch_info.message p{
+  color: var(--rcpch_dark_blue);
+}
+
 .ui.rcpch_info.icon.message .icon {
-  color: var(--rcpch_pink);
+  color: var(--rcpch_dark_blue);
 }
 
 .ui.rcpch_important.message {
@@ -1084,6 +1088,10 @@ ul {
   background-color: var(--rcpch_lightest_blue);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+.ui.rcpch_important.message p {
+  color: var(--rcpch_charcoal);
 }
 
 .ui.rcpch_warning.message {

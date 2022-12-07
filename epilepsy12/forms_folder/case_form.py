@@ -33,7 +33,7 @@ class CaseForm(forms.ModelForm):
     )
     sex = forms.ChoiceField(
         choices=SEX_TYPE,
-        widget=forms.Select(attrs={'class': 'ui fluid rcpch dropdown'}),
+        widget=forms.Select(attrs={'class': 'ui rcpch dropdown'}),
         required=True
     )
     nhs_number = forms.CharField(
@@ -60,18 +60,10 @@ class CaseForm(forms.ModelForm):
         choices=ETHNICITIES,
         widget=forms.Select(
             attrs={
-                'class': 'ui fluid rcpch dropdown'
+                'class': 'ui rcpch dropdown'
             }
         ),
         required=True
-    ),
-    locked = forms.BooleanField(
-        widget=forms.CheckboxInput(
-            attrs={
-                'class': 'ui checkbox'
-            }
-        ),
-        required=False
     )
     locked_at = forms.DateTimeField(
         help_text="Time record locked.",
@@ -82,8 +74,14 @@ class CaseForm(forms.ModelForm):
         required=False
     )
 
+    def __init__(self, *args, **kwargs) -> None:
+        super(CaseForm, self).__init__(*args, **kwargs)
+        self.fields['ethnicity'].widget.attrs.update({
+            'class': 'ui rcpch dropdown'
+        })
+
     class Meta:
         model = Case
         fields = [
-            'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'locked', 'locked_at'
+            'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity'
         ]

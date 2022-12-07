@@ -3,7 +3,7 @@
 {% block content %}
 <div class="ui segment">
   <div class="ui container">
-    {% include '../forms/case_form.html' %}
+    {% include '../forms/case_form.html' with form=form hospital_id=hospital_id hospital_trust=hospital_trust %}
   </div>
 </div>
 {% endblock %}
