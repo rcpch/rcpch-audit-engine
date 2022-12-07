@@ -155,7 +155,9 @@
             </td>
           {% else %}
             <td>
-              <h6>{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
+              {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.registration_date %}
+                <h6>{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
+              {% endif %}
             </td>
           {% endif %}
             
