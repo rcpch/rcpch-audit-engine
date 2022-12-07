@@ -212,7 +212,6 @@ def total_fields_expected(model_instance):
                 # user has said AED given but not scored yet
                 cumulative_score += scoreable_fields_for_model_class_name(
                     'AntiEpilepsyMedicine')
-                print(cumulative_score)
 
         if model_instance.has_rescue_medication_been_prescribed:
             # rescue drugs
@@ -224,8 +223,8 @@ def total_fields_expected(model_instance):
                 for medicine in medicines:
                     # essential fields are:
                     # medicine_name', 'antiepilepsy_medicine_start_date',
-                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
-                    cumulative_score += 4
+                    # 'antiepilepsy_medicine_risk_discussed'
+                    cumulative_score += 3
             else:
                 # user has said AED given but not scored yet
                 cumulative_score += scoreable_fields_for_model_class_name(
