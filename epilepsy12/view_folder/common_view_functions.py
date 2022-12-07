@@ -350,6 +350,7 @@ def count_episode_fields(all_episodes):
             epilepsy_status_known += 1
 
             cumulative_score += 1
+
             if episode.epileptic_seizure_onset_type == 'GO':
                 # generalised onset: essential fields
                 # epileptic_generalised_onset
@@ -357,11 +358,12 @@ def count_episode_fields(all_episodes):
             elif episode.epileptic_seizure_onset_type == 'FO':
                 # focal onset
                 # minimum score is laterality
-                cumulative_score + 1
+                cumulative_score += 1
             else:
                 # either unclassified or unknown onset
                 # no further score
                 cumulative_score += 0
+
         elif episode.epilepsy_or_nonepilepsy_status == "NE":
             # nonepileptic seizure - essential fields:
             # nonepileptic_seizure_unknown_onset
