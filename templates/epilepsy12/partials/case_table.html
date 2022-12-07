@@ -67,7 +67,7 @@
       {% for case in case_list %}
         
           {% if case.registration.days_remaining_before_submission == 0 %}
-              <tr class='closed disabled'>
+              <tr class='disabled'>
           {% else %}
               <tr>
           {% endif %}
@@ -173,7 +173,7 @@
             {% elif case.registration.days_remaining_before_submission == 0 %}
               <span data-tooltip="Data complete and submission date has passed. No further editing of {{case}}'s record is possible."><i class="rcpch_pink check circle outline icon"></i></span>
             {% else %}
-            <span data-tooltip="Data incomplete."><i class="rcpch_light_blue dot circle outline icon"></i></span>
+              <span data-tooltip="Data incomplete."><i class="rcpch_light_blue dot circle outline icon"></i></span>
             {% endif %}
             </td>
         </tr>
