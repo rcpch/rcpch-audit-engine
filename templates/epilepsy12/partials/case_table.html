@@ -103,7 +103,7 @@
                 {% if case.locked %}
 
                 <button 
-                  class="ui rcpch_primary button" 
+                  class="ui rcpch_positive button" 
                   tabindexed="2" disabled
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
                 >Register</button>
@@ -111,7 +111,7 @@
                 {% else %}
 
                 <button 
-                  class="ui rcpch_primary button" 
+                  class="ui rcpch_positive button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
                 >Register</button>
@@ -120,7 +120,7 @@
               {% endif %}
             </div>
 
-            {% if not case.registration.audit_progress.audit_complete and not case.locked %}
+            {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.registration_date %}
             {% percentage_of_total case.registration.audit_progress.total_completed_fields case.registration.audit_progress.total_expected_fields as total_percent %}
               <div class="ui bottom attached tiny rcpch progress" data-percent='{{total_percent}}' id="{{case.pk}}_audit_progress_bar" _="init js $('#{{case.pk}}_audit_progress_bar').progress(); end">
                 <div class='bar'></div>
