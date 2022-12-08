@@ -151,7 +151,12 @@
                       data-tooltip='Submit to Epilepsy12'
                     {% endif %}
                 {% endif %}
-              ><i class="cloud upload icon"></i></button>
+              >
+              {% if case.locked %}
+                <i class="cloud download icon"></i>
+              {% else %}
+                <i class="cloud upload icon"></i></button>
+              {% endif %}
             </td>
           {% else %}
             <td>
