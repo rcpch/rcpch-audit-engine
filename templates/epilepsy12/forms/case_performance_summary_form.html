@@ -1,8 +1,3 @@
 <div class='ui container'>
-    <div class='ui rcpch_warning message' style='margin-bottom: 20px;'>
-        <div class='header'>
-            Warning
-        </div>
-        <p>Still in development. Summary and aggregate statistics for {{case}} will go here.</p>
-    </div>
+    {% include 'epilepsy12/partials/kpis/kpi.html' with case=case %}
 </div>

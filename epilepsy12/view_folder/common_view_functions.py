@@ -1,7 +1,9 @@
 from datetime import datetime, date
+from dateutil import relativedelta
 from django.utils import timezone
 from django_htmx.http import trigger_client_event
 from django.shortcuts import render
+from django.db.models import Q
 from psycopg2 import DatabaseError
 from epilepsy12.models.antiepilepsy_medicine import AntiEpilepsyMedicine
 from epilepsy12.models.registration import Registration
@@ -50,6 +52,7 @@ def test_fields_update_audit_progress(model_instance):
     Accepts model instance as parameter - uses this select correct fields to update
     """
 
+    # use the model instance to identify its verbose name to match the relevant field in the AuditProgress model
     verbose_name_underscored = model_instance._meta.verbose_name.lower().replace(' ', '_')
 
     all_completed_fields = completed_fields(model_instance)
@@ -64,6 +67,7 @@ def test_fields_update_audit_progress(model_instance):
         f'{verbose_name_underscored}_complete': all_completed_fields == all_expected_fields,
     }
 
+    # all models are related to registration, except registration itself
     if verbose_name_underscored == 'registration':
         registration = model_instance
     else:
@@ -585,3 +589,290 @@ def validate_and_update_model(
                 pk=model_id).update(**updated_field)
         except DatabaseError as error:
             raise Exception(error)
+
+
+def calculate_kpis(registration_instance):
+    """
+    Function called on update of every field
+    Identifies completed KPIs and passes these back to update AuditProgress model
+    It accepts the registration instance
+    """
+
+    # child must be registered in the audit for the KPI to be counted
+    is_registered = (
+        registration_instance.registration_date is not None and registration_instance.eligibility_criteria_met) == True
+
+    if not is_registered:
+        # cannot proceed any further if registration incomplete.
+        # In theory it should not be possible to get this far.
+        return
+
+    # 1. paediatrician_with_expertise_in_epilepsies
+    # Calculation Method
+    # Numerator = Number of children and young people [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
+    # Denominator = Number of and young people [diagnosed with epilepsy] at first year
+    if registration_instance.assessment.consultant_paediatrician_referral_made or registration_instance.assessment.paediatric_neurologist_referral_made:
+        paediatrician_with_expertise_in_epilepsies = (
+            registration_instance.assessment.consultant_paediatrician_input_date <= (
+                registration_instance.registration_date + relativedelta(days=14))
+        ) or (
+            registration_instance.assessment.paediatric_neurologist_input_date <= (
+                registration_instance.registration_date + relativedelta(days=14))
+        )
+    else:
+        paediatrician_with_expertise_in_epilepsies = False
+
+    # 2. epilepsy_specialist_nurse
+    # Calculation Method
+    # Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
+    # Denominator = Number of children and young people [diagnosed with epilepsy] at first year
+    if registration_instance.assessment.epilepsy_specialist_nurse_referral_made:
+        epilepsy_specialist_nurse = (
+            registration_instance.assessment.epilepsy_specialist_nurse_input_date <= registration_instance.registration_close_date
+        ) or (
+            registration_instance.assessment.epilepsy_specialist_nurse_referral_date <= registration_instance.registration_close_date
+        )
+    else:
+        epilepsy_specialist_nurse = False
+
+    # 3. tertiary_input
+    # Calculation Method
+    # Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
+    # Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
+    age_at_first_paediatric_assessment = relativedelta.relativedelta(
+        registration_instance.registration_date, registration_instance.case.date_of_birth)
+
+    tertiary_input = (
+        # Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy]
+        age_at_first_paediatric_assessment <= 3
+    ) or (
+        # (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year)
+        AntiEpilepsyMedicine.objects.filter(
+            management=registration_instance.management,
+            is_rescue_medicine=False,
+            antiepilepsy_medicine_start_date__lt=registration_instance.registration_close_date
+        ).count() >= 3
+    ) or (
+        # (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)
+        age_at_first_paediatric_assessment <= 4 and
+        Episode.objects.filter(
+            Q(multiaxial_diagnosis=registration_instance.multiaxial_diagnosis) &
+            Q(epilepsy_or_nonepilepsy_status='E') &
+            Q(epileptic_generalised_onset='MyC')
+        ).exists()
+    ) or (
+        # (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist]
+        (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met == registration_instance.assessment.paediatric_neurologist_referral_made) or
+        (registration_instance.assessment.paediatric_neurologist_input_date is not None and registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met)
+    ) or (
+        # [evidence of referral or involvement of CESS]
+        registration_instance.assessment.childrens_epilepsy_surgical_service_referral_made is not None or
+        registration_instance.assessment.childrens_epilepsy_surgical_service_referral_date is not None or
+        registration_instance.assessment.childrens_epilepsy_surgical_service_input_date is not None
+    )
+
+    # 4. epilepsy_surgery_referral
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral or involvement of CESS]
+    # Denominator =Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
+    epilepsy_surgery_referral = (
+        registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met and (
+            registration_instance.assessment.childrens_epilepsy_surgical_service_referral_made is not None or
+            registration_instance.assessment.childrens_epilepsy_surgical_service_referral_date is not None or
+            registration_instance.assessment.childrens_epilepsy_surgical_service_input_date is not None
+        )
+    )
+
+    # 5. ECG
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year AND who have [12 lead ECG obtained]
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year
+    ecg = (
+        registration_instance.epilepsy_context.were_any_of_the_epileptic_seizures_convulsive and
+        registration_instance.investigations.twelve_lead_ecg_status
+    )
+
+    # 6. MRI
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
+    mri = (
+        age_at_first_paediatric_assessment <= 2 and
+        (
+            registration_instance.multiaxial_diagnosis.syndrome_present and
+            Syndrome.objects.filter(
+                Q(multiaxial_diagnosis=registration_instance.multiaxial_diagnosis) &
+                # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
+                ~Q(syndrome_name__in=[])
+            ).exists() and (
+                registration_instance.investigations.mri_brain_reported_date <= (
+                    registration_instance.investigations.mri_brain_requested_date + relativedelta(days=42))
+            )
+        )
+    )
+
+    # 7. assessment_of_mental_health_issues
+    # Calculation Method
+    # Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
+    # Denominator = = Number of children and young people over 5 years diagnosed with epilepsy
+    assessment_of_mental_health_issues = (
+        age_at_first_paediatric_assessment >= 5
+    ) and (
+        registration_instance.multiaxial_diagnosis.mental_health_screen
+    )
+
+    # 8. mental_health_support
+    # Calculation Method
+    # Numerator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate AND annual risk acknowledgement forms completed AND pregnancy prevention programme in place
+    # Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
+
+    mental_health_support = (
+        age_at_first_paediatric_assessment >= 12 and
+        registration_instance.case.sex == 2
+    ) and (
+        registration_instance.management.has_an_aed_been_given and
+        AntiEpilepsyMedicine.objects.filter(
+            management=registration_instance.management,
+            medicine_id=21,
+            is_a_pregnancy_prevention_programme_needed=True,
+            has_a_valproate_annual_risk_acknowledgement_form_been_completed=True
+        ).exists()
+    )
+
+    # 9. comprehensive_care_planning_agreement
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    comprehensive_care_planning_agreement = (
+        registration_instance.management.individualised_care_plan_in_place
+    )
+
+    # 10. patient_held_individualised_epilepsy_document
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+    patient_held_individualised_epilepsy_document = (
+        registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+    )
+
+    # 11. care_planning_has_been_updated_when_necessary
+
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    care_planning_has_been_updated_when_necessary = (
+        registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
+    )
+
+    # 12. comprehensive_care_planning_content
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    comprehensive_care_planning_content = (
+        registration_instance.management.has_rescue_medication_been_prescribed and
+        registration_instance.management.individualised_care_plan_parental_prolonged_seizure_care and
+        registration_instance.management.individualised_care_plan_include_first_aid and
+        registration_instance.management.individualised_care_plan_addresses_water_safety and
+        registration_instance.management.individualised_care_plan_includes_service_contact_details and
+        registration_instance.management.individualised_care_plan_includes_general_participation_risk and
+        registration_instance.management.individualised_care_plan_addresses_sudep
+    )
+
+    # 13. parental_prolonged_seizures_care_plan
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
+
+    parental_prolonged_seizures_care_plan = (
+        registration_instance.management.has_rescue_medication_been_prescribed and
+        registration_instance.management.individualised_care_plan_parental_prolonged_seizure_care
+    )
+
+    # 14. water_safety
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    water_safety = (
+        registration_instance.management.individualised_care_plan_addresses_water_safety
+    )
+
+    # 15. first_aid
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    first_aid = (
+        registration_instance.management.individualised_care_plan_include_first_aid
+    )
+
+    # 16. general_participation_and_risk
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    general_participation_and_risk = (
+        registration_instance.management.individualised_care_plan_includes_general_participation_risk
+    )
+
+    # 17. service_contact_details
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+
+    service_contact_details = (
+        registration_instance.management.individualised_care_plan_includes_service_contact_details
+    )
+
+    # 18. sudep
+    # Calculation Method
+    # Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
+    # Denominator = Number of children diagnosed with epilepsy at first year
+
+    sudep = (
+        registration_instance.management.individualised_care_plan_parental_prolonged_seizure_care and
+        registration_instance.management.individualised_care_plan_addresses_sudep
+    )
+
+    # 19. school_individual_healthcare_plan
+    # Calculation Method
+    # Numerator = Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
+    # Denominator =Number of children and young people aged 5 years and above diagnosed with epilepsy at first year
+
+    school_individual_healthcare_plan = (
+        age_at_first_paediatric_assessment >= 5
+    ) and (
+        registration_instance.management.individualised_care_plan_includes_ehcp
+    )
+
+    """
+    Store the KPIs in AuditProgress
+    """
+
+    kpis = {
+        'paediatrician_with_expertise_in_epilepsies': paediatrician_with_expertise_in_epilepsies,
+        'epilepsy_specialist_nurse': epilepsy_specialist_nurse,
+        'tertiary_input': tertiary_input,
+        'epilepsy_surgery_referral': epilepsy_surgery_referral,
+        'ecg': ecg,
+        'mri': mri,
+        'assessment_of_mental_health_issues': assessment_of_mental_health_issues,
+        'mental_health_support': mental_health_support,
+        'comprehensive_care_planning_agreement': comprehensive_care_planning_agreement,
+        'patient_held_individualised_epilepsy_document': patient_held_individualised_epilepsy_document,
+        'care_planning_has_been_updated_when_necessary': care_planning_has_been_updated_when_necessary,
+        'comprehensive_care_planning_content': comprehensive_care_planning_content,
+        'parental_prolonged_seizures_care_plan': parental_prolonged_seizures_care_plan,
+        'water_safety': water_safety,
+        'first_aid': first_aid,
+        'general_participation_and_risk': general_participation_and_risk,
+        'service_contact_details': service_contact_details,
+        'sudep': sudep,
+        'school_individual_healthcare_plan': school_individual_healthcare_plan,
+    }
+
+    AuditProgress.objects.filter(
+        pk=registration_instance.audit_progress.pk).update(**kpis)

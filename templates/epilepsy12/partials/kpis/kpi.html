@@ -1,0 +1,124 @@
+{% load epilepsy12_template_tags %}
+<h3>Clinical Team</h3>
+<table class='ui rcpch table'>
+    <thead>
+        <tr>
+            <th>Indicator</th>
+            <th class='right aligned'>Performance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{case.registration.audit_progress.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}</td>
+            <td class='right aligned'>{{ case.registration.audit_progress.paediatrician_with_expertise_in_epilepsies|icon_for_score }}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_epilepsy_specialist_nurse_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.epilepsy_specialist_nurse|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_tertiary_input_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.tertiary_input|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_epilepsy_surgery_referral_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.epilepsy_surgery_referral|icon_for_score}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Investigations</h3>
+<table class='ui rcpch table'>
+    <thead>
+        <tr>
+            <th>Indicator</th>
+            <th class='right aligned'>Performance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{case.registration.audit_progress.get_ecg_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.ecg|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_mri_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.mri|icon_for_score}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Mental Health</h3>
+<table class='ui rcpch table'>
+    <thead>
+        <tr>
+            <th>Indicator</th>
+            <th class='right aligned'>Performance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{case.registration.audit_progress.get_assessment_of_mental_health_issues_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.assessment_of_mental_health_issues|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_mental_health_support_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.mental_health_support|icon_for_score}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Care Planning</h3>
+<table class='ui rcpch table'>
+    <thead>
+        <tr>
+            <th>Indicator</th>
+            <th class='right aligned'>Performance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{case.registration.audit_progress.get_comprehensive_care_planning_agreement_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.comprehensive_care_planning_agreement|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_patient_held_individualised_epilepsy_document_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.patient_held_individualised_epilepsy_document|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_care_planning_has_been_updated_when_necessary_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.care_planning_has_been_updated_when_necessary|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_comprehensive_care_planning_content_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.comprehensive_care_planning_content|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_parental_prolonged_seizures_care_plan_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.parental_prolonged_seizures_care_plan|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_water_safety_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.water_safety|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_first_aid_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.first_aid|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_general_participation_and_risk_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.general_participation_and_risk|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_service_contact_details_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.service_contact_details|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_sudep_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.sudep|icon_for_score}}</td>
+        </tr>
+        <tr>
+            <td>{{case.registration.audit_progress.get_school_individual_healthcare_plan_help_label_text}}</td>
+            <td class='right aligned'>{{case.registration.audit_progress.school_individual_healthcare_plan|icon_for_score}}</td>
+        </tr>
+    </tbody>
+</table>
