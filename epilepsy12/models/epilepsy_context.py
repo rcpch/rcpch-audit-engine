@@ -100,7 +100,7 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, He
     registration = models.OneToOneField(
         Registration,
         on_delete=models.CASCADE,
-        verbose_name="Related Registration",
+        # verbose_name="Related Registration",
         null=True
     )
 
