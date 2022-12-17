@@ -138,6 +138,6 @@ def none_masked(field):
 @register.filter(name='icon_for_score')
 def icon_for_score(score):
     if score < 1:
-        return mark_safe("<i class='red exclamation triangle icon'></i>")
+        return mark_safe("<i class='rcpch_light_blue exclamation triangle icon'></i>")
     else:
         return mark_safe("<i class='check circle outline rcpch_pink icon'></i>")
