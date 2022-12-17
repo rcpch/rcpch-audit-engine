@@ -24,6 +24,11 @@ def percent_complete(registration):
 
 
 @register.simple_tag
+def date_string(date):
+    return date.strftime("%d %B %Y")
+
+
+@register.simple_tag
 def characters_left(description):
     length = 5000-len(description)
     colour = 'black'
