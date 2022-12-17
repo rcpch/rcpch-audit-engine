@@ -11,6 +11,7 @@ from epilepsy12.models.registration import Registration
 from epilepsy12.models.site import Site
 
 from ..models import AuditProgress, Episode, Syndrome, Comorbidity, Management
+from ..general_functions import current_cohort_start_date, first_tuesday_in_january
 
 
 def recalculate_form_generate_response(model_instance, request, context, template, error_message=None):
@@ -482,7 +483,8 @@ def validate_and_update_model(
         field_name,
         page_element,
         comparison_date_field_name=None,
-        is_earliest_date=None):
+        is_earliest_date=None
+):
     """
     This is called from the view to update the model or return an error
     Parameters:
@@ -527,11 +529,13 @@ def validate_and_update_model(
 
     if page_element == 'date_field':
         # date tests a bit involved
+        # No date can be before the date of birth
         # If a comparison date field is supplied, the date itself might not yet have been set.
         # The earlier of the two dates cannot be in the future and cannot be later than the second if supplied.
         # The later of the two dates CAN be in the future but cannot be earlier than the first if supplied.
         # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
         date_valid = None
+
         if comparison_date_field_name:
             instance = model.objects.get(pk=model_id)
             comparison_date = getattr(
@@ -574,11 +578,32 @@ def validate_and_update_model(
     # so update() cannot be used
     # This feels like a bit of a hack so very open to suggestions on more Django way of doing this
     if field_name == 'registration_date':
+
+        # registration_date cannot be before date of birth
         registration = Registration.objects.get(pk=model_id)
-        registration.registration_date = field_value
-        registration.updated_at = timezone.now()
-        registration.updated_by = request.user
-        registration.save()
+        if field_value < registration.case.date_of_birth:
+            date_valid = False
+            errors = f"The date you chose ({field_value.strftime('%d %B %Y')}) cannot not be before {registration.case}'s date of birth."
+            raise ValueError(errors)
+
+        # the registration date cannot be before the current cohort
+        current_cohort_end_date = first_tuesday_in_january(
+            current_cohort_start_date().year)+relativedelta(days=7)
+        if field_value < current_cohort_start_date():
+            date_valid = False
+            errors = f'The date you entered cannot be before the current cohort start date ({current_cohort_start_date().strftime("%d %B %Y")})'
+            raise ValueError(errors)
+        elif field_value > current_cohort_end_date:
+            date_valid = False
+            errors = f'The date you entered cannot be after the current cohort end date ({current_cohort_end_date.strftime("%d %B %Y")})'
+            raise ValueError(errors)
+
+        else:
+            registration = Registration.objects.get(pk=model_id)
+            registration.registration_date = field_value
+            registration.updated_at = timezone.now()
+            registration.updated_by = request.user
+            registration.save()
     else:
         updated_field = {
             field_name: field_value,
