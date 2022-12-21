@@ -1,12 +1,10 @@
 from django.utils import timezone
-from datetime import datetime
 from operator import itemgetter
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
-from epilepsy12.models import comorbidity
-from ..decorator import group_required, update_model
+from ..decorator import group_required
 from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
 from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE

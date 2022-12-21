@@ -9,7 +9,6 @@ from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEP
 from ..decorator import group_required
 from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine
 from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
-from ..decorator import update_model
 
 
 @login_required
@@ -72,14 +71,26 @@ Fields relating to rescue medication begin here
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'has_an_aed_been_given', 'toggle_button')
 def has_an_aed_been_given(request, management_id):
     # HTMX call back from management template
     # POST request on toggle button click
     # if AED has been prescribed returns partial template comprising AED search box and dropdown
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='has_an_aed_been_given',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     management = Management.objects.get(pk=management_id)
 
+    # tidy up
     if management.has_an_aed_been_given == False:
         #     # delete any AEMs that exist
         if AntiEpilepsyMedicine.objects.filter(
@@ -107,7 +118,8 @@ def has_an_aed_been_given(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -403,6 +415,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     return response
 
 
+@login_required
 def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to toggle antiepilepsy_medicine_end_date
@@ -487,12 +500,23 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@update_model(AntiEpilepsyMedicine, 'antiepilepsy_medicine_risk_discussed', 'toggle_button')
 def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_risk_discussed
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=AntiEpilepsyMedicine,
+            model_id=antiepilepsy_medicine_id,
+            field_name='antiepilepsy_medicine_risk_discussed',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
@@ -519,19 +543,31 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
         model_instance=antiepilepsy_medicine.management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@update_model(AntiEpilepsyMedicine, 'is_a_pregnancy_prevention_programme_in_place', 'toggle_button')
 def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update is_a_pregnancy_prevention_programme_in_place
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=AntiEpilepsyMedicine,
+            model_id=antiepilepsy_medicine_id,
+            field_name='is_a_pregnancy_prevention_programme_in_place',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
@@ -558,18 +594,30 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
         model_instance=antiepilepsy_medicine.management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@update_model(AntiEpilepsyMedicine, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed', 'toggle_button')
 def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update has_a_valproate_annual_risk_acknowledgement_form_been_completed
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=AntiEpilepsyMedicine,
+            model_id=antiepilepsy_medicine_id,
+            field_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
@@ -597,7 +645,8 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, ant
         model_instance=antiepilepsy_medicine.management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -610,13 +659,24 @@ Fields relating to rescue medication begin here
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'has_rescue_medication_been_prescribed', 'toggle_button')
 def has_rescue_medication_been_prescribed(request, management_id):
     """
     HTMX call from management template
     POST request on toggle button click
     If rescue medicine has been prescribed, return partial template comprising input search and dropdown
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='has_rescue_medication_been_prescribed',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
 
@@ -647,7 +707,8 @@ def has_rescue_medication_been_prescribed(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -660,7 +721,6 @@ Fields relating to individual care plans begin here
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_in_place', 'toggle_button')
 def individualised_care_plan_in_place(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -668,6 +728,18 @@ def individualised_care_plan_in_place(request, management_id):
     This inverts the boolean field value or sets it based on user selection if none exists, 
     and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_in_place',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
 
@@ -700,7 +772,8 @@ def individualised_care_plan_in_place(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -748,7 +821,6 @@ def individualised_care_plan_date(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_has_parent_carer_child_agreement', 'toggle_button')
 def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -756,6 +828,18 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
     This inverts the boolean field value, and returns the same partial.
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_has_parent_carer_child_agreement',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     management = Management.objects.get(pk=management_id)
 
     context = {
@@ -768,7 +852,8 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -776,7 +861,6 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_includes_service_contact_details', 'toggle_button')
 def individualised_care_plan_includes_service_contact_details(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -784,6 +868,18 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
     This inverts the boolean field value, and returns the same partial.
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_includes_service_contact_details',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     management = Management.objects.get(pk=management_id)
     context = {
         'management': management
@@ -795,7 +891,8 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -803,13 +900,23 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_include_first_aid', 'toggle_button')
 def individualised_care_plan_include_first_aid(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_include_first_aid',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -822,7 +929,8 @@ def individualised_care_plan_include_first_aid(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -830,7 +938,6 @@ def individualised_care_plan_include_first_aid(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_parental_prolonged_seizure_care', 'toggle_button')
 def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -838,6 +945,18 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
     This inverts the boolean field value, and returns the same partial.
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_parental_prolonged_seizure_care',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     management = Management.objects.get(pk=management_id)
     context = {
         'management': management
@@ -849,7 +968,8 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -857,13 +977,23 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_includes_general_participation_risk', 'toggle_button')
 def individualised_care_plan_includes_general_participation_risk(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_includes_general_participation_risk',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -876,7 +1006,8 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -884,13 +1015,23 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_addresses_water_safety', 'toggle_button')
 def individualised_care_plan_addresses_water_safety(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_addresses_water_safety',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -903,7 +1044,8 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -911,13 +1053,23 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_addresses_sudep', 'toggle_button')
 def individualised_care_plan_addresses_sudep(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_addresses_sudep',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -930,7 +1082,8 @@ def individualised_care_plan_addresses_sudep(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -938,13 +1091,23 @@ def individualised_care_plan_addresses_sudep(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'individualised_care_plan_includes_ehcp', 'toggle_button')
 def individualised_care_plan_includes_ehcp(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='individualised_care_plan_includes_ehcp',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
     context = {
@@ -957,7 +1120,8 @@ def individualised_care_plan_includes_ehcp(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -965,13 +1129,23 @@ def individualised_care_plan_includes_ehcp(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'has_individualised_care_plan_been_updated_in_the_last_year', 'toggle_button')
 def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='has_individualised_care_plan_been_updated_in_the_last_year',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
 
@@ -985,7 +1159,8 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -993,13 +1168,23 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'has_been_referred_for_mental_health_support', 'toggle_button')
 def has_been_referred_for_mental_health_support(request, management_id):
     """
     This is an HTMX callback from the has_been_referred_for_mental_health_support partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='has_been_referred_for_mental_health_support',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
 
@@ -1013,7 +1198,8 @@ def has_been_referred_for_mental_health_support(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
@@ -1021,13 +1207,23 @@ def has_been_referred_for_mental_health_support(request, management_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Management, 'has_support_for_mental_health_support', 'toggle_button')
 def has_support_for_mental_health_support(request, management_id):
     """
     This is an HTMX callback from the has_support_for_mental_health_support partial template
     It is triggered by a toggle in the partial generating a post request
     This inverts the boolean field value, and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Management,
+            model_id=management_id,
+            field_name='has_support_for_mental_health_support',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     management = Management.objects.get(pk=management_id)
 
@@ -1041,7 +1237,8 @@ def has_support_for_mental_health_support(request, management_id):
         model_instance=management,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
