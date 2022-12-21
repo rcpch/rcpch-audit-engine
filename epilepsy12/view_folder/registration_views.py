@@ -541,23 +541,3 @@ def registration_date(request, case_id):
     )
 
     return response
-
-
-def total_fields_completed(model_instance):
-    """
-    Loops through all the fields in the model instance (except pk and related fields)
-    and uses these to return a total number of fields that have already been completed.
-    """
-    counter = 0
-    if model_instance.registration_date is not None:
-        counter += 1
-    if model_instance.eligibility_criteria_met:
-        counter += 1
-    if Site.objects.filter(
-        case=model_instance.case,
-        site_is_actively_involved_in_epilepsy_care=True,
-        site_is_primary_centre_of_epilepsy_care=True
-    ).exists():
-        counter += 1
-
-    return counter

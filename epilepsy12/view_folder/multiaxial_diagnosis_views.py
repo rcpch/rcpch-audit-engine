@@ -437,12 +437,23 @@ def seizure_onset_date(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Episode, 'seizure_onset_date_confidence', 'single_choice_multiple_toggle_button')
 def seizure_onset_date_confidence(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Episode,
+            model_id=episode_id,
+            field_name='seizure_onset_date_confidence',
+            page_element='single_choice_multiple_toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     episode = Episode.objects.get(pk=episode_id)
 
     keywords = Keyword.objects.all()
@@ -475,7 +486,8 @@ def seizure_onset_date_confidence(request, episode_id):
         model_instance=episode.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/episode.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -483,12 +495,23 @@ def seizure_onset_date_confidence(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Episode, 'episode_definition', 'select')
 def episode_definition(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Episode,
+            model_id=episode_id,
+            field_name='episode_definition',
+            page_element='select'
+        )
+    except ValueError as error:
+        error_message = error
+
     episode = Episode.objects.get(pk=episode_id)
 
     keywords = Keyword.objects.all()
@@ -513,7 +536,6 @@ def episode_definition(request, episode_id):
         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
@@ -521,7 +543,8 @@ def episode_definition(request, episode_id):
         model_instance=episode.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/episode.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -529,15 +552,33 @@ def episode_definition(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Episode, 'has_description_of_the_episode_or_episodes_been_gathered', 'toggle_button')
 def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id):
     """
     HTMX post request from episode.html partial on toggle click
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Episode,
+            model_id=episode_id,
+            field_name='has_description_of_the_episode_or_episodes_been_gathered',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     keywords = Keyword.objects.all()
 
     episode = Episode.objects.get(pk=episode_id)
+
+    # clean up
+    if not episode.has_description_of_the_episode_or_episodes_been_gathered:
+        # no description gathered - remove any previously gathered descriptions
+        episode.description = ''
+        episode.description_keywords = None
+        episode.save()
 
     context = {
         'episode': episode,
@@ -559,7 +600,6 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
         'paroxysms': sorted(NON_EPILEPSY_PAROXYSMS, key=itemgetter(1)),
         'migraines': sorted(MIGRAINES, key=itemgetter(1)),
         'nonepilepsy_miscellaneous': sorted(EPIS_MISC, key=itemgetter(1)),
-
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
 
@@ -567,7 +607,8 @@ def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id
         model_instance=episode.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/episode.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -881,11 +922,22 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Episode, 'epileptic_generalised_onset', 'select')
 def epileptic_generalised_onset(request, episode_id):
     """
     POST request from epileptic_generalised_onset field in generalised_onset_epilepsy
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Episode,
+            model_id=episode_id,
+            field_name='epileptic_generalised_onset',
+            page_element='select'
+        )
+    except ValueError as error:
+        error_message = error
 
     episode = Episode.objects.get(pk=episode_id)
 
@@ -900,7 +952,8 @@ def epileptic_generalised_onset(request, episode_id):
         model_instance=episode.multiaxial_diagnosis,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -913,11 +966,22 @@ Nonepilepsy
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Episode, 'nonepileptic_seizure_unknown_onset', 'multiple_choice_multiple_toggle_button')
 def nonepilepsy_generalised_onset(request, episode_id):
     """
     POST request from toggle
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Episode,
+            model_id=episode_id,
+            field_name='nonepileptic_seizure_unknown_onset',
+            page_element='multiple_choice_multiple_toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     episode = Episode.objects.get(id=episode_id)
 
@@ -937,7 +1001,8 @@ def nonepilepsy_generalised_onset(request, episode_id):
         model_instance=episode.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/nonepilepsy.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1289,12 +1354,23 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(MultiaxialDiagnosis, 'epilepsy_cause', 'select')
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
     Choices for causes fed from SNOMED server
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name='epilepsy_cause',
+            page_element='select'
+        )
+    except ValueError as error:
+        error_message = error
 
     # SNOMED term populating epilepsy cause dropdown
     ecl = '<< 363235000'
@@ -1304,7 +1380,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
         pk=multiaxial_diagnosis_id)
 
     context = {
-        "epilepsy_causes": epilepsy_causes,
+        'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
@@ -1313,7 +1389,8 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
         model_instance=multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/epilepsy_causes/epilepsy_causes.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1429,7 +1506,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': comorbidity_choices
+        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1454,7 +1531,7 @@ def edit_comorbidity(request, comorbidity_id):
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': comorbidity_choices
+        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1529,7 +1606,6 @@ def close_comorbidity(request, comorbidity_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Comorbidity, 'comorbidity_diagnosis_date', 'date_field')
 def comorbidity_diagnosis_date(request, comorbidity_id):
     """
     POST request from comorbidity partial with comorbidity_diagnosis_date
@@ -1554,7 +1630,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': comorbidity_choices
+        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1570,7 +1646,6 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Comorbidity, 'comorbidity_diagnosis', 'snomed_select')
 def comorbidity_diagnosis(request, comorbidity_id):
     """
     POST request on change select from comorbidity partial
@@ -1579,6 +1654,18 @@ def comorbidity_diagnosis(request, comorbidity_id):
 
     # 35919005 |Pervasive developmental disorder (disorder)|
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Comorbidity,
+            model_id=comorbidity_id,
+            field_name='comorbidity_diagnosis',
+            page_element='snomed_select'
+        )
+    except ValueError as error:
+        error_message = error
+
     ecl = '<< 35919005'
     comorbidity_choices = fetch_ecl(ecl)
 
@@ -1586,7 +1673,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
         pk=comorbidity_id)
 
     context = {
-        "comorbidity_choices": comorbidity_choices,
+        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
         "comorbidity": comorbidity,
     }
 
@@ -1594,7 +1681,8 @@ def comorbidity_diagnosis(request, comorbidity_id):
         model_instance=comorbidity.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidity.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1628,11 +1716,22 @@ def comorbidities(request, multiaxial_diagnosis_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(MultiaxialDiagnosis, 'mental_health_screen', 'toggle_button')
 def mental_health_screen(request, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_screen toggle
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name='mental_health_screen',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
@@ -1646,7 +1745,8 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
         model_instance=multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1654,16 +1754,29 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(MultiaxialDiagnosis, 'mental_health_issue_identified', 'toggle_button')
 def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_issue_identified toggle
     """
 
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name='mental_health_issue_identified',
+            page_element='toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
+
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
+    # tidy up
     if not multiaxial_diagnosis.mental_health_issue_identified:
+        # if no issue identified, remove any previously stored mental health issues
         multiaxial_diagnosis.mental_health_issue = None
         multiaxial_diagnosis.updated_at = timezone.now(),
         multiaxial_diagnosis.updated_by = request.user
@@ -1678,7 +1791,8 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
         model_instance=multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1686,11 +1800,22 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(MultiaxialDiagnosis, 'mental_health_issue', 'single_choice_multiple_toggle_button')
 def mental_health_issue(request, multiaxial_diagnosis_id):
     """
     POST callback from mental_health_issue multiple toggle
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name='mental_health_issue',
+            page_element='single_choice_multiple_toggle_button'
+        )
+    except ValueError as error:
+        error_message = error
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
@@ -1704,7 +1829,8 @@ def mental_health_issue(request, multiaxial_diagnosis_id):
         model_instance=multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
