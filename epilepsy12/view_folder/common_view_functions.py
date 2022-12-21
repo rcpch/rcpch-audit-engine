@@ -739,18 +739,17 @@ def calculate_kpis(registration_instance):
     mri = 0
     if hasattr(registration_instance, 'multiaxial_diagnosis'):
         if (
-            age_at_first_paediatric_assessment <= 2 and
-            (
-                registration_instance.multiaxial_diagnosis.syndrome_present and
+            registration_instance.multiaxial_diagnosis.syndrome_present and
                 Syndrome.objects.filter(
                     Q(multiaxial_diagnosis=registration_instance.multiaxial_diagnosis) &
                     # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                    ~Q(syndrome_name__in=[])
-                ).exists() and (
-                    registration_instance.investigations.mri_brain_reported_date <= (
-                        registration_instance.investigations.mri_brain_requested_date + relativedelta(days=42))
-                )
-            )
+                    ~Q(syndrome_name__in=[3, 16, 17, 18])
+                ).exists() or
+
+            age_at_first_paediatric_assessment <= 2
+        ) and (
+            registration_instance.investigations.mri_brain_reported_date <= (
+                registration_instance.investigations.mri_brain_requested_date + relativedelta(days=42))
         ):
             mri = 1
 
