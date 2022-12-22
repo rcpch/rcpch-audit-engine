@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from ..decorator import group_required, update_model
+from ..decorator import group_required
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from epilepsy12.models.registration import Registration
 from ..models import EpilepsyContext
-from .common_view_functions import recalculate_form_generate_response
+from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
 
 
 @login_required
@@ -35,13 +35,25 @@ def epilepsy_context(request, case_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'previous_febrile_seizure', 'single_choice_multiple_toggle_button')
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='previous_febrile_seizure',
+            page_element='single_choice_multiple_toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -54,7 +66,8 @@ def previous_febrile_seizure(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/previous_febrile_seizure.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -62,13 +75,25 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'previous_acute_symptomatic_seizure', 'single_choice_multiple_toggle_button')
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='previous_acute_symptomatic_seizure',
+            page_element='single_choice_multiple_toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -81,7 +106,8 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/previous_acute_symptomatic_seizure.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -89,13 +115,25 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'is_there_a_family_history_of_epilepsy', 'single_choice_multiple_toggle_button')
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='is_there_a_family_history_of_epilepsy',
+            page_element='single_choice_multiple_toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -108,7 +146,8 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/is_there_a_family_history_of_epilepsy.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -116,13 +155,25 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'previous_neonatal_seizures', 'single_choice_multiple_toggle_button')
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='previous_neonatal_seizures',
+            page_element='single_choice_multiple_toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -135,7 +186,8 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/previous_neonatal_seizures.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -143,12 +195,24 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'were_any_of_the_epileptic_seizures_convulsive', 'toggle_button')
 def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
     Post request from multiple choice toggle within epilepsy partial.
     Updates the model and returns the epilepsy partial and parameters
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='were_any_of_the_epileptic_seizures_convulsive',
+            page_element='toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -161,7 +225,8 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template='epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -169,13 +234,25 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'experienced_prolonged_generalized_convulsive_seizures', 'single_choice_multiple_toggle_button')
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='experienced_prolonged_generalized_convulsive_seizures',
+            page_element='single_choice_multiple_toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -188,7 +265,8 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/experienced_prolonged_generalized_convulsive_seizures.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -196,13 +274,25 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'experienced_prolonged_focal_seizures', 'single_choice_multiple_toggle_button')
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_focal_seizures partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='experienced_prolonged_focal_seizures',
+            page_element='single_choice_multiple_toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -215,7 +305,8 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/experienced_prolonged_focal_seizures.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -223,13 +314,25 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
 @login_required
 @group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(EpilepsyContext, 'diagnosis_of_epilepsy_withdrawn', 'toggle_button')
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            epilepsy_context_id,
+            EpilepsyContext,
+            field_name='diagnosis_of_epilepsy_withdrawn',
+            page_element='toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
@@ -241,7 +344,8 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html",
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response

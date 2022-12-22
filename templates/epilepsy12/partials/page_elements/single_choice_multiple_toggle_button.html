@@ -113,6 +113,11 @@
                     </div>
                 {% endif %}
             </span>
+            {% if error_message %}
+            <div class='ui rcpch message'>
+                {{error_message}}
+            </div>
+            {% endif %}
         </div>
 
     
