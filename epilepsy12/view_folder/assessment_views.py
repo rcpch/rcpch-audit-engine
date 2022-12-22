@@ -3,13 +3,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.user_types import CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE
 from ..models import Registration, Assessment, Case, HospitalTrust, Site
-from ..decorator import update_model
 from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
 
 
 @login_required
 @permission_required(CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE[0], raise_exception=True)
-@update_model(Assessment, 'consultant_paediatrician_referral_made', 'toggle_button')
+# @update_model(Assessment, 'consultant_paediatrician_referral_made', 'toggle_button')
 def consultant_paediatrician_referral_made(request, assessment_id):
     """
     POST request callback from toggle_button in consultant_paediatrician partial
@@ -29,6 +28,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
+    # tidy up
     if assessment.consultant_paediatrician_referral_made == False:
         Assessment.objects.filter(pk=assessment_id).update(
             consultant_paediatrician_referral_date=None,
@@ -133,7 +133,6 @@ def consultant_paediatrician_referral_date(request, assessment_id):
 
 
 @login_required
-@update_model(Assessment, 'consultant_paediatrician_input_date', 'date_field')
 def consultant_paediatrician_input_date(request, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
@@ -190,7 +189,6 @@ def consultant_paediatrician_input_date(request, assessment_id):
 
 
 @login_required
-# @update_model(Assessment, 'general_paediatric_centre', 'hospitals_select')
 def general_paediatric_centre(request, assessment_id):
     """
     HTMX call back from hospital_list partial.
@@ -875,7 +873,6 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 
 
 @login_required
-@update_model(Assessment, 'childrens_epilepsy_surgical_service_referral_criteria_met', 'toggle_button')
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -883,6 +880,17 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     This inverts the boolean field value or sets it based on user selection if none exists,
     and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='childrens_epilepsy_surgical_service_referral_criteria_met',
+            page_element='toggle_button',
+        )
+    except ValueError as error:
+        error_message = error
 
     assessment = Assessment.objects.get(pk=assessment_id)
     # filter list to include only NHS hospitals
@@ -900,7 +908,8 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -1037,7 +1046,6 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
 
 
 @login_required
-@update_model(Assessment, 'childrens_epilepsy_surgical_service_input_date', 'date_field')
 def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1336,7 +1344,6 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 
 
 @login_required
-@update_model(Assessment, 'epilepsy_specialist_nurse_referral_made', 'toggle_button')
 def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1344,6 +1351,17 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     This inverts the boolean field value or sets it based on user selection if none exists,
     and returns the same partial.
     """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Assessment,
+            model_id=assessment_id,
+            field_name='epilepsy_specialist_nurse_referral_made',
+            page_element='toggle_button',
+        )
+    except ValueError as error:
+        error_message = error
 
     # There is no(longer) epilepsy nurse referral in place - set all epilepsy nurse related fields to None
     if Assessment.objects.filter(pk=assessment_id, epilepsy_specialist_nurse_referral_made=False).exists():
@@ -1366,7 +1384,8 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
         model_instance=assessment,
         request=request,
         template=template_name,
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response

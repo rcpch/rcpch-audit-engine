@@ -640,13 +640,13 @@ def calculate_kpis(registration_instance):
     # Denominator = Number of and young people [diagnosed with epilepsy] at first year
     paediatrician_with_expertise_in_epilepsies = 0
     if hasattr(registration_instance, 'assessment'):
-        if registration_instance.assessment.consultant_paediatrician_referral_made:
+        if registration_instance.assessment.consultant_paediatrician_referral_made and registration_instance.assessment.consultant_paediatrician_input_date is not None:
             if (
                 registration_instance.assessment.consultant_paediatrician_input_date <= (
                     registration_instance.registration_date + relativedelta(days=+14))
             ):
                 paediatrician_with_expertise_in_epilepsies = 1
-        elif registration_instance.assessment.paediatric_neurologist_referral_made:
+        elif registration_instance.assessment.paediatric_neurologist_referral_made and registration_instance.assessment.paediatric_neurologist_input_date is not None:
             if (
                 registration_instance.assessment.paediatric_neurologist_input_date <= (
                     registration_instance.registration_date + relativedelta(days=+14))
@@ -659,7 +659,7 @@ def calculate_kpis(registration_instance):
     # Denominator = Number of children and young people [diagnosed with epilepsy] at first year
     epilepsy_specialist_nurse = 0
     if hasattr(registration_instance, 'assessment'):
-        if registration_instance.assessment.epilepsy_specialist_nurse_referral_made:
+        if registration_instance.assessment.epilepsy_specialist_nurse_referral_made and registration_instance.assessment.epilepsy_specialist_nurse_input_date is not None:
             if (
                 registration_instance.assessment.epilepsy_specialist_nurse_input_date <= registration_instance.registration_close_date
             ) or (
