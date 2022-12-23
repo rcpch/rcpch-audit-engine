@@ -4,10 +4,9 @@ from operator import itemgetter
 from django.contrib.auth.decorators import login_required
 from ..decorator import group_required
 
-from epilepsy12.models.syndrome import Syndrome
+from ..models import Syndrome
 from epilepsy12.constants.syndromes import SYNDROMES
-
-from .common_view_functions import recalculate_form_generate_response
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 
 @login_required
@@ -16,8 +15,6 @@ def syndrome_diagnosis_date(request, syndrome_id):
     """
     HTMX post request from syndrome.html partial on date change
     """
-
-    print("hello")
 
     syndrome_diagnosis_date = request.POST.get(
         request.htmx.trigger_name)

@@ -1,9 +1,9 @@
 from django.db import models
 from django.forms import ValidationError
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
-from .management import Management
-from ..general_functions import *
+# from .management import Management
+# from ..general_functions import *
 
 
 class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -124,7 +124,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     # relationships
 
     management = models.ForeignKey(
-        Management,
+        'epilepsy12.Management',
         on_delete=models.CASCADE,
         verbose_name="related management"
     )

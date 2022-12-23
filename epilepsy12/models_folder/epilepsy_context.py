@@ -1,13 +1,13 @@
 
 from django.db import models
 
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 from ..constants import OPT_OUT_UNCERTAIN
 from .time_and_user_abstract_base_classes import *
 
-from .registration import Registration
+# from .registration import Registration
 
-from ..general_functions import *
+# from ..general_functions import *
 
 
 class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -98,7 +98,7 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, He
 
     # relationships
     registration = models.OneToOneField(
-        Registration,
+        'epilepsy12.Registration',
         on_delete=models.CASCADE,
         # verbose_name="Related Registration",
         null=True

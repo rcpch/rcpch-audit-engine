@@ -1,13 +1,13 @@
 from django.db import models
 
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 
-from ..general_functions import *
+from epilepsy12.general_functions import calculate_time_elapsed
 from ..constants import CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE, CAN_ONLY_VIEW_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE, CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE, CAN_DELETE_TERTIARY_NEUROLOGY_CENTRE, CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET, CAN_ALLOCATE_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_EDIT_CHILDRENS_EPILEPSY_SURGERY_CENTRE, CAN_DELETE_CHILDRENS_EPILEPSY_SURGERY_CENTRE
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .registration import Registration
+# from .registration import Registration
 
 
 class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -168,7 +168,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
             return calculate_time_elapsed(self.epilepsy_specialist_nurse_referral_date, self.epilepsy_specialist_nurse_input_date)
 
     registration = models.OneToOneField(
-        Registration,
+        'epilepsy12.Registration',
         on_delete=models.CASCADE,
         verbose_name="related registration"
     )

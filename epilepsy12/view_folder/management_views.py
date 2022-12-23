@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
 from ..decorator import group_required
 from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 
 @login_required

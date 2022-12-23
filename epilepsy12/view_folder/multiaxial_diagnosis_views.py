@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 from ..decorator import group_required
-from epilepsy12.models.multiaxial_diagnosis import MultiaxialDiagnosis
 
 from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
 from epilepsy12.constants.semiology import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES
@@ -14,8 +13,8 @@ from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
-from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome
-from .common_view_functions import completed_fields, recalculate_form_generate_response, validate_and_update_model
+from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 """
 Constants for selections

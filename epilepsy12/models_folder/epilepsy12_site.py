@@ -1,6 +1,7 @@
 from django.db import models
 # other tables
-from .case import Case, HospitalTrust
+# from .case import Case
+# from .hospital_trust import HospitalTrust
 from .time_and_user_abstract_base_classes import *
 
 
@@ -43,7 +44,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # Site is a link table between Case and Hospital Trust in a many to many relationship
 
     hospital_trust = models.ForeignKey(
-        to=HospitalTrust,
+        to='epilepsy12.HospitalTrust',
         related_name="site",
         on_delete=models.PROTECT
     )
@@ -53,7 +54,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         # where site_is_actively_involved_in_epilepsy_care. However,
         # it can have multiple instances where site_is_actively_involved_in_epilepsy_care
         # is false.
-        Case,
+        'epilepsy12.Case',
         on_delete=models.CASCADE,
         related_name='site'
     )

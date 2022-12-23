@@ -1,14 +1,14 @@
 from dateutil.relativedelta import relativedelta
 from datetime import datetime, date
 from django.db import models
-from epilepsy12.models.audit_progress import AuditProgress
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .audit_progress import AuditProgress
+from .help_text_mixin import HelpTextMixin
 
-from .case import Case
+# from .case import Case
 from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE
-from ..general_functions import *
+# from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import first_tuesday_in_january
+from ..general_functions import first_tuesday_in_january, cohort_number_from_enrolment_date
 
 
 class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -86,7 +86,7 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
 
     # relationships
     case = models.OneToOneField(
-        Case,
+        'epilepsy12.Case',
         on_delete=models.PROTECT,
         null=True
     )

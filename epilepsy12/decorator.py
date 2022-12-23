@@ -1,9 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.utils.functional import wraps
-from django.utils import timezone
-from datetime import datetime
-from epilepsy12.models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
-from epilepsy12.models.comorbidity import Comorbidity
+from .models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine, Comorbidity
 
 
 model_primary_keys = [

@@ -1,12 +1,12 @@
 from django.db import models
 
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .multiaxial_diagnosis import MultiaxialDiagnosis
+# from .multiaxial_diagnosis import MultiaxialDiagnosis
 
-from ..general_functions import *
+# from ..general_functions import *
 
 
 class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -40,7 +40,7 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
 
     # relationships
     multiaxial_diagnosis = models.ForeignKey(
-        MultiaxialDiagnosis,
+        'epilepsy12.MultiaxialDiagnosis',
         on_delete=models.CASCADE,
         null=False,
         blank=False,

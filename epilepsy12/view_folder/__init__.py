@@ -7,4 +7,3 @@ from .multiaxial_diagnosis_views import *
 from .investigation_views import *
 from .management_views import *
 from .syndrome_views import *
-from .common_view_functions import *

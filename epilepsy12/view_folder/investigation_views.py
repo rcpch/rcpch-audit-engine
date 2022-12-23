@@ -2,7 +2,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from ..decorator import group_required
 from epilepsy12.models import Investigations, Registration
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 
 @login_required

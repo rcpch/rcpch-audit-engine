@@ -1,9 +1,9 @@
 from django.db import models
 
-from epilepsy12.models.help_text_mixin import HelpTextMixin
-from ..general_functions import *
+from .help_text_mixin import HelpTextMixin
+from ..general_functions import calculate_time_elapsed
 
-from .registration import Registration
+# from .registration import Registration
 from .time_and_user_abstract_base_classes import *
 
 
@@ -104,7 +104,7 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
 
     # relationships
     registration = models.OneToOneField(
-        Registration,
+        'epilepsy12.Registration',
         on_delete=models.CASCADE,
         verbose_name="Related Registration",
         null=True

@@ -1,16 +1,16 @@
 from dateutil import relativedelta
+from datetime import date
 import math
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.conf import settings
-from epilepsy12.models.help_text_mixin import HelpTextMixin
-
-from epilepsy12.models.hospital_trust import HospitalTrust
+from .help_text_mixin import HelpTextMixin
+# from .hospital_trust import HospitalTrust
 
 
 from ..constants import SEX_TYPE, ETHNICITIES, CAN_VIEW_CHILD_NHS_NUMBER, CAN_VIEW_CHILD_DATE_OF_BIRTH, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_ONLY_VIEW_CHILD_CASE_DATA, CAN_CONSENT_TO_AUDIT_PARTICIPATION
-from ..general_functions import *
+from ..general_functions import imd_for_postcode
 from .time_and_user_abstract_base_classes import *
 
 
@@ -110,7 +110,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
 
     # relationships
     hospital_trusts = models.ManyToManyField(
-        HospitalTrust,
+        'epilepsy12.HospitalTrust',
         through='Site',
         related_name='cases',
         through_fields=('case', 'hospital_trust')

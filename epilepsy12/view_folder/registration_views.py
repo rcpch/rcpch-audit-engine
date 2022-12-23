@@ -4,10 +4,9 @@ from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
-from ..models import Registration, Site
-from ..models import Case, AuditProgress, HospitalTrust
+from ..models import Case, AuditProgress, HospitalTrust, Registration, Site
 from ..decorator import group_required
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 
 @login_required

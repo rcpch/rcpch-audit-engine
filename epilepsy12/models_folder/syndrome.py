@@ -1,10 +1,10 @@
 from django.db import models
 from operator import itemgetter
 
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 from ..constants import SYNDROMES
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import *
+# from ..general_functions import *
 
 # other tables
 from .multiaxial_diagnosis import MultiaxialDiagnosis

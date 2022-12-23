@@ -1,5 +1,5 @@
 from django.db import models
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 
 
 class AuditProgress(models.Model, HelpTextMixin):

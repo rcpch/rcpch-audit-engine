@@ -1,10 +1,10 @@
 from django.db import models
-from epilepsy12.models.help_text_mixin import HelpTextMixin
+from .help_text_mixin import HelpTextMixin
 from ..constants import CHRONICITY, DIAGNOSTIC_STATUS
 from .time_and_user_abstract_base_classes import *
 
 # other tables
-from .registration import Registration
+# from .registration import Registration
 
 
 class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -71,7 +71,7 @@ class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBas
 
     # relationships
     registration = models.OneToOneField(
-        Registration,
+        'epilepsy12.Registration',
         on_delete=models.CASCADE,
         verbose_name="Related Registration"
     )

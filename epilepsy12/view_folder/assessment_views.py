@@ -3,12 +3,11 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.user_types import CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE
 from ..models import Registration, Assessment, Case, HospitalTrust, Site
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 
 @login_required
 @permission_required(CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE[0], raise_exception=True)
-# @update_model(Assessment, 'consultant_paediatrician_referral_made', 'toggle_button')
 def consultant_paediatrician_referral_made(request, assessment_id):
     """
     POST request callback from toggle_button in consultant_paediatrician partial

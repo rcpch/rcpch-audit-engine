@@ -1,7 +1,6 @@
 
-from epilepsy12.constants.user_types import AUDIT_CENTRE_LEAD_CLINICIAN, ROLES
-from epilepsy12.models.hospital_trust import HospitalTrust
-from ..models import Epilepsy12User
+from epilepsy12.constants.user_types import ROLES
+from ..models import Epilepsy12User, HospitalTrust
 from django import forms
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm

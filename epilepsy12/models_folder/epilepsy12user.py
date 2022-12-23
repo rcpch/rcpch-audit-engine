@@ -6,9 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 from epilepsy12.constants.user_types import ROLES, TITLES, AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, VIEW_PREFERENCES
-from epilepsy12.models.hospital_trust import HospitalTrust
+# from .hospital_trust import HospitalTrust
 
-from ..general_functions import *
+# from ..general_functions import *
 
 
 class Epilepsy12UserManager(BaseUserManager):
@@ -192,7 +192,7 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
     objects = Epilepsy12UserManager()
 
     hospital_employer = models.ForeignKey(
-        HospitalTrust,
+        'epilepsy12.HospitalTrust',
         on_delete=models.CASCADE,
         blank=True,
         null=True

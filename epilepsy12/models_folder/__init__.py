@@ -9,9 +9,9 @@ from .first_paediatric_assessment import FirstPaediatricAssessment
 from .investigations import Investigations
 from .management import Management
 from .registration import Registration
-from .site import Site
+from .epilepsy12_site import Site
 from .epilepsy12user import Epilepsy12User
-from .keyword import Keyword
+from .semiology_keyword import Keyword
 from .audit_progress import AuditProgress
 from .episode import Episode
 from .syndrome import Syndrome

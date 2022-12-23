@@ -2,10 +2,10 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
-from epilepsy12.models.help_text_mixin import HelpTextMixin
-from .registration import Registration
+from .help_text_mixin import HelpTextMixin
+# from .registration import Registration
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import *
+# from ..general_functions import *
 
 
 class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -106,7 +106,7 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
 
     # relationships
     registration = models.OneToOneField(
-        Registration,
+        'epilepsy12.Registration',
         on_delete=models.CASCADE,
         related_name='multiaxialdiagnosis'
     )

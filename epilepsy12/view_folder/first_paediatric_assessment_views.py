@@ -1,9 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from ..decorator import group_required
 from epilepsy12.constants import *
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
-from ..models import Registration
-from ..models import FirstPaediatricAssessment
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..models import Registration, FirstPaediatricAssessment
 
 
 @login_required

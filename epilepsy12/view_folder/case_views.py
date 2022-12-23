@@ -6,10 +6,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from epilepsy12.decorator import group_required
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import HospitalTrust, Site
-from ..models import Case
+from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
-from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
