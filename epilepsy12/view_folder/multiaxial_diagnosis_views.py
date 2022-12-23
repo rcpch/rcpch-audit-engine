@@ -14,7 +14,7 @@ from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
 from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis
-from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
 
 """
 Constants for selections

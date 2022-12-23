@@ -16,15 +16,17 @@ def syndrome_diagnosis_date(request, syndrome_id):
     HTMX post request from syndrome.html partial on date change
     """
 
-    syndrome_diagnosis_date = request.POST.get(
-        request.htmx.trigger_name)
-
-    Syndrome.objects.filter(pk=syndrome_id).update(
-        syndrome_diagnosis_date=datetime.strptime(
-            syndrome_diagnosis_date, "%Y-%m-%d").date(),
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Syndrome,
+            model_id=syndrome_id,
+            field_name='syndrome_diagnosis_date',
+            page_element='date_field',
+        )
+    except ValueError as error:
+        error_message = error
 
     syndrome = Syndrome.objects.get(pk=syndrome_id)
 
@@ -37,7 +39,8 @@ def syndrome_diagnosis_date(request, syndrome_id):
         model_instance=syndrome.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/syndrome.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
@@ -49,13 +52,18 @@ def syndrome_name(request, syndrome_id):
     """
     HTMX post request from syndrome.html partial on syndrome name change
     """
-    syndrome_name = request.POST.get(
-        request.htmx.trigger_name)
-    Syndrome.objects.filter(pk=syndrome_id).update(
-        syndrome_name=syndrome_name,
-        updated_at=timezone.now(),
-        updated_by=request.user
-    )
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=Syndrome,
+            model_id=syndrome_id,
+            field_name='syndrome_name',
+            page_element='select',
+        )
+    except ValueError as error:
+        error_message = error
 
     syndrome = Syndrome.objects.get(pk=syndrome_id)
 
@@ -68,7 +76,8 @@ def syndrome_name(request, syndrome_id):
         model_instance=syndrome.multiaxial_diagnosis,
         request=request,
         template='epilepsy12/partials/multiaxial_diagnosis/syndrome.html',
-        context=context
+        context=context,
+        error_message=error_message
     )
 
     return response
