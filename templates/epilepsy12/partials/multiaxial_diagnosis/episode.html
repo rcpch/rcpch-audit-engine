@@ -15,7 +15,7 @@
     
         <div class="field">
             {% url 'seizure_onset_date' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='change' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='change' hx_swap="innerHTML" date_value=episode.seizure_onset_date label=episode.get_seizure_onset_date_help_label_text reference=episode.get_seizure_onset_date_help_reference_text input_date_field_name='seizure_onset_date' enabled=perms.epilepsy12.change_episode %}
         </div>
         {% if error_message %}
             <div class='ui rcpch_warning message'>
