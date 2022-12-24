@@ -30,7 +30,7 @@
         
         <div class='field'>
             {% url 'episode_definition' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#episodes' hx_swap='innerHTML' hx_trigger='change' choices=episode_definition_selection test_positive=episode.episode_definition data_position='top left' label=episode.get_episode_definition_help_label_text reference=episode.get_episode_definition_help_reference_text hx_default_text='Select an episode definition...' hx_name='episode_definition' %}
+            {% include 'epilepsy12/partials/page_elements/select.html' with hx_post=hx_post hx_target='#episodes' hx_swap='innerHTML' hx_trigger='change' choices=episode_definition_selection test_positive=episode.episode_definition data_position='top left' label=episode.get_episode_definition_help_label_text reference=episode.get_episode_definition_help_reference_text hx_default_text='Select an episode definition...' hx_name='episode_definition' enabled=perms.epilepsy12.change_episode %}
         </div>
     
     </div>

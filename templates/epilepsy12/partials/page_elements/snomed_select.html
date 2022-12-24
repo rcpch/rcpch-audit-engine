@@ -18,44 +18,54 @@
     {% endcomment %}
     <h5 class="rcpch_plain_label">
         {{label}}
+        <span 
+            id="{{hx_name}}"
+            data-title="Reference"
+            data-content="{{reference|safe}}"
+            data-position="{{data_position}}"
+            data-variation="basic"
+            _="init js $('#{{hx_name}}').popup(); end"
+        >
+            <i class="rcpch question circle icon"></i>
+        </span>
     </h5>
     <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <span>
 
-            {% if disabled %}
-                <div class="ui rcpch_light_blue search selection fluid disabled dropdown">
-            {% else %}
+            {% if enabled %}
                 <div class="ui rcpch_light_blue search selection fluid dropdown">
+            {% else %}
+                <div class="ui rcpch_light_blue search selection fluid disabled dropdown">
             {% endif %}
-                    {% if test_positive %}
-                        <i class="rcpch_pink check circle outline icon"></i>
-                    {% else %}
-                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                            <i class="rcpch_light_blue dot circle outline icon"></i>
-                        </span>
-                    {% endif %}
-                    <i class="dropdown icon"></i>
-                    <input type="hidden" 
-                        name='{{hx_name}}'
-                        hx-post="{{hx_post}}"
-                        hx-target="{{hx_target}}"
-                        hx-swap="{{hx_swap}}"
-                        hx-trigger="{{hx_trigger}}"
-                        value="{{test_positive}}"
-                    >
-                    <div class="default text">{{hx_default_text}}</div>
-                    <div class="menu" >
-                        {% for item in choices %}
-                            <div class="item" data-value="{{item.conceptId}}">{{item.preferredTerm}}</div>
-                        {% endfor %}
-                    </div>
+
+                {% if test_positive %}
+                    <i class="rcpch_pink check circle outline icon"></i>
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                {% endif %}
+                <i class="dropdown icon"></i>
+                <input
+                    type="hidden"
+                    _="init js  $('.ui.rcpch_light_blue.search.selection.fluid.dropdown').dropdown(); end"
+                    name='{{hx_name}}'
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="{{hx_swap}}"
+                    hx-trigger="{{hx_trigger}}"
+                    value="{{test_positive|snomed_concept}}"
+                >
+                <div class="default text">{{hx_default_text}}</div>
+                <div class="menu" >
+                    {% for item in choices %}
+                        <div class="item" data-value="{{item.conceptId}}">{{item.preferredTerm}}</div>
+                    {% endfor %}
+                </div>
+
             </div>
 
         </span>
 
     </div>
-
-<script>
-    $('.ui.rcpch_light_blue.selection.dropdown').dropdown();
-</script>
