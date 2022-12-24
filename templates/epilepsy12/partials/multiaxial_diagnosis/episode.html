@@ -51,7 +51,7 @@
 
         <div class="field">
             {% url 'has_description_of_the_episode_or_episodes_been_gathered' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.has_description_of_the_episode_or_episodes_been_gathered label=episode.get_has_description_of_the_episode_or_episodes_been_gathered_help_label_text reference=episode.get_has_description_of_the_episode_or_episodes_been_gathered_help_reference_text data_position='top left' %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#episodes' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.has_description_of_the_episode_or_episodes_been_gathered tooltip_id='has_description_of_the_episode_or_episodes_been_gathered_tooltip' label=episode.get_has_description_of_the_episode_or_episodes_been_gathered_help_label_text reference=episode.get_has_description_of_the_episode_or_episodes_been_gathered_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_episode %}
         </div>
 
         {% if episode.has_description_of_the_episode_or_episodes_been_gathered %}
