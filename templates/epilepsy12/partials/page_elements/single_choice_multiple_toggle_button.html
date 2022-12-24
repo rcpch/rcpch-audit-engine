@@ -22,7 +22,23 @@
     {% endcomment %}
 
     
-        <label class="toggle_button_label">{{label}}<span data-tooltip='{{reference}}'><i class="rcpch question circle icon"></i></span></label>
+        <h5 class="toggle_button_label">
+            {{label}}
+            {% with hx_target|add:"_tooltip" as hx_target_id %}
+            
+                <span
+                    id="{{hx_target_id|slice:'1:'}}"
+                    data-title="Reference"
+                    data-content="{{reference}}"
+                    data-position="{{data_position}}"
+                    data-variation="basic"
+                    _="init js $('{{hx_target_id}}').popup(); end"
+                    >
+                    <i class="rcpch question circle icon"></i>
+                </span>
+        
+            {% endwith %}
+        </h5>
         <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
             <span>
                 {% if test_positive is None %}

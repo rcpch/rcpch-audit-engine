@@ -16,9 +16,9 @@
         The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
         Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
     {% endcomment %}
-    <label class="rcpch_plain_label">
+    <h5 class="rcpch_plain_label">
         {{label}}
-    </label>
+    </h5>
     <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <span>

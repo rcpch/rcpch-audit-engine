@@ -12,29 +12,28 @@
             hx_target: the id of the html element to target the server response
             hx_trigger: usually 'click' but can be any event
             hx_swap: usually 'innerHTML'
+            tooltip_id: this is the name of the field to update
             test_positive: the model boolean field 
             label: this is the label text pulled in from the the model help text
             reference: this is the reference text pulled in from the the model help text
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
-            disabled: buttons are disabled if users have view-only access
+            enabled: buttons are disabled if users have view-only access
     {% endcomment %}
     
     <h5 class="toggle_button_label">
         {{label}}&nbsp;
-        {% with hx_target|add:"_tooltip" as hx_target_id %}
             
         <span
-            id="{{hx_target_id|slice:'1:'}}"
+            id="{{tooltip_id}}"
             data-title="Reference"
             data-content="{{reference}}"
             data-position="{{data_position}}"
             data-variation="basic"
-            _="init js $('{{hx_target_id}}').popup(); end"
+            _="init js $('#{{tooltip_id}}').popup(); end"
             >
             <i class="rcpch question circle icon"></i>
         </span>
         
-        {% endwith %}
     </h5>
     <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <span>
@@ -44,10 +43,10 @@
                 </span>
                 <div class="ui rcpch_dark_blue buttons">
                         <div
-                            {% if disabled %} 
-                                class="ui mini compact rcpch_dark_blue disabled button"
-                            {% else %}
+                            {% if enabled %} 
                                 class="ui mini compact rcpch_dark_blue button"
+                            {% else %}
+                                class="ui mini compact rcpch_dark_blue disabled button"
                             {% endif %}
                             hx-target="{{hx_target}}"
                             hx-post="{{hx_post}}"
@@ -88,10 +87,10 @@
                         Yes
                         </div>
                         <div 
-                            {% if disabled %} 
-                                class="ui mini compact rcpch_dark_blue disabled button"
-                            {% else %}
+                            {% if enabled %} 
                                 class="ui mini compact rcpch_dark_blue button"
+                            {% else %}
+                                class="ui mini compact rcpch_dark_blue disabled button"
                             {% endif %}
                             hx-target="{{hx_target}}"
                             hx-post="{{hx_post}}"
@@ -111,11 +110,11 @@
                 </div>
                 <div class="ui buttons">
                     <div 
-                        {% if disabled %} 
-                                class="ui mini compact rcpch_dark_blue disabled button"
-                            {% else %}
-                                class="ui mini compact rcpch_dark_blue button"
-                            {% endif %}
+                        {% if enabled %} 
+                            class="ui mini compact rcpch_dark_blue button"
+                        {% else %}
+                            class="ui mini compact rcpch_dark_blue disabled button"
+                        {% endif %}
                         hx-target="{{hx_target}}"
                         hx-post="{{hx_post}}"
                         hx-swap="{{hx_swap}}"
@@ -126,10 +125,10 @@
                     <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                     </div>
                     <div 
-                        {% if disabled %} 
-                                class="ui mini compact rcpch_dark_blue disabled button"
-                        {% else %}
+                        {% if enabled %} 
                             class="ui mini compact rcpch_dark_blue positive button"
+                        {% else %}
+                            class="ui mini compact rcpch_dark_blue disabled button"
                         {% endif %}
                     >No</div>
                 </div>
