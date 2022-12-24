@@ -1,10 +1,6 @@
 <div class="field">
     {% url 'nonepilepsy_generalised_onset' episode_id=episode.id as hx_post %}
-    {% if perms.epilepsy12.change_multiaxial_diagnosis %}
-        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" label=episode.get_nonepileptic_seizure_unknown_onset_help_label_text reference=episode.get_nonepileptic_seizure_unknown_onset_help_reference_text test_positive=episode.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left' disabled=False %}
-    {% else %}
-        {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" label=episode.get_nonepileptic_seizure_unknown_onset_help_label_text reference=episode.get_nonepileptic_seizure_unknown_onset_help_reference_text test_positive=episode.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left' disabled=True %}
-    {% endif %}
+    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=nonepilepsy_onset_types hx_post=hx_post hx_target="#nonepilepsy" hx_trigger="click" tooltip_id='nonepilepsy_generalised_onset_tooltip' label=episode.get_nonepileptic_seizure_unknown_onset_help_label_text reference=episode.get_nonepileptic_seizure_unknown_onset_help_reference_text test_positive=episode.nonepileptic_seizure_unknown_onset hx_swap="innerHTML" data_position='top left' enabled=perms.epilepsy12.change_episode %}
 </div>
 
 <div class="field">

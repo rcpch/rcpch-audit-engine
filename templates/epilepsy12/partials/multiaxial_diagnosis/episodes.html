@@ -32,29 +32,29 @@
                     Uncompleted field
                 {% endif %}
             </td>
-            {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
-                <td>
+            <td>
+                {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
                     {% if episode.epileptic_seizure_onset_type %}
-                        {{episode.get_epileptic_seizure_onset_type_display}}
+                            {{episode.get_epileptic_seizure_onset_type_display}}
                     {% else %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
-                        Uncompleted field
+                            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                                <i class="rcpch_light_blue dot circle outline icon"></i>
+                            </span>
+                                Uncompleted field
                     {% endif %}
-                </td>
-            {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
-                {% if episode.nonepileptic_seizure_type %}
+                {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
+                    {% if episode.nonepileptic_seizure_type is not None %}
                         {{episode.get_nonepileptic_seizure_type_display}}
                     {% else %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
                         Uncompleted field
                     {% endif %}
-            {% else %}
-                <td>Not applicable</td>
-            {% endif %}
+                {% else %}
+                        Not applicable
+                {% endif %}
+            </td>
             <td>
                 <div 
                     class="ui rcpch_light_blue buttons">

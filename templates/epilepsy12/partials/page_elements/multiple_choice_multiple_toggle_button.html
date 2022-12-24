@@ -13,6 +13,7 @@
             hx_trigger: usually 'click' but can be any event
             hx_swap: usually 'innerHTML'
             test_positive: the model boolean field 
+            tooltip_id: the nname of the field to update with the suffix _tooltip
             label: this is the label text
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
         The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
@@ -20,7 +21,19 @@
     {% endcomment %}
 
     
-<label class="toggle_button_label">{{label|safe}}<span data-tooltip='{{reference|safe}}'><i class="rcpch question circle icon"></i></span></label>
+<h5 class="toggle_button_label">
+    {{label|safe}}
+    <span
+        id="{{tooltip_id}}"
+        data-title="Reference"
+        data-content="{{reference|safe}}"
+        data-position="{{data_position}}"
+        data-variation="basic"
+        _="init js $('#{{tooltip_id}}').popup(); end"
+    >
+        <i class="rcpch question circle icon"></i>
+    </span>
+</h5>
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
     <span>
@@ -32,8 +45,12 @@
                 <i class="rcpch_light_blue dot circle outline icon"></i>
             </span>
         {% endif %}
-
-        <div class="ui rcpch_dark_blue buttons">
+        
+        {% if enabled %}
+            <div class="ui rcpch_dark_blue buttons">
+        {% else %}
+            <div class="ui rcpch_dark_blue disabled buttons">
+        {% endif %}
                 
             {% for choice in choices %}
                 {% if choice.0 in test_positive %}

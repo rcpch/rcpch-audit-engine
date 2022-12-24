@@ -25,7 +25,7 @@
 
         <div class="field">
             {% url 'seizure_onset_date_confidence' episode_id=episode.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=seizure_onset_date_confidence_selection hx_post=hx_post hx_target='#episodes' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.seizure_onset_date_confidence label=episode.get_seizure_onset_date_confidence_help_label_text reference=episode.get_seizure_onset_date_confidence_help_reference_text data_position='top left' %}
+            {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=seizure_onset_date_confidence_selection hx_post=hx_post hx_target='#episodes' hx_trigger='click' hx_swap='innerHTML' test_positive=episode.seizure_onset_date_confidence tooltip_id='seizure_onset_date_confidence_tooltip' label=episode.get_seizure_onset_date_confidence_help_label_text reference=episode.get_seizure_onset_date_confidence_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_episode %}
         </div>
         
         <div class='field'>

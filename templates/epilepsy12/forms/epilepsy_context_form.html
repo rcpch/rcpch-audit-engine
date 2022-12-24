@@ -3,42 +3,21 @@
     {% csrf_token %}
 
             <div id="previous_febrile_seizure" class="field">
-                {% url 'previous_febrile_seizure' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_febrile_seizure" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_febrile_seizure label=epilepsy_context.get_previous_febrile_seizure_help_label_text reference=epilepsy_context.get_previous_febrile_seizure_help_reference_text data_position='top left' disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_febrile_seizure" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_febrile_seizure label=epilepsy_context.get_previous_febrile_seizure_help_label_text reference=epilepsy_context.get_previous_febrile_seizure_help_reference_text data_position='top left' disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/previous_febrile_seizure.html' with choices=uncertain_choices epilepsy_context=epilepsy_context %}
             </div>
-
+            
             <div id="previous_acute_symptomatic_seizure" class="field">
-                {% url 'previous_acute_symptomatic_seizure' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_acute_symptomatic_seizure" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_acute_symptomatic_seizure label=epilepsy_context.get_previous_acute_symptomatic_seizure_help_label_text reference=epilepsy_context.get_previous_acute_symptomatic_seizure_help_reference_text data_position='top left' disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_acute_symptomatic_seizure" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_acute_symptomatic_seizure label=epilepsy_context.get_previous_acute_symptomatic_seizure_help_label_text reference=epilepsy_context.get_previous_acute_symptomatic_seizure_help_reference_text data_position='top left' disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/previous_acute_symptomatic_seizure.html' with choices=uncertain_choices epilepsy_context=epilepsy_context %}
             </div>
-
-        
-
+            
+            
+            
             <div id="is_there_a_family_history_of_epilepsy" class="field">
-                {% url 'is_there_a_family_history_of_epilepsy' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#is_there_a_family_history_of_epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.is_there_a_family_history_of_epilepsy label=epilepsy_context.get_is_there_a_family_history_of_epilepsy_help_label_text reference=epilepsy_context.get_is_there_a_family_history_of_epilepsy_help_reference_text data_position='top left' disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#is_there_a_family_history_of_epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.is_there_a_family_history_of_epilepsy label=epilepsy_context.get_is_there_a_family_history_of_epilepsy_help_label_text reference=epilepsy_context.get_is_there_a_family_history_of_epilepsy_help_reference_text data_position='top left' disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/is_there_a_family_history_of_epilepsy.html' with choices=uncertain_choices epilepsy_context=epilepsy_context %}
             </div>
             
             <div id="previous_neonatal_seizures" class="field">
-
-                {% url 'previous_neonatal_seizures' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_neonatal_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_neonatal_seizures label=epilepsy_context.get_previous_neonatal_seizures_help_label_text reference=epilepsy_context.get_previous_neonatal_seizures_help_reference_text data_position='top left' disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_neonatal_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_neonatal_seizures label=epilepsy_context.get_previous_neonatal_seizures_help_label_text reference=epilepsy_context.get_previous_neonatal_seizures_help_reference_text data_position='top left' disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/previous_neonatal_seizures.html' with choices=uncertain_choices epilepsy_context=epilepsy_context %}
             </div>
 
             <div id="were_any_of_the_epileptic_seizures_convulsive" class="field">
@@ -46,24 +25,12 @@
             </div>
             
             <div id="experienced_prolonged_generalized_convulsive_seizures" class="field">
-                {% url 'experienced_prolonged_generalized_convulsive_seizures' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#experienced_prolonged_generalized_convulsive_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.experienced_prolonged_generalized_convulsive_seizures label=epilepsy_context.get_experienced_prolonged_generalized_convulsive_seizures_help_label_text reference=epilepsy_context.get_experienced_prolonged_generalized_convulsive_seizures_help_reference_text data_position='top left' disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#experienced_prolonged_generalized_convulsive_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.experienced_prolonged_generalized_convulsive_seizures label=epilepsy_context.get_experienced_prolonged_generalized_convulsive_seizures_help_label_text reference=epilepsy_context.get_experienced_prolonged_generalized_convulsive_seizures_help_reference_text data_position='top left' disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/experienced_prolonged_generalized_convulsive_seizures.html' with epilepsy_context=epilepsy_context %}
             </div>
             
             <div id="experienced_prolonged_focal_seizures" class="field">
-                {% url 'experienced_prolonged_focal_seizures' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#experienced_prolonged_focal_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.experienced_prolonged_focal_seizures label=epilepsy_context.get_experienced_prolonged_focal_seizures_help_label_text reference=epilepsy_context.get_experienced_prolonged_focal_seizures_help_reference_text data_position='top left' disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#experienced_prolonged_focal_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.experienced_prolonged_focal_seizures label=epilepsy_context.get_experienced_prolonged_focal_seizures_help_label_text reference=epilepsy_context.get_experienced_prolonged_focal_seizures_help_reference_text data_position='top left' disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/experienced_prolonged_focal_seizures.html' with epilepsy_context=epilepsy_context %}
             </div>
-
-        
 
         <div id="diagnosis_of_epilepsy_withdrawn" class="field">
             {% include 'epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html' with epilepsy_context=epilepsy_context %}
