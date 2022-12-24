@@ -4,11 +4,7 @@
 <div class="ui segment">
 
     {% url 'epilepsy_specialist_nurse_referral_made' assessment_id=assessment.pk as hx_post %}
-    {% if perms.epilepsy12.change_assessment %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label=assessment.get_epilepsy_specialist_nurse_referral_made_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_made_help_reference_text data_position='top left' disabled=False %}
-    {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label=assessment.get_epilepsy_specialist_nurse_referral_made_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_made_help_reference_text data_position='top left' disabled=True %}
-    {% endif %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" tooltip_id='epilepsy_specialist_nurse_referral_made_tooltip' label=assessment.get_epilepsy_specialist_nurse_referral_made_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_made_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_assessment %}
 
     {% if assessment.epilepsy_specialist_nurse_referral_made %}
 

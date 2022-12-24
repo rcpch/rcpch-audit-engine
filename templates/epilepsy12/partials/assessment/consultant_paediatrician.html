@@ -3,11 +3,7 @@
     
     <div class="field">
         {% url 'consultant_paediatrician_referral_made' assessment_id=assessment.pk as hx_post %}
-        {% if not perms.epilepsy12.change_assessment %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label=assessment.get_consultant_paediatrician_referral_made_help_label_text reference=assessment.get_consultant_paediatrician_referral_made_help_reference_text data_position="top left" disabled=True %}
-        {% else %}
-            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" label=assessment.get_consultant_paediatrician_referral_made_help_label_text reference=assessment.get_consultant_paediatrician_referral_made_help_reference_text data_position="top left" disabled=False %}
-        {% endif %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.consultant_paediatrician_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="click" tooltip_id='consultant_paediatrician_referral_made_tooltip' label=assessment.get_consultant_paediatrician_referral_made_help_label_text reference=assessment.get_consultant_paediatrician_referral_made_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
     </div>
 
     {% if assessment.consultant_paediatrician_referral_made %}

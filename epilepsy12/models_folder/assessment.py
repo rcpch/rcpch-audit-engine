@@ -21,7 +21,10 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     The cohort number is calculated from the initial date of first paediatric assessment
     """
     childrens_epilepsy_surgical_service_referral_criteria_met = models.BooleanField(
-        "Have the criteria for referral to a children's epilepsy surgery service been met?",
+        help_text={
+            'label': "Are ANY of these criteria present?",
+            'reference': "Have ANY of the criteria for referral to a children's epilepsy surgery service been met?",
+        },
         blank=True,
         default=None,
         null=True
