@@ -32,6 +32,7 @@
             </div>
             
             <div id="previous_neonatal_seizures" class="field">
+
                 {% url 'previous_neonatal_seizures' epilepsy_context_id=epilepsy_context.pk as hx_post %}
                 {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
                     {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=uncertain_choices hx_post=hx_post hx_target="#previous_neonatal_seizures" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.previous_neonatal_seizures label=epilepsy_context.get_previous_neonatal_seizures_help_label_text reference=epilepsy_context.get_previous_neonatal_seizures_help_reference_text data_position='top left' disabled=True %}
@@ -41,12 +42,7 @@
             </div>
 
             <div id="were_any_of_the_epileptic_seizures_convulsive" class="field">
-                {% url 'were_any_of_the_epileptic_seizures_convulsive' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-                {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#were_any_of_the_epileptic_seizures_convulsive" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.were_any_of_the_epileptic_seizures_convulsive label=epilepsy_context.get_were_any_of_the_epileptic_seizures_convulsive_help_label_text reference=epilepsy_context.get_were_any_of_the_epileptic_seizures_convulsive_help_reference_text data_position="top left" disabled=True %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#were_any_of_the_epileptic_seizures_convulsive" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.were_any_of_the_epileptic_seizures_convulsive label=epilepsy_context.get_were_any_of_the_epileptic_seizures_convulsive_help_label_text reference=epilepsy_context.get_were_any_of_the_epileptic_seizures_convulsive_help_reference_text data_position="top left" disabled=False %}
-                {% endif %}
+                {% include 'epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html' with epilepsy_context=epilepsy_context %}
             </div>
             
             <div id="experienced_prolonged_generalized_convulsive_seizures" class="field">
@@ -70,12 +66,7 @@
         
 
         <div id="diagnosis_of_epilepsy_withdrawn" class="field">
-            {% url 'diagnosis_of_epilepsy_withdrawn' epilepsy_context_id=epilepsy_context.pk as hx_post %}
-            {% if request.user|has_group:"trust_audit_team_view_only, epilepsy12_audit_team_view_only" %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#diagnosis_of_epilepsy_withdrawn" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.diagnosis_of_epilepsy_withdrawn label=epilepsy_context.get_diagnosis_of_epilepsy_withdrawn_help_label_text reference=epilepsy_context.get_diagnosis_of_epilepsy_withdrawn_help_reference_text data_position='top left' disabled=True %}
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#diagnosis_of_epilepsy_withdrawn" hx_trigger="click" hx_swap="innerHTML" test_positive=epilepsy_context.diagnosis_of_epilepsy_withdrawn label=epilepsy_context.get_diagnosis_of_epilepsy_withdrawn_help_label_text reference=epilepsy_context.get_diagnosis_of_epilepsy_withdrawn_help_reference_text data_position='top left' disabled=False %}
-            {% endif %}
+            {% include 'epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html' with epilepsy_context=epilepsy_context %}
         </div>
 
 </form>
