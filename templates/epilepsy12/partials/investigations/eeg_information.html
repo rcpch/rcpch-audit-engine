@@ -6,11 +6,7 @@
         <div class="field">
 
             {% url 'eeg_indicated' investigations_id=investigations.pk as hx_post %}
-            {% if not perms.epilepsy12.change_investigations %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label=investigations.get_eeg_indicated_help_label_text reference=investigations.get_eeg_indicated_help_reference_text data_position="top left" disabled=True %}   
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label=investigations.get_eeg_indicated_help_label_text reference=investigations.get_eeg_indicated_help_reference_text data_position="top left" disabled=False %}   
-            {% endif %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated tooltip_id='eeg_indicated_tooltip' label=investigations.get_eeg_indicated_help_label_text reference=investigations.get_eeg_indicated_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_investigations %}   
 
         </div>
 
