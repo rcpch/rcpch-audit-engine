@@ -62,7 +62,7 @@ class Epilepsy12UserManager(BaseUserManager):
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
         user.save()
         user.groups.add(group)
-        print(user)
+
         return user
 
     def create_superuser(self, email, password, **extra_fields):
