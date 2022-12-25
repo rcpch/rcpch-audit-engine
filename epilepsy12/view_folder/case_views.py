@@ -94,16 +94,16 @@ def case_list(request, hospital_id):
                 site__site_is_primary_centre_of_epilepsy_care=True
             )
 
-        if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
-            # this is to sort on IMD
-            all_cases = filtered_cases.order_by(
-                'index_of_multiple_deprivation_quintile').all()
-            sort_flag = "sort_by_imd_up"
-        elif request.htmx.trigger_name == "sort_by_imd_down" or request.GET.get('sort_flag') == "sort_by_imd_down":
-            all_cases = filtered_cases.order_by(
-                '-index_of_multiple_deprivation_quintile').all()
-            sort_flag = "sort_by_imd_down"
-        elif request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
+        # if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
+        #     # this is to sort on IMD
+        #     all_cases = filtered_cases.order_by(
+        #         'index_of_multiple_deprivation_quintile').all()
+        #     sort_flag = "sort_by_imd_up"
+        # elif request.htmx.trigger_name == "sort_by_imd_down" or request.GET.get('sort_flag') == "sort_by_imd_down":
+        #     all_cases = filtered_cases.order_by(
+        #         '-index_of_multiple_deprivation_quintile').all()
+        #     sort_flag = "sort_by_imd_down"
+        if request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
             all_cases = filtered_cases.order_by(
                 'nhs_number').all()
             sort_flag = "sort_by_nhs_number_up"
@@ -143,6 +143,30 @@ def case_list(request, hospital_id):
             all_cases = filtered_cases.order_by(
                 '-id').all()
             sort_flag = "sort_by_id_down"
+        elif request.htmx.trigger_name == "sort_by_deadline_up" or request.GET.get('sort_flag') == "sort_by_deadline_up":
+            all_cases = filtered_cases.order_by(
+                'registration__audit_submission_date').all()
+            sort_flag = "sort_by_deadline_up"
+        elif request.htmx.trigger_name == "sort_by_deadline_down" or request.GET.get('sort_flag') == "sort_by_deadline_down":
+            all_cases = filtered_cases.order_by(
+                '-registration__audit_submission_date').all()
+            sort_flag = "sort_by_deadline_down"
+        elif request.htmx.trigger_name == "sort_by_cohort_up" or request.GET.get('sort_flag') == "sort_by_cohort_up":
+            all_cases = filtered_cases.order_by(
+                'registration__cohort').all()
+            sort_flag = "sort_by_cohort_up"
+        elif request.htmx.trigger_name == "sort_by_cohort_down" or request.GET.get('sort_flag') == "sort_by_cohort_down":
+            all_cases = filtered_cases.order_by(
+                '-registration__cohort').all()
+            sort_flag = "sort_by_cohort_down"
+        elif request.htmx.trigger_name == "sort_by_days_remaining_up" or request.GET.get('sort_flag') == "sort_by_days_remaining_up":
+            all_cases = filtered_cases.order_by(
+                'registration__days_remaining_before_submission').all()
+            sort_flag = "sort_by_days_remaining_before_submission_up"
+        elif request.htmx.trigger_name == "sort_by_days_remaining_before_submission_down" or request.GET.get('sort_flag') == "sort_by_days_remaining_before_submission_down":
+            all_cases = filtered_cases.order_by(
+                '-registration__days_remaining_before_submission').all()
+            sort_flag = "sort_by_days_remaining_before_submission_down"
         else:
             all_cases = filtered_cases.order_by('surname').all()
 
