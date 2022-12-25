@@ -5,7 +5,7 @@
     {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=management.has_rescue_medication_been_prescribed hx_post=hx_post hx_swap="innerHTML" hx_target="#rescue_medicines" hx_trigger="click" tooltip_id='has_rescue_medication_been_prescribed_tooltip' label=management.get_has_rescue_medication_been_prescribed_help_label_text reference=management.get_has_rescue_medication_been_prescribed_help_reference_text enabled=perms.epilepsy12.change_management %}
 
     {% if management.has_rescue_medication_been_prescribed %}
-        <div id='rescue_medicine_list'>
+        <div id='rescue_medicine_list' class='fade-out fade-in'>
             {% include 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine_list.html' with management_id=management.pk medicines=rescue_medicines is_rescue_medicine=True %}
         </div>
     {% endif %}

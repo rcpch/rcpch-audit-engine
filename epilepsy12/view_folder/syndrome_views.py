@@ -1,7 +1,5 @@
-from django.utils import timezone
-from datetime import datetime
 from operator import itemgetter
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from ..decorator import group_required
 
 from ..models import Syndrome
@@ -10,7 +8,7 @@ from ..common_view_functions import validate_and_update_model, recalculate_form_
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.add_syndrome', raise_exception=True)
 def syndrome_diagnosis_date(request, syndrome_id):
     """
     HTMX post request from syndrome.html partial on date change
@@ -47,7 +45,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_syndrome', raise_exception=True)
 def syndrome_name(request, syndrome_id):
     """
     HTMX post request from syndrome.html partial on syndrome name change

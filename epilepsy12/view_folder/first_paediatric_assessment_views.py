@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from ..decorator import group_required
 from epilepsy12.constants import *
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
@@ -42,7 +42,7 @@ def first_paediatric_assessment(request, case_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paediatric_assessment_id):
     """
     HTMX callback from first_paediatric_assessment_in_acute_or_nonacute_setting partial, itself
@@ -83,7 +83,7 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paed
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def has_number_of_episodes_since_the_first_been_documented(request, first_paediatric_assessment_id):
     """
     POST request from toggle in has_number_of_episodes_since_the_first_been_documented partial
@@ -122,7 +122,7 @@ def has_number_of_episodes_since_the_first_been_documented(request, first_paedia
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def general_examination_performed(request, first_paediatric_assessment_id):
     """
     POST request from toggle in has_general_examination_performed partial
@@ -160,7 +160,7 @@ def general_examination_performed(request, first_paediatric_assessment_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def neurological_examination_performed(request, first_paediatric_assessment_id):
     """
     POST request from toggle in neurological_examination_performed partial
@@ -198,7 +198,7 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def developmental_learning_or_schooling_problems(request, first_paediatric_assessment_id):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
@@ -236,7 +236,7 @@ def developmental_learning_or_schooling_problems(request, first_paediatric_asses
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial

@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from ..decorator import group_required
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from ..models import EpilepsyContext, Registration
@@ -33,7 +33,7 @@ def epilepsy_context(request, case_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -73,7 +73,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -113,7 +113,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -153,7 +153,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -193,7 +193,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
     Post request from multiple choice toggle within epilepsy partial.
@@ -232,7 +232,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 
@@ -272,7 +272,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_focal_seizures partial, 
@@ -312,7 +312,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 

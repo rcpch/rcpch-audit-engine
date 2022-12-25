@@ -10,6 +10,7 @@ from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
+from ..constants import RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
 
 
 @login_required
@@ -182,7 +183,8 @@ def case_list(request, hospital_id):
     return render(request, template_name, context)
 
 
-# @login_required
+@login_required
+@group_required([RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY])
 def child_hospital_select(request, hospital_id):
     """
     POST call back from hospital_select to allow user to toggle between hospitals in selected trust
@@ -198,6 +200,7 @@ def child_hospital_select(request, hospital_id):
 
 
 @login_required
+@group_required([RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD])
 def view_preference(request, hospital_id):
     """
     POST request from Toggle in has rcpch_view_preference.html template
@@ -243,6 +246,8 @@ def view_preference(request, hospital_id):
     return response
 
 
+@login_required
+@group_required([RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY])
 def case_statistics(request, hospital_id):
     """
     GET request from cases template to update stats on toggle between RCPCH view and hospital view
@@ -281,10 +286,11 @@ def case_statistics(request, hospital_id):
 
 
 @login_required
+@permission_required('epilepsy12.change_case', )
 def case_submit(request, hospital_id, case_id):
     """
     POST request callback from submit button in case_list partial.
-    Toggles case between locked and unlocked
+    Disables further editing of case information. Case considered submitted
     """
     case = Case.objects.get(pk=case_id)
     case.locked = not case.locked
@@ -355,7 +361,7 @@ def create_case(request, hospital_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_case', raise_exception=True)
 def update_case(request, hospital_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
@@ -399,7 +405,7 @@ def update_case(request, hospital_id, case_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.delete_case', raise_exception=True)
 def delete_case(request, hospital_id, case_id):
     case = get_object_or_404(Case, id=case_id)
     case.delete()
@@ -407,6 +413,7 @@ def delete_case(request, hospital_id, case_id):
 
 
 @login_required
+@permission_required('epilepsy12.can_opt_out_child_from_inclusion_in_audit', raise_exception=True)
 def opt_out(request, hospital_id, case_id):
     """
     This child has opted out of Epilepsy12

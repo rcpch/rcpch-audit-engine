@@ -10,7 +10,6 @@ from ..common_view_functions import validate_and_update_model, recalculate_form_
 
 
 @login_required
-@group_required('epilepsy12_audit_team_view_only', 'epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_view_only', 'trust_audit_team_edit_access', 'trust_audit_team_view_access')
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -102,7 +101,7 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
@@ -178,7 +177,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -210,7 +209,7 @@ def edit_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -238,7 +237,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -266,7 +265,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
@@ -332,7 +331,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.delete_registration', raise_exception=True)
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -394,7 +393,7 @@ def delete_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_view_access', 'epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_view_only', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.view_registration', raise_exception=True)
 def previous_sites(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -426,7 +425,7 @@ Validation process
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def confirm_eligible(request, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child
@@ -471,7 +470,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def registration_status(request, registration_id):
 
     registration = Registration.objects.get(pk=registration_id)
@@ -495,7 +494,7 @@ def registration_status(request, registration_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_registration', raise_exception=True)
 def registration_date(request, case_id):
     """
     This defines registration in the audit and refers to the date of first paediatric assessment. 
