@@ -127,6 +127,7 @@ def group_required(*group_names):
                     case = Case.objects.get(
                         pk=kwargs.get('case_id'))
                     child = case
+
                 # else:
                 #     child = Case.objects.get(pk=kwargs.get('case_id'))
 

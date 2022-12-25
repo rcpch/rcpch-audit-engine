@@ -184,7 +184,6 @@ def case_list(request, hospital_id):
 
 
 @login_required
-@group_required([RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY])
 def child_hospital_select(request, hospital_id):
     """
     POST call back from hospital_select to allow user to toggle between hospitals in selected trust
@@ -200,7 +199,6 @@ def child_hospital_select(request, hospital_id):
 
 
 @login_required
-@group_required([RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD])
 def view_preference(request, hospital_id):
     """
     POST request from Toggle in has rcpch_view_preference.html template
