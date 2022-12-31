@@ -85,10 +85,10 @@
     {% endif %}
     <div class='field'>
         <button
-            {% if not perms.epilepsy12.add_medicine %}
-            class="ui rcpch_primary disabled button"
+            {% if perms.epilepsy12.add_medicine %}
+                class="ui rcpch_primary button"
             {% else %}
-            class="ui rcpch_primary button"
+                class="ui rcpch_primary disabled button"
             {% endif %}
             {% if is_rescue_medicine %}
                 hx-post="{% url 'add_antiepilepsy_medicine' management_id=management_id is_rescue_medicine='is_rescue_medicine' %}"
@@ -107,4 +107,7 @@
         {% endif %}
         </button>
     </div>
+    {% if not perms.epilepsy12.add_antiepilepsy_medicine or not perms.epilepsy12.change_antiepilepsy_medicine or not perms.epilepsy12.delete_antiepilepsy_medicine %}
+        <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_antiepilepsy_medicine perms.epilepsy12.change_antiepilepsy_medicine perms.epilepsy12.delete_antiepilepsy_medicine 'antiepilepsy/seizure medicines' %}</div>
+    {% endif %}
 </div>

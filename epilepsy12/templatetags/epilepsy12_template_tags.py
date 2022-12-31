@@ -58,6 +58,8 @@ def permission_text(add_permission, change_permission, delete_permission, model_
     if add_permission:
         if change_permission and not delete_permission:
             return_string += f' delete {model_name}.'
+        elif not change_permission and delete_permission:
+            return_string += f' edit {model_name}.'
         elif not change_permission and not delete_permission:
             return_string += f' edit or delete {model_name}.'
         else:
