@@ -691,8 +691,9 @@ ul {
   transform: scale(0.9, 0.9);
 }
 
-.radio-tile-group .input-container .radio-button:checked+.radio-tile:hover {
 
+.radio-tile-group .input-container .radio-button:checked+.radio-tile:hover {
+  
   border: 2px solid var(--rcpch_light_blue);
   color: white;
   -webkit-transform: scale(0.9, 0.9);
@@ -701,6 +702,19 @@ ul {
 
 .radio-tile-group .input-container .radio-button:checked+.radio-tile .radio-tile-label {
   color: var(--rcpch_black);
+}
+
+.radio-tile-group .input-container .radio-button:checked:disabled+.radio-tile {
+  background-color: var(--rcpch_light_grey);
+  border: 2px solid var(--rcpch_light_grey);
+}
+.radio-tile-group .input-container .radio-button:checked:disabled+.radio-tile:hover {
+  background-color: var(--rcpch_light_grey);
+  border: 2px solid var(--rcpch_light_grey);
+}
+
+.radio-tile-group .input-container .radio-button:disabled+.radio-tile .radio-tile-label {
+  color: var(--rcpch_light_grey);
 }
 
 /* selects */

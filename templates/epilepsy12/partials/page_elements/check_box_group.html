@@ -14,6 +14,7 @@ hx_field_list_name: the name of the list of options
 hx_model: model instance to update on selection
 hx_post: url and params
 hx_target: target element id
+enabled: boolean
 {% endcomment %}
 
 <div class="container">
@@ -37,6 +38,9 @@ hx_target: target element id
                         hx-trigger="click"
                         hx-target="{{hx_target}}"
                         checked
+                        {% if not enabled %}
+                            disabled
+                        {% endif %}
                     />
                 {% else %}
                     <input 
@@ -48,7 +52,9 @@ hx_target: target element id
                          hx-post="{{hx_post}}"
                         hx-trigger="click"
                         hx-target="{{hx_target}}"
-                        
+                        {% if not enabled %}
+                            disabled
+                        {% endif %}
                     />
                 {% endif %}
                 
