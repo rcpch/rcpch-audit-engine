@@ -1359,3 +1359,11 @@ a label {
 .ui.bottom.attached.tiny.rcpch.progress .bar{
   background-color: var(--rcpch_pink);
 }
+
+.ui.rcpch_warning.basic.label{
+  color: var(--rcpch_dark_red);
+  background-color: var(--rcpch_light_red);
+  border-radius: 0%;
+  border-color: var(--rcpch_dark_red);
+  margin-top: 1em;
+}

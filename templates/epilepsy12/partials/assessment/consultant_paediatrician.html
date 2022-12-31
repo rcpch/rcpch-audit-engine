@@ -41,10 +41,10 @@
                             <div class="ui buttons">
 
                                 <button 
-                                    {% if not perms.epilepsy12.can_delete_general_paediatric_centre %}
-                                        class="ui rcpch_danger disabled button"
-                                    {% else %}
+                                    {% if perms.epilepsy12.delete_assessment %}
                                         class="ui rcpch_danger button"
+                                    {% else %}
+                                        class="ui rcpch_danger disabled button"
                                     {% endif %}
                                     hx-post="{% url 'delete_general_paediatric_centre' site_id=active_general_paediatric_site.pk assessment_id=assessment.pk %}"
                                     hx-target="#general_paediatric"
@@ -55,10 +55,10 @@
                                 {% if general_paediatric_edit_active %}
 
                                     <button 
-                                        {% if not perms.epilepsy12.can_update_general_paediatric_centre %}
-                                            class="ui rcpch_primary disabled button"
-                                        {% else %}
+                                        {% if perms.epilepsy12.change_assessment %}
                                             class="ui rcpch_primary button"
+                                        {% else %}
+                                            class="ui rcpch_primary disabled button"
                                         {% endif %}
                                         hx-post="{% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='edit' %}"
                                         hx-target="#general_paediatric"
@@ -67,10 +67,10 @@
                                     >Edit</button>
 
                                     <button
-                                        {% if not perms.epilepsy12.can_update_general_paediatric_centre %}
-                                            class="ui rcpch_warning disabled button"
-                                        {% else %}
+                                        {% if perms.epilepsy12.change_assessment %}
                                             class="ui rcpch_warning button"
+                                        {% else %}
+                                            class="ui rcpch_warning disabled button"
                                         {% endif %}
                                         hx-post="{% url 'update_general_paediatric_centre_pressed' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk action='cancel' %}"
                                         hx-target="#general_paediatric"
@@ -86,11 +86,12 @@
                     </span>
                 
                 </div>  
+                
                 {% if general_paediatric_edit_active %} 
                     
                     <div class="field" id="allocate_general_paediatric_centre" >
                         {% url 'edit_general_paediatric_centre' assessment_id=assessment.pk site_id=active_general_paediatric_site.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#general_paediatric" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_general_paediatric_centre" test_positive=active_general_paediatric_site.pk label="Update General Paediatric Site" hx_default_text="Search general paediatric hospitals..." data_position="top left" %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#general_paediatric" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_general_paediatric_centre" test_positive=active_general_paediatric_site.pk label="Update General Paediatric Site" hx_default_text="Search general paediatric hospitals..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
                     </div>
 
                 {% endif %}
@@ -101,7 +102,7 @@
                     <p>There is currently no general paediatric centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
                     <div class="field" id="allocate_general_paediatric_centre" >
                         {% url 'general_paediatric_centre' assessment_id=assessment.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#general_paediatric" hx_trigger="click" hx_swap="innerHTML" hx_name="general_paediatric_centre" test_positive=None label="Update General Paediatric Site" hx_default_text="Search general paediatric hospitals..." data_position="top left" %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#general_paediatric" hx_trigger="click" hx_swap="innerHTML" hx_name="general_paediatric_centre" test_positive=None label="Update General Paediatric Site" hx_default_text="Search general paediatric hospitals..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
                     </div>
                 </div>
 

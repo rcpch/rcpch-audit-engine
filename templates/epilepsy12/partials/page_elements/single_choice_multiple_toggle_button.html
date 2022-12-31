@@ -134,6 +134,9 @@
                 {{error_message}}
             </div>
             {% endif %}
+            {% if not enabled %}
+                <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
+            {% endif %}
         </div>
 
     
