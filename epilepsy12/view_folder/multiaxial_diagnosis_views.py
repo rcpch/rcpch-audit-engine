@@ -104,6 +104,7 @@ EPILEPSY_FIELDS = ['epileptic_seizure_onset_type'] + \
     FOCAL_EPILEPSY_FIELDS + GENERALISED_ONSET_EPILEPSY_FIELDS
 
 NONEPILEPSY_FIELDS = [
+    'nonepileptic_seizure_type',
     'nonepileptic_seizure_unknown_onset',
     'nonepileptic_seizure_syncope',
     'nonepileptic_seizure_behavioural',
@@ -111,7 +112,7 @@ NONEPILEPSY_FIELDS = [
     'nonepileptic_seizure_paroxysmal',
     'nonepileptic_seizure_migraine',
     'nonepileptic_seizure_miscellaneous',
-    'nonepileptic_seizure_other'
+    'nonepileptic_seizure_other',
 ]
 
 ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
