@@ -53,6 +53,29 @@ def custom_filter(text, color):
 
 
 @register.simple_tag
+def permission_text(add_permission, change_permission, delete_permission, model_name):
+    return_string = 'You do not have permission to'
+    if add_permission:
+        if change_permission and not delete_permission:
+            return_string += f' delete {model_name}s.'
+        elif not change_permission and not delete_permission:
+            return_string += f' edit or delete {model_name}s.'
+        else:
+            return_string = ""
+    else:
+        if change_permission and not delete_permission:
+            return_string += f' add or delete {model_name}s.'
+        elif not change_permission and not delete_permission:
+            return_string += f' add, edit or delete {model_name}s.'
+        elif change_permission and delete_permission:
+            return_string += f' add {model_name}s.'
+        else:
+            return_string = ""
+    print(return_string)
+    return return_string
+
+
+@register.simple_tag
 def matches_model_field(field_name, model):
     if field_name:
         value = getattr(model, field_name)
@@ -64,6 +87,8 @@ def matches_model_field(field_name, model):
 
 @register.filter
 def snomed_concept(concept_id):
+    if concept_id is None:
+        return
     concept = fetch_concept(concept_id)
     return concept['preferredDescription']['term']
 

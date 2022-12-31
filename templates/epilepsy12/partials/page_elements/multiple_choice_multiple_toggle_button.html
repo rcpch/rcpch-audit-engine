@@ -46,17 +46,17 @@
             </span>
         {% endif %}
         
-        {% if enabled %}
-            <div class="ui rcpch_dark_blue buttons">
-        {% else %}
-            <div class="ui rcpch_dark_blue disabled buttons">
-        {% endif %}
+        
+        <div class="ui rcpch_dark_blue buttons">
                 
             {% for choice in choices %}
                 {% if choice.0 in test_positive %}
                     <div 
-                        class="ui mini compact positive rcpch_dark_blue button"
-                        class="ui mini compact rcpch_dark_blue button"
+                        {% if enabled %}
+                            class="ui mini compact rcpch_dark_blue button"
+                        {% else %}
+                            class="ui mini compact rcpch_dark_blue disabled button"
+                        {% endif %}
                         hx-target="{{hx_target}}"
                         hx-post="{{hx_post}}"
                         hx-swap="{{hx_swap}}"
@@ -65,7 +65,11 @@
                     >{{choice.1}}</div>
                 {% else %}
                     <div 
-                        class="ui mini compact rcpch_dark_blue button"
+                        {% if enabled %}
+                            class="ui mini compact rcpch_dark_blue button"
+                        {% else %}
+                            class="ui mini compact rcpch_dark_blue disabled button"
+                        {% endif %}
                         hx-target="{{hx_target}}"
                         hx-post="{{hx_post}}"
                         hx-swap="{{hx_swap}}"

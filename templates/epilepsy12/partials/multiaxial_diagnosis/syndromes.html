@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <div>
     {% if syndromes|length > 0 %}
         <table class="ui rcpch basic table">
@@ -37,9 +38,9 @@
                         class="ui rcpch_light_blue buttons">
                         <button 
                             {% if perms.epilepsy12.change_syndrome %}
-                            class="ui rcpch_primary button"
+                                class="ui rcpch_primary button"
                             {% else %}
-                            class="ui rcpch_primary disabled button"
+                                class="ui rcpch_primary disabled button"
                             {% endif %}
                             hx-post='{% url "edit_syndrome" syndrome.pk %}'
                             hx-target='#syndromes'
@@ -50,9 +51,9 @@
                         </button>
                         <button 
                             {% if perms.epilepsy12.delete_episode %}
-                            class="ui rcpch_red icon button"
+                                class="ui rcpch_red icon button"
                             {% else %}
-                            class="ui rcpch_red icon disabled button"
+                                class="ui rcpch_red icon disabled button"
                             {% endif %}
                             hx-post='{% url "remove_syndrome" syndrome_id=syndrome.pk %}'
                             hx-target='#syndromes'
@@ -76,10 +77,10 @@
         </div>
     {% endif %}
     <button
-            {% if not perms.epilepsy12.add_multiaxial_diagnosis %}
-                class="ui rcpch_primary disabled button"
-            {% else %}
+            {% if perms.epilepsy12.add_syndrome %}
                 class="ui rcpch_primary button"
+            {% else %}
+                class="ui rcpch_primary disabled button"
             {% endif %}
             hx-post="{% url 'add_syndrome' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
             hx-target="#syndromes"
@@ -89,3 +90,6 @@
         Add a new Syndrome
     </button>
 </div>
+{% if not perms.epilepsy12.add_syndrome or not perms.epilepsy12.change_syndrome or not perms.epilepsy12.delete_syndrome %}
+    <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_syndrome perms.epilepsy12.change_syndrome perms.epilepsy12.delete_syndrome 'syndrome' %}</div>
+{% endif %}

@@ -13,13 +13,13 @@
         {% include 'epilepsy12/partials/multiaxial_diagnosis/focal_onset_epilepsy.html' with episode=episode FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS %}
     </div>
 {% elif episode.epileptic_seizure_onset_type == 'UC' %}
-    <div class="ui message">
-        <h3>Unclassified Onset Epilepsy</h3>
+    <div class="ui rcpch_info message">
+        <div class='header'>Unclassified Onset Epilepsy</div>
         <p>This epilepsy cannot be classified.</p>
     </div>
 {% elif episode.epileptic_seizure_onset_type == 'UO' %}
     <div class="ui rcpch_info message">
-        <h3>Unknown Onset Epilepsy</h3>
+        <div class='header'>Unknown Onset Epilepsy</div>
         <p>Not enough is known about the onset of this epilepsy to give it a classification.</p>
     </div>
 {% endif %}

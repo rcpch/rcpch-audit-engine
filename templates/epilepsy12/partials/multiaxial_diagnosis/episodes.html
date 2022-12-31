@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <div>
 {% if episodes|length > 0 %}
     <table class="ui rcpch basic table">
@@ -114,10 +115,10 @@
     {% endif %}
 {% endif %}
     <button 
-        {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-        class="ui rcpch_primary disabled button"
+        {% if perms.epilepsy12.add_episode %}
+            class="ui rcpch_primary button"
         {% else %}
-        class="ui rcpch_primary button"
+            class="ui rcpch_primary disabled button"
         {% endif %}
         hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
         hx-target="#episodes"
@@ -127,3 +128,6 @@
     Add a new Episode
     </button>
 </div>
+{% if not perms.epilepsy12.add_episode or not perms.epilepsy12.change_episode or not perms.epilepsy12.delete_episode %}
+    <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_episode perms.epilepsy12.change_episode perms.epilepsy12.delete_episode 'episode' %}</div>
+{% endif %}

@@ -57,10 +57,10 @@
                         Yes
                         </div>
                         <div 
-                            {% if disabled %} 
-                                class="ui mini compact rcpch_dark_blue disabled button"
-                            {% else %}
+                            {% if enabled %} 
                                 class="ui mini compact rcpch_dark_blue button"
+                            {% else %}
+                                class="ui mini compact rcpch_dark_blue disabled button"
                             {% endif %}
                             hx-target="{{hx_target}}"
                             hx-post="{{hx_post}}"
@@ -81,8 +81,12 @@
                     Completed field.
                     </div>
                     <div class="ui rcpch_dark_blue buttons">
-                        <div 
-                            class="ui mini compact positive rcpch_dark_blue button"
+                        <div
+                            {% if enabled %}
+                                class="ui mini compact positive rcpch_dark_blue button"
+                            {% else %}
+                                class="ui mini compact positive rcpch_dark_blue disabled button"
+                            {% endif  %}
                         >
                         Yes
                         </div>
