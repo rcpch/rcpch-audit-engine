@@ -3,11 +3,6 @@ from django.db import models
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
-# other tables
-# from .multiaxial_diagnosis import MultiaxialDiagnosis
-
-# from ..general_functions import *
-
 
 class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
     """

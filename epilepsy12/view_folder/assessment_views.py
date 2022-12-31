@@ -1,7 +1,6 @@
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, permission_required
 
-from epilepsy12.constants.user_types import CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE
 from ..models import Registration, Assessment, Case, HospitalTrust, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 

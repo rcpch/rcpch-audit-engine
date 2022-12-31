@@ -118,7 +118,7 @@ def validate_and_update_model(
 
         # the registration date cannot be before the current cohort
         current_cohort_end_date = first_tuesday_in_january(
-            current_cohort_start_date().year)+relativedelta(days=7)
+            current_cohort_start_date().year+1)+relativedelta(days=7)
         if field_value < current_cohort_start_date():
             date_valid = False
             errors = f'The date you entered cannot be before the current cohort start date ({current_cohort_start_date().strftime("%d %B %Y")})'

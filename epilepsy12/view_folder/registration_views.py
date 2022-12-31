@@ -1,15 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
-from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
 from ..models import Case, AuditProgress, HospitalTrust, Registration, Site
-from ..decorator import group_required
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..decorator import user_can_access_this_hospital_trust
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 def register(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -101,6 +101,7 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def allocate_lead_site(request, registration_id):
     """
@@ -177,6 +178,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def edit_lead_site(request, registration_id, site_id):
     """
@@ -209,6 +211,7 @@ def edit_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
@@ -237,6 +240,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
@@ -265,6 +269,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def update_lead_site(request, registration_id, site_id, update):
     """
@@ -331,6 +336,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.delete_registration', raise_exception=True)
 def delete_lead_site(request, registration_id, site_id):
     """
@@ -393,6 +399,7 @@ def delete_lead_site(request, registration_id, site_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.view_registration', raise_exception=True)
 def previous_sites(request, registration_id):
 
@@ -425,6 +432,7 @@ Validation process
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def confirm_eligible(request, registration_id):
     """
@@ -470,6 +478,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def registration_status(request, registration_id):
 
@@ -494,6 +503,7 @@ def registration_status(request, registration_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def registration_date(request, case_id):
     """

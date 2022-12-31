@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required, permission_required
-from ..decorator import group_required
 from epilepsy12.constants import *
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..models import Registration, FirstPaediatricAssessment
+from ..decorator import user_can_access_this_hospital_trust
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 def first_paediatric_assessment(request, case_id):
     registration = Registration.objects.get(case=case_id)
 
@@ -42,6 +43,7 @@ def first_paediatric_assessment(request, case_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paediatric_assessment_id):
     """
@@ -83,6 +85,7 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paed
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def has_number_of_episodes_since_the_first_been_documented(request, first_paediatric_assessment_id):
     """
@@ -122,6 +125,7 @@ def has_number_of_episodes_since_the_first_been_documented(request, first_paedia
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def general_examination_performed(request, first_paediatric_assessment_id):
     """
@@ -160,6 +164,7 @@ def general_examination_performed(request, first_paediatric_assessment_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def neurological_examination_performed(request, first_paediatric_assessment_id):
     """
@@ -198,6 +203,7 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def developmental_learning_or_schooling_problems(request, first_paediatric_assessment_id):
     """
@@ -236,6 +242,7 @@ def developmental_learning_or_schooling_problems(request, first_paediatric_asses
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_first_paediatric_assessment', raise_exception=True)
 def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
     """

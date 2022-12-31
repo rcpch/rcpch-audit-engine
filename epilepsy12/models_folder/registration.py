@@ -5,7 +5,7 @@ from .audit_progress import AuditProgress
 from .help_text_mixin import HelpTextMixin
 
 # from .case import Case
-from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE, CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE, CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE, CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE
+from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_CHANGE_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 # from ..general_functions import *
 from .time_and_user_abstract_base_classes import *
 from ..general_functions import first_tuesday_in_january, cohort_number_from_enrolment_date
@@ -77,8 +77,6 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     def days_remaining_before_submission(self):
         if self.audit_submission_date:
             today = datetime.now().date()
-            # remaining_time = relativedelta(
-            #     self.audit_submission_date, today)
             remaining_time = self.audit_submission_date - today
             if remaining_time.days < 0:
                 return 0
@@ -105,10 +103,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
             CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
             CAN_REGISTER_CHILD_IN_EPILEPSY12,
             CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
-            CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE,
-            CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE,
-            CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE,
-            CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE,
+            CAN_CHANGE_EPILEPSY12_LEAD_CENTRE,
+            CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
+            CAN_CONSENT_TO_AUDIT_PARTICIPATION
         ]
 
     def save(self, *args, **kwargs) -> None:
