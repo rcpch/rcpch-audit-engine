@@ -129,5 +129,5 @@
     </button>
 </div>
 {% if not perms.epilepsy12.add_episode or not perms.epilepsy12.change_episode or not perms.epilepsy12.delete_episode %}
-    <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_episode perms.epilepsy12.change_episode perms.epilepsy12.delete_episode 'episode' %}</div>
+    <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_episode perms.epilepsy12.change_episode perms.epilepsy12.delete_episode 'episodes' %}</div>
 {% endif %}
