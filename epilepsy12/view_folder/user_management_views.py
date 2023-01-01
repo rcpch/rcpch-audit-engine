@@ -1,8 +1,37 @@
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.contrib.auth.models import Group
+from django.contrib.auth import login, get_user_model
+from django.contrib import messages
 from ..models import Epilepsy12User, HospitalTrust
+from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
+from ..constants import AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
+
+
+@login_required
+def epilepsy12_user_management(request):
+
+    if request.user.hospital_employer is not None:
+        # current user is affiliated with an existing hospital - set viewable trust to this
+        selected_hospital = HospitalTrust.objects.get(
+            OrganisationName=request.user.hospital_employer)
+
+    else:
+        # current user is a member of the RCPCH audit team and also not affiliated with a hospital
+        # therefore set selected hospital to first of hospital on the list
+
+        selected_hospital = HospitalTrust.objects.filter(
+            Sector="NHS Sector"
+        ).order_by('OrganisationName').first()
+
+    template_name = 'epilepsy12/epilepsy12_user_management.html'
+
+    context = {
+        'selected_hospital': selected_hospital,
+    }
+    return render(request=request, template_name=template_name, context=context)
 
 
 @login_required
@@ -123,6 +152,60 @@ def epilepsy12_user_list(request, hospital_id):
     template_name = 'registration/user_management/epilepsy12_user_list.html'
 
     return render(request=request, template_name=template_name, context=context)
+
+
+def create_epilepsy12_user(request, hospital_id):
+
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    if request.method == 'POST':
+        form = Epilepsy12UserAdminCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            new_user.is_active = True
+            """
+            Allocate Roles
+            """
+            new_user.is_superuser = False
+            if new_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
+                new_user.is_staff = True
+            elif new_user.role == AUDIT_CENTRE_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+                new_user.is_staff = True
+            elif new_user.role == AUDIT_CENTRE_ADMINISTRATOR:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+                new_user.is_staff = True
+            elif new_user.role == RCPCH_AUDIT_LEAD:
+                group = Group.objects.get(
+                    name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+            elif new_user.role == RCPCH_AUDIT_ANALYST:
+                group = Group.objects.get(
+                    name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
+            elif new_user.role == RCPCH_AUDIT_ADMINISTRATOR:
+                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+            elif new_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
+                group = Group.objects.get(name=PATIENT_ACCESS)
+            else:
+                # no group
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+
+            new_user.save()
+            new_user.groups.add(group)
+            login(request, new_user,
+                  backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, "Sign up successful.")
+            return redirect('hospital_reports')
+        for msg in form.error_messages:
+            messages.error(
+                request, f"Registration Unsuccessful: {form.error_messages[msg]}")
+
+    prepopulated_data = {
+        'hospital_employer': hospital_trust,
+    }
+
+    form = Epilepsy12UserAdminCreationForm(prepopulated_data)
+    return render(request=request, template_name='registration/admin_create_user.html', context={'form': form})
 
 
 def update_epilepsy12_user(request, hospital_id, epilepsy12_user_id):

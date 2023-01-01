@@ -66,13 +66,15 @@
                   Home
                 </a>
                 {% if user.is_authenticated %}
-                  <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
-                    Database management
-                  </a>
+                  {% if user.is_superuser %}
+                    <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
+                      Database management
+                    </a>
+                  {% endif %}
                 
-                <a {% if request.resolver_match.url_name|is_in:"hospital_reports,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
-                  Clinician access
-                </a>
+                  <a {% if request.resolver_match.url_name|is_in:"hospital_reports,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
+                    Clinician access
+                  </a>
                 {% endif %}
                 <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
                   Patient access

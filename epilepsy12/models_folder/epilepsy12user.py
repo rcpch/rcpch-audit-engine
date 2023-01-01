@@ -17,14 +17,13 @@ class Epilepsy12UserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, email, password, username, first_name, role, **extra_fields):
+    def create_user(self, email, password, first_name, role, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
         if not email:
             raise ValueError(_('You must provide an email address'))
-        if not username:
-            raise ValueError(_('You must provide a username'))
+
         if not extra_fields.get('hospital_employer') and not extra_fields.get('is_rcpch_audit_team_member'):
             raise ValueError(
                 _('You must provide the name of your main hospital trust.'))
@@ -32,7 +31,7 @@ class Epilepsy12UserManager(BaseUserManager):
             raise ValueError(
                 _('You must provide your role in the Epilepsy12 audit.'))
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, first_name=first_name,
+        user = self.model(email=email, first_name=first_name,
                           role=role,  **extra_fields)
         user.set_password(password)
         """
@@ -118,8 +117,9 @@ class Epilepsy12UserManager(BaseUserManager):
 
 
 class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
+    username = None
     first_name = models.CharField(
-        _("first name"),
+        _("First name"),
         help_text=_("Enter your first name"),
         max_length=150,
         null=True,
@@ -138,14 +138,12 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         null=True
     )
     email = models.EmailField(
-        _('email address'),
+        _('Email address'),
         help_text=_("Enter your email address."),
-        unique=True
-    )
-    username = models.CharField(
-        help_text="Select a unique username.",
-        max_length=150,
-        unique=True
+        unique=True,
+        error_messages={
+            "unique": _("This email address is already in use.")
+        },
     )
     bio = models.CharField(
         help_text=_("Share something about yourself."),
@@ -185,8 +183,8 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
-    REQUIRED_FIELDS = ['role',
-                       'username', 'first_name', 'surname', 'is_rcpch_audit_team_member']
+    REQUIRED_FIELDS = ['role', 'first_name',
+                       'surname', 'is_rcpch_audit_team_member']
     USERNAME_FIELD = 'email'
 
     objects = Epilepsy12UserManager()

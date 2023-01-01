@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<div class='ui container'>
+
+  <div class="ui two column centered grid">
+    {% csrf_token %}
+
+    <div class="column">
+      
+      <div class="ui header">
+        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+        <div class="content">
+          <h2>Create User</h2>
+        </div>
+      </div>
+
+      <form method="post" class="ui rcpch form">
+        {% csrf_token %}
+          {{ form.as_p }}
+
+          
+        <button class="ui rcpch_primary button" type="submit">Create Epilepsy12 User</button>
+
+            <div class="field">
+              <a href="/password_reset">Reset Password</a>
+            </div>
+
+      </form>
+    
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+
