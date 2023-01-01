@@ -1,0 +1,139 @@
+{% load epilepsy12_template_tags %}
+{% load static %}
+{% csrf_token %}
+
+<div 
+    hx-target='#epilepsy12_user_table' 
+    hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk %}" 
+    hx-trigger='epilepsy12_user_list from:body'
+    hx-swap='innerHTML' 
+    name='epilepsy12_user_table'>
+  {% if epilepsy12_user_list.end_index > 0 %}
+    <table class="ui rcpch table">
+        <thead>
+            <tr>
+
+                <th>Name
+                    {% if sort_flag and sort_flag == "sort_epilepsy12users_by_name_up" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_name_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_down" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12users_by_name_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% else %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_name_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_name_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% endif %}
+                    </th>
+                    <th>Role
+                    {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_role_up" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_role_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_role_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_role_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_role_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% else %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_by_role_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_role_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% endif %}
+                </th>
+                <th></th>
+                
+                <th class='two wide'></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for epilepsy12_user in epilepsy12_user_list %}
+            
+            <tr>
+            
+            <td>{{ epilepsy12_user.get_full_name }}</td>
+            <td>{{ epilepsy12_user.get_role_display }}</td>
+            <td>
+                {% if epilepsy12_user.is_rcpch_audit_team_member %}
+                    <img src="{% static 'images/favicon.ico' %}" class="ui right spaced avatar image">
+                {% endif %}
+            </td>
+            
+            <td class='two wide'>
+                <div class='ui buttons'>
+                <button 
+                    data-tooltip='Edit Epilepsy12 details.' 
+                    class="ui rcpch_primary icon button" 
+                    tabindexed="0">
+                    <a href="{% url 'update_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
+                        <i class="edit outline icon"></i>
+                    </a>
+                </button>
+                {% comment %}
+                <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
+                    class="trash alternate outline icon"></i></a></button>
+                {% endcomment %}
+                
+                </div>
+
+            </td>
+    
+            </tr>
+
+        {% endfor %}
+
+        <tfoot>
+        <tr>
+            <th colspan="10" class="right aligned">
+            {% if epilepsy12_user_list.has_previous %}
+            <div class="ui rcpch_primary button" hx-target="#case_table"
+                hx-get="{% url 'epilepsy12_users' hospital_id=hospital_trust.pk %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
+                hx-swap="innerHTML">Previous 10</div>
+            {% endif %}
+            {% if epilepsy12_user_list.has_next %}
+            <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
+                hx-get="{% url 'epilepsy12_users' hospital_id=hospital_trust.pk  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
+                hx-swap="innerHTML">Next 10</div>
+            {% endif %}
+            </th>
+        </tr>
+        </tfoot>
+
+        </tbody>
+    </table>
+  {% else %}
+    <div class='ui container'>
+        <div class='padded_container'>
+        <div class='ui rcpch_info message'>There are no Epilepsy12 users registered yet</div>
+        </div>
+    </div>
+  {% endif %}
+</div>

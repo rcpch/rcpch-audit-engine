@@ -5,20 +5,6 @@
   <table class="ui rcpch table">
     <thead>
       <tr>
-        {% comment %}
-        <th>ID
-          {% if sort_flag and sort_flag == "sort_by_id_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_id_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_id_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_id_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_id_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
-        </th>
-        {% endcomment %}
         <th>Name
           {% if sort_flag and sort_flag == "sort_by_name_down" %}
           <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"

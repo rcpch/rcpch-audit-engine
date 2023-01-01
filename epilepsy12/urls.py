@@ -48,9 +48,9 @@ urlpatterns = [
          views.opt_out, name='opt_out'),
     path('hospital/<int:hospital_id>/case/<int:case_id>/submit',
          views.case_submit, name='case_submit'),
-    path('hospital/<int:hospital_id>/cases/view_preference',
+    path('hospital/<int:hospital_id>/cases/view_preference/<str:template_name>',
          views.view_preference, name='view_preference'),
-    path('hospital/<int:hospital_id>/cases/hospital_select',
+    path('hospital/<int:hospital_id>/cases/hospital_select/<str:template_name>',
          views.child_hospital_select, name='child_hospital_select'),
     path('selected_hospital_summary', views.selected_hospital_summary,
          name='selected_hospital_summary'),
@@ -70,6 +70,11 @@ urlpatterns = [
     path('patient', views.patient, name="patient"),
     path('investigations/<int:case_id>',
          investigations, name='investigations'),
+    path('hospital/<int:hospital_id>/epilepsy12_user_list/',
+         views.epilepsy12_user_list, name='epilepsy12_user_list'),
+    path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/update',
+         views.update_epilepsy12_user, name='update_epilepsy12_user'),
+
 ]
 
 htmx_paths = [
@@ -155,21 +160,28 @@ htmx_paths = [
     path('multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue',
          views.mental_health_issue, name='mental_health_issue'),
 
+    # epilepsy12_user
+    path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_name_up', views.epilepsy12_user_list,
+         name="sort_epilepsy12_users_by_name_up"),
+    path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_name_down', views.epilepsy12_user_list,
+         name="sort_epilepsy12_users_by_name_down"),
+    path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_role_up', views.epilepsy12_user_list,
+         name="sort_epilepsy12_users_by_role_up"),
+    path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_role_down', views.epilepsy12_user_list,
+         name="sort_epilepsy12_users_by_role_down"),
+    path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_hospital_employer_up', views.epilepsy12_user_list,
+         name="sort_epilepsy12_users_by_hospital_employer_up"),
+    path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_hospital_employer_down', views.epilepsy12_user_list,
+         name="sort_epilepsy12_users_by_hospital_employer_down"),
+
+
     # case table endpoints
     path('htmx/filter_case_list/<hospital_id>', views.case_list,
          name="filter_case_list"),
-    #     path('htmx/sort_by_imd_up/<int:hospital_id>', views.case_list,
-    #          name="sort_by_imd_up"),
-    #     path('htmx/sort_by_imd_down', views.case_list,
-    #          name="sort_by_imd_down"),
     path('htmx/sort_by_nhs_number_up/<int:hospital_id>', views.case_list,
          name="sort_by_nhs_number_up"),
     path('htmx/sort_by_nhs_number_down/<int:hospital_id>', views.case_list,
          name="sort_by_nhs_number_down"),
-    #     path('htmx/sort_by_ethnicity_up/<int:hospital_id>', views.case_list,
-    #          name="sort_by_ethnicity_up"),
-    #     path('htmx/sort_by_ethnicity_down/<int:hospital_id>', views.case_list,
-    #          name="sort_by_ethnicity_down"),
     path('htmx/sort_by_sex_up/<int:hospital_id>', views.case_list,
          name="sort_by_sex_up"),
     path('htmx/sort_by_sex_down/<int:hospital_id>', views.case_list,

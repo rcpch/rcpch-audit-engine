@@ -1,6 +1,6 @@
 
 # django
-from datetime import datetime, date
+from datetime import datetime
 from django.apps import apps
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 from django.conf import settings
@@ -415,22 +415,81 @@ def registration_active(request, case_id, active_template):
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
 
 
-def rcpch_403(request, exception):
-    # this view is necessary to trigger a page refresh
-    # it is called on raise PermissionDenied()
-    # If a 403 template were to be returned at this point as in standard django,
-    # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
-    # from django-htmx middleware forces a redirect. Neat.
-    if request.htmx:
-        redirect = reverse_lazy('redirect_403')
-        return HttpResponseClientRedirect(redirect)
-    else:
-        return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
+@login_required
+def child_hospital_select(request, hospital_id, template_name):
+    """
+    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
+    """
+
+    selected_hospital_id = request.POST.get('child_hospital_select')
+
+    # get currently selected hospital
+    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
+
+    # trigger page reload with new hospital
+    return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
 
 
-def redirect_403(request):
-    # return the custom 403 template. There is not context to add.
-    return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
+@login_required
+def view_preference(request, hospital_id, template_name):
+    """
+    POST request from Toggle in has rcpch_view_preference.html template
+    Users can toggle between national, trust and hospital views.
+    Only RCPCH staff can request a national view.
+    """
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    rcpch_choices = (
+        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
+        (1, f'Trust View ({hospital_trust.ParentName})'),
+        (2, 'National View'),
+    )
+
+    request.user.view_preference = int(request.htmx.trigger_name)
+    request.user.save()
+
+    # this is the list of all hospitals in the selected hospital's trust
+    hospital_children = HospitalTrust.objects.filter(
+        ParentName=hospital_trust.ParentName).all()
+
+    hx_target = '#epilepsy12_user_list_view_preference'
+    if template_name == 'cases':
+        hx_target = '#cases_view_preference'
+
+    context = {
+        'rcpch_choices': rcpch_choices,
+        'hospital_trust': hospital_trust,
+        'hospital_children': hospital_children,
+        'hx_target': hx_target,
+        'template_name': template_name
+    }
+
+    response = render(
+        request, template_name='epilepsy12/partials/cases/view_preference.html', context=context)
+
+    if template_name == 'cases':
+        # if call is from cases template, trigger reload of stats calculations
+
+        # trigger a GET request to rerender the case list
+        trigger_client_event(
+            response=response,
+            name="case_list",
+            params={})  # reloads the form to show the updated cases
+
+        # trigger a GET request to rerender the case list statistics
+        trigger_client_event(
+            response=response,
+            name="case_statistics",
+            params={})  # reloads the form to show the updated cases
+
+    elif template_name == 'epilepsy12_user_list':
+
+        trigger_client_event(
+            response=response,
+            name="epilepsy12_user_list",
+            params={})  # reloads the form to show the updated users
+
+    return response
 
 
 @login_required
@@ -602,6 +661,24 @@ def favicon(request: HttpRequest) -> HttpResponse:
     file = (settings.BASE_DIR / "static" /
             "images/favicon-16x16.png").open("rb")
     return FileResponse(file)
+
+
+def rcpch_403(request, exception):
+    # this view is necessary to trigger a page refresh
+    # it is called on raise PermissionDenied()
+    # If a 403 template were to be returned at this point as in standard django,
+    # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
+    # from django-htmx middleware forces a redirect. Neat.
+    if request.htmx:
+        redirect = reverse_lazy('redirect_403')
+        return HttpResponseClientRedirect(redirect)
+    else:
+        return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
+
+
+def redirect_403(request):
+    # return the custom 403 template. There is not context to add.
+    return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
 
 
 """
