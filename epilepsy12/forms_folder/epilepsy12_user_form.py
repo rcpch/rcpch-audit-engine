@@ -162,14 +162,11 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
         return "Epilepsy12User"
 
     def clean(self):
-        print("cleaning...")
         cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
-        # Get the field values from cleaned_data dict
         return cleaned_data
 
     def save(self, commit=True):
         # Save the provided password in hashed format
-        print("save called")
         user = super(Epilepsy12UserAdminCreationForm, self)
         self.clean()
         user.save(commit=False)

@@ -164,6 +164,8 @@ htmx_paths = [
          views.mental_health_issue, name='mental_health_issue'),
 
     # epilepsy12_user
+    path('hospital/<int:hospital_id>/filtered_epilepsy12_user_list', views.epilepsy12_user_list,
+         name="filtered_epilepsy12_user_list"),
     path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_name_up', views.epilepsy12_user_list,
          name="sort_epilepsy12_users_by_name_up"),
     path('hospital/<int:hospital_id>/epilepsy12_user/sort_epilepsy12_users_by_name_down', views.epilepsy12_user_list,

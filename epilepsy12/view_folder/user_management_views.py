@@ -45,7 +45,7 @@ def epilepsy12_user_list(request, hospital_id):
 
     sort_flag = None
 
-    filter_term = request.GET.get('filtered_case_list')
+    filter_term = request.GET.get('filtered_epilepsy12_user_list')
 
     # get all hospitals which are in the same parent trust
     hospital_children = HospitalTrust.objects.filter(
@@ -73,10 +73,11 @@ def epilepsy12_user_list(request, hospital_id):
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
             # user has requested national level view
+            print(filter_term)
             epilepsy12_user_list = Epilepsy12User.objects.filter(
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
-                Q(hospital_employer__icontains=filter_term) |
+                Q(hospital_employer__OrganisationName__icontains=filter_term) |
                 Q(email__icontains=filter_term)
             ).order_by('surname').all()
     else:
@@ -102,33 +103,33 @@ def epilepsy12_user_list(request, hospital_id):
                 hospital_employer__OrganisationName__contains=hospital_trust.OrganisationName,
             )
 
-    if request.htmx.trigger_name == "sort_epilepsy12_users_by_name_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_name_up":
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            'surname').all()
-        sort_flag = "sort_epilepsy12_users_by_name_up"
-    elif request.htmx.trigger_name == "sort_epilepsy12_users_by_name_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_name_down":
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            '-surname').all()
-        sort_flag = "sort_epilepsy12_users_by_role_up"
-    elif request.htmx.trigger_name == "sort_epilepsy12_users_by_role_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_role_up":
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            'role').all()
-        sort_flag = "sort_epilepsy12_users_by_role_down"
-    elif request.htmx.trigger_name == "sort_epilepsy12_users_by_role_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_role_down":
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            '-role').all()
-        sort_flag = "sort_epilepsy12_users_by_role_down"
-    elif request.htmx.trigger_name == "sort_epilepsy12_users_by_hospital_employer_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_hospital_employer_up":
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            'hospital_employer').all()
-        sort_flag = "sort_epilepsy12_users_by_hospital_employer_down"
-    elif request.htmx.trigger_name == "sort_epilepsy12_users_by_hospital_employer_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_hospital_employer_down":
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            '-hospital_employer').all()
-        sort_flag = "sort_epilepsy12_users_by_hospital_employer_down"
-    else:
-        epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-            'surname').all()
+        if request.htmx.trigger_name == "sort_epilepsy12_users_by_name_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_name_up":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                'surname').all()
+            sort_flag = "sort_epilepsy12_users_by_name_up"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_name_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_name_down":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                '-surname').all()
+            sort_flag = "sort_epilepsy12_users_by_role_up"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_role_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_role_up":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                'role').all()
+            sort_flag = "sort_epilepsy12_users_by_role_down"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_role_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_role_down":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                '-role').all()
+            sort_flag = "sort_epilepsy12_users_by_role_down"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_hospital_employer_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_hospital_employer_up":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                'hospital_employer').all()
+            sort_flag = "sort_epilepsy12_users_by_hospital_employer_down"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_hospital_employer_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_hospital_employer_down":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                '-hospital_employer').all()
+            sort_flag = "sort_epilepsy12_users_by_hospital_employer_down"
+        else:
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                'surname').all()
 
     rcpch_choices = (
         (0, f'Hospital View ({hospital_trust.OrganisationName})'),
