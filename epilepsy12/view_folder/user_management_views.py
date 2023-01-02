@@ -1,10 +1,13 @@
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.models import Group
 from django.contrib.auth import login, get_user_model
 from django.contrib import messages
+from django.http import HttpResponseForbidden
+from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 from ..models import Epilepsy12User, HospitalTrust
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..constants import AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
@@ -154,59 +157,114 @@ def epilepsy12_user_list(request, hospital_id):
     return render(request=request, template_name=template_name, context=context)
 
 
+@login_required
+@permission_required('epilepsy12.add_epilepsy12user')
 def create_epilepsy12_user(request, hospital_id):
 
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
     if request.method == 'POST':
         form = Epilepsy12UserAdminCreationForm(request.POST)
+        print(f'form is bound: {form.is_bound}')
         if form.is_valid():
             new_user = form.save()
-            new_user.is_active = True
+
             """
             Allocate Roles
             """
-            new_user.is_superuser = False
-            if new_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-                new_user.is_staff = True
-            elif new_user.role == AUDIT_CENTRE_CLINICIAN:
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-                new_user.is_staff = True
-            elif new_user.role == AUDIT_CENTRE_ADMINISTRATOR:
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-                new_user.is_staff = True
-            elif new_user.role == RCPCH_AUDIT_LEAD:
-                group = Group.objects.get(
-                    name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            elif new_user.role == RCPCH_AUDIT_ANALYST:
-                group = Group.objects.get(
-                    name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            elif new_user.role == RCPCH_AUDIT_ADMINISTRATOR:
-                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-            elif new_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
-                group = Group.objects.get(name=PATIENT_ACCESS)
-            else:
-                # no group
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+            # new_user.is_superuser = False
+            # if new_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
+            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
+            #     new_user.is_staff = True
+            # elif new_user.role == AUDIT_CENTRE_CLINICIAN:
+            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+            #     new_user.is_staff = True
+            # elif new_user.role == AUDIT_CENTRE_ADMINISTRATOR:
+            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+            #     new_user.is_staff = True
+            # elif new_user.role == RCPCH_AUDIT_LEAD:
+            #     group = Group.objects.get(
+            #         name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+            # elif new_user.role == RCPCH_AUDIT_ANALYST:
+            #     group = Group.objects.get(
+            #         name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
+            # elif new_user.role == RCPCH_AUDIT_ADMINISTRATOR:
+            #     group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+            # elif new_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
+            #     group = Group.objects.get(name=PATIENT_ACCESS)
+            # else:
+            #     # no group
+            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
 
             new_user.save()
-            new_user.groups.add(group)
-            login(request, new_user,
-                  backend='django.contrib.auth.backends.ModelBackend')
+
             messages.success(request, "Sign up successful.")
-            return redirect('hospital_reports')
+            return redirect('epilepsy12_user_list', hospital_id=hospital_id)
+
+        print("form not valid")
         for msg in form.error_messages:
             messages.error(
                 request, f"Registration Unsuccessful: {form.error_messages[msg]}")
 
     prepopulated_data = {
         'hospital_employer': hospital_trust,
+        'title': 'Add Epilepsy12 User',
     }
 
     form = Epilepsy12UserAdminCreationForm(prepopulated_data)
     return render(request=request, template_name='registration/admin_create_user.html', context={'form': form})
 
 
-def update_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
-    return
+@login_required
+@permission_required('epilepsy12.change_epilepsy12user')
+def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
+    """
+    Django model form to edit/update Epilepsy12user
+    """
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    epilepsy12_user_to_edit = get_object_or_404(
+        Epilepsy12User, pk=epilepsy12_user_id)
+    can_edit = False
+    if request.user.is_staff or request.user.hospital_employer == hospital_trust or request.user.is_rcpch_audit_team_member:
+        can_edit = True
+    if can_edit:
+        form = Epilepsy12UserAdminCreationForm(
+            request.POST or None, instance=epilepsy12_user_to_edit)
+    else:
+        return HttpResponseForbidden()
+
+    if ('delete') in request.POST:
+        epilepsy12_user_to_edit.delete()
+        messages.success(request, "Sign up successful.")
+        redirect_url = reverse('epilepsy12_user_list', kwargs={
+                               'hospital_id': hospital_id})
+    if ('cancel') in request.POST:
+        redirect_url = reverse('epilepsy12_user_list', kwargs={
+                               'hospital_id': hospital_id})
+
+    if request.POST and form.is_valid():
+        form.save()
+
+        # Save was successful, so redirect to another page
+        redirect_url = reverse('epilepsy12_user_list', kwargs={
+                               'hospital_id': hospital_id})
+        return redirect(redirect_url)
+
+    template_name = 'registration/admin_create_user.html'
+
+    return render(request, template_name, {
+        'form': form,
+        'title': 'Edit/Update Epilepsy12 User'
+    })
+
+
+@login_required
+@permission_required('epilepsy12.delete_epilepsy12user')
+def delete_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
+    try:
+        Epilepsy12User.objects.get(pk=epilepsy12_user_id).delete()
+    except ValueError as error:
+        messages.error(
+            request, f"Delete User Unsuccessful: {error}")
+
+    return HttpResponseClientRedirect(reverse('epilepsy12_user_list', kwargs={'hospital_id': hospital_id}))

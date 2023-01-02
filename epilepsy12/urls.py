@@ -72,12 +72,12 @@ urlpatterns = [
          investigations, name='investigations'),
     path('hospital/<int:hospital_id>/epilepsy12_user_list/',
          views.epilepsy12_user_list, name='epilepsy12_user_list'),
-    path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/update',
-         views.update_epilepsy12_user, name='update_epilepsy12_user'),
     path('hospital/<int:hospital_id>/epilepsy12_users/create',
          views.create_epilepsy12_user, name='create_epilepsy12_user'),
-
-
+    path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/delete',
+         views.delete_epilepsy12_user, name='delete_epilepsy12_user'),
+    path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/edit',
+         views.edit_epilepsy12_user, name='edit_epilepsy12_user')
 ]
 
 htmx_paths = [

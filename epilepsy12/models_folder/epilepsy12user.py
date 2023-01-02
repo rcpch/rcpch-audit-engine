@@ -1,4 +1,3 @@
-from random import choices
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
@@ -15,37 +14,64 @@ class Epilepsy12UserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
+
+    RCPCH Audit team members can be clinicians or RCPCH staff
+    RCPCH staff cannot be associated with a hospital trust
+    All clinicians must be associated with a hospital trust
     """
 
     def create_user(self, email, password, first_name, role, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
-        if not email:
+        if extra_fields.get['is_superuser'] is None:
+            extra_fields.get['is_superuser'] = False
+
+        if extra_fields.get['is_staff'] is None:
+            extra_fields.get['is_staff'] = False
+            extra_fields.get['hospital_employer'] = None
+
+        if extra_fields.get['is_rcpch_audit_team_member'] is None:
+            extra_fields.get['is_rcpch_audit_team_member'] = False
+
+        if email is None:
             raise ValueError(_('You must provide an email address'))
 
-        if not extra_fields.get('hospital_employer') and not extra_fields.get('is_rcpch_audit_team_member'):
+        if extra_fields.get('hospital_employer') is None and not extra_fields.get('is_staff'):
+            # Non-RCPCH staff (is_staff) are not affiliated with a hospital
             raise ValueError(
                 _('You must provide the name of your main hospital trust.'))
-        if not role:
+
+        if role is None:
             raise ValueError(
                 _('You must provide your role in the Epilepsy12 audit.'))
+
         email = self.normalize_email(email)
-        user = self.model(email=email, first_name=first_name,
-                          role=role,  **extra_fields)
-        user.set_password(password)
+        if password is not None:
+            user = self.model(email=email, password=password, first_name=first_name,
+                              role=role,  **extra_fields)
+            user.save()
+        else:
+            user = self.model(email=email, password=password, first_name=first_name,
+                              role=role,  **extra_fields)
+            user.set_unusable_password()
+            user.save()
+
+        # user not active until has confirmed by email
+        user.is_active = False
+        user.email_confirmed = False
+        user.date_joined = timezone.now()
+        user.view_preference = 0  # hospital level view preference
+
         """
-        Allocate Roles
+        Allocate Groups - the groups already have permissions allocated
         """
         if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-            user.is_staff = True
         elif user.role == AUDIT_CENTRE_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = True
         elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = True
         elif user.role == RCPCH_AUDIT_LEAD:
             group = Group.objects.get(
                 name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
@@ -155,12 +181,15 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         default=False
     )
     is_staff = models.BooleanField(
+        # reflects if user is an RCPCH member of staff. This means they are not affiliated with a hospital trust
         default=False
     )
     is_superuser = models.BooleanField(
         default=False
     )
     is_rcpch_audit_team_member = models.BooleanField(
+        # reflects is a member of the RCPCH audit team. If is_staff is false, user is also a clinician and therefore must
+        # be affiliated with a hospital trust
         default=False
     )
     view_preference = models.SmallIntegerField(
@@ -181,6 +210,10 @@ class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         null=True,
         blank=True
+    )
+
+    email_confirmed = models.BooleanField(
+        default=False
     )
 
     REQUIRED_FIELDS = ['role', 'first_name',

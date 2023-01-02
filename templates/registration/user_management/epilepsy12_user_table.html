@@ -93,14 +93,35 @@
                     data-tooltip='Edit Epilepsy12 details.' 
                     class="ui rcpch_primary icon button" 
                     tabindexed="0">
-                    <a href="{% url 'update_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
+                    <a href="{% url 'edit_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
                         <i class="edit outline icon"></i>
                     </a>
                 </button>
-                {% comment %}
-                <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
-                    class="trash alternate outline icon"></i></a></button>
-                {% endcomment %}
+                
+                <button 
+                    data-tooltip='Delete Epilepsy12 User. This is irreversible.' 
+                    class="ui rcpch_danger icon button" 
+                    tabindexed="1" 
+                    {% if not perms.epilepsy12.delete_epilepsy12user %}disabled{% endif %}
+                    hx-post="{% url 'delete_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}"
+                    hx-trigger='click'
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'Are you sure you want to delete {{epilepsy12_user}}? This is an irreversible step.',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'Delete {{epilepsy12_user}}'
+                          })
+                        if result.isConfirmed issueRequest()"
+                >
+                    <i class="trash alternate outline icon"></i>   
+                </button>
                 
                 </div>
 
