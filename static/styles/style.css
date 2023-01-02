@@ -1342,3 +1342,14 @@ a label {
   border-color: var(--rcpch_dark_red);
   margin-top: 1em;
 }
+
+img.ui.spaced.avatar.image{
+  border-color: var(--rcpch_pink);
+  border-width: 3px;
+  background-color: var(--rcpch_pink);
+  border-style: solid;
+}
+
+.star.outline.icon{
+  color: var(--rcpch_pink);
+}
