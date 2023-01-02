@@ -10,7 +10,7 @@
               
 
       <h5 class="ui right floated header" id='cases_view_preference'>
-          {% include 'epilepsy12/partials/cases/view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices template_name='cases' hx_target='#cases_view_preference' %}
+          {% include 'epilepsy12/partials/cases/view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices test_positive=request.user.view_preference template_name='cases' hx_target='#cases_view_preference' %}
       </h5>
 
     </div>

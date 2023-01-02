@@ -9,6 +9,8 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 class Epilepsy12UserCreationForm(UserCreationForm):
 
+    title = forms.CharField()
+
     email = forms.EmailField(
         max_length=255,
         help_text="Required. Please enter a valid NHS email address."
@@ -161,15 +163,20 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     def clean_password2(self) -> str:
         return "Epilepsy12User"
 
+    def clean_is_staff(self):
+        if self.cleaned_data['is_staff']:
+            # RCPCH staff are not affiliated with a hospital trust
+            self.cleaned_data['hospital_employer'] = None
+
+        return self.cleaned_data['is_staff']
+
     def clean(self):
         cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
         return cleaned_data
 
     def save(self, commit=True):
         # Save the provided password in hashed format
-        user = super(Epilepsy12UserAdminCreationForm, self)
-        self.clean()
-        user.save(commit=False)
+        user = super(Epilepsy12UserAdminCreationForm, self).save(commit=False)
 
         if commit:
             user.save()

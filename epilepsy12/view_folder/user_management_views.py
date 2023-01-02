@@ -73,7 +73,6 @@ def epilepsy12_user_list(request, hospital_id):
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
             # user has requested national level view
-            print(filter_term)
             epilepsy12_user_list = Epilepsy12User.objects.filter(
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
@@ -174,38 +173,35 @@ def create_epilepsy12_user(request, hospital_id):
 
     if request.method == 'POST':
         form = Epilepsy12UserAdminCreationForm(request.POST)
-        print(f'form is bound: {form.is_bound}')
+
         if form.is_valid():
             new_user = form.save()
+            role = form.cleaned_data['role']
 
             """
             Allocate Roles
             """
-            # new_user.is_superuser = False
-            # if new_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
-            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-            #     new_user.is_staff = True
-            # elif new_user.role == AUDIT_CENTRE_CLINICIAN:
-            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            #     new_user.is_staff = True
-            # elif new_user.role == AUDIT_CENTRE_ADMINISTRATOR:
-            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            #     new_user.is_staff = True
-            # elif new_user.role == RCPCH_AUDIT_LEAD:
-            #     group = Group.objects.get(
-            #         name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            # elif new_user.role == RCPCH_AUDIT_ANALYST:
-            #     group = Group.objects.get(
-            #         name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            # elif new_user.role == RCPCH_AUDIT_ADMINISTRATOR:
-            #     group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-            # elif new_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
-            #     group = Group.objects.get(name=PATIENT_ACCESS)
-            # else:
-            #     # no group
-            #     group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+            if role == AUDIT_CENTRE_LEAD_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
+            elif role == AUDIT_CENTRE_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+            elif role == AUDIT_CENTRE_ADMINISTRATOR:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+            elif role == RCPCH_AUDIT_LEAD:
+                group = Group.objects.get(
+                    name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+            elif role == RCPCH_AUDIT_ANALYST:
+                group = Group.objects.get(
+                    name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
+            elif role == RCPCH_AUDIT_ADMINISTRATOR:
+                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+            elif role == RCPCH_AUDIT_PATIENT_FAMILY:
+                group = Group.objects.get(name=PATIENT_ACCESS)
+            else:
+                # no group
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
 
-            new_user.save()
+            group.user_set.add(new_user)
 
             messages.success(request, "Sign up successful.")
             return redirect('epilepsy12_user_list', hospital_id=hospital_id)
@@ -217,11 +213,16 @@ def create_epilepsy12_user(request, hospital_id):
 
     prepopulated_data = {
         'hospital_employer': hospital_trust,
-        'title': 'Add Epilepsy12 User',
     }
 
     form = Epilepsy12UserAdminCreationForm(prepopulated_data)
-    return render(request=request, template_name='registration/admin_create_user.html', context={'form': form})
+
+    context = {
+        'form': form,
+        'title': 'Add Epilepsy12 User',
+    }
+
+    return render(request=request, template_name='registration/admin_create_user.html', context=context)
 
 
 @login_required

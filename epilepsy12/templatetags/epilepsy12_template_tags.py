@@ -77,7 +77,7 @@ def permission_text(add_permission, change_permission, delete_permission, model_
     return return_string
 
 
-@register.simple_tag
+@register.filter
 def matches_model_field(field_name, model):
     if field_name:
         value = getattr(model, field_name)
@@ -109,6 +109,14 @@ def is_in(url_name, args):
         return True
     else:
         return False
+
+
+@register.simple_tag
+def match_two_values(val1, val2):
+    """
+    Matches two values
+    """
+    return val1 == val2
 
 
 @register.filter

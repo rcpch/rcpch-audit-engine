@@ -439,57 +439,10 @@ def view_preference(request, hospital_id, template_name):
     """
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
-    rcpch_choices = (
-        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
-        (1, f'Trust View ({hospital_trust.ParentName})'),
-        (2, 'National View'),
-    )
-
-    request.user.view_preference = int(request.htmx.trigger_name)
+    request.user.view_preference = request.htmx.trigger_name
     request.user.save()
 
-    # this is the list of all hospitals in the selected hospital's trust
-    hospital_children = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).all()
-
-    hx_target = '#epilepsy12_user_list_view_preference'
-    if template_name == 'cases':
-        hx_target = '#cases_view_preference'
-
-    context = {
-        'rcpch_choices': rcpch_choices,
-        'hospital_trust': hospital_trust,
-        'hospital_children': hospital_children,
-        'hx_target': hx_target,
-        'template_name': template_name
-    }
-
-    response = render(
-        request, template_name='epilepsy12/partials/cases/view_preference.html', context=context)
-
-    if template_name == 'cases':
-        # if call is from cases template, trigger reload of stats calculations
-
-        # trigger a GET request to rerender the case list
-        trigger_client_event(
-            response=response,
-            name="case_list",
-            params={})  # reloads the form to show the updated cases
-
-        # trigger a GET request to rerender the case list statistics
-        trigger_client_event(
-            response=response,
-            name="case_statistics",
-            params={})  # reloads the form to show the updated cases
-
-    elif template_name == 'epilepsy12_user_list':
-
-        trigger_client_event(
-            response=response,
-            name="epilepsy12_user_list",
-            params={})  # reloads the form to show the updated users
-
-    return response
+    return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
 
 
 @login_required
