@@ -99,6 +99,7 @@
                 <th class='two wide'></th>
                 <th></th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -109,6 +110,39 @@
             <td>{{ epilepsy12_user.get_full_name }}</td>
             <td>{{ epilepsy12_user.email }}</td>
             <td>{{ epilepsy12_user.get_role_display }}</td>
+            <td>
+                {% if not epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
+                    <i 
+                        class="rcpch_light_blue dot circle outline icon"
+                        id="{{epilepsy12_user.id}}_not_email_confirmed_icon"
+                        data-title="Email Confirmation"
+                        data-content="{{epilepsy12_user}} has not yet completed the signup process."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_not_email_confirmed_icon').popup(); end"
+                    >
+                {% elif epilepsy12_user.email_confirmed and epilepsy12_user.is_active %}
+                    <i 
+                        class="rcpch_pink check circle outline icon"
+                        id="{{epilepsy12_user.id}}_email_confirmed_icon"
+                        data-title="User status"
+                        data-content="{{epilepsy12_user}} is an active user."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_email_confirmed_icon').popup(); end"
+                    >
+                {% elif epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
+                    <i 
+                        class="red close icon"
+                        id="{{epilepsy12_user.id}}_inactive_icon"
+                        data-title="User status"
+                        data-content="{{epilepsy12_user}} is an inactive user."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_is_inactive_icon').popup(); end"
+                    >
+                {% endif %}
+            </td>
             <td>
                 {% if epilepsy12_user.is_rcpch_audit_team_member %}
                     <img 
@@ -150,8 +184,12 @@
             <td class='two wide'>
                 <div class='ui buttons'>
                 <button 
-                    data-tooltip='Edit Epilepsy12 User details.' 
-                    class="ui rcpch_primary icon button" 
+                    data-tooltip='Edit Epilepsy12 User details.'
+                    {% if perms.epilepsy12.change_epilepsy12user %}
+                        class="ui rcpch_primary icon button" 
+                    {% else %}
+                        class="ui rcpch_primary icon disabled button" 
+                    {% endif %}
                     tabindexed="0">
                     <a href="{% url 'edit_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
                         <i class="edit outline icon"></i>
@@ -160,9 +198,12 @@
                 
                 <button 
                     data-tooltip='Delete Epilepsy12 User. This is irreversible.' 
-                    class="ui rcpch_danger icon button" 
+                    {% if perms.epilepsy12.delete_epilepsy12user %}
+                        class="ui rcpch_danger icon button" 
+                    {% else %}
+                        class="ui rcpch_danger icon disabled button" 
+                    {% endif %}
                     tabindexed="1" 
-                    {% if not perms.epilepsy12.delete_epilepsy12user %}disabled{% endif %}
                     hx-post="{% url 'delete_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}"
                     hx-trigger='click'
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -177,7 +218,7 @@
                             confirmButtonColor: '#11a7f2',
                             cancelButtonColor: '#e60700',
                             confirmButtonText: 'Delete {{epilepsy12_user}}'
-                          })
+                        })
                         if result.isConfirmed issueRequest()"
                 >
                     <i class="trash alternate outline icon"></i>   

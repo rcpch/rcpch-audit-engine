@@ -98,6 +98,7 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_rcpch_audit_team_member', True)
+        extra_fields.setdefault('email_confirmed', True)
         # national view preference
         extra_fields.setdefault('view_preference', 2)
 

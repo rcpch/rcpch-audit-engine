@@ -15,7 +15,7 @@ class Epilepsy12UserAdmin(UserAdmin):
     search_fields = ('email', 'surname',
                      'role', 'hospital_employer', 'is_active',)
     list_display = ('id', "email", "title", "first_name", "surname",
-                    "is_active", "twitter_handle", "role", "hospital_employer", "is_rcpch_audit_team_member")
+                    "is_active", "twitter_handle", "role", "hospital_employer", "is_rcpch_audit_team_member", "email_confirmed")
     list_filter = ("is_active", "role", "hospital_employer",)
     fieldsets = (
         (
@@ -50,6 +50,7 @@ class Epilepsy12UserAdmin(UserAdmin):
                     'is_staff',
                     'is_rcpch_audit_team_member',
                     'is_superuser',
+                    "email_confirmed"
                 )
             }
         ),

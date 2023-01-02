@@ -39,6 +39,11 @@ def epilepsy12_user_management(request):
 
 @login_required
 def epilepsy12_user_list(request, hospital_id):
+    """
+    Returns the list of users for the selected hospitals
+    Currently this includes RCPCH staff who are not associated with a hospital, though this breaks the update/delete and cancel
+    buttons.
+    """
 
     # get currently selected hospital
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
@@ -175,6 +180,8 @@ def create_epilepsy12_user(request, hospital_id):
         form = Epilepsy12UserAdminCreationForm(request.POST)
 
         if form.is_valid():
+            form.cleaned_data['email_confirmed'] = False
+            form.cleaned_data['is_active'] = False
             new_user = form.save()
             role = form.cleaned_data['role']
 
