@@ -111,6 +111,14 @@ def epilepsy12_user_list(request, hospital_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 '-surname').all()
             sort_flag = "sort_epilepsy12_users_by_role_up"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_email_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_email_up":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                'surname').all()
+            sort_flag = "sort_epilepsy12_users_by_email_up"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_email_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_email_down":
+            epilepsy12_user_list = filtered_epilepsy12_users.order_by(
+                '-surname').all()
+            sort_flag = "sort_epilepsy12_users_by_role_up"
         elif request.htmx.trigger_name == "sort_epilepsy12_users_by_role_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_role_up":
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 'role').all()
