@@ -234,6 +234,7 @@ def create_epilepsy12_user(request, hospital_id):
 
     context = {
         'form': form,
+        'hospital_id': hospital_id,
         'admin_title': 'Add Epilepsy12 User',
         'is_superuser': False,
         'is_staff': False,
@@ -268,6 +269,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
                                'hospital_id': hospital_id})
         return redirect(redirect_url)
     if ('cancel') in request.POST:
+        print("cancelling")
         redirect_url = reverse('epilepsy12_user_list', kwargs={
                                'hospital_id': hospital_id})
         return redirect(redirect_url)
@@ -283,6 +285,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
     template_name = 'registration/admin_create_user.html'
 
     return render(request, template_name, {
+        'hospital_id': hospital_id,
         'form': form,
         'admin_title': 'Edit/Update Epilepsy12 User'
     })

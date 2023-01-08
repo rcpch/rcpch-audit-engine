@@ -185,9 +185,9 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     # def clean_password2(self):
     #     return "Epilepsy12User"
 
-    # def clean(self):
-    #     cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
-    #     return cleaned_data
+    def clean(self):
+        cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
+        return cleaned_data
 
     # def save(self, commit=True):
     #     # Save the provided password in hashed format

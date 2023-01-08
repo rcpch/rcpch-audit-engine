@@ -77,6 +77,7 @@ ROOT_URLCONF = 'rcpch-audit-engine.urls'
 
 LOGIN_REDIRECT_URL = "/epilepsy12/"
 LOGOUT_REDIRECT_URL = "/epilepsy12/"
+LOGIN_URL = '/epilepsy12/registration/login/'
 
 TEMPLATES = [
     {
