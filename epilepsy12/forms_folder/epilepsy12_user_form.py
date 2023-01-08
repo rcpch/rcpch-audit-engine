@@ -1,10 +1,10 @@
 
 from django import forms
 from django.core import validators
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth import get_user_model
 from epilepsy12.constants.user_types import ROLES, TITLES
 from ..models import Epilepsy12User, HospitalTrust
-
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 
 class Epilepsy12UserCreationForm(UserCreationForm):
@@ -51,44 +51,41 @@ class Epilepsy12UserCreationForm(UserCreationForm):
         fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
                   "is_rcpch_audit_team_member", 'is_staff', 'is_active')
 
-    def clean_email(self):
-        email = self.cleaned_data['email'].lower()
-        try:
-            user = Epilepsy12User.objects.get(email)
-        except Exception as e:
-            return email
-        raise forms.ValidationError(f"{email} already in use!")
+    # def clean_email(self):
+    #     email = self.cleaned_data['email'].lower()
+    #     try:
+    #         user = Epilepsy12User.objects.get(email)
+    #     except Exception as e:
+    #         return email
+    #     raise forms.ValidationError(f"{email} already in use!")
 
-    def clean_password2(self) -> str:
-        password2 = super().clean_password2()
-        print("I get called")
-        return "Epilepsy12User"
+    # def save(self, commit=True):
+    #     # Save the provided password in hashed format
+    #     user = super().save(commit=False)
 
-    def save(self, commit=True):
-        # Save the provided password in hashed format
-        user = super().save(commit=False)
-
-        if commit:
-            user.save()
-        return user
+    #     if commit:
+    #         user.save()
+    #     return user
 
 
 class Epilepsy12UserChangeForm(UserChangeForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer",
-                  "is_rcpch_audit_team_member")
+        fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
+                  "is_rcpch_audit_team_member", 'is_staff', 'is_active')
 
 
 class Epilepsy12UserAdminCreationForm(UserCreationForm):
     """
     This is a standard Django form to be used by admin to create a user without a password
     """
-    title = forms.CharField()
+    admin_title = forms.CharField(
+        required=False
+    )
 
-    def __init__(self, *args, **kwargs) -> None:
-        super(Epilepsy12UserAdminCreationForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
         self.fields['password1'].required = False
         self.fields['password2'].required = False
         # If one field gets autocompleted but not the other, our 'neither
@@ -131,52 +128,134 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     )
 
     is_superuser = forms.BooleanField(
+        initial=False,
         required=False
     )
 
     is_rcpch_audit_team_member = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'})
+        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
+        initial=False,
+        required=False
     )
 
     is_staff = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'})
+        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
+        initial=False,
+        required=False
     )
 
     class Meta:
         model = Epilepsy12User
         fields = ("email", "role", "hospital_employer", 'title', 'first_name', 'surname', "is_staff",
-                  "is_rcpch_audit_team_member")
+                  "is_rcpch_audit_team_member", "is_superuser")
 
-    def clean_email(self):
-        email = self.cleaned_data['email'].lower()
-        try:
-            user = Epilepsy12User.objects.get(email)
-        except Exception as e:
-            return email
-        raise forms.ValidationError(f"{email} already in use!")
+    # def clean_email(self):
+    #     email = self.cleaned_data['email'].lower()
+    #     try:
+    #         user = Epilepsy12User.objects.get(email)
+    #     except Exception as e:
+    #         return email
 
-    def clean_password1(self) -> str:
-        return "Epilepsy12User"
+    #     raise forms.ValidationError(f"{email} already in use!")
 
-    def clean_password2(self) -> str:
-        return "Epilepsy12User"
+    # def clean_is_staff(self):
+    #     if self.cleaned_data['is_staff']:
+    #         # RCPCH staff are not affiliated with a hospital trust
+    #         self.cleaned_data['hospital_employer'] = None
+    #     else:
+    #         return False
 
-    def clean_is_staff(self):
-        if self.cleaned_data['is_staff']:
-            # RCPCH staff are not affiliated with a hospital trust
-            self.cleaned_data['hospital_employer'] = None
+    #     return self.cleaned_data['is_staff']
 
-        return self.cleaned_data['is_staff']
+    # def clean_is_superuser(self):
+    #     if self.cleaned_data['is_superuser']:
+    #         return True
+    #     else:
+    #         return False
+
+    # def clean_is_rcpch_audit_team_member(self):
+    #     if self.cleaned_data['is_rcpch_audit_team_member']:
+    #         return True
+    #     else:
+    #         return False
+
+    # def clean_password1(self):
+    #     return "Epilepsy12User"
+
+    # def clean_password2(self):
+    #     return "Epilepsy12User"
+
+    # def clean(self):
+    #     cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
+    #     return cleaned_data
+
+    # def save(self, commit=True):
+    #     # Save the provided password in hashed format
+    #     user = super(Epilepsy12UserAdminCreationForm, self).save(commit=False)
+    #     if commit:
+    #         user.set_password(self.cleaned_data['password2'])
+    #         user.view_preference = 0
+    #         user.email_confirmed = False
+    #         user.save()
+    #         get_user_model().objects.allocate_group_based_on_role(user)
+
+        # return user
+
+
+class Epilepsy12UserPasswordResetForm(SetPasswordForm):
+    """Change password form."""
+    new_password1 = forms.CharField(label='Password',
+                                    help_text="<ul class='errorlist text-muted'><li>Your password can 't be too similar to your other personal information.</li><li>Your password must contain at least 8 characters.</li><li>Your password can 't be a commonly used password.</li> <li>Your password can 't be entirely numeric.<li></ul>",
+                                    max_length=100,
+                                    required=True,
+                                    widget=forms.PasswordInput(
+                                        attrs={
+                                            'class': 'form-control',
+                                            'placeholder': 'password',
+                                            'type': 'password',
+                                            'id': 'user_password',
+                                        }))
+
+    new_password2 = forms.CharField(label='Confirm password',
+                                    help_text=False,
+                                    max_length=100,
+                                    required=True,
+                                    widget=forms.PasswordInput(
+                                        attrs={
+                                            'class': 'form-control',
+                                            'placeholder': 'confirm password',
+                                            'type': 'password',
+                                            'id': 'user_password',
+                                        }))
 
     def clean(self):
-        cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
+        cleaned_data = super(Epilepsy12UserPasswordResetForm, self).clean()
+        print("cleaning reset password form")
+        return cleaned_data
+
+
+class UserForgotPasswordForm(PasswordResetForm):
+    """User forgot password, check via email form."""
+    email = forms.EmailField(label='Email address',
+                             max_length=254,
+                             required=True,
+                             widget=forms.TextInput(
+                                 attrs={'class': 'form-control',
+                                        'placeholder': 'email address',
+                                        'type': 'text',
+                                        'id': 'email_address'
+                                        }
+                             ))
+
+    def clean(self):
+        print("cleaning passwordresetform")
+        cleaned_data = super(UserForgotPasswordForm, self).clean()
         return cleaned_data
 
     def save(self, commit=True):
+        print("saving passwordresetform")
         # Save the provided password in hashed format
-        user = super(Epilepsy12UserAdminCreationForm, self).save(commit=False)
+        user = super(UserForgotPasswordForm, self).save(commit=False)
 
         if commit:
             user.save()

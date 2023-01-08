@@ -1,6 +1,7 @@
 from . import views
 from .view_folder import *
 from django.urls import path
+from django.contrib.auth.views import PasswordResetConfirmView
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
@@ -27,8 +28,9 @@ router.register(r'keyword', views.KeywordViewSet)
 router.register(r'auditprogress', views.AuditProgressViewSet)
 
 urlpatterns = [
+    path('registration/', include('django.contrib.auth.urls')),
     path("favicon", views.favicon),
-    path("signup/", views.signup, name="signup"),
+    #     path("signup/", views.signup, name="signup"),
     path('403', views.redirect_403, name='redirect_403'),
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
@@ -77,7 +79,8 @@ urlpatterns = [
     path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/delete',
          views.delete_epilepsy12_user, name='delete_epilepsy12_user'),
     path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/edit',
-         views.edit_epilepsy12_user, name='edit_epilepsy12_user')
+         views.edit_epilepsy12_user, name='edit_epilepsy12_user'),
+
 ]
 
 htmx_paths = [
@@ -299,7 +302,6 @@ htmx_paths = [
          views.edit_epilepsy_surgery_centre, name="edit_epilepsy_surgery_centre"),
     path('assessment/<int:assessment_id>/epilepsy_surgery_centre/<int:site_id>/active/<str:action>',
          views.update_epilepsy_surgery_centre_pressed, name="update_epilepsy_surgery_centre_pressed"),
-
 
 
     path('registration/<int:registration_id>/registration_status',

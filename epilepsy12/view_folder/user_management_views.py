@@ -1,16 +1,25 @@
+
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import authenticate, logout, login
+from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.contrib.auth.models import Group
-from django.contrib.auth import login, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.http import HttpResponseForbidden
-from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
+from django.http import HttpResponseForbidden, HttpResponse
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.template.loader import render_to_string
+from django.core.mail import send_mail, BadHeaderError
+
+from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, HospitalTrust
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
-from ..constants import AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
+
+User = get_user_model()
 
 
 @login_required
@@ -180,43 +189,42 @@ def create_epilepsy12_user(request, hospital_id):
         form = Epilepsy12UserAdminCreationForm(request.POST)
 
         if form.is_valid():
-            form.cleaned_data['email_confirmed'] = False
-            form.cleaned_data['is_active'] = False
-            new_user = form.save()
-            role = form.cleaned_data['role']
 
-            """
-            Allocate Roles
-            """
-            if role == AUDIT_CENTRE_LEAD_CLINICIAN:
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-            elif role == AUDIT_CENTRE_CLINICIAN:
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            elif role == AUDIT_CENTRE_ADMINISTRATOR:
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            elif role == RCPCH_AUDIT_LEAD:
-                group = Group.objects.get(
-                    name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            elif role == RCPCH_AUDIT_ANALYST:
-                group = Group.objects.get(
-                    name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            elif role == RCPCH_AUDIT_ADMINISTRATOR:
-                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-            elif role == RCPCH_AUDIT_PATIENT_FAMILY:
-                group = Group.objects.get(name=PATIENT_ACCESS)
-            else:
-                # no group
-                group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+            # success message - return to user list
+            new_user = form.save(commit=False)
+            new_user.set_unusable_password()
+            new_user.is_active = True
+            new_user.email_confirmed = False
+            new_user.view_preference = 0
+            new_user.save()
+            get_user_model().objects.allocate_group_based_on_role(new_user)
 
-            group.user_set.add(new_user)
+            # user created - send email with reset link to new user
+            subject = "Password Reset Requested"
+            email_template_name = "registration/admin_reset_password.html"
+            c = {
+                "email": new_user.email,
+                'domain': '0.0.0.0:8000',
+                'site_name': 'Website',
+                "uid": urlsafe_base64_encode(force_bytes(new_user.pk)),
+                "user": new_user,
+                'token': default_token_generator.make_token(new_user),
+                'protocol': 'http',
+            }
+            email = render_to_string(email_template_name, c)
 
-            messages.success(request, "Sign up successful.")
+            try:
+                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
+                          [new_user.email], fail_silently=False)
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+
+            messages.success(
+                request, f"{new_user.email} account created successfully.")
             return redirect('epilepsy12_user_list', hospital_id=hospital_id)
 
-        print("form not valid")
-        for msg in form.error_messages:
-            messages.error(
-                request, f"Registration Unsuccessful: {form.error_messages[msg]}")
+        messages.error(
+            request, f"Registration Unsuccessful: {form.errors}")
 
     prepopulated_data = {
         'hospital_employer': hospital_trust,
@@ -226,7 +234,10 @@ def create_epilepsy12_user(request, hospital_id):
 
     context = {
         'form': form,
-        'title': 'Add Epilepsy12 User',
+        'admin_title': 'Add Epilepsy12 User',
+        'is_superuser': False,
+        'is_staff': False,
+        'is_rcpch_audit_team_member': False
     }
 
     return render(request=request, template_name='registration/admin_create_user.html', context=context)
@@ -255,23 +266,25 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
         messages.success(request, "Sign up successful.")
         redirect_url = reverse('epilepsy12_user_list', kwargs={
                                'hospital_id': hospital_id})
+        return redirect(redirect_url)
     if ('cancel') in request.POST:
         redirect_url = reverse('epilepsy12_user_list', kwargs={
                                'hospital_id': hospital_id})
+        return redirect(redirect_url)
 
     if request.POST and form.is_valid():
         form.save()
 
         # Save was successful, so redirect to another page
         redirect_url = reverse('epilepsy12_user_list', kwargs={
-                               'hospital_id': hospital_id})
+            'hospital_id': hospital_id})
         return redirect(redirect_url)
 
     template_name = 'registration/admin_create_user.html'
 
     return render(request, template_name, {
         'form': form,
-        'title': 'Edit/Update Epilepsy12 User'
+        'admin_title': 'Edit/Update Epilepsy12 User'
     })
 
 
@@ -285,3 +298,68 @@ def delete_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             request, f"Delete User Unsuccessful: {error}")
 
     return HttpResponseClientRedirect(reverse('epilepsy12_user_list', kwargs={'hospital_id': hospital_id}))
+
+
+# @require_http_methods(["GET", "POST"])
+# def epilepsy12_password_reset_confirm(request, uidb64, token):
+#     """
+#     Endpoint from email link to reset password
+#     """
+#     print("called password reset")
+#     if request.method == 'POST':
+#         try:
+#             uid = force_str(urlsafe_base64_decode(uidb64))
+#             user = User.objects.get(pk=uid)
+#         except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+#             messages.add_message(request, messages.WARNING, str(e))
+#             user = None
+#         if user is not None and default_token_generator.check_token(user, token):
+#             form = Epilepsy12UserPasswordResetForm(
+#                 user=user, data=request.POST)
+#             if form.is_valid():
+#                 form.save()
+
+#                 user.is_active = True
+#                 user.email_confirmed = True
+#                 user.save(commit=True)
+#                 messages.add_message(
+#                     request, messages.SUCCESS, 'Password reset successfully.')
+#                 return redirect('login')
+#             else:
+#                 context = {
+#                     'form': form,
+#                     'uid': uidb64,
+#                     'token': token
+#                 }
+#                 messages.add_message(
+#                     request, messages.WARNING, 'Password could not be reset.')
+#                 return render(request, 'account/password_reset_confirm.html', context)
+#         else:
+#             messages.add_message(request, messages.WARNING,
+#                                  'Password reset link is invalid.')
+#             messages.add_message(request, messages.WARNING,
+#                                  'Please request a new password reset.')
+
+#     try:
+#         uid = force_str(urlsafe_base64_decode(uidb64))
+#         user = User.objects.get(pk=uid)
+#     except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+#         messages.add_message(request, messages.WARNING, str(e))
+#         user = None
+
+#     if user is not None and default_token_generator.check_token(user, token):
+#         user.email_confirmed = True
+#         user.save()
+#         context = {
+#             'form': Epilepsy12UserPasswordResetForm(user),
+#             'uid': uidb64,
+#             'token': token
+#         }
+#         return render(request, 'account/password_reset_confirm.html', context)
+#     else:
+#         messages.add_message(request, messages.WARNING,
+#                              'Password reset link is invalid.')
+#         messages.add_message(request, messages.WARNING,
+#                              'Please request a new password reset.')
+
+#     return redirect('home')

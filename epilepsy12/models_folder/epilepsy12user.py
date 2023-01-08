@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
+from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group, Permission
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -23,44 +23,32 @@ class Epilepsy12UserManager(BaseUserManager):
         """
         Create and save a User with the given email and password.
         """
-        if extra_fields.get['is_superuser'] is None:
-            extra_fields.get['is_superuser'] = False
 
-        if extra_fields.get['is_staff'] is None:
-            extra_fields.get['is_staff'] = False
-            extra_fields.get['hospital_employer'] = None
-
-        if extra_fields.get['is_rcpch_audit_team_member'] is None:
-            extra_fields.get['is_rcpch_audit_team_member'] = False
-
-        if email is None:
+        if not email:
             raise ValueError(_('You must provide an email address'))
 
-        if extra_fields.get('hospital_employer') is None and not extra_fields.get('is_staff'):
+        if not extra_fields.get('hospital_employer') and not extra_fields.get('is_staff'):
             # Non-RCPCH staff (is_staff) are not affiliated with a hospital
             raise ValueError(
                 _('You must provide the name of your main hospital trust.'))
 
-        if role is None:
+        if not role:
             raise ValueError(
                 _('You must provide your role in the Epilepsy12 audit.'))
 
-        email = self.normalize_email(email)
-        if password is not None:
-            user = self.model(email=email, password=password, first_name=first_name,
-                              role=role,  **extra_fields)
-            user.save()
-        else:
-            user = self.model(email=email, password=password, first_name=first_name,
-                              role=role,  **extra_fields)
-            user.set_unusable_password()
-            user.save()
+        email = self.normalize_email(str(email))
+        user = self.model(email=email, first_name=first_name, password=password,
+                          role=role,  **extra_fields)
 
-        # user not active until has confirmed by email
-        user.is_active = False
-        user.email_confirmed = False
-        user.date_joined = timezone.now()
+        user.set_password(password)
         user.view_preference = 0  # hospital level view preference
+        if not extra_fields.get('is_superuser'):
+            user.is_superuser = False
+        if not extra_fields.get('is_active'):
+            user.is_active = False
+        user.email_confirmed = False
+        # user not active until has confirmed by email
+        user.save()
 
         """
         Allocate Groups - the groups already have permissions allocated
@@ -115,34 +103,38 @@ class Epilepsy12UserManager(BaseUserManager):
         Allocate Roles
         """
 
-        if logged_in_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
+        self.allocate_group_based_on_role(logged_in_user)
+
+    def allocate_group_based_on_role(self, user):
+
+        if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-            logged_in_user.is_staff = True
-        elif logged_in_user.role == AUDIT_CENTRE_CLINICIAN:
+            user.is_staff = True
+        elif user.role == AUDIT_CENTRE_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            logged_in_user.is_staff = True
-        elif logged_in_user.role == AUDIT_CENTRE_ADMINISTRATOR:
+            user.is_staff = True
+        elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            logged_in_user.is_staff = True
-        elif logged_in_user.role == RCPCH_AUDIT_LEAD:
+            user.is_staff = True
+        elif user.role == RCPCH_AUDIT_LEAD:
             group = Group.objects.get(
                 name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            logged_in_user.is_staff = True
-        elif logged_in_user.role == RCPCH_AUDIT_ANALYST:
+            user.is_staff = True
+        elif user.role == RCPCH_AUDIT_ANALYST:
             group = Group.objects.get(
                 name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            logged_in_user.is_staff = True
-        elif logged_in_user.role == RCPCH_AUDIT_ADMINISTRATOR:
+            user.is_staff = True
+        elif user.role == RCPCH_AUDIT_ADMINISTRATOR:
             group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-        elif logged_in_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
+        elif user.role == RCPCH_AUDIT_PATIENT_FAMILY:
             group = Group.objects.get(name=PATIENT_ACCESS)
         else:
             # no group
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
-        logged_in_user.groups.add(group)
+        user.groups.add(group)
 
 
-class Epilepsy12User(AbstractBaseUser, PermissionsMixin):
+class Epilepsy12User(AbstractUser, PermissionsMixin):
     username = None
     first_name = models.CharField(
         _("First name"),

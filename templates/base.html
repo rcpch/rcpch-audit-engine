@@ -45,9 +45,9 @@
                 <a class="item" href="{% url 'login' %}">
                   Sign in
                 </a>
-                <a class="item" href="{% url 'signup' %}">
+                {% comment %} <a class="item" href="{% url 'signup' %}">
                   Sign up
-                </a>
+                </a> {% endcomment %}
               {% endif %}
             </div>
           </div>
@@ -96,22 +96,26 @@
 
 
     <div class='ui container'>
-
-        
-        {% if messages %}
-          <div class="ui green message">
-            <i class="close icon"></i>
-                {% for message in messages %}
-                  {% if message.tags %} {% endif %}{{ message }}
-                {% endfor %}
-          </div>
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
-        
-
+      
+      
+      {% if messages %}
+      <div class="ui green message">
+        <i class="close icon"></i>
+        {% for message in messages %}
+        {% if message.tags %} {% endif %}
+        {{ message }}
+        {% endfor %}
+      </div>
+      {% endif %}
+      
     </div>
+    <div class='ui fluid container'>
+      
+      {% block content %}
+      {% endblock %}
+      
+    </div>
+
         
         
     <div class="ui fluid rcpch container">

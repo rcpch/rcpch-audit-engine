@@ -236,12 +236,12 @@
         <tr>
             <th colspan="10" class="right aligned">
             {% if epilepsy12_user_list.has_previous %}
-            <div class="ui rcpch_primary button" hx-target="#case_table"
+            <div class="ui rcpch_primary button" hx-target="#epilepsy12_user_table"
                 hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Previous 10</div>
             {% endif %}
             {% if epilepsy12_user_list.has_next %}
-            <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
+            <div class="ui rcpch_primary button" name="next_button" hx-target="#epilepsy12_user_table"
                 hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Next 10</div>
             {% endif %}

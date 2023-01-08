@@ -145,6 +145,20 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'epilepsy12.Epilepsy12User'
 
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = 'smtp.eu.mailgun.org'
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = True
+    DEFAULT_FROM_EMAIL = 'admin@epilepsy12.tech'
+
+PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

@@ -15,7 +15,7 @@ class Epilepsy12UserAdmin(UserAdmin):
     search_fields = ('email', 'surname',
                      'role', 'hospital_employer', 'is_active',)
     list_display = ('id', "email", "title", "first_name", "surname",
-                    "is_active", "twitter_handle", "role", "hospital_employer", "is_rcpch_audit_team_member", "email_confirmed")
+                    "is_active", "twitter_handle", "role", "hospital_employer", 'is_superuser', "is_rcpch_audit_team_member", "email_confirmed")
     list_filter = ("is_active", "role", "hospital_employer",)
     fieldsets = (
         (
@@ -50,7 +50,8 @@ class Epilepsy12UserAdmin(UserAdmin):
                     'is_staff',
                     'is_rcpch_audit_team_member',
                     'is_superuser',
-                    "email_confirmed"
+                    "email_confirmed",
+                    "view_preference",
                 )
             }
         ),
@@ -79,13 +80,9 @@ class Epilepsy12UserAdmin(UserAdmin):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields['hospital_employer'].required = False
         if not request.user.is_superuser:
-            form.base_fields['is_superuser'].disabled = True
-            form.base_fields['is_rcpch_audit_team_member'].disabled = True
-            form.base_fields['groups'].disabled = True
+            self.exclude = ['is_superuser']
         else:
-            form.base_fields['is_superuser'].disabled = False
-            form.base_fields['is_rcpch_audit_team_member'].disabled = False
-            form.base_fields['groups'].disabled = False
+            self.exclude = []
         if request.user.groups.filter(name='trust_audit_team_edit_access'):
             form.base_fields['groups'].disabled = True
             form.base_fields['first_name'].disabled = True
