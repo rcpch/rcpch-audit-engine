@@ -94,15 +94,6 @@ def case_list(request, hospital_id):
                 site__site_is_primary_centre_of_epilepsy_care=True
             )
 
-        # if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
-        #     # this is to sort on IMD
-        #     all_cases = filtered_cases.order_by(
-        #         'index_of_multiple_deprivation_quintile').all()
-        #     sort_flag = "sort_by_imd_up"
-        # elif request.htmx.trigger_name == "sort_by_imd_down" or request.GET.get('sort_flag') == "sort_by_imd_down":
-        #     all_cases = filtered_cases.order_by(
-        #         '-index_of_multiple_deprivation_quintile').all()
-        #     sort_flag = "sort_by_imd_down"
         if request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
             all_cases = filtered_cases.order_by(
                 'nhs_number').all()
@@ -208,68 +199,6 @@ def case_list(request, hospital_id):
 
 
 @login_required
-def child_hospital_select(request, hospital_id):
-    """
-    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
-    """
-
-    selected_hospital_id = request.POST.get('child_hospital_select')
-
-    # get currently selected hospital
-    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
-
-    # trigger page reload with new hospital
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_trust.pk}))
-
-
-@login_required
-def view_preference(request, hospital_id):
-    """
-    POST request from Toggle in has rcpch_view_preference.html template
-    Users can toggle between national, trust and hospital views.
-    Only RCPCH staff can request a national view.
-    """
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
-
-    rcpch_choices = (
-        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
-        (1, f'Trust View ({hospital_trust.ParentName})'),
-        (2, 'National View'),
-    )
-
-    request.user.view_preference = int(request.htmx.trigger_name)
-    request.user.save()
-
-    # this is the list of all hospitals in the selected hospital's trust
-    hospital_children = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).all()
-
-    context = {
-        'rcpch_choices': rcpch_choices,
-        'hospital_trust': hospital_trust,
-        'hospital_children': hospital_children
-    }
-
-    response = render(
-        request, template_name='epilepsy12/partials/cases/view_preference.html', context=context)
-
-    # trigger a GET request to rerender the case list
-    trigger_client_event(
-        response=response,
-        name="case_list",
-        params={})  # reloads the form to show the updated cases
-
-    # trigger a GET request to rerender the case list statistics
-    trigger_client_event(
-        response=response,
-        name="case_statistics",
-        params={})  # reloads the form to show the updated cases
-
-    return response
-
-
-@login_required
-@group_required([RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY])
 def case_statistics(request, hospital_id):
     """
     GET request from cases template to update stats on toggle between RCPCH view and hospital view

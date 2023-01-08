@@ -1,0 +1,261 @@
+{% load epilepsy12_template_tags %}
+{% load static %}
+{% csrf_token %}
+
+<div 
+    hx-target='#epilepsy12_user_table' 
+    hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk %}" 
+    hx-trigger='epilepsy12_user_list from:body'
+    hx-swap='innerHTML' 
+    name='epilepsy12_user_table'>
+  {% if epilepsy12_user_list.end_index > 0 %}
+    <table class="ui rcpch table">
+        <thead>
+            <tr>
+
+                <th>Name
+                    {% if sort_flag and sort_flag == "sort_epilepsy12users_by_name_up" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_name_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_down" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12users_by_name_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% else %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_name_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_name_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% endif %}
+                </th>
+                <th>Email
+                    {% if sort_flag and sort_flag == "sort_epilepsy12users_by_email_up" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_email_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_by_email_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_email_down" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12users_by_email_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_by_email_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% else %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_email_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_email_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% endif %}
+                </th>
+                <th>Role
+                    {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_role_up" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_role_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_role_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_role_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_role_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% else %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_by_role_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_role_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% endif %}
+                </th>
+                <th></th>
+                
+                <th class='two wide'></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for epilepsy12_user in epilepsy12_user_list %}
+            
+            <tr>
+            
+            <td>{{ epilepsy12_user.get_full_name }}</td>
+            <td>{{ epilepsy12_user.email }}</td>
+            <td>{{ epilepsy12_user.get_role_display }}</td>
+            <td>
+                {% if not epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
+                    <i 
+                        class="rcpch_light_blue dot circle outline icon"
+                        id="{{epilepsy12_user.id}}_not_email_confirmed_icon"
+                        data-title="Email Confirmation"
+                        data-content="{{epilepsy12_user}} has not yet completed the signup process."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_not_email_confirmed_icon').popup(); end"
+                    >
+                {% elif epilepsy12_user.email_confirmed and epilepsy12_user.is_active %}
+                    <i 
+                        class="rcpch_pink check circle outline icon"
+                        id="{{epilepsy12_user.id}}_email_confirmed_icon"
+                        data-title="User status"
+                        data-content="{{epilepsy12_user}} is an active user."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_email_confirmed_icon').popup(); end"
+                    >
+                {% elif epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
+                    <i 
+                        class="red close icon"
+                        id="{{epilepsy12_user.id}}_inactive_icon"
+                        data-title="User status"
+                        data-content="{{epilepsy12_user}} is an inactive user."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_is_inactive_icon').popup(); end"
+                    >
+                {% endif %}
+            </td>
+            <td>
+                {% if epilepsy12_user.is_rcpch_audit_team_member %}
+                    <img 
+                        src="{% static 'images/favicon.ico' %}" 
+                        class="ui left spaced avatar image"
+                        id="{{epilepsy12_user.id}}_rcpch_audit_team_member_icon"
+                        data-title="RCPCH Audit Team Member"
+                        data-content="{{epilepsy12_user}} is a member of the national RCPCH audit team. They can view national data."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_rcpch_audit_team_member_icon').popup(); end"
+                    >
+                {% endif %}
+                {% if epilepsy12_user.is_staff %}
+                    <img 
+                        src="{% static 'images/rcpch-logo.jpg' %}" 
+                        class="ui right spaced avatar image"
+                        id="{{epilepsy12_user.id}}_staff_icon"
+                        data-title="RCPCH Staff Member"
+                        data-content="{{epilepsy12_user}} is a member of RCPCH staff.  They are not affiliated with any hospital or community trust and can view national data."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_staff_icon').popup(); end"
+                    >
+                {% endif %}
+                {% if epilepsy12_user.is_superuser %}
+                    <i 
+                        class="star outline large icon"
+                        id="{{epilepsy12_user.id}}_is_superuser_icon"
+                        data-title="Superuser"
+                        data-content="{{epilepsy12_user}} is a Superuser.  Superusers are rare birds and can access all areas."
+                        data-position="top left"
+                        data-variation="basic"
+                        _="init js $('#{{epilepsy12_user.id}}_is_superuser_icon').popup(); end"
+                    >
+                {% endif %}
+            </td>
+            
+            <td class='two wide'>
+                <div class='ui buttons'>
+                <button 
+                    data-tooltip='Edit Epilepsy12 User details.'
+                    {% if perms.epilepsy12.change_epilepsy12user %}
+                        class="ui rcpch_primary icon button" 
+                    {% else %}
+                        class="ui rcpch_primary icon disabled button" 
+                    {% endif %}
+                    tabindexed="0">
+                    <a href="{% url 'edit_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
+                        <i class="edit outline icon"></i>
+                    </a>
+                </button>
+                
+                <button 
+                    data-tooltip='Delete Epilepsy12 User. This is irreversible.' 
+                    {% if perms.epilepsy12.delete_epilepsy12user %}
+                        class="ui rcpch_danger icon button" 
+                    {% else %}
+                        class="ui rcpch_danger icon disabled button" 
+                    {% endif %}
+                    tabindexed="1" 
+                    hx-post="{% url 'delete_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}"
+                    hx-trigger='click'
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'Are you sure you want to delete {{epilepsy12_user}}? This is an irreversible step.',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'Delete {{epilepsy12_user}}'
+                        })
+                        if result.isConfirmed issueRequest()"
+                >
+                    <i class="trash alternate outline icon"></i>   
+                </button>
+                
+                </div>
+
+            </td>
+    
+            </tr>
+
+        {% endfor %}
+
+        <tfoot>
+        <tr>
+            <th colspan="10" class="right aligned">
+            {% if epilepsy12_user_list.has_previous %}
+            <div class="ui rcpch_primary button" hx-target="#epilepsy12_user_table"
+                hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
+                hx-swap="innerHTML">Previous 10</div>
+            {% endif %}
+            {% if epilepsy12_user_list.has_next %}
+            <div class="ui rcpch_primary button" name="next_button" hx-target="#epilepsy12_user_table"
+                hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
+                hx-swap="innerHTML">Next 10</div>
+            {% endif %}
+            </th>
+        </tr>
+        </tfoot>
+
+        </tbody>
+    </table>
+  {% else %}
+    <div class='ui container'>
+        <div class='padded_container'>
+        <div class='ui rcpch_info message'>There are no Epilepsy12 users registered yet</div>
+        </div>
+    </div>
+  {% endif %}
+</div>

@@ -10,18 +10,17 @@ from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
 class Epilepsy12UserAdmin(UserAdmin):
     add_form = Epilepsy12UserCreationForm
     form = Epilepsy12UserChangeForm
-    order = ('surname')
+    ordering = ['email']
     model = Epilepsy12User
-    search_fields = ('email', 'username', 'surname',
+    search_fields = ('email', 'surname',
                      'role', 'hospital_employer', 'is_active',)
-    list_display = ('id', "username", "email", "title", "first_name", "surname",
-                    "is_active", "twitter_handle", "role", "hospital_employer", "is_rcpch_audit_team_member")
+    list_display = ('id', "email", "title", "first_name", "surname",
+                    "is_active", "twitter_handle", "role", "hospital_employer", 'is_superuser', "is_rcpch_audit_team_member", "email_confirmed")
     list_filter = ("is_active", "role", "hospital_employer",)
     fieldsets = (
         (
             None, {
                 'fields': (
-                    'username',
                     'title',
                     'first_name',
                     'surname',
@@ -51,6 +50,8 @@ class Epilepsy12UserAdmin(UserAdmin):
                     'is_staff',
                     'is_rcpch_audit_team_member',
                     'is_superuser',
+                    "email_confirmed",
+                    "view_preference",
                 )
             }
         ),
@@ -71,7 +72,7 @@ class Epilepsy12UserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'title', 'first_name', 'surname', 'password1', 'password2', 'is_staff', 'is_active', 'is_rcpch_audit_team_member', 'role', 'hospital_employer', 'is_superuser', 'groups')
+            'fields': ('email', 'title', 'first_name', 'surname', 'is_staff', 'is_active', 'is_rcpch_audit_team_member', 'role', 'hospital_employer', 'is_superuser', 'groups')
         }),
     )
 
@@ -79,16 +80,11 @@ class Epilepsy12UserAdmin(UserAdmin):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields['hospital_employer'].required = False
         if not request.user.is_superuser:
-            form.base_fields['is_superuser'].disabled = True
-            form.base_fields['is_rcpch_audit_team_member'].disabled = True
-            form.base_fields['groups'].disabled = True
+            self.exclude = ['is_superuser']
         else:
-            form.base_fields['is_superuser'].disabled = False
-            form.base_fields['is_rcpch_audit_team_member'].disabled = False
-            form.base_fields['groups'].disabled = False
+            self.exclude = []
         if request.user.groups.filter(name='trust_audit_team_edit_access'):
             form.base_fields['groups'].disabled = True
-            form.base_fields['username'].disabled = True
             form.base_fields['first_name'].disabled = True
             form.base_fields['surname'].disabled = True
             form.base_fields['title'].disabled = True
