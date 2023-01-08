@@ -72,7 +72,7 @@ h5,h6 {
   font-weight: 400;
 }
 
-p {
+p, a {
   font-family: Montserrat-Regular;
   color: black;
 }

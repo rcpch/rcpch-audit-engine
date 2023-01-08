@@ -18,7 +18,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, HospitalTrust
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
-
+from django.contrib.sites.shortcuts import get_current_site
 User = get_user_model()
 
 
@@ -204,7 +204,7 @@ def create_epilepsy12_user(request, hospital_id):
             email_template_name = "registration/admin_reset_password.html"
             c = {
                 "email": new_user.email,
-                'domain': '0.0.0.0:8000',
+                'domain': get_current_site(request),
                 'site_name': 'Website',
                 "uid": urlsafe_base64_encode(force_bytes(new_user.pk)),
                 "user": new_user,
