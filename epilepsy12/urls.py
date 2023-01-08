@@ -1,7 +1,7 @@
 from . import views
 from .view_folder import *
 from django.urls import path
-from django.contrib.auth.views import PasswordResetConfirmView
+
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
@@ -29,6 +29,8 @@ router.register(r'auditprogress', views.AuditProgressViewSet)
 
 urlpatterns = [
     path('registration/', include('django.contrib.auth.urls')),
+    path('registration/login', views.epilepsy12_login, name='login'),
+
     path("favicon", views.favicon),
     #     path("signup/", views.signup, name="signup"),
     path('403', views.redirect_403, name='redirect_403'),

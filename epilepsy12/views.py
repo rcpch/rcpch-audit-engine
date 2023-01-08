@@ -28,7 +28,7 @@ from itertools import chain
 from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
-from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm
+from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -37,6 +37,30 @@ from .decorator import rcpch_full_access_only
 from .serializers import *
 
 user = get_user_model()
+
+
+def epilepsy12_login(request):
+    if request.method == "POST":
+        form = Epilepsy12LoginForm(request, data=request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=email, password=password)
+
+            if user is not None:
+                if user.email_confirmed == False:
+                    user.email_confirmed = True
+                    user.save()
+                login(request, user)
+                messages.info(request, f"You are now logged in as {email}.")
+                return redirect("hospital_reports")
+            else:
+                messages.error(request, "Invalid email or password.")
+        else:
+            messages.error(request, "Invalid email or password.")
+    form = Epilepsy12LoginForm()
+    return render(request=request, template_name="registration/login.html", context={"form": form})
 
 
 def index(request):

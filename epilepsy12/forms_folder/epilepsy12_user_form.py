@@ -1,10 +1,17 @@
 
 from django import forms
 from django.core import validators
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm, SetPasswordForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from epilepsy12.constants.user_types import ROLES, TITLES
 from ..models import Epilepsy12User, HospitalTrust
+
+
+class Epilepsy12LoginForm(AuthenticationForm):
+
+    class Meta:
+        model = Epilepsy12User
+        fields = ("email", "password")
 
 
 class Epilepsy12UserCreationForm(UserCreationForm):
