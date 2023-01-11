@@ -2,7 +2,6 @@
 from django import forms
 from django.core import validators
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm, SetPasswordForm, AuthenticationForm
-from django.contrib.auth import get_user_model
 from epilepsy12.constants.user_types import ROLES, TITLES
 from ..models import Epilepsy12User, HospitalTrust
 
@@ -57,22 +56,6 @@ class Epilepsy12UserCreationForm(UserCreationForm):
         model = Epilepsy12User
         fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
                   "is_rcpch_audit_team_member", 'is_staff', 'is_active')
-
-    # def clean_email(self):
-    #     email = self.cleaned_data['email'].lower()
-    #     try:
-    #         user = Epilepsy12User.objects.get(email)
-    #     except Exception as e:
-    #         return email
-    #     raise forms.ValidationError(f"{email} already in use!")
-
-    # def save(self, commit=True):
-    #     # Save the provided password in hashed format
-    #     user = super().save(commit=False)
-
-    #     if commit:
-    #         user.save()
-    #     return user
 
 
 class Epilepsy12UserChangeForm(UserChangeForm):
@@ -154,59 +137,11 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     class Meta:
         model = Epilepsy12User
         fields = ("email", "role", "hospital_employer", 'title', 'first_name', 'surname', "is_staff",
-                  "is_rcpch_audit_team_member", "is_superuser")
-
-    # def clean_email(self):
-    #     email = self.cleaned_data['email'].lower()
-    #     try:
-    #         user = Epilepsy12User.objects.get(email)
-    #     except Exception as e:
-    #         return email
-
-    #     raise forms.ValidationError(f"{email} already in use!")
-
-    # def clean_is_staff(self):
-    #     if self.cleaned_data['is_staff']:
-    #         # RCPCH staff are not affiliated with a hospital trust
-    #         self.cleaned_data['hospital_employer'] = None
-    #     else:
-    #         return False
-
-    #     return self.cleaned_data['is_staff']
-
-    # def clean_is_superuser(self):
-    #     if self.cleaned_data['is_superuser']:
-    #         return True
-    #     else:
-    #         return False
-
-    # def clean_is_rcpch_audit_team_member(self):
-    #     if self.cleaned_data['is_rcpch_audit_team_member']:
-    #         return True
-    #     else:
-    #         return False
-
-    # def clean_password1(self):
-    #     return "Epilepsy12User"
-
-    # def clean_password2(self):
-    #     return "Epilepsy12User"
+                  "is_rcpch_audit_team_member", "is_superuser", "email_confirmed")
 
     def clean(self):
         cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
         return cleaned_data
-
-    # def save(self, commit=True):
-    #     # Save the provided password in hashed format
-    #     user = super(Epilepsy12UserAdminCreationForm, self).save(commit=False)
-    #     if commit:
-    #         user.set_password(self.cleaned_data['password2'])
-    #         user.view_preference = 0
-    #         user.email_confirmed = False
-    #         user.save()
-    #         get_user_model().objects.allocate_group_based_on_role(user)
-
-        # return user
 
 
 class Epilepsy12UserPasswordResetForm(SetPasswordForm):

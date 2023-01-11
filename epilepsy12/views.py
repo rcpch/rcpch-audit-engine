@@ -4,7 +4,7 @@ from datetime import datetime
 from django.apps import apps
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 from django.conf import settings
-from django.contrib.auth import login, get_user_model
+from django.contrib.auth import login, get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import FileResponse, HttpRequest, HttpResponse
@@ -29,6 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
+from .common_view_functions import trust_level_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -343,6 +344,23 @@ def selected_hospital_summary(request):
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
     })
+
+
+def selected_trust_kpis(request, hospital_id):
+    """
+    HTMX get request returning trust_level_kpi.html partial
+    """
+
+    print("Get request")
+
+    selected_trust_kpis = trust_level_kpis(hospital_id=hospital_id)
+
+    template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
+    context = {
+        'selected_trust_kpis': selected_trust_kpis
+    }
+
+    return render(request=request, template_name=template_name, context=context)
 
 
 def tsandcs(request):
