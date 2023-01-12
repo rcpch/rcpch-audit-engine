@@ -6,42 +6,72 @@
     hx-trigger="registration_status from:body"
     id="registration_buttons">
     <h5>First paediatric assessment date</h5>
-    <div class="three fields" >
-        {% if registration.registration_date %}
+    <div class="two fields" >
+
+            <div class='field'>
         
-                <div class="field">
-                    <label>Date of first paediatric assessment</label>
-                    <button class="ui rcpch_primary disabled fluid button">{{registration.registration_date}}</button>
-                </div>
-                
-        {% else %}
+                <div class='two fields'>
 
-            {% if registration.eligibility_criteria_met %}
-                <div class='field'>
-                    {% url 'registration_date' case_id=case_id as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=False error_message=error_message %}
-                </div>
-                
-            {% else %}
-                <div class="field" >
-                    {% url 'registration_date' case_id=case_id as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' disabled=True %}
-                </div>
-            {% endif %}
 
-        {% endif %}
-        <div class="field">
-            <label>Epilepsy12 Submission Deadline</label>
-            <div class='ui rcpch input'>
-                <input type="text" readonly="" placeholder="{{registration.registration_close_date}}"/>
+                    {% if registration.registration_date %}
+                    
+                            <div class="twelve wide field">
+                                <label>{{registration.get_registration_date_help_label_text}}</label>
+                                <button class="ui rcpch_primary disabled fluid button" id='first_paediatric_assessment_date_button'>{{registration.registration_date}}</button>
+                            </div>
+
+                    {% else %}
+
+                        {% if registration.eligibility_criteria_met %}
+
+                            <div class='twelve wide field'>
+                                {% url 'registration_date' case_id=case_id as hx_post %}
+                                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' enabled=perms.epilepsy12.can_register_child_in_epilepsy12 error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone."%}
+                            </div>
+                            
+                        {% else %}
+
+                            <div class="twelve wide field">
+                                {% url 'registration_date' case_id=case_id as hx_post %}
+                                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#registration_date_results' hx_trigger='change' hx_swap='innerHTML' label=registration.get_registration_date_help_label_text reference=registration.get_registration_date_help_reference_text date_value=registration.registration_date data_position='top right' input_date_field_name='registration_date' enabled=False error_message=error_message hx_confirm="Please confirm this is the correct date. This step cannot be undone."%}
+                            </div>
+
+                        {% endif %}
+                        
+
+                    {% endif %}
+
+                    <div class="four wide field">
+                        <label>Cohort</label>
+                        <div class='ui rcpch input'>
+                            <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-        <div class="field">
-            <label>Cohort</label>
-            <div class='ui rcpch input'>
-                <input type="text" readonly="" placeholder="{{registration.cohort}}"/>
+
+            <div class='field'>
+                <div class='two fields'>
+
+                    <div class="field">
+                        <label>Completed First Year</label>
+                        <div class='ui rcpch input'>
+                            <input type="text" readonly="" placeholder="{{registration.registration_close_date}}"/>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Submission Deadline</label>
+                        <div class='ui rcpch input'>
+                            <input type="text" readonly="" placeholder="{{registration.audit_submission_date}}"/>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
+
     </div>
     {% if error_message %}
         <div class='ui rcpch_warning message'>
@@ -49,3 +79,4 @@
         </div>
     {% endif %}
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

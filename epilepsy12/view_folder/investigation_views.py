@@ -1,12 +1,12 @@
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required
-from ..decorator import group_required
+from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.models import Investigations, Registration
-from ..decorator import update_model
-from .common_view_functions import recalculate_form_generate_response, validate_and_update_model
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..decorator import user_can_access_this_hospital_trust
 
 
 @login_required
+@user_can_access_this_hospital_trust()
 def investigations(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()
 
@@ -35,8 +35,8 @@ def investigations(request, case_id):
 
 # htmx
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'eeg_indicated', 'toggle_button')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def eeg_indicated(request, investigations_id):
     """
     This is an HTMX callback from the eeg_information.html partial template
@@ -44,6 +44,19 @@ def eeg_indicated(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='eeg_indicated',
+            page_element='toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     investigations = Investigations.objects.get(pk=investigations_id)
     # if eeg not indicated but previously selected, set dependent fields to None
@@ -64,14 +77,16 @@ def eeg_indicated(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def eeg_request_date(request, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
@@ -115,7 +130,8 @@ def eeg_request_date(request, investigations_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def eeg_performed_date(request, investigations_id):
     """
     This is an HTMX callback from the ecg_information.html partial template
@@ -159,8 +175,8 @@ def eeg_performed_date(request, investigations_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'twelve_lead_ecg_status', 'toggle_button')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def twelve_lead_ecg_status(request, investigations_id):
     """
     This is an HTMX callback from the ecg_status.html partial template
@@ -168,6 +184,20 @@ def twelve_lead_ecg_status(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='twelve_lead_ecg_status',
+            page_element='toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
@@ -180,15 +210,16 @@ def twelve_lead_ecg_status(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'ct_head_scan_status', 'toggle_button')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def ct_head_scan_status(request, investigations_id):
     """
     This is an HTMX callback from the ct_head_status.html partial template
@@ -196,6 +227,20 @@ def ct_head_scan_status(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='ct_head_scan_status',
+            page_element='toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
+
     investigations = Investigations.objects.get(pk=investigations_id)
 
     context = {
@@ -208,15 +253,16 @@ def ct_head_scan_status(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'mri_indicated', 'toggle_button')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def mri_indicated(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
@@ -224,6 +270,19 @@ def mri_indicated(request, investigations_id):
     This inverts the boolean field value, or makes a selection if none is made, 
     and returns the same partial.
     """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request,
+            investigations_id,
+            Investigations,
+            field_name='mri_indicated',
+            page_element='toggle_button',
+        )
+
+    except ValueError as error:
+        error_message = error
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
@@ -245,14 +304,16 @@ def mri_indicated(request, investigations_id):
         model_instance=investigations,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
+        error_message=error_message
     )
 
     return response
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def mri_brain_requested_date(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template
@@ -294,8 +355,8 @@ def mri_brain_requested_date(request, investigations_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
-@update_model(Investigations, 'mri_brain_reported_date', 'date_field')
+@user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.change_investigations', raise_exception=True)
 def mri_brain_reported_date(request, investigations_id):
     """
     This is an HTMX callback from the mri_brain_information.html partial template

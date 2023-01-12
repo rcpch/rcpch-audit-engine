@@ -24,6 +24,11 @@ def percent_complete(registration):
 
 
 @register.simple_tag
+def date_string(date):
+    return date.strftime("%d %B %Y")
+
+
+@register.simple_tag
 def characters_left(description):
     length = 5000-len(description)
     colour = 'black'
@@ -48,6 +53,31 @@ def custom_filter(text, color):
 
 
 @register.simple_tag
+def permission_text(add_permission, change_permission, delete_permission, model_name):
+    return_string = 'You do not have permission to'
+    if add_permission:
+        if change_permission and not delete_permission:
+            return_string += f' delete {model_name}.'
+        elif not change_permission and delete_permission:
+            return_string += f' edit {model_name}.'
+        elif not change_permission and not delete_permission:
+            return_string += f' edit or delete {model_name}.'
+        else:
+            return_string = ""
+    else:
+        if change_permission and not delete_permission:
+            return_string += f' add or delete {model_name}.'
+        elif not change_permission and not delete_permission:
+            return_string += f' add, edit or delete {model_name}.'
+        elif change_permission and delete_permission:
+            return_string += f' add {model_name}.'
+        else:
+            return_string = ""
+    print(return_string)
+    return return_string
+
+
+@register.filter
 def matches_model_field(field_name, model):
     if field_name:
         value = getattr(model, field_name)
@@ -59,6 +89,8 @@ def matches_model_field(field_name, model):
 
 @register.filter
 def snomed_concept(concept_id):
+    if concept_id is None:
+        return
     concept = fetch_concept(concept_id)
     return concept['preferredDescription']['term']
 
@@ -77,6 +109,14 @@ def is_in(url_name, args):
         return True
     else:
         return False
+
+
+@register.simple_tag
+def match_two_values(val1, val2):
+    """
+    Matches two values
+    """
+    return val1 == val2
 
 
 @register.filter
@@ -133,3 +173,11 @@ def none_masked(field):
         return "##########"
     else:
         return field
+
+
+@register.filter(name='icon_for_score')
+def icon_for_score(score):
+    if score < 1:
+        return mark_safe("<i class='rcpch_light_blue exclamation triangle icon'></i>")
+    else:
+        return mark_safe("<i class='check circle outline rcpch_pink icon'></i>")

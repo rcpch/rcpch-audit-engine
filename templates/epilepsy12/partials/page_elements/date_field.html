@@ -9,20 +9,48 @@
         date_value: date value
         data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
         input_date_field_name: the name of the input element - should match the field name being updated
-        disabled
+        enabled
+        hx_confirm
+        tooltip_id: this is the name of the field to update
     NOTE - in the view, the value of the date can be retrieved by request.POST.get(FIELD_NAME_AS_A_STRING)
 {% endcomment %}
 
     <div class="field">
         
-        <label>{{label}}&nbsp;<span data-tooltip='{{reference}}'><i class="rcpch question circle icon"></i></span>
-        </label>
+        <h5>
+            {{label}}&nbsp;
+            <span 
+                id="{{input_date_field_name}}"
+                data-title="Reference"
+                data-content="{{reference}}"
+                data-position="{{data_position}}"
+                data-variation="basic"
+                _="init js $('#{{input_date_field_name}}').popup(); end"
+            >
+                <i class="rcpch question circle icon"></i>
+            </span>
+        </h5>
         {% if error_message %}
             <div class='field error'>
         {% endif %}
             <div class='ui left icon input'>
                 <input 
-                    {% if disabled %}disabled{% endif %}
+                    {% if not enabled %}disabled{% endif %}
+                    {% if hx_confirm %}
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: '{{hx_confirm}}',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'I confirm the date is correct'
+                          })
+                        if result.isConfirmed issueRequest()"
+                    {% endif %}
                     type="date"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-swap="{{hx_swap}}"
@@ -39,9 +67,25 @@
                     <i class="rcpch_pink check circle outline icon"></i>
                 {% endif %}
             </div>
-
-        {% if error_message %}
-            </div>
+            
+            {% if error_message %}
+        </div>
         {% endif %}
-
+        
+        {% if not enabled %}
+            <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
+        {% endif %}
+        
+    </div>
+    
+    
+    <div class="ui mini modal">
+        <div class="header">Confirmation Required</div>
+        <div class="content">
+          <span><p></p></span>
+        </div>
+        <div class="actions">
+          <div class="ui approve button">The date is correct</div>
+          <div class="ui cancel button">Cancel</div>
+        </div>
     </div>

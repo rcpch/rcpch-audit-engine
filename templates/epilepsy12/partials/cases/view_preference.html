@@ -1,7 +1,20 @@
 
 
-{% url 'view_preference' hospital_id=hospital_trust.pk as hx_post %}
-{% include 'epilepsy12/partials/page_elements/rcpch_multiple_toggle.html' with choices=rcpch_choices hx_post=hx_post hx_target="#view_preference" hx_trigger="click" hx_swap="innerHTML" test_positive=request.user.view_preference label="" data_position="top left" %}
-{% if request.user.view_preference == 0 %}
-    {% include 'epilepsy12/partials/cases/hospital_children.html' with hospital_trust=hospital_trust hospital_children=hospital_children %}
+{% url 'view_preference' hospital_id=hospital_trust.pk template_name=template_name as hx_post %}
+{% if request.user.is_rcpch_audit_team_member %}
+
+    {% include 'epilepsy12/partials/page_elements/rcpch_multiple_toggle.html' with choices=rcpch_choices hx_post=hx_post hx_target=hx_target hx_trigger="click" hx_swap="innerHTML" test_positive=test_positive label="" data_position="top left" enabled=True %}
+    {% if request.user.view_preference == 0 %}
+        {% include 'epilepsy12/partials/cases/hospital_children.html' with hospital_trust=hospital_trust hospital_children=hospital_children template_name=template_name %}
+    {% endif %}
+
+{% else %}
+
+    <h5 class="ui right floated header">
+    {{hospital_trust.OrganisationName}} ({{hospital_trust.ParentName}})
+        <div id='hospital_children'>
+            {% include 'epilepsy12/partials/cases/hospital_children.html' with hospital_trust=hospital_trust hospital_children=hospital_children template_name=template_name hx_target='#hospital_children' %}
+        </div>
+    </h5>
+
 {% endif %}

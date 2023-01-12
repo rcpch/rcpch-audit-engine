@@ -18,7 +18,15 @@
     {% endcomment %}
     <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-        <label class='rcpch_plain_label'>{{label|safe}}&nbsp;<span data-html="{{reference|safe}}" class='rcpch_popup'><i class="rcpch question circle icon"></i></span>
+        <h5 class='rcpch_plain_label'>
+            {{label|safe}}&nbsp;
+            <span 
+                data-html="{{reference|safe}}" 
+                class='rcpch_popup'
+            >
+            <i class="rcpch question circle icon"></i>
+            </span>
+        </h5>
 
             {% if disabled %}
                 <div class="ui rcpch_light_blue fluid search selection disabled dropdown">

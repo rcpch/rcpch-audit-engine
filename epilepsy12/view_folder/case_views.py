@@ -6,12 +6,11 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from epilepsy12.decorator import group_required
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import HospitalTrust, Site
-from ..models import Case
+from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
-from ..general_functions import fetch_snomed
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
+from ..constants import RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
 
 
 @login_required
@@ -95,16 +94,7 @@ def case_list(request, hospital_id):
                 site__site_is_primary_centre_of_epilepsy_care=True
             )
 
-        if request.htmx.trigger_name == "sort_by_imd_up" or request.GET.get('sort_flag') == "sort_by_imd_up":
-            # this is to sort on IMD
-            all_cases = filtered_cases.order_by(
-                'index_of_multiple_deprivation_quintile').all()
-            sort_flag = "sort_by_imd_up"
-        elif request.htmx.trigger_name == "sort_by_imd_down" or request.GET.get('sort_flag') == "sort_by_imd_down":
-            all_cases = filtered_cases.order_by(
-                '-index_of_multiple_deprivation_quintile').all()
-            sort_flag = "sort_by_imd_down"
-        elif request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
+        if request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
             all_cases = filtered_cases.order_by(
                 'nhs_number').all()
             sort_flag = "sort_by_nhs_number_up"
@@ -144,6 +134,30 @@ def case_list(request, hospital_id):
             all_cases = filtered_cases.order_by(
                 '-id').all()
             sort_flag = "sort_by_id_down"
+        elif request.htmx.trigger_name == "sort_by_deadline_up" or request.GET.get('sort_flag') == "sort_by_deadline_up":
+            all_cases = filtered_cases.order_by(
+                'registration__audit_submission_date').all()
+            sort_flag = "sort_by_deadline_up"
+        elif request.htmx.trigger_name == "sort_by_deadline_down" or request.GET.get('sort_flag') == "sort_by_deadline_down":
+            all_cases = filtered_cases.order_by(
+                '-registration__audit_submission_date').all()
+            sort_flag = "sort_by_deadline_down"
+        elif request.htmx.trigger_name == "sort_by_cohort_up" or request.GET.get('sort_flag') == "sort_by_cohort_up":
+            all_cases = filtered_cases.order_by(
+                'registration__cohort').all()
+            sort_flag = "sort_by_cohort_up"
+        elif request.htmx.trigger_name == "sort_by_cohort_down" or request.GET.get('sort_flag') == "sort_by_cohort_down":
+            all_cases = filtered_cases.order_by(
+                '-registration__cohort').all()
+            sort_flag = "sort_by_cohort_down"
+        elif request.htmx.trigger_name == "sort_by_days_remaining_up" or request.GET.get('sort_flag') == "sort_by_days_remaining_up":
+            all_cases = filtered_cases.order_by(
+                'registration__days_remaining_before_submission').all()
+            sort_flag = "sort_by_days_remaining_before_submission_up"
+        elif request.htmx.trigger_name == "sort_by_days_remaining_before_submission_down" or request.GET.get('sort_flag') == "sort_by_days_remaining_before_submission_down":
+            all_cases = filtered_cases.order_by(
+                '-registration__days_remaining_before_submission').all()
+            sort_flag = "sort_by_days_remaining_before_submission_down"
         else:
             all_cases = filtered_cases.order_by('surname').all()
 
@@ -185,97 +199,6 @@ def case_list(request, hospital_id):
 
 
 @login_required
-@permission_required('epilepsy12.add_case')
-def create_case(request, hospital_id):
-    """
-    Django function based - returns django form to create a new case, or saves a new case if a
-    POST request. The only instance where htmx not used.
-    """
-    form = CaseForm(request.POST or None)
-    if request.method == "POST":
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.created_at = datetime.now()
-            hospital = HospitalTrust.objects.get(pk=hospital_id)
-            # save the new child
-            obj.save()
-            # allocate the child to the hospital supplied as primary E12 centre
-            Site.objects.create(
-                site_is_actively_involved_in_epilepsy_care=True,
-                site_is_primary_centre_of_epilepsy_care=True,
-                hospital_trust=hospital,
-                case=obj
-            )
-            messages.success(request, "You successfully created the case")
-            return redirect('cases', hospital_id=hospital_id)
-
-    context = {
-        "form": form
-    }
-    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
-
-
-# @login_required
-def child_hospital_select(request, hospital_id):
-    """
-    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
-    """
-
-    selected_hospital_id = request.POST.get('child_hospital_select')
-
-    # get currently selected hospital
-    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
-
-    # trigger page reload with new hospital
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_trust.pk}))
-
-
-@login_required
-def view_preference(request, hospital_id):
-    """
-    POST request from Toggle in has rcpch_view_preference.html template
-    Users can toggle between national, trust and hospital views.
-    Only RCPCH staff can request a national view.
-    """
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
-
-    rcpch_choices = (
-        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
-        (1, f'Trust View ({hospital_trust.ParentName})'),
-        (2, 'National View'),
-    )
-
-    request.user.view_preference = int(request.htmx.trigger_name)
-    request.user.save()
-
-    # this is the list of all hospitals in the selected hospital's trust
-    hospital_children = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).all()
-
-    context = {
-        'rcpch_choices': rcpch_choices,
-        'hospital_trust': hospital_trust,
-        'hospital_children': hospital_children
-    }
-
-    response = render(
-        request, template_name='epilepsy12/partials/cases/view_preference.html', context=context)
-
-    # trigger a GET request to rerender the case list
-    trigger_client_event(
-        response=response,
-        name="case_list",
-        params={})  # reloads the form to show the updated cases
-
-    # trigger a GET request to rerender the case list statistics
-    trigger_client_event(
-        response=response,
-        name="case_statistics",
-        params={})  # reloads the form to show the updated cases
-
-    return response
-
-
 def case_statistics(request, hospital_id):
     """
     GET request from cases template to update stats on toggle between RCPCH view and hospital view
@@ -314,13 +237,91 @@ def case_statistics(request, hospital_id):
 
 
 @login_required
-@group_required('epilepsy12_audit_team_edit_access', 'epilepsy12_audit_team_full_access', 'trust_audit_team_edit_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.change_case', )
+def case_submit(request, hospital_id, case_id):
+    """
+    POST request callback from submit button in case_list partial.
+    Disables further editing of case information. Case considered submitted
+    """
+    case = Case.objects.get(pk=case_id)
+    case.locked = not case.locked
+    case.save()
+
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
+
+
+@login_required
+def case_performance_summary(request, case_id):
+
+    case = Case.objects.get(pk=case_id)
+
+    context = {
+        'case': case,
+        'case_id': case.pk,
+        'active_template': 'case_performance_summary',
+        'audit_progress': case.registration.audit_progress,
+    }
+
+    template = 'epilepsy12/case_performance_summary.html'
+
+    response = render(request=request, template_name=template, context=context)
+
+    return response
+
+
+"""
+Case function based views - class based views not chosen as need to accept hospital_id also in URL
+"""
+
+
+@login_required
+@permission_required('epilepsy12.add_case')
+def create_case(request, hospital_id):
+    """
+    Django function based - returns django form to create a new case, or saves a new case if a
+    POST request. The only instance where htmx not used.
+    """
+    hospital_trust = HospitalTrust.objects.filter(
+        OrganisationID=hospital_id).get()
+    form = CaseForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.created_at = datetime.now()
+            hospital = HospitalTrust.objects.get(pk=hospital_id)
+            # save the new child
+            obj.save()
+            # allocate the child to the hospital supplied as primary E12 centre
+            Site.objects.create(
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+                hospital_trust=hospital,
+                case=obj
+            )
+            messages.success(request, "You successfully created the case")
+        else:
+            messages.error(request, "Case not created")
+            return redirect('cases', hospital_id=hospital_id)
+
+    context = {
+        "hospital_id": hospital_id,
+        "hospital_trust": hospital_trust,
+        "form": form
+    }
+    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
+
+
+@login_required
+@permission_required('epilepsy12.change_case', raise_exception=True)
 def update_case(request, hospital_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
+
+    hospital_trust = HospitalTrust.objects.filter(
+        OrganisationID=hospital_id).get()
 
     if request.method == "POST":
         if ('delete') in request.POST:
@@ -345,14 +346,17 @@ def update_case(request, hospital_id, case_id):
             return redirect('cases', hospital_id=hospital_id)
 
     context = {
-        "form": form
+        "hospital_id": hospital_id,
+        "hospital_trust": hospital_trust,
+        "form": form,
+        'case': case
     }
 
     return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
 @login_required
-@group_required('epilepsy12_audit_team_full_access', 'trust_audit_team_full_access')
+@permission_required('epilepsy12.delete_case', raise_exception=True)
 def delete_case(request, hospital_id, case_id):
     case = get_object_or_404(Case, id=case_id)
     case.delete()
@@ -360,6 +364,7 @@ def delete_case(request, hospital_id, case_id):
 
 
 @login_required
+@permission_required('epilepsy12.can_opt_out_child_from_inclusion_in_audit', raise_exception=True)
 def opt_out(request, hospital_id, case_id):
     """
     This child has opted out of Epilepsy12

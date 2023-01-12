@@ -1,3 +1,4 @@
+
 # django
 from datetime import datetime
 from django.apps import apps
@@ -27,7 +28,7 @@ from itertools import chain
 from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
-from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm
+from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -36,6 +37,30 @@ from .decorator import rcpch_full_access_only
 from .serializers import *
 
 user = get_user_model()
+
+
+def epilepsy12_login(request):
+    if request.method == "POST":
+        form = Epilepsy12LoginForm(request, data=request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=email, password=password)
+
+            if user is not None:
+                if user.email_confirmed == False:
+                    user.email_confirmed = True
+                    user.save()
+                login(request, user)
+                messages.info(request, f"You are now logged in as {email}.")
+                return redirect("hospital_reports")
+            else:
+                messages.error(request, "Invalid email or password.")
+        else:
+            messages.error(request, "Invalid email or password.")
+    form = Epilepsy12LoginForm()
+    return render(request=request, template_name="registration/login.html", context={"form": form})
 
 
 def index(request):
@@ -60,6 +85,19 @@ def hospital_reports(request):
     # Registration.objects.all().delete()
     # Episode.objects.all().delete()
 
+    # this snippet forces a resave on all registration objects to recalculate submission date
+    # it is a one time only step
+    # all_registration = Registration.objects.all()
+    # for reg in all_registration:
+    #     # if reg.audit_submission_date:
+    #     #     print(f'audit close: {reg.case}: {reg.audit_submission_date}')
+    #     if reg.registration_date:
+    #         print(
+    #             f'registration date: {reg.case}: {reg.registration_date} audit close: {reg.case}: {reg.audit_submission_date}')
+    #         reg.save()
+    #     else:
+    #         print('nothing to see here')
+
     """
     !!!
     """
@@ -67,11 +105,11 @@ def hospital_reports(request):
     """
     Remove duplicates
     """
-    for duplicates in Epilepsy12User.objects.values("email").annotate(
-        records=Count("email")
-    ).filter(records__gt=1):
-        for epilepsy12user in Epilepsy12User.objects.filter(name=duplicates["email"])[1:]:
-            epilepsy12user.delete()
+    # for duplicates in Epilepsy12User.objects.values("email").annotate(
+    #     records=Count("email")
+    # ).filter(records__gt=1):
+    #     for epilepsy12user in Epilepsy12User.objects.filter(name=duplicates["email"])[1:]:
+    #         epilepsy12user.delete()
 
     # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
     first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
@@ -200,7 +238,7 @@ def hospital_reports(request):
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
         'all_models': all_models,
-        'model_list': ('registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
+        'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
     })
 
 
@@ -401,6 +439,207 @@ def registration_active(request, case_id, active_template):
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
 
 
+@login_required
+def child_hospital_select(request, hospital_id, template_name):
+    """
+    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
+    """
+
+    selected_hospital_id = request.POST.get('child_hospital_select')
+
+    # get currently selected hospital
+    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
+
+    # trigger page reload with new hospital
+    return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
+
+
+@login_required
+def view_preference(request, hospital_id, template_name):
+    """
+    POST request from Toggle in has rcpch_view_preference.html template
+    Users can toggle between national, trust and hospital views.
+    Only RCPCH staff can request a national view.
+    """
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    request.user.view_preference = request.htmx.trigger_name
+    request.user.save()
+
+    return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
+
+
+@login_required
+@rcpch_full_access_only()
+def download_select(request):
+    """
+    POST request from frida_button.html
+    """
+    model = request.POST.get('model')
+
+    context = {
+        'selected_model': model,
+        'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
+        'is_selected': True
+    }
+
+    return render(request, template_name='epilepsy12/partials/frida_button.html', context=context)
+
+
+@login_required
+@rcpch_full_access_only()
+def download(request, model_name):
+    """
+    POST request to download table as csv
+    """
+
+    field_list = []
+
+    if model_name == 'allregisteredcases':
+        one_to_one_tables = ['registration', 'case', 'firstpaediatricassessment',
+                             'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management']
+
+        for index, one_to_one_table in enumerate(one_to_one_tables):
+            model_class = apps.get_model(
+                app_label='epilepsy12', model_name=one_to_one_table)
+            fields = model_class._meta.get_fields()
+
+            for field in fields:
+                if field.name in ['id', 'episode', 'syndrome', 'antiepilepsymedicine', 'comorbidity']:
+                    pass
+                else:
+                    if one_to_one_table == 'registration':
+                        relative_field_name = field.name
+                    else:
+                        relative_field_name = f'{one_to_one_table}__{field.name}'
+                        if field.name == 'hospital_trusts':
+                            relative_field_name += '__OrganisationName'
+                    field_list.append(relative_field_name)
+        model_class = Registration
+    else:
+        model_class = apps.get_model(
+            app_label='epilepsy12', model_name=model_name)
+
+        fields = model_class._meta.get_fields()
+        for field in fields:
+            field_list.append(field.name)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="all_registered_cases.csv"'
+
+    writer = csv.writer(response)
+
+    all_fields = model_class.objects.all().values(*field_list)
+
+    for index, p in enumerate(all_fields):
+        if index == 0:
+            # csv headings - format the name to be readable from the key and add to the header
+            headers = p.keys()
+
+            header_list = []
+            for header in headers:
+                # loop through the headings and remove the model name which prefixes the field by __
+                split_header = header.split('__')
+                header_list.append(split_header[-1])
+            writer.writerow(header_list)
+        else:
+            # discard the keys and store only the values in each row. If the value represents a choice,
+            # get the choice key from the value
+            # this is a bit tedious but because a queryset is not an instance of the model, we have to create
+            # one in order to use the get_field_display() model instance method to look up the key name.
+            # This function has been abstracted out to the return_choice_for_instance_and_value function below
+            if p.get('case__sex') is not None:
+                field_value = p.get(
+                    'case__sex')
+                choice = return_choice_for_instance_and_value(
+                    Case, 'sex', field_value)
+                p['case__sex'] = choice
+
+            if p.get('case__ethnicity') is not None:
+                field_value = p.get(
+                    'case__ethnicity')
+                choice = return_choice_for_instance_and_value(
+                    Case, 'ethnicity', field_value)
+                p['case__ethnicity'] = choice
+
+            if p.get('firstpaediatricassessment__first_paediatric_assessment_in_acute_or_nonacute_setting') is not None:
+                field_value = p.get(
+                    'firstpaediatricassessment__first_paediatric_assessment_in_acute_or_nonacute_setting')
+                choice = return_choice_for_instance_and_value(
+                    FirstPaediatricAssessment, 'first_paediatric_assessment_in_acute_or_nonacute_setting', field_value)
+                p['firstpaediatricassessment__first_paediatric_assessment_in_acute_or_nonacute_setting'] = choice
+
+            if p.get('epilepsycontext__previous_febrile_seizure') is not None:
+                field_value = p.get(
+                    'epilepsycontext__previous_febrile_seizure')
+                choice = return_choice_for_instance_and_value(
+                    EpilepsyContext, 'previous_febrile_seizure', field_value)
+                p['epilepsycontext__previous_febrile_seizure'] = choice
+
+            if p.get('epilepsycontext__previous_acute_symptomatic_seizure') is not None:
+                field_value = p.get(
+                    'epilepsycontext__previous_acute_symptomatic_seizure')
+                choice = return_choice_for_instance_and_value(
+                    EpilepsyContext, 'previous_acute_symptomatic_seizure', field_value)
+                p['epilepsycontext__previous_acute_symptomatic_seizure'] = choice
+
+            if p.get('epilepsycontext__is_there_a_family_history_of_epilepsy') is not None:
+                field_value = p.get(
+                    'epilepsycontext__is_there_a_family_history_of_epilepsy')
+                choice = return_choice_for_instance_and_value(
+                    EpilepsyContext, 'is_there_a_family_history_of_epilepsy', field_value)
+                p['epilepsycontext__is_there_a_family_history_of_epilepsy'] = choice
+
+            if p.get('epilepsycontext__previous_neonatal_seizures') is not None:
+                field_value = p.get(
+                    'epilepsycontext__previous_neonatal_seizures')
+                choice = return_choice_for_instance_and_value(
+                    EpilepsyContext, 'previous_neonatal_seizures', field_value)
+                p['epilepsycontext__previous_neonatal_seizures'] = choice
+
+            if p.get('epilepsycontext__experienced_prolonged_generalized_convulsive_seizures') is not None:
+                field_value = p.get(
+                    'epilepsycontext__experienced_prolonged_generalized_convulsive_seizures')
+                choice = return_choice_for_instance_and_value(
+                    EpilepsyContext, 'experienced_prolonged_generalized_convulsive_seizures', field_value)
+                p['epilepsycontext__experienced_prolonged_generalized_convulsive_seizures'] = choice
+
+            if p.get('epilepsycontext__experienced_prolonged_focal_seizures') is not None:
+                field_value = p.get(
+                    'epilepsycontext__experienced_prolonged_focal_seizures')
+                choice = return_choice_for_instance_and_value(
+                    EpilepsyContext, 'experienced_prolonged_focal_seizures', field_value)
+                p['epilepsycontext__experienced_prolonged_focal_seizures'] = choice
+
+            if p.get('multiaxialdiagnosis__mental_health_issue') is not None:
+                field_value = p.get('multiaxialdiagnosis__mental_health_issue')
+                choice = return_choice_for_instance_and_value(
+                    MultiaxialDiagnosis, 'mental_health_issue', field_value)
+                p['multiaxialdiagnosis__mental_health_issue'] = choice
+
+            # write the formated data to a new row in the csv
+            writer.writerow(p.values())
+
+    return response
+
+
+def return_choice_for_instance_and_value(model, field, choice_value):
+    query_object = {
+        field: choice_value
+    }
+    temp_instance = model(**query_object)
+    choice = getattr(temp_instance, 'get_{}_display'.format(field))()
+    return choice
+
+
+@require_GET
+@cache_control(max_age=60 * 60 * 24, immutable=True, public=True)  # one day
+def favicon(request: HttpRequest) -> HttpResponse:
+    file = (settings.BASE_DIR / "static" /
+            "images/favicon-16x16.png").open("rb")
+    return FileResponse(file)
+
+
 def rcpch_403(request, exception):
     # this view is necessary to trigger a page refresh
     # it is called on raise PermissionDenied()
@@ -417,59 +656,6 @@ def rcpch_403(request, exception):
 def redirect_403(request):
     # return the custom 403 template. There is not context to add.
     return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
-
-
-@login_required
-@rcpch_full_access_only()
-def download_select(request):
-    """
-    POST request from frida_button.html
-    """
-    model = request.POST.get('model')
-
-    context = {
-        'selected_model': model,
-        'model_list': ('registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
-        'is_selected': True
-    }
-
-    return render(request, template_name='epilepsy12/partials/frida_button.html', context=context)
-
-
-@login_required
-@rcpch_full_access_only()
-def download(request, model_name):
-    """
-    POST request to download table as csv
-    """
-
-    model_instance = apps.get_model(
-        app_label='epilepsy12', model_name=model_name)
-    field_list = []
-
-    fields = model_instance._meta.get_fields()
-    for field in fields:
-        field_list.append(field.name)
-
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{model_name}.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(field_list)
-
-    items = model_instance.objects.all().values_list(*field_list)
-    for item in items:
-        writer.writerow(item)
-
-    return response
-
-
-@require_GET
-@cache_control(max_age=60 * 60 * 24, immutable=True, public=True)  # one day
-def favicon(request: HttpRequest) -> HttpResponse:
-    file = (settings.BASE_DIR / "static" /
-            "images/favicon-16x16.png").open("rb")
-    return FileResponse(file)
 
 
 """

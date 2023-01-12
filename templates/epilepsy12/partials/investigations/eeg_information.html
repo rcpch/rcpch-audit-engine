@@ -6,11 +6,7 @@
         <div class="field">
 
             {% url 'eeg_indicated' investigations_id=investigations.pk as hx_post %}
-            {% if not perms.epilepsy12.change_investigations %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label=investigations.get_eeg_indicated_help_label_text reference=investigations.get_eeg_indicated_help_reference_text data_position="top left" disabled=True %}   
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated label=investigations.get_eeg_indicated_help_label_text reference=investigations.get_eeg_indicated_help_reference_text data_position="top left" disabled=False %}   
-            {% endif %}
+            {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="click" hx_swap="innerHTML" test_positive=investigations.eeg_indicated tooltip_id='eeg_indicated_tooltip' label=investigations.get_eeg_indicated_help_label_text reference=investigations.get_eeg_indicated_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_investigations %}   
 
         </div>
 
@@ -19,18 +15,10 @@
         <div class="three fields">
             
             {% url 'eeg_request_date' investigations_id=investigations.pk as hx_post %}
-            {% if not perms.epilepsy12.change_investigations %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' disabled=True error_messages=error_messages %}   
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' disabled=False error_messages=error_messages %}   
-            {% endif %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations %}   
             
             {% url 'eeg_performed_date' investigations_id=investigations.pk as hx_post %}
-            {% if not perms.epilepsy12.change_investigations %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' disabled=True error_messages=error_messages %}   
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' disabled=False error_messages=error_messages %}   
-            {% endif %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations %}
 
             <div class="field">
                 <label>Time to EEG</label>

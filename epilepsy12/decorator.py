@@ -1,9 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from django.utils.functional import wraps
-from django.utils import timezone
-from datetime import datetime
-from epilepsy12.models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine
-from epilepsy12.models.comorbidity import Comorbidity
+from .models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine, Comorbidity
 
 
 model_primary_keys = [
@@ -131,6 +127,92 @@ def group_required(*group_names):
                     case = Case.objects.get(
                         pk=kwargs.get('case_id'))
                     child = case
+
+                # else:
+                #     child = Case.objects.get(pk=kwargs.get('case_id'))
+
+                if user.is_rcpch_audit_team_member:
+                    hospital = HospitalTrust.objects.filter(
+                        cases=child,
+                        site__site_is_actively_involved_in_epilepsy_care=True,
+                        site__site_is_primary_centre_of_epilepsy_care=True,
+                    )
+                else:
+                    # filter for object where trust (not just hospital) where case is registered is the same as that of user
+                    hospital = HospitalTrust.objects.filter(
+                        cases=child,
+                        site__site_is_actively_involved_in_epilepsy_care=True,
+                        site__site_is_primary_centre_of_epilepsy_care=True,
+                        ParentName=request.user.hospital_employer.ParentName
+                    )
+
+                if hospital.exists() or user.is_rcpch_audit_team_member:
+                    return view(request, *args, **kwargs)
+                else:
+                    raise PermissionDenied()
+            else:
+                raise PermissionDenied()
+
+        return wrapper
+    return decorator
+
+
+def user_can_access_this_hospital_trust():
+    # decorator receives case_id or registration_id from view as argument.
+    # access is granted only to users who are either:
+    # 1. superusers
+    # 2. RCPCH audit members
+    # 3. trust level access where their trust is the same as the child
+    def decorator(view):
+        def wrapper(request, *args, **kwargs):
+            user = request.user
+            if user.is_active and (user.is_superuser):
+                # user is in either a trust level or an RCPCH level group but in the correct group otherwise.
+                if kwargs.get('registration_id') is not None:
+                    registration = Registration.objects.get(
+                        pk=kwargs.get('registration_id'))
+                    child = registration.case
+                elif kwargs.get('management_id') is not None:
+                    management = Management.objects.get(
+                        pk=kwargs.get('management_id'))
+                    child = management.registration.case
+                elif kwargs.get('investigations_id') is not None:
+                    investigations = Investigations.objects.get(
+                        pk=kwargs.get('investigations_id'))
+                    child = investigations.registration.case
+                elif kwargs.get('first_paediatric_assessment_id') is not None:
+                    first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
+                        pk=kwargs.get('first_paediatric_assessment_id'))
+                    child = first_paediatric_assessment.registration.case
+                elif kwargs.get('epilepsy_context_id') is not None:
+                    epilepsy_context = EpilepsyContext.objects.get(
+                        pk=kwargs.get('epilepsy_context_id'))
+                    child = epilepsy_context.registration.case
+                elif kwargs.get('multiaxial_diagnosis_id') is not None:
+                    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+                        pk=kwargs.get('multiaxial_diagnosis_id'))
+                    child = multiaxial_diagnosis.registration.case
+                elif kwargs.get('episode_id') is not None:
+                    episode = Episode.objects.get(
+                        pk=kwargs.get('episode_id'))
+                    child = episode.multiaxial_diagnosis.registration.case
+                elif kwargs.get('syndrome_id') is not None:
+                    syndrome = Syndrome.objects.get(
+                        pk=kwargs.get('syndrome_id'))
+                    child = syndrome.multiaxial_diagnosis.registration.case
+                elif kwargs.get('comorbidity_id') is not None:
+                    comorbidity = Comorbidity.objects.get(
+                        pk=kwargs.get('comorbidity_id'))
+                    child = comorbidity.multiaxial_diagnosis.registration.case
+                elif kwargs.get('antiepilepsy_medicine_id') is not None:
+                    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+                        pk=kwargs.get('antiepilepsy_medicine_id'))
+                    child = antiepilepsy_medicine.management.registration.case
+                elif kwargs.get('case_id') is not None:
+                    case = Case.objects.get(
+                        pk=kwargs.get('case_id'))
+                    child = case
+
                 # else:
                 #     child = Case.objects.get(pk=kwargs.get('case_id'))
 
@@ -167,84 +249,9 @@ def rcpch_full_access_only():
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-            print(user.groups)
             if user.groups.filter(name='epilepsy12_audit_team_full_access').exists():
                 return view(request, *args, **kwargs)
             else:
                 raise PermissionDenied()
         return wrapper
-    return decorator
-
-
-def update_model(model, field_name, page_element, comparison_date_field_name=None, is_earliest_date=False):
-    """
-    Decorator to update the field in the model, depending on the type of page element POSTing back to the view.
-    It also updates the model with the user and the datetime updated and includes error handling
-
-    The page element is a string, corresponding to the page element type returning the value
-    page elements include:
-    - toggle_button
-    - multiple_choice_multiple_toggle_button
-    - single_choice_multiple_toggle_button
-    - select
-    - date_field
-
-    """
-    def decorator(f):
-        def wrapper(request, *args, **kwargs):
-            """
-            This is called every time the decorator function (calling function from the view) is called
-            """
-            if page_element == 'toggle_button':
-                # toggle button
-                # the trigger_name of the element here corresponds to whether true or false has been selected
-
-                if request.htmx.trigger_name == 'button-true':
-                    field_value = True
-                elif request.htmx.trigger_name == 'button-false':
-                    field_value = False
-                else:
-                    # an error has occurred
-                    print('Error has occurred')
-
-            elif page_element == 'multiple_choice_multiple_toggle_button' or page_element == 'single_choice_multiple_toggle_button':
-                # multiple_choice_multiple_toggle_button
-                field_value = request.htmx.trigger_name
-
-            elif page_element == 'date_field':
-                field_value = datetime.strptime(request.POST.get(
-                    request.htmx.trigger_name), "%Y-%m-%d").date()
-
-            elif page_element == 'select' or page_element == 'snomed_select':
-                field_value = request.POST.get(request.htmx.trigger_name)
-
-            # update the model
-            for key, value in kwargs.items():
-
-                if comparison_date_field_name:
-                    instance = model.objects.get(pk=value)
-                    comparison_date = getattr(
-                        instance, comparison_date_field_name)
-                    if is_earliest_date:
-                        date_valid = field_value <= comparison_date
-                        date_error = f'The date you chose ({field_value}) cannot not be after {comparison_date}'
-                    else:
-                        date_valid = field_value >= comparison_date
-                        date_error = f'The date you chose ({field_value}) cannot not be before {comparison_date}'
-
-                    if date_valid:
-                        pass
-                    else:
-                        raise ValueError(date_error)
-
-                updated_field = {
-                    field_name: field_value,
-                    'updated_at': timezone.now(),
-                    'updated_by': request.user
-                }
-                model.objects.filter(
-                    pk=value).update(**updated_field)
-
-            return f(request, *args, **kwargs)
-        return wraps(f)(wrapper)
     return decorator

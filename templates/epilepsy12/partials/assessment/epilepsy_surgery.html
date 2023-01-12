@@ -17,120 +17,124 @@
         <li>Children with epilepsy associated with hypothalamic hamartoma</li>
       </ol>
         {% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk as hx_post %}
-    {% if perms.epilepsy12.can_confirm_childrens_epilepsy_surgical_service_referral_criteria_met %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Are ANY of these criteria present?" data_position="top left" disabled=False %}
-    {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label="Are ANY of these criteria present?" data_position="top left" disabled=True %}
-    {% endif %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_referral_criteria_met_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_reference_text data_position="top left" enabled=perms.epilepsy12.can_confirm_childrens_epilepsy_surgical_service_referral_criteria_met %}
+
   </div>
     
     
         {% url 'childrens_epilepsy_surgical_service_referral_made' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" label=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_reference_text data_position="top left" %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_made_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
 
         {% if assessment.childrens_epilepsy_surgical_service_referral_made %}
 
             <div class="ui rcpch_lightest_blue message">
                 
-                        {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message %}
-                    
-                        {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message %}
-
-                        
-                        <div class="inline field">
-                            <label class='toggle_button_label'>Time to Review</label>
-                            <input class="ui input" type="text" value="{{assessment.childrens_epilepsy_surgery_wait}}" disabled/>
-                        </div>
-
-                        {% if error_message %}
-                            <div class='ui rcpch_warning message'>
-                                {{ error_message }}
-                            </div>
-                        {% endif %}
-
-                        {% if active_surgical_site %}
-                            <div class="field">
-                                <span>
-                                    <i class="rcpch_pink check circle outline icon"></i>
-                                     <label>Surgical centre actively involved in care</label>
-                                    <div class="ui right action input">
-                                        
-                                        <input disabled value="{{active_surgical_site.hospital_trust.OrganisationName}} ({{active_surgical_site.hospital_trust.ParentName}})">
-                                        <div class="ui buttons">
-                                        
-                                            {% if surgery_edit_active %}
-                                                <button 
-                                                    class="ui rcpch_negative button"
-                                                    hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' %}"
-                                                    hx-target="#childrens_epilepsy_surgical_service"
-                                                    hx-swap="innerHTML"
-                                                    hx-trigger="click"
-                                                >Cancel</button>
-                                            {% else %}
-                                                <button 
-                                                    class="ui rcpch_primary button"
-                                                    hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='edit' %}"
-                                                    hx-target="#childrens_epilepsy_surgical_service"
-                                                    hx-swap="innerHTML"
-                                                    hx-trigger="click"
-                                                >Edit</button>
-
-                                                <button 
-                                                    class="ui rcpch_danger button"
-                                                    hx-post="{% url 'delete_epilepsy_surgery_centre' site_id=active_surgical_site.pk assessment_id=assessment.pk %}"
-                                                    hx-target="#childrens_epilepsy_surgical_service"
-                                                    hx-swap="innerHTML"
-                                                    hx-include="[name='hospital_trust']"
-                                                    hx-trigger="click"
-                                                >Delete</button>
-
-                                            {% endif %}
-                                        </div>    
-                                        
-                                    </div>
-                                </span>
-                            
-                            </div>  
-                            {% if surgery_edit_active %}
-                            
-                                <div class="field" id="allocate_surgical_centre">
-                                    {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
-                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" %}
-                                </div>
-                            {% endif %}
-                            
-                        {% else %}
-                            <div class="field" id="allocate_surgical_centre">
-                                <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
-                                {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
-                                {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" %}
-                            </div>
-                        {% endif %}
-
-                        {% if historical_surgical_sites|length > 0 %}
-                           
-                            <div class="field">
-                                <label>Surgical centres previously involved in care</label>
-                                {% for historical_surgical_site in historical_surgical_sites %}
-                                    <li>{{historical_surgical_site.hospital_trust.OrganisationName}}</li>
-                                {% endfor %}
-                            </div>
-                            
-
-                        {% else %}
-                            
-                            <div class="field">
-                                
-                                <p>No surgical centres have previously been involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</p>
-                                
-                            </div>
-                            
-
-                        {% endif %}
+                {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
+            
+                {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
 
                 
+                <div class="inline field">
+                    <label class='toggle_button_label'>Time to Review</label>
+                    <input class="ui input" type="text" value="{{assessment.childrens_epilepsy_surgery_wait}}" disabled/>
+                </div>
+
+                {% if error_message %}
+                    <div class='ui rcpch_warning message'>
+                        {{ error_message }}
+                    </div>
+                {% endif %}
+
+                {% if active_surgical_site %}
+                    <div class="field">
+                        <span>
+                            <i class="rcpch_pink check circle outline icon"></i>
+                                <label>Surgical centre actively involved in care</label>
+                            <div class="ui right action input">
+                                
+                                <input disabled value="{{active_surgical_site.hospital_trust.OrganisationName}} ({{active_surgical_site.hospital_trust.ParentName}})">
+                                <div class="ui buttons">
+                                
+                                    {% if surgery_edit_active %}
+                                        <button 
+                                            class="ui rcpch_negative button"
+                                            hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' %}"
+                                            hx-target="#childrens_epilepsy_surgical_service"
+                                            hx-swap="innerHTML"
+                                            hx-trigger="click"
+                                        >Cancel</button>
+                                    {% else %}
+                                        <button 
+                                            {% if perms.epilepsy12.change_assessment %}
+                                                class="ui rcpch_primary button"
+                                            {% else %}
+                                                class="ui rcpch_primary disabled button"
+                                            {% endif %}
+                                            hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='edit' %}"
+                                            hx-target="#childrens_epilepsy_surgical_service"
+                                            hx-swap="innerHTML"
+                                            hx-trigger="click"
+                                        >Edit</button>
+
+                                        <button 
+                                            {% if perms.epilepsy12.delete_assessment %}
+                                                class="ui rcpch_danger button"
+                                            {% else %}
+                                                class="ui rcpch_danger disabled button"
+                                            {% endif %}
+                                            hx-post="{% url 'delete_epilepsy_surgery_centre' site_id=active_surgical_site.pk assessment_id=assessment.pk %}"
+                                            hx-target="#childrens_epilepsy_surgical_service"
+                                            hx-swap="innerHTML"
+                                            hx-include="[name='hospital_trust']"
+                                            hx-trigger="click"
+                                        >Delete</button>
+
+                                    {% endif %}
+                                </div>    
+                                
+                            </div>
+                        </span>
+                    
+                    </div>  
+                    {% if surgery_edit_active %}
+                    
+                        <div class="field" id="allocate_surgical_centre">
+                            {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
+                            {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+                        </div>
+                    {% endif %}
+                    
+                {% else %}
+                    <div class="field" id="allocate_surgical_centre">
+                        <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
+                        {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+                    </div>
+                {% endif %}
+
+                {% if historical_surgical_sites|length > 0 %}
+                    
+                    <div class="field">
+                        <label>Surgical centres previously involved in care</label>
+                        {% for historical_surgical_site in historical_surgical_sites %}
+                            <li>{{historical_surgical_site.hospital_trust.OrganisationName}}</li>
+                        {% endfor %}
+                    </div>
+                    
+
+                {% else %}
+                    
+                    <div class="field">
+                        
+                        <p>No surgical centres have previously been involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</p>
+                        
+                    </div>
+                    
+
+                {% endif %}
+
 
             </div>
 

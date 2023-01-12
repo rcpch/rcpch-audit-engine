@@ -39,15 +39,15 @@
             <div class="right menu">
               {% if user.is_authenticated %}
                   <a class="item" href={% url 'logout' %}>
-                    Log out {{ user.username }}
+                    Log out {{ user.get_full_name }}
                   </a>
               {% else %}
                 <a class="item" href="{% url 'login' %}">
                   Sign in
                 </a>
-                <a class="item" href="{% url 'signup' %}">
+                {% comment %} <a class="item" href="{% url 'signup' %}">
                   Sign up
-                </a>
+                </a> {% endcomment %}
               {% endif %}
             </div>
           </div>
@@ -66,13 +66,15 @@
                   Home
                 </a>
                 {% if user.is_authenticated %}
-                  <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
-                    Database management
-                  </a>
+                  {% if user.is_superuser %}
+                    <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
+                      Database management
+                    </a>
+                  {% endif %}
                 
-                <a {% if request.resolver_match.url_name|is_in:"hospital_reports,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
-                  Clinician access
-                </a>
+                  <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
+                    Clinician access
+                  </a>
                 {% endif %}
                 <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
                   Patient access
@@ -93,23 +95,27 @@
       </div>
 
 
-    <div class='ui fluid container'>
-
-        
-        {% if messages %}
-          <div class="ui green message">
-            <i class="close icon"></i>
-                {% for message in messages %}
-                  {% if message.tags %} {% endif %}{{ message }}
-                {% endfor %}
-          </div>
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
-        
-
+    <div class='ui container'>
+      
+      
+      {% if messages %}
+      <div class="ui green message">
+        <i class="close icon"></i>
+        {% for message in messages %}
+        {% if message.tags %} {% endif %}
+        {{ message }}
+        {% endfor %}
+      </div>
+      {% endif %}
+      
     </div>
+    <div class='ui fluid container'>
+      
+      {% block content %}
+      {% endblock %}
+      
+    </div>
+
         
         
     <div class="ui fluid rcpch container">
@@ -121,10 +127,12 @@
       {% include 'epilepsy12/footer.html'%}
 
     </div>
-          
+    <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'htmx_1.7/htmx.min.js' %}"></script>
+    <script src="{% static 'htmx_1.8.4/htmx.min.js' %}"></script>
+    <script src="{% static 'hyperscript_0.9.7/hyperscript.min.js' %}"></script>
     <script src="{% static 'js/semantic.min.js' %}" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
       $('.message .close').on('click', function() {

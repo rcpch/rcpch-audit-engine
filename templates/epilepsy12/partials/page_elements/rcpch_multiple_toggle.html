@@ -15,25 +15,24 @@
             test_positive: the model boolean field 
             label: this is the label text
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
-            disabled: this is only true if view_only groups are seeing the form
+            enabled: this is only true if view_only groups are seeing the form
         The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
         Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
     {% endcomment %}
+        {% load epilepsy12_template_tags %}
 
-    
         <label class="toggle_button_label">{{label}}</label>
         <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
             <span>
                 {% if test_positive is None %}
-                    
                     <div class="ui rcpch_dark_blue buttons">
                         {% for choice in choices %}
                             <div 
-                                {% if disabled %}
-                                    class="ui mini compact rcpch_dark_blue disabled button"
-                                {% else %}
+                                {% if enabled %}
                                     class="ui mini compact rcpch_dark_blue button"
+                                {% else %}
+                                    class="ui mini compact rcpch_dark_blue disabled button"
                                 {% endif %}
                                 hx-target="{{hx_target}}"
                                 hx-post="{{hx_post}}"
@@ -48,18 +47,19 @@
                         
                 {% else %}
                 
-                    <div class="ui rcpch_dark_blue buttons">
-                        {% for choice in choices %}
-                            {% if choice.0 == test_positive %}
+                <div class="ui rcpch_dark_blue buttons">
+                    {% for choice in choices %}
+                            {% match_two_values test_positive choice.0 as match %}
+                            {% if match %}
                                 <div 
                                     class="ui mini compact positive rcpch_dark_blue button"
                                 >{{choice.1}}</div>
                             {% else %}
                                 <div
-                                    {% if disabled %}disabled
-                                        class="ui mini compact disabled rcpch_dark_blue button"
-                                    {% else %}
+                                    {% if enabled %}
                                         class="ui mini compact rcpch_dark_blue button"
+                                    {% else %}
+                                        class="ui mini compact disabled rcpch_dark_blue button"
                                     {% endif %}
                                     hx-target="{{hx_target}}"
                                     hx-post="{{hx_post}}"
@@ -78,5 +78,8 @@
             </span>
 
         </div>
+        {% if not enabled %}
+            <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
+        {% endif %}
 
     

@@ -12,17 +12,32 @@
             hx_target: the id of the html element to target the server response
             hx_trigger: usually 'click' but can be any event
             hx_swap: usually 'innerHTML'
-            test_positive: the model boolean field 
+            test_positive: the model boolean field
+            tooltip_id: the nname of the field to update with the suffix _tooltip
             label: this is the label text (passed in from the model help label text)
             reference: this is the reference text (passed in from the model help reference text)
             data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
-            disabled: this is only true if view_only groups are seeing the form
+            enabled: this is only true if view_only groups are seeing the form
         The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
         Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
     {% endcomment %}
 
     
-        <label class="toggle_button_label">{{label}}<span data-tooltip='{{reference}}'><i class="rcpch question circle icon"></i></span></label>
+        <h5 class="toggle_button_label">
+            {{label}}
+            
+                <span
+                    id="{{tooltip_id}}"
+                    data-title="Reference"
+                    data-content="{{reference}}"
+                    data-position="{{data_position}}"
+                    data-variation="basic"
+                    _="init js $('#{{tooltip_id}}').popup(); end"
+                    >
+                    <i class="rcpch question circle icon"></i>
+                </span>
+
+        </h5>
         <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
             <span>
                 {% if test_positive is None %}
@@ -32,10 +47,10 @@
                     <div class="ui rcpch_dark_blue buttons">
                         {% for choice in choices %}
                             <div 
-                                {% if disabled %}
-                                    class="ui mini compact rcpch_dark_blue disabled button"
-                                {% else %}
+                                {% if enabled %}
                                     class="ui mini compact rcpch_dark_blue button"
+                                {% else %}
+                                    class="ui mini compact rcpch_dark_blue disabled button"
                                 {% endif %}
                                 hx-target="{{hx_target}}"
                                 hx-post="{{hx_post}}"
@@ -57,18 +72,18 @@
                             {% for choice in choices %}
                                 {% if choice.0 == test_positive %}
                                     <div 
-                                        {% if disabled %}
-                                            class="ui mini compact positive rcpch_dark_blue disabled button"
-                                        {% else %}
+                                        {% if enabled %}
                                             class="ui mini compact positive rcpch_dark_blue button"
+                                        {% else %}
+                                            class="ui mini compact positive rcpch_dark_blue disabled button"
                                         {% endif %}
                                     >{{choice.1}}</div>
                                 {% else %}
                                     <div 
-                                        {% if disabled %}
-                                            class="ui mini compact disabled rcpch_dark_blue disabled button"
-                                        {% else %}
+                                        {% if enabled %}
                                             class="ui mini compact rcpch_dark_blue button"
+                                        {% else %}
+                                            class="ui mini compact rcpch_dark_blue disabled button"
                                         {% endif %}
                                         hx-target="{{hx_target}}"
                                         hx-post="{{hx_post}}"
@@ -95,10 +110,11 @@
                                 >{{choice}}</div>
                             {% else %}
                                 <div 
-                                    {% if disabled %}disabled
-                                        class="ui mini compact disabled rcpch_dark_blue button"
-                                    {% else %}
+                                    {% if enabled %}
                                         class="ui mini compact rcpch_dark_blue button"
+                                    {% else %}
+                                        disabled
+                                        class="ui mini compact disabled rcpch_dark_blue button"
                                     {% endif %}
                                     hx-target="{{hx_target}}"
                                     hx-post="{{hx_post}}"
@@ -113,6 +129,14 @@
                     </div>
                 {% endif %}
             </span>
+            {% if error_message %}
+            <div class='ui rcpch message'>
+                {{error_message}}
+            </div>
+            {% endif %}
+            {% if not enabled %}
+                <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
+            {% endif %}
         </div>
 
     

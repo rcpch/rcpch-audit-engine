@@ -1,10 +1,6 @@
 {% load epilepsy12_template_tags %}
 {% url 'syndrome_present' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-{% if not perms.epilepsy12.change_syndrome %}
-    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present label=multiaxial_diagnosis.get_syndrome_present_help_label_text reference=multiaxial_diagnosis.get_syndrome_present_help_reference_text data_position='top left' disabled=True %}
-{% else %}
-    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present label=multiaxial_diagnosis.get_syndrome_present_help_label_text reference=multiaxial_diagnosis.get_syndrome_present_help_reference_text data_position='top left' disabled=False %}
-{% endif %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target="#syndrome_section" hx_trigger='click' hx_swap="innerHTML" test_positive=multiaxial_diagnosis.syndrome_present tooltip_id='syndrome_present_tooltip' label=multiaxial_diagnosis.get_syndrome_present_help_label_text reference=multiaxial_diagnosis.get_syndrome_present_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_syndrome %}
 
 {% if multiaxial_diagnosis.syndrome_present %}
 

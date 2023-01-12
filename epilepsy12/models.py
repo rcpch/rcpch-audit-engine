@@ -7,4 +7,4 @@ models.py imports our models from the .py files in the model subdirectory
 # Third party imports
 
 # RCPCH imports
-from .models import *
+from .models_folder import *

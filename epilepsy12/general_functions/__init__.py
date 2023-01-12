@@ -1,7 +1,6 @@
 """
 Imports all the general functions
 """
-
 from .cohort_number import *
 from .index_multiple_deprivation import *
 from .postcode import *
@@ -11,3 +10,4 @@ from .fetch_snomed import *
 from .time_elapsed import calculate_time_elapsed
 from .key_from_value import *
 from .value_from_key import *
+from .date_functions import *

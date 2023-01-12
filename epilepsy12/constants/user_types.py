@@ -78,18 +78,12 @@ GROUPS = (
 )
 
 # Case
-CAN_VIEW_CHILD_NHS_NUMBER = (
-    'can_view_child_nhs_number', 'Can view a child\'s NHS Number')
-CAN_VIEW_CHILD_DATE_OF_BIRTH = (
-    'can_view_child_date_of_birth', 'Can view a child\'s date of birth')
 CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING = ('can_lock_child_case_data_from_editing',
                                          'Can lock a child\'s record from editing.')
 CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING = ('can_unlock_child_case_data_from_editing',
                                            'Can unlock a child\'s record from editing.')
 CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT = ('can_opt_out_child_from_inclusion_in_audit',
                                              'Can sanction an opt out from participating in the audit. Note all the child\'s date except Epilepsy12 unique identifier are irretrievably deleted.')
-CAN_ONLY_VIEW_CHILD_CASE_DATA = ('can_only_view_child_case_data',
-                                 'Can only view a child\'s demographic and case information.')
 
 # Registration
 CAN_APPROVE_ELIGIBILITY = ('can_approve_eligibility',
@@ -102,62 +96,27 @@ CAN_REGISTER_CHILD_IN_EPILEPSY12 = ('can_register_child_in_epilepsy12',
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = ('can_unregister_child_in_epilepsy12',
                                       'Can unregister a child in Epilepsy. Their record and previously entered data is untouched.')
 
-CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE = ('can_only_view_general_paediatric_centre',
-                                           'Can only view general paediatric centre.')
-CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE = ('can_allocate_general_paediatric_centre',
-                                          'Can allocate general paediatric centre.')
-CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE = ('can_update_general_paediatric_centre',
-                                        'Can edit or update but not delete general paediatric centre.')
-CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE = ('can_delete_general_paediatric_centre',
-                                        'Can delete general paediatric centre.')
-CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE = ('can_only_view_tertiary_neurology_centre',
-                                           'Can only view tertiary neurology centre.')
-CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE = ('can_allocate_tertiary_neurology_centre',
-                                          'Can allocate tertiary neurology centre.')
-CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE = ('can_edit_tertiary_neurology_centre',
-                                      'Can edit or update but not delete tertiary neurology centre.')
-CAN_DELETE_TERTIARY_NEUROLOGY_CENTRE = ('can_delete_tertiary_neurology_centre',
-                                        'Can delete tertiary neurology centre.')
-CAN_ONLY_VIEW_CHILDRENS_EPILEPSY_SURGERY_CENTRE = ('can_only_view_childrens_epilepsy_surgery_centre',
-                                                   'Can only view children\'s epilepsy surgery centre.')
-CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET = ('can_confirm_childrens_epilepsy_surgical_service_referral_criteria_met',
-                                                                         'Can confirm children\'s epilepsy surgery centre referral criteria have been met.')
-CAN_ALLOCATE_CHILDRENS_EPILEPSY_SURGERY_CENTRE = ('can_allocate_childrens_epilepsy_surgery_centre',
-                                                  'Can allocate children\'s epilepsy surgery centre.')
-CAN_EDIT_CHILDRENS_EPILEPSY_SURGERY_CENTRE = ('can_edit_childrens_epilepsy_surgery_centre',
-                                              'Can edit or update but not delete children\'s epilepsy surgery centre.')
-CAN_DELETE_CHILDRENS_EPILEPSY_SURGERY_CENTRE = ('can_delete_childrens_epilepsy_surgery_centre',
-                                                'Can delete children\'s epilepsy surgery centre.')
+CAN_CHANGE_EPILEPSY12_LEAD_CENTRE = ('can_change_epilepsy12_lead_centre',
+                                     'Can change Epilepsy12 lead centre.')
+CAN_DELETE_EPILEPSY12_LEAD_CENTRE = ('can_delete_epilepsy12_lead_centre',
+                                     'Can delete Epilepsy12 lead centre.')
+
 CAN_CONSENT_TO_AUDIT_PARTICIPATION = ('can_consent_to_audit_participation',
                                       'Can consent to participating in Epilepsy12.')
 
 PERMISSIONS = (
-    CAN_VIEW_CHILD_NHS_NUMBER,
-    CAN_VIEW_CHILD_DATE_OF_BIRTH,
+
     CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
-    CAN_ONLY_VIEW_CHILD_CASE_DATA,
+
     CAN_APPROVE_ELIGIBILITY,
     CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
     CAN_REGISTER_CHILD_IN_EPILEPSY12,
     CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
 
-    CAN_ONLY_VIEW_GENERAL_PAEDIATRIC_CENTRE,
-    CAN_ONLY_VIEW_TERTIARY_NEUROLOGY_CENTRE,
-    CAN_ONLY_VIEW_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
-
-    CAN_ALLOCATE_GENERAL_PAEDIATRIC_CENTRE,
-    CAN_UPDATE_GENERAL_PAEDIATRIC_CENTRE,
-    CAN_DELETE_GENERAL_PAEDIATRIC_CENTRE,
-
-    CAN_ALLOCATE_TERTIARY_NEUROLOGY_CENTRE,
-    CAN_EDIT_TERTIARY_NEUROLOGY_CENTRE,
-    CAN_DELETE_TERTIARY_NEUROLOGY_CENTRE,
-
-    CAN_CONFIRM_CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_CRITERIA_MET,
-    CAN_ALLOCATE_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
-    CAN_EDIT_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
-    CAN_DELETE_CHILDRENS_EPILEPSY_SURGERY_CENTRE,
+    CAN_CHANGE_EPILEPSY12_LEAD_CENTRE,
+    CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
+    CAN_CONSENT_TO_AUDIT_PARTICIPATION
 
 )

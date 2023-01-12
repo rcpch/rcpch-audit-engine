@@ -1,116 +1,128 @@
-<div class='ui segment'>
-    <h5 class='field'>
-        Add a new medicine
+<div class='ui rcpch pink message'>
+    <h5 class="ui header">
+        <div class='content'>
+            Add a new medicine
+            <div class='sub header'>
+                Complete the details relating to new medicines.
+            </div>
+        </div>
     </h5>
 
-    <div class='two fields'>
-    
-        <div class='field'>
-            {% url 'antiepilepsy_medicine_start_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
-            {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
-            {% endif %}
-        </div>
-        
-        <div class='field'>
-            {% if show_end_date %}
-                {% url 'antiepilepsy_medicine_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
-                {% if is_rescue_medicine %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
-                {% else %}
-                    {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' disabled=False error_message=error_message %}
-                {% endif %}
-            {% else %}
-                {% url 'antiepilepsy_medicine_add_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
-                {% if is_rescue_medicine %}
-                    <label>Medicine End Date</label>
-                    <div 
-                        class='ui rcpch_primary button'
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                        name="antiepilepsy_medicine_add_stop_date"
-                        hx-post="{{hx_post}}"
-                        hx-trigger="click"
-                        hx-target="#rescue_medicine_list"
-                    >Add End Date</div>
-                {% else %}
-                    <label>Medicine End Date</label>
-                    <div 
-                        class='ui rcpch_primary button'
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                        name="antiepilepsy_medicine_add_stop_date"
-                        hx-post="{{hx_post}}"
-                        hx-trigger="click"
-                        hx-target="#antiepilepsy_medicine_list"
-                    >Add End Date</div>
-                {% endif %}
-            {% endif %}
-        </div>
-    </div>
-    {% if error_message %}
-        <div class='ui rcpch_warning message'>
-            {{ error_message }}
-        </div>
-    {% endif %}
+    <div class='ui rcpch_pink segment'>
 
-    
-    <div class='two fields'>
-        
-        <div class='field'>
-            {% url 'medicine_id' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
-            {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_medicine_id_help_label_text reference=antiepilepsy_medicine.get_medicine_id_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_medicine_id_help_label_text reference=antiepilepsy_medicine.get_medicine_id_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' disabled=False %}
-            {% endif %}
-        </div>
-        
-        <div class='field'>
-            {% url 'antiepilepsy_medicine_risk_discussed' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
-            {% if is_rescue_medicine %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='antiepilepsy_medicine_risk_discussed' test_positive=antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed label=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_reference_text data_position='top left' disabled=False %}
-            {% else %}
-                {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='antiepilepsy_medicine_risk_discussed' test_positive=antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed label=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_reference_text data_position='top left' disabled=False %}
-            {% endif %}
-        </div>
-        
-    </div>
-    
-    {% if antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed %}
-    
         <div class='two fields'>
-            {% url 'is_a_pregnancy_prevention_programme_in_place' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post_ppp %}
-            {% url 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post_acknowledge %}
-            {% if is_rescue_medicine %}
-                <div class='field'>
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_ppp hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' disabled=False %}
-                </div>
-                <div class='field'>
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_acknowledge hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed' test_positive=antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed label=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_label_text reference=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_reference_text data_position='top left' disabled=False %}
-                </div>
-            {% else %}
-                <div class='field'>
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_ppp hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' disabled=False %}
-                </div>
-                <div class='field'>
-                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_acknowledge hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed' test_positive=antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed label=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_label_text reference=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_reference_text data_position='top left' disabled=False %}
-                </div>
-            {% endif %}
+        
+            <div class='field'>
+                {% url 'antiepilepsy_medicine_start_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                {% if is_rescue_medicine %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' error_message=error_message enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                {% else %}
+                    {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_start_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_start_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_start_date_help_reference_text hx_default_text='enter date' data_position='top left' error_message=error_message enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                {% endif %}
+            </div>
+            
+            <div class='field'>
+                {% if show_end_date %}
+                    {% url 'antiepilepsy_medicine_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                    {% if is_rescue_medicine %}
+                        {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' error_message=error_message enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                    {% else %}
+                        {% include 'epilepsy12/partials/page_elements/date_field.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' input_date_field_name='antiepilepsy_medicine_stop_date' date_value=antiepilepsy_medicine.antiepilepsy_medicine_stop_date label=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_stop_date_help_reference_text hx_default_text='enter date' data_position='top left' error_message=error_message enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                    {% endif %}
+                {% else %}
+                    {% url 'antiepilepsy_medicine_add_stop_date' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                    {% if is_rescue_medicine %}
+                        <label>Medicine End Date</label>
+                        <div 
+                            class='ui rcpch_primary button'
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                            name="antiepilepsy_medicine_add_stop_date"
+                            hx-post="{{hx_post}}"
+                            hx-trigger="click"
+                            hx-target="#rescue_medicine_list"
+                        >Add End Date</div>
+                    {% else %}
+                        <label>Medicine End Date</label>
+                        <div 
+                            class='ui rcpch_primary button'
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                            name="antiepilepsy_medicine_add_stop_date"
+                            hx-post="{{hx_post}}"
+                            hx-trigger="click"
+                            hx-target="#antiepilepsy_medicine_list"
+                        >Add End Date</div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% if error_message %}
+            <div class='ui rcpch_warning message'>
+                {{ error_message }}
+            </div>
+        {% endif %}
+
+        
+        <div class='two fields'>
+            
+            <div class='field'>
+                {% url 'medicine_id' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                {% if is_rescue_medicine %}
+                    {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_medicine_id_help_label_text reference=antiepilepsy_medicine.get_medicine_id_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                {% else %}
+                    {% include 'epilepsy12/partials/page_elements/select.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='change' hx_swap='innerHTML' hx_name='medicine_id' test_positive=antiepilepsy_medicine.medicine_id label=antiepilepsy_medicine.get_medicine_id_help_label_text reference=antiepilepsy_medicine.get_medicine_id_help_reference_text hx_default_text='Antiseizure medicine' data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                {% endif %}
+            </div>
+            
+            <div class='field'>
+                {% url 'antiepilepsy_medicine_risk_discussed' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post %}
+                {% if is_rescue_medicine %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='antiepilepsy_medicine_risk_discussed' test_positive=antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed tooltip_id='antiepilepsy_medicine_risk_discussed_tooltip' label=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                {% else %}
+                    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='antiepilepsy_medicine_risk_discussed' test_positive=antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed tooltip_id='antiepilepsy_medicine_risk_discussed_tooltip' label=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_label_text reference=antiepilepsy_medicine.get_antiepilepsy_medicine_risk_discussed_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                {% endif %}
+            </div>
+            
+        </div>
+        
+        {% if antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed %}
+        
+            <div class='two fields'>
+                {% url 'is_a_pregnancy_prevention_programme_in_place' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post_ppp %}
+                {% url 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' antiepilepsy_medicine_id=antiepilepsy_medicine.pk as hx_post_acknowledge %}
+                {% if is_rescue_medicine %}
+                    <div class='field'>
+                        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_acknowledge hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed' test_positive=antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed tooltip_id='has_a_valproate_annual_risk_acknowledgement_form_been_completed_tooltip' label=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_label_text reference=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                    </div>
+                    <div class='field'>
+                        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_ppp hx_target='#rescue_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place tooltip_id='is_a_pregnancy_prevention_programme_in_place_tooltip' label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                    </div>
+                {% else %}
+                    <div class='field'>
+                        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_acknowledge hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='has_a_valproate_annual_risk_acknowledgement_form_been_completed' test_positive=antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed tooltip_id='has_a_valproate_annual_risk_acknowledgement_form_been_completed_tooltip' label=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_label_text reference=antiepilepsy_medicine.get_has_a_valproate_annual_risk_acknowledgement_form_been_completed_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                    </div>
+                    <div class='field'>
+                        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with choices=choices hx_post=hx_post_ppp hx_target='#antiepilepsy_medicine_list' hx_trigger='click' hx_swap='innerHTML' hx_name='is_a_pregnancy_prevention_programme_in_place' test_positive=antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place tooltip_id='is_a_pregnancy_prevention_programme_in_place_tooltip' label=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_label_text reference=antiepilepsy_medicine.get_is_a_pregnancy_prevention_programme_in_place_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_antiepilepsy_medicine %}
+                    </div>
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+        <div class='field'>
+            <div 
+                class='ui rcpch_primary button'
+                hx-post='{% url "close_antiepilepsy_medicine" antiepilepsy_medicine_id=antiepilepsy_medicine.pk %}'
+                {% if is_rescue_medicine %}
+                    hx-target='#rescue_medicine_list'
+                {% else %}
+                    hx-target='#antiepilepsy_medicine_list'
+                {% endif %}
+                hx-trigger='click'
+                _="on every transition opacity to 0 then remove me"
+                hx-swap='innerHTML swap:500ms'
+            >{% if is_rescue_medicine %}Return to rescue medication list{%else%}Return to antiseizure medication list{%endif%}</div>
         </div>
 
-    {% endif %}
-
-    <div class='field'>
-        <div 
-            class='ui rcpch_primary button'
-            hx-post='{% url "close_antiepilepsy_medicine" antiepilepsy_medicine_id=antiepilepsy_medicine.pk %}'
-            {% if is_rescue_medicine %}
-                hx-target='#rescue_medicine_list'
-            {% else %}
-                hx-target='#antiepilepsy_medicine_list'
-            {% endif %}
-            hx-trigger='click'
-        >{% if is_rescue_medicine %}Return to rescue medication list{%else%}Return to antiseizure medication list{%endif%}</div>
     </div>
+
 </div>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="ui container">
+
+        <div class='ui top attached rcpch_dark_blue clearing segment'>
+        
+            <h5 class="ui left floated header">
+                Epilepsy12 Users
+            </h5>
+            
+            <h5 class="ui right floated header" id='epilepsy12_user_list_view_preference'>
+                {% include 'epilepsy12/partials/cases/view_preference.html' with hospital_trust=hospital_trust test_positive=request.user.view_preference rcpch_choices=rcpch_choices template_name='epilepsy12_user_list' hx_target='#epilepsy12_user_list_view_preference' %}
+            </h5>
+            
+        </div>
+
+        <div class="ui raised attached segment">
+            <div id="epilepsy12_user_table">
+                {% include 'registration/user_management/epilepsy12_user_table.html' with epilepsy12_user_list=epilepsy12_user_list paginated=paginated hospital_trust=hospital_trust %}
+            </div>
+        
+        <div class="ui grid">
+            
+            <div class="twelve wide column">
+
+                <a href="{% url 'create_epilepsy12_user' hospital_id=hospital_trust.pk %}"><button class="ui rcpch_primary button">Add a new User to {{hospital_trust.OrganisationName}}</button></a>
+                
+                <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
+                    <input type="text" class='prompt' placeholder="Search..." name='filtered_epilepsy12_user_list' hx-target="#epilepsy12_user_table" hx-trigger="keyup" hx-get="{% url 'filtered_epilepsy12_user_list' hospital_id=hospital_trust.pk %}" hx-swap="innerHTML">
+                    <i class="ui rcpch_light_blue circular search link icon"></i>
+                </div>
+                
+            </div>
+            
+            {% comment %} <div class="four wide column" id='case_statistics'>
+                {% include 'epilepsy12/partials/cases/case_statistics.html' with hospital_trust=hospital_trust total_cases=total_cases total_registrations=total_registrations %}
+            </div> {% endcomment %}
+        </div>
+        </div>
+        <div class="ui bottom attached rcpch_footer message">
+        <i class="warning info circle icon"></i>
+        These are all users registered to Epilepsy12.
+        </div>
+
+    </div>
+{% endblock %}

@@ -5,20 +5,6 @@
   <table class="ui rcpch table">
     <thead>
       <tr>
-        {% comment %}
-        <th>ID
-          {% if sort_flag and sort_flag == "sort_by_id_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_id_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_id_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_id_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_id_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_id_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_id_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
-        </th>
-        {% endcomment %}
         <th>Name
           {% if sort_flag and sort_flag == "sort_by_name_down" %}
           <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
@@ -55,47 +41,165 @@
             hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
           {% endif %}
         </th>
+        <th>Deadline
+          {% if sort_flag and sort_flag == "sort_by_deadline_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_deadline_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_deadline_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_deadline_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
+        <th>Cohort
+          {% if sort_flag and sort_flag == "sort_by_cohort_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_cohort_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_cohort_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_cohort_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
+        <th>Days remaining
+          {% if sort_flag and sort_flag == "sort_by_days_remaining_before_submission_down" %}
+          <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% elif sort_flag and sort_flag == "sort_by_days_remaining_before_submission_up" %}
+          <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_down" hx-target="#case_table"
+            hx-get="{% url 'sort_by_days_remaining_before_submission_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% else %}
+          <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
+            hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+          {% endif %}
+        </th>
         <th class='two wide'></th>
+        <th></th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       {% for case in case_list %}
-        {%if case.locked %}
-          <tr class='disabled'>
-        {% else %}
-            <tr>
-        {% endif %}
+        
+          {% if case.registration.days_remaining_before_submission == 0 %}
+              <tr class='disabled'>
+          {% else %}
+              <tr>
+          {% endif %}
+        
           <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
           <td>{% none_masked case.nhs_number %}</td>
+          <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
+          <td>{% if case.registration.cohort is not None %}{{ case.registration.cohort }}{% endif %}</td>
+          <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
               <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
                 class="edit outline icon"></i></a></button>
+              {% comment %}
               <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
                 class="trash alternate outline icon"></i></a></button>
+              {% endcomment %}
               {% if case.registration.registration_date %}
                 {% if case.locked %}
                 <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
-                onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
+                onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
                 {% else %}
-                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2"
-                onclick="location.href='{% url 'register'  case.id %}'">Enter Data</button>
+                <button 
+                  data-tooltip='Complete audit details.'
+                  class="ui rcpch_positive button" 
+                  tabindexed="2"
+                  onclick="location.href='{% url 'register'  case.id %}'"
+                  >Epilepsy12</button>
+                
                 {% endif %}
               {% else %}
                 {% if case.locked %}
-                <button class="ui rcpch_primary button" tabindexed="2" disabled
-                onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
+
+                <button 
+                  class="ui rcpch_positive button" 
+                  tabindexed="2" disabled
+                  onclick="location.href='{% url 'register' case_id=case.id %}'"
+                >Register</button>
+
                 {% else %}
-                <button class="ui rcpch_primary button" tabindexed="2"
-                onclick="location.href='{% url 'register' case_id=case.id %}'">Register</button>
+
+                <button 
+                  class="ui rcpch_positive button" 
+                  tabindexed="2"
+                  onclick="location.href='{% url 'register' case_id=case.id %}'"
+                >Register</button>
+
                 {% endif %}
               {% endif %}
             </div>
+
+            {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.registration_date %}
+            {% percentage_of_total case.registration.audit_progress.total_completed_fields case.registration.audit_progress.total_expected_fields as total_percent %}
+              <div class="ui bottom attached tiny rcpch progress" data-percent='{{total_percent}}' id="{{case.pk}}_audit_progress_bar" _="init js $('#{{case.pk}}_audit_progress_bar').progress(); end">
+                <div class='bar'></div>
+              </div>
+
+            {% endif %}
           </td>
-          <td><button data-tooltip='Opt out of Epilepsy12' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'opt_out' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
-            class="sign-out icon"></i></a></button></td>
+
+          {% if case.registration.audit_progress.audit_complete %}
+            {% comment %}
+              If the audit for this child is complete, the upload button is enabled only if the submission deadline has not yet passed.
+            {% endcomment %}
+            {% url 'case_submit' hospital_id=hospital_id case_id=case.id as hx_post %}
+            <td>
+              <button
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                class="ui rcpch_primary icon button" 
+                tabindexed="1" 
+                hx-post="{{hx_post}}"
+                hx_trigger='click' 
+                hx-target="#case_table"
+                {% if case.registration.days_remaining_before_submission == 0 %}
+                  disabled
+                {% else %}
+                    {% if case.locked %}
+                      data-tooltip='Unsubmit to Epilepsy12'
+                    {% else %}
+                      data-tooltip='Submit to Epilepsy12'
+                    {% endif %}
+                {% endif %}
+              >
+              {% if case.locked %}
+                <i class="cloud download icon"></i>
+              {% else %}
+                <i class="cloud upload icon"></i></button>
+              {% endif %}
+            </td>
+          {% else %}
+            <td>
+              {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.registration_date %}
+                <h6>{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
+              {% endif %}
+            </td>
+          {% endif %}
+            
+            <td>
+            {% if case.registration.days_remaining_before_submission > 7 and case.registration.audit_progress.audit_complete %}
+              {% if case.locked %}
+                <span data-tooltip="Data complete and uploaded. {{case}}'s record can still be unlocked and edited up until {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_pink check circle outline icon"></i></span>
+              {% else %}
+                <span data-tooltip="Data complete. Ready for upload by {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_pink check circle outline icon"></i></span>
+              {% endif %}
+            {% elif case.registration.days_remaining_before_submission <= 7 and case.registration.days_remaining_before_submission > 0 and case.registration.audit_progress.audit_complete %}
+              <span data-tooltip="Data complete. Ready imminently for upload before {{case.registration.audit_submission_date|date:'D j M Y'}}"><i class="rcpch_orange check circle outline icon"></i></span>
+            {% elif case.registration.days_remaining_before_submission == 0 %}
+              <span data-tooltip="Data complete and submission date has passed. No further editing of {{case}}'s record is possible."><i class="rcpch_pink check circle outline icon"></i></span>
+            {% else %}
+              <span data-tooltip="Data incomplete."><i class="rcpch_light_blue dot circle outline icon"></i></span>
+            {% endif %}
+            </td>
         </tr>
 
       {% endfor %}

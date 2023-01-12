@@ -8,35 +8,35 @@ EPILEPSY_SEIZURE_TYPE = (
 )
 
 NON_EPILEPSY_SEIZURE_TYPE = (
-    ("SAS", "Syncope And Anoxic Seizures"),
     ("BPP", "Behavioral Psychological And Psychiatric Disorders"),
-    ("SRC", "Sleep Related Conditions"),
-    ("PMD", "Paroxysmal Movement Disorders"),
     ("MAD", "Migraine Associated Disorders"),
     ("ME", "Miscellaneous Events"),
+    ("SRC", "Sleep Related Conditions"),
+    ("SAS", "Syncope And Anoxic Seizures"),
+    ("PMD", "Paroxysmal Movement Disorders"),
     ("Oth", "Other")
 )
 
 NON_EPILEPSY_SEIZURE_ONSET = (
-    ("TCl", "Tonic-clonic"),
-    ("EpS", "Epileptic spasms"),
     ("BAr", "Behaviour arrest"),
+    ("EpS", "Epileptic spasms"),
+    ("TCl", "Tonic-clonic"),
     ("Oth", "Other")
 )
 
 GENERALISED_SEIZURE_TYPE = (
-    ("TCl", "Tonic-clonic"),
+    ("AEM", "Absence with eyelid myoclonia"),
+    ("Ato", "Atonic"),
+    ("Aab", "Atypical absence"),
     ("Clo", "Clonic"),
-    ("Ton", "Tonic"),
+    ("EpS", "Epileptic spasms"),
     ("MyC", "Myoclonic"),
+    ("MAb", "Myoclonic absence"),
     ("MTC", "Myoclonic-tonic-clonic"),
     ("MAt", "Myoclonic-atonic"),
-    ("Ato", "Atonic"),
-    ("EpS", "Epileptic spasms"),
+    ("Ton", "Tonic"),
+    ("TCl", "Tonic-clonic"),
     ("TAb", "Typical absence"),
-    ("Aab", "Atypical absence"),
-    ("MAb", "Myoclonic absence"),
-    ("AEM", "Absence with eyelid myoclonia"),
     ("Oth", "Other")
 )
 

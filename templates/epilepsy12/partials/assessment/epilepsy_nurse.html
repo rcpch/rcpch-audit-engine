@@ -4,21 +4,17 @@
 <div class="ui segment">
 
     {% url 'epilepsy_specialist_nurse_referral_made' assessment_id=assessment.pk as hx_post %}
-    {% if perms.epilepsy12.change_assessment %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label=assessment.get_epilepsy_specialist_nurse_referral_made_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_made_help_reference_text data_position='top left' disabled=False %}
-    {% else %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" label=assessment.get_epilepsy_specialist_nurse_referral_made_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_made_help_reference_text data_position='top left' disabled=True %}
-    {% endif %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.epilepsy_specialist_nurse_referral_made hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="click" tooltip_id='epilepsy_specialist_nurse_referral_made_tooltip' label=assessment.get_epilepsy_specialist_nurse_referral_made_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_made_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_assessment %}
 
     {% if assessment.epilepsy_specialist_nurse_referral_made %}
 
         <div class="ui rcpch_lightest_blue message">
 
             {% url 'epilepsy_specialist_nurse_referral_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change" label=assessment.get_epilepsy_specialist_nurse_referral_date_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_date_help_reference_text date_value=assessment.epilepsy_specialist_nurse_referral_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_referral_date" error_message=error_message %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change" label=assessment.get_epilepsy_specialist_nurse_referral_date_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_date_help_reference_text date_value=assessment.epilepsy_specialist_nurse_referral_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
                 
             {% url 'epilepsy_specialist_nurse_input_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change" label=assessment.get_epilepsy_specialist_nurse_input_date_help_label_text reference=assessment.get_epilepsy_specialist_nurse_input_date_help_reference_text date_value=assessment.epilepsy_specialist_nurse_input_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_input_date" error_message=error_message %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change" label=assessment.get_epilepsy_specialist_nurse_input_date_help_label_text reference=assessment.get_epilepsy_specialist_nurse_input_date_help_reference_text date_value=assessment.epilepsy_specialist_nurse_input_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>

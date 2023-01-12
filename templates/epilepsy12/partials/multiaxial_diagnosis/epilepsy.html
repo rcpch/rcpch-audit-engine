@@ -1,9 +1,5 @@
 {% url 'epileptic_seizure_onset_type' episode_id=episode.pk as hx_post %}
-{% if perms.epilepsy12.change_multiaxialdiagnosis %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epileptic_seizure_onset_type label=episode.get_epileptic_seizure_onset_type_help_label_text reference=episode.get_epileptic_seizure_onset_type_help_reference_text data_position="top left" disabled=False %}
-{% else %}
-    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epileptic_seizure_onset_type label=episode.get_epileptic_seizure_onset_type_help_label_text reference=episode.get_epileptic_seizure_onset_type_help_reference_text data_position="top left" disabled=True %}
-{% endif %}
+{% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with choices=epileptic_seizure_onset_types hx_post=hx_post hx_target="#epilepsy" hx_trigger="click" hx_swap="innerHTML" test_positive=episode.epileptic_seizure_onset_type tooltip_id='epileptic_seizure_onset_type_tooltip' label=episode.get_epileptic_seizure_onset_type_help_label_text reference=episode.get_epileptic_seizure_onset_type_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_episode %}
 
 
 {% if episode.epileptic_seizure_onset_type == 'GO' %}
@@ -17,13 +13,13 @@
         {% include 'epilepsy12/partials/multiaxial_diagnosis/focal_onset_epilepsy.html' with episode=episode FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS=FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS FOCAL_EPILEPSY_EEG_MANIFESTATIONS=FOCAL_EPILEPSY_EEG_MANIFESTATIONS %}
     </div>
 {% elif episode.epileptic_seizure_onset_type == 'UC' %}
-    <div class="ui message">
-        <h3>Unclassified Onset Epilepsy</h3>
+    <div class="ui rcpch_info message">
+        <div class='header'>Unclassified Onset Epilepsy</div>
         <p>This epilepsy cannot be classified.</p>
     </div>
 {% elif episode.epileptic_seizure_onset_type == 'UO' %}
-    <div class="ui message">
-        <h3>Unknown Onset Epilepsy</h3>
+    <div class="ui rcpch_info message">
+        <div class='header'>Unknown Onset Epilepsy</div>
         <p>Not enough is known about the onset of this epilepsy to give it a classification.</p>
     </div>
 {% endif %}

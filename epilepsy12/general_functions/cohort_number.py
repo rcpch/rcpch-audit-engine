@@ -31,3 +31,20 @@ def cohort_number_from_enrolment_date(enrolment_date: date) -> int:
     for cohort_starting_year in range(2020, 2030):
         if enrolment_date >= date(cohort_starting_year, 12, 1) and enrolment_date <= date(cohort_starting_year+1, 11, 30):
             return cohort_starting_year - 2016
+
+
+def cohort_start_date_from_cohort_number(cohort):
+    """
+    Returns start date of cohort
+    """
+
+    cohort_year = 2016 + cohort
+    return date(cohort_year, 12, 1)
+
+
+def current_cohort_start_date():
+    """
+    Returns the start date of the current cohort
+    """
+    today = date.today()
+    return date(today.year, 12, 1)

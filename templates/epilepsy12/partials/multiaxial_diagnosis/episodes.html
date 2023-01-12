@@ -1,3 +1,4 @@
+{% load epilepsy12_template_tags %}
 <div>
 {% if episodes|length > 0 %}
     <table class="ui rcpch basic table">
@@ -32,29 +33,29 @@
                     Uncompleted field
                 {% endif %}
             </td>
-            {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
-                <td>
+            <td>
+                {% if episode.epilepsy_or_nonepilepsy_status == 'E' %}
                     {% if episode.epileptic_seizure_onset_type %}
-                        {{episode.get_epileptic_seizure_onset_type_display}}
+                            {{episode.get_epileptic_seizure_onset_type_display}}
                     {% else %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
-                        Uncompleted field
+                            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                                <i class="rcpch_light_blue dot circle outline icon"></i>
+                            </span>
+                                Uncompleted field
                     {% endif %}
-                </td>
-            {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
-                {% if episode.nonepileptic_seizure_type %}
+                {% elif episode.epilepsy_or_nonepilepsy_status == 'NE' %}
+                    {% if episode.nonepileptic_seizure_type is not None %}
                         {{episode.get_nonepileptic_seizure_type_display}}
                     {% else %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
+                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
                         Uncompleted field
                     {% endif %}
-            {% else %}
-                <td>Not applicable</td>
-            {% endif %}
+                {% else %}
+                        Not applicable
+                {% endif %}
+            </td>
             <td>
                 <div 
                     class="ui rcpch_light_blue buttons">
@@ -78,7 +79,19 @@
                             class="ui rcpch_red icon disabled button"
                         {% endif %}
                         hx-post='{% url "remove_episode" episode_id=episode.pk %}'
-                        hx-confirm='This action is irreversible. Are you sure you want to continue?'
+                        _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: 'Deleting this seizure episode is irreversible. Are you sure you want to continue?',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'Delete episode'
+                          })
+                        if result.isConfirmed issueRequest()"
                         hx-target='#episodes'
                         hx-trigger='click'
                         hx-swap='innerHTML'
@@ -102,10 +115,10 @@
     {% endif %}
 {% endif %}
     <button 
-        {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-        class="ui rcpch_primary disabled button"
+        {% if perms.epilepsy12.add_episode %}
+            class="ui rcpch_primary button"
         {% else %}
-        class="ui rcpch_primary button"
+            class="ui rcpch_primary disabled button"
         {% endif %}
         hx-post="{% url 'add_episode' multiaxial_diagnosis_id=multiaxial_diagnosis.pk %}"
         hx-target="#episodes"
@@ -115,3 +128,6 @@
     Add a new Episode
     </button>
 </div>
+{% if not perms.epilepsy12.add_episode or not perms.epilepsy12.change_episode or not perms.epilepsy12.delete_episode %}
+    <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_episode perms.epilepsy12.change_episode perms.epilepsy12.delete_episode 'episodes' %}</div>
+{% endif %}

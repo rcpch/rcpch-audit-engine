@@ -3,11 +3,11 @@
 
 
 EPILEPSY_CAUSES = (
-    ("Str", "Structural"),
     ("Gen", "Genetic"),
+    ("Imm", "Immune"),
     ("Inf", "Infectious"),
     ("Met", "Metabolic"),
-    ("Imm", "Immune"),
+    ("Str", "Structural"),
     ("NK", "Not known")
 )
 

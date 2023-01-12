@@ -15,7 +15,7 @@ test_positive: currently selected hospital id
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <div 
-            class="ui rcpch_light_blue search selection fluid dropdown"
+            class="ui rcpch fluid search selection dropdown"
         >
                 <i class="dropdown icon"></i>
                 <input type="hidden" 
@@ -25,6 +25,7 @@ test_positive: currently selected hospital id
                     hx-trigger="{{hx_trigger}}"
                     name='{{hx_name}}'
                     value="{{test_positive}}"
+                    _="init js $('.ui.rcpch.search.selection.dropdown').dropdown(); end"
                 >
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
@@ -36,6 +37,3 @@ test_positive: currently selected hospital id
     
 
 </div>
-<script>
-$('.ui.rcpch_light_blue.search.selection.dropdown').dropdown();
-</script>
