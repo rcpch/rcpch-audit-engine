@@ -351,9 +351,12 @@ def selected_trust_kpis(request, hospital_id):
     HTMX get request returning trust_level_kpi.html partial
     """
     trust_kpis = trust_level_kpis(hospital_id=hospital_id)
+    # create an empty instance of audit progress to access the labels
+    audit_progress = AuditProgress.objects.create()
     template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
     context = {
-        'selected_trust_kpis': trust_kpis
+        'selected_trust_kpis': trust_kpis,
+        'audit_progress': audit_progress
     }
 
     return render(request=request, template_name=template_name, context=context)

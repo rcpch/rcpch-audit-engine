@@ -162,7 +162,7 @@
           {% endif %}
           name="delete"
           value="Delete"
-          hx_post="{% url 'edit_epilepsy12_user' %}"
+          hx_post="{% url 'edit_epilepsy12_user' hospital_id user.pk %}"
             _= "on click
             halt the event
             call Swal.fire({ 

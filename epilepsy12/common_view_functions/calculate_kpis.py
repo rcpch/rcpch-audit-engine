@@ -370,6 +370,7 @@ def trust_level_kpis(hospital_id):
         "sudep": 0,
         "school_individual_healthcare_plan": 0,
         "total_number_of_cases": 0,
+        "parent_trust": parent_trust
     }
 
     for hospital in parent_trust_hospitals:
