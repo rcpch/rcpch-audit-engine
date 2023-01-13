@@ -347,8 +347,6 @@ def trust_level_kpis(hospital_id):
     parent_trust_hospitals = HospitalTrust.objects.filter(
         ParentName=parent_trust).all()
 
-    print(parent_trust_hospitals)
-
     trust_level_kpis = {
         "paediatrician_with_expertise_in_epilepsies": 0,
         "epilepsy_specialist_nurse": 0,
@@ -419,5 +417,7 @@ def trust_level_kpis(hospital_id):
 
                 # Increment the number of cases
                 trust_level_kpis.total_number_of_cases += 1
+
+                trust_level_kpis.parent_trust_name = parent_trust
 
     return trust_level_kpis

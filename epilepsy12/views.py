@@ -221,7 +221,7 @@ def hospital_reports(request):
         childrens_epilepsy_surgical_service_referral_made=True).count()
 
     if all_cases > 0:
-        total_percent = round((all_registrations/all_cases)*100)
+        total_percent = round((all_registrations / all_cases) * 100)
     else:
         total_percent = 0
 
@@ -326,7 +326,7 @@ def selected_hospital_summary(request):
         childrens_epilepsy_surgical_service_referral_made=True).count()
 
     if all_cases > 0:
-        total_percent = round((all_registrations/all_cases)*100)
+        total_percent = round((all_registrations / all_cases) * 100)
     else:
         total_percent = 0
 
@@ -350,14 +350,10 @@ def selected_trust_kpis(request, hospital_id):
     """
     HTMX get request returning trust_level_kpi.html partial
     """
-
-    print("Get request")
-
-    selected_trust_kpis = trust_level_kpis(hospital_id=hospital_id)
-
+    trust_kpis = trust_level_kpis(hospital_id=hospital_id)
     template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
     context = {
-        'selected_trust_kpis': selected_trust_kpis
+        'selected_trust_kpis': trust_kpis
     }
 
     return render(request=request, template_name=template_name, context=context)
