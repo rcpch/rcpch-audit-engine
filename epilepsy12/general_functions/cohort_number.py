@@ -47,4 +47,8 @@ def current_cohort_start_date():
     Returns the start date of the current cohort
     """
     today = date.today()
-    return date(today.year, 12, 1)
+
+    if date(today.year, 12, 1) < today:
+        return date(today.year, 12, 1)
+    else:
+        return date(today.year-1, 12, 1)
