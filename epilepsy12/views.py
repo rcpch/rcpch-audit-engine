@@ -29,7 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
-from .common_view_functions import trust_level_kpis, national_level_kpis
+from .common_view_functions import trust_level_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
