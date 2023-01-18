@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from ..models import *
+import requests
 
 
 def calculate_kpis(registration_instance):
@@ -422,3 +423,35 @@ def trust_level_kpis(hospital_id):
                 trust_level_kpis.parent_trust_name = parent_trust
 
     return trust_level_kpis
+
+
+# def national_level_kpis():
+#     """
+#     Return KPI totals for all children in the UK
+#     """
+
+#     # response = requests.request(
+#     #     method='POST',
+#     #     url='https://api.nhs.uk/service-search/search?api-version=1',
+#     #     headers={
+#     #         'Content-Type': 'application/json',
+#     #         'subscription-key': '450184b1ac7c437c91598685a778fa53'
+#     #     },
+#     #     data=u'''
+#     # {
+#     #     "filter": "(OrganisationTypeID eq 'HA') or (OrganisationTypeID eq 'HOS') or (OrganisationTypeID eq 'LA') or (OrganisationTypeID eq 'SHA') or (OrganisationTypeID eq 'TRU')",
+#     #     "orderby": "OrganisationName",
+#     #     "top": 25,
+#     #     "skip": 0,
+#     #     "count": true
+#     # }
+#     #     ''', )
+
+#     # return response.json()
+
+#     all_trusts = HospitalTrust.objects.all().filter(Sector='NHS Sector').order_by(
+#         'ParentName').distinct('ParentName')
+#     parents = []
+#     for trust in all_trusts:
+#         parents.append(trust.ParentName)
+#     print(parents)
