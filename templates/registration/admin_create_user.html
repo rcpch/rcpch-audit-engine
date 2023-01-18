@@ -16,7 +16,7 @@
         </div>
       </div>
       
-      <form class='ui rcpch form' method="POST" action="">
+      <form class='ui rcpch form' method="POST" action="" name='create_epilepsy12_user_form'>
         {% csrf_token %}
 
         <div class='three fields'>
@@ -129,21 +129,58 @@
 
         </div> {% endcomment %}
 
-        <input class="ui rcpch_primary button" type="submit" value="{{admin_title}}"/>
-        <button 
-        type="submit" 
-            {% if perms.epilepsy12.delete_epilepsy12user %}
-              class="ui rcpch_danger button"
+        <input 
+          class="ui rcpch_primary button" 
+          type="submit" 
+          value="{{admin_title}}" 
+          name='edit'/>
+
+        {% if not form.email_confirmed %}
+
+          <button 
+            type="submit" 
+            {% if perms.epilepsy12.change_epilepsy12user %}
+              class="ui rcpch_primary icon button"
               {% else %}
-              class="ui rcpch_danger disabled button"
+              class="ui rcpch_primary disabled icon button"
             {% endif %}
-            name="delete"
-            _= "on click(issueRequest) halt the event call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove user and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove user from Epilepsy12' }) if result.isConfirmed issueRequest()"
-          >Delete</button>
+            name="resend"
+            value="resend"
+          >
+            <i class="envelope outline icon"></i>
+            Resend Email
+          </button>
+
+        {% endif %}
+
+        <input 
+          type="submit" 
+          {% if perms.epilepsy12.delete_epilepsy12user %}
+            class="ui rcpch_danger button"
+          {% else %}
+            class="ui rcpch_danger disabled button"
+          {% endif %}
+          name="delete"
+          value="Delete"
+          hx_post="{% url 'edit_epilepsy12_user' hospital_id user.pk %}"
+            _= "on click
+            halt the event
+            call Swal.fire({ 
+              title: 'Confirmation Required', 
+              text: 'This will irreversibly remove user and related dated from Epilepsy12.', 
+              icon: 'warning', 
+              iconColor: '#e00087', 
+              showCancelButton: true, 
+              confirmButtonColor: '#11a7f2', 
+              cancelButtonColor: '#e60700', 
+              confirmButtonText: 'Remove user from Epilepsy12' 
+            })
+            if result.isConfirmed " 
+        />
+        
         <a 
-          {% comment %} type="submit"  {% endcomment %}
           class="ui rcpch_negative button"
-          name="cancel"field
+          name="cancel"
           href="{% url 'epilepsy12_user_list' hospital_id=hospital_id %}"
         >Cancel</a>
 

@@ -31,21 +31,30 @@
     {% else %}
         {% if active_template == "register" %}
 
-          <a href="{% url 'register' case_id %}" class="active step">
+          <a 
+            href="{% url 'register' case_id %}" 
+            class="active step"
+          >
             <div class="content">
               <div class="title">Verification and registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
         {% elif active_template == "none" %}
-          <a href="{% url 'register' case_id %}" class="disabled step">
+          <a 
+            href="{% url 'register' case_id %}" 
+            class="disabled step"
+          >
             <div class="content">
               <div class="title">Verification and registration</div>
               <div class="description">Getting started...</div>
             </div>
           </a>
         {% else %}
-          <a href="{% url 'register' case_id %}" class="step">
+          <a 
+            href="{% url 'register' case_id %}" 
+            class="step"
+            >
             <div class="content">
               <div class="title">Verification and registration</div>
               <div class="description">Getting started...</div>

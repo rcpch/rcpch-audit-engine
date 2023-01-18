@@ -58,6 +58,8 @@ urlpatterns = [
          views.child_hospital_select, name='child_hospital_select'),
     path('selected_hospital_summary', views.selected_hospital_summary,
          name='selected_hospital_summary'),
+    path('selected_trust_kpis/<int:hospital_id>', views.selected_trust_kpis,
+         name='selected_trust_kpis'),
     path('hospital/<int:hospital_id>/case_statistics',
          views.case_statistics, name='case_statistics'),
     path('registration/<int:case_id>/registration_active/<str:active_template>',

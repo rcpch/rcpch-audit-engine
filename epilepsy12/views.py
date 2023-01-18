@@ -4,7 +4,7 @@ from datetime import datetime
 from django.apps import apps
 from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 from django.conf import settings
-from django.contrib.auth import login, get_user_model
+from django.contrib.auth import login, get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import FileResponse, HttpRequest, HttpResponse
@@ -29,6 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
+from .common_view_functions import trust_level_kpis, national_level_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -220,7 +221,7 @@ def hospital_reports(request):
         childrens_epilepsy_surgical_service_referral_made=True).count()
 
     if all_cases > 0:
-        total_percent = round((all_registrations/all_cases)*100)
+        total_percent = round((all_registrations / all_cases) * 100)
     else:
         total_percent = 0
 
@@ -325,7 +326,7 @@ def selected_hospital_summary(request):
         childrens_epilepsy_surgical_service_referral_made=True).count()
 
     if all_cases > 0:
-        total_percent = round((all_registrations/all_cases)*100)
+        total_percent = round((all_registrations / all_cases) * 100)
     else:
         total_percent = 0
 
@@ -343,6 +344,33 @@ def selected_hospital_summary(request):
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
     })
+
+
+def selected_trust_kpis(request, hospital_id):
+    """
+    HTMX get request returning trust_level_kpi.html partial
+    """
+    trust_kpis = trust_level_kpis(hospital_id=hospital_id)
+    national_kpis = national_level_kpis()
+    # create an empty instance of audit progress to access the labels
+    audit_progress = AuditProgress.objects.create()
+    template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
+    context = {
+        'selected_trust_kpis': trust_kpis,
+        'national_kpis': national_kpis,
+        'audit_progress': audit_progress
+    }
+
+    # result = national_level_kpis()
+
+    # hospital_list = []
+    # hospitals = HospitalTrust.objects.distinct(
+    #     'ParentName').filter(Sector='NHS Sector').order_by('ParentName')
+    # for hospital in hospitals:
+    #     hospital_list.append(hospital.OrganisationName)
+    # print(hospital_list)
+
+    return render(request=request, template_name=template_name, context=context)
 
 
 def tsandcs(request):

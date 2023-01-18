@@ -118,6 +118,7 @@ class AuditProgress(models.Model, HelpTextMixin):
     Numerator = Number of children and young people  [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
     Denominator = Number of and young people [diagnosed with epilepsy] at first year
     """
+
     paediatrician_with_expertise_in_epilepsies = models.IntegerField(
         help_text={
             'label': 'Paediatrician with expertise in epilepsies',
