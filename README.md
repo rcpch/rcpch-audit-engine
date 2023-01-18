@@ -6,4 +6,4 @@
     </p>
 </p>
 
-All documentation for this project is at https://epilepsy12docs.rcpch.tech
+All documentation for this project is at https://epilepsy12docs.rcpch.tech/

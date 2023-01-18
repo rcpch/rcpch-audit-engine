@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# scripts may need to be made executable on some platforms before they can be run
+# chmod +x <filename> is the command to do this on unixy systems
+
+# starts the postgres and application containers (does not do any setup)
+# runs the django development server
+
+docker compose -f docker-compose.dev.yml down
