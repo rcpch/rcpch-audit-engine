@@ -30,8 +30,14 @@ services:
       sh -c "pip install --upgrade pip &&
              pip install -r requirements/development-requirements.txt &&
              python manage.py collectstatic --noinput &&
-             ./s/migrate &&
-             ./s/seed &&
+             python manage.py makemigrations &&
+             python manage.py migrate &&
+             # Seed the DB
+             python manage.py seed --mode=seed_hospitals &&
+             python manage.py seed --mode=seed_semiology_keywords &&
+             python manage.py seed --mode=seed_dummy_cases &&
+             python manage.py seed --mode=seed_groups_and_permissions &&
+             # run the django development server
              python manage.py runserver 0.0.0.0:8000"
   
   # db container - runs postgres
