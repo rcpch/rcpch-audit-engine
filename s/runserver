@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# Starts the development audit engine with reload on port 8080
-
-python manage.py runserver

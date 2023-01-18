@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# DEPRECATED script - we have now moved to using Docker Compose in dev
+# This script left in the codebase just in case it is ever needed
+
+# Seed the DB
 python manage.py seed --mode=seed_hospitals
 python manage.py seed --mode=seed_semiology_keywords
 python manage.py seed --mode=seed_dummy_cases
