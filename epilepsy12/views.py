@@ -29,7 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
-from .common_view_functions import trust_level_kpis
+from .common_view_functions import trust_level_kpis, national_level_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -351,11 +351,13 @@ def selected_trust_kpis(request, hospital_id):
     HTMX get request returning trust_level_kpi.html partial
     """
     trust_kpis = trust_level_kpis(hospital_id=hospital_id)
+    national_kpis = national_level_kpis()
     # create an empty instance of audit progress to access the labels
     audit_progress = AuditProgress.objects.create()
     template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
     context = {
         'selected_trust_kpis': trust_kpis,
+        'national_kpis': national_kpis,
         'audit_progress': audit_progress
     }
 

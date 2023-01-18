@@ -114,8 +114,15 @@
             {% endif %}
         </div>
 
-        <div class="sixteen wide stackable column" hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" hx-trigger="load" hx-swap='innerHTML' hx-target="#selected_trust_kpis">
-            <div id='selected_trust_kpis'></div>
+        <div 
+            class="sixteen wide stackable column" 
+            hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
+            hx-trigger="load" hx-swap='innerHTML'
+            hx_indicator='#selected_trust_kpis'
+            hx-target="#selected_trust_kpis">
+            <div id='selected_trust_kpis'>
+                <div class="ui active centered inline loader"></div>
+            </div>
         </div>
     
 </div>
