@@ -27,18 +27,7 @@ services:
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
     command: >
-      sh -c "pip install --upgrade pip &&
-             pip install -r requirements/development-requirements.txt &&
-             python manage.py collectstatic --noinput &&
-             python manage.py makemigrations &&
-             python manage.py migrate &&
-             # Seed the DB
-             python manage.py seed --mode=seed_hospitals &&
-             python manage.py seed --mode=seed_semiology_keywords &&
-             python manage.py seed --mode=seed_dummy_cases &&
-             python manage.py seed --mode=seed_groups_and_permissions &&
-             # run the django development server
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py runserver 0.0.0.0:8000"
   
   # db container - runs postgres
   db:

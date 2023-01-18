@@ -26,22 +26,27 @@ services:
       - E12_DEVELOPMENT_MODE=True
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
-      - DJANGO_SUPERUSER_USERNAME=testuser
+      - DJANGO_SUPERUSER_USERNAME=e12-dev-user
       - DJANGO_SUPERUSER_PASSWORD=pw
-      - DJANGO_SUPERUSER_EMAIL="admin@admin.com"
+      - DJANGO_SUPERUSER_FIRST_NAME=dev
+      - DJANGO_SUPERUSER_SURNAME=dev
+      - DJANGO_SUPERUSER_EMAIL=e12-dev-user@rcpch.tech
+      - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
       - DJANGO_SUPERUSER_ROLE=1
     command: >
       sh -c "pip install --upgrade pip &&
-             pip install -r requirements/development-requirements.txt &&
-             python manage.py collectstatic --noinput &&
-             python manage.py makemigrations &&
-             python manage.py migrate &&
-             python manage.py seed --mode=seed_hospitals &&
-             python manage.py seed --mode=seed_semiology_keywords &&
-             python manage.py seed --mode=seed_dummy_cases &&
-             python manage.py seed --mode=seed_groups_and_permissions &&
-             python manage.py createsuperuser --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
+            pip install -r requirements/development-requirements.txt &&
+            python manage.py collectstatic --noinput &&
+            python manage.py makemigrations &&
+            python manage.py migrate &&
+            python manage.py seed --mode=seed_hospitals &&
+            python manage.py seed --mode=seed_semiology_keywords &&
+            python manage.py seed --mode=seed_dummy_cases &&
+            python manage.py seed --mode=seed_groups_and_permissions &&
+            python manage.py createsuperuser --noinput &&
+            echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
+            echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
+            python manage.py runserver 0.0.0.0:8000"
   
   # db container - runs postgres
   db:
