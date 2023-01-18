@@ -3,16 +3,12 @@
 # migrates the database
 
 version: '3.9'
+
 services:
+  
+  # web container - runs the django app
   web:
     build: .
-    command: >
-      sh -c "pip install --upgrade pip &&
-             pip install -r requirements/development-requirements.txt &&
-             python manage.py collectstatic --noinput &&
-             ./s/migrate &&
-             ./s/seed &&
-             python manage.py runserver 0.0.0.0:8000"
     ports:
       - 8000:8000
     depends_on:
@@ -20,15 +16,25 @@ services:
     volumes:
       - .:/home/app/webapp
     environment:
+      # these env vars are ONLY for development
+      - E12_POSTGRES_DB_USER=epilepsy12user
+      - E12_POSTGRES_DB_PASSWORD=password
       - E12_POSTGRES_DB_NAME=epilepsy12db
       - E12_POSTGRES_DB_HOST=db
       - E12_POSTGRES_DB_PORT=5432
-      - E12_POSTGRES_DB_USER=epilepsy12user
-      - E12_POSTGRES_DB_PASSWORD=password
       - E12_SECRET_KEY=mysecretkey
       - E12_DEVELOPMENT_MODE=True
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
+    command: >
+      sh -c "pip install --upgrade pip &&
+             pip install -r requirements/development-requirements.txt &&
+             python manage.py collectstatic --noinput &&
+             ./s/migrate &&
+             ./s/seed &&
+             python manage.py runserver 0.0.0.0:8000"
+  
+  # db container - runs postgres
   db:
     image: postgres:latest
     # volumes:
