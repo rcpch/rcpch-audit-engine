@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+# starts the postgres and application containers
+# 
+
+docker compose up
