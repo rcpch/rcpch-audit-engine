@@ -2,6 +2,9 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
+# DEPLOYS CHANGES IN THE 'LIVE' BRANCH TO THE 'LIVE' DEPLOYMENT SLOT ON AZURE
+# epilepsy12/live
+
 name: Build and deploy Python app to Azure Web App - epilepsy12
 
 on:
