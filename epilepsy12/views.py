@@ -353,22 +353,17 @@ def selected_trust_kpis(request, hospital_id):
     trust_kpis = trust_level_kpis(hospital_id=hospital_id)
     national_kpis = national_level_kpis()
     # create an empty instance of audit progress to access the labels
-    audit_progress = AuditProgress.objects.create()
+    hospital_organisation = HospitalTrust.objects.get(pk=hospital_id)
+    kpis = KPI.objects.create(
+        hospital_organisation=hospital_organisation,
+        parent_trust=hospital_organisation.ParentName
+    )
     template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
     context = {
         'selected_trust_kpis': trust_kpis,
         'national_kpis': national_kpis,
-        'audit_progress': audit_progress
+        'kpis': kpis
     }
-
-    # result = national_level_kpis()
-
-    # hospital_list = []
-    # hospitals = HospitalTrust.objects.distinct(
-    #     'ParentName').filter(Sector='NHS Sector').order_by('ParentName')
-    # for hospital in hospitals:
-    #     hospital_list.append(hospital.OrganisationName)
-    # print(hospital_list)
 
     return render(request=request, template_name=template_name, context=context)
 
