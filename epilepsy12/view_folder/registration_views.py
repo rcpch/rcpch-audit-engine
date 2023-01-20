@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.db.models import Q
 from django_htmx.http import trigger_client_event
-from ..models import Case, AuditProgress, HospitalTrust, Registration, Site
+from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_hospital_trust
 
@@ -37,6 +37,15 @@ def register(request, case_id):
             investigations_total_completed_fields=0,
             management_total_expected_fields=0,
             management_total_completed_fields=0,
+        )
+        lead_hospital = Site.objects.filter(
+            case=case,
+            site_is_primary_centre_of_epilepsy_care=True,
+            site_is_actively_involved_in_epilepsy_care=True
+        ).get()
+        kpi = KPI.objects.create(
+            hospital_organisation=lead_hospital.hospital_trust,
+            parent_trust=lead_hospital.hospital_trust.ParentName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -57,12 +66,14 @@ def register(request, case_id):
             general_participation_and_risk=0,
             service_contact_details=0,
             sudep=0,
-            school_individual_healthcare_plan=0,
+            school_individual_healthcare_plan=0
         )
         registration = Registration.objects.create(
             case=case,
-            audit_progress=audit_progress
+            audit_progress=audit_progress,
+            kpi=kpi
         )
+
     else:
         registration = Registration.objects.filter(case=case).get()
 

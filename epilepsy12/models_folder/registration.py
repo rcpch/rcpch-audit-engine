@@ -95,6 +95,12 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         null=True
     )
 
+    kpi = models.OneToOneField(
+        "epilepsy12.KPI",
+        on_delete=models.CASCADE,
+        null=True
+    )
+
     class Meta:
         verbose_name = 'Registration'
         verbose_name_plural = 'Registrations'

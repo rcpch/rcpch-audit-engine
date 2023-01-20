@@ -175,6 +175,14 @@ def none_masked(field):
         return field
 
 
+@register.simple_tag
+def none_percentage(field):
+    if field is None:
+        return "No data"
+    else:
+        return f'{field} %'
+
+
 @register.filter(name='icon_for_score')
 def icon_for_score(score):
     if score < 1:

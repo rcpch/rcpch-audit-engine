@@ -330,8 +330,8 @@ def calculate_kpis(registration_instance):
         'school_individual_healthcare_plan': school_individual_healthcare_plan,
     }
 
-    AuditProgress.objects.filter(
-        pk=registration_instance.audit_progress.pk).update(**kpis)
+    KPI.objects.filter(
+        pk=registration_instance.kpi.pk).update(**kpis)
 
 
 def trust_level_kpis(hospital_id):
@@ -371,67 +371,38 @@ def trust_level_kpis(hospital_id):
         "parent_trust": parent_trust
     }
 
-    if HospitalTrust.objects.filter(
-            ParentName=parent_trust).all().exists():
+    kpis = KPI.objects.filter(
+        parent_trust=parent_trust
+    ).all()
 
-        # Get all the hospitals within that selected Trust
-        parent_trust_hospitals = HospitalTrust.objects.filter(
-            ParentName=parent_trust).all()
+    if kpis.count() > 0:
+        for kpi in kpis:
+            # Increment the totals for each KPI
+            trust_level_kpis['paediatrician_with_expertise_in_epilepsies'] += kpi.paediatrician_with_expertise_in_epilepsies
+            trust_level_kpis['epilepsy_specialist_nurse'] += kpi.epilepsy_specialist_nurse
+            trust_level_kpis['tertiary_input'] += kpi.tertiary_input
+            trust_level_kpis['epilepsy_surgery_referral'] += kpi.epilepsy_surgery_referral
+            trust_level_kpis['ecg'] += kpi.ecg
+            trust_level_kpis['mri'] += kpi.mri
+            trust_level_kpis['assessment_of_mental_health_issues'] += kpi.assessment_of_mental_health_issues
+            trust_level_kpis['mental_health_support'] += kpi.mental_health_support
+            trust_level_kpis['sodium_valproate'] += kpi.sodium_valproate
+            trust_level_kpis['comprehensive_care_planning_agreement'] += kpi.comprehensive_care_planning_agreement
+            trust_level_kpis['patient_held_individualised_epilepsy_document'] += kpi.patient_held_individualised_epilepsy_document
+            trust_level_kpis['patient_carer_parent_agreement_to_the_care_planning'] += kpi.patient_carer_parent_agreement_to_the_care_planning
+            trust_level_kpis['care_planning_has_been_updated_when_necessary'] += kpi.care_planning_has_been_updated_when_necessary
+            trust_level_kpis['comprehensive_care_planning_content'] += kpi.comprehensive_care_planning_content
+            trust_level_kpis['parental_prolonged_seizures_care_plan'] += kpi.parental_prolonged_seizures_care_plan
+            trust_level_kpis['water_safety'] += kpi.water_safety
+            trust_level_kpis['first_aid'] += kpi.first_aid
+            trust_level_kpis['general_participation_and_risk'] += kpi.general_participation_and_risk
+            trust_level_kpis['service_contact_details'] += kpi.service_contact_details
+            trust_level_kpis['sudep'] += kpi.sudep
+            trust_level_kpis['school_individual_healthcare_plan'] += kpi.school_individual_healthcare_plan
 
-        for hospital in parent_trust_hospitals:
-
-            # Obtain all the Cases where that hospital is active and is the primary centre of care
-
-            sites = Site.objects.filter(
-                hospital_trust=hospital,
-                site_is_actively_involved_in_epilepsy_care=True,
-                site_is_primary_centre_of_epilepsy_care=True
-            ).all()
-
-            if sites.exists():
-
-                # Obtain the Case object for each Site
-                for site in sites:
-
-                    if site.DoesNotExist():
-                        return
-
-                    # Iterate through the cases and increment KPIs accordingly
-                    if site.cases:
-
-                        for case in site.cases:
-
-                            # Filter for only Registered cases, which will have an AuditProgress
-                            audit_progress = AuditProgress.objects.filter(
-                                registration=case.registration).all()
-
-                            # Increment the totals for each KPI
-                            trust_level_kpis.paediatrician_with_expertise_in_epilepsies += audit_progress.paediatrician_with_expertise_in_epilepsies
-                            trust_level_kpis.epilepsy_specialist_nurse += audit_progress.epilepsy_specialist_nurse
-                            trust_level_kpis.tertiary_input += audit_progress.tertiary_input
-                            trust_level_kpis.epilepsy_surgery_referral += audit_progress.epilepsy_surgery_referral
-                            trust_level_kpis.ecg += audit_progress.ecg
-                            trust_level_kpis.mri += audit_progress.mri
-                            trust_level_kpis.assessment_of_mental_health_issues += audit_progress.assessment_of_mental_health_issues
-                            trust_level_kpis.mental_health_support += audit_progress.mental_health_support
-                            trust_level_kpis.sodium_valproate += audit_progress.sodium_valproate
-                            trust_level_kpis.comprehensive_care_planning_agreement += audit_progress.comprehensive_care_planning_agreement
-                            trust_level_kpis.patient_held_individualised_epilepsy_document += audit_progress.patient_held_individualised_epilepsy_document
-                            trust_level_kpis.patient_carer_parent_agreement_to_the_care_planning += audit_progress.patient_carer_parent_agreement_to_the_care_planning
-                            trust_level_kpis.care_planning_has_been_updated_when_necessary += audit_progress.care_planning_has_been_updated_when_necessary
-                            trust_level_kpis.comprehensive_care_planning_content += audit_progress.comprehensive_care_planning_content
-                            trust_level_kpis.parental_prolonged_seizures_care_plan += audit_progress.parental_prolonged_seizures_care_plan
-                            trust_level_kpis.water_safety += audit_progress.water_safety
-                            trust_level_kpis.first_aid += audit_progress.first_aid
-                            trust_level_kpis.general_participation_and_risk += audit_progress.general_participation_and_risk
-                            trust_level_kpis.service_contact_details += audit_progress.service_contact_details
-                            trust_level_kpis.sudep += audit_progress.sudep
-                            trust_level_kpis.school_individual_healthcare_plan += audit_progress.school_individual_healthcare_plan
-
-                            # Increment the number of cases
-                            trust_level_kpis.total_number_of_cases += 1
-
-                            trust_level_kpis.parent_trust_name = parent_trust
+            # Increment the number of cases
+            trust_level_kpis['total_number_of_cases'] += 1
+            trust_level_kpis['parent_trust_name'] = parent_trust
 
     return trust_level_kpis
 
