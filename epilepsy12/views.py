@@ -102,21 +102,54 @@ def hospital_reports(request):
     # add all registered cases to KPIs
     for case in Case.objects.all():
         if Registration.objects.filter(case=case).exists():
-            try:
+            if Site.objects.filter(
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+                case=case
+            ).exists():
                 lead_site = Site.objects.filter(
                     site_is_actively_involved_in_epilepsy_care=True,
                     site_is_primary_centre_of_epilepsy_care=True,
                     case=case
                 ).get()
-            except Site.DoesNotExist:
-                print(f"Lead site does not exist for {case}")
-                return
-            lead_hospital = lead_site.hospital_trust
-            parent_trust = lead_hospital.ParentName
-            if hasattr(case.registration, 'kpi'):
-                print('I have KPIs')
-                if case.registration.kpi is None:
-                    new_kpi = KPI.objects.create(
+                lead_hospital = lead_site.hospital_trust
+                parent_trust = lead_hospital.ParentName
+                if hasattr(case.registration, 'kpi'):
+                    print('I have KPIs')
+                    if case.registration.kpi is None:
+                        new_kpi = KPI.objects.create(
+                            hospital_organisation=lead_hospital,
+                            parent_trust=parent_trust,
+                            paediatrician_with_expertise_in_epilepsies=0,
+                            epilepsy_specialist_nurse=0,
+                            tertiary_input=0,
+                            epilepsy_surgery_referral=0,
+                            ecg=0,
+                            mri=0,
+                            assessment_of_mental_health_issues=0,
+                            mental_health_support=0,
+                            sodium_valproate=0,
+                            comprehensive_care_planning_agreement=0,
+                            patient_held_individualised_epilepsy_document=0,
+                            patient_carer_parent_agreement_to_the_care_planning=0,
+                            care_planning_has_been_updated_when_necessary=0,
+                            comprehensive_care_planning_content=0,
+                            parental_prolonged_seizures_care_plan=0,
+                            water_safety=0,
+                            first_aid=0,
+                            general_participation_and_risk=0,
+                            service_contact_details=0,
+                            sudep=0,
+                            school_individual_healthcare_plan=0
+                        )
+                        case.registration.kpi = new_kpi
+                        case.registration.save()
+                    else:
+                        calculate_kpis(case.registration)
+                    print(f"Done! KPIs calculated for {case}")
+                else:
+                    print('I have no KPIs - creating...')
+                    KPI.objects.create(
                         hospital_organisation=lead_hospital,
                         parent_trust=parent_trust,
                         paediatrician_with_expertise_in_epilepsies=0,
@@ -141,42 +174,10 @@ def hospital_reports(request):
                         sudep=0,
                         school_individual_healthcare_plan=0
                     )
-                    case.registration.kpi = new_kpi
-                    case.registration.save()
-                else:
+                    print(
+                        f"Done! KPIs created for {case}. Now calculating score...")
                     calculate_kpis(case.registration)
-                print(f"Done! KPIs calculated for {case}")
-            else:
-                print('I have no KPIs - creating...')
-                KPI.objects.create(
-                    hospital_organisation=lead_hospital,
-                    parent_trust=parent_trust,
-                    paediatrician_with_expertise_in_epilepsies=0,
-                    epilepsy_specialist_nurse=0,
-                    tertiary_input=0,
-                    epilepsy_surgery_referral=0,
-                    ecg=0,
-                    mri=0,
-                    assessment_of_mental_health_issues=0,
-                    mental_health_support=0,
-                    sodium_valproate=0,
-                    comprehensive_care_planning_agreement=0,
-                    patient_held_individualised_epilepsy_document=0,
-                    patient_carer_parent_agreement_to_the_care_planning=0,
-                    care_planning_has_been_updated_when_necessary=0,
-                    comprehensive_care_planning_content=0,
-                    parental_prolonged_seizures_care_plan=0,
-                    water_safety=0,
-                    first_aid=0,
-                    general_participation_and_risk=0,
-                    service_contact_details=0,
-                    sudep=0,
-                    school_individual_healthcare_plan=0
-                )
-                print(
-                    f"Done! KPIs created for {case}. Now calculating score...")
-                calculate_kpis(case.registration)
-                print(f"Done! KPIs calculated for {case}")
+                    print(f"Done! KPIs calculated for {case}")
 
     """
     !!!
