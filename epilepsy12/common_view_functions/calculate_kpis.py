@@ -60,7 +60,7 @@ def calculate_kpis(registration_instance):
     age_at_first_paediatric_assessment = relativedelta(
         registration_instance.registration_date, registration_instance.case.date_of_birth).years
     tertiary_input = 0
-    if hasattr(registration_instance, 'management') and hasattr(registration_instance, 'assessment'):
+    if hasattr(registration_instance, 'management') and hasattr(registration_instance, 'assessment') and hasattr(registration_instance, 'multiaxial_diagnosis'):
         if (
             # Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy]
             age_at_first_paediatric_assessment <= 3
@@ -111,7 +111,7 @@ def calculate_kpis(registration_instance):
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year AND who have [12 lead ECG obtained]
     # Denominator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year
     ecg = 0
-    if hasattr(registration_instance, 'epilepsy_context'):
+    if hasattr(registration_instance, 'epilepsy_context') and hasattr(registration_instance, 'investigations'):
         if (
             registration_instance.epilepsy_context.were_any_of_the_epileptic_seizures_convulsive and
             registration_instance.investigations.twelve_lead_ecg_status
