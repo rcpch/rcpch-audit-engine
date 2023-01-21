@@ -151,6 +151,38 @@ def to_class_name(value):
         return 'Error'
 
 
+@register.filter
+def return_case(value):
+    if value.__class__.__name__ == "Registration":
+        return value.case
+    elif value.__class__.__name__ == "FirstPaediatricAssessment":
+        return value.registration.case
+    elif value.__class__.__name__ == "EpilepsyContext":
+        return value.registration.case
+    elif value.__class__.__name__ == "MultiaxialDiagnosis":
+        return value.registration.case
+    elif value.__class__.__name__ == "Assessment":
+        return value.registration.case
+    elif value.__class__.__name__ == "Investigations":
+        return value.registration.case
+    elif value.__class__.__name__ == "Management":
+        return value.registration.case
+    elif value.__class__.__name__ == "Site":
+        return value.case
+    elif value.__class__.__name__ == "Episode":
+        return value.multiaxial_diagnosis.registration.case
+    elif value.__class__.__name__ == "Syndrome":
+        return value.multiaxial_diagnosis.registration.case
+    elif value.__class__.__name__ == "Comorbidity":
+        return value.multiaxial_diagnosis.registration.case
+    elif value.__class__.__name__ == "Epilepsy12User":
+        return 'Epilepsy12 User'
+    elif value.__class__.__name__ == "Antiepilepsy Medicine":
+        return value.management.registration.case
+    else:
+        return 'Error'
+
+
 @register.filter('has_group')
 def has_group(user, group_names_string):
     # thanks to Lucas Simon for this efficiency
