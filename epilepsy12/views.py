@@ -111,7 +111,7 @@ def hospital_reports(request):
             parent_trust = lead_hospital.ParentName
             if hasattr(case.registration, 'kpi'):
                 print('I have KPIs')
-                if case.registration.kpi is not None:
+                if case.registration.kpi is None:
                     new_kpi = KPI.objects.create(
                         hospital_organisation=lead_hospital,
                         parent_trust=parent_trust,
