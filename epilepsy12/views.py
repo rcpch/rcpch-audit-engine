@@ -101,7 +101,7 @@ def hospital_reports(request):
 
     # add all registered cases to KPIs
     for case in Case.objects.all():
-        if hasattr(case, 'registration'):
+        if Registration.objects.filter(case=case).exists():
             lead_site = Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_primary_centre_of_epilepsy_care=True,
