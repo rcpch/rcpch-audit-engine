@@ -102,11 +102,15 @@ def hospital_reports(request):
     # add all registered cases to KPIs
     for case in Case.objects.all():
         if Registration.objects.filter(case=case).exists():
-            lead_site = Site.objects.filter(
-                site_is_actively_involved_in_epilepsy_care=True,
-                site_is_primary_centre_of_epilepsy_care=True,
-                case=case
-            ).get()
+            try:
+                lead_site = Site.objects.filter(
+                    site_is_actively_involved_in_epilepsy_care=True,
+                    site_is_primary_centre_of_epilepsy_care=True,
+                    case=case
+                ).get()
+            except Site.DoesNotExist:
+                print(f"Lead site does not exist for {case}")
+                return
             lead_hospital = lead_site.hospital_trust
             parent_trust = lead_hospital.ParentName
             if hasattr(case.registration, 'kpi'):
