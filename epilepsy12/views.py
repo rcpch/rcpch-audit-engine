@@ -29,7 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
-from .common_view_functions import trust_level_kpis, national_level_kpis
+from .common_view_functions import hospital_level_kpis, trust_level_kpis, national_level_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -352,15 +352,18 @@ def selected_trust_kpis(request, hospital_id):
     """
     trust_kpis = trust_level_kpis(hospital_id=hospital_id)
     national_kpis = national_level_kpis()
-    # create an empty instance of audit progress to access the labels
     hospital_organisation = HospitalTrust.objects.get(pk=hospital_id)
+    hospital_kpis = hospital_level_kpis(hospital_id=hospital_id)
+    # create an empty instance of KPIs to access the labels
     kpis = KPI.objects.create(
         hospital_organisation=hospital_organisation,
         parent_trust=hospital_organisation.ParentName
     )
-    template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
+    template_name = 'epilepsy12/partials/kpis/kpis.html'
     context = {
-        'selected_trust_kpis': trust_kpis,
+        'hospital_organisation': hospital_organisation,
+        'hospital_kpis': hospital_kpis,
+        'trust_kpis': trust_kpis,
         'national_kpis': national_kpis,
         'kpis': kpis
     }

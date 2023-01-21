@@ -118,11 +118,20 @@
             class="sixteen wide stackable column" 
             hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
             hx-trigger="load" hx-swap='innerHTML'
-            hx_indicator='#selected_trust_kpis'
-            hx-target="#selected_trust_kpis">
-            <div id='selected_trust_kpis'>
+            hx_indicator='#kpis'
+            hx-target="#kpis">
+            <div id='kpis'>
                 <div class="ui active centered inline loader"></div>
             </div>
+            <button 
+                class='ui right floated rcpch_primary button'
+                hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
+                hx-trigger="click" hx-swap='innerHTML'
+                hx_indicator='#kpis'
+                hx-target="#kpis">
+            Refresh
+            <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+            </button>
         </div>
     
 </div>

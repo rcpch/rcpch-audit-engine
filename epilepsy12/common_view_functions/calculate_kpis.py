@@ -7,7 +7,7 @@ from ..constants import ALL_NHS_TRUSTS
 def calculate_kpis(registration_instance):
     """
     Function called on update of every field
-    Identifies completed KPIs and passes these back to update AuditProgress model
+    Identifies completed KPIs for a given registered child and passes these back to update the KPI model
     It accepts the registration instance
     """
 
@@ -409,27 +409,9 @@ def trust_level_kpis(hospital_id):
 
 def national_level_kpis():
     """
-    Return KPI totals for all children in the UK
+    Return KPI totals for all children in the UK by looping through all trusts
     """
 
-    # response = requests.request(
-    #     method='POST',
-    #     url='https://api.nhs.uk/service-search/search?api-version=1',
-    #     headers={
-    #         'Content-Type': 'application/json',
-    #         'subscription-key': '450184b1ac7c437c91598685a778fa53'
-    #     },
-    #     data=u'''
-    # {
-    #     "filter": "(OrganisationTypeID eq 'HA') or (OrganisationTypeID eq 'HOS') or (OrganisationTypeID eq 'LA') or (OrganisationTypeID eq 'SHA') or (OrganisationTypeID eq 'TRU')",
-    #     "orderby": "OrganisationName",
-    #     "top": 25,
-    #     "skip": 0,
-    #     "count": true
-    # }
-    #     ''', )
-
-    # return response.json()
     national_level_kpis = {
         "paediatrician_with_expertise_in_epilepsies": 0,
         "epilepsy_specialist_nurse": 0,
@@ -488,3 +470,67 @@ def national_level_kpis():
                 national_level_kpis["total_number_of_cases"] += trust_kpis["total_number_of_cases"]
 
     return national_level_kpis
+
+
+def hospital_level_kpis(hospital_id):
+    """
+    Returns KPIs for a given hospital
+    """
+
+    hospital_level_kpi_object = {
+        "paediatrician_with_expertise_in_epilepsies": 0,
+        "epilepsy_specialist_nurse": 0,
+        "tertiary_input": 0,
+        "epilepsy_surgery_referral": 0,
+        "ecg": 0,
+        "mri": 0,
+        "assessment_of_mental_health_issues": 0,
+        "mental_health_support": 0,
+        "sodium_valproate": 0,
+        "comprehensive_care_planning_agreement": 0,
+        "patient_held_individualised_epilepsy_document": 0,
+        "patient_carer_parent_agreement_to_the_care_planning": 0,
+        "care_planning_has_been_updated_when_necessary": 0,
+        "comprehensive_care_planning_content": 0,
+        "parental_prolonged_seizures_care_plan": 0,
+        "water_safety": 0,
+        "first_aid": 0,
+        "general_participation_and_risk": 0,
+        "service_contact_details": 0,
+        "sudep": 0,
+        "school_individual_healthcare_plan": 0,
+        "total_number_of_cases": 0,
+    }
+
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    hospital_kpis = KPI.objects.filter(
+        hospital_organisation=hospital_trust
+    ).all()
+
+    if hospital_kpis.count() > 0:
+        for hospital_kpi in hospital_kpis:
+            hospital_level_kpi_object["paediatrician_with_expertise_in_epilepsies"] += hospital_kpi.paediatrician_with_expertise_in_epilepsies
+            hospital_level_kpi_object["epilepsy_specialist_nurse"] += hospital_kpi.epilepsy_specialist_nurse
+            hospital_level_kpi_object["tertiary_input"] += hospital_kpi.tertiary_input
+            hospital_level_kpi_object["epilepsy_surgery_referral"] += hospital_kpi.epilepsy_surgery_referral
+            hospital_level_kpi_object["ecg"] += hospital_kpi.ecg
+            hospital_level_kpi_object["mri"] += hospital_kpi.mri
+            hospital_level_kpi_object["assessment_of_mental_health_issues"] += hospital_kpi.assessment_of_mental_health_issues
+            hospital_level_kpi_object["mental_health_support"] += hospital_kpi.mental_health_support
+            hospital_level_kpi_object["sodium_valproate"] += hospital_kpi.sodium_valproate
+            hospital_level_kpi_object["comprehensive_care_planning_agreement"] += hospital_kpi.comprehensive_care_planning_agreement
+            hospital_level_kpi_object["patient_held_individualised_epilepsy_document"] += hospital_kpi.patient_held_individualised_epilepsy_document
+            hospital_level_kpi_object["patient_carer_parent_agreement_to_the_care_planning"] += hospital_kpi.patient_carer_parent_agreement_to_the_care_planning
+            hospital_level_kpi_object["care_planning_has_been_updated_when_necessary"] += hospital_kpi.care_planning_has_been_updated_when_necessary
+            hospital_level_kpi_object["comprehensive_care_planning_content"] += hospital_kpi.comprehensive_care_planning_content
+            hospital_level_kpi_object["parental_prolonged_seizures_care_plan"] += hospital_kpi.parental_prolonged_seizures_care_plan
+            hospital_level_kpi_object["water_safety"] += hospital_kpi.water_safety
+            hospital_level_kpi_object["first_aid"] += hospital_kpi.first_aid
+            hospital_level_kpi_object["general_participation_and_risk"] += hospital_kpi.general_participation_and_risk
+            hospital_level_kpi_object["service_contact_details"] += hospital_kpi.service_contact_details
+            hospital_level_kpi_object["sudep"] += hospital_kpi.sudep
+            hospital_level_kpi_object["school_individual_healthcare_plan"] += hospital_kpi.school_individual_healthcare_plan
+            hospital_level_kpi_object["total_number_of_cases"] += 1
+
+    return hospital_level_kpi_object
