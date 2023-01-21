@@ -110,6 +110,7 @@ admin.site.register(AuditProgress)
 admin.site.register(Episode)
 admin.site.register(MultiaxialDiagnosis)
 admin.site.register(Syndrome)
+admin.site.register(KPI)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'

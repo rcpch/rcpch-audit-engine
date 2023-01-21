@@ -351,9 +351,8 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     class Meta:
-        verbose_name = _("")
-
-        verbose_name_plural = _("s")
+        verbose_name = _("KPI ")
+        verbose_name_plural = _("KPIs")
 
     def __str__(self):
         return f'KPI for child in {self.hospital_organisation.OrganisationName}({self.parent_trust})'
