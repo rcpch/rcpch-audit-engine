@@ -19,9 +19,39 @@
                     <thead>
                         <tr>
                             <th class='seven wide'>Indicator</th>
-                            <th class='right aligned'>Hospital</th>
-                            <th class='right aligned'>Trust</th>
-                            <th class='right aligned'>National</th>
+                            <th class='right aligned'>
+                                Hospital 
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_hospital'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered in this hospital."
+                                    data-position='top right'
+                                    _="init js $('#totals_hospital').popup(); end"
+                                ></i>({{hospital_kpis.total_number_of_cases}})
+                            </th>
+                            <th class='right aligned'>
+                                Trust
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_trust'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered in this Trust."
+                                    data-position='top right'
+                                    _="init js $('#totals_trust').popup(); end"
+                                ></i>({{trust_kpis.total_number_of_cases}})
+                            </th>
+                            <th class='right aligned'>
+                                National
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_national'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered nationally."
+                                    data-position='top right'
+                                    _="init js $('#totals_national').popup(); end"
+                                ></i>({{national_kpis.total_number_of_cases}})
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
