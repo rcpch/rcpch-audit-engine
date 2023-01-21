@@ -29,7 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
-from .common_view_functions import hospital_level_kpis, trust_level_kpis, national_level_kpis
+from .common_view_functions import hospital_level_kpis, trust_level_kpis, national_level_kpis, calculate_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -98,6 +98,52 @@ def hospital_reports(request):
     #         reg.save()
     #     else:
     #         print('nothing to see here')
+
+    # add all registered cases to KPIs
+    for case in Case.objects.all():
+        if hasattr(case, 'registration'):
+            lead_site = Site.objects.filter(
+                site_is_actively_involved_in_epilepsy_care=True,
+                site_is_primary_centre_of_epilepsy_care=True,
+                case=case
+            ).get()
+            lead_hospital = lead_site.hospital_trust
+            parent_trust = lead_hospital.ParentName
+            if hasattr(case.registration, 'kpi'):
+                print('I have KPIs')
+                calculate_kpis(case.registration)
+                print(f"Done! KPIs calculated for {case}")
+            else:
+                print('I have no KPIs - creating...')
+                KPI.objects.create(
+                    hospital_organisation=lead_hospital,
+                    parent_trust=parent_trust,
+                    paediatrician_with_expertise_in_epilepsies=0,
+                    epilepsy_specialist_nurse=0,
+                    tertiary_input=0,
+                    epilepsy_surgery_referral=0,
+                    ecg=0,
+                    mri=0,
+                    assessment_of_mental_health_issues=0,
+                    mental_health_support=0,
+                    sodium_valproate=0,
+                    comprehensive_care_planning_agreement=0,
+                    patient_held_individualised_epilepsy_document=0,
+                    patient_carer_parent_agreement_to_the_care_planning=0,
+                    care_planning_has_been_updated_when_necessary=0,
+                    comprehensive_care_planning_content=0,
+                    parental_prolonged_seizures_care_plan=0,
+                    water_safety=0,
+                    first_aid=0,
+                    general_participation_and_risk=0,
+                    service_contact_details=0,
+                    sudep=0,
+                    school_individual_healthcare_plan=0
+                )
+                print(
+                    f"Done! KPIs created for {case}. Now calculating score...")
+                calculate_kpis(case.registration)
+                print(f"Done! KPIs calculated for {case}")
 
     """
     !!!
