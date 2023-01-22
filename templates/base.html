@@ -95,11 +95,11 @@
       </div>
 
 
-    <div class='ui container'>
-      
+    <div class='ui container' style='padding: 1rem;'>
       
       {% if messages %}
-      <div class="ui green message">
+      <div class="ui rcpch_info icon message">
+        <i class="info icon"></i>
         <i class="close icon"></i>
         {% for message in messages %}
         {% if message.tags %} {% endif %}
@@ -109,6 +109,7 @@
       {% endif %}
       
     </div>
+
     <div class='ui fluid container'>
       
       {% block content %}
