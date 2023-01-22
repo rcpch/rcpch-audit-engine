@@ -1,12 +1,9 @@
 from django.db import models
-
+from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 
 from epilepsy12.general_functions import calculate_time_elapsed
 from .time_and_user_abstract_base_classes import *
-
-# other tables
-# from .registration import Registration
 
 
 class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -136,6 +133,16 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
         default=None,
         null=True
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     """
     calculated fields

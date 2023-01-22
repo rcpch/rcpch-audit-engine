@@ -1,11 +1,12 @@
+# django
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .help_text_mixin import HelpTextMixin
-# from .multiaxial_diagnosis import MultiaxialDiagnosis
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, MIGRAINES, EPIS_MISC, GENERALISED_SEIZURE_TYPE
 from .time_and_user_abstract_base_classes import *
-# from ..general_functions import *
 
 
 class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -328,6 +329,16 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         null=True,
         blank=True
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     # relationships
 

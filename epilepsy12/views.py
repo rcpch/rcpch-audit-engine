@@ -426,6 +426,48 @@ def selected_hospital_summary(request):
     })
 
 
+@login_required
+def logs(request, hospital_id, epilepsy12_user_id):
+    """
+    returns logs for given hospital
+    """
+    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+
+    activities = VisitActivity.objects.filter(
+        epilepsy12user=epilepsy12_user).all()
+
+    template_name = 'epilepsy12/logs.html'
+    context = {
+        'epilepsy12_user': epilepsy12_user,
+        'hospital': hospital,
+        'activities': activities
+    }
+
+    return render(request=request, template_name=template_name, context=context)
+
+
+@login_required
+def log_list(request, hospital_id, epilepsy12_user_id):
+    """
+    GET request to return log table 
+    """
+    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+
+    activities = VisitActivity.objects.filter(
+        epilepsy12user=epilepsy12_user).all()
+
+    template_name = 'epilepsy12/logs.html'
+    context = {
+        'epilepsy12_user': epilepsy12_user,
+        'hospital': hospital,
+        'activities': activities
+    }
+
+    return render(request=request, template_name=template_name, context=context)
+
+
 def selected_trust_kpis(request, hospital_id):
     """
     HTMX get request returning trust_level_kpi.html partial

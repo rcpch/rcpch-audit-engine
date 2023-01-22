@@ -1,9 +1,8 @@
 from django.db import models
 from django.forms import ValidationError
+from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
-# from .management import Management
-# from ..general_functions import *
 
 
 class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -114,6 +113,16 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
         null=True,
         blank=True
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     def clean(self):
         if (self.antiepilepsy_medicine_start_date and self.antiepilepsy_medicine_stop_date):
