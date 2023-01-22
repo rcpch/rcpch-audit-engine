@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from semantic_admin import SemanticModelAdmin
+from simple_history.admin import SimpleHistoryAdmin
 # Register your models here.
 from .models import *
 
 from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
 
 
-class Epilepsy12UserAdmin(UserAdmin):
+class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
     add_form = Epilepsy12UserCreationForm
     form = Epilepsy12UserChangeForm
     ordering = ['email']
@@ -94,23 +95,24 @@ class Epilepsy12UserAdmin(UserAdmin):
 
 
 admin.site.register(Epilepsy12User, Epilepsy12UserAdmin)
-admin.site.register(AntiEpilepsyMedicine)
-admin.site.register(Assessment)
-admin.site.register(Case)
-admin.site.register(Comorbidity)
-admin.site.register(EpilepsyContext)
-admin.site.register(Investigations)
-admin.site.register(HospitalTrust)
-admin.site.register(FirstPaediatricAssessment)
-admin.site.register(Management)
-admin.site.register(Registration)
-admin.site.register(Keyword)
-admin.site.register(Site)
+admin.site.register(AntiEpilepsyMedicine, SimpleHistoryAdmin)
+admin.site.register(Assessment, SimpleHistoryAdmin)
+admin.site.register(Case, SimpleHistoryAdmin)
+admin.site.register(Comorbidity, SimpleHistoryAdmin)
+admin.site.register(EpilepsyContext, SimpleHistoryAdmin)
+admin.site.register(Investigations, SimpleHistoryAdmin)
+admin.site.register(HospitalTrust, SimpleHistoryAdmin)
+admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
+admin.site.register(Management, SimpleHistoryAdmin)
+admin.site.register(Registration, SimpleHistoryAdmin)
+admin.site.register(Keyword, SimpleHistoryAdmin)
+admin.site.register(Site, SimpleHistoryAdmin)
 admin.site.register(AuditProgress)
-admin.site.register(Episode)
-admin.site.register(MultiaxialDiagnosis)
-admin.site.register(Syndrome)
+admin.site.register(Episode, SimpleHistoryAdmin)
+admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
+admin.site.register(Syndrome, SimpleHistoryAdmin)
 admin.site.register(KPI)
+admin.site.register(VisitActivity)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'

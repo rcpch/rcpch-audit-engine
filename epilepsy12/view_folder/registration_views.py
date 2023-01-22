@@ -1,14 +1,20 @@
+# django imports
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.db.models import Q
+
+# 3rd party
 from django_htmx.http import trigger_client_event
+
+# RCPCH
 from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_hospital_trust
 
 
 @login_required
+@permission_required('epilepsy12.view_registration', raise_exception=True)
 @user_can_access_this_hospital_trust()
 def register(request, case_id):
 

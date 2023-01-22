@@ -1,9 +1,10 @@
+# django
 from django.db import models
-
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .help_text_mixin import HelpTextMixin
 from ..general_functions import calculate_time_elapsed
-
-# from .registration import Registration
 from .time_and_user_abstract_base_classes import *
 
 
@@ -87,6 +88,16 @@ class Investigations(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
         null=True,
         blank=True
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     def mri_wait(self):
         """

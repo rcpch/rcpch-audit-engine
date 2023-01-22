@@ -1,5 +1,10 @@
+# django
 from django.db import models
 
+# 3rd party
+from simple_history.models import HistoricalRecords
+
+# RCPCH
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
@@ -32,6 +37,16 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
         default=None,
         null=True
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     # relationships
     multiaxial_diagnosis = models.ForeignKey(

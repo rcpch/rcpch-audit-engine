@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     # third party
     'widget_tweaks',
     'django_htmx',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'simple_history'
 ]
 
 MIDDLEWARE = [
@@ -70,7 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_htmx.middleware.HtmxMiddleware'
+    'django_htmx.middleware.HtmxMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware'
 ]
 
 ROOT_URLCONF = 'rcpch-audit-engine.urls'

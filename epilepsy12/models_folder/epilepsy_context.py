@@ -1,13 +1,14 @@
 
+# django
 from django.db import models
 
+# 3rd party
+from simple_history.models import HistoricalRecords
+
+# rcpch
 from .help_text_mixin import HelpTextMixin
 from ..constants import OPT_OUT_UNCERTAIN
 from .time_and_user_abstract_base_classes import *
-
-# from .registration import Registration
-
-# from ..general_functions import *
 
 
 class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -95,6 +96,16 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, He
         null=True,
         choices=OPT_OUT_UNCERTAIN,
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     # relationships
     registration = models.OneToOneField(

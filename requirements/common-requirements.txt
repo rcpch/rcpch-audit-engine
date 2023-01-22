@@ -12,5 +12,6 @@ django-htmx
 whitenoise
 django-semantic-admin
 djangorestframework
+django-simple-history
 
 # RCPCH imports

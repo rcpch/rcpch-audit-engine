@@ -1,7 +1,8 @@
+# django
 from django.db import models
-# other tables
-# from .case import Case
-# from .hospital_trust import HospitalTrust
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .time_and_user_abstract_base_classes import *
 
 
@@ -40,6 +41,8 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True
     )
 
+    history = HistoricalRecords()
+
     # relationships
     # Site is a link table between Case and Hospital Trust in a many to many relationship
 
@@ -58,6 +61,14 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         on_delete=models.CASCADE,
         related_name='site'
     )
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     class Meta:
         verbose_name = 'Site'

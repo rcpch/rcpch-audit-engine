@@ -1,12 +1,19 @@
+# python
 from dateutil import relativedelta
 from datetime import date
 import math
+
+# django
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, DateField
 from django.conf import settings
-from .help_text_mixin import HelpTextMixin
 
+# 3rd party
+from simple_history.models import HistoricalRecords
+
+# epilepsy12
+from .help_text_mixin import HelpTextMixin
 from ..constants import SEX_TYPE, ETHNICITIES, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from ..general_functions import imd_for_postcode
 from .time_and_user_abstract_base_classes import *
@@ -106,6 +113,8 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         null=True
     )
 
+    history = HistoricalRecords()
+
     # relationships
     hospital_trusts = models.ManyToManyField(
         'epilepsy12.HospitalTrust',
@@ -113,6 +122,14 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         related_name='cases',
         through_fields=('case', 'hospital_trust')
     )
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     @property
     def age(self):

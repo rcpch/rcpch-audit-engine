@@ -183,46 +183,54 @@
             
             <td class='two wide'>
                 <div class='ui buttons'>
-                <button 
-                    data-tooltip='Edit Epilepsy12 User details.'
-                    {% if perms.epilepsy12.change_epilepsy12user %}
-                        class="ui rcpch_primary icon button" 
-                    {% else %}
-                        class="ui rcpch_primary icon disabled button" 
-                    {% endif %}
-                    tabindexed="0">
-                    <a href="{% url 'edit_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
-                        <i class="edit outline icon"></i>
+                    
+                    <button 
+                        data-tooltip='Edit Epilepsy12 User details.'
+                        {% if perms.epilepsy12.change_epilepsy12user %}
+                            class="ui rcpch_primary icon button" 
+                        {% else %}
+                            class="ui rcpch_primary icon disabled button" 
+                        {% endif %}
+                        tabindexed="0">
+                        <a href="{% url 'edit_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
+                            <i class="edit outline icon"></i>
+                        </a>
+                    </button>
+                    
+                    <button 
+                        data-tooltip='Delete Epilepsy12 User. This is irreversible.' 
+                        {% if perms.epilepsy12.delete_epilepsy12user %}
+                            class="ui rcpch_danger icon button" 
+                        {% else %}
+                            class="ui rcpch_danger icon disabled button" 
+                        {% endif %}
+                        tabindexed="1" 
+                        hx-post="{% url 'delete_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}"
+                        hx-trigger='click'
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                        _="on htmx:confirm(issueRequest)
+                            halt the event
+                            call Swal.fire({
+                                title: 'Confirmation Required',
+                                text: 'Are you sure you want to delete {{epilepsy12_user}}? This is an irreversible step.',
+                                icon: 'warning',
+                                iconColor: '#e00087',
+                                showCancelButton: true,
+                                confirmButtonColor: '#11a7f2',
+                                cancelButtonColor: '#e60700',
+                                confirmButtonText: 'Delete {{epilepsy12_user}}'
+                            })
+                            if result.isConfirmed issueRequest()"
+                    >
+                        <i class="trash alternate outline icon"></i>   
+                    </button>
+
+                    <a href="{% url 'logs' epilepsy12_user_id=epilepsy12_user.pk hospital_id=hospital_trust.pk %}">
+                        <button 
+                            class='ui rcpch_light_blue icon right floated button'>
+                            <i class='ui list icon'></i>
+                        </button>
                     </a>
-                </button>
-                
-                <button 
-                    data-tooltip='Delete Epilepsy12 User. This is irreversible.' 
-                    {% if perms.epilepsy12.delete_epilepsy12user %}
-                        class="ui rcpch_danger icon button" 
-                    {% else %}
-                        class="ui rcpch_danger icon disabled button" 
-                    {% endif %}
-                    tabindexed="1" 
-                    hx-post="{% url 'delete_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}"
-                    hx-trigger='click'
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    _="on htmx:confirm(issueRequest)
-                        halt the event
-                        call Swal.fire({
-                            title: 'Confirmation Required',
-                            text: 'Are you sure you want to delete {{epilepsy12_user}}? This is an irreversible step.',
-                            icon: 'warning',
-                            iconColor: '#e00087',
-                            showCancelButton: true,
-                            confirmButtonColor: '#11a7f2',
-                            cancelButtonColor: '#e60700',
-                            confirmButtonText: 'Delete {{epilepsy12_user}}'
-                        })
-                        if result.isConfirmed issueRequest()"
-                >
-                    <i class="trash alternate outline icon"></i>   
-                </button>
                 
                 </div>
 
