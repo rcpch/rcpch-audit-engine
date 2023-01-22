@@ -226,9 +226,22 @@
                     </button>
 
                     <a href="{% url 'logs' epilepsy12_user_id=epilepsy12_user.pk hospital_id=hospital_trust.pk %}">
-                        <button 
-                            class='ui rcpch_light_blue icon right floated button'>
-                            <i class='ui list icon'></i>
+                        <button
+                            {% if perms.epilepsy12.view_logs %}
+                                class='ui rcpch_light_blue icon right floated button'
+                            {% else %}
+                                class='ui rcpch_light_blue icon right floated disabled button'
+                            {% endif %}
+                        >
+                            <i 
+                                class='ui list icon'
+                                id="{{epilepsy12_user.id}}_activity_icon"
+                                data-title="Logs"
+                                data-content="View {{epilepsy12_user}}'s activity."
+                                data-position="top left"
+                                data-variation="basic"
+                                _="init js $('#{{epilepsy12_user.id}}_activity_icon').popup(); end"
+                            ></i>
                         </button>
                     </a>
                 
