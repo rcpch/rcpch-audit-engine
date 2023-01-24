@@ -372,8 +372,9 @@ def opt_out(request, hospital_id, case_id):
     leading trust will be retained but set to inactive.
     """
 
-    # hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     case = Case.objects.get(pk=case_id)
+    messages.info(
+        request, f"All data on {case} has been permanently removed from Epilepsy12. The Epilepsy12 unique identifier has been preserved to contribute to annual totals.")
     case.nhs_number = None
     case.first_name = None
     case.surname = None
@@ -386,7 +387,8 @@ def opt_out(request, hospital_id, case_id):
     case.save()
 
     # delete all related records - this should cascade to all tables
-    case.registration.delete()
+    if hasattr(case, 'registration'):
+        case.registration.delete()
 
     # delete all related sites except the primary centre of care, which becomes inactive
     all_sites = case.site.all()
