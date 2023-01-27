@@ -1178,7 +1178,6 @@ ul {
 }
 
 .ui.rcpch_footer.message {
-  border-color: var(--rcpch_dark_blue);
   color: var(--rcpch_white);
   background-color: var(--rcpch_dark_blue);
 }
@@ -1204,7 +1203,7 @@ ul {
 .ui.bottom.attached.rcpch_footer.message {
   margin-top: -1em;
   border-radius: 0%;
-  border-color: var(--rcpch_dark_blue);
+  box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
 }
 
 footer {
