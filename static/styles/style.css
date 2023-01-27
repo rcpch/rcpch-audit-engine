@@ -1200,6 +1200,13 @@ ul {
   border-color: var(--rcpch_dark_blue);
 }
 
+.ui.top.attached.inverted.clearing.segment .content {
+  color: var(--rcpch_white);
+}
+.ui.top.attached.inverted.clearing.segment .content .sub.header {
+  color: var(--rcpch_white);
+}
+
 .ui.bottom.attached.rcpch_footer.message {
   margin-top: -1em;
   border-radius: 0%;

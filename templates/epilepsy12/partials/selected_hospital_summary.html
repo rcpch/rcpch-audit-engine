@@ -149,15 +149,6 @@
             <div id='kpis'>
                 <div class="ui active centered inline loader"></div>
             </div>
-            <button 
-                class='ui right floated rcpch_primary button'
-                hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
-                hx-trigger="click" hx-swap='innerHTML'
-                hx_indicator='#kpis'
-                hx-target="#kpis">
-            Refresh
-            <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-            </button>
         </div>
     
 </div>

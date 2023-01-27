@@ -3,12 +3,23 @@
 <div class="ui rcpch container">
     <div class="sixteen wide column">
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
-        <h5 class="ui left floated header">
-            Real-time KPI Metrics
-        </h5>
-        <h5 class="ui right floated header">
-            {{hospital_organisation.OrganisationName}} ({{ trust_kpis.parent_trust }})
-        </h5>
+            <h5 class='ui header'>
+                <div class='content'>
+                    Real-time KPI Metrics
+                    <div class="sub header">
+                    {{hospital_organisation.OrganisationName}} ({{ trust_kpis.parent_trust }})
+                    </div>    
+                </div>
+                <button 
+                        class='ui right floated rcpch_primary button'
+                        hx-get="{% url 'selected_trust_kpis' hospital_id=hospital_organisation.pk %}" 
+                        hx-trigger="click" hx-swap='innerHTML'
+                        hx_indicator='#kpis'
+                        hx-target="#kpis">
+                    Refresh
+                    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+                </button>
+            </h5>
         </div>
 
         <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
