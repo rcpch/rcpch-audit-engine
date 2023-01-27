@@ -1255,7 +1255,7 @@ footer a:hover {
   color: var(--rcpch_light_blue);
 }
 
-a:-webkit-any-link {
+footer a:-webkit-any-link {
   cursor: pointer;
   text-decoration: none;
   color: white;
