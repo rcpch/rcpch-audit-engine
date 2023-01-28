@@ -30,10 +30,10 @@
             <div class="ui rcpch_lightest_blue message">
                 
                 {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
             
                 {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
 
                 
                 <div class="inline field">
@@ -48,6 +48,7 @@
                 {% endif %}
 
                 {% if active_surgical_site %}
+
                     <div class="field">
                         <span>
                             <i class="rcpch_pink check circle outline icon"></i>
@@ -57,15 +58,8 @@
                                 <input disabled value="{{active_surgical_site.hospital_trust.OrganisationName}} ({{active_surgical_site.hospital_trust.ParentName}})">
                                 <div class="ui buttons">
                                 
-                                    {% if surgery_edit_active %}
-                                        <button 
-                                            class="ui rcpch_negative button"
-                                            hx-post="{% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' %}"
-                                            hx-target="#childrens_epilepsy_surgical_service"
-                                            hx-swap="innerHTML"
-                                            hx-trigger="click"
-                                        >Cancel</button>
-                                    {% else %}
+                                    {% if not surgery_edit_active %}
+                                        
                                         <button 
                                             {% if perms.epilepsy12.change_assessment %}
                                                 class="ui rcpch_primary button"
@@ -102,39 +96,22 @@
                     
                         <div class="field" id="allocate_surgical_centre">
                             {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
-                            {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+                            {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
+                            {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
                         </div>
+
                     {% endif %}
                     
                 {% else %}
+
                     <div class="field" id="allocate_surgical_centre">
                         <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
                         {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+                        {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
+                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
                     </div>
+                    
                 {% endif %}
-
-                {% if historical_surgical_sites|length > 0 %}
-                    
-                    <div class="field">
-                        <label>Surgical centres previously involved in care</label>
-                        {% for historical_surgical_site in historical_surgical_sites %}
-                            <li>{{historical_surgical_site.hospital_trust.OrganisationName}}</li>
-                        {% endfor %}
-                    </div>
-                    
-
-                {% else %}
-                    
-                    <div class="field">
-                        
-                        <p>No surgical centres have previously been involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</p>
-                        
-                    </div>
-                    
-
-                {% endif %}
-
 
             </div>
 

@@ -72,14 +72,15 @@ hx_confirm: if present, the text to confirm continue
                         if result.isConfirmed issueRequest()"
                     {% endif %}
                 >{{label}}</button>
-
-                <button 
-                    class="ui rcpch_cancel button"
-                    hx-post="{{hx_cancel}}"
-                    hx-target="{{hx_target}}"
-                    hx-swap="innerHTML"
-                    hx-trigger="click"
-                >Cancel</button>
+                {% if hx_cancel %}
+                    <button
+                        class="ui rcpch_cancel button"
+                        hx-post="{{hx_cancel}}"
+                        hx-target="{{hx_target}}"
+                        hx-swap="innerHTML"
+                        hx-trigger="click"
+                    >Cancel</button>
+                {% endif %}
             </div>
             
         </span>
