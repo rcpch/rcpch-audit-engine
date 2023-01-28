@@ -98,6 +98,9 @@ CAN_REGISTER_CHILD_IN_EPILEPSY12 = ('can_register_child_in_epilepsy12',
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = ('can_unregister_child_in_epilepsy12',
                                       'Can unregister a child in Epilepsy. Their record and previously entered data is untouched.')
 
+CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE = ('can_allocate_epilepsy12_lead_centre',
+                                       'Can allocate this child to any Epilepsy12 centre.')
+
 CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE = ('can_transfer_epilepsy12_lead_centre',
                                        'Can transfer this child to another Epilepsy12 centre.')
 
@@ -122,6 +125,7 @@ PERMISSIONS = (
     CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
 
     CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
+    CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE,
     CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
     CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
     CAN_CONSENT_TO_AUDIT_PARTICIPATION

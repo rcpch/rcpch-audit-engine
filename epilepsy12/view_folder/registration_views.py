@@ -337,6 +337,7 @@ def update_lead_site(request, registration_id, site_id, update):
     """
 
     registration = Registration.objects.get(pk=registration_id)
+    previous_lead_site = Site.objects.get(pk=site_id)
 
     if update == "edit":
         new_trust_id = request.POST.get('edit_lead_site')
@@ -363,12 +364,7 @@ def update_lead_site(request, registration_id, site_id, update):
             updated_by=request.user,
             case=registration.case)
 
-    site = Site.objects.filter(
-        case=registration.case,
-        site_is_primary_centre_of_epilepsy_care=True,
-        site_is_actively_involved_in_epilepsy_care=True).first()
-
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': site.hospital_trust.pk}))
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': previous_lead_site.hospital_trust.pk}))
 
 
 @login_required

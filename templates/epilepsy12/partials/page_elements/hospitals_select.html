@@ -11,17 +11,20 @@ hx_post: url to post to
 hospital_list: a filtered list of hospitals
 test_positive: currently selected hospital id
 enabled: boolean
+hx_cancel: the url target on cancel pressed
+hx_confirm: if present, the text to confirm continue
 {% endcomment %}
 
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <span>
             
-        {% comment %} {% if test_positive %}
+        {% if test_positive %}
             <i class="rcpch_pink check circle outline icon"></i>
-        {% else %}{% endcomment %}
-        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-            <i class="rcpch_light_blue dot circle outline icon"></i>
-        </span>
+        {% else %}
+            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                <i class="rcpch_light_blue dot circle outline icon"></i>
+            </span>
+        {% endif %}
         
         {% if enabled %}
             <div class="ui rcpch_light_blue search selection dropdown">
@@ -47,12 +50,27 @@ enabled: boolean
             </div>
             <div class='ui buttons'>
                 <button 
-                class="ui rcpch_primary button"
-                hx-post="{{hx_post}}"
-                hx-target="{{hx_target}}"
-                hx-swap="innerHTML"
-                hx-trigger="click"
-                name='hospital_allocate_button'
+                    class="ui rcpch_primary button"
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                    name='hospital_allocate_button'
+                    {% if hx_confirm %}
+                    _="on htmx:confirm(issueRequest)
+                        halt the event
+                        call Swal.fire({
+                            title: 'Confirmation Required',
+                            text: '{{hx_confirm}}',
+                            icon: 'warning',
+                            iconColor: '#e00087',
+                            showCancelButton: true,
+                            confirmButtonColor: '#11a7f2',
+                            cancelButtonColor: '#e60700',
+                            confirmButtonText: 'Allocate hospital'
+                          })
+                        if result.isConfirmed issueRequest()"
+                    {% endif %}
                 >{{label}}</button>
 
                 <button 

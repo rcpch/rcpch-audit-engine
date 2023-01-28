@@ -2,7 +2,7 @@ from django.contrib.auth.management import create_permissions
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from ...constants import GROUPS
-from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, CAN_CONSENT_TO_AUDIT_PARTICIPATION, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE, CAN_EDIT_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT
+from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, CAN_CONSENT_TO_AUDIT_PARTICIPATION, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE, CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE, CAN_EDIT_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT
 from epilepsy12.models import AntiEpilepsyMedicine, Assessment, AuditProgress, Comorbidity, EpilepsyContext, Episode, FirstPaediatricAssessment, Investigations, Management, MultiaxialDiagnosis, Syndrome, Registration, Case, HospitalTrust, Keyword, Site, Epilepsy12User
 
 # globals
@@ -219,6 +219,8 @@ EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS = [
         'content_type': siteContentType},
     {'codename': CAN_EDIT_EPILEPSY12_LEAD_CENTRE[0],
         'content_type': siteContentType},
+    {'codename': CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE[0],
+        'content_type': siteContentType},
 ]
 
 
@@ -246,8 +248,6 @@ TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS = [
      'content_type': registrationContentType},
     {'codename': CAN_REGISTER_CHILD_IN_EPILEPSY12[0],
      'content_type': registrationContentType},
-    {'codename': CAN_EDIT_EPILEPSY12_LEAD_CENTRE[0],
-     'content_type': siteContentType},
     {'codename': CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
      'content_type': caseContentType},
     {'codename': CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT[0],
@@ -302,8 +302,8 @@ def add_permissions_to_existing_groups():
             add_permissions_to_group(
                 EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup)
             # basic permissions
-            add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
             add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+            add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
             add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
 
         elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
@@ -316,6 +316,8 @@ def add_permissions_to_existing_groups():
         elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
             # custom permissions
             add_permissions_to_group(
+                TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+            add_permissions_to_group(
                 TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
             # basic permissions
             add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
@@ -323,6 +325,10 @@ def add_permissions_to_existing_groups():
 
         elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
             # custom permissions
+            add_permissions_to_group(
+                TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+            add_permissions_to_group(
+                TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
             add_permissions_to_group(
                 TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup)
             # basic permissions
@@ -374,6 +380,10 @@ def create_groups():
             elif group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
                 # custom permissions
                 add_permissions_to_group(
+                    EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+                add_permissions_to_group(
+                    EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
+                add_permissions_to_group(
                     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup)
                 # basic permissions
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
@@ -390,6 +400,8 @@ def create_groups():
             elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
                 # custom permissions
                 add_permissions_to_group(
+                    TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+                add_permissions_to_group(
                     TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
                 # basic permissions
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
@@ -397,6 +409,10 @@ def create_groups():
 
             elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
                 # custom permissions
+                add_permissions_to_group(
+                    TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup)
+                add_permissions_to_group(
+                    TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup)
                 add_permissions_to_group(
                     TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup)
                 # basic permissions
