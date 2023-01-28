@@ -16,13 +16,12 @@ enabled: boolean
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <span>
             
-        {% if test_positive %}
+        {% comment %} {% if test_positive %}
             <i class="rcpch_pink check circle outline icon"></i>
-        {% else %}
-            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
-                <i class="rcpch_light_blue dot circle outline icon"></i>
-            </span>
-        {% endif %}
+        {% else %}{% endcomment %}
+        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+            <i class="rcpch_light_blue dot circle outline icon"></i>
+        </span>
         
         {% if enabled %}
             <div class="ui rcpch_light_blue search selection dropdown">
@@ -42,23 +41,32 @@ enabled: boolean
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
                     {% for item in hospital_list %}
-                        <div class="item" data-value="{{item.pk}}">{{item.OrganisationName}}</div>
+                        <div class="item" data-value="{{item.pk}}" >{{item.OrganisationName}}</div>
                     {% endfor %}
                 </div>
             </div>
-            
-            <button 
-            class="ui rcpch_primary button"
-            hx-post="{{hx_post}}"
-            hx-target="{{hx_target}}"
-            hx-swap="innerHTML"
-            hx-trigger="click"
-            name='hospital_allocate_button'
-            >{{label}}</button>
+            <div class='ui buttons'>
+                <button 
+                class="ui rcpch_primary button"
+                hx-post="{{hx_post}}"
+                hx-target="{{hx_target}}"
+                hx-swap="innerHTML"
+                hx-trigger="click"
+                name='hospital_allocate_button'
+                >{{label}}</button>
+
+                <button 
+                    class="ui rcpch_cancel button"
+                    hx-post="{{hx_cancel}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                >Cancel</button>
+            </div>
             
         </span>
         
-        {% if not enabled %}
-            <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
-        {% endif %}
     </div>
+    {% if not enabled %}
+        <small class='rcpch_warning_label'>You do not have permission to update this field</small>
+    {% endif %}

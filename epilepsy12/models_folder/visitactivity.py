@@ -16,7 +16,7 @@ class VisitActivity(models.Model):
 
     activity_datetime = models.DateTimeField(
         auto_created=True,
-        default=timezone.now()
+        default=timezone.now
     )
 
     activity = models.PositiveSmallIntegerField(

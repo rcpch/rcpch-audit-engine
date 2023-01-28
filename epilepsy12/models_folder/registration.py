@@ -7,7 +7,7 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 # rcpch
 from .help_text_mixin import HelpTextMixin
-from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_CHANGE_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE, CAN_CONSENT_TO_AUDIT_PARTICIPATION
+from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from .time_and_user_abstract_base_classes import *
 from ..general_functions import first_tuesday_in_january, cohort_number_from_enrolment_date
 
@@ -120,8 +120,6 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
             CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
             CAN_REGISTER_CHILD_IN_EPILEPSY12,
             CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
-            CAN_CHANGE_EPILEPSY12_LEAD_CENTRE,
-            CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
             CAN_CONSENT_TO_AUDIT_PARTICIPATION
         ]
 

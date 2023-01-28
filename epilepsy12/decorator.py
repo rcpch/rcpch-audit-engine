@@ -161,13 +161,13 @@ def user_can_access_this_hospital_trust():
     # decorator receives case_id or registration_id from view as argument.
     # access is granted only to users who are either:
     # 1. superusers
-    # 2. RCPCH audit members
-    # 3. trust level access where their trust is the same as the child
+    # 2. Active RCPCH audit members
+    # 3. Active trust level users where their trust is the same as the child
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-            if user.is_active and (user.is_superuser):
-                # user is in either a trust level or an RCPCH level group but in the correct group otherwise.
+            if (user.is_active and user.email_confirmed) or user.is_superuser:
+                # user is registered and active or a superuser
                 if kwargs.get('registration_id') is not None:
                     registration = Registration.objects.get(
                         pk=kwargs.get('registration_id'))
@@ -212,9 +212,6 @@ def user_can_access_this_hospital_trust():
                     case = Case.objects.get(
                         pk=kwargs.get('case_id'))
                     child = case
-
-                # else:
-                #     child = Case.objects.get(pk=kwargs.get('case_id'))
 
                 if user.is_rcpch_audit_team_member:
                     hospital = HospitalTrust.objects.filter(

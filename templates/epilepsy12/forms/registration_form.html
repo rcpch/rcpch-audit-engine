@@ -28,25 +28,25 @@
           {% else %}
             <div id='eligibility_result'>
               <button 
-                class="ui rcpch_primary button" 
+                {% if perms.epilepsy12.can_register_child_in_epilepsy12 %}
+                  class="ui rcpch_primary button"
+                {% else %}
+                  class="ui rcpch_primary disabled button"
+                {% endif %}
                 hx-post="{% url 'confirm_eligible' registration_id=registration.pk %}" 
                 hx-target='#eligibility_result'
                 hx-trigger="click">I confirm all criteria are present
-                {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
-                disabled
-                {% endif %}
               </button>
+              {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
+              <small class='rcpch_warning_label'>Your access level does not allow you to register children in Epilepsy12</small>
+              {% endif %}
             </div>
           {% endif %}
         
     </div>
     
     <div id="lead_site" class="field">
-      {% if not perms.epilepsy12.can_register_child_in_epilepsy12 %}
-        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=False %}
-      {% else %}
-        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list show_buttons=True %}
-      {% endif %}
+        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list %}
     </div>
 
     <div id="previous_sites" class="ui segment">

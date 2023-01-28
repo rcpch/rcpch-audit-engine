@@ -228,7 +228,7 @@ htmx_paths = [
          name="sort_by_days_remaining_before_submission_down"),
 
     #     registration endpoints
-    path('registration<int:registration_id>/confirm_eligibility',
+    path('registration/<int:registration_id>/confirm_eligibility',
          views.confirm_eligible, name="confirm_eligible"),
     path('case/<int:case_id>/registration_date',
          views.registration_date, name="registration_date"),

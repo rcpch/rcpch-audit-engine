@@ -1359,3 +1359,11 @@ img.ui.spaced.avatar.image{
 .star.outline.icon{
   color: var(--rcpch_pink);
 }
+
+.rcpch_warning_label {
+  color: var(--rcpch_red);
+}
+
+.ui.buttons .ui.rcpch_cancel.button {
+  border-radius: 0%;
+}

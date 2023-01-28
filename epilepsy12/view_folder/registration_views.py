@@ -3,9 +3,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.db.models import Q
+from django.urls import reverse
 
 # 3rd party
 from django_htmx.http import trigger_client_event
+from django_htmx.http import HttpResponseClientRedirect
 
 # RCPCH
 from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI
@@ -17,7 +19,11 @@ from ..decorator import user_can_access_this_hospital_trust
 @permission_required('epilepsy12.view_registration', raise_exception=True)
 @user_can_access_this_hospital_trust()
 def register(request, case_id):
-
+    """
+    Called on registration form page load. If first time, creates new Registration objectm KPI object and 
+    AuditProgress object. Creates a new Site with selected hospital and associates with this case.
+    Returns register.html template.
+    """
     case = Case.objects.get(pk=case_id)
 
     if not Registration.objects.filter(case=case).exists():
@@ -140,7 +146,7 @@ Lead site allocation, deletion, updating and transfer
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.can_edit_epilepsy12_lead_centre', raise_exception=True)
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
@@ -217,7 +223,7 @@ def allocate_lead_site(request, registration_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.can_edit_epilepsy12_lead_centre', raise_exception=True)
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -250,8 +256,12 @@ def edit_lead_site(request, registration_id, site_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.can_transfer_epilepsy12_lead_centre', raise_exception=True)
 def transfer_lead_site(request, registration_id, site_id):
+    """
+    POST request from lead_site.html on click of transfer lead centre button
+    Returns a lead_site partial
+    """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
@@ -279,7 +289,7 @@ def transfer_lead_site(request, registration_id, site_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.view_registration', raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -308,14 +318,22 @@ def cancel_lead_site(request, registration_id, site_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.can_transfer_epilepsy12_lead_centre', raise_exception=True)
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
-    It either edits the existing lead centre or creates a new one and 
-    set site_is_actively_involved_in_epilepsy_care and site_is_actively_involved_in_epilepsy_care
-    to False in the current record.
-    Returns a lead_site partial but also updates the previous_sites partial also
+    If the update parameter is 'transfer', 
+    updates the lead centre by creating a new Site and 
+    setting site_is_actively_involved_in_epilepsy_care
+    to False in the current record - this is a transfer of care.
+    If the update parameter is 'edit'
+    this updates updating the current site to a new centre.
+
+    Transfers trigger an email to the new lead centre lead clinician and the rcpch audit lead
+    Edits can only be performed by superusers or the RCPCH audit lead - no emails are sent with this option
+    so it is reserved for editing lead centres centrally in rare situations.
+
+    Redirects to the cases table
     """
 
     registration = Registration.objects.get(pk=registration_id)
@@ -350,32 +368,12 @@ def update_lead_site(request, registration_id, site_id, update):
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
-    hospital_list = HospitalTrust.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
-
-    context = {
-        "registration": registration,
-        "site": site,
-        "edit": False,
-        "transfer": False,
-        'hospital_list': hospital_list
-    }
-
-    template_name = "epilepsy12/partials/registration/lead_site.html"
-
-    response = recalculate_form_generate_response(
-        model_instance=registration,
-        request=request,
-        context=context,
-        template=template_name
-    )
-
-    return response
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': site.hospital_trust.pk}))
 
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.delete_registration', raise_exception=True)
+@permission_required('epilepsy12.can_delete_epilepsy12_lead_centre', raise_exception=True)
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -471,7 +469,7 @@ Validation process
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.can_register_child_in_epilepsy12', raise_exception=True)
 def confirm_eligible(request, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child
@@ -516,7 +514,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+# @user_can_access_this_hospital_trust()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def registration_status(request, registration_id):
 
@@ -542,7 +540,7 @@ def registration_status(request, registration_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+@permission_required('epilepsy12.can_register_child_in_epilepsy12', raise_exception=True)
 def registration_date(request, case_id):
     """
     This defines registration in the audit and refers to the date of first paediatric assessment. 

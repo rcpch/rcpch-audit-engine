@@ -4,6 +4,7 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 # rcpch
 from .time_and_user_abstract_base_classes import *
+from ..constants import CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE, CAN_EDIT_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE
 
 
 class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
@@ -73,6 +74,11 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     class Meta:
         verbose_name = 'Site'
         verbose_name_plural = 'Sites'
+        permissions = [
+            CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
+            CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
+            CAN_DELETE_EPILEPSY12_LEAD_CENTRE
+        ]
 
     def __str__(self) -> str:
         return self.hospital_trust.ParentName
