@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from .models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine, Comorbidity
+from .models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine, Comorbidity, Assessment
 
 
 model_primary_keys = [
@@ -208,6 +208,10 @@ def user_can_access_this_hospital_trust():
                     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
                         pk=kwargs.get('antiepilepsy_medicine_id'))
                     child = antiepilepsy_medicine.management.registration.case
+                elif kwargs.get('assessment_id') is not None:
+                    assessment = Assessment.objects.get(
+                        pk=kwargs.get('assessment_id'))
+                    child = assessment.registration.case
                 elif kwargs.get('case_id') is not None:
                     case = Case.objects.get(
                         pk=kwargs.get('case_id'))

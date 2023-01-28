@@ -3,10 +3,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from ..models import Registration, Assessment, Case, HospitalTrust, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..decorator import user_can_access_this_hospital_trust
 
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def consultant_paediatrician_referral_made(request, assessment_id):
     """
     POST request callback from toggle_button in consultant_paediatrician partial
@@ -78,6 +80,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def consultant_paediatrician_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
@@ -133,6 +136,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def consultant_paediatrician_input_date(request, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
@@ -190,6 +194,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def general_paediatric_centre(request, assessment_id):
     """
     HTMX call back from hospital_list partial.
@@ -259,6 +264,7 @@ def general_paediatric_centre(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def edit_general_paediatric_centre(request, assessment_id, site_id):
     """
     HTMX call back from consultant_paediatrician partial template. This is a POST request on button click.
@@ -336,6 +342,7 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def update_general_paediatric_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from consultant_paediatrician partial on click of Update or Cancel
@@ -381,6 +388,7 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def delete_general_paediatric_centre(request, assessment_id, site_id):
     """
     HTMX call back from hospitals_select partial template.
@@ -449,6 +457,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def paediatric_neurologist_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -525,6 +534,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def paediatric_neurologist_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -583,6 +593,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def paediatric_neurologist_input_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -643,6 +654,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def paediatric_neurology_centre(request, assessment_id):
     """
     HTMX call back from hospital_list partial.
@@ -708,6 +720,7 @@ def paediatric_neurology_centre(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template. This is a POST request on button click.
@@ -775,6 +788,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from paediatric_neurology partial on click of Update or Cancel
@@ -819,6 +833,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -888,6 +903,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -932,6 +948,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -1009,6 +1026,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1064,6 +1082,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1119,6 +1138,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def epilepsy_surgery_centre(request, assessment_id):
     """
     HTMX call back from hospital_list partial.
@@ -1185,6 +1205,7 @@ def epilepsy_surgery_centre(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -1255,6 +1276,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from epilepsy_surgery partial on click of Update or Cancel
@@ -1298,6 +1320,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -1367,6 +1390,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1416,6 +1440,7 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1458,6 +1483,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def epilepsy_specialist_nurse_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1500,6 +1526,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
+@user_can_access_this_hospital_trust()
 def assessment(request, case_id):
 
     case = Case.objects.get(pk=case_id)
