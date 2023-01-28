@@ -7,6 +7,7 @@ from ..common_view_functions import validate_and_update_model, recalculate_form_
 
 @login_required
 @user_can_access_this_hospital_trust()
+@permission_required('epilepsy12.view_epilepsycontext', raise_exception=True)
 def epilepsy_context(request, case_id):
 
     registration = Registration.objects.filter(case=case_id).first()
@@ -35,7 +36,7 @@ def epilepsy_context(request, case_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -76,7 +77,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -117,7 +118,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -158,7 +159,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
@@ -199,7 +200,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
     Post request from multiple choice toggle within epilepsy partial.
@@ -239,7 +240,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 
@@ -280,7 +281,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
     HTMX callback from the experienced_prolonged_focal_seizures partial, 
@@ -321,7 +322,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_epilepsy_context', raise_exception=True)
+@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
     HTMX callback from the previous_febrile_seizure partial, 
