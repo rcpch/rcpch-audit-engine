@@ -267,8 +267,8 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit)
             try:
-                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
-                          [epilepsy12_user_to_edit.email], fail_silently=False)
+                send_mail(subject=subject, html_message=email, from_email='admin@epilepsy12.rcpch.tech',
+                          recipient_list=[epilepsy12_user_to_edit.email], fail_silently=False)
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 
