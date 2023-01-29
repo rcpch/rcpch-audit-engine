@@ -7,7 +7,7 @@ from ...constants import ETHNICITIES, DUMMY_NAMES
 from ...models import HospitalTrust, Keyword, Case, Site
 from ...constants import ALL_HOSPITALS, KEYWORDS
 from ...general_functions import random_postcodes
-from .create_groups import create_groups, add_permissions_to_existing_groups
+from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 
 
 class Command(BaseCommand):
@@ -35,6 +35,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'add_permissions_to_existing_groups'):
             self.stdout.write('adding permissions to groups...')
             add_permissions_to_existing_groups()
+        elif (options['mode'] == 'delete_all_groups_and_recreate'):
+            self.stdout.write(
+                'deleting all groups/permissions and reallocating...')
+            delete_and_reallocate_permissions()
 
         else:
             self.stdout.write('No options supplied...')

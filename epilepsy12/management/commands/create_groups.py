@@ -446,3 +446,10 @@ def add_permissions_to_group(permissions_list, group_to_add):
         else:
             print(f'...Adding {codename}')
             group_to_add.permissions.add(newPermission)
+
+
+def delete_and_reallocate_permissions():
+    for group in GROUPS:
+        Group.objects.filter(name=group).delete()
+        print(f'Deleted {group}')
+    create_groups()
