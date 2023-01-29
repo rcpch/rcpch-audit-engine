@@ -77,9 +77,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'rcpch-audit-engine.urls'
 
-LOGIN_REDIRECT_URL = "/epilepsy12/"
-LOGOUT_REDIRECT_URL = "/epilepsy12/"
-LOGIN_URL = '/epilepsy12/registration/login/'
+LOGIN_REDIRECT_URL = "/hospital"
+LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = '/registration/login/'
 
 TEMPLATES = [
     {
