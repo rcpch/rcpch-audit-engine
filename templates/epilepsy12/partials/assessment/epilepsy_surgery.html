@@ -17,7 +17,7 @@
         <li>Children with epilepsy associated with hypothalamic hamartoma</li>
       </ol>
         {% url 'childrens_epilepsy_surgical_service_referral_criteria_met' assessment_id=assessment.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_referral_criteria_met_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_reference_text data_position="top left" enabled=perms.epilepsy12.can_confirm_childrens_epilepsy_surgical_service_referral_criteria_met %}
+        {% include 'epilepsy12/partials/page_elements/toggle_button.html' with test_positive=assessment.childrens_epilepsy_surgical_service_referral_criteria_met hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" tooltip_id='childrens_epilepsy_surgical_service_referral_criteria_met_tooltip' label=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_criteria_met_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_assessment %}
 
   </div>
     
@@ -73,7 +73,7 @@
                                         >Edit</button>
 
                                         <button 
-                                            {% if perms.epilepsy12.delete_assessment %}
+                                            {% if perms.epilepsy12.delete_site %}
                                                 class="ui rcpch_danger button"
                                             {% else %}
                                                 class="ui rcpch_danger disabled button"
