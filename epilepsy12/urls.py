@@ -5,6 +5,7 @@ from django.urls import path
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
+from django.contrib.auth.views import PasswordResetView
 
 router = routers.DefaultRouter()
 
@@ -30,9 +31,8 @@ router.register(r'auditprogress', views.AuditProgressViewSet)
 urlpatterns = [
     path('registration/', include('django.contrib.auth.urls')),
     path('registration/login', views.epilepsy12_login, name='login'),
-
+    path('password-reset/', ResetPasswordView.as_view(), name='password_reset'),
     path("favicon", views.favicon),
-    #     path("signup/", views.signup, name="signup"),
     path('403', views.redirect_403, name='redirect_403'),
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
