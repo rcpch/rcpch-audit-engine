@@ -3,7 +3,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out, user_lo
 from django.dispatch import receiver
 
 # RCPCH
-from .models import VisitActivity
+from .models import VisitActivity, Epilepsy12User
 
 
 @receiver(user_logged_in)
@@ -17,13 +17,16 @@ def log_user_login(sender, request, user, **kwargs):
 
 
 @receiver(user_login_failed)
-def log_user_login_failed(sender, request, user, **kwargs):
-    print(f'{user} ({user.email}) failed log in from {get_client_ip(request)}.')
-    VisitActivity.objects.create(
-        activity=2,
-        ip_address=get_client_ip(request),
-        epilepsy12user=user
-    )
+def log_user_login_failed(sender, request, user=None, **kwargs):
+    if user:
+        VisitActivity.objects.create(
+            activity=2,
+            ip_address=get_client_ip(request),
+            epilepsy12user=user
+        )
+        print(f'{user} ({user.email}) failed log in from {get_client_ip(request)}.')
+    else:
+        print('Login failure by unknown user')
 
 
 @receiver(user_logged_out)

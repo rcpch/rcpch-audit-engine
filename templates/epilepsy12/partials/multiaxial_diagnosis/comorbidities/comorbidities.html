@@ -90,7 +90,7 @@
         Add a new Comorbidity
         </button>
     </div>
-    {% if not perms.epilepsy12.add_comorbidity or not perms.epilepsy12.change_comorbidity or not perms.epilepsy12.delete_comorbidity %}
-        <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_comorbidity perms.epilepsy12.change_comorbidity perms.epilepsy12.delete_comorbidity 'comorbidities' %}</div>
-    {% endif %}
 </div>
+{% if not perms.epilepsy12.add_comorbidity or not perms.epilepsy12.change_comorbidity or not perms.epilepsy12.delete_comorbidity %}
+    <small class='rcpch_warning_label'>{% permission_text perms.epilepsy12.add_comorbidity perms.epilepsy12.change_comorbidity perms.epilepsy12.delete_comorbidity 'comorbidities' %}</small>
+{% endif %}

@@ -119,6 +119,7 @@ ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
 
 
 @login_required
+@permission_required('epilepsy12.view_multiaxialdiagnosis', raise_exception=True)
 @user_can_access_this_hospital_trust()
 def multiaxial_diagnosis(request, case_id):
     """
@@ -1140,9 +1141,14 @@ def nonepileptic_seizure_subtype(request, episode_id):
     return response
 
 
+"""
+Syndromes
+"""
+
+
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_episode', raise_exception=True)
+@permission_required('epilepsy12.add_syndrome', raise_exception=True)
 def add_syndrome(request, multiaxial_diagnosis_id):
     """
     HTMX post request from syndromes.html partial on button click to add new syndrome
@@ -1172,14 +1178,9 @@ def add_syndrome(request, multiaxial_diagnosis_id):
     return response
 
 
-"""
-Syndromes
-"""
-
-
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_episode', raise_exception=True)
+@permission_required('epilepsy12.change_syndrome', raise_exception=True)
 def edit_syndrome(request, syndrome_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
@@ -1286,7 +1287,7 @@ def close_syndrome(request, syndrome_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def syndrome_present(request, multiaxial_diagnosis_id):
     """
 # POST request from the syndrome partial in the multiaxial_description_form
@@ -1333,7 +1334,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     """
 # POST request from the syndrome partial in the multiaxial_description_form
@@ -1381,7 +1382,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
@@ -1426,7 +1427,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     """
     POST from multiple select in epilepsy_causes partial
@@ -1475,7 +1476,7 @@ Comorbidities
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
     """
     POST request from
@@ -1754,7 +1755,7 @@ def comorbidities(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def mental_health_screen(request, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_screen toggle
@@ -1793,7 +1794,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     """
     POST request callback for mental_health_issue_identified toggle
@@ -1840,7 +1841,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_multiaxial_diagnosis', raise_exception=True)
+@permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def mental_health_issue(request, multiaxial_diagnosis_id):
     """
     POST callback from mental_health_issue multiple toggle

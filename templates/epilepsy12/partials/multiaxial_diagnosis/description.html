@@ -22,7 +22,7 @@
                 {% endif %}
 
                 <textarea
-                    {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
+                    {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
                     disabled
                     {% endif %}
                     type="text" 
@@ -31,32 +31,26 @@
                     name="description"
                     placeholder="While watching television {{episode.multiaxial_diagnosis.registration.case}} fell to the floor... ">{{episode.description}}</textarea>
             </div>
+
             
-            {% if not perms.epilepsy12.change_multiaxial_diagnosis %}
-                <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>
+
+            
+            {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
+                <small class='rcpch_warning_label'>You do not have permission to update this field</small>
             {% endif %}
 
         </div>
     
         
         <div>
-            <i class="rcpch question circle icon link" id="choicesPopup"></i>
-            <div 
-                class="ui flowing popup top left transition hidden"
-                _="js $('#choicesPopup').popup(); end"
-            >
-                <p>Some examples of keywords to choose from...</p>
-                {% for choice in choices %}
-                    <div class="ui rcpch_light_blue label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
-                {% endfor %}
-            </div>
-            {% load epilepsy12_template_tags %}
             
-                {% if desscribe.description %}
-                    <label>Characters: {% characters_left desscribe.description %} </label>
-                {% else %}
+            
+            
+                {% comment %} {% if episode.description %} {% endcomment %}
+                    
+                {% comment %} {% else %}
                     <label>Characters: 5000 </label>
-                {% endif %}
+                {% endif %} {% endcomment %}
             
 
         </div>

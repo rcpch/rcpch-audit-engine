@@ -1,7 +1,7 @@
 {% load epilepsy12_template_tags %}
 <div class='field'>
     {% url 'epilepsy_cause_known' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#epilepsy_cause_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.epilepsy_cause_known tooltip_id='epilepsy_cause_known_tooltip' label=multiaxial_diagnosis.get_epilepsy_cause_known_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_known_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_multiaxial_diagnosis %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#epilepsy_cause_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.epilepsy_cause_known tooltip_id='epilepsy_cause_known_tooltip' label=multiaxial_diagnosis.get_epilepsy_cause_known_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_known_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
 </div>
 
 {% if multiaxial_diagnosis.epilepsy_cause_known %}

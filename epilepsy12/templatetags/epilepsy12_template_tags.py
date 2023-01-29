@@ -77,7 +77,7 @@ def permission_text(add_permission, change_permission, delete_permission, model_
     return return_string
 
 
-@register.filter
+@register.simple_tag
 def matches_model_field(field_name, model):
     if field_name:
         value = getattr(model, field_name)
