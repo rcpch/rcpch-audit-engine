@@ -9,7 +9,7 @@
     {% if management.individualised_care_plan_in_place %}
     <div class="field">
         {% url 'individualised_care_plan_date' management_id=management.pk as hx_post %}
-        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date input_date_field_name='individualised_care_plan_date' label=management.get_individualised_care_plan_date_help_label_text reference=management.get_individualised_care_plan_date_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_management error_message=error_message %}
+        {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#individualised_care_plan" hx_swap="innerHTML" hx_trigger="change" date_value=management.individualised_care_plan_date input_date_field_name='individualised_care_plan_date' label=management.get_individualised_care_plan_date_help_label_text reference=management.get_individualised_care_plan_date_help_reference_text data_position="top left" enabled=perms.epilepsy12.change_management error_message=error_message has_permission=perms.epilepsy12.change_management %}
     </div>
         {% if error_message %}
             <div class='ui rcpch_warning message'>
