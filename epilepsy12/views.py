@@ -54,7 +54,12 @@ def epilepsy12_login(request):
                     user.email_confirmed = True
                     user.save()
                 login(request, user)
-                messages.info(request, f"You are now logged in as {email}.")
+                last_logged_in = VisitActivity.objects.filter(
+                    activity=1,
+                    epilepsy12user=user
+                ).order_by('-activity_datetime').first()
+                messages.info(
+                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%-H:%-M (%S seconds) on %A, %-d %B %Y')} from https://{last_logged_in.ip_address}/")
                 return redirect("hospital_reports")
             else:
                 messages.error(request, "Invalid email or password.")
