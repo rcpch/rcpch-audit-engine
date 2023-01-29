@@ -1,0 +1,38 @@
+{% load static %}
+{% autoescape off %}
+
+    <div class='ui container'>
+
+        <div class="ui two column centered grid">
+
+            <div class="column">
+
+                <div class='row'>
+                
+                    <div class="ui header">
+                        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+                        <div class="content">
+                            <h2>Epilepsy12 password reset</h2>
+                        </div>
+                    </div>
+
+                    <p>Dear {{user}},
+
+                    <p>{{child}} has been transferred to {{target_hospital}}.</p>
+
+                    <p>Please login to view any updates.</p>
+
+                    <p>If you have any questions, please contact the RCPCH Epilepsy12 team.</p>
+
+                    <p>Sincerely,</p>
+                    <p>The RCPCH Epilepsy12 team</p>
+                
+                </div>
+            
+            </div>
+        
+        </div>
+
+    </div>
+
+{% endautoescape %}

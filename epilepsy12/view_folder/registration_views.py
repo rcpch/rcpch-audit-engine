@@ -4,15 +4,19 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.db.models import Q
 from django.urls import reverse
+from django.core.mail import send_mail, BadHeaderError
+from django.contrib import messages
+from django.http import HttpResponse
 
 # 3rd party
 from django_htmx.http import trigger_client_event
 from django_htmx.http import HttpResponseClientRedirect
 
 # RCPCH
-from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI
+from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI, Epilepsy12User
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_hospital_trust
+from ..general_functions import construct_transer_epilepsy12_site_email
 
 
 @login_required
@@ -363,6 +367,23 @@ def update_lead_site(request, registration_id, site_id, update):
             updated_at=timezone.now(),
             updated_by=request.user,
             case=registration.case)
+
+        subject = "Epilepsy12 Lead Site Transfer"
+        recipients = Epilepsy12User.objects.filter(
+            is_active=True,
+            role=4
+        ).all()
+        for recipient in recipients:
+            email = construct_transer_epilepsy12_site_email(
+                request=request, user=recipient, target_hospital=new_hospital_trust.ParentName, child=registration.case)
+            try:
+                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
+                          [recipient.email], fail_silently=False)
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+
+        messages.success(
+            request, f"{registration.case} has been successfully transferred to {new_hospital_trust.ParentName}.")
 
     return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': previous_lead_site.hospital_trust.pk}))
 
