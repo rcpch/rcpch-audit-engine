@@ -40,7 +40,7 @@
               <div class="description">Getting started...</div>
             </div>
           </a>
-        {% elif active_template == "none" %}
+          {% elif active_template == "none" %}
           <a 
             href="{% url 'register' case_id %}" 
             class="disabled step"
@@ -89,7 +89,7 @@
               <div class="description">The first visit</div>
             </div>
           </a>
-        {% elif active_template == "none" %}
+          {% elif active_template == "none" or active_template == 'case_performance_summary' and not audit_progress.registration_complete %}
           <a href="{% url 'first_paediatric_assessment' case_id %}" class="disabled step">
             <div class="content">
               <div class="title">First paediatric assessment</div>
@@ -133,7 +133,7 @@
               <div class="description">Background and risk factors</div>
             </div>
           </a>
-        {% elif active_template == "none" %}
+          {% elif active_template == "none" or active_template == 'case_performance_summary' and not audit_progress.registration_complete %}
             <a class="disabled step" href="{% url 'epilepsy_context' case_id %}">
               <div class="content">
               <div class="title">Epilepsy Context</div>
@@ -176,7 +176,7 @@
               <div class="description">DESSCRIBE definition</div>
             </div>
           </a>
-        {% elif active_template == "none" %}
+          {% elif active_template == "none" or active_template == 'case_performance_summary' and not audit_progress.registration_complete %}
           <a href="{% url 'multiaxial_diagnosis' case_id %}" class="disabled step">
             <div class="content">
               <div class="title">Multiaxial diagnosis</div>
@@ -220,7 +220,7 @@
               <div class="description">Important milestones</div>
             </div>
           </a>
-        {% elif active_template == "none" %}
+          {% elif active_template == "none" or active_template == 'case_performance_summary' and not audit_progress.registration_complete %}
           <a href="{% url 'assessment' case_id %}" class="disabled step">
             <div class="content">
               <div class="title">Milestones</div>
@@ -265,7 +265,7 @@
             <div class="description">EEG, ECG and MRI</div>
           </div>
         </a>
-      {% elif active_template == "none" %}
+        {% elif active_template == "none" or active_template == 'case_performance_summary' and not audit_progress.registration_complete %}
         <a href="{% url 'investigations' case_id %}" class="disabled step">
           <div class="content">
             <div class="title">Tests</div>
@@ -308,7 +308,7 @@
             <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
-      {% elif active_template == "none" %}
+      {% elif active_template == "none" or active_template == 'case_performance_summary' and not audit_progress.registration_complete %}
         <a href="{% url 'management' case_id %}" class="disabled step">
           <div class="content">
             <div class="title">Treatment and care planning</div>
@@ -322,21 +322,21 @@
             <div class="description">Medication, other treatment,<br>teams and care plans</div>
           </div>
         </a>
-        {% endif %}
-        {% endif %}
+      {% endif %}
+    {% endif %}
         
     
     {% comment %}
         Performance summary
     {% endcomment %}
     
-    <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
-      <div class='content'>
-        <div class="title">Performance summary</div>
-        <div class="description">Key performance indicators</div>
-      </div>
-    </a>
-
+        <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
+          <div class='content'>
+            <div class="title">Performance summary</div>
+            <div class="description">Key performance indicators</div>
+          </div>
+        </a>
+    
     {% comment %}
         Progress bar
     {% endcomment %}

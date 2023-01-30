@@ -11,7 +11,7 @@ def construct_transer_epilepsy12_site_email(request, user, target_hospital, chil
         "user": user,
         'protocol': 'http',
         "target_hospital": target_hospital,
-        "child": child
+        "child": child,
     }
     email = render_to_string(email_template_name, c)
 

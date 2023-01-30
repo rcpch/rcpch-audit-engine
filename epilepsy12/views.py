@@ -495,7 +495,15 @@ def selected_trust_kpis(request, hospital_id):
         'kpis': kpis
     }
 
-    return render(request=request, template_name=template_name, context=context)
+    response = render(
+        request=request, template_name=template_name, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def tsandcs(request):

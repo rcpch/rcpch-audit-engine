@@ -258,6 +258,7 @@ def case_submit(request, hospital_id, case_id):
 
 
 @login_required
+@permission_required('epilepsy12.view_case')
 def case_performance_summary(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -272,6 +273,12 @@ def case_performance_summary(request, case_id):
     template = 'epilepsy12/case_performance_summary.html'
 
     response = render(request=request, template_name=template, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
 
     return response
 
