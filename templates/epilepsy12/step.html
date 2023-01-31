@@ -1,0 +1,58 @@
+{% if complete_instance %}
+    {% if active_template == template_name %}
+      {% comment %} pink with arrow  {% endcomment %}
+      <a class="active completed step" href="{{ active_url }}">
+        <div class="content">
+          <div class="title">{{ title }}</div>
+          <div class="description">{{ description }}</div>
+        </div>
+      </a>
+    {% else %}
+      {% comment %} pink {% endcomment %}
+      <a class="completed step" href="{{ active_url }}">
+        <div class="content">
+          <div class="title">{{ title }}</div>
+          <div class="description">{{ description }}</div>
+        </div>
+      </a>
+    {% endif %}
+{% else %}
+    {% if active_template == template_name %}
+      {% comment %} dark blue with arrow {% endcomment %}
+      <a 
+        href="{{ active_url }}" 
+        class="active step"
+      >
+        <div class="content">
+          <div class="title">{{ title }}</div>
+          <div class="description">{{ description }}</div>
+        </div>
+      </a>
+
+    {% elif active_template == "none" or active_template == 'case_performance_summary' and not registration_status %}
+      {% comment %} disabled / white {% endcomment %}
+      <a 
+        href="{{ active_url }}" 
+        class="disabled step"
+      >
+        <div class="content">
+          <div class="title">{{ title }}</div>
+          <div class="description">{{ description }}</div>
+        </div>
+      </a>
+
+    {% else %}
+      {% comment %} white - light blue on hover {% endcomment %}
+      
+      <a 
+        href="{{ active_url }}" 
+        class="step"
+        >
+        <div class="content">
+          <div class="title">{{ title }}</div>
+          <div class="description">{{ description }}</div>
+        </div>
+      </a>
+      
+    {% endif %}
+{% endif %}

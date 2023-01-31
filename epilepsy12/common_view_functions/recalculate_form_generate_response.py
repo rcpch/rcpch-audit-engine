@@ -103,7 +103,6 @@ def completed_fields(model_instance):
                                 counter += 1
                     else:
                         counter += 1
-
     return counter
 
 
