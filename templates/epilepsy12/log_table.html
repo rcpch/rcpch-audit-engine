@@ -1,0 +1,42 @@
+{% load epilepsy12_template_tags %}
+{% load static %}
+{% csrf_token %}
+{% if activities.end_index > 0 %}
+    <div 
+        hx-target='#log_table' 
+        hx-get="{% url 'log_list' hospital_id=hospital.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
+        hx-trigger='log_table from:body'
+        hx-swap='innerHTML' 
+        name='log_table'>
+    
+        <table class="ui rcpch table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Activity</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                    <tr>
+                        <td>{{activity.epilepsy12user}}</td>
+                        <td>{{activity.get_activity_display}}</td>
+                        <td>{{activity.activity_datetime}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                
+            </tfoot>
+        </table>
+
+    </div>
+{% else %}
+    
+        <div class='padded_container'>
+            <div class='ui rcpch_info message'>{{epilepsy12_user}} has not logged in yet.</div>
+            <br>
+        </div>
+{% endif %}
+

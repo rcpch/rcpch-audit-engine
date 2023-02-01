@@ -128,7 +128,7 @@ def has_an_aed_been_given(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.add_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.add_antiepilepsymedicine', raise_exception=True)
 def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     """
     Callback POST request from aed_list.html partial to add new AEM to antiepilepsy_medicine model
@@ -186,7 +186,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.delete_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.delete_antiepilepsymedicine', raise_exception=True)
 def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
     POST request from either the rescue_medicine_list or the epilepsy_medicine_list
@@ -227,7 +227,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
     Call back from onclick of edit button in antiepilepsy_medicine_list partial
@@ -268,7 +268,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.view_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.view_antiepilepsymedicine', raise_exception=True)
 def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
     Call back from onclick of edit button in antiepilepsy_medicine_list partial
@@ -310,7 +310,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def medicine_id(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update medicine_name
@@ -375,7 +375,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_start_date
@@ -430,7 +430,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to toggle antiepilepsy_medicine_end_date
@@ -468,7 +468,7 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_stop_date
@@ -518,7 +518,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update antiepilepsy_medicine_risk_discussed
@@ -571,7 +571,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update is_a_pregnancy_prevention_programme_in_place
@@ -624,7 +624,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, antiepilepsy_medicine_id):
     """
     POST callback from antiepilepsy_medicine.html partial to update has_a_valproate_annual_risk_acknowledgement_form_been_completed
@@ -682,7 +682,7 @@ Fields relating to rescue medication begin here
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def has_rescue_medication_been_prescribed(request, management_id):
     """
     HTMX call from management template
@@ -745,7 +745,7 @@ Fields relating to individual care plans begin here
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def individualised_care_plan_in_place(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -806,7 +806,7 @@ def individualised_care_plan_in_place(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_date(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -847,7 +847,7 @@ def individualised_care_plan_date(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -888,7 +888,7 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_includes_service_contact_details(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -928,7 +928,7 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_include_first_aid(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -967,7 +967,7 @@ def individualised_care_plan_include_first_aid(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1007,7 +1007,7 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_includes_general_participation_risk(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1046,7 +1046,7 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_addresses_water_safety(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1085,7 +1085,7 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_addresses_sudep(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1124,7 +1124,7 @@ def individualised_care_plan_addresses_sudep(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_includes_ehcp(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1163,7 +1163,7 @@ def individualised_care_plan_includes_ehcp(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -1203,7 +1203,7 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def has_been_referred_for_mental_health_support(request, management_id):
     """
     This is an HTMX callback from the has_been_referred_for_mental_health_support partial template
@@ -1243,7 +1243,7 @@ def has_been_referred_for_mental_health_support(request, management_id):
 
 @login_required
 @user_can_access_this_hospital_trust()
-@permission_required('epilepsy12.change_antiepilepsy_medicine', raise_exception=True)
+@permission_required('epilepsy12.change_management', raise_exception=True)
 def has_support_for_mental_health_support(request, management_id):
     """
     This is an HTMX callback from the has_support_for_mental_health_support partial template

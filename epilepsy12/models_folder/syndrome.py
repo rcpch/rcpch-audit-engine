@@ -1,13 +1,13 @@
-from django.db import models
+# python
 from operator import itemgetter
-
+# django
+from django.db import models
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .help_text_mixin import HelpTextMixin
 from ..constants import SYNDROMES
 from .time_and_user_abstract_base_classes import *
-# from ..general_functions import *
-
-# other tables
-from .multiaxial_diagnosis import MultiaxialDiagnosis
 
 
 class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -37,10 +37,20 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
         default=None
     )
 
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
+
     # relationships
 
     multiaxial_diagnosis = models.ForeignKey(
-        MultiaxialDiagnosis,
+        'epilepsy12.MultiaxialDiagnosis',
         on_delete=models.CASCADE
     )
 

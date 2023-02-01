@@ -16,4 +16,6 @@ from .audit_progress import AuditProgress
 from .episode import Episode
 from .syndrome import Syndrome
 from .multiaxial_diagnosis import MultiaxialDiagnosis
+from .kpi import KPI
+from .visitactivity import VisitActivity
 from .help_text_mixin import HelpTextMixin

@@ -15,7 +15,7 @@
         </div>
         <div class="field">
             {% url 'comorbidity_diagnosis_date' comorbidity_id=comorbidity.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label=comorbidity.get_comorbidity_diagnosis_date_help_label_text reference=comorbidity.get_comorbidity_diagnosis_date_help_reference_text input_date_field_name='comorbidity_diagnosis_date' enabled=perms.epilepsy12.change_comorbidity %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target='#comorbidities' hx_trigger='change' hx_swap="innerHTML" date_value=comorbidity.comorbidity_diagnosis_date label=comorbidity.get_comorbidity_diagnosis_date_help_label_text reference=comorbidity.get_comorbidity_diagnosis_date_help_reference_text input_date_field_name='comorbidity_diagnosis_date' enabled=perms.epilepsy12.change_comorbidity has_permission=perms.epilepsy12.change_comorbidity %}
         </div>
         {% if error_message %}
             <div class='ui rcpch_warning message'>

@@ -14,6 +14,7 @@ VIEW_PREFERENCES = (
 AUDIT_CENTRE_LEAD_CLINICIAN = 1
 AUDIT_CENTRE_CLINICIAN = 2
 AUDIT_CENTRE_ADMINISTRATOR = 3
+AUDIT_CENTRE_MANAGER = 8
 RCPCH_AUDIT_LEAD = 4
 RCPCH_AUDIT_ANALYST = 5
 RCPCH_AUDIT_ADMINISTRATOR = 6
@@ -23,6 +24,7 @@ ROLES = (
     (AUDIT_CENTRE_LEAD_CLINICIAN, 'Audit Centre Lead Clinician'),
     (AUDIT_CENTRE_CLINICIAN, 'Audit Centre Clinician'),
     (AUDIT_CENTRE_ADMINISTRATOR, 'Audit Centre Administrator'),
+    (AUDIT_CENTRE_MANAGER, 'Audit Centre Manager'),
     (RCPCH_AUDIT_LEAD, 'RCPCH Audit Lead'),
     (RCPCH_AUDIT_ANALYST, 'RCPCH Audit Analyst'),
     (RCPCH_AUDIT_ADMINISTRATOR, 'RCPCH Audit Administrator'),
@@ -96,8 +98,15 @@ CAN_REGISTER_CHILD_IN_EPILEPSY12 = ('can_register_child_in_epilepsy12',
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = ('can_unregister_child_in_epilepsy12',
                                       'Can unregister a child in Epilepsy. Their record and previously entered data is untouched.')
 
-CAN_CHANGE_EPILEPSY12_LEAD_CENTRE = ('can_change_epilepsy12_lead_centre',
-                                     'Can change Epilepsy12 lead centre.')
+CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE = ('can_allocate_epilepsy12_lead_centre',
+                                       'Can allocate this child to any Epilepsy12 centre.')
+
+CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE = ('can_transfer_epilepsy12_lead_centre',
+                                       'Can transfer this child to another Epilepsy12 centre.')
+
+CAN_EDIT_EPILEPSY12_LEAD_CENTRE = ('can_edit_epilepsy12_lead_centre',
+                                   'Can edit this child\'s current Epilepsy12 lead centre.')
+
 CAN_DELETE_EPILEPSY12_LEAD_CENTRE = ('can_delete_epilepsy12_lead_centre',
                                      'Can delete Epilepsy12 lead centre.')
 
@@ -115,7 +124,9 @@ PERMISSIONS = (
     CAN_REGISTER_CHILD_IN_EPILEPSY12,
     CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
 
-    CAN_CHANGE_EPILEPSY12_LEAD_CENTRE,
+    CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
+    CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE,
+    CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
     CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
     CAN_CONSENT_TO_AUDIT_PARTICIPATION
 

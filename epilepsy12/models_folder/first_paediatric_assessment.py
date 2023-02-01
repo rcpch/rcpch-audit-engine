@@ -1,10 +1,11 @@
+# django
 from django.db import models
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .help_text_mixin import HelpTextMixin
-from ..constants import CHRONICITY, DIAGNOSTIC_STATUS
+from ..constants import CHRONICITY
 from .time_and_user_abstract_base_classes import *
-
-# other tables
-# from .registration import Registration
 
 
 class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -68,6 +69,16 @@ class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBas
         null=True,
         default=None
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     # relationships
     registration = models.OneToOneField(

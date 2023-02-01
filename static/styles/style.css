@@ -1178,7 +1178,6 @@ ul {
 }
 
 .ui.rcpch_footer.message {
-  border-color: var(--rcpch_dark_blue);
   color: var(--rcpch_white);
   background-color: var(--rcpch_dark_blue);
 }
@@ -1201,10 +1200,17 @@ ul {
   border-color: var(--rcpch_dark_blue);
 }
 
+.ui.top.attached.inverted.clearing.segment .content {
+  color: var(--rcpch_white);
+}
+.ui.top.attached.inverted.clearing.segment .content .sub.header {
+  color: var(--rcpch_white);
+}
+
 .ui.bottom.attached.rcpch_footer.message {
   margin-top: -1em;
   border-radius: 0%;
-  border-color: var(--rcpch_dark_blue);
+  box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
 }
 
 footer {
@@ -1255,7 +1261,7 @@ footer a:hover {
   color: var(--rcpch_light_blue);
 }
 
-a:-webkit-any-link {
+footer a:-webkit-any-link {
   cursor: pointer;
   text-decoration: none;
   color: white;
@@ -1352,4 +1358,12 @@ img.ui.spaced.avatar.image{
 
 .star.outline.icon{
   color: var(--rcpch_pink);
+}
+
+.rcpch_warning_label {
+  color: var(--rcpch_red);
+}
+
+.ui.buttons .ui.rcpch_cancel.button {
+  border-radius: 0%;
 }

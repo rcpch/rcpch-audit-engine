@@ -1,11 +1,12 @@
+# django
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
-
 from .help_text_mixin import HelpTextMixin
-# from .registration import Registration
 from .time_and_user_abstract_base_classes import *
-# from ..general_functions import *
 
 
 class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -103,6 +104,16 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         blank=True,
         null=True
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     # relationships
     registration = models.OneToOneField(

@@ -9,6 +9,10 @@ from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.mail import send_mail, BadHeaderError
 
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.messages.views import SuccessMessageMixin
+
 from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, HospitalTrust
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
@@ -263,8 +267,8 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit)
             try:
-                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
-                          [epilepsy12_user_to_edit.email], fail_silently=False)
+                send_mail(subject=subject, html_message=email, from_email='admin@epilepsy12.rcpch.tech',
+                          recipient_list=[epilepsy12_user_to_edit.email], fail_silently=False)
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 
@@ -301,3 +305,14 @@ def delete_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             request, f"Delete User Unsuccessful: {error}")
 
     return HttpResponseClientRedirect(reverse('epilepsy12_user_list', kwargs={'hospital_id': hospital_id}))
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name = 'registration/password_reset.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_message = "We've emailed you instructions for setting your password, " \
+                      "if an account exists with the email you entered. You should receive them shortly." \
+                      " If you don't receive an email, " \
+                      "please make sure you've entered the address you registered with, and check your spam folder."
+    success_url = reverse_lazy('index')

@@ -36,7 +36,7 @@
                     <div 
                         class="ui rcpch_light_blue buttons">
                         <button 
-                            {% if not perms.epilepsy12.change_medicine %}
+                            {% if not perms.epilepsy12.change_antiepilepsymedicine %}
                                 class="ui rcpch_primary disabled button"
                             {% else %}
                                 class="ui rcpch_primary button"
@@ -53,7 +53,7 @@
                             Edit
                         </button>
                         <button
-                            {% if not perms.epilepsy12.delete_medicine %}
+                            {% if not perms.epilepsy12.delete_antiepilepsymedicine %}
                                 class="ui rcpch_red icon disabled button"
                             {% else %}
                                 class="ui rcpch_red icon button"
@@ -85,7 +85,7 @@
     {% endif %}
     <div class='field'>
         <button
-            {% if perms.epilepsy12.add_medicine %}
+            {% if perms.epilepsy12.add_antiepilepsymedicine %}
                 class="ui rcpch_primary button"
             {% else %}
                 class="ui rcpch_primary disabled button"
@@ -107,7 +107,7 @@
         {% endif %}
         </button>
     </div>
-    {% if not perms.epilepsy12.add_antiepilepsy_medicine or not perms.epilepsy12.change_antiepilepsy_medicine or not perms.epilepsy12.delete_antiepilepsy_medicine %}
-        <div class='ui rcpch_warning basic label'>{% permission_text perms.epilepsy12.add_antiepilepsy_medicine perms.epilepsy12.change_antiepilepsy_medicine perms.epilepsy12.delete_antiepilepsy_medicine 'antiepilepsy/seizure medicines' %}</div>
+    {% if not perms.epilepsy12.add_antiepilepsymedicine or not perms.epilepsy12.change_antiepilepsymedicine or not perms.epilepsy12.delete_aantiepilepsymedicine %}
+        <small class='rcpch_warning_label'>{% permission_text perms.epilepsy12.add_antiepilepsymedicine perms.epilepsy12.change_antiepilepsymedicine perms.epilepsy12.delete_antiepilepsymedicine 'antiepilepsy/seizure medicines' %}</small>
     {% endif %}
 </div>

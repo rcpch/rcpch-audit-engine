@@ -1,7 +1,4 @@
 {% load epilepsy12_template_tags %}
-{% block steps %}
-
-
 
   <div
       hx-get='{% url "registration_active" case_id active_template %}'
@@ -11,425 +8,80 @@
       name="steps"
     >
 
+    {% comment %} Each one of these represents the steps, found in epilepsy12/step.html {% endcomment %}
+    
     {% if audit_progress.registration_complete %}
-        {% if active_template == "register" %}
-
-          <a class="active completed step" href="{% url 'register' case_id %}">
-            <div class="content">
-              <div class="title">Verification and registration</div>
-              <div class="description">Getting started...</div>
-            </div>
-          </a>
-        {% else %}
-          <a class="completed step" href="{% url 'register' case_id %}">
-            <div class="content">
-              <div class="title">Verification and registration</div>
-              <div class="description">Getting started...</div>
-            </div>
-          </a>
-        {% endif %}
+        {% url 'register' case_id as active_url %}
+        {% include 'epilepsy12/step.html' with active_url=active_url title="Verification and registration" description="Getting started..." active_template=active_template template_name='register' complete_instance=audit_progress.registration_complete registration_status=audit_progress.registration_complete %}
     {% else %}
-        {% if active_template == "register" %}
-
-          <a 
-            href="{% url 'register' case_id %}" 
-            class="active step"
-          >
-            <div class="content">
-              <div class="title">Verification and registration</div>
-              <div class="description">Getting started...</div>
+        <a href="{% url 'register' case_id %}" {% if active_template == 'register' or active_template == 'none' %}class='active step'{% else %}class='step' {% endif %}>
+            <div class='content'>
+            <div class="title">Verification and registration</div>
+            <div class="description">Getting started...</div>
             </div>
-          </a>
-        {% elif active_template == "none" %}
-          <a 
-            href="{% url 'register' case_id %}" 
-            class="disabled step"
-          >
-            <div class="content">
-              <div class="title">Verification and registration</div>
-              <div class="description">Getting started...</div>
-            </div>
-          </a>
-        {% else %}
-          <a 
-            href="{% url 'register' case_id %}" 
-            class="step"
-            >
-            <div class="content">
-              <div class="title">Verification and registration</div>
-              <div class="description">Getting started...</div>
-            </div>
-          </a>
-        {% endif %}
-    {% endif %}
-
-    {% if audit_progress.first_paediatric_assessment_complete %}
-        {% if active_template == "first_paediatric_assessment" %}
-
-          <a class="active completed step" href="{% url 'first_paediatric_assessment' case_id %}">
-            <div class="content">
-              <div class="title">First paediatric assessment</div>
-              <div class="description">The first visit</div>
-            </div>
-          </a>
-        {% else %}
-          <a class="completed step" href="{% url 'first_paediatric_assessment' case_id %}">
-            <div class="content">
-              <div class="title">First paediatric assessment</div>
-              <div class="description">The first visit</div>
-            </div>
-          </a>
-        {% endif %}
-    {% else %}
-        {% if active_template == "first_paediatric_assessment" %}
-
-          <a href="{% url 'first_paediatric_assessment' case_id %}" class="active step">
-            <div class="content">
-              <div class="title">First paediatric assessment</div>
-              <div class="description">The first visit</div>
-            </div>
-          </a>
-        {% elif active_template == "none" %}
-          <a href="{% url 'first_paediatric_assessment' case_id %}" class="disabled step">
-            <div class="content">
-              <div class="title">First paediatric assessment</div>
-              <div class="description">The first visit</div>
-            </div>
-          </a>
-        {% else %}
-          <a href="{% url 'first_paediatric_assessment' case_id %}" class="step">
-            <div class="content">
-              <div class="title">First paediatric assessment</div>
-              <div class="description">The first visit</div>
-            </div>
-          </a>
-        {% endif %}
+        </a>
     {% endif %}
     
-
-    {% if audit_progress.epilepsy_context_complete %}
-      {% if active_template == "epilepsy_context" %}
-
-        <a class="active completed step" href="{% url 'epilepsy_context' case_id %}">
-          <div class="content">
-              <div class="title">Epilepsy Context</div>
-              <div class="description">Background and risk factors</div>
-            </div>
-        </a>
-      {% else %}
-        <a class="completed step" href="{% url 'epilepsy_context' case_id %}">
-          <div class="content">
-              <div class="title">Epilepsy Context</div>
-              <div class="description">Background and risk factors</div>
-            </div>
-        </a>
-      {% endif %}
-    {% else %}
-        {% if active_template == "epilepsy_context" %}
-
-          <a href="{% url 'epilepsy_context' case_id %}" class="active step">
-            <div class="content">
-              <div class="title">Epilepsy Context</div>
-              <div class="description">Background and risk factors</div>
-            </div>
-          </a>
-        {% elif active_template == "none" %}
-            <a class="disabled step" href="{% url 'epilepsy_context' case_id %}">
-              <div class="content">
-              <div class="title">Epilepsy Context</div>
-              <div class="description">Background and risk factors</div>
-            </div>
-            </a>
-        {% else %}
-          <a href="{% url 'epilepsy_context' case_id %}" class="step">
-            <div class="content">
-              <div class="title">Epilepsy Context</div>
-              <div class="description">Background and risk factors</div>
-            </div>
-          </a>
-        {% endif %}
-    {% endif %}
+    {% url 'first_paediatric_assessment' case_id as active_url %}
+    {% include 'epilepsy12/step.html' with active_url=active_url title="First paediatric assessment" description="The first visit" active_template=active_template template_name='first_paediatric_assessment' complete_instance=audit_progress.first_paediatric_assessment_complete registration_status=audit_progress.registration_complete %}
     
-    {% if audit_progress.multiaxial_diagnosis_complete %}
-      {% if active_template == "multiaxial_diagnosis" %}
-
-        <a class="active completed step" href="{% url 'multiaxial_diagnosis' case_id %}">
-          <div class="content">
-              <div class="title">Multiaxial diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-        </a>
-      {% else %}
-        <a class="completed step" href="{% url 'multiaxial_diagnosis' case_id %}">
-          <div class="content">
-              <div class="title">Multiaxial diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-        </a>
-      {% endif %}
-    {% else %}
-        {% if active_template == "multiaxial_diagnosis" %}
-
-          <a href="{% url 'multiaxial_diagnosis' case_id %}" class="active step">
-            <div class="content">
-              <div class="title">Multiaxial diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-          </a>
-        {% elif active_template == "none" %}
-          <a href="{% url 'multiaxial_diagnosis' case_id %}" class="disabled step">
-            <div class="content">
-              <div class="title">Multiaxial diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-          </a>
-        {% else %}
-          <a href="{% url 'multiaxial_diagnosis' case_id %}" class="step">
-            <div class="content">
-              <div class="title">Multiaxial diagnosis</div>
-              <div class="description">DESSCRIBE definition</div>
-            </div>
-          </a>
-        {% endif %}
-    {% endif %}
+    {% url 'epilepsy_context' case_id as active_url %}
+    {% include 'epilepsy12/step.html' with active_url=active_url title="Epilepsy Context" description="Background and risk factors" active_template=active_template template_name='epilepsy_context' complete_instance=audit_progress.epilepsy_context_complete registration_status=audit_progress.registration_complete %}
     
-
-    {% if audit_progress.assessment_complete %}
-        {% if active_template == "assessment" %}          
-
-          <a class="active completed step" href="{% url 'assessment' case_id %}">
-            <div class="content">
-              <div class="title">Milestones</div>
-              <div class="description">Important milestones</div>
-            </div>
-          </a>
-        {% else %}
-          <a class="completed step" href="{% url 'assessment' case_id %}">
-            <div class="content">
-              <div class="title">Milestones</div>
-              <div class="description">Important milestones</div>
-            </div>
-          </a>
-        {% endif %}
-    {% else %}
-        {% if active_template == "assessment" %}
-
-          <a href="{% url 'assessment' case_id %}" class="active step">
-            <div class="content">
-              <div class="title">Milestones</div>
-              <div class="description">Important milestones</div>
-            </div>
-          </a>
-        {% elif active_template == "none" %}
-          <a href="{% url 'assessment' case_id %}" class="disabled step">
-            <div class="content">
-              <div class="title">Milestones</div>
-              <div class="description">Important milestones</div>
-            </div>
-          </a>
-        {% else %}
-          <a href="{% url 'assessment' case_id %}" class="step">
-            <div class="content">
-              <div class="title">Milestones</div>
-              <div class="description">Important milestones</div>
-            </div>
-          </a>
-        {% endif %}
-    {% endif %}
+    {% url 'multiaxial_diagnosis' case_id as active_url %}
+    {% include 'epilepsy12/step.html' with active_url=active_url title="Multiaxial diagnosis" description="DESSCRIBE definition" active_template=active_template template_name='multiaxial_diagnosis' complete_instance=audit_progress.multiaxial_diagnosis_complete registration_status=audit_progress.registration_complete %}
     
-
-    {% if audit_progress.investigations_complete %}
-
-      {% if active_template == "investigations" %}
-
-        <a class="active completed step" href="{% url 'investigations' case_id %}">
-          <div class="content">
-            <div class="title">Tests</div>
-            <div class="description">EEG, ECG and MRI</div>
-          </div>
-        </a>
-      {% else %}
-        <a class="completed step" href="{% url 'investigations' case_id %}">
-          <div class="content">
-            <div class="title">Tests</div>
-            <div class="description">EEG, ECG and MRI</div>
-          </div>
-        </a>
-      {% endif %}
-    {% else %}
-      {% if active_template == "investigations" %}
-      
-        <a href="{% url 'investigations' case_id %}" class="active step">
-          <div class="content">
-            <div class="title">Tests</div>
-            <div class="description">EEG, ECG and MRI</div>
-          </div>
-        </a>
-      {% elif active_template == "none" %}
-        <a href="{% url 'investigations' case_id %}" class="disabled step">
-          <div class="content">
-            <div class="title">Tests</div>
-            <div class="description">EEG, ECG and MRI</div>
-          </div>
-        </a>
-      {% else %}
-        <a href="{% url 'investigations' case_id %}" class="step">
-          <div class="content">
-            <div class="title">Tests</div>
-            <div class="description">EEG, ECG and MRI</div>
-          </div>
-        </a>
-      {% endif %}
-    {% endif %}
-
-    {% if audit_progress.management_complete %}
-      {% if active_template == "management" %}
-        
-        <a class="active completed step" href="{% url 'management' case_id %}">
-          <div class="content">
-            <div class="title">Treatment and care planning</div>
-            <div class="description">Medication, other treatment,<br>teams and care plans</div>
-          </div>
-        </a>
-      {% else %}
-        <a class="completed step" href="{% url 'management' case_id %}">
-          <div class="content">
-            <div class="title">Treatment and care planning</div>
-            <div class="description">Medication, other treatment,<br>teams and care plans</div>
-          </div>
-        </a>
-      {% endif %}
-    {% else %}
-      {% if active_template == "management" %}
-
-        <a href="{% url 'management' case_id %}" class="active step">
-          <div class="content">
-            <div class="title">Treatment and care planning</div>
-            <div class="description">Medication, other treatment,<br>teams and care plans</div>
-          </div>
-        </a>
-      {% elif active_template == "none" %}
-        <a href="{% url 'management' case_id %}" class="disabled step">
-          <div class="content">
-            <div class="title">Treatment and care planning</div>
-            <div class="description">Medication, other treatment,<br>teams and care plans</div>
-          </div>
-        </a>
-      {% else %}
-        <a href="{% url 'management' case_id %}" class="step">
-          <div class="content">
-            <div class="title">Treatment and care planning</div>
-            <div class="description">Medication, other treatment,<br>teams and care plans</div>
-          </div>
-        </a>
-        {% endif %}
-        {% endif %}
+    {% url 'assessment' case_id as active_url %}
+    {% include 'epilepsy12/step.html' with active_url=active_url title="Milestones" description="Important milestones" active_template=active_template template_name='assessment' complete_instance=audit_progress.assessment_complete registration_status=audit_progress.registration_complete %}
+    
+    {% url 'investigations' case_id as active_url %}
+    {% include 'epilepsy12/step.html' with active_url=active_url title="Tests" description="EEG, ECG and MRI" active_template=active_template template_name='investigations' complete_instance=audit_progress.investigations_complete registration_status=audit_progress.registration_complete %}
+    
+    {% url 'management' case_id as active_url %}
+    {% include 'epilepsy12/step.html' with active_url=active_url title="Treatment and care planning" description="Medication, other treatment,<br>teams and care plans" active_template=active_template template_name='management' complete_instance=audit_progress.management_complete registration_status=audit_progress.registration_complete %}
         
     
     {% comment %}
         Performance summary
     {% endcomment %}
     
-    <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
-      <div class='content'>
-        <div class="title">Performance summary</div>
-        <div class="description">Key performance indicators</div>
-      </div>
-    </a>
-
+        <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
+          <div class='content'>
+            <div class="title">Performance summary</div>
+            <div class="description">Key performance indicators</div>
+          </div>
+        </a>
+    
     {% comment %}
         Progress bar
     {% endcomment %}
 
     {% if active_template == "register" %}
-      {% with denominator=audit_progress.registration_total_expected_fields %}
-      {% with numerator=audit_progress.registration_total_completed_fields %}
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Verification and registration" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.registration_total_expected_fields total_completed_fields=audit_progress.registration_total_completed_fields title="Verification and registration" %}
     {% endif %}
     
     {% if active_template == "first_paediatric_assessment" %}
-      
-        {% with denominator=audit_progress.first_paediatric_assessment_total_expected_fields %}
-        {% with numerator=audit_progress.first_paediatric_assessment_total_completed_fields %}
-
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="First paediatric assessment" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.first_paediatric_assessment_total_expected_fields total_completed_fields=audit_progress.first_paediatric_assessment_total_completed_fields title="First paediatric assessment" %}
     {% endif %}
     
     {% if active_template == "epilepsy_context" %}
-      
-          {% with denominator=audit_progress.epilepsy_context_total_expected_fields %}
-          {% with numerator=audit_progress.epilepsy_context_total_completed_fields %}
-
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="The epilepsy context" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.epilepsy_context_total_expected_fields total_completed_fields=audit_progress.epilepsy_context_total_completed_fields title="The epilepsy context" %}
     {% endif %}
     
     {% if active_template == "multiaxial_diagnosis" %}
-      
-          {% with numerator=audit_progress.multiaxial_diagnosis_total_completed_fields %}
-          {% with denominator=audit_progress.multiaxial_diagnosis_total_expected_fields %}
-
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Multiaxial diagnosis" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.multiaxial_diagnosis_total_expected_fields total_completed_fields=audit_progress.multiaxial_diagnosis_total_completed_fields title="Multiaxial diagnosis" %}
     {% endif %}
     
     {% if active_template == "assessment" %}
-      
-          {% with numerator=audit_progress.assessment_total_completed_fields %}
-          {% with denominator=audit_progress.assessment_total_expected_fields %}
-
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Milestones" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.assessment_total_expected_fields total_completed_fields=audit_progress.assessment_total_completed_fields title="Milestones" %}
     {% endif %}
     
     {% if active_template == "investigations" %}
-      
-        {% with numerator=audit_progress.investigations_total_completed_fields %}
-        {% with denominator=audit_progress.investigations_total_expected_fields %}
-
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Tests" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.investigations_total_expected_fields total_completed_fields=audit_progress.investigations_total_completed_fields title="Tests" %}
     {% endif %}
     
     {% if active_template == "management" %}
-      
-        {% with numerator=audit_progress.management_total_completed_fields %}
-        {% with denominator=audit_progress.management_total_expected_fields %}
-
-      <div id="progress">
-        {% percentage_of_total numerator denominator as total_percent %}
-        {% include 'epilepsy12/partials/charts/progress.html' with numerator=numerator denominator=denominator percentage=total_percent title="Treatment and care planning" pie_size='small' %}
-      </div>
-      {% endwith %}
-      {% endwith %}
+        {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.management_total_expected_fields total_completed_fields=audit_progress.management_total_completed_fields title="Treatment and care planning" %}
     {% endif %}
 
   </div>
-
-{% endblock steps %}

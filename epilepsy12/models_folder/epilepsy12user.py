@@ -1,12 +1,14 @@
+# django
 from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group, Permission
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
-from epilepsy12.constants.user_types import ROLES, TITLES, AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, VIEW_PREFERENCES
-# from .hospital_trust import HospitalTrust
+# 3rd party
+from simple_history.models import HistoricalRecords
 
-# from ..general_functions import *
+# rcpch
+from epilepsy12.constants.user_types import ROLES, TITLES, AUDIT_CENTRE_LEAD_CLINICIAN, TRUST_AUDIT_TEAM_FULL_ACCESS, AUDIT_CENTRE_CLINICIAN, TRUST_AUDIT_TEAM_EDIT_ACCESS, AUDIT_CENTRE_ADMINISTRATOR, TRUST_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_LEAD, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, RCPCH_AUDIT_ANALYST, EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, RCPCH_AUDIT_ADMINISTRATOR, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, RCPCH_AUDIT_PATIENT_FAMILY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, AUDIT_CENTRE_MANAGER, VIEW_PREFERENCES
 
 
 class Epilepsy12UserManager(BaseUserManager):
@@ -59,6 +61,8 @@ class Epilepsy12UserManager(BaseUserManager):
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
         elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+        elif user.role == AUDIT_CENTRE_MANAGER:
+            group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
         elif user.role == RCPCH_AUDIT_LEAD:
             group = Group.objects.get(
                 name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
@@ -208,6 +212,8 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         default=False
     )
 
+    history = HistoricalRecords()
+
     REQUIRED_FIELDS = ['role', 'first_name',
                        'surname', 'is_rcpch_audit_team_member']
     USERNAME_FIELD = 'email'
@@ -238,11 +244,14 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     def __unicode__(self):
         return self.email
 
-    def has_perm(self, perm, obj=None):
-        if Permission.objects.filter(user=self, codename=perm).exists() or self.is_superuser:
-            return True
-        else:
-            return False
+    # def has_perm(self, perm, obj=None):
+    #     print(f'{perm} requested for this user')
+    #     print(Permission.objects.filter(user=self).all())
+    #     if Permission.objects.filter(user=self, codename=perm).exists() or self.is_superuser:
+    #         print(f'{perm} exists for this user')
+    #         return True
+    #     else:
+    #         return False
 
     def has_module_perms(self, app_label):
         return True

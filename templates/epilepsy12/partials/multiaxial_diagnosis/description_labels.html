@@ -1,16 +1,32 @@
-        {% if episode.description_keywords|length > 0 %}
-            
-                {% for keyword in episode.description_keywords %}
-                    {% url 'delete_description_keyword' episode.pk forloop.counter0 as hx_post %}
-                    <div 
-                        class='ui rcpch_light_blue label'
-                    >{{keyword}}
-                        <i class='icon close' 
-                            hx-post='{{hx_post}}' 
-                            hx-target='#description_results' 
-                            hx-trigger='click' 
-                            hx-swap='innerHTML'></i>
-                    </div>
-                {% endfor %}
-            
-        {% endif %}
+{% load epilepsy12_template_tags %}
+
+<span>
+    <i class="rcpch question circle icon link" id="choicesPopup"></i>
+    <div 
+        class="ui flowing popup top left transition hidden"
+        _="js $('#choicesPopup').popup(); end"
+    >
+        <p>Some examples of keywords to choose from...</p>
+        {% for choice in keyword_selection %}
+            <div class="ui rcpch_light_blue label" style="margin-bottom: 5px;">{{choice.keyword}}</div>
+        {% endfor %}
+    </div>
+    <label>Characters: {% characters_left episode.description %} </label>
+</span>
+
+{% if episode.description_keywords|length > 0 %}
+    <div>
+        {% for keyword in episode.description_keywords %}
+            {% url 'delete_description_keyword' episode.pk forloop.counter0 as hx_post %}
+            <div 
+                class='ui rcpch_light_blue label'
+            >{{keyword}}
+                <i class='icon close' 
+                    hx-post='{{hx_post}}' 
+                    hx-target='#description_results' 
+                    hx-trigger='click' 
+                    hx-swap='innerHTML'></i>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

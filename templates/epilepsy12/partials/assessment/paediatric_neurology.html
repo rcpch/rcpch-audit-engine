@@ -9,10 +9,10 @@
         <div class="ui rcpch_lightest_blue message">
 
             {% url 'paediatric_neurologist_referral_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label=assessment.get_paediatric_neurologist_referral_date_help_label_text reference=assessment.get_paediatric_neurologist_referral_date_help_reference_text date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label=assessment.get_paediatric_neurologist_referral_date_help_label_text reference=assessment.get_paediatric_neurologist_referral_date_help_reference_text date_value=assessment.paediatric_neurologist_referral_date input_date_field_name="paediatric_neurologist_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
             
             {% url 'paediatric_neurologist_input_date' assessment_id=assessment.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label=assessment.get_paediatric_neurologist_input_date_help_label_text reference=assessment.get_paediatric_neurologist_input_date_help_reference_text date_value=assessment.paediatric_neurologist_input_date input_date_field_name="paediatric_neurologist_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#paediatric_neurology" hx_trigger="change" label=assessment.get_paediatric_neurologist_input_date_help_label_text reference=assessment.get_paediatric_neurologist_input_date_help_reference_text date_value=assessment.paediatric_neurologist_input_date input_date_field_name="paediatric_neurologist_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>
@@ -25,6 +25,8 @@
                 </div>
             {% endif %}
 
+            
+
             {% if active_neurology_site %}
 
                             <div class="field">
@@ -34,91 +36,64 @@
                                     <div class="ui right action input">
                                         
                                         <input disabled value="{{active_neurology_site.hospital_trust.OrganisationName}} ({{active_neurology_site.hospital_trust.ParentName}})">
-                                        <div class="ui buttons">
-                                            
-                                            {% if neurology_edit_active %}
+
+                                        {% if not neurology_edit_active %}
+
+                                            <div class="ui buttons">
+
+                                                    <button 
+                                                        {% if perms.epilepsy12.delete_assessment %}
+                                                            class="ui rcpch_danger button"
+                                                        {% else %}
+                                                            class="ui rcpch_danger disabled button"
+                                                        {% endif %}
+                                                        hx-post="{% url 'delete_paediatric_neurology_centre' site_id=active_neurology_site.pk assessment_id=assessment.pk %}"
+                                                        hx-target="#paediatric_neurology"
+                                                        hx-swap="innerHTML"
+                                                        hx-include="[name='hospital_trust']"
+                                                        hx-trigger="click"
+                                                    >Delete</button>
+
+                                                    <button 
+                                                        {% if perms.epilepsy12.change_assessment %}
+                                                            class="ui rcpch_primary button"
+                                                        {% else %}
+                                                            class="ui rcpch_primary disabled button"
+                                                        {% endif %}
+                                                        hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='edit' %}"
+                                                        hx-target="#paediatric_neurology"
+                                                        hx-swap="innerHTML"
+                                                        hx-trigger="click"
+                                                    >Edit</button>
                                                 
-                                                <button 
-                                                    class="ui rcpch_negative button"
-                                                    hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' %}"
-                                                    hx-target="#paediatric_neurology"
-                                                    hx-swap="innerHTML"
-                                                    hx-trigger="click"
-                                                >Cancel</button>
-                                            
-                                            {% else %}
+                                            </div>
 
-                                                <button 
-                                                    {% if perms.epilepsy12.change_assessment %}
-                                                        class="ui rcpch_primary button"
-                                                    {% else %}
-                                                        class="ui rcpch_primary disabled button"
-                                                    {% endif %}
-                                                    hx-post="{% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='edit' %}"
-                                                    hx-target="#paediatric_neurology"
-                                                    hx-swap="innerHTML"
-                                                    hx-trigger="click"
-                                                >Edit</button>
-
-                                                <button 
-                                                    {% if perms.epilepsy12.delete_assessment %}
-                                                        class="ui rcpch_danger button"
-                                                    {% else %}
-                                                        class="ui rcpch_danger disabled button"
-                                                    {% endif %}
-                                                    hx-post="{% url 'delete_paediatric_neurology_centre' site_id=active_neurology_site.pk assessment_id=assessment.pk %}"
-                                                    hx-target="#paediatric_neurology"
-                                                    hx-swap="innerHTML"
-                                                    hx-include="[name='hospital_trust']"
-                                                    hx-trigger="click"
-                                                >Delete</button>
-
-                                            {% endif %}
-
-                                        </div>    
+                                        {% endif %}
                                         
                                     </div>
                                 </span>
                             
-                            </div>  
+                            </div>
                             {% if neurology_edit_active %}
                             
                                 <div class="field" id="allocate_paediatric_neurology_centre">
+                                    {% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' as hx_cancel %}
                                     {% url 'edit_paediatric_neurology_centre' assessment_id=assessment.pk site_id=active_neurology_site.pk as hx_post %}
-                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_paediatric_neurology_centre" test_positive=active_paediatric_neurology_centre.pk label="Update Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
+                                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_paediatric_neurology_centre" test_positive=active_paediatric_neurology_centre.pk label="Update Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment hx_cancel=hx_cancel %}
                                 </div>
 
                             {% endif %}
                             
-                        {% else %}
-                            <div class="field" id="allocate_paediatric_neurology_centre">
-                                <p>There is currently no paediatric neurology centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
-                                {% url 'paediatric_neurology_centre' assessment_id=assessment.pk as hx_post %}
-                                {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="paediatric_neurology_centre" test_positive=None label="Allocate Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment %}
-                            </div>
-                        {% endif %}
+            {% else %}
 
-                        {% if historical_neurology_sites|length > 0 %}
-                           
-                            <div class="field">
-                                <label>Paediatric neurology centres previously involved in care</label>
-                                {% for historical_neurology_site in historical_neurology_sites %}
-                                    <li>{{historical_neurology_site.hospital_trust.OrganisationName}}</li>
-                                {% endfor %}
-                            </div>
-                            
+                <div class="field" id="allocate_paediatric_neurology_centre">
+                    <p>There is currently no paediatric neurology centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
+                    {% url 'paediatric_neurology_centre' assessment_id=assessment.pk as hx_post %}
+                    {% url 'update_paediatric_neurology_centre_pressed' assessment_id=assessment.pk site_id=active_neurology_site.pk action='cancel' as hx_cancel %}
+                    {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#paediatric_neurology" hx_trigger="click" hx_swap="innerHTML" hx_name="paediatric_neurology_centre" test_positive=None label="Allocate Paediatric Neurology Centre" hx_default_text="Search paediatric neurology centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment hx_cancel=hx_cancel %}
+                </div>
 
-                        {% else %}
-                            
-                            <div class="field">
-                                
-                                <p>No paediatric neurology centres have previously been involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</p>
-                                
-                            </div>
-                            
-
-                        {% endif %}
-
+            {% endif %}
 
         </div>
 

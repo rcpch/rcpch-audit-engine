@@ -5,6 +5,7 @@ from django.urls import path
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
+from django.contrib.auth.views import PasswordResetView
 
 router = routers.DefaultRouter()
 
@@ -30,9 +31,8 @@ router.register(r'auditprogress', views.AuditProgressViewSet)
 urlpatterns = [
     path('registration/', include('django.contrib.auth.urls')),
     path('registration/login', views.epilepsy12_login, name='login'),
-
+    path('password-reset/', ResetPasswordView.as_view(), name='password_reset'),
     path("favicon", views.favicon),
-    #     path("signup/", views.signup, name="signup"),
     path('403', views.redirect_403, name='redirect_403'),
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
@@ -56,6 +56,10 @@ urlpatterns = [
          views.view_preference, name='view_preference'),
     path('hospital/<int:hospital_id>/cases/hospital_select/<str:template_name>',
          views.child_hospital_select, name='child_hospital_select'),
+    path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/logs',
+         views.logs, name='logs'),
+    path('hospital/<int:hospital_id>/epilepsy12_users/<int:epilepsy12_user_id>/log_list',
+         views.log_list, name='log_list'),
     path('selected_hospital_summary', views.selected_hospital_summary,
          name='selected_hospital_summary'),
     path('selected_trust_kpis/<int:hospital_id>', views.selected_trust_kpis,
@@ -224,7 +228,7 @@ htmx_paths = [
          name="sort_by_days_remaining_before_submission_down"),
 
     #     registration endpoints
-    path('registration<int:registration_id>/confirm_eligibility',
+    path('registration/<int:registration_id>/confirm_eligibility',
          views.confirm_eligible, name="confirm_eligible"),
     path('case/<int:case_id>/registration_date',
          views.registration_date, name="registration_date"),

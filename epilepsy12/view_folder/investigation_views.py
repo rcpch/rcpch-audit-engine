@@ -6,6 +6,7 @@ from ..decorator import user_can_access_this_hospital_trust
 
 
 @login_required
+@permission_required('epilepsy12.view_investigations', raise_exception=True)
 @user_can_access_this_hospital_trust()
 def investigations(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()

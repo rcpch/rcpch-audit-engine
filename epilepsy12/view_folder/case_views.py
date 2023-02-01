@@ -47,6 +47,7 @@ def case_list(request, hospital_id):
             all_cases = Case.objects.filter(
                 Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+                Q(site__site_is_actively_involved_in_epilepsy_care=True) &
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
                 Q(nhs_number__icontains=filter_term)
@@ -56,6 +57,7 @@ def case_list(request, hospital_id):
             all_cases = Case.objects.filter(
                 Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+                Q(site__site__site_is_actively_involved_in_epilepsy_care=True) &
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
                 Q(nhs_number__icontains=filter_term)
@@ -64,6 +66,7 @@ def case_list(request, hospital_id):
             # user has requested national level view
             all_cases = Case.objects.filter(
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+                Q(site__site__site_is_actively_involved_in_epilepsy_care=True) &
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
                 Q(nhs_number__icontains=filter_term)
@@ -85,13 +88,15 @@ def case_list(request, hospital_id):
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
                 hospital_trusts__ParentName__contains=hospital_trust.ParentName,
-                site__site_is_primary_centre_of_epilepsy_care=True
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True
             )
         else:
             # filters all primary centres at hospital level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
                 hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName,
-                site__site_is_primary_centre_of_epilepsy_care=True
+                site__site_is_primary_centre_of_epilepsy_care=True,
+                site__site_is_actively_involved_in_epilepsy_care=True
             )
 
         if request.htmx.trigger_name == "sort_by_nhs_number_up" or request.GET.get('sort_flag') == "sort_by_nhs_number_up":
@@ -162,7 +167,9 @@ def case_list(request, hospital_id):
             all_cases = filtered_cases.order_by('surname').all()
 
     registered_cases = all_cases.filter(
-        ~Q(registration__isnull=True),
+        ~Q(registration__isnull=True) &
+        Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+        Q(site__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
 
 
@@ -251,6 +258,7 @@ def case_submit(request, hospital_id, case_id):
 
 
 @login_required
+@permission_required('epilepsy12.view_case')
 def case_performance_summary(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -265,6 +273,12 @@ def case_performance_summary(request, case_id):
     template = 'epilepsy12/case_performance_summary.html'
 
     response = render(request=request, template_name=template, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
 
     return response
 
@@ -372,8 +386,9 @@ def opt_out(request, hospital_id, case_id):
     leading trust will be retained but set to inactive.
     """
 
-    # hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     case = Case.objects.get(pk=case_id)
+    messages.info(
+        request, f"All data on {case} has been permanently removed from Epilepsy12. The Epilepsy12 unique identifier has been preserved to contribute to annual totals.")
     case.nhs_number = None
     case.first_name = None
     case.surname = None
@@ -386,7 +401,8 @@ def opt_out(request, hospital_id, case_id):
     case.save()
 
     # delete all related records - this should cascade to all tables
-    case.registration.delete()
+    if hasattr(case, 'registration'):
+        case.registration.delete()
 
     # delete all related sites except the primary centre of care, which becomes inactive
     all_sites = case.site.all()

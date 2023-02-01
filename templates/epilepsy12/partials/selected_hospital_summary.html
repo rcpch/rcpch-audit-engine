@@ -12,76 +12,102 @@
                 </div>
             </div>
         {% endif %}
+
         <div class='eight wide left aligned column'>
-            <div class='field'>
-                <a href="{% url 'epilepsy12_user_list' hospital_id=selected_hospital.pk %}"><button class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Epilepsy12 Staff</button></a>
-            </div>
+            
+                <div class='field'>
+                    <a href="{% url 'epilepsy12_user_list' hospital_id=selected_hospital.pk %}">
+                        <button 
+                            class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Epilepsy12 Staff
+                        </button>
+                    </a>
+                </div>
+            
         </div>
+
         <div class='eight wide right aligned column'>
             <div class='field'>
                 <a href="{% url 'cases' hospital_id=selected_hospital.pk %}"><button class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Children</button></a>
             </div>
         </div>
+        
+        
+        <div class='sixteen wide right fluid column'>
 
-        <div class="eight wide stackable column">
-            <div class="ui rcpch_light_blue fluid stackable card">
-                <div class="content">
-                    <div class="header">
-                        {{ selected_hospital.ParentName }}
-                    </div>
-                    <div class="description">
-                        {{ selected_hospital.Address1 }}<br>
-                        {{ selected_hospital.Address2 }}<br>
-                        {{ selected_hospital.Address3 }}<br>
-                        {{ selected_hospital.City }}<br>
-                        {{ selected_hospital.Postcode }}<br>
-                        <span><i class="phone icon"></i>{{ selected_hospital.Phone }}</span><br>
-                        <span><i class="envelope outline icon"></i>{{ selected_hospital.Email }}</span><br>
-                        <span><i class="internet explorer icon"></i>{{ selected_hospital.Website }}</span><br>
+            
+            <div class="ui four cards">
+                
+                <div class="ui rcpch_light_blue stackable card">
+                    <div class="content">
+                        <div class="header">
+                            {{ selected_hospital.ParentName }}
+                        </div>
+                        <div class="description">
+                            {{ selected_hospital.Address1 }}<br>
+                            {{ selected_hospital.Address2 }}<br>
+                            {{ selected_hospital.Address3 }}<br>
+                            {{ selected_hospital.City }}<br>
+                            {{ selected_hospital.Postcode }}<br>
+                            <span><i class="phone icon"></i>{{ selected_hospital.Phone }}</span><br>
+                            <span><i class="envelope outline icon"></i>{{ selected_hospital.Email }}</span><br>
+                            <span><i class="internet explorer icon"></i>{{ selected_hospital.Website }}</span><br>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="eight wide stackable column">
-                <h2 class='header'>
-                {{selected_hospital.ParentName}} summary
-                </h2>
-                <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
-                    {% if cases_aggregated_by_ethnicity %}
-                        {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
-                    {% else %}
-                        <h3>Distribution by Ethnicity</h3>
-                        <h5>No data yet!<h5>
-                    {% endif %}
+                <div class="ui rcpch_light_blue stackable card">
+                    <div class="content">
+                        <h2 class='header'>
+                        Distribution by Ethnicity
+                        </h2>
+                        <div class='description'>
+                            <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
+                                {% if cases_aggregated_by_ethnicity %}
+                                    {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            
-        </div>
+                
+                <div class="ui rcpch_light_blue stackable card">
+                    <div class="content">
+                        <h2 class='header'>
+                        Distribution by Sex
+                        </h2>
+                        <div class='description'>
+                            <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container stackable segment">
+                                {% if cases_aggregated_by_sex %}
+                                    {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="eight wide stackable  column">
+                <div class="ui rcpch_light_blue stackable card">
+                    <div class="content">
+                        <h2 class='header'>
+                        Distribution by Index of Multiple Deprivation
+                        </h2>
+                        <div class='description'>
+                            <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container stackable segment">
+                                {% if cases_aggregated_by_deprivation %}
+                                    {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container stackable segment">
-                {% if cases_aggregated_by_sex %}
-                    {% include 'epilepsy12/partials/charts/cases_aggregated_by_sex.html' with cases_aggregated_by_sex=cases_aggregated_by_sex %}
-                {% else %}
-                    <h3>Distribution by Sex</h3>
-                    <h5>No data yet!<h5>
-                {% endif %}
             </div>
-            
-        </div>
-
-        <div class="eight wide stackable column">
-
-            <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container stackable segment">
-                {% if cases_aggregated_by_deprivation %}
-                    {% include 'epilepsy12/partials/charts/deprivation_scores.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
-                {% else %}
-                    <h3>Distribution by Index of Multiple Deprivation</h3>
-                    <h5>No data yet!<h5>
-                {% endif %}
-            </div>
-
+    
         </div>
 
 
@@ -118,9 +144,9 @@
             class="sixteen wide stackable column" 
             hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
             hx-trigger="load" hx-swap='innerHTML'
-            hx_indicator='#selected_trust_kpis'
-            hx-target="#selected_trust_kpis">
-            <div id='selected_trust_kpis'>
+            hx_indicator='#kpis'
+            hx-target="#kpis">
+            <div id='kpis'>
                 <div class="ui active centered inline loader"></div>
             </div>
         </div>

@@ -1,8 +1,10 @@
+# django
 from django.db import models
-# other tables
-# from .case import Case
-# from .hospital_trust import HospitalTrust
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .time_and_user_abstract_base_classes import *
+from ..constants import CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE, CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE, CAN_EDIT_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE
 
 
 class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
@@ -40,6 +42,8 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         null=True
     )
 
+    history = HistoricalRecords()
+
     # relationships
     # Site is a link table between Case and Hospital Trust in a many to many relationship
 
@@ -59,9 +63,23 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         related_name='site'
     )
 
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
+
     class Meta:
         verbose_name = 'Site'
         verbose_name_plural = 'Sites'
+        permissions = [
+            CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE,
+            CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
+            CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
+            CAN_DELETE_EPILEPSY12_LEAD_CENTRE
+        ]
 
     def __str__(self) -> str:
         return self.hospital_trust.ParentName

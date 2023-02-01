@@ -1,4 +1,8 @@
+# django
 from django.db import models
+# 3rd party
+from simple_history.models import HistoricalRecords
+# rcpch
 from .time_and_user_abstract_base_classes import *
 
 
@@ -139,6 +143,16 @@ class HospitalTrust(models.Model):
         blank=True,
         default=None
     )
+
+    history = HistoricalRecords()
+
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
 
     class Meta:
         indexes = [models.Index(fields=['OrganisationName'])]

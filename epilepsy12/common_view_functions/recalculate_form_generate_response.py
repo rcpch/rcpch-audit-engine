@@ -103,7 +103,6 @@ def completed_fields(model_instance):
                                 counter += 1
                     else:
                         counter += 1
-
     return counter
 
 
@@ -278,7 +277,7 @@ def avoid_fields(model_instance):
     elif model_class_name == 'AntiEpilepsyMedicine':
         return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date']
     elif model_class_name == 'Registration':
-        return ['id', 'management', 'assessment', 'investigations', 'multiaxialdiagnosis', 'registration', 'epilepsycontext', 'firstpaediatricassessment', 'registration_close_date', 'registration_date_one_year_on', 'audit_submission_date', 'cohort', 'case', 'audit_progress', 'created_by', 'created_at', 'updated_by', 'updated_at']
+        return ['id', 'management', 'assessment', 'investigations', 'multiaxialdiagnosis', 'registration', 'epilepsycontext', 'firstpaediatricassessment', 'registration_close_date', 'registration_date_one_year_on', 'audit_submission_date', 'cohort', 'case', 'audit_progress', 'created_by', 'created_at', 'updated_by', 'updated_at', 'kpi']
     else:
         raise ValueError(
             f'Form scoring error: {model_class_name} not found to return fields to avoid in form calculation.')

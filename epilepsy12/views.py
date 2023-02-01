@@ -29,7 +29,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
-from .common_view_functions import trust_level_kpis, national_level_kpis
+from .common_view_functions import hospital_level_kpis, trust_level_kpis, national_level_kpis, calculate_kpis
 
 from epilepsy12.constants.ethnicities import ETHNICITIES
 from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
@@ -54,7 +54,12 @@ def epilepsy12_login(request):
                     user.email_confirmed = True
                     user.save()
                 login(request, user)
-                messages.info(request, f"You are now logged in as {email}.")
+                last_logged_in = VisitActivity.objects.filter(
+                    activity=1,
+                    epilepsy12user=user
+                ).order_by('-activity_datetime').first()
+                messages.info(
+                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%-H:%-M (%S seconds) on %A, %-d %B %Y')} from https://{last_logged_in.ip_address}/")
                 return redirect("hospital_reports")
             else:
                 messages.error(request, "Invalid email or password.")
@@ -98,6 +103,86 @@ def hospital_reports(request):
     #         reg.save()
     #     else:
     #         print('nothing to see here')
+
+    # add all registered cases to KPIs
+    # for case in Case.objects.all():
+    #     if Registration.objects.filter(case=case).exists():
+    #         if Site.objects.filter(
+    #             site_is_actively_involved_in_epilepsy_care=True,
+    #             site_is_primary_centre_of_epilepsy_care=True,
+    #             case=case
+    #         ).exists():
+    #             lead_site = Site.objects.filter(
+    #                 site_is_actively_involved_in_epilepsy_care=True,
+    #                 site_is_primary_centre_of_epilepsy_care=True,
+    #                 case=case
+    #             ).get()
+    #             lead_hospital = lead_site.hospital_trust
+    #             parent_trust = lead_hospital.ParentName
+    #             if hasattr(case.registration, 'kpi'):
+    #                 print('I have KPIs')
+    #                 if case.registration.kpi is None:
+    #                     new_kpi = KPI.objects.create(
+    #                         hospital_organisation=lead_hospital,
+    #                         parent_trust=parent_trust,
+    #                         paediatrician_with_expertise_in_epilepsies=0,
+    #                         epilepsy_specialist_nurse=0,
+    #                         tertiary_input=0,
+    #                         epilepsy_surgery_referral=0,
+    #                         ecg=0,
+    #                         mri=0,
+    #                         assessment_of_mental_health_issues=0,
+    #                         mental_health_support=0,
+    #                         sodium_valproate=0,
+    #                         comprehensive_care_planning_agreement=0,
+    #                         patient_held_individualised_epilepsy_document=0,
+    #                         patient_carer_parent_agreement_to_the_care_planning=0,
+    #                         care_planning_has_been_updated_when_necessary=0,
+    #                         comprehensive_care_planning_content=0,
+    #                         parental_prolonged_seizures_care_plan=0,
+    #                         water_safety=0,
+    #                         first_aid=0,
+    #                         general_participation_and_risk=0,
+    #                         service_contact_details=0,
+    #                         sudep=0,
+    #                         school_individual_healthcare_plan=0
+    #                     )
+    #                     case.registration.kpi = new_kpi
+    #                     case.registration.save()
+    #                 else:
+    #                     calculate_kpis(case.registration)
+    #                 print(f"Done! KPIs calculated for {case}")
+    #             else:
+    #                 print('I have no KPIs - creating...')
+    #                 KPI.objects.create(
+    #                     hospital_organisation=lead_hospital,
+    #                     parent_trust=parent_trust,
+    #                     paediatrician_with_expertise_in_epilepsies=0,
+    #                     epilepsy_specialist_nurse=0,
+    #                     tertiary_input=0,
+    #                     epilepsy_surgery_referral=0,
+    #                     ecg=0,
+    #                     mri=0,
+    #                     assessment_of_mental_health_issues=0,
+    #                     mental_health_support=0,
+    #                     sodium_valproate=0,
+    #                     comprehensive_care_planning_agreement=0,
+    #                     patient_held_individualised_epilepsy_document=0,
+    #                     patient_carer_parent_agreement_to_the_care_planning=0,
+    #                     care_planning_has_been_updated_when_necessary=0,
+    #                     comprehensive_care_planning_content=0,
+    #                     parental_prolonged_seizures_care_plan=0,
+    #                     water_safety=0,
+    #                     first_aid=0,
+    #                     general_participation_and_risk=0,
+    #                     service_contact_details=0,
+    #                     sudep=0,
+    #                     school_individual_healthcare_plan=0
+    #                 )
+    #                 print(
+    #                     f"Done! KPIs created for {case}. Now calculating score...")
+    #                 calculate_kpis(case.registration)
+    #                 print(f"Done! KPIs calculated for {case}")
 
     """
     !!!
@@ -346,31 +431,79 @@ def selected_hospital_summary(request):
     })
 
 
+@login_required
+def logs(request, hospital_id, epilepsy12_user_id):
+    """
+    returns logs for given hospital
+    """
+    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+
+    activities = VisitActivity.objects.filter(
+        epilepsy12user=epilepsy12_user).all()
+
+    template_name = 'epilepsy12/logs.html'
+    context = {
+        'epilepsy12_user': epilepsy12_user,
+        'hospital': hospital,
+        'activities': activities
+    }
+
+    return render(request=request, template_name=template_name, context=context)
+
+
+@login_required
+def log_list(request, hospital_id, epilepsy12_user_id):
+    """
+    GET request to return log table 
+    """
+    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+
+    activities = VisitActivity.objects.filter(
+        epilepsy12user=epilepsy12_user).all()
+
+    template_name = 'epilepsy12/logs.html'
+    context = {
+        'epilepsy12_user': epilepsy12_user,
+        'hospital': hospital,
+        'activities': activities
+    }
+
+    return render(request=request, template_name=template_name, context=context)
+
+
 def selected_trust_kpis(request, hospital_id):
     """
     HTMX get request returning trust_level_kpi.html partial
     """
     trust_kpis = trust_level_kpis(hospital_id=hospital_id)
     national_kpis = national_level_kpis()
-    # create an empty instance of audit progress to access the labels
-    audit_progress = AuditProgress.objects.create()
-    template_name = 'epilepsy12/partials/kpis/trust_level_kpi.html'
+    hospital_organisation = HospitalTrust.objects.get(pk=hospital_id)
+    hospital_kpis = hospital_level_kpis(hospital_id=hospital_id)
+    # create an empty instance of KPIs to access the labels
+    kpis = KPI.objects.create(
+        hospital_organisation=hospital_organisation,
+        parent_trust=hospital_organisation.ParentName
+    )
+    template_name = 'epilepsy12/partials/kpis/kpis.html'
     context = {
-        'selected_trust_kpis': trust_kpis,
+        'hospital_organisation': hospital_organisation,
+        'hospital_kpis': hospital_kpis,
+        'trust_kpis': trust_kpis,
         'national_kpis': national_kpis,
-        'audit_progress': audit_progress
+        'kpis': kpis
     }
 
-    # result = national_level_kpis()
+    response = render(
+        request=request, template_name=template_name, context=context)
 
-    # hospital_list = []
-    # hospitals = HospitalTrust.objects.distinct(
-    #     'ParentName').filter(Sector='NHS Sector').order_by('ParentName')
-    # for hospital in hospitals:
-    #     hospital_list.append(hospital.OrganisationName)
-    # print(hospital_list)
-
-    return render(request=request, template_name=template_name, context=context)
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response,
+        name="registration_active",
+        params={})  # reloads the form to show the active steps
+    return response
 
 
 def tsandcs(request):
