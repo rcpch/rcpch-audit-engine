@@ -35,12 +35,16 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS",
-                          "127.0.0.1,localhost,0.0.0.0").split(",")
+print(DEBUG)
 
-# Development mode allows the use of alternate settings when running locally
-# Defaults to False. Set to true in an environment variable if needed.
-DEVELOPMENT_MODE = os.getenv("E12_DEVELOPMENT_MODE", "False") == "True"
+# Need to handle missing ENV var
+# Need to handle duplicates
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(",") + ["127.0.0.1",
+                                                                "localhost",
+                                                                "0.0.0.0"]
+
+print(ALLOWED_HOSTS)
+
 
 # Application definition
 
@@ -108,24 +112,16 @@ WSGI_APPLICATION = 'rcpch-audit-engine.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
-if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        "default": {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
-            'USER': os.environ.get('E12_POSTGRES_DB_USER'),
-            'PASSWORD': os.environ.get('E12_POSTGRES_DB_PASSWORD'),
-            'HOST': os.environ.get('E12_POSTGRES_DB_HOST'),
-            'PORT': os.environ.get('E12_POSTGRES_DB_PORT'),
-        }
+DATABASES = {
+    "default": {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
+        'USER': os.environ.get('E12_POSTGRES_DB_USER'),
+        'PASSWORD': os.environ.get('E12_POSTGRES_DB_PASSWORD'),
+        'HOST': os.environ.get('E12_POSTGRES_DB_HOST'),
+        'PORT': os.environ.get('E12_POSTGRES_DB_PORT'),
     }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if os.getenv("E12_PRODUCTION_DATABASE_URL", None) is None:
-        raise Exception(
-            "E12_PRODUCTION_DATABASE_URL environment variable not defined")
-    DATABASES = {
-        "default": dj_database_url.parse(os.environ.get("E12_PRODUCTION_DATABASE_URL")),
-    }
+}
 
 
 # Password validation
@@ -148,16 +144,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'epilepsy12.Epilepsy12User'
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'smtp.eu.mailgun.org'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'admin@epilepsy12.tech'
+if DEBUG is True:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = 'smtp.eu.mailgun.org'
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = True
+    DEFAULT_FROM_EMAIL = 'admin@epilepsy12.tech'
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
@@ -183,7 +179,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 STATIC_ROOT = str(BASE_DIR.joinpath("staticfiles"))
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-WHITENOISE_ROOT = os.path.join(STATIC_ROOT, 'root')
+WHITENOISE_ROOT = os.path.join(BASE_DIR, 'static/root')
 
 
 # Default primary key field type

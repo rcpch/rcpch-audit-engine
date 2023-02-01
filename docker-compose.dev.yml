@@ -23,7 +23,6 @@ services:
       - E12_POSTGRES_DB_HOST=db
       - E12_POSTGRES_DB_PORT=5432
       - E12_SECRET_KEY=mysecretkey
-      - E12_DEVELOPMENT_MODE=True
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
     command: >
