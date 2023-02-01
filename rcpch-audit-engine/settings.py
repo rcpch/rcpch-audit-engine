@@ -39,9 +39,9 @@ print(DEBUG)
 
 # Need to handle missing ENV var
 # Need to handle duplicates
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(",") + ["127.0.0.1",
-                                                                "localhost",
-                                                                "0.0.0.0"]
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + ["127.0.0.1",
+                                                                    "localhost",
+                                                                    "0.0.0.0"]
 
 print(ALLOWED_HOSTS)
 
