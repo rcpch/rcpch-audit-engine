@@ -1,3 +1,3 @@
 from .calculate_kpis import calculate_kpis, hospital_level_kpis, trust_level_kpis, national_level_kpis
-from .recalculate_form_generate_response import recalculate_form_generate_response, completed_fields
+from .recalculate_form_generate_response import recalculate_form_generate_response, completed_fields, test_fields_update_audit_progress
 from .validate_form_update_model import validate_and_update_model

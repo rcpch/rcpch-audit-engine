@@ -1,13 +1,17 @@
-from random import randint, getrandbits, choice
+from random import randint, choice
 from datetime import date
+from dateutil.relativedelta import relativedelta
+from random import randint
 from django.core.management.base import BaseCommand
 
 
 from ...constants import ETHNICITIES, DUMMY_NAMES
-from ...models import HospitalTrust, Keyword, Case, Site
+from ...models import HospitalTrust, Keyword, Case, Site, Registration
 from ...constants import ALL_HOSPITALS, KEYWORDS
-from ...general_functions import random_postcodes
+from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
+from ...common_view_functions import national_level_kpis
+from .create_e12_records import create_epilepsy12_record, create_registrations
 
 
 class Command(BaseCommand):
@@ -29,6 +33,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
+        elif (options['mode'] == 'seed_registrations'):
+            self.stdout.write(
+                'register cases in audit and complete all fields with random answers...')
+            run_registrations()
         elif (options['mode'] == 'seed_groups_and_permissions'):
             self.stdout.write('setting up groups and permissions...')
             create_groups()
@@ -133,7 +141,6 @@ def run_dummy_cases_seed():
 
     for index in range(len(DUMMY_NAMES)-1):
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
-        locked = bool(getrandbits(1))
         nhs_number = randint(1000000000, 9999999999)
         first_name = DUMMY_NAMES[index]['firstname']
         surname = DUMMY_NAMES[index]['lastname']
@@ -146,19 +153,15 @@ def run_dummy_cases_seed():
         postcode = postcode_list[index]
         ethnicity = choice(ETHNICITIES)[0]
 
-        if index < 33:
-            hospital_trust = HospitalTrust.objects.filter(
-                OrganisationName="King's College Hospital").get()
-        elif index >= 33 and index < 66:
-            hospital_trust = HospitalTrust.objects.filter(
-                OrganisationName="Addenbrooke's").get()
-        else:
-            hospital_trust = HospitalTrust.objects.filter(
-                OrganisationName='Great North Childrens Hospital').get()
+        # get a random hospital
+        hospital_trust = HospitalTrust.objects.filter(
+            Sector="NHS Sector").order_by("?").first()
+
+        case_has_error = False
 
         try:
             new_case = Case(
-                locked=locked,
+                locked=False,
                 nhs_number=nhs_number,
                 first_name=first_name,
                 surname=surname,
@@ -170,21 +173,50 @@ def run_dummy_cases_seed():
             new_case.save()
         except Exception as e:
             print(f"Error saving case: {e}")
+            case_has_error = True
 
-        try:
-            new_site = Site.objects.create(
-                hospital_trust=hospital_trust,
-                site_is_actively_involved_in_epilepsy_care=True,
-                site_is_primary_centre_of_epilepsy_care=True,
-                case=new_case
-            )
-            new_site.save()
-        except Exception as e:
-            print(f"Error saving site: {e}")
+        if not case_has_error:
+            try:
+                new_site = Site.objects.create(
+                    hospital_trust=hospital_trust,
+                    site_is_actively_involved_in_epilepsy_care=True,
+                    site_is_primary_centre_of_epilepsy_care=True,
+                    case=new_case
+                )
+                new_site.save()
+            except Exception as e:
+                print(f"Error saving site: {e}")
 
-        added += 1
-        print(f"Saved {new_case.first_name} {new_case.surname} at {new_site.hospital_trust.ParentName}({new_site.hospital_trust.OrganisationName})...")
+            added += 1
+            print(f"Saved {new_case.first_name} {new_case.surname} at {new_site.hospital_trust.ParentName}({new_site.hospital_trust.OrganisationName})...")
     print(f"Saved {added} cases.")
+
+
+def run_registrations():
+    """
+    Calling function to register all cases in Epilepsy12 and complete all fields with random answers
+    """
+    create_registrations()
+
+    complete_registrations()
+
+
+def complete_registrations():
+    """
+    Loop through the registrations and score all fields
+    """
+    for registration in Registration.objects.all():
+        current_cohort_end_date = first_tuesday_in_january(
+            current_cohort_start_date().year + 2) + relativedelta(days=7)
+        registration.registration_date = random_date(
+            start=current_cohort_start_date(), end=current_cohort_end_date)
+        registration.eligibility_criteria_met = True
+        registration.save()
+
+        create_epilepsy12_record(registration_instance=registration)
+
+    # calculate national level kpis
+    national_level_kpis()
 
 
 def image():
