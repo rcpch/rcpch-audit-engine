@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 # epilepsy12 dependencies
 from ...models import FirstPaediatricAssessment, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Episode, Keyword, Comorbidity, Assessment, Site, HospitalTrust, Management, AntiEpilepsyMedicine, Case, AuditProgress, Registration, KPI, Investigations
 from ...constants import OPT_OUT_UNCERTAIN, SYNDROMES, EPILEPSY_CAUSES, NEUROPSYCHIATRIC, DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_EEG_MANIFESTATIONS, LATERALITY, GENERALISED_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, MIGRAINES, EPIS_MISC, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_PAROXYSMS, ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
-from ...general_functions import random_date, current_cohort_start_date, first_tuesday_in_january
+from ...general_functions import random_date, current_cohort_start_date, first_tuesday_in_january, fetch_ecl
 from ...common_view_functions import test_fields_update_audit_progress, calculate_kpis
 
 
@@ -79,6 +79,9 @@ def create_epilepsy12_record(registration_instance):
     """
     Creates a full randomised record for a given registration instance.
     """
+    # score registration_instance
+    test_fields_update_audit_progress(
+        model_instance=registration_instance)
 
     # create random first paediatric assessment
     first_paediatric_assessment = create_first_paediatric_assessment(
@@ -174,8 +177,10 @@ def create_multiaxial_diagnosis(registration_instance):
         )
 
     if multiaxial_diagnosis.epilepsy_cause_known:
-        # TODO need to include SNOMED here
-        multiaxial_diagnosis.epilepsy_cause = None
+        ecl = '<< 363235000'
+        epilepsy_causes = fetch_ecl(ecl)
+        random_cause = epilepsy_causes[randint(0, len(epilepsy_causes)-1)]
+        multiaxial_diagnosis.epilepsy_cause = random_cause['conceptId']
         total_cause_choices = len(EPILEPSY_CAUSES)
         random_number_of_choices = randint(1, total_cause_choices)
         choices = []
@@ -191,12 +196,16 @@ def create_multiaxial_diagnosis(registration_instance):
     if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
         # add upto 5 comorbidities
         for count_item in range(1, randint(1, 5)):
-            # TODO this is dependent on SNOMED
+            ecl = '<< 35919005'
+            comorbidity_choices = fetch_ecl(ecl)
+            random_comorbidity = comorbidity_choices[randint(
+                0, len(comorbidity_choices)-1)]
+            print(random_comorbidity)
             Comorbidity.objects.create(
                 multiaxial_diagnosis=multiaxial_diagnosis,
                 comorbidity_diagnosis_date=random_date(
                     start=registration_instance.registration_date, end=registration_instance.registration_close_date),
-                comorbidity_diagnosis='Infantile Autism'
+                comorbidity_diagnosis=random_comorbidity['conceptId']
             )
 
     # create a random number of episodes to a maximum of 5
@@ -487,13 +496,13 @@ def create_management(registration_instance):
             getrandbits(1))
         management.individualised_care_plan_includes_general_participation_risk = bool(
             getrandbits(1))
-        management.ndividualised_care_plan_addresses_water_safety = bool(
+        management.individualised_care_plan_addresses_water_safety = bool(
             getrandbits(1))
         management.individualised_care_plan_addresses_sudep = bool(
             getrandbits(1))
         management.individualised_care_plan_includes_ehcp = bool(
             getrandbits(1))
-        management.as_individualised_care_plan_been_updated_in_the_last_year = bool(
+        management.has_individualised_care_plan_been_updated_in_the_last_year = bool(
             getrandbits(1))
         management.has_been_referred_for_mental_health_support = bool(
             getrandbits(1))
