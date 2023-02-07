@@ -13,3 +13,4 @@ from .value_from_key import *
 from .date_functions import *
 from .construct_confirm_email import *
 from .construct_transfer_email import *
+from .random_generator import *

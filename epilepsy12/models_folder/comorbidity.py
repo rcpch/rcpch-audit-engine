@@ -29,11 +29,12 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
     )
 
     comorbidity_diagnosis = models.CharField(
+        # this currently stores a SNOMED conceptId which looks up the preferredTerm in the select
         help_text={
             'label': 'What is the comorbidity?',
             'reference': 'What is the comorbidity?',
         },
-        max_length=50,
+        max_length=250,
         default=None,
         null=True
     )
