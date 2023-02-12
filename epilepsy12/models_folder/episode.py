@@ -80,8 +80,8 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
 
     epilepsy_or_nonepilepsy_status = models.CharField(
         help_text={
-            'label': "Is a diagnosis of epilepsy definite, or uncertain.",
-            'reference': "Is a diagnosis of epilepsy definite, or uncertain.",
+            'label': "Is this episode epileptic, non-epileptic or uncertain?",
+            'reference': "Is this episode epileptic, non-epileptic or uncertain?",
         },
         max_length=3,
         choices=EPILEPSY_DIAGNOSIS_STATUS,
