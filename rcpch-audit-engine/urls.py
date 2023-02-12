@@ -4,6 +4,8 @@ from django.urls import path, include
 
 
 handler403 = 'epilepsy12.views.rcpch_403'
+handler404 = 'epilepsy12.views.rcpch_404'
+handler500 = 'epilepsy12.views.rcpch_500'
 
 
 router = routers.DefaultRouter()

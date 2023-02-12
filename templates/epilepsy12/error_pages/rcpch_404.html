@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="ui container">
+  <div class="ui grid">
+    <div class="twelve wide centered column">
+      <div class="content">
+        <div class="ui icon rcpch_warning message">
+          <i class="exclamation circle icon"></i>
+          <div class="content">
+            <div class="header">404 - Page not found</div>
+            There is no page for this address. Did you come here from a broken
+            link or mistype the address? Follow this link to go back to the
+            <a href="{% url 'index' %}">home page</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+</div>
