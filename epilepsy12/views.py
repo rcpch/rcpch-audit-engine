@@ -819,6 +819,12 @@ def redirect_403(request):
     return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
 
 
+def rcpch_404(request, exception):
+    return render(request, template_name='epilepsy12/error_pages/rcpch_404.html', context={})
+
+def rcpch_500(request):
+    return render(request, template_name='epilepsy12/error_pages/rcpch_500.html', status=500)
+
 """
 Django Rest Framework Viewsets
 """

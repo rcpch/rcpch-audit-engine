@@ -200,7 +200,7 @@ def create_multiaxial_diagnosis(registration_instance):
             comorbidity_choices = fetch_ecl(ecl)
             random_comorbidity = comorbidity_choices[randint(
                 0, len(comorbidity_choices)-1)]
-            print(random_comorbidity)
+            
             Comorbidity.objects.create(
                 multiaxial_diagnosis=multiaxial_diagnosis,
                 comorbidity_diagnosis_date=random_date(

@@ -4,8 +4,7 @@
 # standard imports
 autopep8
 coverage
-pylint
-pylint_django
+black
 pytest
 
 # third party imports
