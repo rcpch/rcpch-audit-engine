@@ -8,3 +8,4 @@ from .investigation_views import *
 from .management_views import *
 from .syndrome_views import *
 from .user_management_views import *
+from .hospital_views import *

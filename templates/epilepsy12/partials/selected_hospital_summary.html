@@ -1,9 +1,9 @@
 {% load static %}
 {% load epilepsy12_template_tags %}
+{% csrf_token %} 
 
 <div class="ui grid container">
     
-
         {% if request.user.is_rcpch_audit_team_member %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -55,6 +55,7 @@
                     </div>
                 </div>
 
+                
                 <div class="ui rcpch_light_blue stackable card">
                     <div class="content">
                         <h2 class='header'>
@@ -104,13 +105,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> 
+                
 
             </div>
     
         </div>
 
 
+        {% comment %} 
         <div class="four wide stackable column">
             {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" pie_size='med' %}
         </div>
@@ -138,7 +141,8 @@
             {% else %}
                 <h5>No data yet!<h5>
             {% endif %}
-        </div>
+        </div> 
+        {% endcomment %}
 
         <div class='sixteen wide right fluid column'>
 
