@@ -10,6 +10,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
 from ..common_view_functions import trigger_client_event, hospital_level_kpis, trust_level_kpis, national_level_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score
+from ..general_functions import value_from_key
 
 
 @login_required
@@ -84,6 +85,7 @@ def hospital_reports(request):
         'total_referred_to_surgery': total_referred_to_surgery,
         'all_models': all_models,
         'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
+        'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
     })
 
 
@@ -193,3 +195,38 @@ def view_preference(request, hospital_id, template_name):
     request.user.save()
 
     return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
+
+
+def selected_trust_select_kpi(request, hospital_id):
+    """
+    POST request from dropdown in selected_hospital_summary.html
+    """
+
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    context = {
+        'kpi_name': request.POST.get('kpi_name'),
+        'kpi_value': value_from_key(key=request.POST.get('kpi_name'), choices=INDIVIDUAL_KPI_MEASURES),
+        'selected_hospital': hospital_trust
+    }
+
+    template_name = 'epilepsy12/partials/hospital/metric.html'
+
+    return render(request=request, template_name=template_name, context=context)
+
+
+def selected_trust_selected_kpi(request, hospital_id, kpi_name):
+    """
+    GET request returning selected kpi for that trust
+    """
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    context = {
+        'selected_hospital': hospital_trust,
+        'kpi_name': kpi_name,
+        'kpi_value': value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
+    }
+
+    template_name = 'epilepsy12/partials/hospital/metric.html'
+
+    return render(request=request, template_name=template_name, context=context)
