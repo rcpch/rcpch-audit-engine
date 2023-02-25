@@ -14,3 +14,4 @@ from .names import *
 from .syndromes import *
 from .focal_seizures import *
 from .non_epilepsy_fields import *
+from .kpi import *
