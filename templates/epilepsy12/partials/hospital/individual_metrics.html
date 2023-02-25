@@ -1,0 +1,7 @@
+<div class="ui container">
+  <p>
+    Within the clinical audit there are 12 'Performance Indicator' measures
+    which are derived from national guidelines and recommendations.
+  </p>
+  {% include 'epilepsy12/partials/page_elements/kpi_select.html' with label='Select a measure' reference="Select one of the 12 measures to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 %}
+</div>

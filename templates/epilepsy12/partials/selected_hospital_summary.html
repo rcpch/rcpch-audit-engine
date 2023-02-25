@@ -140,16 +140,32 @@
             {% endif %}
         </div>
 
-        <div 
-            class="sixteen wide stackable column" 
-            hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
-            hx-trigger="load" hx-swap='innerHTML'
-            hx_indicator='#kpis'
-            hx-target="#kpis">
-            <div id='kpis'>
-                <div class="ui active centered inline loader"></div>
+        <div class='sixteen wide right fluid column'>
+
+            <div class="ui top attached tabular menu" _="init js $('.menu .item').tab();">
+                <a class="active item" data-tab="first">Overview</a>
+                <a class="item" data-tab="second">Individual Measures</a>
             </div>
+
+            <div class="ui bottom attached active tab segment" data-tab="first">
+                <div 
+                    class="sixteen wide stackable column" 
+                    hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
+                    hx-trigger="load" hx-swap='innerHTML'
+                    hx_indicator='#kpis'
+                    hx-target="#kpis">
+                    <div id='kpis'>
+                        <div class="ui active centered inline loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui bottom attached tab segment" data-tab="second">
+                {% include 'epilepsy12/partials/hospital/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
+            </div>
+        
         </div>
+
     
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>

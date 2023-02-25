@@ -1078,11 +1078,11 @@ ul {
   border-radius: 0%;
 }
 
-.ui.rcpch_light_blue.selection.active.dropdown {
+/* .ui.rcpch_light_blue.selection.active.dropdown {
   background: var(--rcpch_pink);
   border-radius: 0%;
   color: white;
-}
+} */
 
 .ui.rcpch_light_blue.fluid.search.selection.dropdown ::-webkit-scrollbar-thumb {
   border-radius: 0%;

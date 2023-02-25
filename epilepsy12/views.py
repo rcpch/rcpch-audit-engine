@@ -325,6 +325,7 @@ def hospital_reports(request):
         'total_referred_to_surgery': total_referred_to_surgery,
         'all_models': all_models,
         'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
+        'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
     })
 
 
@@ -428,10 +429,11 @@ def selected_hospital_summary(request):
         'total_referred_to_paediatrics': total_referred_to_paediatrics,
         'total_referred_to_neurology': total_referred_to_neurology,
         'total_referred_to_surgery': total_referred_to_surgery,
+        'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
     })
 
 
-@login_required
+@ login_required
 def logs(request, hospital_id, epilepsy12_user_id):
     """
     returns logs for given hospital
@@ -452,10 +454,10 @@ def logs(request, hospital_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@ login_required
 def log_list(request, hospital_id, epilepsy12_user_id):
     """
-    GET request to return log table 
+    GET request to return log table
     """
     hospital = HospitalTrust.objects.get(pk=hospital_id)
     epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
@@ -524,7 +526,7 @@ def documentation(request):
 def signup(request, *args, **kwargs):
     """
     Part of the registration process. Signing up for a new account, returns empty form as a GET request
-    or validates the form, creates an account and allocates a group if part of a POST request. It is not possible 
+    or validates the form, creates an account and allocates a group if part of a POST request. It is not possible
     to create a superuser account through this route.
     """
     user = request.user
@@ -822,8 +824,10 @@ def redirect_403(request):
 def rcpch_404(request, exception):
     return render(request, template_name='epilepsy12/error_pages/rcpch_404.html', context={})
 
+
 def rcpch_500(request):
     return render(request, template_name='epilepsy12/error_pages/rcpch_500.html', status=500)
+
 
 """
 Django Rest Framework Viewsets
