@@ -7,11 +7,12 @@ from django.core.management.base import BaseCommand
 
 from ...constants import ETHNICITIES, DUMMY_NAMES
 from ...models import HospitalTrust, Keyword, Case, Site, Registration
-from ...constants import ALL_HOSPITALS, KEYWORDS
+from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from ...common_view_functions import national_level_kpis
 from .create_e12_records import create_epilepsy12_record, create_registrations
+from .add_codes_to_hospitals import add_codes_to_hospital
 
 
 class Command(BaseCommand):
@@ -50,7 +51,9 @@ class Command(BaseCommand):
 
         else:
             self.stdout.write('No options supplied...')
+        print('\033[38;2;17;167;142m')
         self.stdout.write(image())
+        print('\033[38;2;17;167;142m')
         self.stdout.write('done.')
 
 
@@ -86,29 +89,32 @@ def run_hospitals_seed():
     for index, hospital in enumerate(ALL_HOSPITALS):
         if hospital["Sector"] == "NHS Sector":
             hospital_trust = HospitalTrust(
-                OrganisationID=hospital["OrganisationID"],
-                OrganisationCode=hospital["OrganisationCode"],
-                OrganisationType=hospital["OrganisationType"],
-                SubType=hospital["SubType"],
-                Sector=hospital["Sector"],
-                OrganisationStatus=hospital["OrganisationStatus"],
-                IsPimsManaged=hospital["IsPimsManaged"],
-                OrganisationName=hospital["OrganisationName"],
-                Address1=hospital["Address1"],
-                Address2=hospital["Address2"],
-                Address3=hospital["Address3"],
-                City=hospital["City"],
-                County=hospital["County"],
-                Postcode=hospital["Postcode"],
-                Latitude=hospital["Latitude"],
-                Longitude=hospital["Longitude"],
-                ParentODSCode=hospital["ParentODSCode"],
-                ParentName=hospital["ParentName"],
-                Phone=hospital["Phone"],
-                Email=hospital["Email"],
-                Website=hospital["Website"],
-                Fax=hospital["Fax"]
+                OrganisationID=hospital.get("OrganisationCode"),
+                OrganisationCode=hospital.get("OrganisationCode", None),
+                OrganisationType=hospital.get("OrganisationType", None),
+                SubType=hospital.get("SubType", None),
+                Sector=hospital.get("Sector", None),
+                OrganisationStatus=hospital.get("OrganisationStatus", None),
+                IsPimsManaged=hospital.get("IsPimsManaged", None),
+                OrganisationName=hospital.get("OrganisationName", None),
+                Address1=hospital.get("Address1", None),
+                Address2=hospital.get("Address2", None),
+                Address3=hospital.get("Address3", None),
+                City=hospital.get("City", None),
+                County=hospital.get("County", None),
+                Postcode=hospital.get("Postcode", None),
+                Latitude=hospital.get("Latitude", None),
+                Longitude=hospital.get("Longitude", None),
+                ParentODSCode=hospital.get("ParentODSCode", None),
+                ParentName=hospital.get("ParentName", None),
+                Phone=hospital.get("Phone", None),
+                Email=hospital.get("Email", None),
+                Website=hospital.get("Website", None),
+                Fax=hospital.get("Fax", None),
+                DateValid=date(2023, 1, 1)
             )
+
+            add_codes_to_hospital(hospital_trust=hospital_trust)
 
             try:
                 hospital_trust.save()
@@ -117,8 +123,51 @@ def run_hospitals_seed():
                 print(error)
             added += 1
             chosen_hospital = hospital["OrganisationName"]
-            print(f"New hospital added...{added}: {chosen_hospital}")
-    print(f"Hospitals added...{added}")
+            print(
+                '\033[31m', f"New English hospital added...{added}: {chosen_hospital}", '\033[31m')
+    print(f"English Hospitals added...{added}")
+
+    added = 0
+
+    for index, hospital in enumerate(WELSH_HOSPITALS):
+        try:
+            welsh_hospital = HospitalTrust(
+                OrganisationID=hospital.get("OrganisationCode", 1000000+index),
+                OrganisationCode=hospital.get(
+                    "OrganisationCode", None),
+                OrganisationType=hospital.get("OrganisationType", None),
+                SubType=hospital.get("SubType", None),
+                Sector=hospital.get("Sector", None),
+                OrganisationStatus=hospital.get("OrganisationStatus", None),
+                IsPimsManaged=hospital.get("IsPimsManaged", None),
+                OrganisationName=hospital.get("OrganisationName", None),
+                Address1=hospital.get("Address1", None),
+                Address2=hospital.get("Address2", None),
+                Address3=hospital.get("Address3", None),
+                City=hospital.get("City", None),
+                County=hospital.get("County", None),
+                Postcode=hospital.get("Postcode", None),
+                Latitude=hospital.get("Latitude", None),
+                Longitude=hospital.get("Longitude", None),
+                ParentODSCode=hospital.get("ParentODSCode", None),
+                ParentName=hospital.get("ParentName", None),
+                Phone=hospital.get("Phone", None),
+                Email=hospital.get("Email", None),
+                Website=hospital.get("Website", None),
+                Fax=hospital.get("Fax", None),
+                DateValid=date(2023, 1, 1)
+            )
+            welsh_hospital.save()
+            print(
+                '\033[94m', f"New Welsh hospital added...{added}: {welsh_hospital.OrganisationName}({welsh_hospital.ParentName})", '\033[94m')
+            added += 1
+
+            add_codes_to_hospital(welsh_hospital)
+
+        except Exception as error:
+            print("Exception creating "+hospital["OrganisationName"])
+
+    print(f"Welsh Hospitals added...{added}")
 
 
 def delete_hospitals():
