@@ -241,12 +241,6 @@ def selected_trust_selected_kpi(request, hospital_id, kpi_name):
     """
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
 
-    # for organisation in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES:
-    #     if HospitalTrust.objects.filter(ParentODSCode=organisation["ODS Trust Code"]).exists():
-    #         for hospital in HospitalTrust.objects.filter(ParentODSCode=organisation["ODS Trust Code"]):
-    #             print(
-    #                 f"{hospital.OrganisationName} ({hospital.ParentName} - {hospital.ParentODSCode})")
-
     context = {
         'selected_hospital': hospital_trust,
         'kpi_name': kpi_name,
