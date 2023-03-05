@@ -9,7 +9,7 @@ from django_htmx.http import HttpResponseClientRedirect
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
-from ..common_view_functions import trigger_client_event, hospital_level_kpis, trust_level_kpis, national_level_kpis, kpis_for_abstraction_level, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score
+from ..common_view_functions import trigger_client_event, kpis_for_abstraction_level, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score
 from ..general_functions import value_from_key
 
 
@@ -138,24 +138,21 @@ def selected_trust_kpis(request, hospital_id):
     """
     HTMX get request returning trust_level_kpi.html partial
     """
-    # trust_kpis = trust_level_kpis(hospital_id=hospital_id)
-    # national_kpis = national_level_kpis()
-    # hospital_kpis = hospital_level_kpis(hospital_id=hospital_id)
 
     hospital_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level='hospital')
+        hospital_id=hospital_id, abstraction_level='hospital', kpi_name='all')
     trust_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level='trust')
+        hospital_id=hospital_id, abstraction_level='trust', kpi_name='all')
     icb_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level='icb')
+        hospital_id=hospital_id, abstraction_level='icb', kpi_name='all')
     nhs_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level="nhs_region")
+        hospital_id=hospital_id, abstraction_level="nhs_region", kpi_name='all')
     open_uk_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level="open_uk")
+        hospital_id=hospital_id, abstraction_level="open_uk", kpi_name='all')
     country_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level="country")
+        hospital_id=hospital_id, abstraction_level="country", kpi_name='all')
     national_kpis = kpis_for_abstraction_level(
-        hospital_id=hospital_id, abstraction_level='national')
+        hospital_id=hospital_id, abstraction_level='national', kpi_name='all')
 
     # create an empty instance of KPIs to access the labels
     hospital_organisation = HospitalTrust.objects.get(pk=hospital_id)
@@ -223,28 +220,46 @@ def selected_trust_select_kpi(request, hospital_id):
     """
 
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    kpi_name = request.POST.get('kpi_name')
+    if kpi_name is None:
+        # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
+        kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
+    kpi_value = value_from_key(
+        key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
+
+    hospital_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level='hospital', kpi_name=kpi_name)
+    trust_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level='trust', kpi_name=kpi_name)
+    icb_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level='icb', kpi_name=kpi_name)
+    nhs_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level="nhs_region", kpi_name=kpi_name)
+    open_uk_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level="open_uk", kpi_name=kpi_name)
+    country_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level="country", kpi_name=kpi_name)
+    national_kpi = kpis_for_abstraction_level(
+        hospital_id=hospital_id, abstraction_level='national', kpi_name=kpi_name)
 
     context = {
-        'kpi_name': request.POST.get('kpi_name'),
-        'kpi_value': value_from_key(key=request.POST.get('kpi_name'), choices=INDIVIDUAL_KPI_MEASURES),
-        'selected_hospital': hospital_trust
-    }
-
-    template_name = 'epilepsy12/partials/hospital/metric.html'
-
-    return render(request=request, template_name=template_name, context=context)
-
-
-def selected_trust_selected_kpi(request, hospital_id, kpi_name):
-    """
-    GET request returning selected kpi for that trust
-    """
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
-
-    context = {
-        'selected_hospital': hospital_trust,
         'kpi_name': kpi_name,
-        'kpi_value': value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
+        'kpi_value': kpi_value,
+        'selected_hospital': hospital_trust,
+        'hospital_kpi': hospital_kpi[kpi_name],
+        'total_hospital_kpi_cases': hospital_kpi['total_number_of_cases'],
+        'trust_kpi': trust_kpi[kpi_name],
+        'total_trust_kpi_cases': trust_kpi['total_number_of_cases'],
+        'icb_kpi': icb_kpi[kpi_name],
+        'total_icb_kpi_cases': icb_kpi['total_number_of_cases'],
+        'nhs_kpi': nhs_kpi[kpi_name],
+        'total_nhs_kpi_cases': nhs_kpi['total_number_of_cases'],
+        'open_uk_kpi': open_uk_kpi[kpi_name],
+        'total_open_uk_kpi_cases': open_uk_kpi['total_number_of_cases'],
+        'country_kpi': country_kpi[kpi_name],
+        'total_country_kpi_cases': country_kpi['total_number_of_cases'],
+        'national_kpi': national_kpi[kpi_name],
+        'total_national_kpi_cases': national_kpi['total_number_of_cases'],
     }
 
     template_name = 'epilepsy12/partials/hospital/metric.html'

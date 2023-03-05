@@ -31,6 +31,8 @@ def add_codes_to_hospital(hospital_trust: HospitalTrust):
         hospital_trust.SubICBName = parent_codes["Sub ICB Locations (formerly CCGs)"]
         hospital_trust.SubICBODSCode = parent_codes["ODS Sub ICB Code"]
 
+        hospital_trust.Country = "England"
+
         # get the nhs region ONS code
         nhs_region = next(
             (item for item in NHS_ENGLAND_REGIONS if item["NHS_ENGLAND_REGION_CODE"] == parent_codes["NHS England Region Code"]), None)

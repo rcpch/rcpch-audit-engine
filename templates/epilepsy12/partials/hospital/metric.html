@@ -1,2 +1,74 @@
-<h1>Selected KPI</h1>
-<h1>{{kpi_value}}</h1>
+{% load static %}
+{% load epilepsy12_template_tags %}
+{% csrf_token %} 
+
+<div class='ui grid container'>
+    
+    <div class="four wide stackable bottom aligned column">
+        {% percentage_of_total hospital_kpi total_hospital_kpi_cases as total_percent %}
+        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent numerator=hospital_kpi denominator=total_hospital_kpi_cases title=selected_hospital.OrganisationName pie_size='med' %}
+    </div>
+    
+    <div class="four wide stackable bottom aligned column">
+        {% if total_trust_kpi_cases is not None and total_trust_kpi_cases > 0 %}
+            {% percentage_of_total trust_kpi total_trust_kpi_cases as total_percent %}
+            {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_hospital.ParentName numerator=trust_kpi denominator=total_trust_kpi_cases pie_size='med' %}
+        {% else %}
+            <h5>No data yet!<h5>
+        {% endif %}
+    </div>
+
+    {% if selected_hospital.ICBODSCode %}
+        <div class="four wide stackable bottom aligned column">
+            {% if total_icb_kpi_cases is not None and total_icb_kpi_cases > 0 %}
+                {% percentage_of_total icb_kpi total_icb_kpi_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_hospital.ICBName numerator=icb_kpi denominator=total_icb_kpi_cases pie_size='med' %}
+            {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if selected_hospital.NHSEnglandRegionCode %}
+        <div class="four wide stackable bottom aligned column">
+            {% if total_nhs_kpi_cases is not None and total_nhs_kpi_cases > 0 %}
+                {% percentage_of_total nhs_kpi total_nhs_kpi_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_hospital.NHSEnglandRegion numerator=nhs_kpi denominator=total_nhs_kpi_cases pie_size='med' %}
+                {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% if selected_hospital.OPENUKNetworkCode %}
+        <div class="four wide stackable bottom aligned column">
+            {% if total_open_uk_kpi_cases is not None and total_open_uk_kpi_cases > 0 %}
+                {% percentage_of_total open_uk_kpi total_open_uk_kpi_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_hospital.OPENUKNetworkName numerator=open_uk_kpi denominator=total_open_uk_kpi_cases pie_size='med' %}
+            {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+    {% endif %}
+        
+    {% if selected_hospital.CountryONSCode %}
+        <div class="four wide stackable bottom aligned column">
+            {% if total_nhs_kpi_cases is not None and total_nhs_kpi_cases > 0 %}
+                {% percentage_of_total country_kpi total_country_kpi_cases as total_percent %}
+                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_hospital.Country numerator=country_kpi denominator=total_country_kpi_cases pie_size='med' %}
+            {% else %}
+                <h5>No data yet!<h5>
+            {% endif %}
+        </div>
+        {% endif %}
+    
+    <div class="four wide stackable bottom aligned column">
+        {% if total_national_kpi_cases is not None and total_national_kpi_cases > 0 %}
+            {% percentage_of_total national_kpi total_national_kpi_cases as total_percent %}
+            {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="UK" numerator=national_kpi denominator=total_national_kpi_cases pie_size='med' %}
+        {% else %}
+            <h5>No data yet!<h5>
+        {% endif %}
+    </div>
+    
+</div>

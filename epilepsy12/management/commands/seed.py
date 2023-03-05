@@ -10,7 +10,7 @@ from ...models import HospitalTrust, Keyword, Case, Site, Registration
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
-from ...common_view_functions import national_level_kpis
+from ...common_view_functions import kpis_for_abstraction_level
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from .add_codes_to_hospitals import add_codes_to_hospital
 
@@ -265,7 +265,7 @@ def complete_registrations():
         create_epilepsy12_record(registration_instance=registration)
 
     # calculate national level kpis
-    national_level_kpis()
+    kpis_for_abstraction_level()
 
 
 def image():
