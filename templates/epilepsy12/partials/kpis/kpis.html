@@ -7,7 +7,7 @@
                 <div class='content'>
                     Real-time KPI Metrics
                     <div class="sub header">
-                    {{hospital_organisation.OrganisationName}} ({{ trust_kpis.parent_trust }})
+                    {{hospital_organisation.OrganisationName}} ({{ hospital_organisation.ParentName }})
                     </div>    
                 </div>
                 <button 
@@ -24,12 +24,12 @@
 
         <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
-            <div class="ui rcpch segment">
+            {% comment %} <div class="ui rcpch segment"> {% endcomment %}
                 <h3>Clinical Team</h3>
                 <table class='ui rcpch table'>
                     <thead>
                         <tr>
-                            <th class='seven wide'>Indicator</th>
+                            <th class='five wide'>Indicator</th>
                             <th class='right aligned'>
                                 Hospital 
                                 <i 
@@ -53,6 +53,50 @@
                                 ></i>({{trust_kpis.total_number_of_cases}})
                             </th>
                             <th class='right aligned'>
+                                Integrated Care Board
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_isb'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered in this Integrated Care Board."
+                                    data-position='top right'
+                                    _="init js $('#totals_icb').popup(); end"
+                                ></i>({{icb_kpis.total_number_of_cases}})
+                            </th>
+                            <th class='right aligned'>
+                                NHS Region
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_nhs'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered in this NHS Region."
+                                    data-position='top right'
+                                    _="init js $('#totals_nhs').popup(); end"
+                                ></i>({{nhs_kpis.total_number_of_cases}})
+                            </th>
+                            <th class='right aligned'>
+                                OPEN UK Region
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_open_uk'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered in this OPEN UK Region."
+                                    data-position='top right'
+                                    _="init js $('#totals_open_uk').popup(); end"
+                                ></i>({{open_uk_kpis.total_number_of_cases}})
+                            </th>
+                            <th class='right aligned'>
+                                Country
+                                <i 
+                                    class="info circle icon"
+                                    id='totals_country'
+                                    data-title='Epilepsy12 totals'
+                                    data-content="Number of children registered in this country."
+                                    data-position='top right'
+                                    _="init js $('#totals_country').popup(); end"
+                                ></i>({{country_kpis.total_number_of_cases}})
+                            </th>
+                            <th class='right aligned'>
                                 National
                                 <i 
                                     class="info circle icon"
@@ -69,6 +113,10 @@
                         <tr>
                             {% percentage_of_total hospital_kpis.paediatrician_with_expertise_in_epilepsies hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.paediatrician_with_expertise_in_epilepsies trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.paediatrician_with_expertise_in_epilepsies icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.paediatrician_with_expertise_in_epilepsies nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.paediatrician_with_expertise_in_epilepsies open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.paediatrician_with_expertise_in_epilepsies country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.paediatrician_with_expertise_in_epilepsies national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -80,11 +128,19 @@
                                 _="init js $('#paediatrician_with_expertise_in_epilepsies').popup(); end">
                                 {{trust_kpis.tertiary_input|icon_for_score}} {% none_percentage national_percentage %}</td>
                             </td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.epilepsy_specialist_nurse hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.epilepsy_specialist_nurse trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.epilepsy_specialist_nurse icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.epilepsy_specialist_nurse nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.epilepsy_specialist_nurse open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.epilepsy_specialist_nurse country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.epilepsy_specialist_nurse national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_epilepsy_specialist_nurse_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -92,6 +148,10 @@
                                 data-content="{{kpis.get_epilepsy_specialist_nurse_help_reference_text}}"
                                 data-position='top right' _="init js $('#epilepsy_specialist_nurse').popup(); end">
                                 {{trust_kpis.epilepsy_specialist_nurse|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
@@ -104,11 +164,19 @@
                             data-content="{{kpis.get_tertiary_input_help_reference_text}}"
                             data-position='top right' _="init js $('#tertiary_input').popup(); end">
                             {{trust_kpis.tertiary_input|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.epilepsy_surgery_referral hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.epilepsy_surgery_referral trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.epilepsy_surgery_referral icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.epilepsy_surgery_referral nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.epilepsy_surgery_referral open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.epilepsy_surgery_referral country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.epilepsy_surgery_referral national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_epilepsy_surgery_referral_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -116,6 +184,10 @@
                                 data-content="{{kpis.get_epilepsy_surgery_referral_help_reference_text}}"
                                 data-position='top right' _="init js $('#epilepsy_surgery_referral').popup(); end">
                                 {{trust_kpis.epilepsy_surgery_referral|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                     </tbody>
@@ -125,9 +197,13 @@
                 <table class='ui rcpch table'>
                     <thead>
                         <tr>
-                            <th class='seven wide'>Indicator</th>
+                            <th class='five wide'>Indicator</th>
                             <th class='right aligned'>Hospital</th>
                             <th class='right aligned'>Trust</th>
+                            <th class='right aligned'>Integrated Care Board</th>
+                            <th class='right aligned'>NHS Region</th>
+                            <th class='right aligned'>OPEN UK Region</th>
+                            <th class='right aligned'>Country</th>
                             <th class='right aligned'>National</th>
                         </tr>
                     </thead>
@@ -135,6 +211,10 @@
                         <tr>
                             {% percentage_of_total hospital_kpis.ecg hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.ecg trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.ecg icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.ecg nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.ecg open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.ecg country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.ecg national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_ecg_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -142,11 +222,19 @@
                                 data-content="{{kpis.get_ecg_help_reference_text}}"
                                 data-position='top right' _="init js $('#ecg').popup(); end">
                                 {{trust_kpis.ecg|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.mri hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.mri trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.mri icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.mri nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.mri open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.mri country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.mri national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_mri_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -154,6 +242,10 @@
                                 data-content="{{kpis.get_mri_help_reference_text}}"
                                 data-position='top right' _="init js $('#mri').popup(); end">
                                 {{trust_kpis.mri|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                     </tbody>
@@ -163,9 +255,13 @@
                 <table class='ui rcpch table'>
                     <thead>
                         <tr>
-                            <th class='seven wide'>Indicator</th>
+                            <th class='five wide'>Indicator</th>
                             <th class='right aligned'>Hospital</th>
                             <th class='right aligned'>Trust</th>
+                            <th class='right aligned'>Integrated Care Board</th>
+                            <th class='right aligned'>NHS Region</th>
+                            <th class='right aligned'>OPEN UK Region</th>
+                            <th class='right aligned'>Country</th>
                             <th class='right aligned'>National</th>
                         </tr>
                     </thead>
@@ -173,6 +269,10 @@
                         <tr>
                             {% percentage_of_total hospital_kpis.assessment_of_mental_health_issues hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.assessment_of_mental_health_issues trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.assessment_of_mental_health_issues icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.assessment_of_mental_health_issues nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.assessment_of_mental_health_issues open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.assessment_of_mental_health_issues country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.assessment_of_mental_health_issues national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_assessment_of_mental_health_issues_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -181,11 +281,19 @@
                                 data-content="{{kpis.get_assessment_of_mental_health_issues_help_reference_text}}"
                                 data-position='top right' _="init js $('#assessment_of_mental_health_issues').popup(); end">
                                 {{trust_kpis.assessment_of_mental_health_issues|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.mental_health_support hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.mental_health_support trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.mental_health_support icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.mental_health_support nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.mental_health_support open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.mental_health_support country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.mental_health_support national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{trust_kpis.get_mental_health_support_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -193,6 +301,10 @@
                                 data-content="{{kpis.get_mental_health_support_help_reference_text}}"
                                 data-position='top right' _="init js $('#mental_health_support').popup(); end">
                                 {{trust_kpis.mental_health_support|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                     </tbody>
@@ -202,9 +314,13 @@
                 <table class='ui rcpch table'>
                     <thead>
                         <tr>
-                            <th class='seven wide'>Indicator</th>
+                            <th class='five wide'>Indicator</th>
                             <th class='right aligned'>Hospital</th>
                             <th class='right aligned'>Trust</th>
+                            <th class='right aligned'>Integrated Care Board</th>
+                            <th class='right aligned'>NHS Region</th>
+                            <th class='right aligned'>OPEN UK Region</th>
+                            <th class='right aligned'>Country</th>
                             <th class='right aligned'>National</th>
                         </tr>
                     </thead>
@@ -212,6 +328,10 @@
                         <tr>
                             {% percentage_of_total hospital_kpis.comprehensive_care_planning_agreement hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.comprehensive_care_planning_agreement trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.comprehensive_care_planning_agreement icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.comprehensive_care_planning_agreement nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.comprehensive_care_planning_agreement open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.comprehensive_care_planning_agreement country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.comprehensive_care_planning_agreement national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_comprehensive_care_planning_agreement_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -220,11 +340,19 @@
                                 data-content="{{kpis.get_comprehensive_care_planning_agreement_help_reference_text}}"
                                 data-position='top right' _="init js $('#comprehensive_care_planning_agreement').popup(); end">
                                 {{trust_kpis.comprehensive_care_planning_agreement|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.patient_held_individualised_epilepsy_document hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.patient_held_individualised_epilepsy_document trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.patient_held_individualised_epilepsy_document icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.patient_held_individualised_epilepsy_document nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.patient_held_individualised_epilepsy_document open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.patient_held_individualised_epilepsy_document country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.patient_held_individualised_epilepsy_document national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_patient_held_individualised_epilepsy_document_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -234,11 +362,19 @@
                                 data-position='top right'
                                 _="init js $('#patient_held_individualised_epilepsy_document').popup(); end">
                                 {{trust_kpis.patient_held_individualised_epilepsy_document|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total trust_kpis.care_planning_has_been_updated_when_necessary trust_kpis.total_number_of_cases as trust_percentage %}
                             {% percentage_of_total trust_kpis.care_planning_has_been_updated_when_necessary trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.care_planning_has_been_updated_when_necessary icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.care_planning_has_been_updated_when_necessary nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.care_planning_has_been_updated_when_necessary open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.care_planning_has_been_updated_when_necessary country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.care_planning_has_been_updated_when_necessary national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_care_planning_has_been_updated_when_necessary_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -248,11 +384,19 @@
                                 data-position='top right'
                                 _="init js $('#care_planning_has_been_updated_when_necessary').popup(); end">
                                 {{trust_kpis.care_planning_has_been_updated_when_necessary|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.comprehensive_care_planning_content hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.comprehensive_care_planning_content trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.comprehensive_care_planning_content icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.comprehensive_care_planning_content nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.comprehensive_care_planning_content open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.comprehensive_care_planning_content country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.comprehensive_care_planning_content national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_comprehensive_care_planning_content_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -261,11 +405,19 @@
                                 data-content="{{audit_procomprehensive_care_planning_contentiary_input_help_reference_text}}"
                                 data-position='top right' _="init js $('#comprehensive_care_planning_content').popup(); end">
                                 {{trust_kpis.comprehensive_care_planning_content|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.parental_prolonged_seizures_care_plan hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.parental_prolonged_seizures_care_plan trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.parental_prolonged_seizures_care_plan icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.parental_prolonged_seizures_care_plan nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.parental_prolonged_seizures_care_plan open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.parental_prolonged_seizures_care_plan country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.parental_prolonged_seizures_care_plan national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_parental_prolonged_seizures_care_plan_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -274,11 +426,19 @@
                                 data-content="{{kpis.get_parental_prolonged_seizures_care_plan_help_reference_text}}"
                                 data-position='top right' _="init js $('#parental_prolonged_seizures_care_plan').popup(); end">
                                 {{trust_kpis.parental_prolonged_seizures_care_plan|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.water_safety hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.water_safety trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.water_safety icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.water_safety nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.water_safety open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.water_safety country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.water_safety national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_water_safety_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -286,11 +446,19 @@
                                 data-content="{{kpis.get_water_safety_help_reference_text}}"
                                 data-position='top right' _="init js $('#water_safety').popup(); end">
                                 {{trust_kpis.water_safety|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.first_aid hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.first_aid trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.first_aid icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.first_aid nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.first_aid open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.first_aid country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.first_aid national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_first_aid_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -298,11 +466,19 @@
                                 data-content="{{kpis.get_first_aid_help_reference_text}}"
                                 data-position='top right' _="init js $('#first_aid').popup(); end">
                                 {{trust_kpis.first_aid|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.general_participation_and_risk hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.general_participation_and_risk trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.general_participation_and_risk icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.general_participation_and_risk nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.general_participation_and_risk open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.general_participation_and_risk country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.general_participation_and_risk national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_general_participation_and_risk_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -311,11 +487,19 @@
                                 data-content="{{kpis.get_general_participation_and_risk_help_reference_text}}"
                                 data-position='top right' _="init js $('#general_participation_and_risk').popup(); end">
                                 {{trust_kpis.general_participation_and_risk|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.service_contact_details hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.service_contact_details trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.service_contact_details icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.service_contact_details nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.service_contact_details open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.service_contact_details country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.service_contact_details national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_service_contact_details_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -323,11 +507,19 @@
                                 data-content="{{kpis.service_contact_details.get_service_contact_details_help_reference_text}}"
                                 data-position='top right' _="init js $('#service_contact_details').popup(); end">
                                 {{trust_kpis.service_contact_details|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.sudep hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.sudep trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.sudep icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.sudep nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.sudep open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.sudep country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.sudep national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_sudep_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -335,11 +527,19 @@
                                 data-content="{{kpis.get_sudep_help_reference_text}}"
                                 data-position='top right' _="init js $('#sudep').popup(); end">
                                 {{trust_kpis.sudep|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.school_individual_healthcare_plan hospital_kpis.total_number_of_cases as hospital_percentage %}
                             {% percentage_of_total trust_kpis.school_individual_healthcare_plan trust_kpis.total_number_of_cases as trust_percentage %}
+                            {% percentage_of_total icb_kpis.school_individual_healthcare_plan icb_kpis.total_number_of_cases as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.school_individual_healthcare_plan nhs_kpis.total_number_of_cases as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.school_individual_healthcare_plan open_uk_kpis.total_number_of_cases as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.school_individual_healthcare_plan country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.school_individual_healthcare_plan national_kpis.total_number_of_cases as national_percentage %}
                             <td>{{kpis.get_school_individual_healthcare_plan_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
@@ -348,12 +548,16 @@
                                 data-content="{{kpis.get_school_individual_healthcare_plan_help_reference_text}}"
                                 data-position='top right' _="init js $('#school_individual_healthcare_plan').popup(); end">
                                 {{trust_kpis.school_individual_healthcare_plan|icon_for_score}} {% none_percentage national_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}</td>
                         </tr>
                     </tbody>
                 </table>
 
-            </div>
+            {% comment %} </div> {% endcomment %}
 
         </div>
 

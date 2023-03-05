@@ -1,63 +1,54 @@
-{% extends "base.html" %} 
-{% load static %} 
-{% load epilepsy12_template_tags %}
-{% csrf_token %} 
-{% block content %}
+{% extends "base.html" %} {% load static %} {% load epilepsy12_template_tags %}
+{% csrf_token %} {% block content %}
 <div class="ui rcpch container">
-  
   <div id="rcpch_hospital_select">
     {% include 'epilepsy12/partials/selected_hospital_summary.html' with hospital_list=hospital_list selected_hospital=selected_hospital hospital_list=hospital_list cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity cases_aggregated_by_sex=cases_aggregated_by_sex cases_aggregated_by_deprivation=cases_aggregated_by_deprivation percent_completed_registrations=percent_completed_registrations total_registrations=total_registrations total_cases=total_cases total_referred_to_paediatrics=total_referred_to_paediatrics total_referred_to_neurology=total_referred_to_neurology total_referred_to_surgery=total_referred_to_surgery %}
   </div>
-  
 
   {% if request.user|has_group:'epilepsy12_audit_team_full_access' %}
-    <div class="row" id="frida_button">
-        {% include 'epilepsy12/partials/frida_button.html' with model_list=model_list selected_model=selected_model %}
-    </div>
+  <div class="row" id="frida_button">
+    {% include 'epilepsy12/partials/frida_button.html' with
+    model_list=model_list selected_model=selected_model %}
+  </div>
   {% endif %}
 
+  <div class="ui rcpch container">
+      <div class="sixteen wide column">
+            <div class="ui inverted segment" id="chat">
+                <h5 class="header">Activity</h5>
 
-    <div class='sixteen wide column'>
+                <div class="ui feed">
+                {% if all_models|length > 0%} {% for model in all_models %}
 
-        <div class="ui inverted segment" id="chat">
-            
-            <h5 class="header">Activity</h5>
-
-            <div class="ui feed">
-                {% if all_models|length > 0%} 
-                    {% for model in all_models %}
-
-                    <div class="event">
-                        <div class="label">
-                            <div class="rcpch_circle">
-                                <img src='{% static "images/rcpch-logo.jpg" %}' />
-                            </div>
-                        </div>
-                        <div class="content">
-                            <div class="summary">
-                                {{model.updated_by}} updated a record in {{model|to_class_name}} for {{model|return_case}}
-                                <div class="date">{{model.updated_at}}</div>
-                            </div>
-                            <div class="meta">
-                                <a class="like"> <i class="like icon"></i> 4 Likes </a>
-                            </div>
-                        </div>
+                <div class="event">
+                    <div class="label">
+                    <div class="rcpch_circle">
+                        <img src='{% static "images/rcpch-logo.jpg" %}' />
                     </div>
+                    </div>
+                    <div class="content">
+                    <div class="summary">
+                        {{model.updated_by}} updated a record in {{model|to_class_name}}
+                        for {{model|return_case}}
+                        <div class="date">{{model.updated_at}}</div>
+                    </div>
+                    <div class="meta">
+                        <a class="like"> <i class="like icon"></i> 4 Likes </a>
+                    </div>
+                    </div>
+                </div>
 
-                    {% endfor %} 
-                {% else %}
+                {% endfor %} {% else %}
 
-                    <div class="ui rcpch_info message">
+                <div class="ui rcpch_info message">
                     No one has made any changes yet...
-                    </div>
+                </div>
 
                 {% endif %}
+                </div>
             </div>
-
         </div>
-
     </div>
-    
 </div>
 
 {% endblock content %}
