@@ -1,19 +1,20 @@
-
+{% csrf_token %} 
 <div class="ui container">
   <p>
     Within the clinical audit there are 12 'Performance Indicator' measures
     which are derived from national guidelines and recommendations.
-    {{selected_kpi.ecg}}
   </p>
-  {% url "selected_trust_select_kpi" hospital_id=selected_hospital.pk as hx_post %}
+  {% url "selected_trust_select_kpi" hospital_id=selected_hospital.pk as hx_post %} 
   {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_selected_kpi' hx_trigger='change' hx_swap='innerHTML' label='Select a measure' reference="Select one of the 12 measures to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
   <div
     id="selected_trust_selected_kpi"
-    hx-get="{% url 'selected_trust_selected_kpi' hospital_id=selected_hospital.pk kpi_name=individual_kpi_choices.0.0 %}"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    hx-post="{% url 'selected_trust_select_kpi' hospital_id=selected_hospital.pk %}"
     hx-target="#selected_trust_selected_kpi"
-    hx-swap="innerHTML"
-    hx-trigger="load"
+    hx-swap="outerHTML"
+    hx-trigger="change, load"
+    hx_indicator='#selected_trust_selected_kpi'
   >
-  <div></div>
+   
   </div>
 </div>
