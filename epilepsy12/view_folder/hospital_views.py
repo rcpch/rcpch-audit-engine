@@ -7,7 +7,7 @@ from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
-from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE
+from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
 from ..common_view_functions import trigger_client_event, hospital_level_kpis, trust_level_kpis, national_level_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score
 from ..general_functions import value_from_key
@@ -220,6 +220,12 @@ def selected_trust_selected_kpi(request, hospital_id, kpi_name):
     GET request returning selected kpi for that trust
     """
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+
+    # for organisation in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES:
+    #     if HospitalTrust.objects.filter(ParentODSCode=organisation["ODS Trust Code"]).exists():
+    #         for hospital in HospitalTrust.objects.filter(ParentODSCode=organisation["ODS Trust Code"]):
+    #             print(
+    #                 f"{hospital.OrganisationName} ({hospital.ParentName} - {hospital.ParentODSCode})")
 
     context = {
         'selected_hospital': hospital_trust,
