@@ -295,12 +295,15 @@
                             {% percentage_of_total open_uk_kpis.mental_health_support open_uk_kpis.total_number_of_cases as open_uk_percentage %}
                             {% percentage_of_total country_kpis.mental_health_support country_kpis.total_number_of_cases as country_percentage %}
                             {% percentage_of_total national_kpis.mental_health_support national_kpis.total_number_of_cases as national_percentage %}
-                            <td>{{trust_kpis.get_mental_health_support_help_label_text}}</td>
+                            <td>{{kpis.get_mental_health_support_help_label_text}}</td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %}</td>
-                            <td class='right aligned' id='mental_health_support' data-title='Mental health support'
+                            <td class='right aligned' 
+                                id='mental_health_support' 
+                                data-title='Mental health support'
                                 data-content="{{kpis.get_mental_health_support_help_reference_text}}"
                                 data-position='top right' _="init js $('#mental_health_support').popup(); end">
-                                {{trust_kpis.mental_health_support|icon_for_score}} {% none_percentage national_percentage %}</td>
+                                {{trust_kpis.mental_health_support|icon_for_score}} {% none_percentage national_percentage %}
+                            </td>
                             <td class='right aligned'>{% none_percentage icb_percentage %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %}</td>
                             <td class='right aligned'>{% none_percentage open_uk_percentage %}</td>

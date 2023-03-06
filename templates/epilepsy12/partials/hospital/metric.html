@@ -3,7 +3,7 @@
 {% csrf_token %} 
 
 <div class='ui grid container'>
-    
+
     <div class="four wide stackable bottom aligned column">
         {% percentage_of_total hospital_kpi total_hospital_kpi_cases as total_percent %}
         {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent numerator=hospital_kpi denominator=total_hospital_kpi_cases title=selected_hospital.OrganisationName pie_size='med' %}
@@ -70,5 +70,26 @@
             <h5>No data yet!<h5>
         {% endif %}
     </div>
+
+    {% comment %} <div class='sixteen wide right fluid column'>
+
+        <div class="ui rcpch_light_blue fluid card">
+            <div class="content">
+                <h2 class='header'>
+                Ranking
+                </h2>
+                <div class='description'>
+                    <div id="kpi_ranking" class="ui rcpch_chart_container stackable segment">
+                        {% if ranked|length > 0 %}
+                        {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with ranked=ranked series_name=kpi_value %}
+                        {% else %}
+                            <h5>No data yet!<h5>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     
+    </div> {% endcomment %}
+
 </div>
