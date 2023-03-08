@@ -922,7 +922,7 @@ ul {
 
 .rcpch_pie_label {
   color: var(--rcpch_dark_grey);
-  font-family: 'Montserrat';
+  font-family: Montserrat-Regular;
   font-weight: bold;
   font-size: small;
   padding: 5px;
@@ -1370,10 +1370,10 @@ img.ui.spaced.avatar.image{
 
 .ui.statistic .value {
   color: var(--rcpch_light_blue);
-  font-family: 'Montserrat';
+  font-family: Montserrat-Regular;
 }
 
 .ui.statistic div.label {
-  font-family: 'Montserrat';
+  font-family: Montserrat-Regular;
   color: var(--rcpch_charcoal);
 }
