@@ -10,7 +10,6 @@ from ...models import HospitalTrust, Keyword, Case, Site, Registration
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
-from ...common_view_functions import kpis_for_abstraction_level
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from .add_codes_to_hospitals import add_codes_to_hospital
 
@@ -28,6 +27,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_hospitals'):
             self.stdout.write('seeding hospital trust data...')
             run_hospitals_seed()
+        elif (options['mode'] == 'seed_welsh_hospitals'):
+            self.stdout.write('seeding hospital trust data...')
+            run_welsh_hospitals_seed()
         elif (options['mode'] == 'seed_semiology_keywords'):
             self.stdout.write('seeding hospital trust data...')
             run_semiology_keywords_seed()
@@ -89,7 +91,7 @@ def run_hospitals_seed():
     for index, hospital in enumerate(ALL_HOSPITALS):
         if hospital["Sector"] == "NHS Sector":
             hospital_trust = HospitalTrust(
-                OrganisationID=hospital.get("OrganisationCode"),
+                OrganisationID=hospital.get("OrganisationID"),
                 OrganisationCode=hospital.get("OrganisationCode", None),
                 OrganisationType=hospital.get("OrganisationType", None),
                 SubType=hospital.get("SubType", None),
@@ -127,12 +129,18 @@ def run_hospitals_seed():
                 '\033[31m', f"New English hospital added...{added}: {chosen_hospital}", '\033[31m')
     print(f"English Hospitals added...{added}")
 
+    run_welsh_hospitals_seed()
+
+
+def run_welsh_hospitals_seed():
+    # this adds all the English hospitals from JSON in the constants folder
+    # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
     added = 0
 
     for index, hospital in enumerate(WELSH_HOSPITALS):
         try:
             welsh_hospital = HospitalTrust(
-                OrganisationID=hospital.get("OrganisationCode", 1000000+index),
+                OrganisationID=index + 90000,
                 OrganisationCode=hospital.get(
                     "OrganisationCode", None),
                 OrganisationType=hospital.get("OrganisationType", None),
@@ -265,7 +273,7 @@ def complete_registrations():
         create_epilepsy12_record(registration_instance=registration)
 
     # calculate national level kpis
-    kpis_for_abstraction_level()
+    # kpis_for_abstraction_level()
 
 
 def image():
