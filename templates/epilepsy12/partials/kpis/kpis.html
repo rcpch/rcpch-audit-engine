@@ -11,11 +11,11 @@
                     </div>    
                 </div>
                 <button 
-                        class='ui right floated rcpch_primary button'
-                        hx-get="{% url 'selected_trust_kpis' hospital_id=hospital_organisation.pk %}" 
-                        hx-trigger="click" hx-swap='innerHTML'
-                        hx_indicator='#kpis'
-                        hx-target="#kpis">
+                    class='ui right floated rcpch_primary button'
+                    hx-get="{% url 'selected_trust_kpis' hospital_id=hospital_organisation.pk %}" 
+                    hx-trigger="click" hx-swap='innerHTML'
+                    hx_indicator='#kpis'
+                    hx-target="#kpis">
                     Refresh
                     <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                 </button>
@@ -56,7 +56,7 @@
                                 Integrated Care Board ({{hospital_organisation.ICBName}})
                                 <i 
                                     class="info circle icon"
-                                    id='totals_isb'
+                                    id='totals_icb'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered in this Integrated Care Board."
                                     data-position='top right'

@@ -30,6 +30,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_welsh_hospitals'):
             self.stdout.write('seeding hospital trust data...')
             run_welsh_hospitals_seed()
+        elif (options['mode'] == 'add_codes_to_english_hospitals'):
+            self.stdout.write(
+                'adding ODS codes to existing English hospital trust records...')
+            add_codes_to_english_hospitals()
         elif (options['mode'] == 'seed_semiology_keywords'):
             self.stdout.write('seeding hospital trust data...')
             run_semiology_keywords_seed()
@@ -176,6 +180,18 @@ def run_welsh_hospitals_seed():
             print("Exception creating "+hospital["OrganisationName"])
 
     print(f"Welsh Hospitals added...{added}")
+
+
+def add_codes_to_english_hospitals():
+    """
+    A custom function to run in the rare likelihood that an existing table of hospitals exists but does not have 
+    the ODS codes in it
+    """
+    index = 0
+    for hospital in HospitalTrust.objects.all():
+        add_codes_to_hospital(hospital)
+        index += 1
+    print(f'Updated {index} English hospitals with ODS Codes.')
 
 
 def delete_hospitals():

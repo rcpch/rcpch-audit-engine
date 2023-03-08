@@ -343,7 +343,7 @@ ul {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-#centredData {
+.rcpch_centred_text {
   text-align: center;
 }
 
@@ -1368,12 +1368,12 @@ img.ui.spaced.avatar.image{
   border-radius: 0%;
 }
 
-.ui.large.statistic .value {
+.ui.statistic .value {
   color: var(--rcpch_light_blue);
   font-family: 'Montserrat';
 }
 
-.ui.large.statistic div.label {
+.ui.statistic div.label {
   font-family: 'Montserrat';
   color: var(--rcpch_charcoal);
 }

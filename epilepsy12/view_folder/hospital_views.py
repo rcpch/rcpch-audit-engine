@@ -5,15 +5,15 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-from django.db.models import Sum, Count, F
+from django.db.models import Sum, Count, Q
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
-from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score
-from ..general_functions import cohort_number_from_enrolment_date, current_cohort_start_date, first_tuesday_in_january, value_from_key
+from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_and_complete_cases_for_hospital, all_registered_and_complete_cases_for_hospital_trust, all_registered_only_cases_for_hospital, all_registered_only_cases_for_hospital_trust
+from ..general_functions import get_current_cohort_data, value_from_key
 
 
 @login_required
@@ -39,57 +39,43 @@ def hospital_reports(request):
 
     template_name = 'epilepsy12/hospital.html'
 
-    current_cohort = cohort_number_from_enrolment_date(
-        current_cohort_start_date())
+    cohort_data = get_current_cohort_data()
 
     if request.user.hospital_employer is not None:
         # current user is affiliated with an existing hospital - set viewable trust to this
         selected_hospital = HospitalTrust.objects.get(
             OrganisationName=request.user.hospital_employer)
-
-        # query to return all cases registered in the current cohort at the hospital of logged in user if clinician
-        all_cases = Case.objects.filter(
-            F(hospital_trusts__OrganisationName__contains=request.user.hospital_employer.OrganisationName) &
-            F(registration__cohort=current_cohort)
-        ).all().count()
-        # query to return all completed E12 cases in the current cohort
-        all_registrations = Case.objects.filter(
-            F(hospital_trusts__OrganisationName__contains=request.user.hospital_employer.OrganisationName) &
-            F(registration__isnull=False) &
-            F(auditprogress__registration_complete=True) &
-            F(auditprogress__first_paediatric_assessment_complete=True) &
-            F(auditprogress__assessment_complete=True) &
-            F(auditprogress__epilepsy_context_complete=True) &
-            F(auditprogress__multiaxial_diagnosis_complete=True) &
-            F(auditprogress__investigations_complete=True) &
-            F(auditprogress__management_complete=True)
-        ).all().count()
     else:
         # current user is a member of the RCPCH audit team and also not affiliated with a hospital
         # therefore set selected hospital to first of hospital on the list
-
         selected_hospital = HospitalTrust.objects.filter(
             Sector="NHS Sector"
         ).order_by('OrganisationName').first()
 
-        all_registrations = Registration.objects.all().count()
-        all_cases = Case.objects.all().count()
+    # query to return all completed E12 cases in the current cohort in this hospital
+    count_of_current_cohort_registered_completed_cases_in_this_hospital = all_registered_and_complete_cases_for_hospital(
+        hospital_instance=selected_hospital).count()
+    # query to return all completed E12 cases in the current cohort in this hospital trust
+    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust = all_registered_and_complete_cases_for_hospital_trust(
+        hospital_instance=selected_hospital).count()
+    # query to return all cases registered in the current cohort at this hospital
+    count_of_current_cohort_registered_cases_in_this_hospital = all_registered_only_cases_for_hospital(
+        hospital_instance=selected_hospital).count()
+    # query to return all cases registered in the current cohort at this hospital trust
+    count_of_current_cohort_registered_cases_in_this_hospital_trust = all_registered_only_cases_for_hospital_trust(
+        hospital_instance=selected_hospital).count()
 
-    total_referred_to_surgery = Assessment.objects.filter(
-        childrens_epilepsy_surgical_service_referral_made=True).count()
-
-    if all_cases > 0:
-        total_percent = round((all_registrations / all_cases) * 100)
+    if count_of_current_cohort_registered_completed_cases_in_this_hospital > 0:
+        total_percent_hospital = round((count_of_current_cohort_registered_cases_in_this_hospital /
+                                       count_of_current_cohort_registered_completed_cases_in_this_hospital) * 100)
     else:
-        total_percent = 0
+        total_percent_hospital = 0
 
-    cohort_data = {
-        'cohort_start_date': current_cohort_start_date(),
-        'cohort_end_date': date(current_cohort_start_date().year+1, 11, 30),
-        'cohort': current_cohort,
-        'submission_date': first_tuesday_in_january(current_cohort_start_date().year+1) + relativedelta(days=7),
-        'days_remaining':  relativedelta(first_tuesday_in_january(current_cohort_start_date().year+1) + relativedelta(days=7) - date.today()).days
-    }
+    if count_of_current_cohort_registered_completed_cases_in_this_hospital_trust > 0:
+        total_percent_trust = round((count_of_current_cohort_registered_cases_in_this_hospital_trust /
+                                    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust) * 100)
+    else:
+        total_percent_trust = 0
 
     return render(request=request, template_name=template_name, context={
         'user': request.user,
@@ -98,11 +84,13 @@ def hospital_reports(request):
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity(selected_hospital=selected_hospital),
         'cases_aggregated_by_sex': cases_aggregated_by_sex(selected_hospital=selected_hospital),
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation_score(selected_hospital=selected_hospital),
-        'percent_completed_registrations': total_percent,
-        'total_registrations': all_registrations,
-        'total_cases': all_cases,
+        'percent_completed_hospital': total_percent_hospital,
+        'percent_completed_trust': total_percent_trust,
+        'count_of_current_cohort_registered_cases_in_this_hospital': count_of_current_cohort_registered_cases_in_this_hospital,
+        'count_of_current_cohort_registered_completed_cases_in_this_hospital': count_of_current_cohort_registered_completed_cases_in_this_hospital,
+        'count_of_current_cohort_registered_cases_in_this_hospital_trust': count_of_current_cohort_registered_cases_in_this_hospital_trust,
+        'count_of_current_cohort_registered_completed_cases_in_this_hospital_trust': count_of_current_cohort_registered_completed_cases_in_this_hospital_trust,
         'cohort_data': cohort_data,
-        'total_referred_to_surgery': total_referred_to_surgery,
         'all_models': all_models,
         'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
         'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
@@ -118,24 +106,32 @@ def selected_hospital_summary(request):
     selected_hospital = HospitalTrust.objects.get(
         pk=request.POST.get('selected_hospital_summary'))
 
-    # query to return all cases and registrations of selected hospital
-    all_cases = Case.objects.filter(
-        hospital_trusts__OrganisationName__contains=selected_hospital).all().count()
-    all_registrations = Case.objects.filter(
-        hospital_trusts__OrganisationName__contains=selected_hospital).all().filter(
-            registration__isnull=False).count()
+    cohort_data = get_current_cohort_data()
 
-    total_referred_to_paediatrics = Assessment.objects.filter(
-        consultant_paediatrician_referral_made=True).count()
-    total_referred_to_neurology = Assessment.objects.filter(
-        paediatric_neurologist_referral_made=True).count()
-    total_referred_to_surgery = Assessment.objects.filter(
-        childrens_epilepsy_surgical_service_referral_made=True).count()
+    # query to return all completed E12 cases in the current cohort in this hospital
+    count_of_current_cohort_registered_completed_cases_in_this_hospital = all_registered_and_complete_cases_for_hospital(
+        hospital_instance=selected_hospital).count()
+    # query to return all completed E12 cases in the current cohort in this hospital trust
+    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust = all_registered_and_complete_cases_for_hospital_trust(
+        hospital_instance=selected_hospital).count()
+    # query to return all cases registered in the current cohort at this hospital
+    count_of_current_cohort_registered_cases_in_this_hospital = all_registered_only_cases_for_hospital(
+        hospital_instance=selected_hospital).count()
+    # query to return all cases registered in the current cohort at this hospital trust
+    count_of_current_cohort_registered_cases_in_this_hospital_trust = all_registered_only_cases_for_hospital_trust(
+        hospital_instance=selected_hospital).count()
 
-    if all_cases > 0:
-        total_percent = round((all_registrations / all_cases) * 100)
+    if count_of_current_cohort_registered_completed_cases_in_this_hospital > 0:
+        total_percent_hospital = round((count_of_current_cohort_registered_cases_in_this_hospital /
+                                       count_of_current_cohort_registered_completed_cases_in_this_hospital) * 100)
     else:
-        total_percent = 0
+        total_percent_hospital = 0
+
+    if count_of_current_cohort_registered_completed_cases_in_this_hospital_trust > 0:
+        total_percent_trust = round((count_of_current_cohort_registered_cases_in_this_hospital_trust /
+                                    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust) * 100)
+    else:
+        total_percent_trust = 0
 
     return render(request=request, template_name='epilepsy12/partials/selected_hospital_summary.html', context={
         'user': request.user,
@@ -144,12 +140,13 @@ def selected_hospital_summary(request):
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity(selected_hospital=selected_hospital),
         'cases_aggregated_by_sex': cases_aggregated_by_sex(selected_hospital=selected_hospital),
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation_score(selected_hospital=selected_hospital),
-        'percent_completed_registrations': total_percent,
-        'total_registrations': all_registrations,
-        'total_cases': all_cases,
-        'total_referred_to_paediatrics': total_referred_to_paediatrics,
-        'total_referred_to_neurology': total_referred_to_neurology,
-        'total_referred_to_surgery': total_referred_to_surgery,
+        'percent_completed_hospital': total_percent_hospital,
+        'percent_completed_trust': total_percent_trust,
+        'count_of_current_cohort_registered_cases_in_this_hospital': count_of_current_cohort_registered_cases_in_this_hospital,
+        'count_of_current_cohort_registered_completed_cases_in_this_hospital': count_of_current_cohort_registered_completed_cases_in_this_hospital,
+        'count_of_current_cohort_registered_cases_in_this_hospital_trust': count_of_current_cohort_registered_cases_in_this_hospital_trust,
+        'count_of_current_cohort_registered_completed_cases_in_this_hospital_trust': count_of_current_cohort_registered_completed_cases_in_this_hospital_trust,
+        'cohort_data': cohort_data,
         'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
     })
 
