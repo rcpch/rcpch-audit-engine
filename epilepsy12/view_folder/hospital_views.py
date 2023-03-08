@@ -215,6 +215,9 @@ def selected_trust_kpis(request, hospital_id):
         'kpis': kpis
     }
 
+    # remove the temporary instance as otherwise would contribute to totals
+    kpis.delete()
+
     response = render(
         request=request, template_name=template_name, context=context)
 
