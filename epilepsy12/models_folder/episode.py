@@ -80,8 +80,8 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
 
     epilepsy_or_nonepilepsy_status = models.CharField(
         help_text={
-            'label': "Is a diagnosis of epilepsy definite, or uncertain.",
-            'reference': "Is a diagnosis of epilepsy definite, or uncertain.",
+            'label': "Is this episode epileptic, non-epileptic or uncertain?",
+            'reference': "Is this episode epileptic, non-epileptic or uncertain?",
         },
         max_length=3,
         choices=EPILEPSY_DIAGNOSIS_STATUS,
@@ -248,8 +248,8 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
 
     nonepileptic_seizure_unknown_onset = models.CharField(
         help_text={
-            'label': 'How best describes the generalised nature of the nonepileptic episode(s)?',
-            'reference': 'How best describes the generalised nature of the nonepileptic episode(s)?',
+            'label': 'How best describes the onset of the nonepileptic episode(s)?',
+            'reference': 'How best describes the onset of the nonepileptic episode(s)?',
         },
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_ONSET,

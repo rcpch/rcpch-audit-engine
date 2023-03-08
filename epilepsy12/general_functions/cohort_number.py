@@ -2,7 +2,12 @@
 Cohort numbers functions
 """
 
+# python imports
 from datetime import date
+from dateutil.relativedelta import relativedelta
+
+# e12 imports
+from .date_functions import first_tuesday_in_january
 
 
 def cohort_number_from_enrolment_date(enrolment_date: date) -> int:
@@ -52,3 +57,21 @@ def current_cohort_start_date():
         return date(today.year, 12, 1)
     else:
         return date(today.year-1, 12, 1)
+
+
+def get_current_cohort_data():
+    """
+    Returns all current cohort dates
+    """
+    current_cohort = cohort_number_from_enrolment_date(
+        current_cohort_start_date())
+
+    cohort_data = {
+        'cohort_start_date': current_cohort_start_date(),
+        'cohort_end_date': date(current_cohort_start_date().year+1, 11, 30),
+        'cohort': current_cohort,
+        'submission_date': first_tuesday_in_january(current_cohort_start_date().year+1) + relativedelta(days=7),
+        'days_remaining':  relativedelta(first_tuesday_in_january(current_cohort_start_date().year+1) + relativedelta(days=7) - date.today()).days
+    }
+
+    return cohort_data

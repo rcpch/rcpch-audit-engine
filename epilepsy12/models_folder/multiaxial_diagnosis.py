@@ -40,11 +40,12 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     )
 
     epilepsy_cause = models.CharField(
+        # this currently stores a SNOMED conceptId which looks up the preferredTerm in the select
         help_text={
             'label': "What is the main identified cause of the epilepsy?",
             'reference': "What is the main identified cause of the epilepsy?",
         },
-        max_length=50,
+        max_length=250,
         default=None,
         blank=True,
         null=True

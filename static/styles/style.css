@@ -343,7 +343,7 @@ ul {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-#centredData {
+.rcpch_centred_text {
   text-align: center;
 }
 
@@ -838,8 +838,8 @@ ul {
 .pie {
   position: relative;
   display: inline-block;
-  background-image: conic-gradient(rgba(0, 0, 0, 0) calc(3.6deg * var(--percent)),
-      rgba(0, 0, 0, 1) calc(3.6deg * var(--percent)));
+  background-image: conic-gradient(rgba(0, 0, 0, 1) calc(3.6deg * var(--percent)),
+      rgba(0, 0, 0, 0) calc(3.6deg * var(--percent)));
   background-blend-mode: overlay;
   background-position: 50% 50%;
   background-size: 150%;
@@ -1078,11 +1078,11 @@ ul {
   border-radius: 0%;
 }
 
-.ui.rcpch_light_blue.selection.active.dropdown {
+/* .ui.rcpch_light_blue.selection.active.dropdown {
   background: var(--rcpch_pink);
   border-radius: 0%;
   color: white;
-}
+} */
 
 .ui.rcpch_light_blue.fluid.search.selection.dropdown ::-webkit-scrollbar-thumb {
   border-radius: 0%;
@@ -1366,4 +1366,14 @@ img.ui.spaced.avatar.image{
 
 .ui.buttons .ui.rcpch_cancel.button {
   border-radius: 0%;
+}
+
+.ui.statistic .value {
+  color: var(--rcpch_light_blue);
+  font-family: 'Montserrat';
+}
+
+.ui.statistic div.label {
+  font-family: 'Montserrat';
+  color: var(--rcpch_charcoal);
 }

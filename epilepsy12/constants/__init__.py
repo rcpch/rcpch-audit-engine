@@ -12,3 +12,10 @@ from .hospital_trusts import *
 from .keywords import *
 from .names import *
 from .syndromes import *
+from .focal_seizures import *
+from .non_epilepsy_fields import *
+from .kpi import *
+from .integrated_care_boards import *
+from .welsh_hospitals import *
+from .irish_hospitals import *
+from .scottish_hospitals import *

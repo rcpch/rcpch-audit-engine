@@ -1,0 +1,51 @@
+{% comment %} This is a single choice select which is reused in multiple places.
+Note requires jquery to work. This select accepts the following parameters:
+choices: these are the choices available hx_post: the url posted to including
+parameters hx_target: the id of the html element to target the server response
+hx_trigger: usually 'change' but can be any event hx_swap: usually 'innerHTML'
+hx_name: the model field to update test_positive: the model boolean field label:
+this is the label text hx_default_text: default text of an unselected element
+data_position: this is the position of the popup label (js independent) ['top
+left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom
+right', 'right center', 'left center'] enabled: this is set to false if a view
+only user sees the form The chosen value is stored as the name of the button and
+accessed in the view as request.htmx.trigger_name Which choices are selected
+from is obvious because the endpoint posted to is specific to the choices. {% endcomment %}
+<div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <h5 class="rcpch_plain_label">
+    {{label|safe}}&nbsp;
+    <span
+      id="{{hx_name}}"
+      data-title="Reference"
+      data-content="{{reference|safe}}"
+      data-position="{{data_position}}"
+      data-variation="basic"
+      _="init js $('#{{hx_name}}').popup(); end"
+    >
+      <i class="rcpch question circle icon"></i>
+    </span>
+  </h5>
+
+  <div class="ui rcpch_light_blue fluid search selection dropdown">
+
+      <i class="dropdown icon"></i>
+      <input
+        type="hidden"
+        _="init js $('.ui.rcpch_light_blue.fluid.search.selection.dropdown').dropdown(); end"
+        name="{{hx_name}}"
+        hx-post="{{hx_post}}"
+        hx-target="{{hx_target}}"
+        hx-swap="{{hx_swap}}"
+        hx-trigger="{{hx_trigger}}"
+        value="{{test_positive}}"
+      />
+      <div class="default text">{{hx_default_text}}</div>
+      <div class="menu">
+        {% for item in choices %}
+        <div class="item" data-value="{{item.0}}">{{item.1}}</div>
+        {% endfor %}
+      </div>
+    </div>
+    
+  </div>
+</div>

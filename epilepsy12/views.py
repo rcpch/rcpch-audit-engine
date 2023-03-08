@@ -2,7 +2,7 @@
 # django
 from datetime import datetime
 from django.apps import apps
-from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
+# from django.db.models import Case as DJANGO_CASE
 from django.conf import settings
 from django.contrib.auth import login, get_user_model, authenticate
 from django.contrib.auth.decorators import login_required
@@ -22,17 +22,10 @@ from rest_framework import permissions, viewsets
 
 # python
 import csv
-from itertools import chain
-
-# third party libraries
-from django_htmx.http import HttpResponseClientRedirect
 
 # epilepsy12
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserCreationForm, Epilepsy12LoginForm
-from .common_view_functions import hospital_level_kpis, trust_level_kpis, national_level_kpis, calculate_kpis
 
-from epilepsy12.constants.ethnicities import ETHNICITIES
-from epilepsy12.models import Case, Epilepsy12User, FirstPaediatricAssessment, Assessment
 from .view_folder import *
 from .decorator import rcpch_full_access_only
 from .serializers import *
@@ -59,7 +52,7 @@ def epilepsy12_login(request):
                     epilepsy12user=user
                 ).order_by('-activity_datetime').first()
                 messages.info(
-                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%-H:%-M (%S seconds) on %A, %-d %B %Y')} from https://{last_logged_in.ip_address}/")
+                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%-H:%-M (%S seconds) on %A, %-d %B %Y')} from {last_logged_in.ip_address}")
                 return redirect("hospital_reports")
             else:
                 messages.error(request, "Invalid email or password.")
@@ -79,359 +72,7 @@ def database(request):
     return render(request, template_name, {})
 
 
-@login_required
-def hospital_reports(request):
-    """
-    !!!!
-    One time statement only for development
-    Drops all registration and related records
-    !!!!
-    """
-
-    # Registration.objects.all().delete()
-    # Episode.objects.all().delete()
-
-    # this snippet forces a resave on all registration objects to recalculate submission date
-    # it is a one time only step
-    # all_registration = Registration.objects.all()
-    # for reg in all_registration:
-    #     # if reg.audit_submission_date:
-    #     #     print(f'audit close: {reg.case}: {reg.audit_submission_date}')
-    #     if reg.registration_date:
-    #         print(
-    #             f'registration date: {reg.case}: {reg.registration_date} audit close: {reg.case}: {reg.audit_submission_date}')
-    #         reg.save()
-    #     else:
-    #         print('nothing to see here')
-
-    # add all registered cases to KPIs
-    # for case in Case.objects.all():
-    #     if Registration.objects.filter(case=case).exists():
-    #         if Site.objects.filter(
-    #             site_is_actively_involved_in_epilepsy_care=True,
-    #             site_is_primary_centre_of_epilepsy_care=True,
-    #             case=case
-    #         ).exists():
-    #             lead_site = Site.objects.filter(
-    #                 site_is_actively_involved_in_epilepsy_care=True,
-    #                 site_is_primary_centre_of_epilepsy_care=True,
-    #                 case=case
-    #             ).get()
-    #             lead_hospital = lead_site.hospital_trust
-    #             parent_trust = lead_hospital.ParentName
-    #             if hasattr(case.registration, 'kpi'):
-    #                 print('I have KPIs')
-    #                 if case.registration.kpi is None:
-    #                     new_kpi = KPI.objects.create(
-    #                         hospital_organisation=lead_hospital,
-    #                         parent_trust=parent_trust,
-    #                         paediatrician_with_expertise_in_epilepsies=0,
-    #                         epilepsy_specialist_nurse=0,
-    #                         tertiary_input=0,
-    #                         epilepsy_surgery_referral=0,
-    #                         ecg=0,
-    #                         mri=0,
-    #                         assessment_of_mental_health_issues=0,
-    #                         mental_health_support=0,
-    #                         sodium_valproate=0,
-    #                         comprehensive_care_planning_agreement=0,
-    #                         patient_held_individualised_epilepsy_document=0,
-    #                         patient_carer_parent_agreement_to_the_care_planning=0,
-    #                         care_planning_has_been_updated_when_necessary=0,
-    #                         comprehensive_care_planning_content=0,
-    #                         parental_prolonged_seizures_care_plan=0,
-    #                         water_safety=0,
-    #                         first_aid=0,
-    #                         general_participation_and_risk=0,
-    #                         service_contact_details=0,
-    #                         sudep=0,
-    #                         school_individual_healthcare_plan=0
-    #                     )
-    #                     case.registration.kpi = new_kpi
-    #                     case.registration.save()
-    #                 else:
-    #                     calculate_kpis(case.registration)
-    #                 print(f"Done! KPIs calculated for {case}")
-    #             else:
-    #                 print('I have no KPIs - creating...')
-    #                 KPI.objects.create(
-    #                     hospital_organisation=lead_hospital,
-    #                     parent_trust=parent_trust,
-    #                     paediatrician_with_expertise_in_epilepsies=0,
-    #                     epilepsy_specialist_nurse=0,
-    #                     tertiary_input=0,
-    #                     epilepsy_surgery_referral=0,
-    #                     ecg=0,
-    #                     mri=0,
-    #                     assessment_of_mental_health_issues=0,
-    #                     mental_health_support=0,
-    #                     sodium_valproate=0,
-    #                     comprehensive_care_planning_agreement=0,
-    #                     patient_held_individualised_epilepsy_document=0,
-    #                     patient_carer_parent_agreement_to_the_care_planning=0,
-    #                     care_planning_has_been_updated_when_necessary=0,
-    #                     comprehensive_care_planning_content=0,
-    #                     parental_prolonged_seizures_care_plan=0,
-    #                     water_safety=0,
-    #                     first_aid=0,
-    #                     general_participation_and_risk=0,
-    #                     service_contact_details=0,
-    #                     sudep=0,
-    #                     school_individual_healthcare_plan=0
-    #                 )
-    #                 print(
-    #                     f"Done! KPIs created for {case}. Now calculating score...")
-    #                 calculate_kpis(case.registration)
-    #                 print(f"Done! KPIs calculated for {case}")
-
-    """
-    !!!
-    """
-
-    """
-    Remove duplicates
-    """
-    # for duplicates in Epilepsy12User.objects.values("email").annotate(
-    #     records=Count("email")
-    # ).filter(records__gt=1):
-    #     for epilepsy12user in Epilepsy12User.objects.filter(name=duplicates["email"])[1:]:
-    #         epilepsy12user.delete()
-
-    # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
-    first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
-    site = Site.objects.filter()
-    epilepsy_context = EpilepsyContext.objects.filter()
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
-    episode = Episode.objects.filter()
-    syndrome = Syndrome.objects.filter()
-    comorbidity = Comorbidity.objects.filter()
-    assessment = Assessment.objects.filter()
-    investigations = Investigations.objects.filter()
-    management = Management.objects.filter()
-    registration = Registration.objects.filter()
-
-    all_models = sorted(
-        chain(registration, first_paediatric_assessment, site, epilepsy_context, multiaxial_diagnosis,
-              episode, syndrome, comorbidity, assessment, investigations, management),
-        key=lambda x: x.updated_at, reverse=True)[:5]
-
-    template_name = 'epilepsy12/hospital.html'
-
-    if request.user.hospital_employer is not None:
-        # current user is affiliated with an existing hospital - set viewable trust to this
-        selected_hospital = HospitalTrust.objects.get(
-            OrganisationName=request.user.hospital_employer)
-
-        # query to return all cases and registrations of hospital of logged in user if clinician
-        all_cases = Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().count()
-        all_registrations = Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=request.user.hospital_employer).all().filter(
-                registration__isnull=False).count()
-    else:
-        # current user is a member of the RCPCH audit team and also not affiliated with a hospital
-        # therefore set selected hospital to first of hospital on the list
-
-        selected_hospital = HospitalTrust.objects.filter(
-            Sector="NHS Sector"
-        ).order_by('OrganisationName').first()
-
-        all_registrations = Registration.objects.all().count()
-        all_cases = Case.objects.all().count()
-
-    # aggregate queries on trust level cases
-    deprivation_quintiles = (
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-        (5, 5)
-    )
-
-    ethnicity_long_list = [When(ethnicity=k, then=Value(v))
-                           for k, v in ETHNICITIES]
-    imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
-                     for k, v in deprivation_quintiles]
-    sex_long_list = [When(sex=k, then=Value(v))
-                     for k, v in SEX_TYPE]
-
-    cases_aggregated_by_ethnicity = (
-        Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
-        .values('ethnicity')
-        .annotate(
-            ethnicity_display=DJANGO_CASE(
-                *ethnicity_long_list, output_field=CharField()
-            )
-        )
-        .values('ethnicity_display')
-        .annotate(
-            ethnicities=Count('ethnicity')).order_by('ethnicities')
-    )
-
-    cases_aggregated_by_sex = (
-        Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
-        .values('sex')
-        .annotate(
-            sex_display=DJANGO_CASE(
-                *sex_long_list, output_field=CharField()
-            )
-        )
-        .values('sex_display')
-        .annotate(
-            sexes=Count('sex')).order_by('sexes')
-    )
-
-    cases_aggregated_by_deprivation = (
-        Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
-        .values('index_of_multiple_deprivation_quintile')
-        .annotate(
-            index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
-                *imd_long_list, output_field=PositiveSmallIntegerField()
-            )
-        )
-        .values('index_of_multiple_deprivation_quintile_display')
-        .annotate(
-            cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
-        .order_by('cases_aggregated_by_deprivation')
-    )
-
-    total_referred_to_paediatrics = Assessment.objects.filter(
-        consultant_paediatrician_referral_made=True).count()
-    total_referred_to_neurology = Assessment.objects.filter(
-        paediatric_neurologist_referral_made=True).count()
-    total_referred_to_surgery = Assessment.objects.filter(
-        childrens_epilepsy_surgical_service_referral_made=True).count()
-
-    if all_cases > 0:
-        total_percent = round((all_registrations / all_cases) * 100)
-    else:
-        total_percent = 0
-
-    return render(request=request, template_name=template_name, context={
-        'user': request.user,
-        'selected_hospital': selected_hospital,
-        'hospital_list': HospitalTrust.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
-        'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
-        'cases_aggregated_by_sex': cases_aggregated_by_sex,
-        'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
-        'percent_completed_registrations': total_percent,
-        'total_registrations': all_registrations,
-        'total_cases': all_cases,
-        'total_referred_to_paediatrics': total_referred_to_paediatrics,
-        'total_referred_to_neurology': total_referred_to_neurology,
-        'total_referred_to_surgery': total_referred_to_surgery,
-        'all_models': all_models,
-        'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
-    })
-
-
-@login_required
-def selected_hospital_summary(request):
-    """
-    POST request from selected_hospital_summary.html on hospital select
-    """
-
-    selected_hospital = HospitalTrust.objects.get(
-        pk=request.POST.get('selected_hospital_summary'))
-
-    # query to return all cases and registrations of selected hospital
-    all_cases = Case.objects.filter(
-        hospital_trusts__OrganisationName__contains=selected_hospital).all().count()
-    all_registrations = Case.objects.filter(
-        hospital_trusts__OrganisationName__contains=selected_hospital).all().filter(
-            registration__isnull=False).count()
-
-    # aggregate queries on trust level cases
-    deprivation_quintiles = (
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-        (5, 5)
-    )
-
-    ethnicity_long_list = [When(ethnicity=k, then=Value(v))
-                           for k, v in ETHNICITIES]
-    imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
-                     for k, v in deprivation_quintiles]
-    sex_long_list = [When(sex=k, then=Value(v))
-                     for k, v in SEX_TYPE]
-
-    cases_aggregated_by_ethnicity = (
-        Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
-        .values('ethnicity')
-        .annotate(
-            ethnicity_display=DJANGO_CASE(
-                *ethnicity_long_list, output_field=CharField()
-            )
-        )
-        .values('ethnicity_display')
-        .annotate(
-            ethnicities=Count('ethnicity')).order_by('ethnicities')
-    )
-
-    cases_aggregated_by_sex = (
-        Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
-        .values('sex')
-        .annotate(
-            sex_display=DJANGO_CASE(
-                *sex_long_list, output_field=CharField()
-            )
-        )
-        .values('sex_display')
-        .annotate(
-            sexes=Count('sex')).order_by('sexes')
-    )
-
-    cases_aggregated_by_deprivation = (
-        Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
-        .values('index_of_multiple_deprivation_quintile')
-        .annotate(
-            index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
-                *imd_long_list, output_field=PositiveSmallIntegerField()
-            )
-        )
-        .values('index_of_multiple_deprivation_quintile_display')
-        .annotate(
-            cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
-        .order_by('cases_aggregated_by_deprivation')
-    )
-
-    total_referred_to_paediatrics = Assessment.objects.filter(
-        consultant_paediatrician_referral_made=True).count()
-    total_referred_to_neurology = Assessment.objects.filter(
-        paediatric_neurologist_referral_made=True).count()
-    total_referred_to_surgery = Assessment.objects.filter(
-        childrens_epilepsy_surgical_service_referral_made=True).count()
-
-    if all_cases > 0:
-        total_percent = round((all_registrations / all_cases) * 100)
-    else:
-        total_percent = 0
-
-    return render(request=request, template_name='epilepsy12/partials/selected_hospital_summary.html', context={
-        'user': request.user,
-        'selected_hospital': selected_hospital,
-        'hospital_list': HospitalTrust.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
-        'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity,
-        'cases_aggregated_by_sex': cases_aggregated_by_sex,
-        'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation,
-        'percent_completed_registrations': total_percent,
-        'total_registrations': all_registrations,
-        'total_cases': all_cases,
-        'total_referred_to_paediatrics': total_referred_to_paediatrics,
-        'total_referred_to_neurology': total_referred_to_neurology,
-        'total_referred_to_surgery': total_referred_to_surgery,
-    })
-
-
-@login_required
+@ login_required
 def logs(request, hospital_id, epilepsy12_user_id):
     """
     returns logs for given hospital
@@ -452,10 +93,10 @@ def logs(request, hospital_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@ login_required
 def log_list(request, hospital_id, epilepsy12_user_id):
     """
-    GET request to return log table 
+    GET request to return log table
     """
     hospital = HospitalTrust.objects.get(pk=hospital_id)
     epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
@@ -471,39 +112,6 @@ def log_list(request, hospital_id, epilepsy12_user_id):
     }
 
     return render(request=request, template_name=template_name, context=context)
-
-
-def selected_trust_kpis(request, hospital_id):
-    """
-    HTMX get request returning trust_level_kpi.html partial
-    """
-    trust_kpis = trust_level_kpis(hospital_id=hospital_id)
-    national_kpis = national_level_kpis()
-    hospital_organisation = HospitalTrust.objects.get(pk=hospital_id)
-    hospital_kpis = hospital_level_kpis(hospital_id=hospital_id)
-    # create an empty instance of KPIs to access the labels
-    kpis = KPI.objects.create(
-        hospital_organisation=hospital_organisation,
-        parent_trust=hospital_organisation.ParentName
-    )
-    template_name = 'epilepsy12/partials/kpis/kpis.html'
-    context = {
-        'hospital_organisation': hospital_organisation,
-        'hospital_kpis': hospital_kpis,
-        'trust_kpis': trust_kpis,
-        'national_kpis': national_kpis,
-        'kpis': kpis
-    }
-
-    response = render(
-        request=request, template_name=template_name, context=context)
-
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response,
-        name="registration_active",
-        params={})  # reloads the form to show the active steps
-    return response
 
 
 def tsandcs(request):
@@ -524,7 +132,7 @@ def documentation(request):
 def signup(request, *args, **kwargs):
     """
     Part of the registration process. Signing up for a new account, returns empty form as a GET request
-    or validates the form, creates an account and allocates a group if part of a POST request. It is not possible 
+    or validates the form, creates an account and allocates a group if part of a POST request. It is not possible
     to create a superuser account through this route.
     """
     user = request.user
@@ -598,36 +206,6 @@ def registration_active(request, case_id, active_template):
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
-
-
-@login_required
-def child_hospital_select(request, hospital_id, template_name):
-    """
-    POST call back from hospital_select to allow user to toggle between hospitals in selected trust
-    """
-
-    selected_hospital_id = request.POST.get('child_hospital_select')
-
-    # get currently selected hospital
-    hospital_trust = HospitalTrust.objects.get(pk=selected_hospital_id)
-
-    # trigger page reload with new hospital
-    return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
-
-
-@login_required
-def view_preference(request, hospital_id, template_name):
-    """
-    POST request from Toggle in has rcpch_view_preference.html template
-    Users can toggle between national, trust and hospital views.
-    Only RCPCH staff can request a national view.
-    """
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
-
-    request.user.view_preference = request.htmx.trigger_name
-    request.user.save()
-
-    return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
 
 
 @login_required
@@ -817,6 +395,14 @@ def rcpch_403(request, exception):
 def redirect_403(request):
     # return the custom 403 template. There is not context to add.
     return render(request, template_name='epilepsy12/error_pages/rcpch_403.html', context={})
+
+
+def rcpch_404(request, exception):
+    return render(request, template_name='epilepsy12/error_pages/rcpch_404.html', context={})
+
+
+def rcpch_500(request):
+    return render(request, template_name='epilepsy12/error_pages/rcpch_500.html', status=500)
 
 
 """

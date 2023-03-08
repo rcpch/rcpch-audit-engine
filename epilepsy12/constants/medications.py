@@ -40,7 +40,7 @@ BENZODIAZEPINE_TYPES = (
     (1003, "Lorazepam")
 )
 
-ANTIEPILEPSY_MEDICINES = {
+ANTIEPILEPSY_MEDICINES = (
     (0, "Acetazolamide"),
     (1, "ACTH"),
     (2, "Carbamazepine"),
@@ -73,4 +73,4 @@ ANTIEPILEPSY_MEDICINES = {
     (28, "Epidyolex® "),
     (29, "Other Cannabis-based medicinal product"),
     (30, "Other")
-}
+)

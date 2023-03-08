@@ -1,9 +1,9 @@
 {% load static %}
 {% load epilepsy12_template_tags %}
+{% csrf_token %} 
 
 <div class="ui grid container">
     
-
         {% if request.user.is_rcpch_audit_team_member %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -55,6 +55,7 @@
                     </div>
                 </div>
 
+                
                 <div class="ui rcpch_light_blue stackable card">
                     <div class="content">
                         <h2 class='header'>
@@ -104,7 +105,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> 
+                
 
             </div>
     
@@ -112,44 +114,84 @@
 
 
         <div class="four wide stackable column">
-            {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" pie_size='med' %}
-        </div>
-        
-        <div class="four wide column">
-            {% if total_cases is not None and total_cases > 0%}
-                {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
-                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases pie_size='med' %}
-            {% else %}
-                <h5>No data yet!<h5>
-            {% endif %}
-        </div>
-        <div class="four wide stackable column">
-            {% if total_cases is not None and total_cases > 0%}
-                {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
-                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases pie_size='med' %}
-            {% else %}
-                <h5>No data yet!<h5>
-            {% endif %}
-        </div>
-        <div class="four wide stackable column">
-            {% if total_cases is not None and total_cases > 0%}
-                {% percentage_of_total total_referred_to_surgery total_cases as total_percent %}
-                {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Eligible for Epilepsy Surgery" numerator=total_referred_to_surgery denominator=total_cases pie_size='med' %}
-            {% else %}
-                <h5>No data yet!<h5>
-            {% endif %}
-        </div>
-
-        <div 
-            class="sixteen wide stackable column" 
-            hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
-            hx-trigger="load" hx-swap='innerHTML'
-            hx_indicator='#kpis'
-            hx-target="#kpis">
-            <div id='kpis'>
-                <div class="ui active centered inline loader"></div>
+            {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_hospital numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital denominator=count_of_current_cohort_registered_cases_in_this_hospital title="Completed Returns" pie_size='med' %}
+            <div class='rcpch_centred_text'>
+                <p><small>{{selected_hospital.OrganisationName}}</small></p>
             </div>
         </div>
+        
+        <div class="four wide stackable column">
+            {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital_trust denominator=count_of_current_cohort_registered_cases_in_this_hospital_trust title="Completed Returns" pie_size='med' %}
+            <div class='rcpch_centred_text'>
+                <p><small>{{selected_hospital.ParentName}}</small></p>
+            </div>
+        </div>
+        
+        <div class="four wide center middle aligned stackable column">
+            
+            <div class="ui large statistic">
+                <div class="value">
+                  {{cohort_data.cohort}}
+                </div>
+                <div class="label">
+                  Current Cohort
+                </div>
+                <div class='rcpch_centred_text'>
+                    {% if cohort_data.days_remaining == 0 %}
+                            Actively recruiting
+                    {% else %}
+                            Recruitment closed
+                    {% endif %}
+                    <p><small>{{cohort_data.cohort_start_date}}-{{cohort_data.cohort_end_date}}</small></p>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="four wide center middle aligned stackable column">
+            
+            <div class="ui large statistic">
+                <div class="value">
+                    {{cohort_data.days_remaining}}
+                </div>
+                <div class="label">
+                  Days remaining
+                </div>
+                <div class='rcpch_centred_text'>
+                    {% if cohort_data.days_remaining == 0 %}
+                            Submission date passed
+                        <p><small> ({{cohort_data.submission_date}})</small></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class='sixteen wide right fluid column'>
+
+            <div class="ui top attached tabular menu" _="init js $('.menu .item').tab();">
+                <a class="active item" data-tab="first">Overview</a>
+                <a class="item" data-tab="second">Individual Measures</a>
+            </div>
+
+            <div class="ui bottom attached active tab segment" data-tab="first">
+                <div 
+                    class="sixteen wide stackable column" 
+                    hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
+                    hx-trigger="load" hx-swap='innerHTML'
+                    hx_indicator='#kpis'
+                    hx-target="#kpis">
+                    <div id='kpis'>
+                        <div class="ui active centered inline loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui bottom attached tab segment" data-tab="second">
+                {% include 'epilepsy12/partials/hospital/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
+            </div>
+        
+        </div>
+
     
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>

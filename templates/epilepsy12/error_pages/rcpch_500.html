@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="ui container">
+  <div class="ui grid">
+    <div class="twelve wide centered column">
+      <div class="content">
+        <div class="ui icon rcpch_warning message">
+          <i class="exclamation circle icon"></i>
+          <div class="content">
+            <div class="header">500 - Server Error</div>
+            E12 Server error. Our apologies for this. If this error persists
+            please contact the E12 team or go back to the
+            <a href="{% url 'index' %}">home page</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+</div>

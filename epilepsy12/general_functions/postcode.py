@@ -28,5 +28,4 @@ def validate_postcode(postcode: str) -> bool:
     if(valid_postcode_regex.match('not matched')):
         return False
     else:
-        print("I am correct")
         return True

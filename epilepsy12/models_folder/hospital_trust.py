@@ -119,6 +119,90 @@ class HospitalTrust(models.Model):
         blank=True,
         default=None
     )
+    OPENUKNetworkName = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    OPENUKNetworkCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    NHSEnglandRegion = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    NHSEnglandRegionCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    NHSEnglandRegionONSCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    ICBName = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    ICBODSCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    ICBONSBoundaryCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    LocalAuthorityName = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    LocalAuthorityODSCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    SubICBName = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    SubICBODSCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    CountryONSCode = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
+    Country = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None
+    )
     Phone = models.CharField(
         max_length=100,
         null=True,
@@ -141,6 +225,11 @@ class HospitalTrust(models.Model):
         max_length=100,
         null=True,
         blank=True,
+        default=None
+    )
+    DateValid = models.DateTimeField(
+        blank=True,
+        null=True,
         default=None
     )
 
