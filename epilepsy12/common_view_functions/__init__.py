@@ -2,3 +2,4 @@ from .calculate_kpis import calculate_kpis, annotate_kpis
 from .recalculate_form_generate_response import recalculate_form_generate_response, completed_fields, test_fields_update_audit_progress, trigger_client_event
 from .validate_form_update_model import validate_and_update_model
 from .aggregate_by import cases_aggregated_by_deprivation_score, cases_aggregated_by_ethnicity, cases_aggregated_by_sex
+from .report_queries import *
