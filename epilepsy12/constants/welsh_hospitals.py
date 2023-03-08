@@ -3179,7 +3179,7 @@ WELSH_HOSPITALS = [
         "Email": None,
         "Fax": None,
         "IsPimsManaged": None,
-        "OrganisationCode": "7a7ej",
+        "OrganisationCode": "7A7EJ",
         "OrganisationID": None,
         "OrganisationName": "Ystradgynlais Community Hospital",
         "OrganisationStatus": "Visible",
