@@ -117,21 +117,42 @@
             {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_registrations numerator=total_registrations denominator=total_cases title="Registrations Completed" pie_size='med' %}
         </div>
         
-        <div class="four wide column">
-            {% if total_cases is not None and total_cases > 0%}
+        <div class="four wide center bottom aligned column">
+            <div class="ui centered large statistic">
+                <div class="value">
+                  {{cohort_data.cohort}}
+                </div>
+                <div class="label">
+                  Current Cohort
+                </div>
+                <small>{{cohort_data.cohort_start_date}}-{{cohort_data.cohort_end_date}}</small>
+            </div>
+            {% comment %} {% if total_cases is not None and total_cases > 0%}
                 {% percentage_of_total total_referred_to_paediatrics total_cases as total_percent %}
                 {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Paediatrics" numerator=total_referred_to_paediatrics denominator=total_cases pie_size='med' %}
             {% else %}
-                <h5>No data yet!<h5>
-            {% endif %}
+                <h5>No data yet!<h5> 
+            {% endif %}{% endcomment %}
         </div>
-        <div class="four wide stackable column">
-            {% if total_cases is not None and total_cases > 0%}
+        <div class="four wide center bottom aligned stackable column">
+            {% comment %} {% if total_cases is not None and total_cases > 0%}
                 {% percentage_of_total total_referred_to_neurology total_cases as total_percent %}
                 {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title="Referred to Neurology" numerator=total_referred_to_neurology denominator=total_cases pie_size='med' %}
             {% else %}
                 <h5>No data yet!<h5>
-            {% endif %}
+            {% endif %} {% endcomment %}
+            <div class="ui large statistic">
+                <div class="value">
+                    {{cohort_data.days_remaining}}
+                </div>
+                <div class="label">
+                  Days remaining
+                </div>
+                {% if cohort_data.days_remaining == 0 %}
+                        Submission date passed
+                       <small> ({{cohort_data.submission_date}})</small>
+                {% endif %}
+            </div>
         </div>
         <div class="four wide stackable column">
             {% if total_cases is not None and total_cases > 0%}

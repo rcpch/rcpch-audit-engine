@@ -838,8 +838,8 @@ ul {
 .pie {
   position: relative;
   display: inline-block;
-  background-image: conic-gradient(rgba(0, 0, 0, 0) calc(3.6deg * var(--percent)),
-      rgba(0, 0, 0, 1) calc(3.6deg * var(--percent)));
+  background-image: conic-gradient(rgba(0, 0, 0, 1) calc(3.6deg * var(--percent)),
+      rgba(0, 0, 0, 0) calc(3.6deg * var(--percent)));
   background-blend-mode: overlay;
   background-position: 50% 50%;
   background-size: 150%;
@@ -1366,4 +1366,14 @@ img.ui.spaced.avatar.image{
 
 .ui.buttons .ui.rcpch_cancel.button {
   border-radius: 0%;
+}
+
+.ui.large.statistic .value {
+  color: var(--rcpch_light_blue);
+  font-family: 'Montserrat';
+}
+
+.ui.large.statistic div.label {
+  font-family: 'Montserrat';
+  color: var(--rcpch_charcoal);
 }
