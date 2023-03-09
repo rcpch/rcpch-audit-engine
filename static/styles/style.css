@@ -42,6 +42,7 @@
   /* 128,128,128 */
   --rcpch_charcoal: #4d4d4d;
   /* 77,77,77 */
+  --rcpch_charcoal_dark: #191919;
   --rcpch_black: #000000;
   /* secondary colours */
   --rcpch_red: #e60700;
@@ -1203,12 +1204,7 @@ ul {
   box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
 }
 
-footer {
-  margin-top: auto;
-  background-color: #191919;
-  clear: both;
-  padding-top: 30px;
-}
+
 
 footer p {
   color: white;

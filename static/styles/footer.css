@@ -1,4 +1,5 @@
 /* STYLES FOR THE FOOTER */
+
 .footer {
   font-family: Montserrat-Regular;
   position: absolute;
@@ -10,4 +11,11 @@
 .ui.footer.segment {
   margin: 5em 0em 0em;
   padding: 5em 0em;
+}
+
+footer {
+  margin-top: auto;
+  background-color: var(--rcpch_charcoal_dark);
+  clear: both;
+  padding-top: 30px;
 }
