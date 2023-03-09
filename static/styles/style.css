@@ -88,7 +88,7 @@ ul {
   color: var(--rcpch_charcoal);
 }
 
-#rcpch_link {
+.rcpch_link {
   font-family: Montserrat-Regular;
   color: black;
 }
@@ -115,7 +115,7 @@ ul {
   font-family: Montserrat-Regular;
 }
 
-#patient {
+.patient {
   color: pink;
 }
 
@@ -137,15 +137,6 @@ ul {
   color: var(--rcpch_light_blue);
   font-family: Montserrat-Regular;
 }
-
-#active_menu_item {
-  color: var(--rcpch_strong_blue);
-  border-width: 5px;
-  line-height: 1.125rem;
-  border-color: var(--rcpch_strong_blue);
-  font-family: Montserrat-Regular;
-}
-
 
 #nav-rcpch {
   width: 150px;
