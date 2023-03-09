@@ -1,0 +1,7 @@
+#active_menu_item{
+  color: var(--rcpch_strong_blue);
+  border-width: 5px;
+  line-height: 1.125rem;
+  border-color: var(--rcpch_strong_blue);
+  font-family: Montserrat-Regular;
+}
