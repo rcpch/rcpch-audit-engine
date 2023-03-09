@@ -67,6 +67,6 @@ footer a:-webkit-any-link {
   width: auto;
 }
 
-footer.copyright {
-  color: var(--rcpch_white);
+.ui.grid>.row.footer_social_media_row {
+  padding: 0.5rem 0rem;
 }
