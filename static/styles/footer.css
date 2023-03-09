@@ -70,3 +70,7 @@ footer a:-webkit-any-link {
 .ui.grid>.row.footer_social_media_row {
   padding: 0.5rem 0rem;
 }
+
+h2.footer_h2 {
+  font-weight: 700;
+}
