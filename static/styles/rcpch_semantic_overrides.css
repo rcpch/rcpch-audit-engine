@@ -1,3 +1,5 @@
+/* NAVBAR */
+
 #active_menu_item{
   color: var(--rcpch_strong_blue);
   border-width: 5px;
@@ -5,3 +7,10 @@
   border-color: var(--rcpch_strong_blue);
   font-family: Montserrat-Regular;
 }
+
+/* VERY SPECIFIC STYLES */
+
+.rcpch_link {
+    font-family: Montserrat-Regular;
+    color: black;
+  }
