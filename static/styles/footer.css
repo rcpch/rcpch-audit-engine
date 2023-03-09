@@ -1,6 +1,5 @@
 /* STYLES FOR THE FOOTER */
 
-
 footer {
   margin-top: auto;
   background-color: var(--rcpch_charcoal_dark);
@@ -67,10 +66,64 @@ footer a:-webkit-any-link {
   width: auto;
 }
 
-.ui.grid>.row.footer_social_media_row {
+/* LAYOUT OF FOOTER CONTENTS */
+
+.ui.grid > .row.footer_all_contents_row {
+  padding: 1em 2em;
+}
+
+.ui.grid > .row.footer_link_row {
   padding: 0.5rem 0rem;
 }
 
 h2.footer_h2 {
   font-weight: 700;
+  font-size: 1.5em;
+}
+
+.footer_links_container {
+  margin-top: 1em;
+}
+
+.ui.grid.footer_grid {
+  padding: 2em;
+  border-top: 1px solid var(--rcpch_charcoal)
+}
+
+.ui.grid.footer_grid.legal_footer {
+  border-color: hsla(0,0%,100%,.1)!important; 
+}
+
+
+
+.row.footer_copyright_row {
+  margin: 1em 0em;
+}
+
+/* RCPCH BUTTON */
+
+.ui.button.rcpch_website_button_white {
+  margin: 1.5em 0em;
+  border-radius: 0% !important;
+  background: var(--rcpch_white);
+  color: var(--rcpch_black);
+  font-family: Montserrat-Regular;
+}
+
+.ui.button.rcpch_website_button_white:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_light_blue);
+  transition-duration: 0.4s;
+}
+
+/* TCS LINKs */
+
+a.tcs_link {
+  text-decoration-line: underline !important;  
+}
+
+/* COPYRIGHT TEXT */
+.copyright>p{
+  font-size: smaller;
 }
