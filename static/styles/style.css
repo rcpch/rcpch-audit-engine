@@ -88,11 +88,6 @@ ul {
   color: var(--rcpch_charcoal);
 }
 
-.rcpch_link {
-  font-family: Montserrat-Regular;
-  color: black;
-}
-
 .ui.fluid.rcpch.container {
   padding: 2rem;
 }
