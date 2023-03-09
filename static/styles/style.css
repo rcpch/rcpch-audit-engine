@@ -1,3 +1,6 @@
+/* IMPORTS FOR VARIOUS SECTIONS */
+@import './footer.css';
+
 @font-face {
   font-family: Montserrat-Bold;
   src: local('Montserrat-Bold'),
@@ -87,6 +90,20 @@ ul {
   font-family: Montserrat-Regular;
   color: var(--rcpch_charcoal);
 }
+
+#active_menu_item{
+  color: var(--rcpch_strong_blue);
+  border-width: 5px;
+  line-height: 1.125rem;
+  border-color: var(--rcpch_strong_blue);
+  font-family: Montserrat-Regular;
+}
+
+.rcpch_link {
+  font-family: Montserrat-Regular;
+  color: black;
+}
+
 
 .ui.fluid.rcpch.container {
   padding: 2rem;
