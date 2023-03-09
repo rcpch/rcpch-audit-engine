@@ -109,19 +109,6 @@ ul {
   padding: 2rem;
 }
 
-.footer {
-  font-family: Montserrat-Regular;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 50px;
-}
-
-.ui.footer.segment {
-  margin: 5em 0em 0em;
-  padding: 5em 0em;
-}
-
 .ui.label {
   list-style: none;
   font-family: Montserrat-Regular;
