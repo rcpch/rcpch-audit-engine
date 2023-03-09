@@ -1,17 +1,5 @@
 /* STYLES FOR THE FOOTER */
 
-.footer {
-  font-family: Montserrat-Regular;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 50px;
-}
-
-.ui.footer.segment {
-  margin: 5em 0em 0em;
-  padding: 5em 0em;
-}
 
 footer {
   margin-top: auto;
@@ -35,8 +23,26 @@ footer img {
   max-width: 100%;
 }
 
+footer a,
+footer a:hover {
+  color: var(--rcpch_light_blue);
+}
+
+.footer {
+  font-family: Montserrat-Regular;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+}
+
 footer .icon {
   color: white;
+}
+
+.ui.footer.segment {
+  margin: 5em 0em 0em;
+  padding: 5em 0em;
 }
 
 .standard-footer__icon {
@@ -46,11 +52,6 @@ footer .icon {
   margin-right: 0.66667em;
   padding: 0.5em;
   width: 2.25rem;
-}
-
-footer a,
-footer a:hover {
-  color: var(--rcpch_light_blue);
 }
 
 footer a:-webkit-any-link {
@@ -64,4 +65,8 @@ footer a:-webkit-any-link {
 .epilepsy12_logo_footer {
   height: 25%;
   width: auto;
+}
+
+footer.copyright {
+  color: var(--rcpch_white);
 }
