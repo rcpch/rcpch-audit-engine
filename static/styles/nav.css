@@ -1,15 +1,32 @@
-#active_menu_item{
-  color: var(--rcpch_strong_blue);
-  border-width: 5px;
-  line-height: 1.125rem;
-  border-color: var(--rcpch_strong_blue);
-  font-family: Montserrat-Regular;
+/* entire */
+
+/*  SIGNIN*/
+
+.ui.text.menu.signin {
+  background-color: #eee;
+  margin: 0px;
+  height: 1em;
 }
 
+.ui.text.menu .right.menu {
+  font-family: Montserrat-Regular;
+  background-color: var(--rcpch_light_blue);
+  margin-right: 4em;
+  padding: 1em;
+}
+
+.signin_text {
+  font-weight: 700;
+}
+
+/* NAV */
+
+
+
 .ui.secondary.pointing.menu {
-  margin-bottom: 1rem;
   font-family: Montserrat-Regular;
   font-size: small;
+  margin: 0px;
 }
 
 .ui.secondary.pointing.menu .item {
@@ -19,10 +36,24 @@
 .ui.secondary.pointing.menu .item:hover {
   border-color: var(--rcpch_light_blue);
   border-width: 5px;
+}
+
+.ui.secondary.pointing.menu .active.item {
+  /* color: var(--rcpch_strong_blue); */
+  border-width: 5px;
   line-height: 1.125rem;
-  color: var(--rcpch_light_blue);
+  border-color: var(--rcpch_strong_blue);
   font-family: Montserrat-Regular;
 }
+
+.ui.secondary.pointing.menu .active.item:hover {
+  border-color: var(--rcpch_light_blue)
+}
+
+.ui.secondary.pointing.menu a.item:hover {
+  line-height: 1.1rem;  
+}
+
 
 #nav-rcpch {
   width: 150px;
@@ -36,11 +67,3 @@
   border-width: 0;
 }
 
-.ui.text.menu .right.menu {
-  font-family: Montserrat-Regular;
-  background-color: var(--rcpch_light_blue);
-}
-
-.ui.text.menu .right.menu .item:hover {
-  font-family: Montserrat-Bold;
-}
