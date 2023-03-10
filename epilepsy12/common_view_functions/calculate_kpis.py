@@ -144,23 +144,39 @@ def calculate_kpis(registration_instance):
             mri = 1
 
     # 7. assessment_of_mental_health_issues
+    # %  of children with epilepsy where there is documented evidence that they have been asked about mental health
+    #  either through clinical screening, or a questionnaire/measure
     # Calculation Method
     # Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
     # Denominator = = Number of children and young people over 5 years diagnosed with epilepsy
     assessment_of_mental_health_issues = 0
-    if hasattr(registration_instance, 'multiaxial_diagnosis'):
+    if hasattr(registration_instance, 'multiaxialdiagnosis'):
         if (
             age_at_first_paediatric_assessment >= 5
         ) and (
-            registration_instance.multiaxial_diagnosis.mental_health_screen
+            registration_instance.multiaxialdiagnosis.mental_health_screen
         ):
             assessment_of_mental_health_issues = 1
 
-    # 8. mental_health_support
+    # mental_health_support
+    # %  of children with epilepsy and a mental health problem who have evidence of mental health support
+    # Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue
+    # identified AND had evidence of mental health support
+    # received
+
+    # Denominator= Number of children and young people
+    # diagnosed with epilepsy AND had a mental health issue
+    # identified
+    mental_health_support = 0
+    if hasattr(registration_instance, 'management'):
+        if (registration_instance.management.has_been_referred_for_mental_health_support or registration_instance.management.has_support_for_mental_health_support):
+            mental_health_support = 1
+
+    # 8. sodium_valproate
     # Calculation Method
     # Numerator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate AND annual risk acknowledgement forms completed AND pregnancy prevention programme in place
     # Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
-    mental_health_support = 0
+    sodium_valproate = 0
     if hasattr(registration_instance, 'management'):
         if(
             age_at_first_paediatric_assessment >= 12 and
@@ -174,7 +190,7 @@ def calculate_kpis(registration_instance):
                 has_a_valproate_annual_risk_acknowledgement_form_been_completed=True
             ).exists()
         ):
-            mental_health_support = 1
+            sodium_valproate = 1
 
     # 9. comprehensive_care_planning_agreement
     # Calculation Method
@@ -199,7 +215,6 @@ def calculate_kpis(registration_instance):
             patient_held_individualised_epilepsy_document = 1
 
     # 11. care_planning_has_been_updated_when_necessary
-
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -321,6 +336,7 @@ def calculate_kpis(registration_instance):
         'mri': mri,
         'assessment_of_mental_health_issues': assessment_of_mental_health_issues,
         'mental_health_support': mental_health_support,
+        'sodium_valproate': sodium_valproate,
         'comprehensive_care_planning_agreement': comprehensive_care_planning_agreement,
         'patient_held_individualised_epilepsy_document': patient_held_individualised_epilepsy_document,
         'care_planning_has_been_updated_when_necessary': care_planning_has_been_updated_when_necessary,
