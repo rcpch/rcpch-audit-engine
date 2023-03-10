@@ -34,49 +34,50 @@
       </div>
       <div class="ui container rcpch fluid nav">
         <div class="ui secondary pointing stackable menu ">
-          <a {% if request.resolver_match.url_name|is_in:'index' %} class="active_menu_item active item" {% else %} class="item" {% endif %}
-             href="{% url 'index' %}">
-            <span>
-              <img id="nav-rcpch"
-                   src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}"
-                   class="item">
-            </span>
-          </a>
-          <h4>Epilepsy12 audit platform</h4>
-          <div class='right menu'>
-            <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %}
-               id="link"
+            <a {% if request.resolver_match.url_name|is_in:'index' %} class="active_menu_item active item" {% else %} class="item" {% endif %}
                href="{% url 'index' %}">
-              Home
+              <span>
+                <img id="nav-rcpch"
+                     src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}"
+                     class="item">
+              </span>
             </a>
-            {% if user.is_authenticated %}
-              {% if user.is_superuser %}
-                <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-                   href="{% url 'admin:index' %}">
-                  Database management
+            <h4>Epilepsy12 audit platform</h4>
+            <div class='right menu'>
+              <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'index' %}">
+                Home
+              </a>
+              {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                  <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                     href="{% url 'admin:index' %}">
+                    Database management
+                  </a>
+                {% endif %}
+                <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                   id="link"
+                   href="{% url 'hospital_reports' %}">
+                  Clinician access
                 </a>
               {% endif %}
-              <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+              <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
                  id="link"
-                 href="{% url 'hospital_reports' %}">
-                Clinician access
+                 href="{% url 'patient' %}">
+                Patient access
               </a>
-            {% endif %}
-            <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-               id="link"
-               href="{% url 'patient' %}">
-              Patient access
-            </a>
-            <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-               id="link"
-               href="{% url 'docs' %}">
-              Documentation
-            </a>
-            <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-               id="link"
-               href="{% url 'tsandcs' %}">
-              Terms of Service
-            </a>
+              <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'docs' %}">
+                Documentation
+              </a>
+              <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'tsandcs' %}">
+                Terms of Service
+              </a>
+            </div>
           </div>
         </div>
       </div>
