@@ -1,102 +1,85 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+    <div class="ui fluid container hero_container">
+        <div class="ui middle aligned six column centered grid rcpch_hero">
+            <div class="four wide column centered">
+                <img src="{% static 'images/EP12_ID_COLOUR_Digital_full_screen.png' %}"
+                     class='ui image epilepsy12_logo'/>
+            </div>
+            <div class="row">
+                <div class="ten wide column centered">
+                    <h1 class='ui header content'>The UK national audit for childhood epilepsies.</h1>
+                    <h2 class='ui header'>
+                        A platform for clinicians and families, built by the Royal College of Paediatrics and Child Health.
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class='ui fluid container'>
-    <div class='rcpch_hero'>
-        <div class='rcpch_hero_wallpaper'></div>
-        <img src="{% static 'images/EP12_ID_COLOUR_Digital_full_screen.png' %}" class='epilepsy12_logo'/>
-        <div class='centred_rcpch_title'>
-            <h1 class='ui header'>
-                <div class='content'>
-                    The UK national audit for childhood epilepsies.
-                    <div class='sub header'>
-                        A platform for clinicians and families, built by the Royal College of Paediatrics and Child Health</div>
+    <div class='ui fluid rcpch container'>
+        <div class="ui two stackable cards">
+            <div class="ui raised rcpch_dark_blue card">
+                <div class="content">
+                    <div class="header">Community and hospital</div>
+                    <div class="meta">
+                        <span class="category">Clinician access</span>
+                    </div>
+                    <div class="description">
+                        <p></p>
+                    </div>
+                    <div class="center aligned image">
+                        <i class="huge hospital outline icon"></i>
                     </div>
                 </div>
-            </h1>
-        </div>
-    </div>
-</div>
-
-<div class='ui fluid rcpch container'>
-
-    <div class="ui two stackable cards">
-        
-        <div class="ui raised rcpch_dark_blue card">      
-            <div class="content">
-                <div class="header">Community and hospital</div>
-                <div class="meta">
-                <span class="category">Clinician access</span>
-                </div>
-                <div class="description">
-                <p></p>
-                </div>
-                <div class="center aligned image">
-                    <i class="huge hospital outline icon"></i>
+                <div class="extra content">
+                    <a href={% url 'hospital_reports' %}>
+                        <button class="ui fluid rcpch_primary button">Select</button>
+                    </a>
                 </div>
             </div>
-            <div class="extra content">
-                <a href={% url 'hospital_reports' %}>
-                    <button class="ui fluid rcpch_primary button">Select</button>
-                </a> 
+            <div class="ui rcpch_dark_blue raised card">
+                <div class="content">
+                    <div class="header">Children and families</div>
+                    <div class="meta">
+                        <span class="category">Patient access</span>
+                    </div>
+                    <div class="description">
+                        <p></p>
+                    </div>
+                    <div class="center aligned image">
+                        <i class="huge white child icon"></i>
+                    </div>
+                </div>
+                <div class="extra content">
+                    <a href={% url 'patient' %}>
+                        <button class="ui fluid rcpch_primary button">Select</button>
+                    </a>
+                </div>
             </div>
         </div>
-
-        <div class="ui rcpch_dark_blue raised card">
-            <div class="content">
-                <div class="header">Children and families</div>
-                <div class="meta">
-                <span class="category">Patient access</span>
-                </div>
-                <div class="description">
-                <p></p>
-                </div>
-                <div class="center aligned image">
-                    <i class="huge white child icon"></i>
-                </div>
-            </div>
-            <div class="extra content">
-                <a href={% url 'patient' %}>
-                    <button class="ui fluid rcpch_primary button">Select</button>
-                </a>
-            </div>
-        </div>
-
-    </div>
-
         <div class="ui segment">
-        <h2>Welcome to the Epilepsy12 data platform</h2>
-        <p>
-        Epilepsy12 is delivered by the Royal College of Paediatrics and Child Health (RCPCH). The RCPCH mission is to transform child health through knowledge, innovation and expertise.
-        </p>
-        <h3>
-        National Data Opt Out Implementation (England only)
-        </h3>
-        <p>
-        The Epilepsy12 audit is now exempt from the NHS National Data Opt-Out. Healthcare providers in England no longer need to screen patients against the opt-out list prior to entering their data. Patients can still opt out of Epilepsy12 specifically by contacting their clinical team. You can indicate this in the first year of care form and the record will be deleted.
-
-        Please take a look at our <a href="https://www.rcpch.ac.uk/work-we-do/quality-improvement-patient-safety/epilepsy12-audit/methodology-data-submission">methodology and data submission</a> page for more information.
-        </p>
-        <h3>
-        Childhood epilepsy
-        </h3>
-        <p>
-        Epilepsy affects around one in every 200 children and young people in the UK (aged 18 and under). The condition is one of the most common significant long-term health conditions of childhood. Epilepsy can have a huge impact on children and families. Epileptic seizures can happen in any part of the brain cortex and what happens depends on where in the brain the seizure is happening. Seizures can be distressing but it's not just the seizures that are the problem. Children and young people may experience issues with learning, behaviour and emotions. That's why children and parents need support and guidance from healthcare professionals throughout the stages of diagnosis and treatment.
-        </p>
-
-        <h3>
-        About Epilepsy12
-        </h3>
-
-        <p>
-        Epilepsy12 (The UK collaborative clinical audit of health care for children and young people with suspected epileptic seizures) is a national clinical audit established in 2009 and has the continued aim of helping epilepsy services, and those who commission health services, to measure and improve the quality of care for children and young people with seizures and epilepsies. As per rounds 1 - 3 of the audit the audit is overseen by a project board and a dedicated project team within the RCPCH.</p>
-        <p>
-        You can contact the team at: epilepsy12@rcpch.ac.uk or on 020 7092 6157/6056. Dr Colin Dunkley, Consultant Paediatrician, is the current clinical lead for Epilepsy12.
-        </p>
+            <h2>Welcome to the Epilepsy12 data platform</h2>
+            <p>
+                Epilepsy12 is delivered by the Royal College of Paediatrics and Child Health (RCPCH). The RCPCH mission is to transform child health through knowledge, innovation and expertise.
+            </p>
+            <h3>National Data Opt Out Implementation (England only)</h3>
+            <p>
+                The Epilepsy12 audit is now exempt from the NHS National Data Opt-Out. Healthcare providers in England no longer need to screen patients against the opt-out list prior to entering their data. Patients can still opt out of Epilepsy12 specifically by contacting their clinical team. You can indicate this in the first year of care form and the record will be deleted.
+                Please take a look at our <a href="https://www.rcpch.ac.uk/work-we-do/quality-improvement-patient-safety/epilepsy12-audit/methodology-data-submission">methodology and data submission</a> page for more information.
+            </p>
+            <h3>Childhood epilepsy</h3>
+            <p>
+                Epilepsy affects around one in every 200 children and young people in the UK (aged 18 and under). The condition is one of the most common significant long-term health conditions of childhood. Epilepsy can have a huge impact on children and families. Epileptic seizures can happen in any part of the brain cortex and what happens depends on where in the brain the seizure is happening. Seizures can be distressing but it's not just the seizures that are the problem. Children and young people may experience issues with learning, behaviour and emotions. That's why children and parents need support and guidance from healthcare professionals throughout the stages of diagnosis and treatment.
+            </p>
+            <h3>About Epilepsy12</h3>
+            <p>
+                Epilepsy12 (The UK collaborative clinical audit of health care for children and young people with suspected epileptic seizures) is a national clinical audit established in 2009 and has the continued aim of helping epilepsy services, and those who commission health services, to measure and improve the quality of care for children and young people with seizures and epilepsies. As per rounds 1 - 3 of the audit the audit is overseen by a project board and a dedicated project team within the RCPCH.
+            </p>
+            <p>
+                You can contact the team at: epilepsy12@rcpch.ac.uk or on 020 7092 6157/6056. Dr Colin Dunkley, Consultant Paediatrician, is the current clinical lead for Epilepsy12.
+            </p>
+        </div>
     </div>
-
-</div>
-
-
 {% endblock %}

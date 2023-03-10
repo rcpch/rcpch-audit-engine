@@ -61,6 +61,9 @@
   --rcpch_strong_green: #66cc33;
 
   --rcpch_dark_red: #9a0500;
+
+  /* STANDARD FONT */
+  --rcpch_standard_font: Montserrat-Regular;
 }
 
 body {
@@ -115,33 +118,41 @@ ul {
 
 
 /* hero */
-.rcpch_hero {
-  position: relative;
-  text-align: center;
-  height: 350px;
-}
 
-.rcpch_hero_wallpaper {
-  height: 350px;
-  position: relative;
-  filter: brightness(50%);
-  background-image: url('images/blue-wallpaper-wheel.png');
+.ui.fluid.container.hero_container {
+  padding-top: 1rem;
+  height: 40vh;
+  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
   background-repeat: no-repeat;
   background-size: 100% auto;
 }
 
+.rcpch_hero {
+  position: relative;
+  text-align: center;
+}
+
+.rcpch_hero_wallpaper > .row {
+  height: 100%;
+}
+
 .epilepsy12_logo {
-  position: absolute;
-  filter: brightness(100%);
-  top: 0;
-  right: 0;
-  left: 0;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 2vw;
-  min-width: none;
+  margin-top: 4vw;
   max-width: 300px;
-  height: auto;
+}
+
+.rcpch_hero > .row > div > * {
+  color: var(--rcpch_white);
+  text-align: center;
+  font-family: var(--rcpch_standard_font);
+}
+
+.rcpch_hero > .row > div > h1 {
+  font-size: 3em;
+}
+
+.rcpch_hero > .row > div > h2 {
+  font-size: 1.5em;
 }
 
 
@@ -161,6 +172,7 @@ ul {
   /** Y-axis align **/
   justify-content: center;
   margin-top: 1vh;
+  font-family: Montserrat-Regular;
 }
 
 .centred_rcpch_title h1.ui.header .sub.header {
