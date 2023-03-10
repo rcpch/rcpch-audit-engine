@@ -156,48 +156,7 @@ ul {
 }
 
 
-.rcpch_hero .centred_rcpch_title h1.ui.header .content {
-  position: absolute;
-  color: white;
-  font-size: 3vw;
-  z-index: 1000;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  /** Y-axis align **/
-  justify-content: center;
-  margin-top: 1vh;
-  font-family: Montserrat-Regular;
-}
-
-.centred_rcpch_title h1.ui.header .sub.header {
-  position: absolute;
-  color: white;
-  font-size: 3vw;
-  z-index: 1000;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  /** Y-axis align **/
-  justify-content: center;
-  /** X-axis align **/
-  color: white;
-  font-size: 2vw;
-  margin-top: 5vh;
-  margin-bottom: 5vh;
-}
-
-
 /* links */
-
-
 
 #tsandcssegment {
   background-color: #11a7f2;
@@ -237,6 +196,7 @@ ul {
   border-radius: 0%;
   font-family: Montserrat-Regular;
   color: white;
+  width: auto;
 }
 
 .ui.rcpch_dark_blue.card .content .header {
