@@ -54,7 +54,7 @@
 
           <div class="ui secondary pointing stackable menu">
 
-              <a {% if request.resolver_match.url_name|is_in:'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
+              <a {% if request.resolver_match.url_name|is_in:'index' %} class="active_menu_item active item" {% else %} class="item" {% endif %} href={% url 'index' %}>
                 <span>
                   <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
                 </span>
@@ -62,7 +62,7 @@
                   <h4>Epilepsy12 audit platform</h4>
 
               <div class='right menu'>
-                <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'index' %}>
+                <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %} id="link" href={% url 'index' %}>
                   Home
                 </a>
                 {% if user.is_authenticated %}
