@@ -1,6 +1,7 @@
 /* IMPORTS FOR VARIOUS SECTIONS */
 @import './footer.css';
-
+@import './nav.css';
+/* END IMPORTS */
 @font-face {
   font-family: Montserrat-Bold;
   src: local('Montserrat-Bold'),
@@ -60,6 +61,9 @@
   --rcpch_strong_green: #66cc33;
 
   --rcpch_dark_red: #9a0500;
+
+  /* STANDARD FONT */
+  --rcpch_standard_font: Montserrat-Regular;
 }
 
 body {
@@ -93,14 +97,6 @@ ul {
   color: var(--rcpch_charcoal);
 }
 
-#active_menu_item{
-  color: var(--rcpch_strong_blue);
-  border-width: 5px;
-  line-height: 1.125rem;
-  border-color: var(--rcpch_strong_blue);
-  font-family: Montserrat-Regular;
-}
-
 .rcpch_link {
   font-family: Montserrat-Regular;
   color: black;
@@ -120,118 +116,47 @@ ul {
   color: pink;
 }
 
-/* menu */
-.ui.secondary.pointing.menu {
-  margin-bottom: 1rem;
-  font-family: Montserrat-Regular;
-  font-size: small;
-}
-
-.ui.secondary.pointing.menu .item {
-  line-height: 1.5rem;
-}
-
-.ui.secondary.pointing.menu .item:hover {
-  border-color: var(--rcpch_light_blue);
-  border-width: 5px;
-  line-height: 1.125rem;
-  color: var(--rcpch_light_blue);
-  font-family: Montserrat-Regular;
-}
-
-#nav-rcpch {
-  width: 150px;
-  height: auto;
-  padding: 0;
-  font-family: Montserrat-Regular;
-  border-width: 0;
-}
-
-#nav-rcpch:hover {
-  border-width: 0;
-}
-
-.ui.text.menu .right.menu {
-  font-family: Montserrat-Regular;
-  background-color: var(--rcpch_light_blue);
-}
-
-.ui.text.menu .right.menu .item:hover {
-  font-family: Montserrat-Bold;
-}
 
 /* hero */
-.rcpch_hero {
-  position: relative;
-  text-align: center;
-  height: 350px;
-}
 
-.rcpch_hero_wallpaper {
-  height: 350px;
-  position: relative;
-  filter: brightness(50%);
-  background-image: url('images/blue-wallpaper-wheel.png');
+.ui.fluid.container.hero_container {
+  padding-top: 1rem;
+  height: 40vh;
+  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
   background-repeat: no-repeat;
   background-size: 100% auto;
 }
 
+.rcpch_hero {
+  position: relative;
+  text-align: center;
+}
+
+.rcpch_hero_wallpaper > .row {
+  height: 100%;
+}
+
 .epilepsy12_logo {
-  position: absolute;
-  filter: brightness(100%);
-  top: 0;
-  right: 0;
-  left: 0;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 2vw;
-  min-width: none;
+  margin-top: 4vw;
   max-width: 300px;
-  height: auto;
 }
 
-
-.rcpch_hero .centred_rcpch_title h1.ui.header .content {
-  position: absolute;
-  color: white;
-  font-size: 3vw;
-  z-index: 1000;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  /** Y-axis align **/
-  justify-content: center;
-  margin-top: 1vh;
+.rcpch_hero > .row > div > * {
+  color: var(--rcpch_white);
+  text-align: center;
+  font-family: var(--rcpch_standard_font);
 }
 
-.centred_rcpch_title h1.ui.header .sub.header {
-  position: absolute;
-  color: white;
-  font-size: 3vw;
-  z-index: 1000;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  /** Y-axis align **/
-  justify-content: center;
-  /** X-axis align **/
-  color: white;
-  font-size: 2vw;
-  margin-top: 5vh;
-  margin-bottom: 5vh;
+.rcpch_hero > .row > div > h1 {
+  font-size: 3em;
+}
+
+.rcpch_hero > .row > div > h2 {
+  font-size: 1.5em;
 }
 
 
 /* links */
-
-
 
 #tsandcssegment {
   background-color: #11a7f2;
@@ -271,6 +196,7 @@ ul {
   border-radius: 0%;
   font-family: Montserrat-Regular;
   color: white;
+  width: auto;
 }
 
 .ui.rcpch_dark_blue.card .content .header {
