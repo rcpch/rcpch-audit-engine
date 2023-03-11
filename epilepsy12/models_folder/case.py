@@ -14,7 +14,7 @@ from simple_history.models import HistoricalRecords
 
 # epilepsy12
 from .help_text_mixin import HelpTextMixin
-from ..constants import SEX_TYPE, ETHNICITIES, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_CONSENT_TO_AUDIT_PARTICIPATION
+from ..constants import SEX_TYPE, ETHNICITIES, UNKNOWN_POSTCODES, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from ..general_functions import imd_for_postcode
 from .time_and_user_abstract_base_classes import *
 
@@ -190,8 +190,9 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
             *args, **kwargs) -> None:
 
         # This field requires the deprivare api to be running
-        # commented out for now to allow live demo to function
-        if self.postcode:
+        # note if one of ['ZZ99 3CZ','ZZ99 3GZ','ZZ99 3WZ','ZZ99 3VZ'], represent not known, not known - England,
+        # not known - Wales or no fixed abode
+        if self.postcode and self.postcode not in UNKNOWN_POSTCODES:
             self.index_of_multiple_deprivation_quintile = imd_for_postcode(
                 self.postcode)
         return super().save(*args, **kwargs)
