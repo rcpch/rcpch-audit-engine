@@ -66,14 +66,14 @@ def hospital_reports(request):
         hospital_instance=selected_hospital).count()
 
     if count_of_current_cohort_registered_completed_cases_in_this_hospital > 0:
-        total_percent_hospital = round((count_of_current_cohort_registered_cases_in_this_hospital /
-                                       count_of_current_cohort_registered_completed_cases_in_this_hospital) * 100)
+        total_percent_hospital = round((count_of_current_cohort_registered_completed_cases_in_this_hospital /
+                                       count_of_current_cohort_registered_cases_in_this_hospital) * 100)
     else:
         total_percent_hospital = 0
 
     if count_of_current_cohort_registered_completed_cases_in_this_hospital_trust > 0:
-        total_percent_trust = round((count_of_current_cohort_registered_cases_in_this_hospital_trust /
-                                    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust) * 100)
+        total_percent_trust = round((count_of_current_cohort_registered_completed_cases_in_this_hospital_trust /
+                                    count_of_current_cohort_registered_cases_in_this_hospital_trust) * 100)
     else:
         total_percent_trust = 0
 

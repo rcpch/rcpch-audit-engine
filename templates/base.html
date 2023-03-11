@@ -6,119 +6,97 @@
   <head>
     <meta charset="utf-8" />
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no"
-    />
-    <meta
-      name="description"
-      content="The Epilepsy12 National Audit for Childhood Epilepsy."
-    />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no"/>
+    <meta name="description"
+          content="The Epilepsy12 National Audit for Childhood Epilepsy."/>
     <meta name="keywords" content="Epilepsy12 RCPCH Audit Childhood Epilepsy" />
     <meta name="author" content="RCPCH" />
     <meta name="theme-color" content="#ffffff" />
     <title>Epilepsy12 Platform | RCPCH</title>
-    <link
-      rel="stylesheet"
-      href="{% static 'styles/semantic.min.css' %}"
-      type="text/css"
-    />
-
+    <link rel="stylesheet"
+          href="{% static 'styles/semantic.min.css' %}"
+          type="text/css"/>
     <link rel="icon" href="/favicon.ico'"/>
     <link rel="stylesheet" href="{% static 'styles/style.css' %}"/>
-    
   </head>
-
   <body id="root">
-
-      <div class="ui fluid rcpch container">
-
-        {% block nav %}
-
-          <div class="ui text menu">
-            <div class="right menu"> 
-              {% if user.is_authenticated %}
-                  <a class="item" href="{% url 'logout' %}">
-                    Log out {{ user.get_full_name }}
-                  </a>
-              {% else %}
-                <a class="item" href="{% url 'login' %}">
-                  Sign in
-                </a>
-                {% comment %} <a class="item" href="{% url 'signup' %}">
-                  Sign up
-                </a> {% endcomment %}
-              {% endif %}
-            </div>
-          </div>
-
-          <div class="ui secondary pointing stackable menu">
-
-              <a {% if request.resolver_match.url_name|is_in:'index' %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'index' %}>
-                <span>
-                  <img id="nav-rcpch" src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}" class="item">
-                </span>
+    {% block nav %}
+      <div class="ui text menu signin">
+        <div class="right menu">
+          {% if user.is_authenticated %}
+            <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
+          {% else %}
+            <a class="item signin_button" href="{% url 'login' %}"><i class="arrow right icon"></i><span class="signin_text">Sign in</span></a>
+            {% comment %} <a class="item signin_button" href="{% url 'signup' %}"><i class="arrow right icon"></i><span class="signin_text">Sign up</span></a> {% endcomment %}
+          {% endif %}
+        </div>
+      </div>
+      <div class="ui container rcpch fluid nav">
+        <div class="ui secondary pointing stackable menu ">
+            <a {% if request.resolver_match.url_name|is_in:'index' %} class="active_menu_item active item" {% else %} class="item" {% endif %}
+               href="{% url 'index' %}">
+              <span>
+                <img id="nav-rcpch"
+                     src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}"
+                     class="item">
+              </span>
+            </a>
+            <h4>Epilepsy12 audit platform</h4>
+            <div class='right menu'>
+              <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'index' %}">
+                Home
               </a>
-                  <h4>Epilepsy12 audit platform</h4>
-
-              <div class='right menu'>
-                <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'index' %}>
-                  Home
-                </a>
-                {% if user.is_authenticated %}
-                  {% if user.is_superuser %}
-                    <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} href={% url 'admin:index' %}>
-                      Database management
-                    </a>
-                  {% endif %}
-                
-                  <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'hospital_reports' %}>
-                    Clinician access
+              {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                  <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                     href="{% url 'admin:index' %}">
+                    Database management
                   </a>
                 {% endif %}
-                <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'patient' %}>
-                  Patient access
+                <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                   id="link"
+                   href="{% url 'hospital_reports' %}">
+                  Clinician access
                 </a>
-                <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'docs' %}>
-                  Documentation
-                </a>
-                <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %} id="link" href={% url 'tsandcs' %}>
-                  Terms of Service
-                </a>
-              </div>
-
+              {% endif %}
+              <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'patient' %}">
+                Patient access
+              </a>
+              <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'docs' %}">
+                Documentation
+              </a>
+              <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                 id="link"
+                 href="{% url 'tsandcs' %}">
+                Terms of Service
+              </a>
+            </div>
           </div>
-
-      
-        {% endblock %}
-
+        </div>
       </div>
-
-
-    <div class='ui container' style='padding: 1rem;'>
-      
-      {% if messages %}
-      <div class="ui rcpch_info icon message">
-        <i class="info icon"></i>
-        <i class="close icon"></i>
-        {% for message in messages %}
-        {% if message.tags %} {% endif %}
-        {{ message }}
-        {% endfor %}
+    {% endblock %}
+    {% if messages %}
+      <div class='ui container'>
+        <div class="ui rcpch_info icon message">
+          <i class="info icon"></i>
+          <i class="close icon"></i>
+          {% for message in messages %}
+            {% if message.tags %}{% endif %}
+            {{ message }}
+          {% endfor %}
+        </div>
       </div>
-      {% endif %}
-      
-    </div>
-
+    {% endif %}
     <div class='ui fluid container'>
-      
-      {% block content %}
-      {% endblock %}
-      
+      {% block content %}{% endblock %}
     </div>
-
-        
-        
     <div class="ui fluid rcpch container">
       <div class="ui rcpch_warning message">This site is currently under development.</div>
     </div>
@@ -133,7 +111,6 @@
     <script src="{% static 'hyperscript_0.9.8/hyperscript.min.js' %}"></script>
     <script src="{% static 'js/semantic.min.js' %}" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
       $('.message .close').on('click', function() {
         $(this)
@@ -182,5 +159,4 @@
       
     </script>
   </body>
-  
 </html>

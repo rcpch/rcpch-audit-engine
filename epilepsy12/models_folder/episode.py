@@ -64,7 +64,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
             'label': "What is the episode(s) like and is the description adequate?",
             'reference': "What is the episode(s) like and is the description adequate?",
         },
-        max_length=5000,
+        max_length=2000,
         default="",
         blank=True,
         null=True

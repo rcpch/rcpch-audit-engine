@@ -25,25 +25,27 @@ def calculate_kpis(registration_instance):
         return
 
     # 1. paediatrician_with_expertise_in_epilepsies
+    # % of children and young people with epilepsy, with input by a ‘consultant paediatrician with expertise in epilepsies’ within 2 weeks of initial referral
     # Calculation Method
     # Numerator = Number of children and young people [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
     # Denominator = Number of and young people [diagnosed with epilepsy] at first year
     paediatrician_with_expertise_in_epilepsies = 0
     if hasattr(registration_instance, 'assessment'):
-        if registration_instance.assessment.consultant_paediatrician_referral_made and registration_instance.assessment.consultant_paediatrician_input_date is not None:
+        if registration_instance.assessment.consultant_paediatrician_referral_made and registration_instance.assessment.consultant_paediatrician_input_date is not None and registration_instance.assessment.consultant_paediatrician_referral_date is not None:
             if (
                 registration_instance.assessment.consultant_paediatrician_input_date <= (
-                    registration_instance.registration_date + relativedelta(days=+14))
+                    registration_instance.assessment.consultant_paediatrician_referral_date + relativedelta(days=+14))
             ):
                 paediatrician_with_expertise_in_epilepsies = 1
         elif registration_instance.assessment.paediatric_neurologist_referral_made and registration_instance.assessment.paediatric_neurologist_input_date is not None:
             if (
                 registration_instance.assessment.paediatric_neurologist_input_date <= (
-                    registration_instance.registration_date + relativedelta(days=+14))
+                    registration_instance.assessment.consultant_paediatrician_referral_date + relativedelta(days=+14))
             ):
                 paediatrician_with_expertise_in_epilepsies = 1
 
     # 2. epilepsy_specialist_nurse
+    # % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
     # Calculation Method
     # Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
     # Denominator = Number of children and young people [diagnosed with epilepsy] at first year
@@ -58,13 +60,14 @@ def calculate_kpis(registration_instance):
                 epilepsy_specialist_nurse = 1
 
     # 3. tertiary_input
+    # % of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care
     # Calculation Method
     # Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
     # Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
     age_at_first_paediatric_assessment = relativedelta(
         registration_instance.registration_date, registration_instance.case.date_of_birth).years
     tertiary_input = 0
-    if hasattr(registration_instance, 'management') and hasattr(registration_instance, 'assessment') and hasattr(registration_instance, 'multiaxial_diagnosis'):
+    if hasattr(registration_instance, 'management') and hasattr(registration_instance, 'assessment') and hasattr(registration_instance, 'multiaxialdiagnosis'):
         if (
             # Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy]
             age_at_first_paediatric_assessment <= 3
@@ -79,7 +82,7 @@ def calculate_kpis(registration_instance):
             # (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)
             age_at_first_paediatric_assessment <= 4 and
             Episode.objects.filter(
-                Q(multiaxial_diagnosis=registration_instance.multiaxial_diagnosis) &
+                Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                 Q(epilepsy_or_nonepilepsy_status='E') &
                 Q(epileptic_generalised_onset='MyC')
             ).exists()
@@ -95,7 +98,8 @@ def calculate_kpis(registration_instance):
         ):
             tertiary_input = 1
 
-    # 4. epilepsy_surgery_referral
+    # 3b. epilepsy_surgery_referral
+    # % of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral or involvement of CESS]
     # Denominator =Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
@@ -110,7 +114,8 @@ def calculate_kpis(registration_instance):
         ):
             epilepsy_surgery_referral = 1
 
-    # 5. ECG
+    # 4. ECG
+    # % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year AND who have [12 lead ECG obtained]
     # Denominator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year
@@ -122,45 +127,67 @@ def calculate_kpis(registration_instance):
         ):
             ecg = 1
 
-    # 6. MRI
+    # 5. MRI
+    # % of children and young people with defined indications for an MRI, who had who had timely MRI within 6 weeks of request
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
     # Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
     mri = 0
-    if hasattr(registration_instance, 'multiaxial_diagnosis'):
+    if hasattr(registration_instance, 'multiaxialdiagnosis'):
         if (
-            registration_instance.multiaxial_diagnosis.syndrome_present and
+            registration_instance.multiaxialdiagnosis.syndrome_present and
                 Syndrome.objects.filter(
-                    Q(multiaxial_diagnosis=registration_instance.multiaxial_diagnosis) &
+                    Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                     # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
                     ~Q(syndrome_name__in=[3, 16, 17, 18])
                 ).exists() or
 
             age_at_first_paediatric_assessment <= 2
         ) and (
-            registration_instance.investigations.mri_brain_reported_date <= (
-                registration_instance.investigations.mri_brain_requested_date + relativedelta(days=42))
+            registration_instance.investigations.mri_indicated and
+            registration_instance.investigations.mri_brain_requested_date is not None and
+            registration_instance.investigations.mri_brain_reported_date is not None
         ):
-            mri = 1
+            if registration_instance.investigations.mri_brain_reported_date <= (
+                    registration_instance.investigations.mri_brain_requested_date + relativedelta(days=42)):
+                mri = 1
 
-    # 7. assessment_of_mental_health_issues
+    # 6. assessment_of_mental_health_issues
+    # %  of children with epilepsy where there is documented evidence that they have been asked about mental health
+    #  either through clinical screening, or a questionnaire/measure
     # Calculation Method
     # Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
     # Denominator = = Number of children and young people over 5 years diagnosed with epilepsy
     assessment_of_mental_health_issues = 0
-    if hasattr(registration_instance, 'multiaxial_diagnosis'):
+    if hasattr(registration_instance, 'multiaxialdiagnosis'):
         if (
             age_at_first_paediatric_assessment >= 5
         ) and (
-            registration_instance.multiaxial_diagnosis.mental_health_screen
+            registration_instance.multiaxialdiagnosis.mental_health_screen
         ):
             assessment_of_mental_health_issues = 1
 
-    # 8. mental_health_support
+    # 7. mental_health_support
+    # %  of children with epilepsy and a mental health problem who have evidence of mental health support
+    # Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue
+    # identified AND had evidence of mental health support
+    # received
+    # Denominator= Number of children and young people diagnosed with epilepsy AND had a mental health issue identified
+    mental_health_support = 0
+    if hasattr(registration_instance, 'management') and hasattr(registration_instance, 'multiaxialdiagnosis'):
+        if (
+            registration_instance.multiaxialdiagnosis.mental_health_issue_identified and
+            registration_instance.management.has_been_referred_for_mental_health_support and
+            registration_instance.management.has_support_for_mental_health_support
+        ):
+            mental_health_support = 1
+
+    # 8. sodium_valproate
+    # % of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
     # Calculation Method
     # Numerator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate AND annual risk acknowledgement forms completed AND pregnancy prevention programme in place
     # Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
-    mental_health_support = 0
+    sodium_valproate = 0
     if hasattr(registration_instance, 'management'):
         if(
             age_at_first_paediatric_assessment >= 12 and
@@ -174,9 +201,10 @@ def calculate_kpis(registration_instance):
                 has_a_valproate_annual_risk_acknowledgement_form_been_completed=True
             ).exists()
         ):
-            mental_health_support = 1
+            sodium_valproate = 1
 
     # 9. comprehensive_care_planning_agreement
+    # % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -187,19 +215,32 @@ def calculate_kpis(registration_instance):
         ):
             comprehensive_care_planning_agreement = 1
 
-    # 10. patient_held_individualised_epilepsy_document
+    # a. patient_held_individualised_epilepsy_document
+    # % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
     patient_held_individualised_epilepsy_document = 0
     if hasattr(registration_instance, 'management'):
         if(
-            registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+            registration_instance.management.individualised_care_plan_in_place and
+            registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement and
+            registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
         ):
             patient_held_individualised_epilepsy_document = 1
 
-    # 11. care_planning_has_been_updated_when_necessary
+    # b patient_carer_parent_agreement_to_the_care_planning
+    # % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+    patient_carer_parent_agreement_to_the_care_planning = 0
+    if hasattr(registration_instance, 'management'):
+        if (
+            registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+        ):
+            patient_carer_parent_agreement_to_the_care_planning = 1
 
+    # c. care_planning_has_been_updated_when_necessary
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -210,7 +251,8 @@ def calculate_kpis(registration_instance):
         ):
             care_planning_has_been_updated_when_necessary = 1
 
-    # 12. comprehensive_care_planning_content
+    # 9b. comprehensive_care_planning_content
+    # Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -227,7 +269,7 @@ def calculate_kpis(registration_instance):
         ):
             comprehensive_care_planning_content = 1
 
-    # 13. parental_prolonged_seizures_care_plan
+    # a. parental_prolonged_seizures_care_plan
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
     # Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
@@ -239,7 +281,7 @@ def calculate_kpis(registration_instance):
         ):
             parental_prolonged_seizures_care_plan = 1
 
-    # 14. water_safety
+    # b. water_safety
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -250,7 +292,7 @@ def calculate_kpis(registration_instance):
         ):
             water_safety = 1
 
-    # 15. first_aid
+    # c. first_aid
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -261,7 +303,7 @@ def calculate_kpis(registration_instance):
         ):
             first_aid = 1
 
-    # 16. general_participation_and_risk
+    # d. general_participation_and_risk
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -272,7 +314,7 @@ def calculate_kpis(registration_instance):
         ):
             general_participation_and_risk = 1
 
-    # 17. service_contact_details
+    # e. service_contact_details
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -283,7 +325,7 @@ def calculate_kpis(registration_instance):
         ):
             service_contact_details = 1
 
-    # 18. sudep
+    # f. sudep
     # Calculation Method
     # Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
     # Denominator = Number of children diagnosed with epilepsy at first year
@@ -295,7 +337,8 @@ def calculate_kpis(registration_instance):
         ):
             sudep = 1
 
-    # 19. school_individual_healthcare_plan
+    # 10. school_individual_healthcare_plan
+    # Percentage of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.
     # Calculation Method
     # Numerator = Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
     # Denominator =Number of children and young people aged 5 years and above diagnosed with epilepsy at first year
@@ -321,8 +364,10 @@ def calculate_kpis(registration_instance):
         'mri': mri,
         'assessment_of_mental_health_issues': assessment_of_mental_health_issues,
         'mental_health_support': mental_health_support,
+        'sodium_valproate': sodium_valproate,
         'comprehensive_care_planning_agreement': comprehensive_care_planning_agreement,
         'patient_held_individualised_epilepsy_document': patient_held_individualised_epilepsy_document,
+        'patient_carer_parent_agreement_to_the_care_planning': patient_carer_parent_agreement_to_the_care_planning,
         'care_planning_has_been_updated_when_necessary': care_planning_has_been_updated_when_necessary,
         'comprehensive_care_planning_content': comprehensive_care_planning_content,
         'parental_prolonged_seizures_care_plan': parental_prolonged_seizures_care_plan,
