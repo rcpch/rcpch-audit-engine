@@ -12,7 +12,8 @@ from django_htmx.http import HttpResponseClientRedirect
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
-from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_and_complete_cases_for_hospital, all_registered_and_complete_cases_for_hospital_trust, all_registered_only_cases_for_hospital, all_registered_only_cases_for_hospital_trust
+from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level
+# all_registered_and_complete_cases_for_hospital, all_registered_and_complete_cases_for_hospital_trust, all_registered_only_cases_for_hospital, all_registered_only_cases_for_hospital_trust
 from ..general_functions import get_current_cohort_data, value_from_key
 
 
@@ -53,17 +54,33 @@ def hospital_reports(request):
         ).order_by('OrganisationName').first()
 
     # query to return all completed E12 cases in the current cohort in this hospital
-    count_of_current_cohort_registered_completed_cases_in_this_hospital = all_registered_and_complete_cases_for_hospital(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_completed_cases_in_this_hospital = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='organisation'
+    ).count()
     # query to return all completed E12 cases in the current cohort in this hospital trust
-    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust = all_registered_and_complete_cases_for_hospital_trust(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='trust'
+    ).count()
     # query to return all cases registered in the current cohort at this hospital
-    count_of_current_cohort_registered_cases_in_this_hospital = all_registered_only_cases_for_hospital(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_cases_in_this_hospital = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=False,
+        abstraction_level='organisation'
+    ).count()
     # query to return all cases registered in the current cohort at this hospital trust
-    count_of_current_cohort_registered_cases_in_this_hospital_trust = all_registered_only_cases_for_hospital_trust(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_cases_in_this_hospital_trust = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=False,
+        abstraction_level='trust'
+    ).count()
 
     if count_of_current_cohort_registered_completed_cases_in_this_hospital > 0:
         total_percent_hospital = round((count_of_current_cohort_registered_cases_in_this_hospital /
@@ -109,17 +126,33 @@ def selected_hospital_summary(request):
     cohort_data = get_current_cohort_data()
 
     # query to return all completed E12 cases in the current cohort in this hospital
-    count_of_current_cohort_registered_completed_cases_in_this_hospital = all_registered_and_complete_cases_for_hospital(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_completed_cases_in_this_hospital = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='organisation'
+    ).count()
     # query to return all completed E12 cases in the current cohort in this hospital trust
-    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust = all_registered_and_complete_cases_for_hospital_trust(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_completed_cases_in_this_hospital_trust = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='trust'
+    ).count()
     # query to return all cases registered in the current cohort at this hospital
-    count_of_current_cohort_registered_cases_in_this_hospital = all_registered_only_cases_for_hospital(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_cases_in_this_hospital = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=False,
+        abstraction_level='organisation'
+    ).count()
     # query to return all cases registered in the current cohort at this hospital trust
-    count_of_current_cohort_registered_cases_in_this_hospital_trust = all_registered_only_cases_for_hospital_trust(
-        hospital_instance=selected_hospital).count()
+    count_of_current_cohort_registered_cases_in_this_hospital_trust = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=selected_hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=False,
+        abstraction_level='trust'
+    ).count()
 
     if count_of_current_cohort_registered_completed_cases_in_this_hospital > 0:
         total_percent_hospital = round((count_of_current_cohort_registered_cases_in_this_hospital /
