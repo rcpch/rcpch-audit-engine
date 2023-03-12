@@ -29,17 +29,19 @@
   margin: 0px;
 }
 
-.ui.secondary.pointing.menu .item {
-  line-height: 1.5rem;
+.ui.secondary.pointing.menu .item,
+.ui.secondary.pointing.menu .active.item {
+  border-bottom: 5px solid transparent;
 }
 
 .ui.secondary.pointing.menu .item:hover {
-  border-color: var(--rcpch_light_blue);
-  border-width: 5px;
+  /* border-color: var(--rcpch_light_blue);
+  border-width: 5px; */
+  border-bottom: 5px solid var(--rcpch_light_blue);
 }
 
 .ui.secondary.pointing.menu .active.item {
-  /* color: var(--rcpch_strong_blue); */
+  color: var(--rcpch_strong_blue);
   border-width: 5px;
   line-height: 1.125rem;
   border-color: var(--rcpch_strong_blue);
@@ -48,10 +50,6 @@
 
 .ui.secondary.pointing.menu .active.item:hover {
   border-color: var(--rcpch_light_blue)
-}
-
-.ui.secondary.pointing.menu a.item:hover {
-  line-height: 1.1rem;  
 }
 
 
