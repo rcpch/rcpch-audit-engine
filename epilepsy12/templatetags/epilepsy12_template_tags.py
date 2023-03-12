@@ -221,5 +221,7 @@ def icon_for_score(score):
         return
     if score < 1:
         return mark_safe("<i class='rcpch_light_blue exclamation triangle icon'></i>")
+    elif score > 1:
+        return mark_safe("<i class='rcpch_pink ban icon'></i>")
     else:
         return mark_safe("<i class='check circle outline rcpch_pink icon'></i>")
