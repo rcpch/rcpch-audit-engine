@@ -5,14 +5,14 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Avg
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
-from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level
+from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, aggregate_all_kpi_fields_against_registration, all_registered_cases_for_cohort_and_abstraction_level
 # all_registered_and_complete_cases_for_hospital, all_registered_and_complete_cases_for_hospital_trust, all_registered_only_cases_for_hospital, all_registered_only_cases_for_hospital_trust
 from ..general_functions import get_current_cohort_data, value_from_key
 
@@ -194,29 +194,53 @@ def selected_trust_kpis(request, hospital_id):
     It uses django aggregation which is super quick
     """
 
-    # filter all Hospitals based on level of abstraction
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
-    hospital_level = HospitalTrust.objects.filter(
-        pk=hospital_id).order_by('OrganisationName')
-    trust_level = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).order_by('OrganisationName')
-    icb_level = HospitalTrust.objects.filter(
-        ICBODSCode=hospital_trust.ICBODSCode).order_by('OrganisationName')
-    nhs_level = HospitalTrust.objects.filter(
-        NHSEnglandRegionCode=hospital_trust.NHSEnglandRegionCode).order_by('OrganisationName')
-    open_uk_level = HospitalTrust.objects.filter(
-        OPENUKNetworkCode=hospital_trust.OPENUKNetworkCode).order_by('OrganisationName')
-    country_level = HospitalTrust.objects.filter(
-        CountryONSCode=hospital_trust.CountryONSCode).order_by('OrganisationName')
-    national_level = HospitalTrust.objects.all().order_by('OrganisationName')
+    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    cohort_data = get_current_cohort_data()
+    hospital_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='organisation'
+    )
+    trust_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='trust'
+    )
+    icb_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='icb'
+    )
+    nhs_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='nhs_region'
+    )
+    open_uk_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='open_uk'
+    )
+    country_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='country'
+    )
+    national_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='national'
+    )
 
-    # create function to aggregate all fields in the related KPI model
-    all_kpi_measures = ['paediatrician_with_expertise_in_epilepsies', 'epilepsy_specialist_nurse', 'tertiary_input', 'epilepsy_surgery_referral', 'ecg', 'mri', 'assessment_of_mental_health_issues', 'mental_health_support', 'comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document',
-                        'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'service_contact_details', 'sudep', 'school_individual_healthcare_plan']
-    aggregation_fields = {}
-    for measure in all_kpi_measures:
-        aggregation_fields[f'{measure}'] = Sum(f'kpi__{measure}')
-    aggregation_fields['total_number_of_cases'] = Count(f'kpi__pk')
+    # call function to aggregate all fields in the related KPI model (related via registration model)
+    aggregation_fields = aggregate_all_kpi_fields_against_registration()
 
     # aggregate at each level of abstraction
     hospital_kpis = hospital_level.aggregate(**aggregation_fields)
@@ -308,51 +332,82 @@ def selected_trust_select_kpi(request, hospital_id):
     kpi_value = value_from_key(
         key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
 
-    hospital_level = HospitalTrust.objects.filter(
-        pk=hospital_id).order_by('OrganisationName')
-    trust_level = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).order_by('OrganisationName')
-    icb_level = HospitalTrust.objects.filter(
-        ICBODSCode=hospital_trust.ICBODSCode).order_by('OrganisationName')
-    nhs_level = HospitalTrust.objects.filter(
-        NHSEnglandRegionCode=hospital_trust.NHSEnglandRegionCode).order_by('OrganisationName')
-    open_uk_level = HospitalTrust.objects.filter(
-        OPENUKNetworkCode=hospital_trust.OPENUKNetworkCode).order_by('OrganisationName')
-    country_level = HospitalTrust.objects.filter(
-        CountryONSCode=hospital_trust.CountryONSCode).order_by('OrganisationName')
-    national_level = HospitalTrust.objects.all().order_by('OrganisationName')
+    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    cohort_data = get_current_cohort_data()
+    hospital_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='organisation'
+    )
+    trust_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='trust'
+    )
+    icb_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='icb'
+    )
+    nhs_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='nhs_region'
+    )
+    open_uk_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='open_uk'
+    )
+    country_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='country'
+    )
+    national_level = all_registered_cases_for_cohort_and_abstraction_level(
+        hospital_organisation_instance=hospital,
+        cohort=cohort_data['cohort'],
+        case_complete=True,
+        abstraction_level='national'
+    )
 
-    # create aggregate function for selected KPI measure
-    aggregate_parameter = {}
-    aggregate_parameter[f'{kpi_name}'] = Sum(f'kpi__{kpi_name}')
-    aggregate_parameter['total_cases'] = Count(f'kpi__pk')
+    # call function to aggregate all fields in the related KPI model (related via registration model)
+    aggregation_fields = aggregate_all_kpi_fields_against_registration(
+        kpi_measure=kpi_name)
 
-    hospital_kpi = hospital_level.aggregate(**aggregate_parameter)
-    trust_kpi = trust_level.aggregate(**aggregate_parameter)
-    icb_kpi = icb_level.aggregate(**aggregate_parameter)
-    nhs_kpi = nhs_level.aggregate(**aggregate_parameter)
-    open_uk_kpi = open_uk_level.aggregate(**aggregate_parameter)
-    country_kpi = country_level.aggregate(**aggregate_parameter)
-    national_kpi = national_level.aggregate(**aggregate_parameter)
+    # aggregate at each level of abstraction
+    hospital_kpi = hospital_level.aggregate(**aggregation_fields)
+    trust_kpi = trust_level.aggregate(**aggregation_fields)
+    icb_kpi = icb_level.aggregate(**aggregation_fields)
+    nhs_kpi = nhs_level.aggregate(**aggregation_fields)
+    open_uk_kpi = open_uk_level.aggregate(**aggregation_fields)
+    country_kpi = country_level.aggregate(**aggregation_fields)
+    national_kpi = national_level.aggregate(**aggregation_fields)
 
     context = {
         'kpi_name': kpi_name,
         'kpi_value': kpi_value,
         'selected_hospital': hospital_trust,
         'hospital_kpi': hospital_kpi[kpi_name],
-        'total_hospital_kpi_cases': hospital_kpi['total_cases'],
+        'total_hospital_kpi_cases': hospital_kpi['total_number_of_cases'],
         'trust_kpi': trust_kpi[kpi_name],
-        'total_trust_kpi_cases': trust_kpi['total_cases'],
+        'total_trust_kpi_cases': trust_kpi['total_number_of_cases'],
         'icb_kpi': icb_kpi[kpi_name],
-        'total_icb_kpi_cases': icb_kpi['total_cases'],
+        'total_icb_kpi_cases': icb_kpi['total_number_of_cases'],
         'nhs_kpi': nhs_kpi[kpi_name],
-        'total_nhs_kpi_cases': nhs_kpi['total_cases'],
+        'total_nhs_kpi_cases': nhs_kpi['total_number_of_cases'],
         'open_uk_kpi': open_uk_kpi[kpi_name],
-        'total_open_uk_kpi_cases': open_uk_kpi['total_cases'],
+        'total_open_uk_kpi_cases': open_uk_kpi['total_number_of_cases'],
         'country_kpi': country_kpi[kpi_name],
-        'total_country_kpi_cases': country_kpi['total_cases'],
+        'total_country_kpi_cases': country_kpi['total_number_of_cases'],
         'national_kpi': national_kpi[kpi_name],
-        'total_national_kpi_cases': national_kpi['total_cases'],
+        'total_national_kpi_cases': national_kpi['total_number_of_cases'],
         # 'ranked': ranked_kpis
     }
 

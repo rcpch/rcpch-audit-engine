@@ -78,6 +78,11 @@ def all_registered_cases_for_cohort_and_abstraction_level(hospital_organisation_
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
+    elif abstraction_level == 'national':
+        q_filter = (
+            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
+            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+        )
     else:
         raise ValueError(
             f"Incorrect or invalid abstraction error f{abstraction_level} supplied.")

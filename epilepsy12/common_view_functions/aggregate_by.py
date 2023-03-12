@@ -1,5 +1,5 @@
 # Django imports
-from django.db.models import Count, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
+from django.db.models import Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
@@ -87,3 +87,35 @@ def cases_aggregated_by_ethnicity(selected_hospital):
     )
 
     return cases_aggregated_by_ethnicity
+
+
+def aggregate_all_kpi_fields_against_registration(kpi_measure=None):
+    """
+    Returns a dictionary of all KPI fields with aggregation for each measure ready to pass
+    into a related model. If an individual measure is passed in, only that measure will be aggregated.
+    It can only be used by a model which has a relationship with registration
+    Returned fields include sum of totals of all KPI measures for that registration as well as average score
+    and total KPIs
+    """
+
+    all_kpi_measures = ['paediatrician_with_expertise_in_epilepsies', 'epilepsy_specialist_nurse', 'tertiary_input', 'epilepsy_surgery_referral', 'ecg', 'mri', 'assessment_of_mental_health_issues', 'mental_health_support', 'comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document',
+                        'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'service_contact_details', 'sudep', 'school_individual_healthcare_plan']
+    aggregation_fields = {}
+
+    if kpi_measure:
+        aggregation_fields[f'{kpi_measure}'] = Sum(
+            f'registration__kpi__{kpi_measure}')
+        aggregation_fields[f'{kpi_measure}_average'] = Avg(
+            f'registration__kpi__{kpi_measure}')
+        aggregation_fields['total_number_of_cases'] = Count(
+            f'registration__kpi__pk')
+    else:
+        for measure in all_kpi_measures:
+            aggregation_fields[f'{measure}'] = Sum(
+                f'registration__kpi__{measure}')
+            aggregation_fields[f'{measure}_average'] = Avg(
+                f'registration__kpi__{measure}')
+        aggregation_fields['total_number_of_cases'] = Count(
+            f'registration__kpi__pk')
+
+    return aggregation_fields
