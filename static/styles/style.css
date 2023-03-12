@@ -116,6 +116,22 @@ ul {
   color: pink;
 }
 
+/* hero updated */
+.ui.center.aligned.segment.rcpch_masthead {
+  padding: 4em 0em;
+  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.masthead_text_row {
+  padding-top: 1em;
+}
+
+.masthead_text_row>div>* {
+  color: var(--rcpch_white);
+  font-family: var(--rcpch_standard_font);
+}
 
 /* hero */
 
