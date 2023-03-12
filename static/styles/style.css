@@ -116,7 +116,8 @@ ul {
   color: pink;
 }
 
-/* hero updated */
+/* hero */
+
 .ui.center.aligned.segment.rcpch_masthead {
   padding: 4em 0em;
   background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
@@ -124,52 +125,30 @@ ul {
   background-size: cover;
 }
 
+.rcpch_masthead>div.row>div>img.epilepsy12_logo {
+  margin-top: 4vw;
+  max-width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .masthead_text_row {
   padding-top: 1em;
 }
 
-.masthead_text_row>div>* {
+.masthead_text_row>div.masthead_text>* {
   color: var(--rcpch_white);
   font-family: var(--rcpch_standard_font);
+  font-weight: 900;
 }
 
-/* hero */
-
-.ui.fluid.container.hero_container {
-  padding-top: 1rem;
-  height: 40vh;
-  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.rcpch_hero {
-  position: relative;
-  text-align: center;
-}
-
-.rcpch_hero_wallpaper > .row {
-  height: 100%;
-}
-
-.epilepsy12_logo {
-  margin-top: 4vw;
-  max-width: 300px;
-}
-
-.rcpch_hero > .row > div > * {
-  color: var(--rcpch_white);
-  text-align: center;
-  font-family: var(--rcpch_standard_font);
-}
-
-.rcpch_hero > .row > div > h1 {
+.masthead_text_row>div>h1 {
   font-size: 3em;
 }
-
-.rcpch_hero > .row > div > h2 {
+.masthead_text_row>div>h2 {
   font-size: 1.5em;
 }
+
 
 
 /* links */
