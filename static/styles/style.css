@@ -164,6 +164,39 @@ ul {
   font-size: 1.5em;
 }
 
+/*  INDEX  */
+.index_segment {
+  padding-bottom: 5em;
+}
+
+div.center.aligned.image.rcpch_index_card_image {
+  padding: 5em;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/blue-wallpaper-wheel.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.ui.card>.content.rcpch_index_card_content {
+  padding: 1.5rem;
+}
+
+
+.rcpch_index_card_content.content > h1.ui.header {
+  color: var(--rcpch_charcoal);
+}
+
+.ui.card>.content.rcpch_index_card_content>h3.ui.header {
+  margin-top: 1em;
+}
+
+.ui.card>.content.rcpch_index_card_content>div.description {
+  margin-top: 3em;
+}
+
+.rcpch_icon_text_group.rcpch_index_card_select {
+  margin-top: 3em;
+  margin-bottom: 1em;
+}
 
 
 /* links */
