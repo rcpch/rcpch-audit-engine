@@ -180,8 +180,7 @@ WHITENOISE_ROOT = os.path.join(BASE_DIR, 'static/root')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://epilepsy12-dev.azurewebsites.net', 'https://epilepsy12.rcpch.tech']
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
