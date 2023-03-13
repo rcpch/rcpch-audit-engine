@@ -198,6 +198,12 @@ div.center.aligned.image.rcpch_index_card_image {
   margin-bottom: 1em;
 }
 
+a.rcpch_index_card_link {
+  font-weight: 900;
+  font-size: 1.4em;
+  margin-right: 0.2em;
+}
+
 
 /* links */
 
