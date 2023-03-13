@@ -1,0 +1,71 @@
+/* entire */
+
+/*  SIGNIN*/
+
+.ui.text.menu.signin {
+  background-color: #eee;
+  margin: 0px;
+  height: 1em;
+}
+
+.ui.text.menu .right.menu {
+  font-family: Montserrat-Regular;
+  background-color: var(--rcpch_light_blue);
+  margin-right: 4em;
+  padding: 1em;
+}
+
+.signin_text {
+  font-weight: 700;
+}
+
+/* NAV */
+
+
+
+.ui.secondary.pointing.menu {
+  font-family: Montserrat-Regular;
+  font-size: small;
+  margin: 0px;
+}
+
+.ui.secondary.pointing.menu .item,
+.ui.secondary.pointing.menu .active.item {
+  border-bottom: 5px solid transparent;
+}
+
+.ui.secondary.pointing.menu .item:hover {
+  /* border-color: var(--rcpch_light_blue);
+  border-width: 5px; */
+  border-bottom: 5px solid var(--rcpch_light_blue);
+}
+
+.ui.secondary.pointing.menu .active.item {
+  color: var(--rcpch_strong_blue);
+  border-width: 5px;
+  line-height: 1.125rem;
+  border-color: var(--rcpch_strong_blue);
+  font-family: Montserrat-Regular;
+}
+
+.ui.secondary.pointing.menu .active.item:hover {
+  border-color: var(--rcpch_light_blue);
+  color: var(--rcpch_strong_blue);
+}
+
+
+#nav-rcpch {
+  width: 150px;
+  height: auto;
+  padding: 0;
+  font-family: Montserrat-Regular;
+  border-width: 0;
+}
+
+#nav-rcpch:hover {
+  border-width: 0;
+}
+
+.ui.fluid.rcpch.container.nav {
+  padding: 0em 3em;
+}

@@ -4,6 +4,8 @@ from ..constants import *
 
 
 class CaseForm(forms.ModelForm):
+    unknown_postcode = forms.CharField()
+
     first_name = forms.CharField(
         help_text="Enter the first name.",
         widget=forms.TextInput(
@@ -54,7 +56,8 @@ class CaseForm(forms.ModelForm):
                 "placeholder": "Postcode",
                 "type": "text"
             }
-        )
+        ),
+        required=False
     )
     ethnicity = forms.ChoiceField(
         choices=ETHNICITIES,
@@ -83,5 +86,13 @@ class CaseForm(forms.ModelForm):
     class Meta:
         model = Case
         fields = [
-            'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity'
+            'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'unknown_postcode'
         ]
+
+    def clean(self):
+        cleaned_data = super(CaseForm, self).clean()
+
+        if (len(self.cleaned_data['unknown_postcode']) > 0 and len(self.cleaned_data['postcode']) == 0):
+            self.cleaned_data['postcode'] = self.cleaned_data['unknown_postcode']
+        # Finally, return the cleaned_data
+        return cleaned_data

@@ -30,9 +30,9 @@ def date_string(date):
 
 @register.simple_tag
 def characters_left(description):
-    length = 5000-len(description)
+    length = 2000-len(description)
     colour = 'black'
-    if (length < 10):
+    if (length < 100):
         colour = 'red'
     safe_text = f'<span style="color:{colour}">{length}</span>'
     return mark_safe(safe_text)
