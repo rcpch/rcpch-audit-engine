@@ -133,7 +133,7 @@ def calculate_kpis(registration_instance):
 
         else:
             # not eligible for this measure
-            tertiary_input = 3
+            tertiary_input = 2
 
     # 3b. epilepsy_surgery_referral
     # Calculation Method
@@ -157,7 +157,7 @@ def calculate_kpis(registration_instance):
                 epilepsy_surgery_referral = 1
         else:
             # not eligible for this measure
-            epilepsy_surgery_referral = 3
+            epilepsy_surgery_referral = 2
 
     # 4. ECG
     # Calculation Method
@@ -178,7 +178,7 @@ def calculate_kpis(registration_instance):
                 ecg = 1
         else:
             # not eligible for this measure
-            ecg = 3
+            ecg = 2
 
     # 5. MRI
     # Calculation Method
@@ -217,7 +217,7 @@ def calculate_kpis(registration_instance):
 
         else:
             # not eligible for this measure
-            mri = 3
+            mri = 2
 
     # 6. assessment_of_mental_health_issues
     # Calculation Method
@@ -238,7 +238,7 @@ def calculate_kpis(registration_instance):
                 assessment_of_mental_health_issues = 1
         else:
             # not eligible for this measure
-            assessment_of_mental_health_issues = 3
+            assessment_of_mental_health_issues = 2
 
     # 7. mental_health_support
     # Percentage of children with epilepsy and a mental health problem who have evidence of mental health support
@@ -262,7 +262,7 @@ def calculate_kpis(registration_instance):
                 mental_health_support = 1
         else:
             # not eligible for this measure
-            mental_health_support = 3
+            mental_health_support = 2
 
     # 8. Sodium Valproate
     # Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
@@ -302,7 +302,7 @@ def calculate_kpis(registration_instance):
                 sodium_valproate = 1
         else:
             # not eligible for this measure
-            sodium_valproate = 3
+            sodium_valproate = 2
 
     # 9. comprehensive_care_planning_agreement
     # Calculation Method
@@ -389,7 +389,7 @@ def calculate_kpis(registration_instance):
                 parental_prolonged_seizures_care_plan = 1
         else:
             # not eligible for this measure
-            parental_prolonged_seizures_care_plan = 3
+            parental_prolonged_seizures_care_plan = 2
 
     # 14. water_safety
     # Calculation Method
@@ -476,7 +476,7 @@ def calculate_kpis(registration_instance):
                 school_individual_healthcare_plan = 1
         else:
             # not eligible for this measure
-            school_individual_healthcare_plan = 3
+            school_individual_healthcare_plan = 2
 
     """
     Store the KPIs in AuditProgress
