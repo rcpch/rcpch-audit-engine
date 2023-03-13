@@ -89,10 +89,12 @@
                 
                 <div class="ui rcpch_light_blue  card">
                     <div class="content">
-                        <h2 class='header'>
-                        Distribution by Ethnicity
-                        </h2>
-                        <div class='description'>
+                        
+                        <h3 >Distribution by Ethnicity</h3>
+                        
+                    </div>
+
+                        <div class="">
                             <div id="ethnicity_piechart" class="ui rcpch_chart_container stackable segment">
                                 {% if cases_aggregated_by_ethnicity %}
                                     {% include 'epilepsy12/partials/charts/ethnicity_piechart.html' with cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity %}
@@ -100,15 +102,17 @@
                                     <h5>No data yet!<h5>
                                 {% endif %}
                             </div>
-                        </div>
+                        
                     </div>
                 </div>
                 
                 <div class="ui rcpch_light_blue  card">
                     <div class="content">
-                        <h2 class='header'>
-                        Distribution by Sex
-                        </h2>
+                        
+                            <h3>Distribution by Sex</h3>
+                        
+                    </div>
+                    <div class="">
                         <div class='description'>
                             <div id="cases_aggregated_by_sex" class="ui rcpch_chart_container stackable segment">
                                 {% if cases_aggregated_by_sex %}
@@ -123,9 +127,10 @@
 
                 <div class="ui rcpch_light_blue  card">
                     <div class="content">
-                        <h2 class='header'>
-                        Distribution by Index of Multiple Deprivation
-                        </h2>
+                        
+                        <h3>Distribution by Index of Multiple Deprivation</h3>
+                    
+                    </div>
                         <div class='description'>
                             <div id="cases_aggregated_by_ethnicity" class="ui rcpch_chart_container stackable segment">
                                 {% if cases_aggregated_by_deprivation %}

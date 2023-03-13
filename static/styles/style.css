@@ -247,6 +247,12 @@ a.rcpch_index_card_link {
   color: black;
 }
 
+.ui.rcpch_light_blue.card .content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* SUMMARY STATS CARDS */
 
 .hospital_details {
