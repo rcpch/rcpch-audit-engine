@@ -181,7 +181,7 @@ div.center.aligned.image.rcpch_index_card_image {
 }
 
 
-.rcpch_index_card_content.content > h1.ui.header {
+.rcpch_index_card_content.content>h1.ui.header {
   color: var(--rcpch_charcoal);
 }
 
@@ -203,7 +203,6 @@ a.rcpch_index_card_link {
   font-size: 1.4em;
   margin-right: 0.2em;
 }
-
 
 /* links */
 
