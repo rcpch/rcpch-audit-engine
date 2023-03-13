@@ -1,10 +1,9 @@
 # Django imports
-from django.db.models import Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
+from django.db.models import Q, F, Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
-from epilepsy12.models import Case
-
+from ..models import Case
 """
 Reporting
 """
@@ -89,33 +88,86 @@ def cases_aggregated_by_ethnicity(selected_hospital):
     return cases_aggregated_by_ethnicity
 
 
-def aggregate_all_kpi_fields_against_registration(kpi_measure=None):
+def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     """
     Returns a dictionary of all KPI fields with aggregation for each measure ready to pass
     into a related model. If an individual measure is passed in, only that measure will be aggregated.
-    It can only be used by a model which has a relationship with registration
-    Returned fields include sum of totals of all KPI measures for that registration as well as average score
-    and total KPIs
+    It can only be used by a model which has a relationship with registration (but not registration itself)
+    Returned fields include sum of all eligible KPI measures (identified as having an individual score of 1 or 0)
+    for that registration as well as average score of the same and total number KPIs.
+    A KPI score of 2 is excluded as not eligible for that measure.
     """
 
-    all_kpi_measures = ['paediatrician_with_expertise_in_epilepsies', 'epilepsy_specialist_nurse', 'tertiary_input', 'epilepsy_surgery_referral', 'ecg', 'mri', 'assessment_of_mental_health_issues', 'mental_health_support', 'comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document',
-                        'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'service_contact_details', 'sudep', 'school_individual_healthcare_plan']
+    all_kpi_measures = [
+        'paediatrician_with_expertise_in_epilepsies',
+        'epilepsy_specialist_nurse',
+        'tertiary_input',
+        'epilepsy_surgery_referral',
+        'ecg',
+        'mri',
+        'assessment_of_mental_health_issues',
+        'mental_health_support',
+        'sodium_valproate',
+        'comprehensive_care_planning_agreement',
+        'patient_held_individualised_epilepsy_document',
+        'patient_carer_parent_agreement_to_the_care_planning',
+        'care_planning_has_been_updated_when_necessary',
+        'comprehensive_care_planning_content',
+        'parental_prolonged_seizures_care_plan',
+        'water_safety',
+        'first_aid',
+        'general_participation_and_risk',
+        'service_contact_details',
+        'sudep',
+        'school_individual_healthcare_plan'
+    ]
+
     aggregation_fields = {}
 
     if kpi_measure:
-        aggregation_fields[f'{kpi_measure}'] = Sum(
-            f'registration__kpi__{kpi_measure}')
-        aggregation_fields[f'{kpi_measure}_average'] = Avg(
-            f'registration__kpi__{kpi_measure}')
-        aggregation_fields['total_number_of_cases'] = Count(
-            f'registration__kpi__pk')
-    else:
-        for measure in all_kpi_measures:
-            aggregation_fields[f'{measure}'] = Sum(
-                f'registration__kpi__{measure}')
-            aggregation_fields[f'{measure}_average'] = Avg(
-                f'registration__kpi__{measure}')
-        aggregation_fields['total_number_of_cases'] = Count(
-            f'registration__kpi__pk')
+        # a single measure selected for aggregation
 
-    return aggregation_fields
+        q_objects = Q(**{f'registration__kpi__{kpi_measure}__lt': 2}
+                      ) & Q(**{f'registration__kpi__{kpi_measure}__isnull': False})
+        f_objects = F(f'registration__kpi__{kpi_measure}')
+
+        # sum this measure
+        aggregation_fields[f'{kpi_measure}'] = Sum(
+            DJANGO_CASE(When(q_objects,
+                        then=f_objects), default=None)
+        )
+        # average of the sum of this measure
+        aggregation_fields[f'{kpi_measure}_average'] = Avg(
+            DJANGO_CASE(When(q_objects,
+                        then=f_objects), default=None))
+        # total cases scored for this measure
+        aggregation_fields['total_number_of_cases'] = Count(
+            DJANGO_CASE(When(q_objects,
+                        then=f_objects), default=None))
+    else:
+        # aggregate all measures
+
+        for measure in all_kpi_measures:
+            # filter cases for all kpi with a score < 2
+            q_objects = Q(**{f'registration__kpi__{measure}__lt': 2}
+                          ) & Q(**{f'registration__kpi__{measure}__isnull': False})
+            f_objects = F(f'registration__kpi__{measure}')
+
+            # sum this measure
+            aggregation_fields[f'{measure}'] = Sum(
+                DJANGO_CASE(When(q_objects,
+                                 then=f_objects), default=0))
+            # average of the sum of this measure
+            aggregation_fields[f'{measure}_average'] = Avg(
+                DJANGO_CASE(When(q_objects,
+                                 then=f_objects), default=0))
+            # total cases scored for this measure
+            aggregation_fields[f'{measure}_total'] = Count(
+                DJANGO_CASE(When(q_objects,
+                                 then=f_objects), default=0))
+        # total_cases scored for all measures
+        aggregation_fields['total_number_of_cases'] = Count(
+            DJANGO_CASE(When(q_objects,
+                        then=f_objects), default=0))
+
+    return filtered_cases.aggregate(**aggregation_fields)
