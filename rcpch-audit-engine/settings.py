@@ -141,7 +141,7 @@ if DEBUG is True:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = 'smtp.eu.mailgun.org'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST_SERVER')
     EMAIL_PORT = 587
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
