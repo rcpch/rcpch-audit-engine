@@ -10,7 +10,7 @@ from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
-from ..constants import RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
+from ..constants import UNKNOWN_POSTCODES, RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
 
 
 @login_required
@@ -57,7 +57,7 @@ def case_list(request, hospital_id):
             all_cases = Case.objects.filter(
                 Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
-                Q(site__site__site_is_actively_involved_in_epilepsy_care=True) &
+                Q(site__site_is_actively_involved_in_epilepsy_care=True) &
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
                 Q(nhs_number__icontains=filter_term)
@@ -66,7 +66,7 @@ def case_list(request, hospital_id):
             # user has requested national level view
             all_cases = Case.objects.filter(
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
-                Q(site__site__site_is_actively_involved_in_epilepsy_care=True) &
+                Q(site__site_is_actively_involved_in_epilepsy_care=True) &
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
                 Q(nhs_number__icontains=filter_term)
@@ -297,7 +297,21 @@ def create_case(request, hospital_id):
     """
     hospital_trust = HospitalTrust.objects.filter(
         OrganisationID=hospital_id).get()
+
+    # set select boxes for situations when postcode unknown
+    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    if hospital_trust.Country == 'Wales':
+        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+
+    choices = (
+        ('ZZ99 3WZ', 'Address unknown'),
+        country_choice,
+        ('ZZ99 3VZ', 'No fixed abode'),
+    )
     form = CaseForm(request.POST or None)
+
+    template_name = 'epilepsy12/cases/case.html'
+
     if request.method == "POST":
         if form.is_valid():
             obj = form.save(commit=False)
@@ -313,6 +327,7 @@ def create_case(request, hospital_id):
                 case=obj
             )
             messages.success(request, "You successfully created the case")
+            return redirect('cases', hospital_id=hospital_id)
         else:
             messages.error(request, "Case not created")
             return redirect('cases', hospital_id=hospital_id)
@@ -320,9 +335,11 @@ def create_case(request, hospital_id):
     context = {
         "hospital_id": hospital_id,
         "hospital_trust": hospital_trust,
-        "form": form
+        "form": form,
+        'choices': choices,
+        'child_has_unknown_postcode': False
     }
-    return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
+    return render(request=request, template_name=template_name, context=context)
 
 
 @login_required
@@ -337,8 +354,21 @@ def update_case(request, hospital_id, case_id):
     hospital_trust = HospitalTrust.objects.filter(
         OrganisationID=hospital_id).get()
 
+    # set select boxes for situations when postcode unknown
+    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    if hospital_trust.Country == 'Wales':
+        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+
+    choices = (
+        ('ZZ99 3WZ', 'Address unknown'),
+        country_choice,
+        ('ZZ99 3VZ', 'No fixed abode'),
+    )
+
     if request.method == "POST":
         if ('delete') in request.POST:
+            messages.success(
+                request, f"You successfully deleted the {case}'s details")
             case.delete()
             return redirect('cases', hospital_id=hospital_id)
         form = CaseForm(request.POST, instance=case)
@@ -359,22 +389,51 @@ def update_case(request, hospital_id, case_id):
                 request, "You successfully updated the child's details")
             return redirect('cases', hospital_id=hospital_id)
 
+    child_has_unknown_postcode = False
+    test_positive = None
+    if case.postcode in UNKNOWN_POSTCODES:
+        child_has_unknown_postcode = True
+        test_positive = case.postcode
+
     context = {
         "hospital_id": hospital_id,
         "hospital_trust": hospital_trust,
         "form": form,
-        'case': case
+        'case': case,
+        'child_has_unknown_postcode': child_has_unknown_postcode,
+        'test_positive': test_positive,
+        'choices': choices
     }
 
     return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
-@login_required
-@permission_required('epilepsy12.delete_case', raise_exception=True)
-def delete_case(request, hospital_id, case_id):
-    case = get_object_or_404(Case, id=case_id)
-    case.delete()
-    return redirect('cases', hospital_id=hospital_id)
+def unknown_postcode(request, hospital_id):
+    """
+    POST call back from single choice multiple select if postcode does not exist
+    """
+    test_positive = request.htmx.trigger_name
+
+    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    # set select boxes for situations when postcode unknown
+    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    if hospital_trust.Country == 'Wales':
+        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+
+    choices = (
+        ('ZZ99 3WZ', 'Address unknown'),
+        country_choice,
+        ('ZZ99 3VZ', 'No fixed abode'),
+    )
+    template_name = 'epilepsy12/cases/unknown_postcode.html'
+    context = {
+        'choices': choices,
+        'hospital_id': hospital_id,
+        'test_positive': test_positive,
+        'hide_completion_fields': True,
+        'enabled': True
+    }
+    return render(request=request, template_name=template_name, context=context)
 
 
 @login_required

@@ -1,62 +1,53 @@
-
 <form class="ui form">
-    <div class="ui rcpch_important message">
-         Write a freehand description of each episode as recorded in the clinical records, using as much detail as you can, to a maximum of 5000 characters. Any key words that have an agreed meaning will automatically be labelled.
+  <div class="ui rcpch_important message">
+    Write a freehand description of each episode as recorded in the clinical
+    records, using as much detail as you can, to a maximum of 2000 characters.
+    Any key words that have an agreed meaning will automatically be labelled.
+  </div>
+
+  <div
+    class="field"
+    hx-post="{% url 'edit_description' episode_id=episode.pk %}"
+    hx-target="#description_results"
+    hx-swap="innerHTML"
+    hx-trigger="keyup"
+  >
+    <div class="ui left icon input">
+      {% if episode.description|length > 0 %}
+      <i class="rcpch_pink check circle outline icon"></i>
+      {% else %}
+      <span
+        data-tooltip="Uncompleted field. This must be scored to complete the record."
+        data-inverted=""
+        data-position="{{data_position}}"
+      >
+        <i class="rcpch_light_blue dot circle outline icon"></i>
+      </span>
+      {% endif %}
+
+      <textarea
+        {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
+        disabled
+        {% endif %}
+        type="text"
+        class="ui rcpch textarea"
+        rows="3"
+        maxlength="2000"
+        name="description"
+        placeholder="While watching television {{episode.multiaxial_diagnosis.registration.case}} fell to the floor... "
+      >
+{{episode.description}}</textarea
+      >
     </div>
-    
-        <div 
-            class="field" 
-            hx-post="{% url 'edit_description' episode_id=episode.pk %}"
-            hx-target="#description_results" 
-            hx-trigger="keyup" 
-            hx-swap="innerHTML">
 
-            <div class="ui left icon input">
-            
-                {% if episode.description|length > 0 %}
-                    <i class="rcpch_pink check circle outline icon"></i>
-                {% else %}
-                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">
-                        <i class="rcpch_light_blue dot circle outline icon"></i>
-                    </span>
-                {% endif %}
+    {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
+    <small class="rcpch_warning_label"
+      >You do not have permission to update this field</small
+    >
+    {% endif %}
+  </div>
 
-                <textarea
-                    {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
-                    disabled
-                    {% endif %}
-                    type="text" 
-                    class="ui rcpch textarea"  
-                    rows="3" 
-                    name="description"
-                    placeholder="While watching television {{episode.multiaxial_diagnosis.registration.case}} fell to the floor... ">{{episode.description}}</textarea>
-            </div>
-
-            
-
-            
-            {% if not perms.epilepsy12.change_multiaxialdiagnosis %}
-                <small class='rcpch_warning_label'>You do not have permission to update this field</small>
-            {% endif %}
-
-        </div>
-    
-        
-        <div>
-            
-            
-            
-                {% comment %} {% if episode.description %} {% endcomment %}
-                    
-                {% comment %} {% else %}
-                    <label>Characters: 5000 </label>
-                {% endif %} {% endcomment %}
-            
-
-        </div>
-        
-        <div id="description_results">
-            {% include 'epilepsy12/partials/multiaxial_diagnosis/description_labels.html' with episode=episode %}
-        </div>
-    
+  <div id="description_results">
+    {% include 'epilepsy12/partials/multiaxial_diagnosis/description_labels.html' with episode=episode %}
+  </div>
 </form>
