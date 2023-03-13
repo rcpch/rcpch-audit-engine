@@ -1,6 +1,7 @@
 /* IMPORTS FOR VARIOUS SECTIONS */
 @import './footer.css';
 @import './nav.css';
+
 /* END IMPORTS */
 @font-face {
   font-family: Montserrat-Bold;
@@ -75,13 +76,15 @@ h1,
 h2,
 h3,
 h4,
-h5,h6 {
+h5,
+h6 {
   font-family: Montserrat-Regular;
   color: black;
   font-weight: 400;
 }
 
-p, a {
+p,
+a {
   font-family: Montserrat-Regular;
   color: black;
 }
@@ -107,6 +110,10 @@ ul {
   padding: 2rem;
 }
 
+.ui.rcpch.container {
+  padding: 2rem;
+}
+
 .ui.label {
   list-style: none;
   font-family: Montserrat-Regular;
@@ -116,18 +123,25 @@ ul {
   color: pink;
 }
 
+.rcpch_icon_text_group {
+  display: inline-flex;
+}
+
+.rcpch_icon_text_group>p.rcpch_icon_text {
+  margin: auto;
+}
+
 /* hero */
 
 .ui.center.aligned.segment.rcpch_masthead {
   padding: 4em 0em;
-  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/blue-wallpaper-wheel.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.rcpch_masthead>div.row>div>img.epilepsy12_logo {
-  margin-top: 4vw;
-  max-width: 60%;
+.rcpch_masthead>.rcpch.container>div.row>div>img.epilepsy12_logo {
+  max-width: 50%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -145,11 +159,50 @@ ul {
 .masthead_text_row>div>h1 {
   font-size: 3em;
 }
+
 .masthead_text_row>div>h2 {
   font-size: 1.5em;
 }
 
+/*  INDEX  */
+.index_segment {
+  padding-bottom: 5em;
+}
 
+div.center.aligned.image.rcpch_index_card_image {
+  padding: 5em;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/blue-wallpaper-wheel.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.ui.card>.content.rcpch_index_card_content {
+  padding: 1.5rem;
+}
+
+
+.rcpch_index_card_content.content>h1.ui.header {
+  color: var(--rcpch_charcoal);
+}
+
+.ui.card>.content.rcpch_index_card_content>h3.ui.header {
+  margin-top: 1em;
+}
+
+.ui.card>.content.rcpch_index_card_content>div.description {
+  margin-top: 3em;
+}
+
+.rcpch_icon_text_group.rcpch_index_card_select {
+  margin-top: 3em;
+  margin-bottom: 1em;
+}
+
+a.rcpch_index_card_link {
+  font-weight: 900;
+  font-size: 1.4em;
+  margin-right: 0.2em;
+}
 
 /* links */
 
@@ -179,11 +232,36 @@ ul {
   border-radius: 0%;
   font-family: Montserrat-Regular;
   color: black;
+  text-align: center;
 }
+
+.ui.rcpch_light_blue.card>.ui.header {
+  padding: 0.5em 0.5em;
+  margin-bottom: 0em;
+  margin-top: 0em
+}
+
 
 .ui.rcpch_light_blue.card .content .description {
   font-family: Montserrat-Regular;
   color: black;
+}
+
+.ui.rcpch_light_blue.card .content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* SUMMARY STATS CARDS */
+
+.hospital_details {
+  padding: 0.5em 0.5em;
+}
+
+.hospital_details>.hospital_address>div.item>p {
+  margin-bottom: 0em;
+  /* text-align: center; */
 }
 
 .ui.rcpch_dark_blue.card {
@@ -447,7 +525,8 @@ ul {
   background-color: var(--rcpch_light_blue);
   border-color: var(--rcpch_light_blue);
 }
-#first_paediatric_assessment_date_button{
+
+#first_paediatric_assessment_date_button {
   border-style: solid;
 }
 
@@ -605,7 +684,7 @@ ul {
 
 
 .radio-tile-group .input-container .radio-button:checked+.radio-tile:hover {
-  
+
   border: 2px solid var(--rcpch_light_blue);
   color: white;
   -webkit-transform: scale(0.9, 0.9);
@@ -620,6 +699,7 @@ ul {
   background-color: var(--rcpch_light_grey);
   border: 2px solid var(--rcpch_light_grey);
 }
+
 .radio-tile-group .input-container .radio-button:checked:disabled+.radio-tile:hover {
   background-color: var(--rcpch_light_grey);
   border: 2px solid var(--rcpch_light_grey);
@@ -959,11 +1039,11 @@ ul {
   border-radius: 0%;
 }
 
-.ui.rcpch.dropdown .menu .item:hover{
+.ui.rcpch.dropdown .menu .item:hover {
   background: var(--rcpch_light_blue);
 }
 
-.ui.rcpch.dropdown .menu .selected.item{
+.ui.rcpch.dropdown .menu .selected.item {
   background: var(--rcpch_dark_blue);
   color: var(--rcpch_white);
 }
@@ -975,18 +1055,19 @@ ul {
   background-color: var(--rcpch_white);
 }
 
-.ui.rcpch.selection.active.dropdown .menu{
+.ui.rcpch.selection.active.dropdown .menu {
   border-radius: 0%;
   border: 3px solid rgba(17, 167, 242, 1) !important;
-  border-top: 3px solid transparent !important;;
+  border-top: 3px solid transparent !important;
+  ;
 }
 
-.ui.rcpch.selection.active.dropdown ::-webkit-scrollbar{
+.ui.rcpch.selection.active.dropdown ::-webkit-scrollbar {
   background-color: var(--rcpch_lightest_blue);
 }
 
 
-.ui.rcpch.selection.active.dropdown ::-webkit-scrollbar-thumb{
+.ui.rcpch.selection.active.dropdown ::-webkit-scrollbar-thumb {
   background: var(--rcpch_light_blue);
   border-radius: 0%;
 }
@@ -1057,7 +1138,7 @@ ul {
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
 }
 
-.ui.rcpch_info.message p{
+.ui.rcpch_info.message p {
   color: var(--rcpch_dark_blue);
 }
 
@@ -1116,6 +1197,7 @@ ul {
 .ui.top.attached.inverted.clearing.segment .content {
   color: var(--rcpch_white);
 }
+
 .ui.top.attached.inverted.clearing.segment .content .sub.header {
   color: var(--rcpch_white);
 }
@@ -1194,15 +1276,15 @@ a label {
   border-radius: 0%;
 }
 
-.ui.bottom.attached.tiny.rcpch.progress{
+.ui.bottom.attached.tiny.rcpch.progress {
   background-color: var(--rcpch_light_grey);
 }
 
-.ui.bottom.attached.tiny.rcpch.progress .bar{
+.ui.bottom.attached.tiny.rcpch.progress .bar {
   background-color: var(--rcpch_pink);
 }
 
-.ui.rcpch_warning.basic.label{
+.ui.rcpch_warning.basic.label {
   color: var(--rcpch_dark_red);
   background-color: var(--rcpch_light_red);
   border-radius: 0%;
@@ -1210,14 +1292,14 @@ a label {
   margin-top: 1em;
 }
 
-img.ui.spaced.avatar.image{
+img.ui.spaced.avatar.image {
   border-color: var(--rcpch_pink);
   border-width: 3px;
   background-color: var(--rcpch_pink);
   border-style: solid;
 }
 
-.star.outline.icon{
+.star.outline.icon {
   color: var(--rcpch_pink);
 }
 
