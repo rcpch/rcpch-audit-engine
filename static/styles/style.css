@@ -124,7 +124,7 @@ ul {
   height: 40vh;
   background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/blue-wallpaper-wheel.png');
   background-repeat: no-repeat;
-  background-size: 100% auto;
+  background-size: cover;
 }
 
 .rcpch_hero {
