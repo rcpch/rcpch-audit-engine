@@ -232,11 +232,30 @@ a.rcpch_index_card_link {
   border-radius: 0%;
   font-family: Montserrat-Regular;
   color: black;
+  text-align: center;
 }
+
+.ui.rcpch_light_blue.card>.ui.header {
+  padding: 0.5em 0.5em;
+  margin-bottom: 0em;
+  margin-top: 0em
+}
+
 
 .ui.rcpch_light_blue.card .content .description {
   font-family: Montserrat-Regular;
   color: black;
+}
+
+/* SUMMARY STATS CARDS */
+
+.hospital_details {
+  padding: 0.5em 0.5em;
+}
+
+.hospital_details>.hospital_address>div.item>p {
+  margin-bottom: 0em;
+  /* text-align: center; */
 }
 
 .ui.rcpch_dark_blue.card {

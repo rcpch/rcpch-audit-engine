@@ -35,28 +35,59 @@
         <div class='sixteen wide right fluid column'>
 
             
-            <div class="ui four cards">
+            <div class="ui four stackable cards">
                 
-                <div class="ui rcpch_light_blue stackable card">
-                    <div class="content">
-                        <div class="header">
-                            {{ selected_hospital.ParentName }}
-                        </div>
-                        <div class="description">
-                            {{ selected_hospital.Address1 }}<br>
-                            {{ selected_hospital.Address2 }}<br>
-                            {{ selected_hospital.Address3 }}<br>
-                            {{ selected_hospital.City }}<br>
-                            {{ selected_hospital.Postcode }}<br>
-                            <span><i class="phone icon"></i>{{ selected_hospital.Phone }}</span><br>
-                            <span><i class="envelope outline icon"></i>{{ selected_hospital.Email }}</span><br>
-                            <span><i class="internet explorer icon"></i>{{ selected_hospital.Website }}</span><br>
-                        </div>
+                <div class="ui rcpch_light_blue  card">
+                    <div class="ui centered header">
+                        <h3>{{ selected_hospital.ParentName }}</h3>
                     </div>
+                    <h4 class="ui horizontal header divider">
+                        <i class="ui small hospital icon "></i>Address
+                    </h4>
+                        <div class="hospital_details ">
+                            <div class="hospital_address">
+                                <div class="item">
+                                    {%if selected_hospital.Address1%}<p>{{ selected_hospital.Address1 }}</p>{%endif%}
+                                    {%if selected_hospital.Address2%}<p>{{ selected_hospital.Address2 }}</p>{%endif%}
+                                    {%if selected_hospital.Address3%}<p>{{ selected_hospital.Address3 }}</p>{%endif%}
+                                    {%if selected_hospital.City%}<p>{{ selected_hospital.City }}</p>{%endif%}
+                                    {%if selected_hospital.Postcode%}<p>{{ selected_hospital.Postcode }}</p>{%endif%}
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="ui horizontal header divider">
+                            <i class="ui small address book icon "></i>Details
+                        </h4>
+                        <div class="hospital_details ">
+                            <div class="item middle aligned rcpch_icon_text_group">
+                                <i class="ui icon phone"></i>
+                                {%if selected_hospital.Phone%}
+                                <p class="rcpch_icon_text">{{ selected_hospital.Phone }}</p>
+                                {%else%}
+                                <p class="rcpch_icon_text">Can't find phone number</p>
+                                {%endif%}
+                            </div><br>
+                            <div class="item middle aligned rcpch_icon_text_group">
+                                <i class="ui icon envelope"></i>
+                                {%if selected_hospital.Email%}
+                                <p class="rcpch_icon_text">{{ selected_hospital.Email }}</p>
+                                {%else%}
+                                <p class="rcpch_icon_text">Can't find email</p>
+                                {%endif%}
+                            </div><br>
+                            <div class="item middle aligned rcpch_icon_text_group">    
+                                <i class="ui icon linkify"></i>
+                                {%if selected_hospital.Website%}
+                                <p class="rcpch_icon_text">{{ selected_hospital.Website }}</p>
+                                {%else%}
+                                <p class="rcpch_icon_text">Can't find website</p>
+                                {%endif%}
+                            </div>
+                        </div>
                 </div>
 
                 
-                <div class="ui rcpch_light_blue stackable card">
+                <div class="ui rcpch_light_blue  card">
                     <div class="content">
                         <h2 class='header'>
                         Distribution by Ethnicity
@@ -73,7 +104,7 @@
                     </div>
                 </div>
                 
-                <div class="ui rcpch_light_blue stackable card">
+                <div class="ui rcpch_light_blue  card">
                     <div class="content">
                         <h2 class='header'>
                         Distribution by Sex
@@ -90,7 +121,7 @@
                     </div>
                 </div>
 
-                <div class="ui rcpch_light_blue stackable card">
+                <div class="ui rcpch_light_blue  card">
                     <div class="content">
                         <h2 class='header'>
                         Distribution by Index of Multiple Deprivation
