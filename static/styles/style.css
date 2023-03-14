@@ -86,7 +86,7 @@ h6 {
 p,
 a,
 button {
-  font-family: Montserrat-Regular !important;
+  font-family: var(--rcpch_standard_font) !important;
   color: black;
 }
 
