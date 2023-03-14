@@ -1220,11 +1220,7 @@ div.ui.card>div.content>div.hospital_address_container {
   border-color: var(--rcpch_dark_blue);
 }
 
-.ui.top.attached.inverted.clearing.segment .content {
-  color: var(--rcpch_white);
-}
-
-.ui.top.attached.inverted.clearing.segment .content .sub.header {
+.ui.header>div.content.kpi_header>p {
   color: var(--rcpch_white);
 }
 
