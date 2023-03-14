@@ -50,7 +50,7 @@ def calculate_kpis(registration_instance):
         elif registration_instance.assessment.paediatric_neurologist_referral_made and registration_instance.assessment.paediatric_neurologist_input_date is not None:
             if (
                 registration_instance.assessment.paediatric_neurologist_input_date <= (
-                    registration_instance.assessment.consultant_paediatrician_referral_date + relativedelta(days=+14))
+                    registration_instance.assessment.paediatric_neurologist_referral_date + relativedelta(days=+14))
             ):
                 paediatrician_with_expertise_in_epilepsies = 1
 
@@ -165,7 +165,6 @@ def calculate_kpis(registration_instance):
             # not eligible for this measure
             epilepsy_surgery_referral = 2
 
-
     # 4. ECG
     # % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
     # Calculation Method
@@ -193,17 +192,22 @@ def calculate_kpis(registration_instance):
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
     # Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
     mri = None
-    if hasattr(registration_instance, 'multiaxialdiagnosis'):
+    if hasattr(registration_instance, 'multiaxialdiagnosis') and hasattr(registration_instance, 'investigations'):
         # denominator
         if (
-            registration_instance.multiaxialdiagnosis.syndrome_present and
-            Syndrome.objects.filter(
-                Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
-                # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                ~Q(syndrome_name__in=[3, 16, 17, 18])
-            ).exists() or
+            (
+                registration_instance.multiaxialdiagnosis.syndrome_present and
+                Syndrome.objects.filter(
+                    Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
+                    # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
+                    ~Q(syndrome_name__in=[3, 16, 17, 18])
+                ).exists() or
 
-            age_at_first_paediatric_assessment <= 2
+                age_at_first_paediatric_assessment <= 2
+            ) and (
+                registration_instance.investigations.mri_brain_requested_date is not None and
+                registration_instance.investigations.mri_brain_reported_date is not None
+            )
         ):
             # eligible for this measure
             mri = 0
