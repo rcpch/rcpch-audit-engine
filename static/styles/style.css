@@ -1321,3 +1321,47 @@ img.ui.spaced.avatar.image {
   font-family: Montserrat-Regular;
   color: var(--rcpch_charcoal);
 }
+
+.ui.rcpch_stats.statistic>.rcpch_stats_value {
+  color: var(--rcpch_light_blue);
+  /* font-size: 5rem; */
+}
+
+
+/* summary stats css */
+
+.rcpch_summary_stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+div.rcpch_summary_stats>div.rcpch_summary_stats_row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 1em 0em;
+}
+
+
+
+.rcpch_summary_stats>.rcpch_summary_stats_row>* {
+  margin: 0em;
+  color: var(--rcpch_charcoal);
+}
+
+.rcpch_summary_stats>.rcpch_summary_stats_row>h1 {
+  color: var(--rcpch_light_blue);
+  font-size: 4em;
+}
+
+.rcpch_summary_stats>.rcpch_summary_stats_row>h2 {
+  font-size: 1.5em;
+}
+.rcpch_summary_stats>.rcpch_summary_stats_row>h3 {
+  font-size: 1em;
+}
+.rcpch_summary_stats>.rcpch_summary_stats_row>h4 {
+  font-size: 0.8em;
+}
