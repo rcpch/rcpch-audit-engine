@@ -257,8 +257,26 @@ a.rcpch_index_card_link {
 
 /* SUMMARY STATS CARDS */
 
+div.ui.card>div.content>div.hospital_address_container {
+  margin: 1em auto;
+}
+
+
 .hospital_details {
   padding: 0.5em 0.5em;
+  margin: 0em auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.ui.rcpch.hospital.icon {
+  margin-right: 0.5em;
+}
+
+.hospital_details>.hospital_address>div.item {
+  text-align: center;
 }
 
 .hospital_details>.hospital_address>div.item>p {
