@@ -13,23 +13,19 @@
             </div>
         {% endif %}
 
-        <div class='eight wide left aligned column'>
-            
-                <div class='field'>
-                    <a href="{% url 'epilepsy12_user_list' hospital_id=selected_hospital.pk %}">
-                        <button 
-                            class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Epilepsy12 Staff
-                        </button>
-                    </a>
-                </div>
-            
-        </div>
-
-        <div class='eight wide right aligned column'>
-            <div class='field'>
-                <a href="{% url 'cases' hospital_id=selected_hospital.pk %}"><button class="ui rcpch_primary button">View All {{selected_hospital.ParentName}} Children</button></a>
+        <div class="fluid row stackable">
+            <div class="eight wide column">
+                <button class="ui rcpch_primary fluid button">
+                    <a href="{% url 'epilepsy12_user_list' hospital_id=selected_hospital.pk %}">View All {{selected_hospital.ParentName}} Epilepsy12 Staff</a>
+                    </button>
+            </div>
+            <div class="eight wide  column">
+                <button class="ui rcpch_primary fluid button">
+                    <a href="{% url 'cases' hospital_id=selected_hospital.pk %}" class="fluid">View All {{selected_hospital.ParentName}} Children</a>
+                    </button>
             </div>
         </div>
+
         
         
         <div class='sixteen wide right fluid column'>
