@@ -229,8 +229,10 @@ a.rcpch_index_card_link {
   background-color: #3366cc;
 }
 
+/* SUMMARY STATS CARDS */
+
 .ui.rcpch_light_blue.card {
-  background-color: #11a7f2;
+  background-color: var(--rcpch_strong_blue);
   border-radius: 0%;
   font-family: Montserrat-Regular;
   color: black;
@@ -249,13 +251,17 @@ a.rcpch_index_card_link {
   color: black;
 }
 
+.ui.rcpch_light_blue.card div.content >h3 {
+  color: var(--rcpch_white)
+}
+
+
 .ui.rcpch_light_blue.card .content {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* SUMMARY STATS CARDS */
 
 div.ui.card>div.content>div.hospital_address_container {
   margin: 1em auto;
