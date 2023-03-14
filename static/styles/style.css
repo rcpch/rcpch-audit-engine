@@ -277,7 +277,7 @@ div.ui.card>div.content>div.hospital_address_container {
   align-items: center;
 }
 
-.ui.rcpch.hospital.icon {
+.ui.rcpch.hospital.icon, .ui.rcpch.address.book.icon {
   margin-right: 0.5em;
 }
 
