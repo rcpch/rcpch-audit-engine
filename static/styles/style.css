@@ -84,8 +84,9 @@ h6 {
 }
 
 p,
-a {
-  font-family: Montserrat-Regular;
+a,
+button {
+  font-family: Montserrat-Regular ;
   color: black;
 }
 
