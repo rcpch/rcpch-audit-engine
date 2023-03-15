@@ -493,6 +493,10 @@ div.ui.card>div.content>div.hospital_address_container {
   color: var(--rcpch_orange);
 }
 
+.rcpch_light_grey.icon {
+  color: var(--rcpch_light_grey);
+}
+
 .ui.rcpch_red.icon.button {
   border-radius: 0%;
   background-color: var(--rcpch_red);
@@ -1341,6 +1345,10 @@ img.ui.spaced.avatar.image {
 .ui.statistic div.label {
   font-family: Montserrat-Regular;
   color: var(--rcpch_charcoal);
+}
+
+.kpi_unscored {
+  color: var(--rcpch_mid_grey);
 }
 
 .ui.rcpch_stats.statistic>.rcpch_stats_value {
