@@ -7,8 +7,7 @@
 
   {% if request.user|has_group:'epilepsy12_audit_team_full_access' %}
   <div class="row" id="frida_button">
-    {% include 'epilepsy12/partials/frida_button.html' with
-    model_list=model_list selected_model=selected_model %}
+    {% include 'epilepsy12/partials/frida_button.html' with model_list=model_list selected_model=selected_model %}
   </div>
   {% endif %}
 
