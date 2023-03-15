@@ -42,7 +42,7 @@ services:
             python manage.py seed --mode=seed_hospitals &&
             python manage.py seed --mode=seed_semiology_keywords &&
             python manage.py seed --mode=seed_dummy_cases &&
-            # python manage.py seed --mode=seed_registrations &&
+            python manage.py seed --mode=seed_registrations &&
             python manage.py seed --mode=seed_groups_and_permissions &&
             python manage.py createsuperuser --noinput &&
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&

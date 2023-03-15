@@ -59,12 +59,11 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
         default=None
     )
 
-    description = models.CharField(
+    description = models.TextField(
         help_text={
             'label': "What is the episode(s) like and is the description adequate?",
             'reference': "What is the episode(s) like and is the description adequate?",
         },
-        max_length=2000,
         default="",
         blank=True,
         null=True
