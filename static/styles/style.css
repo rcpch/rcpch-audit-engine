@@ -84,8 +84,10 @@ h6 {
 }
 
 p,
-a {
-  font-family: Montserrat-Regular;
+a,
+button,
+th {
+  font-family: var(--rcpch_standard_font) !important;
   color: black;
 }
 
@@ -227,8 +229,10 @@ a.rcpch_index_card_link {
   background-color: #3366cc;
 }
 
+/* SUMMARY STATS CARDS */
+
 .ui.rcpch_light_blue.card {
-  background-color: #11a7f2;
+  background-color: var(--rcpch_strong_blue);
   border-radius: 0%;
   font-family: Montserrat-Regular;
   color: black;
@@ -247,16 +251,38 @@ a.rcpch_index_card_link {
   color: black;
 }
 
+.ui.rcpch_light_blue.card div.content >h3 {
+  color: var(--rcpch_white)
+}
+
+
 .ui.rcpch_light_blue.card .content {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* SUMMARY STATS CARDS */
+
+div.ui.card>div.content>div.hospital_address_container {
+  margin: 1em auto;
+}
+
 
 .hospital_details {
   padding: 0.5em 0.5em;
+  margin: 0em auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.ui.rcpch.hospital.icon, .ui.rcpch.address.book.icon {
+  margin-right: 0.5em;
+}
+
+.hospital_details>.hospital_address>div.item {
+  text-align: center;
 }
 
 .hospital_details>.hospital_address>div.item>p {
@@ -1198,11 +1224,7 @@ a.rcpch_index_card_link {
   border-color: var(--rcpch_dark_blue);
 }
 
-.ui.top.attached.inverted.clearing.segment .content {
-  color: var(--rcpch_white);
-}
-
-.ui.top.attached.inverted.clearing.segment .content .sub.header {
+.ui.header>div.content.kpi_header>p {
   color: var(--rcpch_white);
 }
 
@@ -1327,4 +1349,48 @@ img.ui.spaced.avatar.image {
 
 .kpi_unscored {
   color: var(--rcpch_mid_grey);
+}
+
+.ui.rcpch_stats.statistic>.rcpch_stats_value {
+  color: var(--rcpch_light_blue);
+  /* font-size: 5rem; */
+}
+
+
+/* summary stats css */
+
+.rcpch_summary_stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+div.rcpch_summary_stats>div.rcpch_summary_stats_row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 1em 0em;
+}
+
+
+
+.rcpch_summary_stats>.rcpch_summary_stats_row>* {
+  margin: 0em;
+  color: var(--rcpch_charcoal);
+}
+
+.rcpch_summary_stats>.rcpch_summary_stats_row>h1 {
+  color: var(--rcpch_light_blue);
+  font-size: 4em;
+}
+
+.rcpch_summary_stats>.rcpch_summary_stats_row>h2 {
+  font-size: 1.5em;
+}
+.rcpch_summary_stats>.rcpch_summary_stats_row>h3 {
+  font-size: 1em;
+}
+.rcpch_summary_stats>.rcpch_summary_stats_row>h4 {
+  font-size: 0.8em;
 }

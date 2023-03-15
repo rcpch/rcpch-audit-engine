@@ -80,7 +80,6 @@ def calculate_kpis(registration_instance):
     if hasattr(registration_instance, 'management') and hasattr(registration_instance, 'assessment') and hasattr(registration_instance, 'multiaxialdiagnosis'):
 
         # denominator
-
         if (
             age_at_first_paediatric_assessment <= 3
         ) or (
