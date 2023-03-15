@@ -8,23 +8,7 @@ from ..models import Case
 
 
 def all_registered_cases_for_cohort_and_abstraction_level(hospital_organisation_instance, cohort, case_complete=True, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation'):
-
-
-def all_registered_cases_for_cohort_and_abstraction_level(hospital_organisation_instance, cohort, case_complete=True, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation'):
     """
-    Returns all Cases that have been registered for a given cohort at a given abstration level.
-    It can return cases that are only registered in E12 for a given cohort but have not yet completed the return, or 
-    cases that are both registered and have also completed all required fields in the return.
-    Parameters accepted:
-    HospitalTrust instance
-    Cohort - this is an integer
-    case_complete: a boolean flag denoting that the case is registered in Epilepsy12 and a fully completed audit return is available
-    abstraction level: string, one of ['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national']
-
-    Note that all these children will by definition have epilepsy, since a cohort cannot be allocated without the clinician confirming
-    1. the child has epilepsy
-    2. the first paediatric assessment falls within the the dates for that cohort
-    3. a lead E12 site has been allocated
     Returns all Cases that have been registered for a given cohort at a given abstration level.
     It can return cases that are only registered in E12 for a given cohort but have not yet completed the return, or 
     cases that are both registered and have also completed all required fields in the return.
@@ -40,23 +24,6 @@ def all_registered_cases_for_cohort_and_abstraction_level(hospital_organisation_
     3. a lead E12 site has been allocated
     """
 
-    if case_complete:
-        all_cases_for_cohort = Case.objects.filter(
-            Q(registration__isnull=False) &
-            Q(registration__audit_progress__registration_complete=True) &
-            Q(registration__audit_progress__first_paediatric_assessment_complete=True) &
-            Q(registration__audit_progress__assessment_complete=True) &
-            Q(registration__audit_progress__epilepsy_context_complete=True) &
-            Q(registration__audit_progress__multiaxial_diagnosis_complete=True) &
-            Q(registration__audit_progress__investigations_complete=True) &
-            Q(registration__audit_progress__management_complete=True) &
-            Q(registration__cohort=cohort)
-        ).all()
-    else:
-        all_cases_for_cohort = Case.objects.filter(
-            Q(registration__isnull=False) &
-            Q(registration__cohort=cohort)
-        ).all()
     if case_complete:
         all_cases_for_cohort = Case.objects.filter(
             Q(registration__isnull=False) &

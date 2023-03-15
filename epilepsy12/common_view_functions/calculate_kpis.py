@@ -18,17 +18,7 @@ def calculate_kpis(registration_instance):
     2 - measure failed
     3 - measure scored but not applicable (eg ECG in nonconvulsive seizure)
     None - measure not scored yet
-    It accepts the registration instance and is called each time a related model is updated
-    The outcome of a measure follows 4 potential states:
-    1 - measure achieved
-    2 - measure failed
-    3 - measure scored but not applicable (eg ECG in nonconvulsive seizure)
-    None - measure not scored yet
     """
-
-    # important metric for calculations that follow
-    age_at_first_paediatric_assessment = relativedelta(
-        registration_instance.registration_date, registration_instance.case.date_of_birth).years
 
     # important metric for calculations that follow
     age_at_first_paediatric_assessment = relativedelta(
@@ -100,10 +90,6 @@ def calculate_kpis(registration_instance):
                 antiepilepsy_medicine_start_date__lt=registration_instance.registration_close_date
             ).count() >= 3
         ) or (
-            # number of children and young people diagnosed with epilepsy  who met [CESS criteria]
-            registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-        ) or (
-            # Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures]
             # number of children and young people diagnosed with epilepsy  who met [CESS criteria]
             registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
         ) or (
