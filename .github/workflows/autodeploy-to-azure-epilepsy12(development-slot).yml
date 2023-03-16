@@ -64,6 +64,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
-          app-name: 'epilepsy12'
-          slot-name: 'development'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8B8000BE9FE8486398E281B9241BA509 }}
+          app-name: 'epilepsy12-development'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
