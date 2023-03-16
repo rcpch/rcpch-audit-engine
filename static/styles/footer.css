@@ -10,6 +10,7 @@ footer {
 footer p {
     color: white;
     font-size: 1vw;
+    text-align: justify;
 }
 
 footer h2 {
