@@ -1,16 +1,22 @@
 /* IMPORTS FOR VARIOUS SECTIONS */
 
+
 @import './footer.css';
 @import './nav.css';
 
 /* END IMPORTS */
 
+
 @font-face {
+    font-family: Montserrat-Bold;
+    src: local('Montserrat-Bold'), url("fonts/Montserrat/static/Montserrat-Bold.ttf") format("truetype");
     font-family: Montserrat-Bold;
     src: local('Montserrat-Bold'), url("fonts/Montserrat/static/Montserrat-Bold.ttf") format("truetype");
 }
 
 @font-face {
+    font-family: Montserrat-Italic;
+    src: local('Montserrat-Italic'), url("fonts/Montserrat/static/Montserrat-Italic.ttf") format("truetype");
     font-family: Montserrat-Italic;
     src: local('Montserrat-Italic'), url("fonts/Montserrat/static/Montserrat-Italic.ttf") format("truetype");
 }
@@ -274,7 +280,7 @@ div.ui.card>div.content>div.hospital_address_container {
 }
 
 .ui.rcpch.hospital.icon {
-  margin-right: 0.5em;
+    margin-right: 0.5em;
 }
 
 .hospital_details>.hospital_address>div.item {
