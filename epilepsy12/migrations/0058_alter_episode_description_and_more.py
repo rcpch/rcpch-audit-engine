@@ -12,28 +12,26 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="episode",
             name="description",
-            field=models.CharField(
+            field=models.TextField(
                 blank=True,
                 default="",
                 help_text={
-                    "label": "What is the episode(s) like and is the description adequate?",
-                    "reference": "What is the episode(s) like and is the description adequate?",
+                        "label": "What is the episode(s) like and is the description adequate?",
+                        "reference": "What is the episode(s) like and is the description adequate?",
                 },
-                max_length=2000,
                 null=True,
             ),
         ),
         migrations.AlterField(
             model_name="historicalepisode",
             name="description",
-            field=models.CharField(
+            field=models.TextField(
                 blank=True,
                 default="",
                 help_text={
-                    "label": "What is the episode(s) like and is the description adequate?",
-                    "reference": "What is the episode(s) like and is the description adequate?",
+                        "label": "What is the episode(s) like and is the description adequate?",
+                        "reference": "What is the episode(s) like and is the description adequate?",
                 },
-                max_length=2000,
                 null=True,
             ),
         ),
