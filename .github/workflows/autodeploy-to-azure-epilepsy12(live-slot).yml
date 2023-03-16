@@ -65,5 +65,5 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'epilepsy12'
-          slot-name: 'Production'
+          slot-name: 'live'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9E7C43861BEF424DB2C7005B2A3CF8A2 }}
