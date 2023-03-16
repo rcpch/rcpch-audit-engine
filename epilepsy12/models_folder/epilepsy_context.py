@@ -59,7 +59,7 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, He
     )
     diagnosis_of_epilepsy_withdrawn = models.BooleanField(
         help_text={
-            'label': "has the diagnosis of epilepsy been withdrawn?",
+            'label': "Has the diagnosis of epilepsy been withdrawn?",
             'reference': 'In the first year after first assessment, has a diagnosis of epilepsy been withdrawn because it has been subsequently deemed incorrect?'
         },
         null=True,
