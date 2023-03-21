@@ -10,7 +10,11 @@ class Epilepsy12LoginForm(AuthenticationForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "password")
+        fields = ("username", "password")
+
+    def clean_username(self):
+        data = self.cleaned_data['username']
+        return data.lower()
 
 
 class Epilepsy12UserCreationForm(UserCreationForm):
@@ -139,9 +143,9 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
         fields = ("email", "role", "hospital_employer", 'title', 'first_name', 'surname', "is_staff",
                   "is_rcpch_audit_team_member", "is_superuser", "email_confirmed")
 
-    def clean(self):
-        cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
-        return cleaned_data
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        return data.lower()
 
 
 class Epilepsy12UserPasswordResetForm(SetPasswordForm):
