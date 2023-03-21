@@ -1,9 +1,11 @@
 # django
-from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group, Permission
+from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.db.models.functions import Lower
+from django.db.models import UniqueConstraint
 # 3rd party
 from simple_history.models import HistoricalRecords
 
@@ -259,6 +261,12 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     class Meta:
         verbose_name = "Epilepsy12 User"
         verbose_name_plural = "Epilepsy12 Users"
+        constraints = [
+            UniqueConstraint(
+                Lower("email"),
+                name="user_email_ci_uniqueness",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.get_full_name()
