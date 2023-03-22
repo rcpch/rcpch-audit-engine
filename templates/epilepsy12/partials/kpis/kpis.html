@@ -3,12 +3,12 @@
 <div class="ui rcpch container">
     <div class="sixteen wide column">
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
-            <h5 class='ui header'>
-                <div class='content'>
-                    Real-time KPI Metrics
-                    <div class="sub header">
-                    {{hospital_organisation.OrganisationName}} ({{ hospital_organisation.ParentName }})
-                    </div>    
+            <div class='ui header'>
+                <div class='content kpi_header'>
+                    <p>Real-time KPI Metrics</p>
+                    <!-- <div class="sub header"> -->
+                    <p>{{hospital_organisation.OrganisationName}} ({{ hospital_organisation.ParentName }})</p>
+                    <!-- </div>     -->
                 </div>
                 <button 
                     class='ui right floated rcpch_primary button'
@@ -19,12 +19,11 @@
                     Refresh
                     <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                 </button>
-            </h5>
+            </div>
         </div>
 
         <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
-            {% comment %} <div class="ui rcpch segment"> {% endcomment %}
                 <h3>Clinical Team</h3>
                 <table class='ui rcpch table'>
                     <thead>

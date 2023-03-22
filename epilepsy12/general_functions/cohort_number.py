@@ -59,9 +59,15 @@ def current_cohort_start_date():
         return date(today.year-1, 12, 1)
 
 
-def get_current_cohort_data():
+def get_current_cohort_data() -> dict:
     """
-    Returns all current cohort dates
+    Returns all current cohort dates and cohort number
+    Return keys are:
+    'cohort_start_date'
+    'cohort_end_date'
+    'cohort'
+    'submission_date'
+    'days_remaining'
     """
     current_cohort = cohort_number_from_enrolment_date(
         current_cohort_start_date())

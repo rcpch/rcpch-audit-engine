@@ -30,9 +30,9 @@ def date_string(date):
 
 @register.simple_tag
 def characters_left(description):
-    length = 5000-len(description)
+    length = 2000-len(description)
     colour = 'black'
-    if (length < 10):
+    if (length < 100):
         colour = 'red'
     safe_text = f'<span style="color:{colour}">{length}</span>'
     return mark_safe(safe_text)
@@ -220,6 +220,42 @@ def icon_for_score(score):
     if score is None:
         return
     if score < 1:
-        return mark_safe("<i class='rcpch_light_blue exclamation triangle icon'></i>")
+        return mark_safe(
+            """<i 
+                    class='rcpch_light_blue exclamation triangle icon'
+                    data-title="Not achieved"
+                    data-content="This measure has not been achieved for this child."
+                    data-position="top right"
+                    _="init js $('.rcpch_light_blue.exclamation.triangle.icon').popup(); end"
+                ></i>
+            """)
+    elif score > 1:
+        return mark_safe(
+            """<i 
+                    class='rcpch_light_grey ban icon'
+                    data-title="Not applicable"
+                    data-content="This measure does not apply to this child."
+                    data-position="top right"
+                    _="init js $('.rcpch_light_grey.ban.icon').popup(); end"
+                ></i>"""
+        )
+    elif score == 1:
+        return mark_safe(
+            """<i 
+                class='check circle outline rcpch_pink icon'
+                data-title="Achieved"
+                data-content="This child's care has met the Epilepsy12 standard for this measure."
+                data-position="top right"
+                _="init js $('.check.circle.outline.rcpch_pink.icon').popup(); end"
+                ></i>
+                """)
     else:
-        return mark_safe("<i class='check circle outline rcpch_pink icon'></i>")
+        return mark_safe(
+            """<i 
+                class='rcpch dot circle icon'
+                data-title="Unscored"
+                data-content="This measure has not yet been scored."
+                data-position="top right"
+                _="init js $('.rcpch.dot.circle.icon').popup(); end"
+                ></i>
+                """)

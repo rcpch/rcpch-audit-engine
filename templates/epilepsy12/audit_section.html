@@ -1,40 +1,40 @@
-
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% load static %}
 
 
-    {% block content %}
-  
-      <div class='ui container'>
+{% block content %}
 
-            <div class="ui grid">
-              <div class="four wide column">
-                  <div class="ui vertical ordered mini top attached rcpch steps" id="registration_active">
-                    {% include "./steps.html" with audit_progress=audit_progress case_id=case_id %}
-                  </div>
-              </div>
-              <div class="twelve wide column">
-                <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
-                <h5 class="ui left floated header">
-                  {% block audit_section_title %}{% endblock %}
-                </h5>
-                <h5 class="ui right floated header">
-                  {{ registration.case.first_name }} {{ registration.case.surname }} {{ registration.case.nhs_number}}
-                </h5>
-                </div>
-                <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
-                  {% block audit_section_form %}{% endblock %}
-                </div>
-                <div class="ui bottom attached rcpch_footer info icon message">
-                  <i class="info circle icon"></i>
-                  {% block audit_section_instructions %}{% endblock %}
-                </div>
-              </div>
-            <div>
-            
-            {% block audit_section_list %}{% endblock %}
+<div class='ui rcpch container'>
 
+  <div class="ui grid">
+    <div class="four wide column">
+      <div class="ui vertical ordered mini top attached rcpch steps" id="registration_active">
+        {% include "./steps.html" with audit_progress=audit_progress case_id=case_id %}
       </div>
+    </div>
+    <div class="twelve wide column">
+      <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
+        <h5 class="ui left floated header">
+          {% block audit_section_title %}{% endblock %}
+        </h5>
+        <h5 class="ui right floated header">
+          {{ registration.case.first_name }} {{ registration.case.surname }} {{ registration.case.nhs_number}}
+        </h5>
+      </div>
+      <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
+        {% block audit_section_form %}{% endblock %}
+      </div>
+      <div class="ui bottom attached rcpch_footer info icon message">
+        <i class="info circle icon"></i>
+        {% block audit_section_instructions %}{% endblock %}
+      </div>
+    </div>
+    <div>
 
-    {% endblock %}
-    
+      {% block audit_section_list %}{% endblock %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

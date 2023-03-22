@@ -1,0 +1,62 @@
+{% load static %}
+{% load epilepsy12_template_tags %}
+
+<div class="ui text menu signin">
+    <div class="right menu">
+      {% if user.is_authenticated %}
+        <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
+      {% else %}
+        <a class="item signin_button" href="{% url 'login' %}"><i class="arrow right icon"></i><span class="signin_text">Sign in</span></a>
+        {% comment %} <a class="item signin_button" href="{% url 'signup' %}"><i class="arrow right icon"></i><span class="signin_text">Sign up</span></a> {% endcomment %}
+      {% endif %}
+    </div>
+  </div>
+  <div class="ui container rcpch fluid nav">
+    <div class="ui secondary pointing stackable menu ">
+        <a {% if request.resolver_match.url_name|is_in:'index' %} class="active_menu_item active item" {% else %} class="item" {% endif %}
+           href="{% url 'index' %}">
+          <span>
+            <img id="nav-rcpch"
+                 src="{% static 'images/rcpch-logo-mobile.4d5b446caf9a.svg' %}"
+                 class="item">
+          </span>
+        </a>
+        <h4>Epilepsy12 audit platform</h4>
+        <div class='right menu'>
+          <a {% if request.resolver_match.url_name|is_in:'index' %}class="active item" id="active_menu_item"{% else %} class="item" {% endif %}
+             id="link"
+             href="{% url 'index' %}">
+            Home
+          </a>
+          {% if user.is_authenticated %}
+            {% if user.is_superuser %}
+              <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+                 href="{% url 'admin:index' %}">
+                Database management
+              </a>
+            {% endif %}
+            <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+               id="link"
+               href="{% url 'hospital_reports' %}">
+              Clinician access
+            </a>
+          {% endif %}
+          <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+             id="link"
+             href='https://www.rcpch.ac.uk/resources/patient-parent-guide-epilepsy12-audit'>
+            Patient access
+          </a>
+          <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+             id="link"
+             href="{% url 'docs' %}">
+            Documentation
+          </a>
+          <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+             id="link"
+             href="{% url 'tsandcs' %}">
+            Terms of Service
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>

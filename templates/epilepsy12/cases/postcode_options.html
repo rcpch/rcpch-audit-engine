@@ -1,0 +1,38 @@
+<div class="four wide left aligned column">
+    <div 
+      class="row" 
+      id="no_postcode"
+      {% if child_has_unknown_postcode %}
+        _="on load hide #postcode_field then hide #no_postcode then show #unknown_postcode">
+      {% else %}
+        _="on load hide #add_postcode then hide #unknown_postcode">
+      {% endif %}
+        <label
+            >
+            <i class="rcpch question circle icon link" id="unknownpostcodeIdPopup"></i>
+            <div class="ui flowing popup top left transition hidden">
+            <p>If the postcode is not known, a record can still be saved. It will not be possible to calculate a deprivation score however.</p>
+            </div>
+        </label>
+        <button
+            style="margin-top: 1.5em;"
+            class="ui large rcpch_primary button"
+            _="on click halt the event then hide #postcode_field then hide #no_postcode then show #unknown_postcode then show #add_postcode"
+          >No postcode</button>
+    </div>
+    <div class="row">
+        <button 
+          id="add_postcode" 
+          class="ui rcpch_primary button"
+          _="on click halt the event then show #postcode_field then hide #unknown_postcode then show #no_postcode then hide me"
+        >Add postcode</button>
+    </div>
+
+  </div>
+
+  <div 
+    class="twelve wide left aligned column"
+    id="unknown_postcode"
+  >
+      {% include 'epilepsy12/cases/unknown_postcode.html' with choices=choices test_positive=test_positive %}
+  </div>

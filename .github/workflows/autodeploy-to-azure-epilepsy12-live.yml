@@ -2,6 +2,9 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
+# DEPLOYS CHANGES IN THE 'LIVE' BRANCH TO THE 'LIVE' DEPLOYMENT SLOT ON AZURE
+# epilepsy12/live
+
 name: Build and deploy Python app to Azure Web App - epilepsy12
 
 on:
@@ -29,6 +32,9 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
+        
+      - name: collect static files
+        run: python manage.py collectstatic --noinput
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       
@@ -58,6 +64,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
-          app-name: 'epilepsy12'
+          app-name: 'epilepsy12-live'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9E7C43861BEF424DB2C7005B2A3CF8A2 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1E0B0FCE42D9478791AD4B497010440A }}

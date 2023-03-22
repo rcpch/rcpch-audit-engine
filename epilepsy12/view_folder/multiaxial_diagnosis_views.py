@@ -559,23 +559,24 @@ def edit_description(request, episode_id):
     This component comprises the input free text describing a seizure episode and labels for each of the keywords identified.
     The htmx post request is triggered on every key up.
     This function returns the description keyword partial to the browser.
-    TODO #33 implement 5000 character cut off
     """
 
     description = request.POST.get('description')
-
     keywords = Keyword.objects.all()
-    matched_keywords = fuzzy_scan_for_keywords(description, keywords)
 
-    update_field = {
-        'description': description,
-        'description_keywords': matched_keywords,
-        'updated_at': timezone.now(),
-        'updated_by': request.user
-    }
-    if (len(description) <= 5000):
+    if (len(description) <= 2000):
+
+        matched_keywords = fuzzy_scan_for_keywords(description, keywords)
+
+        update_field = {
+            'description': description,
+            'description_keywords': matched_keywords,
+            'updated_at': timezone.now(),
+            'updated_by': request.user
+        }
         Episode.objects.update_or_create(
             pk=episode_id, defaults=update_field)
+
     episode = Episode.objects.get(pk=episode_id)
 
     context = {
