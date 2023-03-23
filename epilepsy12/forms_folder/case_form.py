@@ -57,7 +57,7 @@ class CaseForm(forms.ModelForm):
                 "type": "text"
             }
         ),
-        required=False
+        required=True
     )
     ethnicity = forms.ChoiceField(
         choices=ETHNICITIES,
@@ -92,7 +92,4 @@ class CaseForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(CaseForm, self).clean()
 
-        if (len(self.cleaned_data['unknown_postcode']) > 0 and len(self.cleaned_data['postcode']) == 0):
-            self.cleaned_data['postcode'] = self.cleaned_data['unknown_postcode']
-        # Finally, return the cleaned_data
         return cleaned_data

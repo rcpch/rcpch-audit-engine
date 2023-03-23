@@ -414,6 +414,8 @@ def unknown_postcode(request, hospital_id):
     """
     test_positive = request.htmx.trigger_name
 
+    print(request.htmx.trigger_name)
+
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
@@ -425,6 +427,7 @@ def unknown_postcode(request, hospital_id):
         country_choice,
         ('ZZ99 3VZ', 'No fixed abode'),
     )
+
     template_name = 'epilepsy12/cases/unknown_postcode.html'
     context = {
         'choices': choices,
