@@ -64,7 +64,7 @@
   
   {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
   <div class="field">
-    <label>NHS/CHI Number</label>
+    <label>NHS Number</label>
     {{form.nhs_number}} {% if form.nhs_number.errors %}
     <div class="ui pointing red basic label">{{form.nhs_number.errors}}</div>
     {% endif %}
