@@ -1,7 +1,7 @@
 <form class="ui form" method="post">
     {% csrf_token %}
     <h5 class="header">
-    Anti-epilepsy and rescue medicines
+    Antiepilepsy and rescue medicines
     </h5>
     <div class="field" id="aeds">
         {% include 'epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicines.html' with management=management antiepilepsy_medicines=antiepilepsy_medicines %}

@@ -20,8 +20,8 @@ class Management(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
 
     has_an_aed_been_given = models.BooleanField(
         help_text={
-            'label': "Has an anti-seizure medicine been given?",
-            'reference': "Has an anti-seizure medicine been given?",
+            'label': "Has an antiseizure medicine been given?",
+            'reference': "Has an antiseizure medicine been given?",
         },
         default=None,
         null=True,
