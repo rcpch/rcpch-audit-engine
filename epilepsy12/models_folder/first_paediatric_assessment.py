@@ -22,8 +22,8 @@ class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBas
 
     first_paediatric_assessment_in_acute_or_nonacute_setting = models.IntegerField(
         help_text={
-            'label': "Is the first paediatric assessment in an acute or nonacute setting?",
-            'reference': "Is the first paediatric assessment in an acute or nonacute setting?"
+            'label': "Was the first paediatric assessment in an acute or nonacute setting?",
+            'reference': "Was the first paediatric assessment in an acute or nonacute setting?"
         },
         choices=CHRONICITY,
         null=True,
