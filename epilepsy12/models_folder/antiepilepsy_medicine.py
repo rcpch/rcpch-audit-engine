@@ -40,8 +40,8 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_snomed_code = models.CharField(
         help_text={
-            'label': "Antiseizure/rescue medicine SNOMED-CT code",
-            'reference': "Antiseizure medicine SNOMED-CT code",
+            'label': "Anti-seizure/rescue medicine SNOMED-CT code",
+            'reference': "Anti-seizure medicine SNOMED-CT code",
         },
         max_length=50,
         default=None,
@@ -50,8 +50,8 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     )
     antiepilepsy_medicine_snomed_preferred_name = models.CharField(
         help_text={
-            'label': "Antiseizure/rescue medicine SNOMED-CT preferred name",
-            'reference': "Antiseizure medicine SNOMED-CT preferred name",
+            'label': "Anti-seizure/rescue medicine SNOMED-CT preferred name",
+            'reference': "Anti-seizure medicine SNOMED-CT preferred name",
         },
         max_length=50,
         default=None,
@@ -70,7 +70,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     antiepilepsy_medicine_stop_date = models.DateField(
         help_text={
             'label': "Medicine discontinued date",
-            'reference': "Antiseizure medicine discontinued date",
+            'reference': "Anti-seizure medicine discontinued date",
         },
         default=None,
         null=True,
@@ -79,7 +79,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     antiepilepsy_medicine_risk_discussed = models.BooleanField(
         help_text={
             'label': "Medication risks discussed?",
-            'reference': "Have the risks related to the antiseizure medicine been discussed with the child/young person and their family?",
+            'reference': "Have the risks related to the anti-seizure medicine been discussed with the child/young person and their family?",
         },
         default=None,
         null=True,
