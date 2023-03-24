@@ -1,6 +1,10 @@
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from django import forms
+from django.forms import ValidationError
 from ..models import Case
 from ..constants import *
+from ..general_functions import is_valid_postcode, validate_nhs_number
 
 
 class CaseForm(forms.ModelForm):
@@ -89,7 +93,30 @@ class CaseForm(forms.ModelForm):
             'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'unknown_postcode'
         ]
 
-    def clean(self):
-        cleaned_data = super(CaseForm, self).clean()
+    # def clean(self):
+    #     cleaned_data = super(CaseForm, self).clean()
 
-        return cleaned_data
+    #     return cleaned_data
+    def clean_postcode(self):
+        postcode = self.cleaned_data['postcode']
+        if is_valid_postcode(postcode=postcode):
+            return postcode
+        else:
+            raise ValidationError('Invalid postcode')
+
+    def clean_date_of_birth(self):
+        date_of_birth = self.cleaned_data['date_of_birth']
+        today = date.today()
+        if date_of_birth > today:
+            print(f"{date_of_birth} not being raised as an error")
+            raise ValidationError("Date of birth cannot be in the future.")
+        else:
+            return date_of_birth
+
+    def clean_nhs_number(self):
+        nhs_number = self.cleaned_data['nhs_number']
+        validity = validate_nhs_number(nhs_number)
+        if validity['valid']:
+            return nhs_number
+        else:
+            raise ValidationError(validity['message'])

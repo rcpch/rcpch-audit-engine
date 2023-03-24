@@ -1434,3 +1434,19 @@ div.rcpch_summary_stats>div.rcpch_summary_stats_row {
 .rcpch_summary_stats>.rcpch_summary_stats_row>h4 {
     font-size: 0.8em;
 }
+
+.ui.pointing.red.basic.label {
+    border-radius: 0%;
+    box-shadow: 0px 0em 0em 0em var(--rcpch_dark_red) inset;
+    border-color: var(--rcpch_dark_red);
+    padding: 0%;
+    margin-left: 0%;
+}
+
+.errorlist {
+    color: var(--rcpch_dark_red);
+    list-style-type: none;
+    font-family: var(--rcpch_standard_font);
+    padding-left: 10px;
+    padding-right: 10px;
+}

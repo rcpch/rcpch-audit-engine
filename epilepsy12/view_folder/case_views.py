@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
-from epilepsy12.decorator import group_required
+from django.contrib import messages
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
@@ -372,7 +372,8 @@ def update_case(request, hospital_id, case_id):
             case.delete()
             return redirect('cases', hospital_id=hospital_id)
         form = CaseForm(request.POST, instance=case)
-        if form.is_valid:
+        if form.is_valid():
+            print("form is valid")
             obj = form.save()
             if (case.locked != obj.locked):
                 # locked status has changed
