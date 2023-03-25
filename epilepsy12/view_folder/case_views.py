@@ -328,9 +328,6 @@ def create_case(request, hospital_id):
             )
             messages.success(request, "You successfully created the case")
             return redirect('cases', hospital_id=hospital_id)
-        # else:
-        #     messages.error(request, "Case not created")
-        #     return redirect('cases', hospital_id=hospital_id)
 
     context = {
         "hospital_id": hospital_id,
@@ -368,7 +365,7 @@ def update_case(request, hospital_id, case_id):
     if request.method == "POST":
         if ('delete') in request.POST:
             messages.success(
-                request, f"You successfully deleted the {case}'s details")
+                request, f"You successfully deleted {case}'s details")
             case.delete()
             return redirect('cases', hospital_id=hospital_id)
         form = CaseForm(request.POST, instance=case)
@@ -386,7 +383,7 @@ def update_case(request, hospital_id, case_id):
             obj.updated_by = request.user
             obj.save()
             messages.success(
-                request, "You successfully updated the child's details")
+                request, f"You successfully updated the {case}'s details")
             return redirect('cases', hospital_id=hospital_id)
 
     child_has_unknown_postcode = False

@@ -93,7 +93,7 @@
         
           <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
-          <td>{% none_masked case.nhs_number %}</td>
+          <td data-mask="000 000 0000">{% none_masked case.nhs_number %}</td>
           <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
           <td>{% if case.registration.cohort is not None %}{{ case.registration.cohort }}{% endif %}</td>
           <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>

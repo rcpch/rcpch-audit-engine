@@ -14,7 +14,7 @@ def validate_nhs_number(number_to_validate):
     if len(cleaned_number_as_string) != 10:
         return {
             'valid': False,
-            'message': 'The NHS Number must contain 10 digits.'
+            'message': 'The NHS Number must be exactly 10 digits long.'
         }
     else:
         # remove final digit

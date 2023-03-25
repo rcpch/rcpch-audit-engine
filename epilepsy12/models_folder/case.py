@@ -53,10 +53,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         null=True,
         blank=True
     )
-    # nhs_patient = models.BooleanField(
-    #     "Is an NHS patient?"
-    # )
-    nhs_number = models.CharField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
+    nhs_number = models.CharField(  # the NHS number for England and Wales
         "NHS Number",
         unique=True,
         blank=True,

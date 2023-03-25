@@ -48,7 +48,8 @@ class CaseForm(forms.ModelForm):
             attrs={
                 "class": "form-control",
                 "placeholder": "NHS Number",
-                "type": "text"
+                "type": "text",
+                "data-mask": "000 000 0000"
             }
         ),
         required=True
@@ -130,8 +131,8 @@ class CaseForm(forms.ModelForm):
             # this is a new form - check this number is unique in the database
             if Case.objects.filter(nhs_number=formatted_number).exists():
                 raise ValidationError('NHS Number already taken!')
-        validity = validate_nhs_number(nhs_number)
+        validity = validate_nhs_number(formatted_number)
         if validity['valid']:
-            return nhs_number
+            return formatted_number
         else:
             raise ValidationError(validity['message'])
