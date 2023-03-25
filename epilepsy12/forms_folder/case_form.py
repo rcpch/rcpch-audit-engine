@@ -8,7 +8,9 @@ from ..general_functions import is_valid_postcode, validate_nhs_number
 
 
 class CaseForm(forms.ModelForm):
-    unknown_postcode = forms.CharField()
+    unknown_postcode = forms.CharField(
+        required=False
+    )
 
     first_name = forms.CharField(
         help_text="Enter the first name.",
@@ -17,7 +19,8 @@ class CaseForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "first name"
             }
-        )
+        ),
+        required=True
     )
     surname = forms.CharField(
         help_text="Enter the surname.",
@@ -26,7 +29,8 @@ class CaseForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "surname"
             }
-        )
+        ),
+        required=True
     )
     date_of_birth = forms.DateField(
         widget=forms.TextInput(
@@ -35,7 +39,8 @@ class CaseForm(forms.ModelForm):
                 "placeholder": "date of birth",
                 "type": "date"
             }
-        )
+        ),
+        required=True
     )
     sex = forms.ChoiceField(
         choices=SEX_TYPE,
@@ -88,7 +93,8 @@ class CaseForm(forms.ModelForm):
         self.fields['ethnicity'].widget.attrs.update({
             'class': 'ui rcpch dropdown'
         })
-        self.existing_nhs_number = int(self.instance.nhs_number)
+
+        self.existing_nhs_number = self.instance.nhs_number
 
     class Meta:
         model = Case
@@ -96,10 +102,6 @@ class CaseForm(forms.ModelForm):
             'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'unknown_postcode'
         ]
 
-    # def clean(self):
-    #     cleaned_data = super(CaseForm, self).clean()
-
-    #     return cleaned_data
     def clean_postcode(self):
         # remove spaces
         postcode = str(self.cleaned_data['postcode']).replace(' ', '')
@@ -124,7 +126,7 @@ class CaseForm(forms.ModelForm):
         # ensure NHS number is unique in the database
         if self.existing_nhs_number is not None:
             # this form is updating an existing NHS number
-            if formatted_number != self.existing_nhs_number:
+            if formatted_number != int(self.existing_nhs_number):
                 # the new number does not match the one stored
                 if Case.objects.filter(nhs_number=formatted_number).exists():
                     raise ValidationError('NHS Number already taken!')
@@ -132,6 +134,8 @@ class CaseForm(forms.ModelForm):
             # this is a new form - check this number is unique in the database
             if Case.objects.filter(nhs_number=formatted_number).exists():
                 raise ValidationError('NHS Number already taken!')
+
+        # check NHS number is valid
         validity = validate_nhs_number(formatted_number)
         if validity['valid']:
             return formatted_number

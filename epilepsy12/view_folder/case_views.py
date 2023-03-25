@@ -10,7 +10,7 @@ from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
-from ..constants import UNKNOWN_POSTCODES, RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
+from ..constants import UNKNOWN_POSTCODES_NO_SPACES, RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
 
 
 @login_required
@@ -299,14 +299,14 @@ def create_case(request, hospital_id):
         OrganisationID=hospital_id).get()
 
     # set select boxes for situations when postcode unknown
-    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    country_choice = ('ZZ993CZ', 'Address unspecified - England')
     if hospital_trust.Country == 'Wales':
-        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+        country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
-        ('ZZ99 3WZ', 'Address unknown'),
+        ('ZZ993WZ', 'Address unknown'),
         country_choice,
-        ('ZZ99 3VZ', 'No fixed abode'),
+        ('ZZ993VZ', 'No fixed abode'),
     )
     form = CaseForm(request.POST or None)
 
@@ -328,6 +328,9 @@ def create_case(request, hospital_id):
             )
             messages.success(request, "You successfully created the case")
             return redirect('cases', hospital_id=hospital_id)
+        else:
+            messages.error(request=request,
+                           message="It was not possible to save the case")
 
     context = {
         "hospital_id": hospital_id,
@@ -352,14 +355,14 @@ def update_case(request, hospital_id, case_id):
         OrganisationID=hospital_id).get()
 
     # set select boxes for situations when postcode unknown
-    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    country_choice = ('ZZ993CZ', 'Address unspecified - England')
     if hospital_trust.Country == 'Wales':
-        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+        country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
-        ('ZZ99 3WZ', 'Address unknown'),
+        ('ZZ993WZ', 'Address unknown'),
         country_choice,
-        ('ZZ99 3VZ', 'No fixed abode'),
+        ('ZZ993VZ', 'No fixed abode'),
     )
 
     if request.method == "POST":
@@ -388,7 +391,7 @@ def update_case(request, hospital_id, case_id):
 
     child_has_unknown_postcode = False
     test_positive = None
-    if case.postcode in UNKNOWN_POSTCODES:
+    if case.postcode in UNKNOWN_POSTCODES_NO_SPACES:
         child_has_unknown_postcode = True
         test_positive = case.postcode
 
@@ -411,18 +414,16 @@ def unknown_postcode(request, hospital_id):
     """
     test_positive = request.htmx.trigger_name
 
-    print(request.htmx.trigger_name)
-
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     # set select boxes for situations when postcode unknown
-    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    country_choice = ('ZZ993CZ', 'Address unspecified - England')
     if hospital_trust.Country == 'Wales':
-        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+        country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
-        ('ZZ99 3WZ', 'Address unknown'),
+        ('ZZ993WZ', 'Address unknown'),
         country_choice,
-        ('ZZ99 3VZ', 'No fixed abode'),
+        ('ZZ993VZ', 'No fixed abode'),
     )
 
     template_name = 'epilepsy12/cases/unknown_postcode.html'

@@ -25,14 +25,16 @@
   {% endblock %}
 
   {% if messages %}
-  <div class='ui rcpch container'>
-    <div class="ui rcpch_info icon message">
-      <i class="info icon"></i>
-      <i class="close icon"></i>
-      {% for message in messages %}
-      {% if message.tags %}{% endif %}
-      {{ message }}
-      {% endfor %}
+  <div class='ui container'>
+    <div class="rcpch_padding">
+      <div class="ui rcpch_info icon message">
+        <i class="info icon"></i>
+        <i class="close icon"></i>
+        {% for message in messages %}
+        {% if message.tags %}{% endif %}
+        {{ message }}
+        {% endfor %}
+      </div>
     </div>
   </div>
   {% endif %}

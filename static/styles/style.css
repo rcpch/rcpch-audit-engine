@@ -1450,3 +1450,8 @@ div.rcpch_summary_stats>div.rcpch_summary_stats_row {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.rcpch_padding {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
