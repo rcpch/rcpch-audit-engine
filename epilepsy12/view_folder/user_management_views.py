@@ -183,9 +183,14 @@ def epilepsy12_user_list(request, hospital_id):
 def create_epilepsy12_user(request, hospital_id):
 
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    prepopulated_data = {
+        'hospital_employer': hospital_trust,
+    }
+    form = Epilepsy12UserAdminCreationForm(initial=prepopulated_data)
 
     if request.method == 'POST':
-        form = Epilepsy12UserAdminCreationForm(request.POST)
+
+        form = Epilepsy12UserAdminCreationForm(request.POST or None)
 
         if form.is_valid():
 
@@ -202,8 +207,12 @@ def create_epilepsy12_user(request, hospital_id):
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
             try:
-                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
-                          [new_user.email], fail_silently=False)
+                send_mail(
+                    subject=subject, from_email='admin@epilepsy12.rcpch.tech',
+                    recipient_list=[new_user.email],
+                    fail_silently=False,
+                    html_message=email
+                )
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 
@@ -211,14 +220,9 @@ def create_epilepsy12_user(request, hospital_id):
                 request, f"{new_user.email} account created successfully.")
             return redirect('epilepsy12_user_list', hospital_id=hospital_id)
 
-        messages.error(
-            request, f"Registration Unsuccessful: {form.errors}")
-
-    prepopulated_data = {
-        'hospital_employer': hospital_trust,
-    }
-
-    form = Epilepsy12UserAdminCreationForm(prepopulated_data)
+        # else:
+        #     messages.error(
+        #         request, f"Registration Unsuccessful: {form.errors.as_text()}")
 
     context = {
         'form': form,
@@ -238,6 +242,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
     """
     Django model form to edit/update Epilepsy12user
     """
+
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     epilepsy12_user_to_edit = get_object_or_404(
         Epilepsy12User, pk=epilepsy12_user_id)
@@ -249,6 +254,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             request.POST or None, instance=epilepsy12_user_to_edit)
     else:
         return HttpResponseForbidden()
+
     if request.method == 'POST':
         if 'delete' in request.POST:
             epilepsy12_user_to_edit.delete()
