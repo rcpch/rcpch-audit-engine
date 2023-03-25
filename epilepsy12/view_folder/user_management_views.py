@@ -7,11 +7,12 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail, BadHeaderError, EmailMessage
 
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.utils.html import strip_tags
 
 from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, HospitalTrust
@@ -211,6 +212,7 @@ def create_epilepsy12_user(request, hospital_id):
                     subject=subject, from_email='admin@epilepsy12.rcpch.tech',
                     recipient_list=[new_user.email],
                     fail_silently=False,
+                    message=strip_tags(email),
                     html_message=email
                 )
             except BadHeaderError:
