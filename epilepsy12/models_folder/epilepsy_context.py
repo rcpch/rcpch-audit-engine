@@ -88,7 +88,7 @@ class EpilepsyContext(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, He
     experienced_prolonged_focal_seizures = models.CharField(
         help_text={
             'label': "Has the child at any point in time experienced prolonged focal seizures?",
-            'reference': "Has the child at any point in time experienced prolonged focal convulsive seizures > 5 min duration (or successive continuing > 5min)?",
+            'reference': "Has the child at any point in time experienced prolonged focal seizures > 5 min duration (or successive continuing > 5min)?",
         },
 
         max_length=2,
