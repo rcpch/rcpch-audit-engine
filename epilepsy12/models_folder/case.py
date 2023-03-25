@@ -53,10 +53,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         null=True,
         blank=True
     )
-    # nhs_patient = models.BooleanField(
-    #     "Is an NHS patient?"
-    # )
-    nhs_number = models.CharField(  # the NHS number for England and Wales - THIS IS NOT IN THE ORIGINAL TABLES
+    nhs_number = models.CharField(  # the NHS number for England and Wales
         "NHS Number",
         unique=True,
         blank=True,
@@ -192,9 +189,13 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         # This field requires the deprivare api to be running
         # note if one of ['ZZ99 3CZ','ZZ99 3GZ','ZZ99 3WZ','ZZ99 3VZ'], represent not known, not known - England,
         # not known - Wales or no fixed abode
-        if self.postcode and self.postcode not in UNKNOWN_POSTCODES:
-            self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-                self.postcode)
+        if self.postcode:
+            # test if unknown
+            unknown = [code for code in UNKNOWN_POSTCODES if code.replace(
+                ' ', '') == str(self.postcode).replace(' ', '')]
+            if len(unknown) < 1:
+                self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+                    self.postcode)
         return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

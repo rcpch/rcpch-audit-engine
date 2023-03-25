@@ -1,7 +1,5 @@
 import requests
 # from requests import request
-from .postcode import valid_postcode
-import json
 
 """
 Steps to calculate IMD
