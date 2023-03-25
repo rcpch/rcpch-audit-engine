@@ -328,9 +328,9 @@ def create_case(request, hospital_id):
             )
             messages.success(request, "You successfully created the case")
             return redirect('cases', hospital_id=hospital_id)
-        else:
-            messages.error(request, "Case not created")
-            return redirect('cases', hospital_id=hospital_id)
+        # else:
+        #     messages.error(request, "Case not created")
+        #     return redirect('cases', hospital_id=hospital_id)
 
     context = {
         "hospital_id": hospital_id,
@@ -373,7 +373,6 @@ def update_case(request, hospital_id, case_id):
             return redirect('cases', hospital_id=hospital_id)
         form = CaseForm(request.POST, instance=case)
         if form.is_valid():
-            print("form is valid")
             obj = form.save()
             if (case.locked != obj.locked):
                 # locked status has changed

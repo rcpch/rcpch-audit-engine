@@ -50,7 +50,8 @@ class CaseForm(forms.ModelForm):
                 "placeholder": "NHS Number",
                 "type": "text"
             }
-        )
+        ),
+        required=True
     )
     postcode = forms.CharField(
         help_text="Enter the postcode.",
@@ -86,6 +87,7 @@ class CaseForm(forms.ModelForm):
         self.fields['ethnicity'].widget.attrs.update({
             'class': 'ui rcpch dropdown'
         })
+        self.existing_nhs_number = int(self.instance.nhs_number)
 
     class Meta:
         model = Case
@@ -108,13 +110,26 @@ class CaseForm(forms.ModelForm):
         date_of_birth = self.cleaned_data['date_of_birth']
         today = date.today()
         if date_of_birth > today:
-            print(f"{date_of_birth} not being raised as an error")
             raise ValidationError("Date of birth cannot be in the future.")
         else:
             return date_of_birth
 
     def clean_nhs_number(self):
+        # remove spaces
         nhs_number = self.cleaned_data['nhs_number']
+        formatted_number = int(str(nhs_number).replace(' ', ''))
+
+        # ensure NHS number is unique in the database
+        if self.existing_nhs_number is not None:
+            # this form is updating an existing NHS number
+            if formatted_number != self.existing_nhs_number:
+                # the new number does not match the one stored
+                if Case.objects.filter(nhs_number=formatted_number).exists():
+                    raise ValidationError('NHS Number already taken!')
+        else:
+            # this is a new form - check this number is unique in the database
+            if Case.objects.filter(nhs_number=formatted_number).exists():
+                raise ValidationError('NHS Number already taken!')
         validity = validate_nhs_number(nhs_number)
         if validity['valid']:
             return nhs_number
