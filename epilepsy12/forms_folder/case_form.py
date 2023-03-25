@@ -60,7 +60,7 @@ class CaseForm(forms.ModelForm):
             attrs={
                 "class": "form-control",
                 "placeholder": "Postcode",
-                "type": "text"
+                "type": "text",
             }
         ),
         required=True
@@ -101,7 +101,8 @@ class CaseForm(forms.ModelForm):
 
     #     return cleaned_data
     def clean_postcode(self):
-        postcode = self.cleaned_data['postcode']
+        # remove spaces
+        postcode = str(self.cleaned_data['postcode']).replace(' ', '')
         if is_valid_postcode(postcode=postcode):
             return postcode
         else:
