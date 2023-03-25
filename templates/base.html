@@ -53,7 +53,9 @@
     integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="{% static 'jquery_mask/jquery.mask.min.js' %}"></script>
   <script>
+    $('#id_nhs_number').mask('0000 000 000')
     $('.message .close').on('click', function () {
       $(this)
         .closest('.message')
