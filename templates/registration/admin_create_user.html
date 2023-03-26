@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<div class='ui container'>
+<div class='ui rcpch container'>
   <div class="rcpch_padding">
 
     <div class="ui two column centered grid">
@@ -117,26 +117,6 @@
 
           </div>
 
-          {% comment %} <div class="two fields">
-
-            <div class='field'>
-              <label for="{{form.password1.id_for_label}}">Password</label>
-              {{ form.password1 }}
-              {% if form.password1.errors %}
-                  <div class="ui pointing red basic label">{{form.password1.errors}}</div>
-              {% endif %}
-            </div>
-            
-            <div class='field'>
-              <label for="{{form.password2.id_for_label}}">Repeat password</label>
-              {{ form.password2 }}
-              {% if form.password2.errors %}
-                  <div class="ui pointing red basic label">{{form.password2.errors}}</div>
-              {% endif %}
-            </div>
-
-          </div> {% endcomment %}
-
           <input 
             class="ui rcpch_primary button" 
             type="submit" 
@@ -155,7 +135,6 @@
               name="resend"
               value="resend"
             >
-              <i class="envelope outline icon"></i>
               Resend Email
             </button>
 

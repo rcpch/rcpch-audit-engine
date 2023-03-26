@@ -299,7 +299,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
     return render(request, template_name, {
         'hospital_id': hospital_id,
         'form': form,
-        'admin_title': 'Edit/Update Epilepsy12 User'
+        'admin_title': 'Edit Epilepsy12 User'
     })
 
 
