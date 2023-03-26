@@ -255,8 +255,6 @@ def selected_trust_kpis(request, hospital_id):
     national_kpis = aggregate_all_eligible_kpi_fields(
         national_level)
 
-    print(national_kpis)
-
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
     hospital_organisation = HospitalTrust.objects.get(pk=hospital_id)
