@@ -5,7 +5,7 @@
 version: '3.9'
 
 services:
-  
+
   # web container - runs the django app
   web:
     build: .
@@ -33,6 +33,8 @@ services:
       - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
       - DJANGO_SUPERUSER_ROLE=1
       - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
+    env_file:
+      - example.env
     command: >
       sh -c "pip install --upgrade pip &&
             pip install -r requirements/development-requirements.txt &&
@@ -48,7 +50,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
-  
+
   # db container - runs postgres
   db:
     image: postgres:latest

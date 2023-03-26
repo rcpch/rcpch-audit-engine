@@ -37,6 +37,8 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + ["127.0.0.1",
                                                                     "localhost",
                                                                     "0.0.0.0"]
 
+RCPCH_CENSUS_TOKEN = os.getenv("DJANGO_REST_FRAMEWORK_TOKEN", None)
+
 # Application definition
 
 INSTALLED_APPS = [
