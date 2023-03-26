@@ -10,8 +10,8 @@ from django.db.models import Sum, Count, Avg
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
-from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
-from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
+from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
+from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
 from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level, aggregate_all_eligible_kpi_fields
 # all_registered_and_complete_cases_for_hospital, all_registered_and_complete_cases_for_hospital_trust, all_registered_only_cases_for_hospital, all_registered_only_cases_for_hospital_trust
 from ..general_functions import get_current_cohort_data, value_from_key
@@ -241,19 +241,19 @@ def selected_trust_kpis(request, hospital_id):
 
     # aggregate at each level of abstraction
     hospital_kpis = aggregate_all_eligible_kpi_fields(
-        hospital_level)  # .aggregate(**aggregation_fields)
+        hospital_level)
     trust_kpis = aggregate_all_eligible_kpi_fields(
-        trust_level)  # .aggregate(**aggregation_fields)
+        trust_level)
     icb_kpis = aggregate_all_eligible_kpi_fields(
-        icb_level)  # .aggregate(**aggregation_fields)
+        icb_level)
     nhs_kpis = aggregate_all_eligible_kpi_fields(
-        nhs_level)  # .aggregate(**aggregation_fields)
+        nhs_level)
     open_uk_kpis = aggregate_all_eligible_kpi_fields(
-        open_uk_level)  # .aggregate(**aggregation_fields)
+        open_uk_level)
     country_kpis = aggregate_all_eligible_kpi_fields(
-        country_level)  # .aggregate(**aggregation_fields)
+        country_level)
     national_kpis = aggregate_all_eligible_kpi_fields(
-        national_level)  # .aggregate(**aggregation_fields)
+        national_level)
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
