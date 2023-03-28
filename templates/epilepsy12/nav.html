@@ -51,11 +51,6 @@
              href="{% url 'docs' %}">
             Documentation
           </a>
-          <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-             id="link"
-             href="{% url 'tsandcs' %}">
-            Terms of Service
-          </a>
         </div>
       </div>
     </div>

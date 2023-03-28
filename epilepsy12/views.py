@@ -115,11 +115,6 @@ def log_list(request, hospital_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-def tsandcs(request):
-    template_name = 'epilepsy12/terms_and_conditions.html'
-    return render(request, template_name, {})
-
-
 def patient(request):
     template_name = 'epilepsy12/patient.html'
     return render(request, template_name, {})
