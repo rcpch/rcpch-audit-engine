@@ -60,3 +60,4 @@ services:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=epilepsy12db
+      - TZ="Europe/London"
