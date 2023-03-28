@@ -94,7 +94,33 @@
                             hx-trigger="click"></i>
                     {% endif %}
                 </th>
-                <th></th>
+                <th>Hospital Employer
+                    {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_hospital_employer_up" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_hospital_employer_up" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_hospital_employer_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_hospital_employer_down" %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_epilepsy12_users_by_hospital_employer_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_hospital_employer_up' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% else %}
+                        <i 
+                            class="sort icon" 
+                            id="sort_button" 
+                            name="sort_by_hospital_employer_down" 
+                            hx-target="#epilepsy12_user_table"
+                            hx-get="{% url 'sort_epilepsy12_users_by_hospital_employer_down' hospital_id=hospital_trust.pk %}" 
+                            hx-trigger="click"></i>
+                    {% endif %}
+                </th>
                 
                 <th class='two wide'></th>
                 <th></th>
@@ -110,6 +136,7 @@
             <td>{{ epilepsy12_user.get_full_name }}</td>
             <td>{{ epilepsy12_user.email }}</td>
             <td>{{ epilepsy12_user.get_role_display }}</td>
+            <td>{{ epilepsy12_user.hospital_employer  }}</td>
             <td>
                 {% if not epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
                     <i 
