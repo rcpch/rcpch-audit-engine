@@ -114,7 +114,7 @@ def hospital_reports(request):
     })
 
 
-@ login_required
+@login_required
 def selected_hospital_summary(request):
     """
     POST request from selected_hospital_summary.html on hospital select
@@ -290,7 +290,7 @@ def selected_trust_kpis(request, hospital_id):
     return response
 
 
-@ login_required
+@login_required
 def child_hospital_select(request, hospital_id, template_name):
     """
     POST call back from hospital_select to allow user to toggle between hospitals in selected trust
@@ -305,7 +305,7 @@ def child_hospital_select(request, hospital_id, template_name):
     return HttpResponseClientRedirect(reverse(template_name, kwargs={'hospital_id': hospital_trust.pk}))
 
 
-@ login_required
+@login_required
 def view_preference(request, hospital_id, template_name):
     """
     POST request from Toggle in has rcpch_view_preference.html template

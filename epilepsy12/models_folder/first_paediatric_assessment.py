@@ -16,7 +16,7 @@ class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBas
     This class references the Case class as a case can have multiple episodes.
     This class references the EEG class as an episode can have multiple EEGs
 
-    This whole clase might better belong in the initial assessment
+    This whole class might better belong in the initial assessment
 
     """
 

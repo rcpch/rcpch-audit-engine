@@ -73,7 +73,7 @@ def database(request):
     return render(request, template_name, {})
 
 
-@ login_required
+@login_required
 def logs(request, hospital_id, epilepsy12_user_id):
     """
     returns logs for given hospital
@@ -94,7 +94,7 @@ def logs(request, hospital_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@ login_required
+@login_required
 def log_list(request, hospital_id, epilepsy12_user_id):
     """
     GET request to return log table
