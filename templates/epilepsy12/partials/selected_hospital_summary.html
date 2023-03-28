@@ -121,14 +121,14 @@
                 <div class="ui  card">
                     <div class="content">
                         <div class="ui centered header">
-                            <h3>Completed Returns</h3>
+                            <h3>Completed Patient Records</h3>
                         </div>
                         <div class="">
     
                                 <div class="column">
                                     
                                     <div class="four wide stackable column">
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_hospital numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital denominator=count_of_current_cohort_registered_cases_in_this_hospital title="Completed Returns" pie_size='med' %}
+                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_hospital numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital denominator=count_of_current_cohort_registered_cases_in_this_hospital title="Completed Patient Records - Hospital" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
                                             <p><small>{{selected_hospital.OrganisationName}}</small></p>
                                         </div>
@@ -137,7 +137,7 @@
                                 </div>
                                 <div class="column">
                                     <div class="four wide stackable column">
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital_trust denominator=count_of_current_cohort_registered_cases_in_this_hospital_trust title="Completed Returns" pie_size='med' %}
+                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital_trust denominator=count_of_current_cohort_registered_cases_in_this_hospital_trust title="Completed Patient Records - Trust" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
                                             <p><small>{{selected_hospital.ParentName}}</small></p>
                                         </div>
