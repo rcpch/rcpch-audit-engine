@@ -1259,7 +1259,7 @@ div.ui.card>div.content>div.hospital_address_container {
 }
 
 .ui.bottom.attached.rcpch_footer.message {
-    margin-top: -1em;
+    /* margin-top: -1em; */
     border-radius: 0%;
     box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
 }
