@@ -35,11 +35,13 @@
                 Database management
               </a>
             {% endif %}
+            {% if not request.user|has_group:"patient_access"  %}
             <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
                id="link"
                href="{% url 'hospital_reports' %}">
               Clinician access
             </a>
+            {%endif%}
           {% endif %}
           {% if request.user|has_group:"patient_access" %}
           <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
