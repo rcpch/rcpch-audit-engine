@@ -5,13 +5,13 @@
 
         <div class='ui top attached rcpch_dark_blue clearing segment'>
         
-            <h5 class="ui left floated header">
+            <h5 class="ui header">
                 Epilepsy12 Users
             </h5>
             
-            <h5 class="ui right floated header" id='epilepsy12_user_list_view_preference'>
+            <div class="ui header column" id='epilepsy12_user_list_view_preference'>
                 {% include 'epilepsy12/partials/cases/view_preference.html' with hospital_trust=hospital_trust test_positive=request.user.view_preference rcpch_choices=rcpch_choices template_name='epilepsy12_user_list' hx_target='#epilepsy12_user_list_view_preference' %}
-            </h5>
+            </div>
             
         </div>
 
