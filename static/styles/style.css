@@ -364,15 +364,6 @@ div.ui.card>div.content>div.hospital_address_container {
     text-align: center;
 }
 
-#sort_button:hover {
-    color: #e00087;
-}
-
-#sort_button {
-    margin: 0px;
-    padding: 0%;
-}
-
 
 /* audit sections */
 
@@ -1402,6 +1393,14 @@ img.ui.spaced.avatar.image {
     font-weight: 900;
 }
 
+.rcpch_td_data_indicator_wrapper i:hover {
+        color: #e00087;
+}
+
+p:has(+ i:hover) {
+    color: #e00087;
+}
+
 tbody {
     vertical-align: top;
 }
@@ -1489,5 +1488,21 @@ div.rcpch_summary_stats>div.rcpch_summary_stats_row {
 
 .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
     flex-grow: 1;
+}
+
+table.ui.rcpch.table.user_table thead {
+    vertical-align: top;
+}
+
+table.ui.rcpch.table.user_table tbody {
+    vertical-align: middle;
+}
+
+table.ui.rcpch.table.cases_table thead {
+    vertical-align: top;
+}
+
+table.ui.rcpch.table.cases_table tbody {
+    vertical-align: middle;
 }
 
