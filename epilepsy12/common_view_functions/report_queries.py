@@ -4,7 +4,7 @@ from typing import Literal
 from django.db.models import Q
 
 # E12 imports
-from ..models import Case
+from ..models import Case, HospitalTrust
 
 
 def all_registered_cases_for_cohort_and_abstraction_level(hospital_organisation_instance, cohort, case_complete=True, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation'):
@@ -88,3 +88,56 @@ def all_registered_cases_for_cohort_and_abstraction_level(hospital_organisation_
             f"Incorrect or invalid abstraction error f{abstraction_level} supplied.")
 
     return all_cases_for_cohort.filter(q_filter)
+
+
+def get_all_countries():
+    """
+    Returns a list of all Countries
+    [('Y56', 'London'), ('Y58', 'South West'), ('Y59', 'South East'), ('Y60', 'Midlands (Y60)'), ('Y61', 'East of England'), ('Y62', 'North West'), ('Y63', 'North East and Yorkshire'), (None, None)]
+    """
+    return HospitalTrust.objects.order_by('CountryONSCode',
+                                          'Country').values_list('CountryONSCode',
+                                                                 'Country').distinct()
+
+
+def get_all_nhs_regions():
+    """
+    Returns a list of all NHS Regions
+    [('Y56', 'London'), ('Y58', 'South West'), ('Y59', 'South East'), ('Y60', 'Midlands (Y60)'), ('Y61', 'East of England'), ('Y62', 'North West'), ('Y63', 'North East and Yorkshire'), (None, None)]
+    """
+    return HospitalTrust.objects.order_by('NHSEnglandRegionCode',
+                                          'NHSEnglandRegion').values_list('NHSEnglandRegionCode',
+                                                                          'NHSEnglandRegion').distinct()
+
+
+def get_all_open_uk_regions():
+    """
+    Returns a list of all OPEN UK Networks
+    [('BRPNF', 'Birmingham Regional Paediatric Neurology Forum'), ('CEWT', "Children's Epilepsy Workstream in Trent"), ('EPEN', 'Eastern Paediatric Epilepsy Network'), ('EPIC', "Mersey and North Wales network 'Epilepsy In Childhood' interest group"), ('NTPEN', 'North Thames Paediatric Epilepsy Network'), ('NWEIG', "North West Children and Young People's Epilepsy Interest Group"), ('ORENG', 'Oxford region epilepsy interest group'), ('PENNEC', 'Paediatric Epilepsy Network for the North East and Cumbria'), ('SETPEG', 'South East Thames Paediatric Epilepsy Group'), ('SETPEG', 'SSouth East Thames Paediatric Epilepsy Group'), ('SWEP', 'South Wales Epilepsy Forum'), ('SWIPE', 'South West Interest Group Paediatric Epilepsy'), ('SWTPEG', 'South West Thames Paediatric Epilepsy Group'), ('TEN', 'Trent Epilepsy Network'), ('WPNN', 'Wessex Paediatric Neurosciences Network'), ('YPEN', 'Yorkshire Paediatric Neurology Network'), (None, None)]
+    """
+    return HospitalTrust.objects.order_by('OPENUKNetworkCode',
+                                          'OPENUKNetworkName').values_list('OPENUKNetworkCode',
+                                                                           'OPENUKNetworkName').distinct()
+
+
+def get_all_icbs():
+    """
+    Returns a list of all Integrated Care Boards
+    """
+    return HospitalTrust.objects.order_by('ICBODSCode',
+                                          'ICBName').values_list('ICBODSCode',
+                                                                 'ICBName').distinct()
+
+
+def get_all_trusts():
+    """
+    Returns a list of all Trusts
+    """
+    return HospitalTrust.objects.order_by('ParentODSCode', 'ParentName').values_list('ParentODSCode', 'ParentName').distinct()
+
+
+def get_all_organisations():
+    """
+    Returns a list of all Organisations
+    """
+    return HospitalTrust.objects.order_by('OrganisationODSCode', 'OrganisationName').values_list('OrganisationODSCode', 'OrganisationName').distinct()

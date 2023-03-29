@@ -1,9 +1,11 @@
+from typing import Literal
 # Django imports
 from django.db.models import Q, F, Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
 from ..models import Case
+from .report_queries import get_all_organisations, get_all_trusts, get_all_icbs, get_all_nhs_regions, get_all_open_uk_regions, get_all_countries
 """
 Reporting
 """
@@ -171,3 +173,71 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
                         then=f_objects), default=0))
 
     return filtered_cases.aggregate(**aggregation_fields)
+
+
+def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(cohort, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation', kpi_measure=None):
+    """
+    Returns aggregated KPIS for given cohort against sublevel of abstraction (eg all NHS England regions)
+    """
+
+    if abstraction_level == 'organisation':
+        abstraction_sublevels = get_all_organisations()
+
+    if abstraction_level == 'trust':
+        abstraction_sublevels = get_all_trusts()
+
+    if abstraction_level == 'icb':
+        abstraction_sublevels = get_all_icbs()
+
+    if abstraction_level == 'nhs_region':
+        abstraction_sublevels = get_all_nhs_regions()
+
+    if abstraction_level == 'open_uk':
+        abstraction_sublevels = get_all_open_uk_regions()
+
+    if abstraction_level == 'country':
+        abstraction_sublevels = get_all_countries()
+
+    # if abstraction_level == 'national':
+    #     abstraction_sublevels = get_all_countries()
+    #     abstraction_sublevel_Q = Q(site__hospital_trust__CountryONSCode=abstraction_sublevel[0])
+    # NOT NEEDED AS COVERED BY  ALL ORGANISATIONS
+
+    final_object = []
+    for abstraction_sublevel in abstraction_sublevels:
+
+        if abstraction_level == 'organisation':
+            abstraction_sublevel_Q = Q(
+                site__hospital_trust__OrganisationODSCode=abstraction_sublevel[0])
+        if abstraction_level == 'trust':
+            abstraction_sublevel_Q = Q(
+                site__hospital_trust__ParentODSCode=abstraction_sublevel[0])
+        if abstraction_level == 'icb':
+            abstraction_sublevel_Q = Q(
+                site__hospital_trust__ICBODSCode=abstraction_sublevel[0])
+        if abstraction_level == 'nhs_region':
+            abstraction_sublevel_Q = Q(
+                site__hospital_trust__NHSEnglandRegionCode=abstraction_sublevel[0])
+        if abstraction_level == 'open_uk':
+            abstraction_sublevel_Q = Q(
+                site__hospital_trust__OPENUKNetworkCode=abstraction_sublevel[0])
+        if abstraction_level == 'country':
+            abstraction_sublevel_Q = Q(
+                site__hospital_trust__CountryONSCode=abstraction_sublevel[0])
+
+        filtered_cases = Case.objects.filter(
+            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
+            Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+            abstraction_sublevel_Q &
+            Q(registration__cohort=cohort)
+        )
+        aggregated_kpis = aggregate_all_eligible_kpi_fields(
+            filtered_cases, kpi_measure=kpi_measure)
+        final_object.append(
+            {
+                "region": abstraction_sublevel,
+                "aggregated_kpis": aggregated_kpis
+            }
+        )
+
+    return final_object
