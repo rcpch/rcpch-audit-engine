@@ -70,20 +70,20 @@ def epilepsy12_user_list(request, hospital_id):
         if request.user.view_preference == 0:
             # user has requested hospital level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(hospital_employer__OrganisationName__contains=hospital_trust.OrganisationName) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(hospital_employer__OrganisationName__icontains=filter_term) |
-                Q(email__icontains=filter_term)
+                Q(hospital_employer__OrganisationName__icontains=hospital_trust.OrganisationName) &
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                 Q(email__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 1:
             # user has requested trust level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(hospital_employer__OrganisationName__contains=hospital_trust.ParentName) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(hospital_employer__OrganisationName__icontains=filter_term) |
-                Q(email__icontains=filter_term)
+                Q(hospital_employer__OrganisationName__icontains=hospital_trust.ParentName) &
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                 Q(email__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
             # user has requested national level view
