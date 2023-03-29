@@ -25,7 +25,7 @@
         <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
                 <h3>Clinical Team</h3>
-                <table class='ui rcpch table'>
+                <table class='ui rcpch  table kpi_table'>
                     <thead>
                         <tr>
                             <th class='four wide'>Indicator</th>
@@ -118,7 +118,7 @@
                             {% percentage_of_total country_kpis.paediatrician_with_expertise_in_epilepsies country_kpis.paediatrician_with_expertise_in_epilepsies_total as country_percentage %}
                             {% percentage_of_total national_kpis.paediatrician_with_expertise_in_epilepsies national_kpis.paediatrician_with_expertise_in_epilepsies_total as national_percentage %}
                             <td>
-                                {{kpis.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}
+                                <p>{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='paediatrician_with_expertise_in_epilepsies'
@@ -127,6 +127,7 @@
                                     data-position='top right'
                                     _="init js $('#paediatrician_with_expertise_in_epilepsies').popup(); end">
                                 </i>
+                                </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %}({{trust_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td></td>
@@ -145,13 +146,15 @@
                             {% percentage_of_total country_kpis.epilepsy_specialist_nurse country_kpis.epilepsy_specialist_nurse_total as country_percentage %}
                             {% percentage_of_total national_kpis.epilepsy_specialist_nurse national_kpis.epilepsy_specialist_nurse_total as national_percentage %}
                             <td>
-                                {{kpis.get_epilepsy_specialist_nurse_help_label_text}}
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='epilepsy_specialist_nurse' data-title='Epilepsy specialist nurse'
-                                    data-content="{{kpis.get_epilepsy_specialist_nurse_help_reference_text}} Note: different measures have different denominators."
-                                    data-position='top right' _="init js $('#epilepsy_specialist_nurse').popup(); end">
-                                </i>
+                                <p>
+                                    {{kpis.get_epilepsy_specialist_nurse_help_label_text}}
+                                    <i
+                                        class="rcpch question circle icon"
+                                        id='epilepsy_specialist_nurse' data-title='Epilepsy specialist nurse'
+                                        data-content="{{kpis.get_epilepsy_specialist_nurse_help_reference_text}} Note: different measures have different denominators."
+                                        data-position='top right' _="init js $('#epilepsy_specialist_nurse').popup(); end">
+                                    </i>
+                                </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.epilepsy_specialist_nurse_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.epilepsy_specialist_nurse_total}})</td>
@@ -170,13 +173,14 @@
                             {% percentage_of_total country_kpis.tertiary_input country_kpis.tertiary_input_total as country_percentage %}
                             {% percentage_of_total national_kpis.tertiary_input national_kpis.tertiary_input_total as national_percentage %}
                             <td>
-                                {{kpis.get_tertiary_input_help_label_text}}
+                                <p>{{kpis.get_tertiary_input_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='tertiary_input' data-title='Tertiary Input'
                                     data-content="{{kpis.get_tertiary_input_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#tertiary_input').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.tertiary_input_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.tertiary_input_total}})</td>
@@ -195,13 +199,14 @@
                             {% percentage_of_total country_kpis.epilepsy_surgery_referral country_kpis.epilepsy_surgery_referral_total as country_percentage %}
                             {% percentage_of_total national_kpis.epilepsy_surgery_referral national_kpis.epilepsy_surgery_referral_total as national_percentage %}
                             <td>
-                                {{kpis.get_epilepsy_surgery_referral_help_label_text}}
+                                <p>{{kpis.get_epilepsy_surgery_referral_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='epilepsy_surgery_referral' data-title='Epilepsy surgery referral'
                                     data-content="{{kpis.get_epilepsy_surgery_referral_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#epilepsy_surgery_referral').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.epilepsy_surgery_referral_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.epilepsy_surgery_referral_total}})</td>
@@ -238,13 +243,14 @@
                             {% percentage_of_total country_kpis.ecg country_kpis.ecg_total as country_percentage %}
                             {% percentage_of_total national_kpis.ecg national_kpis.ecg_total as national_percentage %}
                             <td>
-                                {{kpis.get_ecg_help_label_text}}
+                                <p>{{kpis.get_ecg_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='ecg' data-title='ECG'
                                     data-content="{{kpis.get_ecg_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#ecg').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.ecg_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.ecg_total}})</td>
@@ -263,13 +269,14 @@
                             {% percentage_of_total country_kpis.mri country_kpis.mri_total as country_percentage %}
                             {% percentage_of_total national_kpis.mri national_kpis.mri_total as national_percentage %}
                             <td>
-                                {{kpis.get_mri_help_label_text}}
+                                <p>{{kpis.get_mri_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='mri' data-title='MRI'
                                     data-content="{{kpis.get_mri_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#mri').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.mri_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.mri_total}})</td>
@@ -306,7 +313,7 @@
                             {% percentage_of_total country_kpis.assessment_of_mental_health_issues country_kpis.assessment_of_mental_health_issues_total as country_percentage %}
                             {% percentage_of_total national_kpis.assessment_of_mental_health_issues national_kpis.assessment_of_mental_health_issues_total as national_percentage %}
                             <td>
-                                {{kpis.get_assessment_of_mental_health_issues_help_label_text}}
+                                <p>{{kpis.get_assessment_of_mental_health_issues_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='assessment_of_mental_health_issues'
@@ -314,6 +321,7 @@
                                     data-content="{{kpis.get_assessment_of_mental_health_issues_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#assessment_of_mental_health_issues').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.assessment_of_mental_health_issues_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.assessment_of_mental_health_issues_total}})</td>
@@ -332,7 +340,7 @@
                             {% percentage_of_total country_kpis.mental_health_support country_kpis.mental_health_support_total as country_percentage %}
                             {% percentage_of_total national_kpis.mental_health_support national_kpis.mental_health_support_total as national_percentage %}
                             <td>
-                                {{kpis.get_mental_health_support_help_label_text}}
+                                <p>{{kpis.get_mental_health_support_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='mental_health_support' 
@@ -340,6 +348,7 @@
                                     data-content="{{kpis.get_mental_health_support_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#mental_health_support').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.mental_health_support_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.mental_health_support_total}})
@@ -377,7 +386,7 @@
                             {% percentage_of_total country_kpis.comprehensive_care_planning_agreement country_kpis.comprehensive_care_planning_agreement_total as country_percentage %}
                             {% percentage_of_total national_kpis.comprehensive_care_planning_agreement national_kpis.comprehensive_care_planning_agreement_total as national_percentage %}
                             <td>
-                                {{kpis.get_comprehensive_care_planning_agreement_help_label_text}}
+                                <p>{{kpis.get_comprehensive_care_planning_agreement_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='comprehensive_care_planning_agreement'
@@ -385,6 +394,7 @@
                                     data-content="{{kpis.get_comprehensive_care_planning_agreement_help_reference_text}} Note: different measures have different denominators."
                                     data-position='top right' _="init js $('#comprehensive_care_planning_agreement').popup(); end">
                                 </i>
+                            </p>
                             </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.comprehensive_care_planning_agreement_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.comprehensive_care_planning_agreement_total}})</td>
@@ -404,14 +414,16 @@
                             {% percentage_of_total national_kpis.patient_held_individualised_epilepsy_document national_kpis.patient_held_individualised_epilepsy_document_total as national_percentage %}
                             <td>
                                 {{kpis.get_patient_held_individualised_epilepsy_document_help_label_text}}
-                                <i 
-                                    class="rcpch question circle icon"
-                                    id='patient_held_individualised_epilepsy_document'
-                                    data-title='Parent-held individualised epilepsy document'
-                                    data-content="{{kpis.get_patient_held_individualised_epilepsy_document_help_reference_text}} Note: different measures have different denominators."
-                                    data-position='top right'
-                                    _="init js $('#patient_held_individualised_epilepsy_document').popup(); end">
-                                </i>
+                                
+                                    <i
+                                        class="rcpch question circle icon"
+                                        id='patient_held_individualised_epilepsy_document'
+                                        data-title='Parent-held individualised epilepsy document'
+                                        data-content="{{kpis.get_patient_held_individualised_epilepsy_document_help_reference_text}} Note: different measures have different denominators."
+                                        data-position='top right'
+                                        _="init js $('#patient_held_individualised_epilepsy_document').popup(); end">
+                                    </i>
+                                
                             </td>
                         <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.patient_held_individualised_epilepsy_document_total}})</td>
                         <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.patient_held_individualised_epilepsy_document_total}})</td>
@@ -483,7 +495,7 @@
                             {% percentage_of_total country_kpis.parental_prolonged_seizures_care_plan country_kpis.parental_prolonged_seizures_care_plan_total as country_percentage %}
                             {% percentage_of_total national_kpis.parental_prolonged_seizures_care_plan national_kpis.parental_prolonged_seizures_care_plan_total as national_percentage %}
                             <td>
-                                {{kpis.get_parental_prolonged_seizures_care_plan_help_label_text}}
+                             {{kpis.get_parental_prolonged_seizures_care_plan_help_label_text}}
                                 <i 
                                     class="rcpch question circle icon"
                                     id='parental_prolonged_seizures_care_plan'
@@ -639,7 +651,7 @@
                             {% percentage_of_total country_kpis.school_individual_healthcare_plan country_kpis.school_individual_healthcare_plan_total as country_percentage %}
                             {% percentage_of_total national_kpis.school_individual_healthcare_plan national_kpis.school_individual_healthcare_plan_total as national_percentage %}
                             <td>
-                                {{kpis.get_school_individual_healthcare_plan_help_label_text}}
+                                <p>{{kpis.get_school_individual_healthcare_plan_help_label_text}}</p>
                                 <i 
                                     class="rcpch question circle icon"
                                     id='school_individual_healthcare_plan'

@@ -1386,6 +1386,18 @@ img.ui.spaced.avatar.image {
   color: var(--rcpch_mid_grey);
 }
 
+td>p {
+    font-weight: 900;
+  }
+
+tr {
+    transition: background-color 0.25s;
+}
+
+tr:hover {
+    background-color: var(--rcpch_light_grey);
+}
+
 .ui.rcpch_stats.statistic>.rcpch_stats_value {
     color: var(--rcpch_light_blue);
     /* font-size: 5rem; */
@@ -1462,3 +1474,4 @@ div.rcpch_summary_stats>div.rcpch_summary_stats_row {
 .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
     flex-grow: 1;
 }
+
