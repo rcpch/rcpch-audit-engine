@@ -5,7 +5,7 @@
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
             <div class='ui header'>
                 <div class='content kpi_header'>
-                    <p>Real-time KPI Metrics</p>
+                    <p>Real-time Key Performance Indicator (KPI) Metrics</p>
                     <!-- <div class="sub header"> -->
                     <p>{{hospital_organisation.OrganisationName}} ({{ hospital_organisation.ParentName }})</p>
                     <!-- </div>     -->
@@ -41,7 +41,7 @@
                                 ></i>({{hospital_kpis.total_number_of_cases}})
                             </th>
                             <th class='right aligned'>
-                                Trust
+                                Health Board/Trust
                                 <i 
                                     class="info circle icon"
                                     id='totals_trust'
@@ -96,7 +96,7 @@
                                 ></i>({{country_kpis.total_number_of_cases}})
                             </th>
                             <th class='right aligned'>
-                                National
+                                England & Wales Combined
                                 <i 
                                     class="info circle icon"
                                     id='totals_national'
@@ -665,8 +665,7 @@
 
         <div class="ui bottom attached rcpch_footer info icon message">
             <i class="info circle icon"></i>
-            These are key indicators for your trust, compared with the national average. Different indicators have different denominators.
-        </div>
+            These are key indicators for your Health Board/Trust, compared to the percentages for your relevant ICB, NHS England Region, OPEN UK Region, Country and England and Wales combined.        </div>
     
     </div>
 
