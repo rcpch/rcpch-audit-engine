@@ -33,8 +33,6 @@ services:
       - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
       - DJANGO_SUPERUSER_ROLE=1
       - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
-    env_file:
-      - example.env
     command: >
       sh -c "pip install --upgrade pip &&
             pip install -r requirements/development-requirements.txt &&
