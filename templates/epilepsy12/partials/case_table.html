@@ -108,14 +108,14 @@
               {% if case.registration.registration_date %}
                 {% if case.locked %}
                 <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
-                onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
+                onclick="location.href='{% url 'register'  case.id %}'">Audit</button>
                 {% else %}
                 <button 
                   data-tooltip='Complete audit details.'
                   class="ui rcpch_positive button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register'  case.id %}'"
-                  >Epilepsy12</button>
+                  >Audit</button>
                 
                 {% endif %}
               {% else %}
