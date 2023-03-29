@@ -143,6 +143,7 @@ ul {
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/blue-wallpaper-wheel.png');
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .rcpch_masthead>.rcpch.container>div.row>div>img.epilepsy12_logo {
@@ -181,6 +182,7 @@ div.center.aligned.image.rcpch_index_card_image {
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/blue-wallpaper-wheel.png');
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .ui.card>.content.rcpch_index_card_content {
