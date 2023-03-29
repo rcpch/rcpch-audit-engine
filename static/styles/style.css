@@ -1184,8 +1184,11 @@ div.ui.card>div.content>div.hospital_address_container {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.ui.rcpch.table tr:first-child()
+
 .ui.rcpch.table td {
-    border-color: white;
+    /* border-color: white; */
+    vertical-align: top;
 }
 
 .ui.rcpch.table>tfoot>tr>th {
@@ -1386,9 +1389,22 @@ img.ui.spaced.avatar.image {
   color: var(--rcpch_mid_grey);
 }
 
-td>p {
+.rcpch_td_data_indicator_wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.rcpch_td_data_indicator_wrapper i {
+    padding-left: 1em;
+}
+
+.rcpch_td_data_indicator_wrapper p {
     font-weight: 900;
-  }
+}
+
+tbody {
+    vertical-align: top;
+}
 
 tr {
     transition: background-color 0.25s;
