@@ -15,10 +15,6 @@
 
     </div>
     <div class="ui raised attached segment">
-      <div id="case_table">
-        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated hospital_trust=hospital_trust %}
-      </div>
-      
       <div class="ui grid">
         
           <div class="twelve wide column">
@@ -36,6 +32,10 @@
               {% include 'epilepsy12/partials/cases/case_statistics.html' with hospital_trust=hospital_trust total_cases=total_cases total_registrations=total_registrations %}
           </div>
       </div>
+      <div id="case_table">
+        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated hospital_trust=hospital_trust %}
+      </div>
+      
     </div>
     <div class="ui bottom attached rcpch_footer message">
       <i class="warning info circle icon"></i>
