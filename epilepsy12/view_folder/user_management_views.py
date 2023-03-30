@@ -288,6 +288,10 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
 
         if request.POST and form.is_valid():
             form.save()
+            
+            # adds success message
+            messages.success(
+                request, f"You successfully updated {epilepsy12_user_to_edit}'s details")
 
             # Save was successful, so redirect to another page
             redirect_url = reverse('epilepsy12_user_list', kwargs={

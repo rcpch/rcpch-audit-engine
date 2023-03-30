@@ -154,9 +154,9 @@ PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 
