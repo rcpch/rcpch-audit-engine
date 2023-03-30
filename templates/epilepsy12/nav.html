@@ -43,18 +43,18 @@
             Patient access
             </a>
           {% endif %}
-          <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-          id="link"
-          href="{% url 'docs' %}">
-          Documentation
-          </a>
           {% if user.is_superuser %}
-            <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-              href="{% url 'admin:index' %}">
-              Admin
-            </a>
-          {% endif %}
+          <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+          href="{% url 'admin:index' %}">
+          Admin
+        </a>
         {% endif %}
+        {% endif %}
+        <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+        id="link"
+        href="{% url 'docs' %}">
+        Documentation
+        </a>
   </div>
       </div>
     </div>
