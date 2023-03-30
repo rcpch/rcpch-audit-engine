@@ -1,30 +1,21 @@
-<canvas id="hospitals_ranked_by_kpi_measure"></canvas>
-<script
-  src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"
-  integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI="
-  crossorigin="anonymous"
-></script>
+<canvas id="open_uk_region_ranked_by_kpi_measure"></canvas>
 <script>
-  var ctx = document.getElementById('hospitals_ranked_by_kpi_measure').getContext('2d');
+  var ctx = document.getElementById('open_uk_region_ranked_by_kpi_measure').getContext('2d');
   var myChart = new Chart(ctx, {
       type: 'bar',
+      labels:[],
       data: {
-          labels: [{% for data in ranked %}'{{ data.hospital.OrganisationName }}',{% endfor %}], //loop through queryset,
-          datasets: [{
-              label: '{{series_name}}',
-              data: [{% for kpi in ranked %}{{ kpi.kpi }},{% endfor %}],
-              backgroundColor: [
-                  'rgba(17, 167, 242, 1.0)',
-              ],
-              borderColor: [
-                  'rgba(17, 167, 242, 1.0)',
-              ],
-              borderWidth: 1,
-          }]
+        datasets: [
+          {
+            label: 'OpenUK Regions',
+            data: all_aggregated_kpis_by_open_uk_region_in_current_cohort,
+            backgroundColor: ['rgba(17, 167, 242, 1.0)', ]
+          }
+        ]
       },
       options: {
           responsive: true,
-          maintainAspectRatio: false,
+          maintainAspectRatio: true,
           plugins: {
             title: {
               display: true,
@@ -36,7 +27,17 @@
               display: true,
               position: 'right'
             },
+          },
+          scales: {
+            xAxes: [{
+              display: true
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
           }
       }
-  });
+    });
 </script>
