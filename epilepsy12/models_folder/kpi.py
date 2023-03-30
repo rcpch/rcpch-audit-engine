@@ -9,27 +9,47 @@ class KPI(models.Model, HelpTextMixin):
     
     The 12 key performance indicators, as specified by RCPCH, are:
     
-        1. Paediatrician with expertise in epilepsies --- % of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral
-        2. Epilepsy Specialist Nurse --- % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
-        3a. Tertiary input	 --- % of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care
-        3b. Epilepsy surgery referral	 --- % of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral
-        4. ECG  --- % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
-        5. MRI	 --- % of children and young people with defined indications for an MRI, who had who had timely MRI within 6 weeks of request
-        6. Assessment of mental health issues  --- %  of children with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure
-        7. Mental health support --- %  of children with epilepsy and a mental health problem who have evidence of mental health support"
-        8. Sodium Valproate --- % of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
-        9. Comprehensive Care Planning agreement  --- % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
-        9a. Patient held individualised epilepsy document/copy of clinic letter that includes care planning information --- % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
-        9b. Patient/carer/parent agreement to the care planning --- % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
-        9c. Care planning has been updated when necessary --- % of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary
-        9b. Comprehensive Care Planning content --- % of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning
-        9a. Parental prolonged seizures care plan
-        9b. Water safety
-        9c. First aid
-        9d. General participation and risk
-        9e. Service contact details
-        9f. SUDEP
-        10. School Individual Healthcare Plan --- % of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.              
+    1. Paediatrician with expertise in epilepsies - % of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral
+    
+    2. Epilepsy Specialist Nurse - % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
+    
+    3. Tertiary input	 - % of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care
+    
+        3b. Epilepsy surgery referral	 - % of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral
+    
+    4. ECG  - % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
+    
+    5. MRI	 - % of children and young people with defined indications for an MRI, who had who had timely MRI within 6 weeks of request
+    
+    6. Assessment of mental health issues  - %  of children with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure
+    
+    7. Mental health support - %  of children with epilepsy and a mental health problem who have evidence of mental health support"
+    
+    8. Sodium Valproate - % of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
+    
+    9. (a) Comprehensive Care Planning agreement  - % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
+    
+            9a. Patient held individualised epilepsy document/copy of clinic letter that includes care planning information - % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
+            
+            9b. Patient/carer/parent agreement to the care planning - % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
+            
+            9c. Care planning has been updated when necessary - % of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary
+          
+    9. (b) Comprehensive Care Planning content - % of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning
+        
+            9a. Parental prolonged seizures care plan
+            
+            9b. Water safety
+            
+            9c. First aid
+            
+            9d. General participation and risk
+            
+            9e. Service contact details
+            
+            9f. SUDEP
+    
+    10. School Individual Healthcare Plan - % of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.              
 
     """
 
