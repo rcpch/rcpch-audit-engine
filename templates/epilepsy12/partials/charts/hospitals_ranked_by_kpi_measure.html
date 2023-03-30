@@ -1,43 +1,31 @@
-<canvas id="open_uk_region_ranked_by_kpi_measure"></canvas>
-<script>
-  var ctx = document.getElementById('open_uk_region_ranked_by_kpi_measure').getContext('2d');
-  var myChart = new Chart(ctx, {
+{% load epilepsy12_template_tags %}
+<div>
+  <canvas id="{{data_id}}"></canvas>
+</div>
+  <script>
+    var myChart = new Chart(document.getElementById('{{data_id}}'), {
       type: 'bar',
-      labels:[],
       data: {
-        datasets: [
-          {
-            label: 'OpenUK Regions',
-            data: all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-            backgroundColor: ['rgba(17, 167, 242, 1.0)', ]
-          }
-        ]
+        labels: [{% for item in data %}'{{ item.region.1 }}',{% endfor %}],
+        datasets: [{
+          label: 'KPIs',
+          data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
+          borderWidth: 1,
+          backgroundColor: ['#3366cc']
+        }]
       },
       options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            title: {
-              display: true,
-              text: "Hospitals ranked",
-              position: 'top',
-              align: 'start'
-            },
-            legend: {
-              display: true,
-              position: 'right'
-            },
-          },
-          scales: {
-            xAxes: [{
-              display: true
-            }],
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              }
-            }]
+        plugins: {
+          title: {
+            text: '{{data_title}}',
+            display: true
           }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
       }
     });
-</script>
+  </script>

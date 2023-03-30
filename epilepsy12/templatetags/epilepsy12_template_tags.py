@@ -45,6 +45,11 @@ def percentage_of_total(numerator, denominator):
             return round(int(numerator)/int(denominator)*100)
 
 
+@register.simple_tag
+def kpi_for_kpi_name(aggregated_kpi, kpi_name):
+    return aggregated_kpi['aggregated_kpis'][kpi_name]
+
+
 @register.filter
 def custom_filter(text, color):
     safe_text = '<span style="color:{color}">{text}</span>'.format(

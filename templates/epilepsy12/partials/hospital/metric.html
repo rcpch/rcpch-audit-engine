@@ -72,8 +72,17 @@
     </div>
 
     <div class='sixteen wide right fluid column'>
-        <div id="op_uk_kpi_ranking" class="ui rcpch_chart_container stackable segment">
-            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with all_aggregated_kpis_by_open_uk_region_in_current_cohort=all_aggregated_kpis_by_open_uk_region_in_current_cohort  %}
+        <div id="open_uk_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=open_uk data_title=open_uk_title data_id=open_uk_id  %}
+        </div>
+        <div id="icb_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=icb data_title=icb_title data_id=icb_id  %}
+        </div>
+        <div id="nhs_region_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=nhs_region data_title=nhs_region_title data_id=nhs_region_id  %}
+        </div>
+        <div id="country_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id  %}
         </div>
     </div>
 
