@@ -125,7 +125,8 @@
               {% endcomment %}
               {% if case.registration.registration_date %}
                 {% if case.locked %}
-                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
+                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" 
+                disabled
                 onclick="location.href='{% url 'register'  case.id %}'">Audit</button>
                 {% else %}
                 <button 
@@ -143,7 +144,7 @@
                   class="ui rcpch_positive button" 
                   tabindexed="2" disabled
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
-                >Register</button>
+                >Audit</button>
 
                 {% else %}
 
@@ -151,7 +152,7 @@
                   class="ui rcpch_positive button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
-                >Register</button>
+                >Audit</button>
 
                 {% endif %}
               {% endif %}

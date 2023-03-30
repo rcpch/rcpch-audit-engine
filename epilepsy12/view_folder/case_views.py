@@ -386,7 +386,7 @@ def update_case(request, hospital_id, case_id):
             obj.updated_by = request.user
             obj.save()
             messages.success(
-                request, f"You successfully updated the {case}'s details")
+                request, f"You successfully updated {case}'s details")
             return redirect('cases', hospital_id=hospital_id)
 
     child_has_unknown_postcode = False
