@@ -102,7 +102,7 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     email = forms.EmailField(
         max_length=255,
         help_text="Required. Please enter a valid NHS email address.",
-        initial='Enter your email', required=True, validators=[validators.EmailValidator(message="Invalid Email")]
+        required=True, validators=[validators.EmailValidator(message="Invalid Email")]
     )
 
     role = forms.ChoiceField(
@@ -147,6 +147,12 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     )
 
     is_staff = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
+        initial=False,
+        required=False
+    )
+
+    email_confirmed = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
         initial=False,
         required=False

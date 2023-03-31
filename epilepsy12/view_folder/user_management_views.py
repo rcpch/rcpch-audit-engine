@@ -222,10 +222,6 @@ def create_epilepsy12_user(request, hospital_id):
                 request, f"{new_user.email} account created successfully.")
             return redirect('epilepsy12_user_list', hospital_id=hospital_id)
 
-        # else:
-        #     messages.error(
-        #         request, f"Registration Unsuccessful: {form.errors.as_text()}")
-
     context = {
         'form': form,
         'hospital_id': hospital_id,
@@ -270,13 +266,18 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
                 'hospital_id': hospital_id})
             return redirect(redirect_url)
         if 'resend' in request.POST:
-            # user created - send email with reset link to new user
+            # send email with reset link to new user
             subject = "Password Reset Requested"
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit)
             try:
-                send_mail(subject=subject, html_message=email, from_email='admin@epilepsy12.rcpch.tech',
-                          recipient_list=[epilepsy12_user_to_edit.email], fail_silently=False)
+                send_mail(
+                    subject=subject, from_email='admin@epilepsy12.rcpch.tech',
+                    recipient_list=[epilepsy12_user_to_edit.email],
+                    fail_silently=False,
+                    message=strip_tags(email),
+                    html_message=email
+                )
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 
@@ -288,7 +289,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
 
         if request.POST and form.is_valid():
             form.save()
-            
+
             # adds success message
             messages.success(
                 request, f"You successfully updated {epilepsy12_user_to_edit}'s details")

@@ -123,7 +123,7 @@
             value="{{admin_title}}" 
             name='edit'/>
 
-          {% if not user.email_confirmed %}
+          {% if not form.email_confirmed.value %}
 
             <button 
               type="submit" 
