@@ -130,13 +130,13 @@
                                 </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %}({{trust_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td></td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>{% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.epilepsy_specialist_nurse hospital_kpis.epilepsy_specialist_nurse_total as hospital_percentage %}
@@ -158,15 +158,15 @@
                                     
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.epilepsy_specialist_nurse_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.epilepsy_specialist_nurse_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.epilepsy_specialist_nurse_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.epilepsy_specialist_nurse_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.epilepsy_specialist_nurse_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.epilepsy_specialist_nurse_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.epilepsy_specialist_nurse_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
                         </tr>
-                        <tr>
+                        <tr class="subcategory-header">
                             {% percentage_of_total hospital_kpis.tertiary_input hospital_kpis.tertiary_input_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.tertiary_input trust_kpis.tertiary_input_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.tertiary_input icb_kpis.tertiary_input_total as icb_percentage %}
@@ -186,15 +186,15 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.tertiary_input_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.tertiary_input_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.tertiary_input_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.tertiary_input_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.tertiary_input_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.tertiary_input_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.tertiary_input_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.tertiary_input_total}}){% endif %}</td>
                         </tr>
-                        <tr>
+                        <tr class="subcategory-row">
                             {% percentage_of_total hospital_kpis.epilepsy_surgery_referral hospital_kpis.epilepsy_surgery_referral_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.epilepsy_surgery_referral trust_kpis.epilepsy_surgery_referral_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.epilepsy_surgery_referral icb_kpis.epilepsy_surgery_referral_total as icb_percentage %}
@@ -214,13 +214,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.epilepsy_surgery_referral_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.epilepsy_surgery_referral_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.epilepsy_surgery_referral_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.epilepsy_surgery_referral_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.epilepsy_surgery_referral_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.epilepsy_surgery_referral_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.epilepsy_surgery_referral_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -260,13 +260,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.ecg_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.ecg_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.ecg_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.ecg_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.ecg_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.ecg_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.ecg_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.ecg_total}}) {% endif %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.mri hospital_kpis.mri_total as hospital_percentage %}
@@ -288,13 +288,13 @@
                                         </i>
                                     </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.mri_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.mri_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.mri_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.mri_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.mri_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.mri_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.mri_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.mri_total}}){% endif %}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -335,13 +335,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.assessment_of_mental_health_issues_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.assessment_of_mental_health_issues_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.assessment_of_mental_health_issues_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.assessment_of_mental_health_issues_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.assessment_of_mental_health_issues_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.assessment_of_mental_health_issues_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.assessment_of_mental_health_issues_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
                         </tr>
                         <tr>
                             {% percentage_of_total hospital_kpis.mental_health_support hospital_kpis.mental_health_support_total as hospital_percentage %}
@@ -364,14 +364,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.mental_health_support_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.mental_health_support_total}})
-                            </td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.mental_health_support_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.mental_health_support_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.mental_health_support_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.mental_health_support_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.mental_health_support_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.mental_health_support_total}}){% endif %}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -413,13 +412,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.sodium_valproate_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.sodium_valproate_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.sodium_valproate_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.sodium_valproate_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.sodium_valproate_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.sodium_valproate_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None_kpis.sodium_valproate_total > 0 %}({{nhs_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.sodium_valproate_total}}){% endif %}</td>
                         </tr>
 
                     </tbody>
@@ -461,13 +460,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.comprehensive_care_planning_agreement_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.comprehensive_care_planning_agreement_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.comprehensive_care_planning_agreement_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.comprehensive_care_planning_agreement_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.comprehensive_care_planning_agreement_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.comprehensive_care_planning_agreement_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.comprehensive_care_planning_agreement_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9A (a) patient_held_individualised_epilepsy_document -->
@@ -493,13 +492,13 @@
                                     
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
                         </tr>
                         
                         <tr class="subcategory-row"> <!-- 9A (b) patient_carer_parent_agreement_to_the_care_planning -->
@@ -525,13 +524,13 @@
                                     
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9A (c) care_planning_has_been_updated_when_necessary -->
@@ -555,13 +554,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-header"> <!-- 9B comprehensive_care_planning_content -->
@@ -584,13 +583,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.comprehensive_care_planning_content_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.comprehensive_care_planning_content_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.comprehensive_care_planning_content_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.comprehensive_care_planning_content_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.comprehensive_care_planning_content_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.comprehensive_care_planning_content_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.comprehensive_care_planning_content_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (a) parental_prolonged_seizures_care_plan -->
@@ -613,13 +612,13 @@
                                                              </i>
                              </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.parental_prolonged_seizures_care_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.parental_prolonged_seizures_care_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.parental_prolonged_seizures_care_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.parental_prolonged_seizures_care_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.parental_prolonged_seizures_care_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.parental_prolonged_seizures_care_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.parental_prolonged_seizures_care_plan_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (b) water_safety -->
@@ -642,13 +641,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.water_safety_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.water_safety_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.water_safety_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.water_safety_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.water_safety_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.water_safety_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.water_safety_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %} ({{hospital_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %} ({{trust_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %} ({{icb_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %} ({{nhs_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %} ({{open_uk_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %} ({{country_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %} ({{national_kpis.water_safety_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (c) first_aid -->
@@ -671,13 +670,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.first_aid_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.first_aid_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.first_aid_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.first_aid_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.first_aid_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.first_aid_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.first_aid_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.first_aid_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (d) general_participation_and_risk -->
@@ -700,13 +699,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.general_participation_and_risk_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.general_participation_and_risk_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.general_participation_and_risk_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.general_participation_and_risk_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.general_participation_and_risk_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.general_participation_and_risk_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.general_participation_and_risk_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.general_participation_and_risk_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (e) service_contact_details -->
@@ -729,13 +728,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.service_contact_details_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.service_contact_details_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.service_contact_details_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.service_contact_details_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.service_contact_details_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.service_contact_details_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.service_contact_details_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.service_contact_details_total}}){% endif %}</td>
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (f) sudep -->
@@ -758,13 +757,13 @@
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.sudep_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.sudep_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.sudep_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.sudep_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.sudep_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.sudep_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.sudep_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.sudep_total}}){% endif %}</td>
                         </tr>
 
                         <tr> <!-- 10 school_individual_healthcare_plan -->
@@ -788,13 +787,13 @@
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.school_individual_healthcare_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.school_individual_healthcare_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.school_individual_healthcare_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.school_individual_healthcare_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.school_individual_healthcare_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.school_individual_healthcare_plan_total}})</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.school_individual_healthcare_plan_total}})</td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} {% if hospital_percentage is not None %}({{hospital_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
                         </tr>
                     </tbody>
                 </table>
