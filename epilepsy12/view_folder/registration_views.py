@@ -126,7 +126,9 @@ def register(request, case_id):
         "previously_registered_sites": previously_registered_sites,
         "audit_progress": registration.audit_progress,
         "active_template": active_template,
-        'field_enabled': False
+        # pass back organisation_id to steps for return to cases button
+        'organisation_id': lead_site.hospital_trust.pk,
+        'field_enabled': False,
     }
 
     template_name = 'epilepsy12/register.html'

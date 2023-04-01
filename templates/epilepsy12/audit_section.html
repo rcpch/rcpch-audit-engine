@@ -5,12 +5,12 @@
 
     {% block content %}
   
-      <div class='ui container'>
+      <div class='ui rcpch container'>
 
             <div class="ui grid">
               <div class="four wide column">
                   <div class="ui vertical ordered mini top attached rcpch steps" id="registration_active">
-                    {% include "./steps.html" with audit_progress=audit_progress case_id=case_id %}
+                    {% include "./steps.html" with audit_progress=audit_progress case_id=case_id organisation_id=organisation_id %}
                   </div>
               </div>
               <div class="twelve wide column">

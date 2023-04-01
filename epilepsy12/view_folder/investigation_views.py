@@ -1,6 +1,6 @@
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, permission_required
-from epilepsy12.models import Investigations, Registration
+from epilepsy12.models import Investigations, Registration, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_hospital_trust
 
@@ -14,12 +14,20 @@ def investigations(request, case_id):
     investigations, created = Investigations.objects.get_or_create(
         registration=registration)
 
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.hospital_trust.pk
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "investigations": investigations,
         "audit_progress": registration.audit_progress,
-        "active_template": "investigations"
+        "active_template": "investigations",
+        'organisation_id': organisation_id
     }
 
     template_name = 'epilepsy12/investigations.html'

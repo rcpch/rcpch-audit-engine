@@ -72,7 +72,7 @@ def database(request):
     return render(request, template_name, {})
 
 
-@ login_required
+@login_required
 def logs(request, hospital_id, epilepsy12_user_id):
     """
     returns logs for given hospital
@@ -93,7 +93,7 @@ def logs(request, hospital_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@ login_required
+@login_required
 def log_list(request, hospital_id, epilepsy12_user_id):
     """
     GET request to return log table
@@ -193,6 +193,12 @@ def registration_active(request, case_id, active_template):
     """
     registration = Registration.objects.get(case=case_id)
     audit_progress = registration.audit_progress
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.hospital_trust.id
 
     # enable the steps if has just registered
     if audit_progress.registration_complete:
@@ -202,7 +208,8 @@ def registration_active(request, case_id, active_template):
     context = {
         'audit_progress': audit_progress,
         'active_template': active_template,
-        'case_id': case_id
+        'case_id': case_id,
+        'organisation_id': organisation_id
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
