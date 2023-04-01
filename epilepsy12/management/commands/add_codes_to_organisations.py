@@ -4,92 +4,92 @@ import requests
 from pprint import pprint
 
 # E12 imports
-from ...models import HospitalTrust
+from ...models import Organisation
 from ...constants import INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES, NHS_ENGLAND_REGIONS, UK_ONS_REGIONS, OPEN_UK_NETWORKS
 from ...constants import SWANSEA_BAY_UNIVERSITY_HEALTH_BOARD, ANEURAN_BEVAN_LOCAL_HEALTH_BOARD, BETSI_CADWALADR_UNIVERSITY_HEALTH_BOARD, CARDIFF_AND_VALE_HEALTH_BOARD, CWM_TAF_HEALTH_BOARD, HYWEL_DDA_LOCAL_HEALTH_BOARD, POWYS_TEACHING_LOCAL_HEALTH_BOARD, WALES_HOSPITALS
 
 
-def add_codes_to_hospital(hospital_trust: HospitalTrust):
+def add_codes_to_organisation(organisation: Organisation):
     """
-    Adds ODS and ONS codes to hospital trust model instance
+    Adds ODS and ONS codes to organisation trust model instance
     """
 
     parent_codes = next(
-        (item for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES if item["ODS Trust Code"] == hospital_trust.ParentODSCode), None)
+        (item for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES if item["ODS Trust Code"] == organisation.ParentODSCode), None)
 
     if parent_codes:
         print('Adding NHS England regions and local authorities....')
-        hospital_trust.NHSEnglandRegion = parent_codes["NHS England Region"]
-        hospital_trust.NHSEnglandRegionCode = parent_codes["NHS England Region Code"]
+        organisation.NHSEnglandRegion = parent_codes["NHS England Region"]
+        organisation.NHSEnglandRegionCode = parent_codes["NHS England Region Code"]
 
-        hospital_trust.ICBName = parent_codes["ICB Name"]
-        hospital_trust.ICBODSCode = parent_codes["ODS ICB Code"]
-        hospital_trust.ICBONSBoundaryCode = parent_codes["ONS ICB Boundary Code"]
+        organisation.ICBName = parent_codes["ICB Name"]
+        organisation.ICBODSCode = parent_codes["ODS ICB Code"]
+        organisation.ICBONSBoundaryCode = parent_codes["ONS ICB Boundary Code"]
 
-        hospital_trust.LocalAuthorityName = parent_codes["Local Authority"]
-        hospital_trust.LocalAuthorityODSCode = parent_codes["ODS LA Code"]
-        hospital_trust.SubICBName = parent_codes["Sub ICB Locations (formerly CCGs)"]
-        hospital_trust.SubICBODSCode = parent_codes["ODS Sub ICB Code"]
+        organisation.LocalAuthorityName = parent_codes["Local Authority"]
+        organisation.LocalAuthorityODSCode = parent_codes["ODS LA Code"]
+        organisation.SubICBName = parent_codes["Sub ICB Locations (formerly CCGs)"]
+        organisation.SubICBODSCode = parent_codes["ODS Sub ICB Code"]
 
-        hospital_trust.Country = "England"
+        organisation.Country = "England"
 
         # get the nhs region ONS code
         nhs_region = next(
             (item for item in NHS_ENGLAND_REGIONS if item["NHS_ENGLAND_REGION_CODE"] == parent_codes["NHS England Region Code"]), None)
         if nhs_region:
             print('Adding NHS England regions ONS codes....')
-            hospital_trust.NHSEnglandRegionONSCode = nhs_region["NHS_ENGLAND_REGION_ONS_CODE"]
+            organisation.NHSEnglandRegionONSCode = nhs_region["NHS_ENGLAND_REGION_ONS_CODE"]
         else:
-            print(f'{hospital_trust.ParentName} has no NHS Region.')
+            print(f'{organisation.ParentName} has no NHS Region.')
 
     else:
-        print(f'{hospital_trust.ParentName} has no ICB or Local Authority.')
+        print(f'{organisation.ParentName} has no ICB or Local Authority.')
 
     # get the OPEN UK Netwok names/codes and country
     open_uk_network = next(
-        (item for item in OPEN_UK_NETWORKS if item["ods trust code"] == hospital_trust.ParentODSCode), None)
+        (item for item in OPEN_UK_NETWORKS if item["ods trust code"] == organisation.ParentODSCode), None)
     if open_uk_network:
         print('Adding OPEN UK regions and codes....')
-        hospital_trust.OPENUKNetworkCode = open_uk_network.get(
+        organisation.OPENUKNetworkCode = open_uk_network.get(
             "OPEN UK Network Code", None)
-        hospital_trust.OPENUKNetworkName = open_uk_network.get(
+        organisation.OPENUKNetworkName = open_uk_network.get(
             "OPEN UK Network Name", None)
-        hospital_trust.Country = open_uk_network.get("country", None)
+        organisation.Country = open_uk_network.get("country", None)
     else:
-        print(f'{hospital_trust.ParentName} has no OPEN UK Network Code.')
+        print(f'{organisation.ParentName} has no OPEN UK Network Code.')
 
     # get the country codes
     country = next(
-        (item for item in UK_ONS_REGIONS if item["Country_ONS_Name"] == hospital_trust.Country), None)
+        (item for item in UK_ONS_REGIONS if item["Country_ONS_Name"] == organisation.Country), None)
     if country:
-        hospital_trust.CountryONSCode = country["Country_ONS_Code"]
+        organisation.CountryONSCode = country["Country_ONS_Code"]
         print('Adding country codes....')
     else:
-        print(f'{hospital_trust.ParentName} has no Country codes.')
+        print(f'{organisation.ParentName} has no Country codes.')
 
-    hospital_trust.DateValid = timezone.now()
+    organisation.DateValid = timezone.now()
 
-    hospital_trust.save()
+    organisation.save()
     print(
-        f'{hospital_trust.OrganisationName}({hospital_trust.ParentName}) updated.')
+        f'{organisation.OrganisationName}({organisation.ParentName}) updated.')
 
 
-def add_codes_to_all_hospitals():
+def add_codes_to_all_organisations():
     """
-    Retrospective function for hospitals that have already been seeded to update with codes
+    Retrospective function for organisations that have already been seeded to update with codes
     """
 
-    hospital_trusts = HospitalTrust.objects.all()
-    for hospital_trust in hospital_trusts:
-        add_codes_to_hospital(hospital_trust=hospital_trust)
+    organisations = Organisation.objects.all()
+    for organisation in organisations:
+        add_codes_to_organisation(organisation=organisation)
 
 
-def create_wales_hospitals_object():
+def create_wales_organisations_object():
 
-    for hospital in WALES_HOSPITALS:
-        hospital_name = hospital['location_name'].split()[0]
-        print(hospital_name)
-        ods_url = f'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations?Name={hospital_name}&Status=Active'
+    for organisation in WALES_HOSPITALS:
+        organisation_name = organisation['location_name'].split()[0]
+        print(organisation_name)
+        ods_url = f'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations?Name={organisation_name}&Status=Active'
 
     try:
         response = requests.get(ods_url)
@@ -107,7 +107,7 @@ def nhs_api_search():
     nhs_api = 'https://api.nhs.uk/service-search?api-version=2&search="NHS Sector", "HOS","Princess Royal University Hospital"&searchFields=OrganisationSubType, OrganisationTypeId, OrganisationName'
 
 
-def create_welsh_hospital_trust():
+def create_welsh_organisation():
     ODS_WELSH_HOSPITALS = [
         {
             "Name": "CEFN COED HOSPITAL",
@@ -1575,9 +1575,9 @@ def create_welsh_hospital_trust():
     DateValid
     """
 
-    new_hospitals = []
-    for hospital in ODS_WELSH_HOSPITALS:
-        ods_url = f'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/{hospital["OrgId"]}'
+    new_organisations = []
+    for organisation in ODS_WELSH_HOSPITALS:
+        ods_url = f'https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations/{organisation["OrgId"]}'
 
         try:
             response = requests.get(ods_url)
@@ -1587,9 +1587,9 @@ def create_welsh_hospital_trust():
         location = response.json()["Organisation"]["GeoLoc"]["Location"]
         organisation = response.json()["Organisation"]
 
-        new_hospital = {
+        new_organisation = {
             'OrganisationID': None,
-            'OrganisationCode': hospital.get("OrgId", None),
+            'OrganisationCode': organisation.get("OrgId", None),
             'OrganisationType': None,
             'SubType': None,
             'Sector': 'NHS Sector',
@@ -1602,8 +1602,8 @@ def create_welsh_hospital_trust():
             'City': location.get('Town'),
             'County': location.get('County'),
             'Postcode': location.get('PostCode'),
-            'ParentODSCode': hospital.get("RegionCode"),
-            'ParentName': hospital.get("Region"),
+            'ParentODSCode': organisation.get("RegionCode"),
+            'ParentName': organisation.get("Region"),
             'CountryONSCode': "W92000004",
             'Country': location.get('Country', None),
             'Phone': None,
@@ -1612,5 +1612,5 @@ def create_welsh_hospital_trust():
             'Fax': None
         }
 
-        new_hospitals.append(new_hospital)
-    pprint(new_hospitals)
+        new_organisations.append(new_organisation)
+    pprint(new_organisations)

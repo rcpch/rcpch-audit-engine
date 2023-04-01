@@ -2,12 +2,12 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.models import Investigations, Registration, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 
 
 @login_required
 @permission_required('epilepsy12.view_investigations', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def investigations(request, case_id):
     registration = Registration.objects.filter(case=case_id).first()
 
@@ -19,7 +19,7 @@ def investigations(request, case_id):
         site_is_primary_centre_of_epilepsy_care=True,
         case=registration.case
     ).get()
-    organisation_id = site.hospital_trust.pk
+    organisation_id = site.organisation.pk
 
     context = {
         "case_id": case_id,
@@ -44,7 +44,7 @@ def investigations(request, case_id):
 
 # htmx
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def eeg_indicated(request, investigations_id):
     """
@@ -94,7 +94,7 @@ def eeg_indicated(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def eeg_request_date(request, investigations_id):
     """
@@ -139,7 +139,7 @@ def eeg_request_date(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def eeg_performed_date(request, investigations_id):
     """
@@ -184,7 +184,7 @@ def eeg_performed_date(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def twelve_lead_ecg_status(request, investigations_id):
     """
@@ -227,7 +227,7 @@ def twelve_lead_ecg_status(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def ct_head_scan_status(request, investigations_id):
     """
@@ -270,7 +270,7 @@ def ct_head_scan_status(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def mri_indicated(request, investigations_id):
     """
@@ -321,7 +321,7 @@ def mri_indicated(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def mri_brain_requested_date(request, investigations_id):
     """
@@ -364,7 +364,7 @@ def mri_brain_requested_date(request, investigations_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_investigations', raise_exception=True)
 def mri_brain_reported_date(request, investigations_id):
     """

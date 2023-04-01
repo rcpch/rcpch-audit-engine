@@ -3,7 +3,7 @@ from django import forms
 from django.core import validators
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm, SetPasswordForm, AuthenticationForm
 from epilepsy12.constants.user_types import ROLES, TITLES
-from ..models import Epilepsy12User, HospitalTrust
+from ..models import Epilepsy12User, Organisation
 
 
 class Epilepsy12LoginForm(AuthenticationForm):
@@ -35,8 +35,8 @@ class Epilepsy12UserCreationForm(UserCreationForm):
         required=True
     )
 
-    hospital_employer = forms.ModelChoiceField(
-        queryset=HospitalTrust.objects.all(),
+    organisation_employer = forms.ModelChoiceField(
+        queryset=Organisation.objects.all(),
         widget=forms.Select(
             attrs={'class': 'ui fluid search rcpch dropdown', 'readonly': True}),
         required=False
@@ -66,7 +66,7 @@ class Epilepsy12UserCreationForm(UserCreationForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
+        fields = ("email", "role", "organisation_employer", 'first_name', 'surname',
                   "is_rcpch_audit_team_member", 'is_staff', 'is_active')
 
     def __init__(self, *args, **kwargs) -> None:
@@ -77,7 +77,7 @@ class Epilepsy12UserChangeForm(UserChangeForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
+        fields = ("email", "role", "organisation_employer", 'first_name', 'surname',
                   "is_rcpch_audit_team_member", 'is_staff', 'is_active')
 
 
@@ -111,8 +111,8 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
         required=True
     )
 
-    hospital_employer = forms.ModelChoiceField(
-        queryset=HospitalTrust.objects.all(),
+    organisation_employer = forms.ModelChoiceField(
+        queryset=Organisation.objects.all(),
         widget=forms.Select(
             attrs={'class': 'ui fluid search rcpch disabled dropdown'})
     )
@@ -160,7 +160,7 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer", 'title', 'first_name', 'surname', "is_staff",
+        fields = ("email", "role", "organisation_employer", 'title', 'first_name', 'surname', "is_staff",
                   "is_rcpch_audit_team_member", "is_superuser", "email_confirmed")
 
     def clean_email(self):

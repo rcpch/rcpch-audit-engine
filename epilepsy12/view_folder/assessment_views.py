@@ -1,14 +1,14 @@
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, permission_required
 
-from ..models import Registration, Assessment, Case, HospitalTrust, Site
+from ..models import Registration, Assessment, Case, Organisation, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def consultant_paediatrician_referral_made(request, assessment_id):
     """
     POST request callback from toggle_button in consultant_paediatrician partial
@@ -50,13 +50,13 @@ def consultant_paediatrician_referral_made(request, assessment_id):
                                 site_is_actively_involved_in_epilepsy_care=True,
                                 site_is_general_paediatric_centre=True).update(site_is_actively_involved_in_epilepsy_care=False)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         'assessment': assessment,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -80,7 +80,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def consultant_paediatrician_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
@@ -105,14 +105,14 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "general_paediatric_edit_active": False,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -136,7 +136,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def consultant_paediatrician_input_date(request, assessment_id):
     """
     This is an HTMX callback from the consultant_paediatrician partial template
@@ -161,14 +161,14 @@ def consultant_paediatrician_input_date(request, assessment_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "general_paediatric_edit_active": False,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -194,29 +194,29 @@ def consultant_paediatrician_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def general_paediatric_centre(request, assessment_id):
     """
-    HTMX call back from hospital_list partial.
+    HTMX call back from organisation_list partial.
     POST request to update/save centre in Site model
-    assessment_id passed to hospital_list partial from
+    assessment_id passed to organisation_list partial from
     consultant_paediatrician partial which is its parent
     """
 
-    general_paediatric_centre = HospitalTrust.objects.get(pk=request.POST.get(
+    general_paediatric_centre = Organisation.objects.get(pk=request.POST.get(
         'general_paediatric_centre'))
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # if this registration already has a record in sites
-    #  associated with this hospital,
+    #  associated with this organisation,
     # update it include general paediatrics, else create a new record
     if Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=general_paediatric_centre,
+            organisation=general_paediatric_centre,
             site_is_actively_involved_in_epilepsy_care=True).exists():
         Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=general_paediatric_centre).update(
+            organisation=general_paediatric_centre).update(
                 site_is_general_paediatric_centre=True,
                 site_is_actively_involved_in_epilepsy_care=True,
                 updated_at=timezone.now(),
@@ -225,7 +225,7 @@ def general_paediatric_centre(request, assessment_id):
     else:
         site = Site.objects.create(
             case=assessment.registration.case,
-            hospital_trust=general_paediatric_centre,
+            organisation=general_paediatric_centre,
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_childrens_epilepsy_surgery_centre=False,
             site_is_actively_involved_in_epilepsy_care=True,
@@ -234,14 +234,14 @@ def general_paediatric_centre(request, assessment_id):
         )
         site.save()
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "general_paediatric_edit_active": False,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -264,7 +264,7 @@ def general_paediatric_centre(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def edit_general_paediatric_centre(request, assessment_id, site_id):
     """
     HTMX call back from consultant_paediatrician partial template. This is a POST request on button click.
@@ -274,22 +274,22 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
     selected_general_paediatric_centre_id = request.POST.get(
         'edit_general_paediatric_centre')
 
-    new_hospital_trust = HospitalTrust.objects.get(
+    new_organisation = Organisation.objects.get(
         pk=selected_general_paediatric_centre_id)
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
     if Site.objects.filter(
         case=assessment.registration.case,
-        hospital_trust=new_hospital_trust,
+        organisation=new_organisation,
         site_is_actively_involved_in_epilepsy_care=True
     ).exists():
-        # this hospital trust already exists as an active site for this registration
+        # this organisation trust already exists as an active site for this registration
         # update that record, update this to show
 
         site = Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=new_hospital_trust,
+            organisation=new_organisation,
             site_is_actively_involved_in_epilepsy_care=True
         ).get()
         site.site_is_general_paediatric_centre = True
@@ -303,23 +303,23 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
         old_site.save()
 
     else:
-        # this change is a new hospital
+        # this change is a new organisation
         Site.objects.filter(pk=site_id).update(
-            hospital_trust=new_hospital_trust,
+            organisation=new_organisation,
             site_is_general_paediatric_centre=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user
         )
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "general_paediatric_edit_active": False,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -342,14 +342,14 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def update_general_paediatric_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from consultant_paediatrician partial on click of Update or Cancel
     (action is 'edit' or 'cancel') to change the general_paediatric_edit_active flag
     It returns the partial template with the updated flag.
     Note it does not update the record - only toggles the cancel button and
-    shows/hides the hospital_list dropdown partial
+    shows/hides the organisation_list dropdown partial
     """
 
     assessment = Assessment.objects.get(pk=assessment_id)
@@ -358,14 +358,14 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
     if action == 'cancel':
         general_paediatric_edit_active = False
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "general_paediatric_edit_active": general_paediatric_edit_active,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -388,10 +388,10 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def delete_general_paediatric_centre(request, assessment_id, site_id):
     """
-    HTMX call back from hospitals_select partial template.
+    HTMX call back from organisations_select partial template.
     This is a POST request on button click.
     It carries parameters passed in from the consultant_paediatrician partial.
     If the Site object associated with this centre is also associate
@@ -421,15 +421,15 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "general_paediatric_edit_active": False,
         "error": error_message,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -457,7 +457,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def paediatric_neurologist_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -504,13 +504,13 @@ def paediatric_neurologist_referral_made(request, assessment_id):
                                 site_is_actively_involved_in_epilepsy_care=True,
                                 site_is_paediatric_neurology_centre=True).update(site_is_actively_involved_in_epilepsy_care=False)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -534,7 +534,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def paediatric_neurologist_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -562,14 +562,14 @@ def paediatric_neurologist_referral_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "neurology_edit_active": False,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -593,7 +593,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def paediatric_neurologist_input_date(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -621,14 +621,14 @@ def paediatric_neurologist_input_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "neurology_edit_active": False,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -654,25 +654,25 @@ def paediatric_neurologist_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def paediatric_neurology_centre(request, assessment_id):
     """
-    HTMX call back from hospital_list partial.
+    HTMX call back from organisation_list partial.
     POST request to update/save centre in Site model
-    assessment_id passed to hospital_list partial from
+    assessment_id passed to organisation_list partial from
     epilepsy_surgery partial which is its parent
     """
-    paediatric_neurology_centre = HospitalTrust.objects.get(pk=request.POST.get(
+    paediatric_neurology_centre = Organisation.objects.get(pk=request.POST.get(
         'paediatric_neurology_centre'))
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # if this registration already has a record in sites
-    #  associated with this hospital,
+    #  associated with this organisation,
     # update it include paediatric neurology, else create a new record
-    if Site.objects.filter(case=assessment.registration.case, hospital_trust=paediatric_neurology_centre).exists():
+    if Site.objects.filter(case=assessment.registration.case, organisation=paediatric_neurology_centre).exists():
         Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=paediatric_neurology_centre).update(
+            organisation=paediatric_neurology_centre).update(
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_paediatric_neurology_centre=True,
                 updated_at=timezone.now(),
@@ -681,7 +681,7 @@ def paediatric_neurology_centre(request, assessment_id):
     else:
         site = Site.objects.create(
             case=assessment.registration.case,
-            hospital_trust=paediatric_neurology_centre,
+            organisation=paediatric_neurology_centre,
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_childrens_epilepsy_surgery_centre=False,
             site_is_actively_involved_in_epilepsy_care=True,
@@ -690,14 +690,14 @@ def paediatric_neurology_centre(request, assessment_id):
         )
         site.save()
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "neurology_edit_active": False,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -720,28 +720,28 @@ def paediatric_neurology_centre(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template. This is a POST request on button click.
     It updates the Site object and returns the same partial template.
     """
-    paediatric_neurology_centre = HospitalTrust.objects.get(
+    paediatric_neurology_centre = Organisation.objects.get(
         pk=request.POST.get('edit_paediatric_neurology_centre'))
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
     if Site.objects.filter(
         case=assessment.registration.case,
-        hospital_trust=paediatric_neurology_centre,
+        organisation=paediatric_neurology_centre,
         site_is_actively_involved_in_epilepsy_care=True
     ).exists():
-        # this hospital trust already exists for this registration
+        # this organisation trust already exists for this registration
         # update that record, delete this
 
         site = Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=paediatric_neurology_centre,
+            organisation=paediatric_neurology_centre,
             site_is_actively_involved_in_epilepsy_care=True
         ).get()
         site.site_is_paediatric_neurology_centre = True
@@ -749,23 +749,23 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
         Site.objects.get(pk=site_id).delete()
 
     else:
-        # this change is a new hospital
+        # this change is a new organisation
         Site.objects.filter(pk=site_id).update(
-            hospital_trust=paediatric_neurology_centre,
+            organisation=paediatric_neurology_centre,
             site_is_paediatric_neurology_centre=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user
         )
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "neurology_edit_active": False,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -788,14 +788,14 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from paediatric_neurology partial on click of Update or Cancel
     (action is 'edit' or 'cancel') to change the neurology_edit_active flag
     It returns the partial template with the updated flag.
     Note it does not update the record - only toggles the cancel button and
-    shows/hides the hospital_list dropdown partial
+    shows/hides the organisation_list dropdown partial
     """
     assessment = Assessment.objects.get(pk=assessment_id)
 
@@ -803,14 +803,14 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
     if action == 'cancel':
         neurology_edit_active = False
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "neurology_edit_active": neurology_edit_active,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -833,7 +833,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -867,15 +867,15 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": error_message,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -903,7 +903,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -924,13 +924,13 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
         error_message = error
 
     assessment = Assessment.objects.get(pk=assessment_id)
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     template_name = "epilepsy12/partials/assessment/epilepsy_surgery.html"
@@ -948,7 +948,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the paediatric_neurologist partial template
@@ -994,15 +994,15 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
                                 site_is_actively_involved_in_epilepsy_care=True,
                                 site_is_childrens_epilepsy_surgery_centre=True).update(site_is_actively_involved_in_epilepsy_care=False)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -1026,7 +1026,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1050,15 +1050,15 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         'assessment': assessment,
         "surgery_edit_active": False,
         "error": None,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -1082,7 +1082,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_surgery partial template
@@ -1106,15 +1106,15 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         'assessment': assessment,
         "surgery_edit_active": False,
         "error": None,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -1138,25 +1138,25 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def epilepsy_surgery_centre(request, assessment_id):
     """
-    HTMX call back from hospital_list partial.
+    HTMX call back from organisation_list partial.
     POST request to update/save centre in Site model
-    assessment_id passed to hospital_list partial from
+    assessment_id passed to organisation_list partial from
     epilepsy_surgery partial which is its parent
     """
-    epilepsy_surgery_centre = HospitalTrust.objects.get(pk=request.POST.get(
+    epilepsy_surgery_centre = Organisation.objects.get(pk=request.POST.get(
         'epilepsy_surgery_centre'))
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # if this registration already has a record in sites
-    #  associated with this hospital,
+    #  associated with this organisation,
     # update it to include epilepsy surgery, else create a new record
-    if Site.objects.filter(case=assessment.registration.case, hospital_trust=epilepsy_surgery_centre).exists():
+    if Site.objects.filter(case=assessment.registration.case, organisation=epilepsy_surgery_centre).exists():
         Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=epilepsy_surgery_centre).update(
+            organisation=epilepsy_surgery_centre).update(
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_childrens_epilepsy_surgery_centre=True,
                 updated_at=timezone.now(),
@@ -1165,7 +1165,7 @@ def epilepsy_surgery_centre(request, assessment_id):
     else:
         site = Site.objects.create(
             case=assessment.registration.case,
-            hospital_trust=epilepsy_surgery_centre,
+            organisation=epilepsy_surgery_centre,
             site_is_primary_centre_of_epilepsy_care=False,
             site_is_childrens_epilepsy_surgery_centre=True,
             site_is_actively_involved_in_epilepsy_care=True,
@@ -1174,15 +1174,15 @@ def epilepsy_surgery_centre(request, assessment_id):
         )
         site.save()
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -1205,7 +1205,7 @@ def epilepsy_surgery_centre(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -1213,22 +1213,22 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     It updates the Site object with the new centre and returns
     the same partial template.
     """
-    new_hospital_trust = HospitalTrust.objects.get(
+    new_organisation = Organisation.objects.get(
         pk=request.POST.get('edit_epilepsy_surgery_centre'))
 
     assessment = Assessment.objects.get(pk=assessment_id)
 
     if Site.objects.filter(
         case=assessment.registration.case,
-        hospital_trust=new_hospital_trust,
+        organisation=new_organisation,
         site_is_actively_involved_in_epilepsy_care=True
     ).exists():
-        # this hospital trust already exists for this registration
+        # this organisation trust already exists for this registration
         # update that record, delete this
 
         site = Site.objects.filter(
             case=assessment.registration.case,
-            hospital_trust=new_hospital_trust,
+            organisation=new_organisation,
             site_is_actively_involved_in_epilepsy_care=True
         ).get()
         site.site_is_childrens_epilepsy_surgery_centre = True
@@ -1236,24 +1236,24 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
         Site.objects.get(pk=site_id).delete()
 
     else:
-        # this change is a new hospital
+        # this change is a new organisation
         Site.objects.filter(pk=site_id).update(
-            hospital_trust=new_hospital_trust,
+            organisation=new_organisation,
             site_is_childrens_epilepsy_surgery_centre=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user
         )
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
         "surgery_edit_active": False,
         "error": None,
-        "hospital_list": hospital_list
+        "organisation_list": organisation_list
     }
 
     # add previous and current sites to context
@@ -1276,7 +1276,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, action):
     """
     HTMX callback from epilepsy_surgery partial on click of Update or Cancel
@@ -1289,15 +1289,15 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
     if action == 'cancel':
         surgery_edit_active = False
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "surgery_edit_active": surgery_edit_active,
         "error": None,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -1320,7 +1320,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     """
     HTMX call back from epilepsy_surgery partial template.
@@ -1354,15 +1354,15 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     # refresh all objects and return
     assessment = Assessment.objects.get(pk=assessment_id)
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
         "surgery_edit_active": False,
         "error": error_message,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     # add previous and current sites to context
@@ -1390,7 +1390,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1440,7 +1440,7 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1483,7 +1483,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def epilepsy_specialist_nurse_input_date(request, assessment_id):
     """
     This is an HTMX callback from the epilepsy_nurse partial template
@@ -1526,7 +1526,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 
 @login_required
 @permission_required('epilepsy12.change_assessment', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def assessment(request, case_id):
 
     case = Case.objects.get(pk=case_id)
@@ -1542,8 +1542,8 @@ def assessment(request, case_id):
 
     assessment = Assessment.objects.filter(registration=registration).get()
 
-    # filter list to include only NHS hospitals
-    hospital_list = HospitalTrust.objects.filter(
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     site = Site.objects.filter(
@@ -1551,7 +1551,7 @@ def assessment(request, case_id):
         site_is_primary_centre_of_epilepsy_care=True,
         case=registration.case
     ).get()
-    organisation_id = site.hospital_trust.pk
+    organisation_id = site.organisation.pk
 
     context = {
         "case_id": case_id,
@@ -1559,7 +1559,7 @@ def assessment(request, case_id):
         "registration": assessment.registration,
         "audit_progress": registration.audit_progress,
         "active_template": "assessment",
-        "hospital_list": hospital_list,
+        "organisation_list": organisation_list,
         "organisation_id": organisation_id
     }
 

@@ -11,7 +11,7 @@ Reporting
 """
 
 
-def cases_aggregated_by_sex(selected_hospital):
+def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
 
     sex_long_list = [When(sex=k, then=Value(v))
@@ -19,7 +19,7 @@ def cases_aggregated_by_sex(selected_hospital):
 
     cases_aggregated_by_sex = (
         Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
+            organisations__OrganisationName__contains=selected_organisation)
         .values('sex')
         .annotate(
             sex_display=DJANGO_CASE(
@@ -34,7 +34,7 @@ def cases_aggregated_by_sex(selected_hospital):
     return cases_aggregated_by_sex
 
 
-def cases_aggregated_by_deprivation_score(selected_hospital):
+def cases_aggregated_by_deprivation_score(selected_organisation):
     # aggregate queries on trust level cases
 
     deprivation_quintiles = (
@@ -50,7 +50,7 @@ def cases_aggregated_by_deprivation_score(selected_hospital):
 
     cases_aggregated_by_deprivation = (
         Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
+            organisations__OrganisationName__contains=selected_organisation)
         .values('index_of_multiple_deprivation_quintile')
         .annotate(
             index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
@@ -66,7 +66,7 @@ def cases_aggregated_by_deprivation_score(selected_hospital):
     return cases_aggregated_by_deprivation
 
 
-def cases_aggregated_by_ethnicity(selected_hospital):
+def cases_aggregated_by_ethnicity(selected_organisation):
 
     # aggregate queries on trust level cases
 
@@ -75,7 +75,7 @@ def cases_aggregated_by_ethnicity(selected_hospital):
 
     cases_aggregated_by_ethnicity = (
         Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
+            organisations__OrganisationName__contains=selected_organisation)
         .values('ethnicity')
         .annotate(
             ethnicity_display=DJANGO_CASE(
@@ -200,7 +200,7 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
     # if abstraction_level == 'national':
     #     abstraction_sublevels = get_all_countries()
-    #     abstraction_sublevel_Q = Q(site__hospital_trust__CountryONSCode=abstraction_sublevel[0])
+    #     abstraction_sublevel_Q = Q(site__organisation__CountryONSCode=abstraction_sublevel[0])
     # NOT NEEDED AS COVERED BY  ALL ORGANISATIONS
 
     final_object = []
@@ -208,22 +208,22 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
         if abstraction_level == 'organisation':
             abstraction_sublevel_Q = Q(
-                site__hospital_trust__OrganisationODSCode=abstraction_sublevel[0])
+                site__organisation__OrganisationODSCode=abstraction_sublevel[0])
         if abstraction_level == 'trust':
             abstraction_sublevel_Q = Q(
-                site__hospital_trust__ParentODSCode=abstraction_sublevel[0])
+                site__organisation__ParentODSCode=abstraction_sublevel[0])
         if abstraction_level == 'icb':
             abstraction_sublevel_Q = Q(
-                site__hospital_trust__ICBODSCode=abstraction_sublevel[0])
+                site__organisation__ICBODSCode=abstraction_sublevel[0])
         if abstraction_level == 'nhs_region':
             abstraction_sublevel_Q = Q(
-                site__hospital_trust__NHSEnglandRegionCode=abstraction_sublevel[0])
+                site__organisation__NHSEnglandRegionCode=abstraction_sublevel[0])
         if abstraction_level == 'open_uk':
             abstraction_sublevel_Q = Q(
-                site__hospital_trust__OPENUKNetworkCode=abstraction_sublevel[0])
+                site__organisation__OPENUKNetworkCode=abstraction_sublevel[0])
         if abstraction_level == 'country':
             abstraction_sublevel_Q = Q(
-                site__hospital_trust__CountryONSCode=abstraction_sublevel[0])
+                site__organisation__CountryONSCode=abstraction_sublevel[0])
 
         filtered_cases = Case.objects.filter(
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &

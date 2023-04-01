@@ -10,13 +10,13 @@ from ..constants import CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE, CAN_TRANSFER_EPILEP
 class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
     This class records information about each site that oversees the epilepsy care of each case.
-    This class references the HospitalTrust class, as one hospital trust may reference multiple sites
+    This class references the Organisation class, as one organisation trust may reference multiple sites
     One registration can have several sites
     Each registration that has a record in sites that has 
-    site_is_actively_involved_in_epilepsy_care as True will have a unique hospital trust, which can
+    site_is_actively_involved_in_epilepsy_care as True will have a unique organisation trust, which can
     have more than one role (eg can be neurology and surgery lead together)
-    It is possible for a registration to have two sites each with the same hospital_trust, however,
-    if one of those hospital trusts is nolonger actively involved in the care.
+    It is possible for a registration to have two sites each with the same organisation, however,
+    if one of those organisation trusts is nolonger actively involved in the care.
 
     Each site can have more than one role
     """
@@ -47,8 +47,8 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # relationships
     # Site is a link table between Case and Hospital Trust in a many to many relationship
 
-    hospital_trust = models.ForeignKey(
-        to='epilepsy12.HospitalTrust',
+    organisation = models.ForeignKey(
+        to='epilepsy12.Organisation',
         related_name="site",
         on_delete=models.PROTECT
     )
@@ -82,4 +82,4 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         ]
 
     def __str__(self) -> str:
-        return self.hospital_trust.ParentName
+        return self.organisation.ParentName

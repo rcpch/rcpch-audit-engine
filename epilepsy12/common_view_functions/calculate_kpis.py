@@ -538,15 +538,15 @@ def calculate_kpis(registration_instance):
         pk=registration_instance.kpi.pk).update(**kpis)
 
 
-def annotate_kpis(filtered_hospitals, kpi_name="all"):
+def annotate_kpis(filtered_organisations, kpi_name="all"):
     """
     Single function to rationalize all functions calculatirng KPIs
-    Accepts query_list of hospitals
+    Accepts query_list of organisations
     Accepts flag for kpi_name if only individual kpi_name requested
     """
     if kpi_name == "all":
-        return filtered_hospitals.annotate(paediatrician_with_expertise_in_epilepsies_sum=Sum('kpi__paediatrician_with_expertise_in_epilepsies')).annotate(epilepsy_specialist_nurse_sum=Sum('kpi__epilepsy_specialist_nurse')).annotate(tertiary_input_sum=Sum('kpi__tertiary_input')).annotate(epilepsy_surgery_referral_sum=Sum('kpi__epilepsy_surgery_referral')).annotate(ecg_sum=Sum('kpi__ecg')).annotate(mri_sum=Sum('kpi__mri')).annotate(assessment_of_mental_health_issues_sum=Sum('kpi__assessment_of_mental_health_issues')).annotate(mental_health_support_sum=Sum('kpi__mental_health_support')).annotate(comprehensive_care_planning_agreement_sum=Sum('kpi__comprehensive_care_planning_agreement')).annotate(patient_held_individualised_epilepsy_document_sum=Sum('kpi__patient_held_individualised_epilepsy_document')).annotate(
+        return filtered_organisations.annotate(paediatrician_with_expertise_in_epilepsies_sum=Sum('kpi__paediatrician_with_expertise_in_epilepsies')).annotate(epilepsy_specialist_nurse_sum=Sum('kpi__epilepsy_specialist_nurse')).annotate(tertiary_input_sum=Sum('kpi__tertiary_input')).annotate(epilepsy_surgery_referral_sum=Sum('kpi__epilepsy_surgery_referral')).annotate(ecg_sum=Sum('kpi__ecg')).annotate(mri_sum=Sum('kpi__mri')).annotate(assessment_of_mental_health_issues_sum=Sum('kpi__assessment_of_mental_health_issues')).annotate(mental_health_support_sum=Sum('kpi__mental_health_support')).annotate(comprehensive_care_planning_agreement_sum=Sum('kpi__comprehensive_care_planning_agreement')).annotate(patient_held_individualised_epilepsy_document_sum=Sum('kpi__patient_held_individualised_epilepsy_document')).annotate(
             care_planning_has_been_updated_when_necessary_sum=Sum('kpi__care_planning_has_been_updated_when_necessary')).annotate(comprehensive_care_planning_content_sum=Sum('kpi__comprehensive_care_planning_content')).annotate(parental_prolonged_seizures_care_plan_sum=Sum('kpi__parental_prolonged_seizures_care_plan')).annotate(water_safety_sum=Sum('kpi__water_safety')).annotate(first_aid_sum=Sum('kpi__first_aid')).annotate(general_participation_and_risk_sum=Sum('kpi__general_participation_and_risk')).annotate(service_contact_details_sum=Sum('kpi__service_contact_details')).annotate(sudep_sum=Sum('kpi__sudep')).annotate(school_individual_healthcare_plan_sum=Sum('kpi__school_individual_healthcare_plan'))
     else:
-        ans = filtered_hospitals.annotate(kpi_sum=Sum(f"kpi__{kpi_name}"))
+        ans = filtered_organisations.annotate(kpi_sum=Sum(f"kpi__{kpi_name}"))
         return ans

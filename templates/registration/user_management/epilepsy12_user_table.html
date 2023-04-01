@@ -4,7 +4,7 @@
 
 <div 
     hx-target='#epilepsy12_user_table' 
-    hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk %}" 
+    hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk %}" 
     hx-trigger='epilepsy12_user_list from:body'
     hx-swap='innerHTML' 
     name='epilepsy12_user_table'>
@@ -22,7 +22,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_name_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_by_name_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_down" %}
                             <i
@@ -30,7 +30,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12users_by_name_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_by_name_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -38,7 +38,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_name_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_name_up' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_name_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% endif %}
                     </div>
@@ -51,7 +51,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_email_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_email_up' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_by_email_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_email_down" %}
                             <i
@@ -59,7 +59,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12users_by_email_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_email_down' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_by_email_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -67,7 +67,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_email_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_email_up' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_email_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% endif %}
                 </div>
@@ -80,7 +80,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_role_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
                             <i
@@ -88,7 +88,7 @@
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_role_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -96,36 +96,36 @@
                                 id="sort_button"
                                 name="sort_by_role_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% endif %}
                 </div>
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
                     <p>Hospital Employer</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_hospital_employer_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_epilepsy12_users_by_hospital_employer_up"
+                                name="sort_epilepsy12_users_by_organisation_employer_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_hospital_employer_down' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_hospital_employer_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_epilepsy12_users_by_hospital_employer_down"
+                                name="sort_epilepsy12_users_by_organisation_employer_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_hospital_employer_up' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_by_hospital_employer_down"
+                                name="sort_by_organisation_employer_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_hospital_employer_down' hospital_id=hospital_trust.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% endif %}
                 </div>
@@ -145,7 +145,7 @@
             <td>{{ epilepsy12_user.get_full_name }}</td>
             <td>{{ epilepsy12_user.email }}</td>
             <td>{{ epilepsy12_user.get_role_display }}</td>
-            <td>{{ epilepsy12_user.hospital_employer  }}</td>
+            <td>{{ epilepsy12_user.organisation_employer  }}</td>
             <td>
                 {% if not epilepsy12_user.email_confirmed and not epilepsy12_user.is_active %}
                     <i 
@@ -198,7 +198,7 @@
                         class="ui right spaced avatar image"
                         id="{{epilepsy12_user.id}}_staff_icon"
                         data-title="RCPCH Staff Member"
-                        data-content="{{epilepsy12_user}} is a member of RCPCH staff.  They are not affiliated with any hospital or community trust and can view national data."
+                        data-content="{{epilepsy12_user}} is a member of RCPCH staff.  They are not affiliated with any organisation or community trust and can view national data."
                         data-position="top left"
                         data-variation="basic"
                         _="init js $('#{{epilepsy12_user.id}}_staff_icon').popup(); end"
@@ -228,7 +228,7 @@
                             class="ui rcpch_primary icon disabled button" 
                         {% endif %}
                         tabindexed="0">
-                        <a href="{% url 'edit_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}">
+                        <a href="{% url 'edit_epilepsy12_user' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}">
                             <i class="edit outline icon"></i>
                         </a>
                     </button>
@@ -241,7 +241,7 @@
                             class="ui rcpch_danger icon disabled button" 
                         {% endif %}
                         tabindexed="1" 
-                        hx-post="{% url 'delete_epilepsy12_user' hospital_id=hospital_trust.pk epilepsy12_user_id=epilepsy12_user.pk %}"
+                        hx-post="{% url 'delete_epilepsy12_user' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}"
                         hx-trigger='click'
                         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                         _="on htmx:confirm(issueRequest)
@@ -267,7 +267,7 @@
                         {% else %}
                             class='ui rcpch_light_blue icon right floated disabled button'
                         {% endif %}
-                        onclick="location.href='{% url 'logs' epilepsy12_user_id=epilepsy12_user.pk hospital_id=hospital_trust.pk %}'"
+                        onclick="location.href='{% url 'logs' epilepsy12_user_id=epilepsy12_user.pk organisation_id=organisation.pk %}'"
                     >
                         <i 
                             class='ui list icon'
@@ -293,12 +293,12 @@
             <th colspan="10" class="right aligned">
             {% if epilepsy12_user_list.has_previous %}
             <div class="ui rcpch_primary button" hx-target="#epilepsy12_user_table"
-                hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
+                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Previous 10</div>
             {% endif %}
             {% if epilepsy12_user_list.has_next %}
             <div class="ui rcpch_primary button" name="next_button" hx-target="#epilepsy12_user_table"
-                hx-get="{% url 'epilepsy12_user_list' hospital_id=hospital_trust.pk  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
+                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Next 10</div>
             {% endif %}
             </th>

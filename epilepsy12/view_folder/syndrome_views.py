@@ -4,11 +4,11 @@ from django.contrib.auth.decorators import login_required, permission_required
 from ..models import Syndrome
 from epilepsy12.constants.syndromes import SYNDROMES
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.add_syndrome', raise_exception=True)
 def syndrome_diagnosis_date(request, syndrome_id):
     """
@@ -46,7 +46,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_syndrome', raise_exception=True)
 def syndrome_name(request, syndrome_id):
     """

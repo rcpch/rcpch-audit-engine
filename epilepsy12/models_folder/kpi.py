@@ -388,8 +388,8 @@ class KPI(models.Model, HelpTextMixin):
         null=True
     )
 
-    hospital_organisation = models.ForeignKey(
-        "epilepsy12.HospitalTrust",
+    organisation = models.ForeignKey(
+        "epilepsy12.Organisation",
         on_delete=models.CASCADE
     )
 
@@ -402,4 +402,4 @@ class KPI(models.Model, HelpTextMixin):
         verbose_name_plural = _("KPIs")
 
     def __str__(self):
-        return f'KPI for child in {self.hospital_organisation.OrganisationName}({self.parent_trust})'
+        return f'KPI for child in {self.organisation.OrganisationName}({self.parent_trust})'
