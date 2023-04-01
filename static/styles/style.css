@@ -29,7 +29,7 @@
 :root {
     --rcpch_lightest_blue: #f0fafe;
     --rcpch_lightest_grey: #f3f3f3;
-    --rcpch_light_blue: #0c98dd;
+    /* --rcpch_light_blue: #0c98dd; */
     --rcpch_strong_blue: #3366cc;
     /* 51,102,204 */
     --rcpch_dark_blue: #0d0d58;
@@ -39,6 +39,7 @@
     --rcpch_pink: #e00087;
     /* 224,0,135 */
     --rcpch_light_pink: #ffe0f3;
+    --rcpch_lightest_pink: #fbe5f3;
     /* 224,0,135 */
     /* monochrome */
     --rcpch_white: #ffffff;
@@ -68,6 +69,7 @@
     --rcpch_dark_red: #9a0500;
     /* STANDARD FONT */
     --rcpch_standard_font: Montserrat-Regular;
+    --rcpch_bold_font: Montserrat-Bold;
 }
 
 body {
@@ -1189,6 +1191,15 @@ div.ui.card>div.content>div.hospital_address_container {
     border-top: white;
 }
 
+.ui.rcpch.table .subcategory-header {
+    background-color: var(--rcpch_mid_grey);
+    font-family: var(--rcpch_bold_font);
+}
+
+.ui.rcpch.table .subcategory-row {
+    background-color: var(--rcpch_light_grey);
+}
+
 
 /* rcpch message */
 
@@ -1411,9 +1422,9 @@ tr {
     transition: background-color 0.25s;
 }
 
-tr:hover {
+/* tr:hover {
     background-color: var(--rcpch_light_grey);
-}
+} */
 
 .ui.rcpch_stats.statistic>.rcpch_stats_value {
     color: var(--rcpch_light_blue);

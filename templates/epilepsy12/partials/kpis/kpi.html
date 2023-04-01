@@ -160,6 +160,34 @@
   </tbody>
 </table>
 
+<h3>Medication</h3>
+<table class="ui rcpch table">
+  <thead>
+    <tr>
+      <th>Indicator</th>
+      <th class="right aligned">Performance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr {% if case.registration.kpi.sodium_valproate == 2 %} class='kpi_unscored' {% endif %}>
+      <td class="left aligned">
+        <i
+          class="rcpch question circle icon"
+          id="sodium_valproate"
+          data-title="Sodium valproate"
+          data-content="{{case.registration.kpi.get_sodium_valproate_help_reference_text}}"
+          data-position="top right"
+          _="init js $('#sodium_valproate').popup(); end"
+        ></i>
+        {{case.registration.kpi.get_sodium_valproate_help_label_text}}
+      </td>
+      <td class="right aligned">
+        {{case.registration.kpi.sodium_valproate|icon_for_score}}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 <h3>Care Planning</h3>
 <table class="ui rcpch table">
   <thead>
@@ -169,7 +197,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr {% if case.registration.kpi.comprehensive_care_planning_agreement == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.comprehensive_care_planning_agreement == 2 %} class='kpi_unscored' {% endif %} class="subcategory-header">
       <td class="left aligned">
         <i 
           class='rcpch question circle icon'
@@ -184,7 +212,7 @@
         {{case.registration.kpi.comprehensive_care_planning_agreement|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.patient_held_individualised_epilepsy_document == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.patient_held_individualised_epilepsy_document == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -200,7 +228,23 @@
         {{case.registration.kpi.patient_held_individualised_epilepsy_document|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.care_planning_has_been_updated_when_necessary == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.patient_carer_parent_agreement_to_the_care_planning == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
+      <td class="left aligned">
+        <i
+          class="rcpch question circle icon"
+          id="patient_carer_parent_agreement_to_the_care_planning"
+          data-title="Parent-held individualised epilepsy document"
+          data-content="{{case.registration.kpi.get_patient_carer_parent_agreement_to_the_care_planning_help_reference_text}}"
+          data-position="top right"
+          _="init js $('#patient_carer_parent_agreement_to_the_care_planning').popup(); end"
+        ></i>
+        {{case.registration.kpi.get_patient_carer_parent_agreement_to_the_care_planning_help_label_text}}
+      </td>
+      <td class="right aligned">
+        {{case.registration.kpi.patient_carer_parent_agreement_to_the_care_planning|icon_for_score}}
+      </td>
+    </tr>
+    <tr {% if case.registration.kpi.care_planning_has_been_updated_when_necessary == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
         class="rcpch question circle icon"
@@ -216,7 +260,7 @@
         {{case.registration.kpi.care_planning_has_been_updated_when_necessary|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.comprehensive_care_planning_content == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.comprehensive_care_planning_content == 2 %} class='kpi_unscored' {% endif %} class="subcategory-header">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -232,7 +276,7 @@
         {{case.registration.kpi.comprehensive_care_planning_content|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.parental_prolonged_seizures_care_plan == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.parental_prolonged_seizures_care_plan == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -248,7 +292,7 @@
         {{case.registration.kpi.parental_prolonged_seizures_care_plan|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.water_safety == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.water_safety == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -263,7 +307,7 @@
         {{case.registration.kpi.water_safety|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.first_aid == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.first_aid == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -278,7 +322,7 @@
         {{case.registration.kpi.first_aid|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.general_participation_and_risk == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.general_participation_and_risk == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -294,7 +338,7 @@
         {{case.registration.kpi.general_participation_and_risk|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.service_contact_details == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.service_contact_details == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -310,7 +354,7 @@
         {{case.registration.kpi.service_contact_details|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.sudep == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.sudep == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
