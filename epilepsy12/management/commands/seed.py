@@ -25,17 +25,17 @@ class Command(BaseCommand):
             self.stdout.write('Deleting organisation trust data...')
             delete_organisations()
         elif (options['mode'] == 'seed_organisations'):
-            self.stdout.write('seeding organisation trust data...')
+            self.stdout.write('seeding organisation data...')
             run_organisations_seed()
         elif (options['mode'] == 'seed_welsh_organisations'):
-            self.stdout.write('seeding organisation trust data...')
+            self.stdout.write('seeding organisation data...')
             run_welsh_organisations_seed()
         elif (options['mode'] == 'add_codes_to_english_organisations'):
             self.stdout.write(
-                'adding ODS codes to existing English organisation trust records...')
+                'adding ODS codes to existing English organisation records...')
             add_codes_to_english_organisations()
         elif (options['mode'] == 'seed_semiology_keywords'):
-            self.stdout.write('seeding organisation trust data...')
+            self.stdout.write('seeding organisation data...')
             run_semiology_keywords_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
@@ -89,7 +89,7 @@ def run_organisations_seed():
     # this adds all the English organisations from JSON in the constants folder
     # There are also lists of organisations across northern ireland, wales and scotland, but the JSON has a different structure
     if Organisation.objects.all().exists():
-        print('Hospital table already exists. Skipping this step...')
+        print('Organisation table already exists. Skipping this step...')
         return
     added = 0
     for index, organisation in enumerate(ALL_HOSPITALS):
@@ -126,13 +126,13 @@ def run_organisations_seed():
             try:
                 organisation.save()
             except Exception as error:
-                print("Exception at "+organisation["ParentName"])
+                print("Exception at "+organisation.ParentName)
                 print(error)
             added += 1
-            chosen_organisation = organisation["OrganisationName"]
+            chosen_organisation = organisation.OrganisationName
             print(
                 '\033[31m', f"New English organisation added...{added}: {chosen_organisation}", '\033[31m')
-    print(f"English Hospitals added...{added}")
+    print(f"English organisations added...{added}")
 
     run_welsh_organisations_seed()
 
@@ -181,7 +181,7 @@ def run_welsh_organisations_seed():
         except Exception as error:
             print("Exception creating "+organisation["OrganisationName"])
 
-    print(f"Welsh Hospitals added...{added}")
+    print(f"Welsh organisations added...{added}")
 
 
 def add_codes_to_english_organisations():
@@ -200,7 +200,7 @@ def delete_organisations():
     try:
         Organisation.objects.all().delete()
     except:
-        print("Unable to delete Hospital table")
+        print("Unable to delete Organisation table")
     print("...all organisations deleted.")
 
 

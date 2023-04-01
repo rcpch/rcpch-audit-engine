@@ -181,7 +181,7 @@ def case_list(request, organisation_id):
     registered_count = registered_cases.count()
 
     rcpch_choices = (
-        (0, f'Hospital View ({organisation.OrganisationName})'),
+        (0, f'Organisation View ({organisation.OrganisationName})'),
         (1, f'Trust View ({organisation.ParentName})'),
         (2, 'National View'),
     )

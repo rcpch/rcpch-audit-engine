@@ -153,7 +153,7 @@ def epilepsy12_user_list(request, organisation_id):
                 'surname').all()
 
     rcpch_choices = (
-        (0, f'Hospital View ({organisation.OrganisationName})'),
+        (0, f'Organisation View ({organisation.OrganisationName})'),
         (1, f'Trust View ({organisation.ParentName})'),
         (2, 'National View'),
     )

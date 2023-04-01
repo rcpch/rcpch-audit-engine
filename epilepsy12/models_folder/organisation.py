@@ -245,8 +245,8 @@ class Organisation(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=['OrganisationName'])]
-        verbose_name = 'Hospital Trust'
-        verbose_name_plural = 'Hospital Trusts'
+        verbose_name = 'Organisation'
+        verbose_name_plural = 'Organisations'
         ordering = ('OrganisationName',)
 
     def __str__(self) -> str:

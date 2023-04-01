@@ -45,7 +45,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     history = HistoricalRecords()
 
     # relationships
-    # Site is a link table between Case and Hospital Trust in a many to many relationship
+    # Site is a link table between Case and Organisation in a many to many relationship
 
     organisation = models.ForeignKey(
         to='epilepsy12.Organisation',
