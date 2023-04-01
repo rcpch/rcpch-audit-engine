@@ -556,6 +556,20 @@ div.ui.card>div.content>div.hospital_address_container {
   border-color: var(--rcpch_light_blue);
 }
 
+.ui.rcpch_grey.button {
+  border-radius: 0% !important;
+  color: black;
+  background-color: var(--rcpch_mid_grey);
+  border-color: var(--rcpch_mid_grey);
+}
+
+.ui.rcpch_grey.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_dark_blue);
+  transition-duration: 0.4s;
+}
+
 #first_paediatric_assessment_date_button {
   border-style: solid;
 }
