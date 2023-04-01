@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
-from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine
+from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_hospital_trust
 
@@ -32,15 +32,22 @@ def management(request, case_id):
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False).all()
 
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.hospital_trust.pk
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "management": management,
         "rescue_medicines": rescue_medicines,
         "antiepilepsy_medicines": antiepilepsy_medicines,
-        # 'snomed_items': snomed_items,
         "audit_progress": registration.audit_progress,
-        "active_template": "management"
+        "active_template": "management",
+        "organisation_id": organisation_id
     }
 
     template_name = 'epilepsy12/management.html'

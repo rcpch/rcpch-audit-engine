@@ -33,31 +33,4 @@
     {% include 'epilepsy12/partials/assessment/epilepsy_nurse.html' with assessment=assessment %}
   </div>
 
-
-  <h5>
-
-    {% comment %}
-    table for {{registration.case.first_name}} {{registration.surname}}
-    registration id: {{registration.pk}}
-    assessment id: {{registration.assessment.pk}} registration_id {{registration.pk}}
-  </h5>
-  <table class="ui table">
-    <th>Name</th>
-    <th>Is Lead</th>
-    <th>Neuro</th>
-    <th>Surgery</th>
-    <th>Paeds</th>
-    <th>Active</th>
-    {% for site in all_my_sites %}
-    <tr>
-      <td>{{site.hospital_trust.OrganisationName}}</td>
-      <td>{{site.site_is_primary_centre_of_epilepsy_care}}</td>
-      <td>{{site.site_is_paediatric_neurology_centre}}</td>
-      <td>{{site.site_is_childrens_epilepsy_surgery_centre}}</td>
-      <td>{{site.site_is_general_paediatric_centre}}</td>
-      <td>{{site.site_is_actively_involved_in_epilepsy_care}}</td>
-    </tr>
-    {% endfor%}
-  </table>
-  {% endcomment %}
 </form>

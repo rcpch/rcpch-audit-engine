@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.constants import *
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..models import Registration, FirstPaediatricAssessment
+from ..models import Registration, FirstPaediatricAssessment, Site
 from ..decorator import user_can_access_this_hospital_trust
 
 
@@ -22,6 +22,13 @@ def first_paediatric_assessment(request, case_id):
         first_paediatric_assessment = FirstPaediatricAssessment.objects.filter(
             registration=registration).get()
 
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.hospital_trust.pk
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -30,7 +37,8 @@ def first_paediatric_assessment(request, case_id):
         "when_the_first_epileptic_episode_occurred_confidence_selection": DATE_ACCURACY,
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "audit_progress": registration.audit_progress,
-        "active_template": "first_paediatric_assessment"
+        "active_template": "first_paediatric_assessment",
+        "organisation_id": organisation_id
     }
 
     response = recalculate_form_generate_response(

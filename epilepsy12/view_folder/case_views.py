@@ -262,12 +262,19 @@ def case_submit(request, hospital_id, case_id):
 def case_performance_summary(request, case_id):
 
     case = Case.objects.get(pk=case_id)
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=case
+    ).get()
+    organisation_id = site.hospital_trust.pk
 
     context = {
         'case': case,
         'case_id': case.pk,
         'active_template': 'case_performance_summary',
         'audit_progress': case.registration.audit_progress,
+        "organisation_id": organisation_id
     }
 
     template = 'epilepsy12/case_performance_summary.html'

@@ -1546,13 +1546,21 @@ def assessment(request, case_id):
     hospital_list = HospitalTrust.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.hospital_trust.pk
+
     context = {
         "case_id": case_id,
         "assessment": assessment,
         "registration": assessment.registration,
         "audit_progress": registration.audit_progress,
         "active_template": "assessment",
-        "hospital_list": hospital_list
+        "hospital_list": hospital_list,
+        "organisation_id": organisation_id
     }
 
     # add previous and current sites to context

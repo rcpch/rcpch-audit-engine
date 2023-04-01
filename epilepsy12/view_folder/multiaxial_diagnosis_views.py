@@ -12,7 +12,7 @@ from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
-from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis
+from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
 from ..decorator import user_can_access_this_hospital_trust
 
@@ -75,8 +75,12 @@ def multiaxial_diagnosis(request, case_id):
     ecl = '<< 363235000 '
     epilepsy_causes = fetch_ecl(ecl)
 
-
-# TODO: #218 epilepsy cause cause selection needs to have 'Not Known' last in the list, not alphabetically sorted.
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.hospital_trust.pk
 
     context = {
         "case_id": registration.case_id,
@@ -93,6 +97,7 @@ def multiaxial_diagnosis(request, case_id):
         "active_template": "multiaxial_diagnosis",
         'there_are_epileptic_episodes': there_are_epileptic_episodes,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "organisation_id": organisation_id
     }
 
     response = recalculate_form_generate_response(
