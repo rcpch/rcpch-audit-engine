@@ -25,7 +25,7 @@
         <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
 
                 <h3>Clinical Team</h3>
-                <table class='ui rcpch  table kpi_table'>
+                <table class='ui rcpch table kpi_table'>
                     <thead>
                         <tr>
                             <th class='three wide'>Indicator</th>
@@ -375,6 +375,55 @@
                         </tr>
                     </tbody>
                 </table>
+                
+                <h3>Medication</h3>
+                <table class='ui rcpch table'>
+                    <thead>
+                        <tr>
+                            <th class='three wide'>Indicator</th>
+                            <th class='right aligned'>Hospital</th>
+                            <th class='right aligned'>Trust</th>
+                            <th class='right aligned'>Integrated Care Board</th>
+                            <th class='right aligned'>NHS Region</th>
+                            <th class='right aligned'>OPEN UK Region</th>
+                            <th class='right aligned'>Country</th>
+                            <th class='right aligned'>National</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            {% percentage_of_total hospital_kpis.sodium_valproate hospital_kpis.sodium_valproate_total as hospital_percentage %}
+                            {% percentage_of_total trust_kpis.sodium_valproate trust_kpis.sodium_valproate_total as trust_percentage %}
+                            {% percentage_of_total icb_kpis.sodium_valproate icb_kpis.sodium_valproate_total as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.sodium_valproate nhs_kpis.sodium_valproate_total as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.sodium_valproate open_uk_kpis.sodium_valproate_total as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.sodium_valproate country_kpis.sodium_valproate_total as country_percentage %}
+                            {% percentage_of_total national_kpis.sodium_valproate national_kpis.sodium_valproate_total as national_percentage %}
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{{kpis.get_sodium_valproate_help_label_text}}</p>
+                                    <i
+                                        class="rcpch question circle icon"
+                                        id='sodium_valproate'
+                                        data-title='Sodium valproate'
+                                        data-content="{{kpis.get_sodium_valproate_help_reference_text}} Note: different measures have different denominators."
+                                        data-position='top right' _="init js $('#sodium_valproate').popup(); end">
+                                    </i>
+                                </div>
+                            
+                            </td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.sodium_valproate_total}})</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.sodium_valproate_total}})</td>
+                        </tr>
+
+                    </tbody>
+                </table>
 
                 <h3>Care Planning</h3>
                 <table class='ui rcpch table'>
@@ -391,7 +440,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr class="subcategory-header"> <!-- 9A comprehensive_care_planning_agreement -->
                             {% percentage_of_total hospital_kpis.comprehensive_care_planning_agreement hospital_kpis.comprehensive_care_planning_agreement_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.comprehensive_care_planning_agreement trust_kpis.comprehensive_care_planning_agreement_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.comprehensive_care_planning_agreement icb_kpis.comprehensive_care_planning_agreement_total as icb_percentage %}
@@ -420,7 +469,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.comprehensive_care_planning_agreement_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.comprehensive_care_planning_agreement_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9A (a) patient_held_individualised_epilepsy_document -->
                             {% percentage_of_total hospital_kpis.patient_held_individualised_epilepsy_document hospital_kpis.patient_held_individualised_epilepsy_document_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.patient_held_individualised_epilepsy_document trust_kpis.patient_held_individualised_epilepsy_document_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.patient_held_individualised_epilepsy_document icb_kpis.patient_held_individualised_epilepsy_document_total as icb_percentage %}
@@ -443,35 +493,68 @@
                                     
                                 </div>
                             </td>
-                        <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                        <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                        <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                        <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                        <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                        <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                        <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.patient_held_individualised_epilepsy_document_total}})</td>
-                    </tr>
-                    <tr>
-                        {% percentage_of_total hospital_kpis.care_planning_has_been_updated_when_necessary hospital_kpis.care_planning_has_been_updated_when_necessary_total as hospital_percentage %}
-                        {% percentage_of_total trust_kpis.care_planning_has_been_updated_when_necessary trust_kpis.care_planning_has_been_updated_when_necessary_total as trust_percentage %}
-                        {% percentage_of_total icb_kpis.care_planning_has_been_updated_when_necessary icb_kpis.care_planning_has_been_updated_when_necessary_total as icb_percentage %}
-                        {% percentage_of_total nhs_kpis.care_planning_has_been_updated_when_necessary nhs_kpis.care_planning_has_been_updated_when_necessary_total as nhs_percentage %}
-                        {% percentage_of_total open_uk_kpis.care_planning_has_been_updated_when_necessary open_uk_kpis.care_planning_has_been_updated_when_necessary_total as open_uk_percentage %}
-                        {% percentage_of_total country_kpis.care_planning_has_been_updated_when_necessary country_kpis.care_planning_has_been_updated_when_necessary_total as country_percentage %}
-                        {% percentage_of_total national_kpis.care_planning_has_been_updated_when_necessary national_kpis.care_planning_has_been_updated_when_necessary_total as national_percentage %}
-                        <td>
-                            <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{{kpis.get_care_planning_has_been_updated_when_necessary_help_label_text}}</p>
-                                <i
-                                    class="rcpch question circle icon"
-                                    id='care_planning_has_been_updated_when_necessary'
-                                    data-title='Care planning has been updated when necessary'
-                                    data-content="{{kpis.get_care_planning_has_been_updated_when_necessary_help_reference_text}} Note: different measures have different denominators."
-                                    data-position='top right'
-                                    _="init js $('#care_planning_has_been_updated_when_necessary').popup(); end">
-                                </i>
-                            </div>
-                        </td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.patient_held_individualised_epilepsy_document_total}})</td>
+                        </tr>
+                        
+                        <tr class="subcategory-row"> <!-- 9A (b) patient_carer_parent_agreement_to_the_care_planning -->
+                            {% percentage_of_total hospital_kpis.patient_carer_parent_agreement_to_the_care_planning hospital_kpis.patient_carer_parent_agreement_to_the_care_planning_total as hospital_percentage %}
+                            {% percentage_of_total trust_kpis.patient_carer_parent_agreement_to_the_care_planning trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total as trust_percentage %}
+                            {% percentage_of_total icb_kpis.patient_carer_parent_agreement_to_the_care_planning icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.patient_carer_parent_agreement_to_the_care_planning nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning_total as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.patient_carer_parent_agreement_to_the_care_planning country_kpis.patient_carer_parent_agreement_to_the_care_planning_total as country_percentage %}
+                            {% percentage_of_total national_kpis.patient_carer_parent_agreement_to_the_care_planning national_kpis.patient_carer_parent_agreement_to_the_care_planning_total as national_percentage %}
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{{kpis.get_patient_carer_parent_agreement_to_the_care_planning_help_label_text}}</p>
+                                    
+                                        <i
+                                            class="rcpch question circle icon"
+                                            id='patient_carer_parent_agreement_to_the_care_planning'
+                                            data-title='Patient/Carer/Parent agreement'
+                                            data-content="{{kpis.get_patient_carer_parent_agreement_to_the_care_planning_help_reference_text}} Note: different measures have different denominators."
+                                            data-position='top right'
+                                            _="init js $('#patient_carer_parent_agreement_to_the_care_planning').popup(); end">
+                                        </i>
+                                    
+                                </div>
+                            </td>
+                            <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} ({{nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} ({{open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.patient_carer_parent_agreement_to_the_care_planning_total}})</td>
+                        </tr>
+
+                        <tr class="subcategory-row"> <!-- 9A (c) care_planning_has_been_updated_when_necessary -->
+                            {% percentage_of_total hospital_kpis.care_planning_has_been_updated_when_necessary hospital_kpis.care_planning_has_been_updated_when_necessary_total as hospital_percentage %}
+                            {% percentage_of_total trust_kpis.care_planning_has_been_updated_when_necessary trust_kpis.care_planning_has_been_updated_when_necessary_total as trust_percentage %}
+                            {% percentage_of_total icb_kpis.care_planning_has_been_updated_when_necessary icb_kpis.care_planning_has_been_updated_when_necessary_total as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.care_planning_has_been_updated_when_necessary nhs_kpis.care_planning_has_been_updated_when_necessary_total as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.care_planning_has_been_updated_when_necessary open_uk_kpis.care_planning_has_been_updated_when_necessary_total as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.care_planning_has_been_updated_when_necessary country_kpis.care_planning_has_been_updated_when_necessary_total as country_percentage %}
+                            {% percentage_of_total national_kpis.care_planning_has_been_updated_when_necessary national_kpis.care_planning_has_been_updated_when_necessary_total as national_percentage %}
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{{kpis.get_care_planning_has_been_updated_when_necessary_help_label_text}}</p>
+                                    <i
+                                        class="rcpch question circle icon"
+                                        id='care_planning_has_been_updated_when_necessary'
+                                        data-title='Care planning has been updated when necessary'
+                                        data-content="{{kpis.get_care_planning_has_been_updated_when_necessary_help_reference_text}} Note: different measures have different denominators."
+                                        data-position='top right'
+                                        _="init js $('#care_planning_has_been_updated_when_necessary').popup(); end">
+                                    </i>
+                                </div>
+                            </td>
                             <td class='right aligned'>{% none_percentage hospital_percentage %} ({{hospital_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{trust_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} ({{icb_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
@@ -480,7 +563,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.care_planning_has_been_updated_when_necessary_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-header"> <!-- 9B comprehensive_care_planning_content -->
                             {% percentage_of_total hospital_kpis.comprehensive_care_planning_content hospital_kpis.comprehensive_care_planning_content_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.comprehensive_care_planning_content trust_kpis.comprehensive_care_planning_content_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.comprehensive_care_planning_content icb_kpis.comprehensive_care_planning_content_total as icb_percentage %}
@@ -508,7 +592,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.comprehensive_care_planning_content_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.comprehensive_care_planning_content_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (a) parental_prolonged_seizures_care_plan -->
                             {% percentage_of_total hospital_kpis.parental_prolonged_seizures_care_plan hospital_kpis.parental_prolonged_seizures_care_plan_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.parental_prolonged_seizures_care_plan trust_kpis.parental_prolonged_seizures_care_plan_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.parental_prolonged_seizures_care_plan icb_kpis.parental_prolonged_seizures_care_plan_total as icb_percentage %}
@@ -536,7 +621,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.parental_prolonged_seizures_care_plan_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.parental_prolonged_seizures_care_plan_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (b) water_safety -->
                             {% percentage_of_total hospital_kpis.water_safety hospital_kpis.water_safety_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.water_safety trust_kpis.water_safety_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.water_safety icb_kpis.water_safety_total as icb_percentage %}
@@ -564,7 +650,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.water_safety_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.water_safety_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (c) first_aid -->
                             {% percentage_of_total hospital_kpis.first_aid hospital_kpis.first_aid_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.first_aid trust_kpis.first_aid_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.first_aid icb_kpis.first_aid_total as icb_percentage %}
@@ -592,7 +679,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.first_aid_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.first_aid_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (d) general_participation_and_risk -->
                             {% percentage_of_total hospital_kpis.general_participation_and_risk hospital_kpis.general_participation_and_risk_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.general_participation_and_risk trust_kpis.general_participation_and_risk_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.general_participation_and_risk icb_kpis.general_participation_and_risk_total as icb_percentage %}
@@ -620,7 +708,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.general_participation_and_risk_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.general_participation_and_risk_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (e) service_contact_details -->
                             {% percentage_of_total hospital_kpis.service_contact_details hospital_kpis.service_contact_details_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.service_contact_details trust_kpis.service_contact_details_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.service_contact_details icb_kpis.service_contact_details_total as icb_percentage %}
@@ -648,7 +737,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.service_contact_details_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.service_contact_details_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (f) sudep -->
                             {% percentage_of_total hospital_kpis.sudep hospital_kpis.sudep_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.sudep trust_kpis.sudep_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.sudep icb_kpis.sudep_total as icb_percentage %}
@@ -676,7 +766,8 @@
                             <td class='right aligned'>{% none_percentage country_percentage %} ({{country_kpis.sudep_total}})</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} ({{national_kpis.sudep_total}})</td>
                         </tr>
-                        <tr>
+
+                        <tr> <!-- 10 school_individual_healthcare_plan -->
                             {% percentage_of_total hospital_kpis.school_individual_healthcare_plan hospital_kpis.school_individual_healthcare_plan_total as hospital_percentage %}
                             {% percentage_of_total trust_kpis.school_individual_healthcare_plan trust_kpis.school_individual_healthcare_plan_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.school_individual_healthcare_plan icb_kpis.school_individual_healthcare_plan_total as icb_percentage %}
