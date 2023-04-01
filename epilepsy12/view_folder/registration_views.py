@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
 from django.http import HttpResponse
+from django.utils.html import strip_tags
 
 # 3rd party
 from django_htmx.http import trigger_client_event
@@ -16,7 +17,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI, Epilepsy12User
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_hospital_trust
-from ..general_functions import construct_transer_epilepsy12_site_email
+from ..general_functions import construct_transfer_epilepsy12_site_email
 
 
 @login_required
@@ -126,7 +127,9 @@ def register(request, case_id):
         "previously_registered_sites": previously_registered_sites,
         "audit_progress": registration.audit_progress,
         "active_template": active_template,
-        'field_enabled': False
+        # pass back organisation_id to steps for return to cases button
+        'organisation_id': lead_site.hospital_trust.pk,
+        'field_enabled': False,
     }
 
     template_name = 'epilepsy12/register.html'
@@ -374,11 +377,16 @@ def update_lead_site(request, registration_id, site_id, update):
             role=4
         ).all()
         for recipient in recipients:
-            email = construct_transer_epilepsy12_site_email(
+            email = construct_transfer_epilepsy12_site_email(
                 request=request, user=recipient, target_hospital=new_hospital_trust.ParentName, child=registration.case)
             try:
-                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
-                          [recipient.email], fail_silently=False)
+                send_mail(
+                    subject=subject,
+                    recipient_list=[recipient.email],
+                    message=strip_tags(email),
+                    html_message=email,
+                    from_email='admin@epilepsy12.rcpch.tech',
+                    fail_silently=False)
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 

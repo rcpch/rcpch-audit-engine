@@ -4,13 +4,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
-from epilepsy12.decorator import group_required
+from django.contrib import messages
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import HospitalTrust, Site, Case
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
-from ..constants import UNKNOWN_POSTCODES, RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
+from ..constants import UNKNOWN_POSTCODES_NO_SPACES, RCPCH_AUDIT_ADMINISTRATOR, RCPCH_AUDIT_ANALYST, RCPCH_AUDIT_LEAD, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY
 
 
 @login_required
@@ -24,8 +24,6 @@ def case_list(request, hospital_id):
     If the user is a clinician / centre lead, only the children under their care are seen (whether registered or not)
     If the user is an audit administrator, they have can view all cases in the audit, but cannot edit
     If the user is a superuser, they can view and edit all cases in the audit (but with great power comes great responsibility)
-
-    #TODO #32 Audit trail of all viewing or touching the database
 
     """
 
@@ -48,9 +46,9 @@ def case_list(request, hospital_id):
                 Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(nhs_number__icontains=filter_term)
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(nhs_number__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 1:
             # user has requested trust level view
@@ -58,18 +56,18 @@ def case_list(request, hospital_id):
                 Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(nhs_number__icontains=filter_term)
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(nhs_number__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
             # user has requested national level view
             all_cases = Case.objects.filter(
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(nhs_number__icontains=filter_term)
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(nhs_number__icontains=filter_term))
             ).order_by('surname').all()
 
     else:
@@ -262,12 +260,19 @@ def case_submit(request, hospital_id, case_id):
 def case_performance_summary(request, case_id):
 
     case = Case.objects.get(pk=case_id)
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=case
+    ).get()
+    organisation_id = site.hospital_trust.pk
 
     context = {
         'case': case,
         'case_id': case.pk,
         'active_template': 'case_performance_summary',
         'audit_progress': case.registration.audit_progress,
+        "organisation_id": organisation_id
     }
 
     template = 'epilepsy12/case_performance_summary.html'
@@ -299,14 +304,14 @@ def create_case(request, hospital_id):
         OrganisationID=hospital_id).get()
 
     # set select boxes for situations when postcode unknown
-    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    country_choice = ('ZZ993CZ', 'Address unspecified - England')
     if hospital_trust.Country == 'Wales':
-        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+        country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
-        ('ZZ99 3WZ', 'Address unknown'),
+        ('ZZ993WZ', 'Address unknown'),
         country_choice,
-        ('ZZ99 3VZ', 'No fixed abode'),
+        ('ZZ993VZ', 'No fixed abode'),
     )
     form = CaseForm(request.POST or None)
 
@@ -329,8 +334,8 @@ def create_case(request, hospital_id):
             messages.success(request, "You successfully created the case")
             return redirect('cases', hospital_id=hospital_id)
         else:
-            messages.error(request, "Case not created")
-            return redirect('cases', hospital_id=hospital_id)
+            messages.error(request=request,
+                           message="It was not possible to save the case")
 
     context = {
         "hospital_id": hospital_id,
@@ -355,24 +360,24 @@ def update_case(request, hospital_id, case_id):
         OrganisationID=hospital_id).get()
 
     # set select boxes for situations when postcode unknown
-    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    country_choice = ('ZZ993CZ', 'Address unspecified - England')
     if hospital_trust.Country == 'Wales':
-        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+        country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
-        ('ZZ99 3WZ', 'Address unknown'),
+        ('ZZ993WZ', 'Address unknown'),
         country_choice,
-        ('ZZ99 3VZ', 'No fixed abode'),
+        ('ZZ993VZ', 'No fixed abode'),
     )
 
     if request.method == "POST":
         if ('delete') in request.POST:
             messages.success(
-                request, f"You successfully deleted the {case}'s details")
+                request, f"You successfully deleted {case}'s details")
             case.delete()
             return redirect('cases', hospital_id=hospital_id)
         form = CaseForm(request.POST, instance=case)
-        if form.is_valid:
+        if form.is_valid():
             obj = form.save()
             if (case.locked != obj.locked):
                 # locked status has changed
@@ -386,12 +391,12 @@ def update_case(request, hospital_id, case_id):
             obj.updated_by = request.user
             obj.save()
             messages.success(
-                request, "You successfully updated the child's details")
+                request, f"You successfully updated {case}'s details")
             return redirect('cases', hospital_id=hospital_id)
 
     child_has_unknown_postcode = False
     test_positive = None
-    if case.postcode in UNKNOWN_POSTCODES:
+    if case.postcode in UNKNOWN_POSTCODES_NO_SPACES:
         child_has_unknown_postcode = True
         test_positive = case.postcode
 
@@ -416,15 +421,16 @@ def unknown_postcode(request, hospital_id):
 
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     # set select boxes for situations when postcode unknown
-    country_choice = ('ZZ99 3CZ', 'Address unspecified - England')
+    country_choice = ('ZZ993CZ', 'Address unspecified - England')
     if hospital_trust.Country == 'Wales':
-        country_choice = ('ZZ99 3GZ', 'Address unspecified - Wales')
+        country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
-        ('ZZ99 3WZ', 'Address unknown'),
+        ('ZZ993WZ', 'Address unknown'),
         country_choice,
-        ('ZZ99 3VZ', 'No fixed abode'),
+        ('ZZ993VZ', 'No fixed abode'),
     )
+
     template_name = 'epilepsy12/cases/unknown_postcode.html'
     context = {
         'choices': choices,

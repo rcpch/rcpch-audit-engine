@@ -2,80 +2,98 @@
 <div hx-target='#case_table' hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}" hx-trigger='case_list from:body'
   hx-swap='innerHTML' name='case_table'>
   {% if case_list.end_index > 0 %}
-  <table class="ui rcpch table">
+  <table class="ui rcpch table cases_table">
     <thead>
       <tr>
-        <th>Name
-          {% if sort_flag and sort_flag == "sort_by_name_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_name_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
+        <th class="two wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>Name</p>
+            {% if sort_flag and sort_flag == "sort_by_name_down" %}
+            <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% elif sort_flag and sort_flag == "sort_by_name_up" %}
+            <i class="sort icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table"
+              hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% else %}
+            <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% endif %}
+          </div>
         </th>
-        <th>Sex
-          {% if sort_flag and sort_flag == "sort_by_sex_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_sex_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_sex_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_sex_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
+        <th class="two wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>Sex</p>
+            {% if sort_flag and sort_flag == "sort_by_sex_down" %}
+            <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% elif sort_flag and sort_flag == "sort_by_sex_up" %}
+            <i class="sort icon" id="sort_button" name="sort_by_sex_down" hx-target="#case_table"
+              hx-get="{% url 'sort_by_sex_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% else %}
+            <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% endif %}
+          </div>
         </th>
-        <th>NHS Number
-          {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_nhs_number_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
+        <th class="two wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>NHS Number</p>
+            {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
+            <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
+            <i class="sort icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table"
+              hx-get="{% url 'sort_by_nhs_number_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% else %}
+            <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% endif %}
+          </div>
         </th>
-        <th>Deadline
-          {% if sort_flag and sort_flag == "sort_by_deadline_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_deadline_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_deadline_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_deadline_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
+        <th class="two wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>Deadline</p>
+            {% if sort_flag and sort_flag == "sort_by_deadline_down" %}
+            <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% elif sort_flag and sort_flag == "sort_by_deadline_up" %}
+            <i class="sort icon" id="sort_button" name="sort_by_deadline_down" hx-target="#case_table"
+              hx-get="{% url 'sort_by_deadline_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% else %}
+            <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% endif %}
+          </div>
         </th>
-        <th>Cohort
-          {% if sort_flag and sort_flag == "sort_by_cohort_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_cohort_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_cohort_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_cohort_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
+        <th class="two wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>Cohort</p>
+            {% if sort_flag and sort_flag == "sort_by_cohort_down" %}
+            <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% elif sort_flag and sort_flag == "sort_by_cohort_up" %}
+            <i class="sort icon" id="sort_button" name="sort_by_cohort_down" hx-target="#case_table"
+              hx-get="{% url 'sort_by_cohort_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% else %}
+            <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% endif %}
+          </div>
         </th>
-        <th>Days remaining
-          {% if sort_flag and sort_flag == "sort_by_days_remaining_before_submission_down" %}
-          <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% elif sort_flag and sort_flag == "sort_by_days_remaining_before_submission_up" %}
-          <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_down" hx-target="#case_table"
-            hx-get="{% url 'sort_by_days_remaining_before_submission_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% else %}
-          <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
-            hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
-          {% endif %}
+        <th class="two wide">
+          <div class="rcpch_td_data_indicator_wrapper">
+            <p>Days remaining</p>
+            {% if sort_flag and sort_flag == "sort_by_days_remaining_before_submission_down" %}
+            <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% elif sort_flag and sort_flag == "sort_by_days_remaining_before_submission_up" %}
+            <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_down" hx-target="#case_table"
+              hx-get="{% url 'sort_by_days_remaining_before_submission_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% else %}
+            <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
+              hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+            {% endif %}
+          </div>
         </th>
         <th class='two wide'></th>
         <th></th>
@@ -93,7 +111,7 @@
         
           <td>{% none_masked case.first_name %} {% none_masked case.surname %}</td>
           <td>{% none_masked case.get_sex_display %}</td>
-          <td>{% none_masked case.nhs_number %}</td>
+          <td data-mask="000 000 0000">{% none_masked case.nhs_number %}</td>
           <td>{% none_masked case.registration.audit_submission_date|date:'D j M Y' %}</td>
           <td>{% if case.registration.cohort is not None %}{{ case.registration.cohort }}{% endif %}</td>
           <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
@@ -107,15 +125,16 @@
               {% endcomment %}
               {% if case.registration.registration_date %}
                 {% if case.locked %}
-                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" disabled
-                onclick="location.href='{% url 'register'  case.id %}'">Epilepsy12</button>
+                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" 
+                disabled
+                onclick="location.href='{% url 'register'  case.id %}'">Audit</button>
                 {% else %}
                 <button 
                   data-tooltip='Complete audit details.'
                   class="ui rcpch_positive button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register'  case.id %}'"
-                  >Epilepsy12</button>
+                  >Audit</button>
                 
                 {% endif %}
               {% else %}
@@ -125,7 +144,7 @@
                   class="ui rcpch_positive button" 
                   tabindexed="2" disabled
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
-                >Register</button>
+                >Audit</button>
 
                 {% else %}
 
@@ -133,7 +152,7 @@
                   class="ui rcpch_positive button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
-                >Register</button>
+                >Audit</button>
 
                 {% endif %}
               {% endif %}

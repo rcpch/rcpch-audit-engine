@@ -5,7 +5,7 @@
 version: '3.9'
 
 services:
-  
+
   # web container - runs the django app
   web:
     build: .
@@ -48,7 +48,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
-  
+
   # db container - runs postgres
   db:
     image: postgres:latest
@@ -58,3 +58,4 @@ services:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=epilepsy12db
+      - TZ="Europe/London"

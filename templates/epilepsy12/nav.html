@@ -28,35 +28,41 @@
              href="{% url 'index' %}">
             Home
           </a>
-          {% if user.is_authenticated %}
-            {% if user.is_superuser %}
-              <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-                 href="{% url 'admin:index' %}">
-                Database management
-              </a>
-            {% endif %}
+        {% if user.is_authenticated %}
+
+          {% if not request.user|has_group:"patient_access"  %}
             <a {% if request.resolver_match.url_name|is_in:"hospital_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-               id="link"
-               href="{% url 'hospital_reports' %}">
-              Clinician access
+            id="link"
+            href="{% url 'hospital_reports' %}">
+            Clinician access
+            </a>
+          {%endif%}
+
+          {% if request.user|has_group:"patient_access" %}
+            <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+            id="link"
+            href='https://www.rcpch.ac.uk/resources/patient-parent-guide-epilepsy12-audit'>
+            Patient access
             </a>
           {% endif %}
-          <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-             id="link"
-             href="{% url 'patient' %}">
-            Patient access
-          </a>
+          
           <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-             id="link"
-             href="{% url 'docs' %}">
-            Documentation
+          id="link"
+          href="{% url 'docs' %}">
+          Documentation
           </a>
-          <a {% if request.resolver_match.url_name|is_in:'tsandcs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-             id="link"
-             href="{% url 'tsandcs' %}">
-            Terms of Service
+          
+          {% if user.is_superuser %}
+          <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+          href="{% url 'admin:index' %}">
+          Admin
           </a>
-        </div>
+          {% endif %}
+
+          
+
+        {% endif %}
+  </div>
       </div>
     </div>
   </div>

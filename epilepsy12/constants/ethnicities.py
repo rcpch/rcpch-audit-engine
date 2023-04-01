@@ -13,7 +13,7 @@ ETHNICITIES = (
     ("B", "Irish"),
     ("Z", "Not Stated"),
     ("J", "Pakistani or British Pakistani"),
-    ("F", "White and Asian"),
-    ("E", "White and Black African"),
-    ("D", "White and Black Caribbean")
+    ("F", "Mixed (White and Asian)"),
+    ("E", "Mixed (White and Black African)"),
+    ("D", "Mixed (White and Black Caribbean)")
 )

@@ -64,7 +64,7 @@
   
   {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
   <div class="field">
-    <label>NHS/CHI Number</label>
+    <label>NHS Number</label>
     {{form.nhs_number}} {% if form.nhs_number.errors %}
     <div class="ui pointing red basic label">{{form.nhs_number.errors}}</div>
     {% endif %}
@@ -93,7 +93,7 @@
       class="ui rcpch_danger button"
       _="on htmx:confirm(issueRequest) 
               halt the event 
-              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
+              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
               if result.isConfirmed issueRequest()"
     >
       Opt out of Epilepsy12
@@ -125,7 +125,7 @@
     type="submit"
     class="ui rcpch_danger button"
     name="delete"
-    value="delete"
+    value="Delete"
     form="create_case_form"
   />
     
@@ -135,11 +135,5 @@
     >Cancel</a
   >
 
-  
 </form>
-
-<!-- _="on click(issueRequest) 
-          halt the event 
-          call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
-          if result.isConfirmed issueRequest()" -->
 

@@ -1,147 +1,122 @@
 {% load static %}
 <footer>
-  <div class="ui fluid grid footer_grid">
-    <div class="row footer_all_contents_row">
-      <div class="four wide column">
-        <img
-          src="{% static 'images/EP12_ID_MONO_WHITE_Digital_Small.png' %}"
-          class="epilepsy12_logo_footer"
-        />
-        <div class="rcpch_full_logo">
-          <img
-            src="{% static 'images/rcpch-logo-mono.8cb184509440.png' %}"
-            alt="Leading the way in Children's Health"
-          />
-        </div>
-      </div>
-      <div class="four wide column">
-        <div class="ui row">
-          <h2 class="footer_h2 centered">Find us on social media</h2>
-        </div>
-        <div class="row footer_links_container">
-          <div class="row footer_link_row">
-            <div class="column">
-              <a href="https://twitter.com/Epilepsy_12" class="">
-                <i class="twitter square large icon"></i>
-                <span class="">Epilepsy12 on Twitter</span>
-              </a>
-            </div>
-          </div>
-          <div class="row footer_link_row">
-            <div class="column">
-              <a href="https://www.facebook.com/RCPCH/" class="">
-                <i class="facebook square large icon"></i>
-                <span class="">RCPCH on Facebook</span>
-              </a>
-            </div>
-          </div>
-          <div class="row footer_link_row">
-            <div class="column">
-              <a
-                href="https://www.linkedin.com/company/royal-college-of-paediatrics-and-child-health"
-                class=""
-              >
-                <i class="linkedin square large icon"></i>
-                <span class="">RCPCH on LinkedIn</span>
-              </a>
-            </div>
-          </div>
-          <div class="row footer_link_row">
-            <div class="column middle aligned content">
-              <a href="https://github.com/rcpch/epilepsy12-server" class="">
-                <i class="github square large icon"></i>
-                <span class="">Follow us on Github</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="ui fluid grid rcpch container footer_grid">
 
-      <div class="four wide column">
-        <div class="row">
-          <h2 class="footer_h2">Links</h2>
-        </div>
-        <div class="row footer_links_container">
-          <div class="row footer_link_row">
-            <div class="column">
-              <a href="http://www.rcpch.ac.uk/epilepsy12" target="_blank">
-                Epilepsy12
-              </a>
+        <div class="row stackable footer_all_contents_row">
+            <div class="four wide column">
+                <img src="{% static 'images/EP12_ID_MONO_WHITE_Digital_Small.png' %}" class="ui centered image epilepsy12_logo_footer" />
+                <img src="{% static 'images/rcpch-logo-mono.8cb184509440.png' %}" alt="Leading the way in Children's Health" class="ui centered image epilepsy12_logo_footer" />
             </div>
-          </div>
-          <div class="row footer_link_row">
-            <div class="column">
-              <a href="https://www.youngepilepsy.org.uk/" target="_blank">
-                Young Epilepsy
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+            <div class="four wide column">
 
-      <div class="four wide column">
-        <div class="row">
-          <h2 class="footer_h2">About us</h2>
+                <h2 class="footer_h2 centered">Find us on social media</h2>
+
+                <div class="row footer_links_container">
+                    <div class="row footer_link_row">
+                        <div class="column">
+                            <a href="https://twitter.com/Epilepsy_12" class="">
+                                <i class="twitter square large icon"></i>
+                                <span class="">Epilepsy12 on Twitter</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row footer_link_row">
+                        <div class="column">
+                            <a href="https://www.facebook.com/RCPCH/" class="">
+                                <i class="facebook square large icon"></i>
+                                <span class="">RCPCH on Facebook</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row footer_link_row">
+                        <div class="column">
+                            <a href="https://www.linkedin.com/company/royal-college-of-paediatrics-and-child-health" class="">
+                                <i class="linkedin square large icon"></i>
+                                <span class="">RCPCH on LinkedIn</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row footer_link_row">
+                        <div class="column middle aligned content">
+                            <a href="https://github.com/rcpch/epilepsy12-server" class="">
+                                <i class="github square large icon"></i>
+                                <span class="">Follow us on Github</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="four wide column">
+                <div class="row">
+                    <h2 class="footer_h2">Links</h2>
+                </div>
+                <div class="row footer_links_container">
+                    <div class="row footer_link_row">
+                        <div class="column">
+                            <a href="http://www.rcpch.ac.uk/epilepsy12" target="_blank">
+              Epilepsy12
+            </a>
+                        </div>
+                    </div>
+                    <div class="row footer_link_row">
+                        <div class="column">
+                            <a href="https://www.youngepilepsy.org.uk/" target="_blank">
+              Young Epilepsy
+            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="four wide column">
+                <div class="row">
+                    <h2 class="footer_h2">About us</h2>
+                </div>
+                <div class="row footer_links_container">
+                    <div class="row footer_link_row">
+                        <p id="footer_text">
+                            Epilepsy12 is a platform of the Royal College of Paediatrics and Child Health. Founded in 1996 and with members in the UK and internationally, we play a major role in postgraduate medical education, professional standards, research and policy.
+                        </p>
+                    </div>
+                    <div class="row footer_link_row">
+                        <button class="ui rcpch_website_button_white button" href="https://www.rcpch.ac.uk/about-us">
+            RCPCH website
+          </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="row footer_links_container">
-          <div class="row footer_link_row">
-            <p id="footer_text">
-              Epilepsy12 is a platform of the Royal College of Paediatrics and
-              Child Health. Founded in 1996 and with members in the UK and
-              internationally, we play a major role in postgraduate medical
-              education, professional standards, research and policy.
-            </p>
-          </div>
-          <div class="row footer_link_row">
-            <button
-              class="ui rcpch_website_button_white button"
-              href="https://www.rcpch.ac.uk/about-us"
-            >
-              RCPCH website
-            </button>
-          </div>
+        <div class="row footer_all_contents_row">
+            <div class="column sixteen wide">
+                <a href="https://www.rcpch.ac.uk/about-us/website-terms-conditions" class="tcs_link" target="_blank">Terms, conditions and cookies</a
+      >
+      <a
+        href="https://www.rcpch.ac.uk/about-us/accessibility-website"
+        class="tcs_link"
+        target="_blank"
+      >
+        Accessibility
+      </a>
+                <a href="https://www.rcpch.ac.uk/about-us/rights-permissions-copyrighted-material" class="tcs_link" target="_blank">
+        Rights and permissions for reuse of our content
+      </a>
+            </div>
         </div>
+
+        <div class="row footer_all_contents_row">
+            <div class="sixteen wide column">
+                <div class="copyright">
+                    <a href='#'>Built by the RCPCH Incubator 2023. All rights reserved.</a
+        >
+        <p>
+          Copyright © 2021-2022 RCPCH is a registered charity in England and
+          Wales (1057744) and in Scotland (SC038299).
+        </p>
       </div>
     </div>
   </div>
-  <div class="ui fluid grid footer_grid legal_footer">
-    <div class="row footer_all_contents_row">
-      <div class="column sixteen wide">
-        <a
-          href="https://www.rcpch.ac.uk/about-us/website-terms-conditions"
-          class="tcs_link"
-          target="_blank"
-          >Terms, conditions and cookies</a
-        >
-        <a
-          href="https://www.rcpch.ac.uk/about-us/accessibility-website"
-          class="tcs_link"
-          target="_blank"
-        >
-          Accessibility
-        </a>
-        <a
-          href="https://www.rcpch.ac.uk/about-us/rights-permissions-copyrighted-material"
-          class="tcs_link"
-          target="_blank"
-        >
-          Rights and permissions for reuse of our content
-        </a>
-      </div>
     </div>
 
-    <div class="row footer_all_contents_row">
-      <div class="sixteen wide column">
-        <div class="copyright">
-          <a href='{% url "tsandcs" %}'
-            >Built by the RCPCH Incubator 2021. All rights reserved.</a
-          >
-          <p>
-            Copyright © 2021-2022 RCPCH is a registered charity in England and
-            Wales (1057744) and in Scotland (SC038299).
-          </p>
-        </div>
-      </div>
-    </div>
   </div>
 </footer>
