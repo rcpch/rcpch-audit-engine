@@ -25,8 +25,6 @@ def case_list(request, hospital_id):
     If the user is an audit administrator, they have can view all cases in the audit, but cannot edit
     If the user is a superuser, they can view and edit all cases in the audit (but with great power comes great responsibility)
 
-    #TODO #32 Audit trail of all viewing or touching the database
-
     """
 
     sort_flag = None
@@ -48,9 +46,9 @@ def case_list(request, hospital_id):
                 Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(nhs_number__icontains=filter_term)
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(nhs_number__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 1:
             # user has requested trust level view
@@ -58,18 +56,18 @@ def case_list(request, hospital_id):
                 Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(nhs_number__icontains=filter_term)
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(nhs_number__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
             # user has requested national level view
             all_cases = Case.objects.filter(
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(nhs_number__icontains=filter_term)
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(nhs_number__icontains=filter_term))
             ).order_by('surname').all()
 
     else:
