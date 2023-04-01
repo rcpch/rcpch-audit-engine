@@ -36,7 +36,6 @@ urlpatterns = [
     path('403', views.redirect_403, name='redirect_403'),
     path('', views.index, name="index"),
     path('database', views.database, name="database"),
-    path('tsandcs', views.tsandcs, name="tsandcs"),
     path('hospital', views.hospital_reports, name="hospital_reports"),
     path('hospital/<int:hospital_id>/cases/', views.case_list, name="cases"),
     path('hospital/<int:hospital_id>/case/<int:case_id>/update',

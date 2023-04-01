@@ -71,25 +71,19 @@
         {% endif %}
     </div>
 
-    {% comment %} <div class='sixteen wide right fluid column'>
-
-        <div class="ui rcpch_light_blue fluid card">
-            <div class="content">
-                <h2 class='header'>
-                Ranking
-                </h2>
-                <div class='description'>
-                    <div id="kpi_ranking" class="ui rcpch_chart_container stackable segment">
-                        {% if ranked|length > 0 %}
-                        {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with ranked=ranked series_name=kpi_value %}
-                        {% else %}
-                            <h5>No data yet!<h5>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+    <div class='sixteen wide right fluid column'>
+        <div id="open_uk_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=open_uk data_title=open_uk_title data_id=open_uk_id  %}
         </div>
-    
-    </div> {% endcomment %}
+        <div id="icb_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=icb data_title=icb_title data_id=icb_id  %}
+        </div>
+        <div id="nhs_region_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=nhs_region data_title=nhs_region_title data_id=nhs_region_id  %}
+        </div>
+        <div id="country_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/hospitals_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id  %}
+        </div>
+    </div>
 
 </div>

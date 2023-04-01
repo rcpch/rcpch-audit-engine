@@ -37,6 +37,8 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + ["127.0.0.1",
                                                                     "localhost",
                                                                     "0.0.0.0"]
 
+RCPCH_CENSUS_TOKEN = os.getenv("DJANGO_REST_FRAMEWORK_TOKEN", None)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.admindocs',
     'rest_framework',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
@@ -152,9 +155,9 @@ PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 

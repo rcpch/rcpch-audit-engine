@@ -6,14 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
 from django.db.models import Sum, Count, Avg
+from pprint import pprint
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
 
 # E12 imports
-from epilepsy12.constants import ETHNICITIES, INDIVIDUAL_KPI_MEASURES, SEX_TYPE, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
-from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, Case, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
-from ..common_view_functions import trigger_client_event, annotate_kpis, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level, aggregate_all_eligible_kpi_fields
-# all_registered_and_complete_cases_for_hospital, all_registered_and_complete_cases_for_hospital_trust, all_registered_only_cases_for_hospital, all_registered_only_cases_for_hospital_trust
+from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
+from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, HospitalTrust, KPI
+from ..common_view_functions import trigger_client_event, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level, aggregate_all_eligible_kpi_fields, return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel
 from ..general_functions import get_current_cohort_data, value_from_key
 
 
@@ -241,19 +241,19 @@ def selected_trust_kpis(request, hospital_id):
 
     # aggregate at each level of abstraction
     hospital_kpis = aggregate_all_eligible_kpi_fields(
-        hospital_level)  # .aggregate(**aggregation_fields)
+        hospital_level)
     trust_kpis = aggregate_all_eligible_kpi_fields(
-        trust_level)  # .aggregate(**aggregation_fields)
+        trust_level)
     icb_kpis = aggregate_all_eligible_kpi_fields(
-        icb_level)  # .aggregate(**aggregation_fields)
+        icb_level)
     nhs_kpis = aggregate_all_eligible_kpi_fields(
-        nhs_level)  # .aggregate(**aggregation_fields)
+        nhs_level)
     open_uk_kpis = aggregate_all_eligible_kpi_fields(
-        open_uk_level)  # .aggregate(**aggregation_fields)
+        open_uk_level)
     country_kpis = aggregate_all_eligible_kpi_fields(
-        country_level)  # .aggregate(**aggregation_fields)
+        country_level)
     national_kpis = aggregate_all_eligible_kpi_fields(
-        national_level)  # .aggregate(**aggregation_fields)
+        national_level)
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
@@ -273,7 +273,7 @@ def selected_trust_kpis(request, hospital_id):
         'open_uk_kpis': open_uk_kpis,
         'country_kpis': country_kpis,
         'national_kpis': national_kpis,
-        'kpis': kpis
+        'kpis': kpis,
     }
 
     # remove the temporary instance as otherwise would contribute to totals
@@ -397,6 +397,21 @@ def selected_trust_select_kpi(request, hospital_id):
     # national_level.aggregate(**aggregation_fields)
     national_kpi = aggregate_all_eligible_kpi_fields(national_level, kpi_name)
 
+    all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
+        cohort=cohort_data['cohort'], abstraction_level='open_uk', kpi_measure=kpi_name)
+
+    all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
+        cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
+
+    all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
+        cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
+
+    all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
+        cohort=cohort_data['cohort'], abstraction_level='icb', kpi_measure=kpi_name)
+
+    all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
+        cohort=cohort_data['cohort'], abstraction_level='country', kpi_measure=kpi_name)
+
     context = {
         'kpi_name': kpi_name,
         'kpi_value': kpi_value,
@@ -415,7 +430,18 @@ def selected_trust_select_kpi(request, hospital_id):
         'total_country_kpi_cases': country_kpi['total_number_of_cases'],
         'national_kpi': national_kpi[kpi_name],
         'total_national_kpi_cases': national_kpi['total_number_of_cases'],
-        # 'ranked': ranked_kpis
+        'open_uk': all_aggregated_kpis_by_open_uk_region_in_current_cohort,
+        'open_uk_title': f'{kpi_value} by against OPEN UK Region',
+        'open_uk_id': 'open_uk_id',
+        'icb': all_aggregated_kpis_by_icb_in_current_cohort,
+        'icb_title': f'{kpi_value} by Integrated Care Board',
+        'icb_id': 'icb_id',
+        'nhs_region': all_aggregated_kpis_by_nhs_region_in_current_cohort,
+        'nhs_region_title': f'{kpi_value} by against NHS Region',
+        'nhs_region_id': 'nhs_region_id',
+        'country': all_aggregated_kpis_by_country_in_current_cohort,
+        'country_title': f'{kpi_value} by against Country',
+        'country_id': 'country_id'
     }
 
     template_name = 'epilepsy12/partials/hospital/metric.html'

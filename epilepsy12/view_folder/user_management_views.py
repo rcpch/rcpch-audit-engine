@@ -7,11 +7,12 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail, BadHeaderError, EmailMessage
 
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.utils.html import strip_tags
 
 from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, HospitalTrust
@@ -69,20 +70,20 @@ def epilepsy12_user_list(request, hospital_id):
         if request.user.view_preference == 0:
             # user has requested hospital level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(hospital_employer__OrganisationName__contains=hospital_trust.OrganisationName) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(hospital_employer__icontains=filter_term) |
-                Q(email__icontains=filter_term)
+                Q(hospital_employer__OrganisationName__icontains=hospital_trust.OrganisationName) &
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                 Q(email__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 1:
             # user has requested trust level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(hospital_employer__OrganisationName__contains=hospital_trust.ParentName) &
-                Q(first_name__icontains=filter_term) |
-                Q(surname__icontains=filter_term) |
-                Q(hospital_employer__icontains=filter_term) |
-                Q(email__icontains=filter_term)
+                Q(hospital_employer__OrganisationName__icontains=hospital_trust.ParentName) &
+                (Q(first_name__icontains=filter_term) |
+                 Q(surname__icontains=filter_term) |
+                 Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                 Q(email__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
             # user has requested national level view
@@ -183,9 +184,14 @@ def epilepsy12_user_list(request, hospital_id):
 def create_epilepsy12_user(request, hospital_id):
 
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    prepopulated_data = {
+        'hospital_employer': hospital_trust,
+    }
+    form = Epilepsy12UserAdminCreationForm(initial=prepopulated_data)
 
     if request.method == 'POST':
-        form = Epilepsy12UserAdminCreationForm(request.POST)
+
+        form = Epilepsy12UserAdminCreationForm(request.POST or None)
 
         if form.is_valid():
 
@@ -202,23 +208,19 @@ def create_epilepsy12_user(request, hospital_id):
             subject = "Password Reset Requested"
             email = construct_confirm_email(request=request, user=new_user)
             try:
-                send_mail(subject, email, 'admin@epilepsy12.rcpch.tech',
-                          [new_user.email], fail_silently=False)
+                send_mail(
+                    subject=subject, from_email='admin@epilepsy12.rcpch.tech',
+                    recipient_list=[new_user.email],
+                    fail_silently=False,
+                    message=strip_tags(email),
+                    html_message=email
+                )
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 
             messages.success(
                 request, f"{new_user.email} account created successfully.")
             return redirect('epilepsy12_user_list', hospital_id=hospital_id)
-
-        messages.error(
-            request, f"Registration Unsuccessful: {form.errors}")
-
-    prepopulated_data = {
-        'hospital_employer': hospital_trust,
-    }
-
-    form = Epilepsy12UserAdminCreationForm(prepopulated_data)
 
     context = {
         'form': form,
@@ -238,6 +240,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
     """
     Django model form to edit/update Epilepsy12user
     """
+
     hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
     epilepsy12_user_to_edit = get_object_or_404(
         Epilepsy12User, pk=epilepsy12_user_id)
@@ -249,6 +252,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             request.POST or None, instance=epilepsy12_user_to_edit)
     else:
         return HttpResponseForbidden()
+
     if request.method == 'POST':
         if 'delete' in request.POST:
             epilepsy12_user_to_edit.delete()
@@ -262,13 +266,18 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
                 'hospital_id': hospital_id})
             return redirect(redirect_url)
         if 'resend' in request.POST:
-            # user created - send email with reset link to new user
+            # send email with reset link to new user
             subject = "Password Reset Requested"
             email = construct_confirm_email(
                 request=request, user=epilepsy12_user_to_edit)
             try:
-                send_mail(subject=subject, html_message=email, from_email='admin@epilepsy12.rcpch.tech',
-                          recipient_list=[epilepsy12_user_to_edit.email], fail_silently=False)
+                send_mail(
+                    subject=subject, from_email='admin@epilepsy12.rcpch.tech',
+                    recipient_list=[epilepsy12_user_to_edit.email],
+                    fail_silently=False,
+                    message=strip_tags(email),
+                    html_message=email
+                )
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
 
@@ -281,6 +290,10 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
         if request.POST and form.is_valid():
             form.save()
 
+            # adds success message
+            messages.success(
+                request, f"You successfully updated {epilepsy12_user_to_edit}'s details")
+
             # Save was successful, so redirect to another page
             redirect_url = reverse('epilepsy12_user_list', kwargs={
                 'hospital_id': hospital_id})
@@ -291,7 +304,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
     return render(request, template_name, {
         'hospital_id': hospital_id,
         'form': form,
-        'admin_title': 'Edit/Update Epilepsy12 User'
+        'admin_title': 'Edit Epilepsy12 User'
     })
 
 

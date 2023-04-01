@@ -19,4 +19,4 @@ from .integrated_care_boards import *
 from .welsh_hospitals import *
 from .irish_hospitals import *
 from .scottish_hospitals import *
-from .postcodes import UNKNOWN_POSTCODES
+from .postcodes import UNKNOWN_POSTCODES, UNKNOWN_POSTCODES_NO_SPACES

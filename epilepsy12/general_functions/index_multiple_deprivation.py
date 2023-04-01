@@ -1,7 +1,5 @@
 import requests
-# from requests import request
-from .postcode import valid_postcode
-import json
+import os
 
 """
 Steps to calculate IMD
@@ -12,28 +10,21 @@ Steps to calculate IMD
 
 
 def imd_for_postcode(user_postcode: str) -> int:
-
-    # TODO #26 validate the postcode, strip spaces
-    postcode = user_postcode.replace(" ", "")
-
-    url = "https://api.postcodes.io/postcodes/"+postcode
-    response = requests.get(url=url)
+    """
+    This is makes an API call to the RCPCH Census Platform with postcode and quantile_type
+    Postcode - can have spaces or not - this is processed by the API
+    Quantile - this is an integer representing what quantiles are requested (eg quintile, decile etc)
+    """
+    RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv(
+        "RCPCH_CENSUS_PLATFORM_TOKEN")
+    url = f"https://rcpch-census-engine.azurewebsites.net/api/v1/index_of_multiple_deprivation_quantile?postcode={user_postcode}&quantile=5"
+    response = requests.get(
+        url=url, headers={'Authorization': f'Token {RCPCH_CENSUS_PLATFORM_TOKEN}'})
 
     if response.status_code == 404:
-        print("Could not get LSOA from postcode.")
+        print("Could not get deprivation score.")
         return None
 
-    serialised = response.json()
-    lsoa = serialised["result"]["codes"]["lsoa"]
+    result = response.json()['result']
 
-    # note for this to work Mark Wardle's Deprivare needs to be running on port 8080
-    # Thank you Mark for this remarkable tool (https://github.com/wardle/deprivare)
-
-    deprivare_url = "http://rcpch-deprivare.uksouth.azurecontainer.io:8080/v1/uk/lsoa/"+lsoa
-
-    deprivare_response = requests.get(
-        url=deprivare_url, headers={"Content-Type": 'application/json; charset=utf-8'})
-    result = deprivare_response.json(
-    )["uk-composite-imd-2020-mysoc/UK_IMD_E_pop_quintile"]
-
-    return result
+    return result['data_quantile']
