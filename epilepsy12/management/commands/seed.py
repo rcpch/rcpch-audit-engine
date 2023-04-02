@@ -6,36 +6,36 @@ from django.core.management.base import BaseCommand
 
 
 from ...constants import ETHNICITIES, DUMMY_NAMES
-from ...models import HospitalTrust, Keyword, Case, Site, Registration
+from ...models import Organisation, Keyword, Case, Site, Registration
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from .create_e12_records import create_epilepsy12_record, create_registrations
-from .add_codes_to_hospitals import add_codes_to_hospital
+from .add_codes_to_organisations import add_codes_to_organisation
 
 
 class Command(BaseCommand):
-    help = "seed database with hospital trust data for testing and development."
+    help = "seed database with organisation trust data for testing and development."
 
     def add_arguments(self, parser):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'delete_hospitals'):
-            self.stdout.write('Deleting hospital trust data...')
-            delete_hospitals()
-        elif (options['mode'] == 'seed_hospitals'):
-            self.stdout.write('seeding hospital trust data...')
-            run_hospitals_seed()
-        elif (options['mode'] == 'seed_welsh_hospitals'):
-            self.stdout.write('seeding hospital trust data...')
-            run_welsh_hospitals_seed()
-        elif (options['mode'] == 'add_codes_to_english_hospitals'):
+        if (options['mode'] == 'delete_organisations'):
+            self.stdout.write('Deleting organisation trust data...')
+            delete_organisations()
+        elif (options['mode'] == 'seed_organisations'):
+            self.stdout.write('seeding organisation data...')
+            run_organisations_seed()
+        elif (options['mode'] == 'seed_welsh_organisations'):
+            self.stdout.write('seeding organisation data...')
+            run_welsh_organisations_seed()
+        elif (options['mode'] == 'add_codes_to_english_organisations'):
             self.stdout.write(
-                'adding ODS codes to existing English hospital trust records...')
-            add_codes_to_english_hospitals()
+                'adding ODS codes to existing English organisation records...')
+            add_codes_to_english_organisations()
         elif (options['mode'] == 'seed_semiology_keywords'):
-            self.stdout.write('seeding hospital trust data...')
+            self.stdout.write('seeding organisation data...')
             run_semiology_keywords_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
@@ -85,121 +85,123 @@ def run_semiology_keywords_seed():
     print(f"Keywords added: {added}")
 
 
-def run_hospitals_seed():
-    # this adds all the English hospitals from JSON in the constants folder
-    # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
-    if HospitalTrust.objects.all().exists():
-        print('Hospital table already exists. Skipping this step...')
+def run_organisations_seed():
+    # this adds all the English organisations from JSON in the constants folder
+    # There are also lists of organisations across northern ireland, wales and scotland, but the JSON has a different structure
+    if Organisation.objects.all().exists():
+        print('Organisation table already exists. Skipping this step...')
         return
     added = 0
-    for index, hospital in enumerate(ALL_HOSPITALS):
-        if hospital["Sector"] == "NHS Sector":
-            hospital_trust = HospitalTrust(
-                OrganisationID=hospital.get("OrganisationID"),
-                OrganisationCode=hospital.get("OrganisationCode", None),
-                OrganisationType=hospital.get("OrganisationType", None),
-                SubType=hospital.get("SubType", None),
-                Sector=hospital.get("Sector", None),
-                OrganisationStatus=hospital.get("OrganisationStatus", None),
-                IsPimsManaged=hospital.get("IsPimsManaged", None),
-                OrganisationName=hospital.get("OrganisationName", None),
-                Address1=hospital.get("Address1", None),
-                Address2=hospital.get("Address2", None),
-                Address3=hospital.get("Address3", None),
-                City=hospital.get("City", None),
-                County=hospital.get("County", None),
-                Postcode=hospital.get("Postcode", None),
-                Latitude=hospital.get("Latitude", None),
-                Longitude=hospital.get("Longitude", None),
-                ParentODSCode=hospital.get("ParentODSCode", None),
-                ParentName=hospital.get("ParentName", None),
-                Phone=hospital.get("Phone", None),
-                Email=hospital.get("Email", None),
-                Website=hospital.get("Website", None),
-                Fax=hospital.get("Fax", None),
+    for index, organisation in enumerate(ALL_HOSPITALS):
+        if organisation["Sector"] == "NHS Sector":
+            organisation = Organisation(
+                OrganisationID=organisation.get("OrganisationID"),
+                OrganisationCode=organisation.get("OrganisationCode", None),
+                OrganisationType=organisation.get("OrganisationType", None),
+                SubType=organisation.get("SubType", None),
+                Sector=organisation.get("Sector", None),
+                OrganisationStatus=organisation.get(
+                    "OrganisationStatus", None),
+                IsPimsManaged=organisation.get("IsPimsManaged", None),
+                OrganisationName=organisation.get("OrganisationName", None),
+                Address1=organisation.get("Address1", None),
+                Address2=organisation.get("Address2", None),
+                Address3=organisation.get("Address3", None),
+                City=organisation.get("City", None),
+                County=organisation.get("County", None),
+                Postcode=organisation.get("Postcode", None),
+                Latitude=organisation.get("Latitude", None),
+                Longitude=organisation.get("Longitude", None),
+                ParentODSCode=organisation.get("ParentODSCode", None),
+                ParentName=organisation.get("ParentName", None),
+                Phone=organisation.get("Phone", None),
+                Email=organisation.get("Email", None),
+                Website=organisation.get("Website", None),
+                Fax=organisation.get("Fax", None),
                 DateValid=date(2023, 1, 1)
             )
 
-            add_codes_to_hospital(hospital_trust=hospital_trust)
+            add_codes_to_organisation(organisation=organisation)
 
             try:
-                hospital_trust.save()
+                organisation.save()
             except Exception as error:
-                print("Exception at "+hospital["ParentName"])
+                print("Exception at "+organisation.ParentName)
                 print(error)
             added += 1
-            chosen_hospital = hospital["OrganisationName"]
+            chosen_organisation = organisation.OrganisationName
             print(
-                '\033[31m', f"New English hospital added...{added}: {chosen_hospital}", '\033[31m')
-    print(f"English Hospitals added...{added}")
+                '\033[31m', f"New English organisation added...{added}: {chosen_organisation}", '\033[31m')
+    print(f"English organisations added...{added}")
 
-    run_welsh_hospitals_seed()
+    run_welsh_organisations_seed()
 
 
-def run_welsh_hospitals_seed():
-    # this adds all the English hospitals from JSON in the constants folder
-    # There are also lists of hospitals across northern ireland, wales and scotland, but the JSON has a different structure
+def run_welsh_organisations_seed():
+    # this adds all the English organisations from JSON in the constants folder
+    # There are also lists of organisations across northern ireland, wales and scotland, but the JSON has a different structure
     added = 0
 
-    for index, hospital in enumerate(WELSH_HOSPITALS):
+    for index, organisation in enumerate(WELSH_HOSPITALS):
         try:
-            welsh_hospital = HospitalTrust(
+            welsh_organisation = Organisation(
                 OrganisationID=index + 90000,
-                OrganisationCode=hospital.get(
+                OrganisationCode=organisation.get(
                     "OrganisationCode", None),
-                OrganisationType=hospital.get("OrganisationType", None),
-                SubType=hospital.get("SubType", None),
-                Sector=hospital.get("Sector", None),
-                OrganisationStatus=hospital.get("OrganisationStatus", None),
-                IsPimsManaged=hospital.get("IsPimsManaged", None),
-                OrganisationName=hospital.get("OrganisationName", None),
-                Address1=hospital.get("Address1", None),
-                Address2=hospital.get("Address2", None),
-                Address3=hospital.get("Address3", None),
-                City=hospital.get("City", None),
-                County=hospital.get("County", None),
-                Postcode=hospital.get("Postcode", None),
-                Latitude=hospital.get("Latitude", None),
-                Longitude=hospital.get("Longitude", None),
-                ParentODSCode=hospital.get("ParentODSCode", None),
-                ParentName=hospital.get("ParentName", None),
-                Phone=hospital.get("Phone", None),
-                Email=hospital.get("Email", None),
-                Website=hospital.get("Website", None),
-                Fax=hospital.get("Fax", None),
+                OrganisationType=organisation.get("OrganisationType", None),
+                SubType=organisation.get("SubType", None),
+                Sector=organisation.get("Sector", None),
+                OrganisationStatus=organisation.get(
+                    "OrganisationStatus", None),
+                IsPimsManaged=organisation.get("IsPimsManaged", None),
+                OrganisationName=organisation.get("OrganisationName", None),
+                Address1=organisation.get("Address1", None),
+                Address2=organisation.get("Address2", None),
+                Address3=organisation.get("Address3", None),
+                City=organisation.get("City", None),
+                County=organisation.get("County", None),
+                Postcode=organisation.get("Postcode", None),
+                Latitude=organisation.get("Latitude", None),
+                Longitude=organisation.get("Longitude", None),
+                ParentODSCode=organisation.get("ParentODSCode", None),
+                ParentName=organisation.get("ParentName", None),
+                Phone=organisation.get("Phone", None),
+                Email=organisation.get("Email", None),
+                Website=organisation.get("Website", None),
+                Fax=organisation.get("Fax", None),
                 DateValid=date(2023, 1, 1)
             )
-            welsh_hospital.save()
+            welsh_organisation.save()
             print(
-                '\033[94m', f"New Welsh hospital added...{added}: {welsh_hospital.OrganisationName}({welsh_hospital.ParentName})", '\033[94m')
+                '\033[94m', f"New Welsh organisation added...{added}: {welsh_organisation.OrganisationName}({welsh_organisation.ParentName})", '\033[94m')
             added += 1
 
-            add_codes_to_hospital(welsh_hospital)
+            add_codes_to_organisation(welsh_organisation)
 
         except Exception as error:
-            print("Exception creating "+hospital["OrganisationName"])
+            print("Exception creating "+organisation["OrganisationName"])
 
-    print(f"Welsh Hospitals added...{added}")
+    print(f"Welsh organisations added...{added}")
 
 
-def add_codes_to_english_hospitals():
+def add_codes_to_english_organisations():
     """
-    A custom function to run in the rare likelihood that an existing table of hospitals exists but does not have 
+    A custom function to run in the rare likelihood that an existing table of organisations exists but does not have 
     the ODS codes in it
     """
     index = 0
-    for hospital in HospitalTrust.objects.all():
-        add_codes_to_hospital(hospital)
+    for organisation in Organisation.objects.all():
+        add_codes_to_organisation(organisation)
         index += 1
-    print(f'Updated {index} English hospitals with ODS Codes.')
+    print(f'Updated {index} English organisations with ODS Codes.')
 
 
-def delete_hospitals():
+def delete_organisations():
     try:
-        HospitalTrust.objects.all().delete()
+        Organisation.objects.all().delete()
     except:
-        print("Unable to delete Hospital table")
-    print("...all hospitals deleted.")
+        print("Unable to delete Organisation table")
+    print("...all organisations deleted.")
 
 
 def run_dummy_cases_seed():
@@ -226,8 +228,8 @@ def run_dummy_cases_seed():
         postcode = postcode_list[index]
         ethnicity = choice(ETHNICITIES)[0]
 
-        # get a random hospital
-        hospital_trust = HospitalTrust.objects.filter(
+        # get a random organisation
+        organisation = Organisation.objects.filter(
             Sector="NHS Sector").order_by("?").first()
 
         case_has_error = False
@@ -251,7 +253,7 @@ def run_dummy_cases_seed():
         if not case_has_error:
             try:
                 new_site = Site.objects.create(
-                    hospital_trust=hospital_trust,
+                    organisation=organisation,
                     site_is_actively_involved_in_epilepsy_care=True,
                     site_is_primary_centre_of_epilepsy_care=True,
                     case=new_case
@@ -261,7 +263,8 @@ def run_dummy_cases_seed():
                 print(f"Error saving site: {e}")
 
             added += 1
-            print(f"Saved {new_case.first_name} {new_case.surname} at {new_site.hospital_trust.ParentName}({new_site.hospital_trust.OrganisationName})...")
+            print(
+                f"Saved {new_case.first_name} {new_case.surname} at {new_site.organisation.ParentName}({new_site.organisation.OrganisationName})...")
     print(f"Saved {added} cases.")
 
 

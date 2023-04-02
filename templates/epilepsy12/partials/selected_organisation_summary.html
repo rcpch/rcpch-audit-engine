@@ -7,21 +7,21 @@
         {% if request.user.is_rcpch_audit_team_member %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-                    {% url 'selected_hospital_summary' as hx_post %}
-                    {% include 'epilepsy12/partials/page_elements/rcpch_hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#rcpch_hospital_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_hospital_summary" test_positive=selected_hospital.pk label="Select a hospital trust to view" hx_default_text="Search general paediatric hospitals..." data_position="top left" %}
+                    {% url 'selected_organisation_summary' as hx_post %}
+                    {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary" test_positive=selected_organisation.pk label="Select a organisation trust to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
                 </div>
             </div>
         {% endif %}
 
         <div class="fluid row stackable">
             <div class="eight wide column">
-                <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' hospital_id=selected_hospital.pk %}">
-                    View All {{selected_hospital.ParentName}} Epilepsy12 Staff
+                <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
+                    View All {{selected_organisation.ParentName}} Epilepsy12 Staff
                 </a>
             </div>
             <div class="eight wide  column">
-                <a class="ui rcpch_primary fluid button" href="{% url 'cases' hospital_id=selected_hospital.pk %}">
-                    View All {{selected_hospital.ParentName}} Children
+                <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
+                    View All {{selected_organisation.ParentName}} Children
                     </a>
             </div>
         </div>
@@ -33,48 +33,48 @@
                 
                 <div class="ui card">
                     <div class="content">
-                        <div class="hospital_address_container">
-                            <div class="ui centered header hospital_address">
-                                <h3>{{ selected_hospital.ParentName }}</h3>
+                        <div class="organisation_address_container">
+                            <div class="ui centered header organisation_address">
+                                <h3>{{ selected_organisation.ParentName }}</h3>
                             </div>
                             <h4 class="ui horizontal divider">
-                                <i class="ui  rcpch  small hospital icon "></i>Address
+                                <i class="ui  rcpch  small organisation icon "></i>Address
                             </h4>
-                                <div class="hospital_details ">
-                                    <div class="hospital_address">
+                                <div class="organisation_details ">
+                                    <div class="organisation_address">
                                         <div class="item">
-                                            {%if selected_hospital.Address1%}<p>{{ selected_hospital.Address1 }}</p>{%endif%}
-                                            {%if selected_hospital.Address2%}<p>{{ selected_hospital.Address2 }}</p>{%endif%}
-                                            {%if selected_hospital.Address3%}<p>{{ selected_hospital.Address3 }}</p>{%endif%}
-                                            {%if selected_hospital.City%}<p>{{ selected_hospital.City }}</p>{%endif%}
-                                            {%if selected_hospital.Postcode%}<p>{{ selected_hospital.Postcode }}</p>{%endif%}
+                                            {%if selected_organisation.Address1%}<p>{{ selected_organisation.Address1 }}</p>{%endif%}
+                                            {%if selected_organisation.Address2%}<p>{{ selected_organisation.Address2 }}</p>{%endif%}
+                                            {%if selected_organisation.Address3%}<p>{{ selected_organisation.Address3 }}</p>{%endif%}
+                                            {%if selected_organisation.City%}<p>{{ selected_organisation.City }}</p>{%endif%}
+                                            {%if selected_organisation.Postcode%}<p>{{ selected_organisation.Postcode }}</p>{%endif%}
                                         </div>
                                     </div>
                                 </div>
                                 <h4 class="ui horizontal divider">
                                     <i class="ui rcpch small address book icon "></i>Details
                                 </h4>
-                                <div class="hospital_details ">
+                                <div class="organisation_details ">
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon phone"></i>
-                                        {%if selected_hospital.Phone%}
-                                        <p class="rcpch_icon_text">{{ selected_hospital.Phone }}</p>
+                                        {%if selected_organisation.Phone%}
+                                        <p class="rcpch_icon_text">{{ selected_organisation.Phone }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find phone number</p>
                                         {%endif%}
                                     </div>
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon envelope"></i>
-                                        {%if selected_hospital.Email%}
-                                        <p class="rcpch_icon_text">{{ selected_hospital.Email }}</p>
+                                        {%if selected_organisation.Email%}
+                                        <p class="rcpch_icon_text">{{ selected_organisation.Email }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find email</p>
                                         {%endif%}
                                     </div>
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon linkify"></i>
-                                        {%if selected_hospital.Website%}
-                                        <p class="rcpch_icon_text">{{ selected_hospital.Website }}</p>
+                                        {%if selected_organisation.Website%}
+                                        <p class="rcpch_icon_text">{{ selected_organisation.Website }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find website</p>
                                         {%endif%}
@@ -128,18 +128,18 @@
                                 <div class="column">
                                     
                                     <div class="four wide stackable column">
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_hospital numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital denominator=count_of_current_cohort_registered_cases_in_this_hospital title="Completed Patient Records - Hospital" pie_size='med' %}
+                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_organisation numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Organisation" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
-                                            <p><small>{{selected_hospital.OrganisationName}}</small></p>
+                                            <p><small>{{selected_organisation.OrganisationName}}</small></p>
                                         </div>
                                     </div>
             
                                 </div>
                                 <div class="column">
                                     <div class="four wide stackable column">
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_hospital_trust denominator=count_of_current_cohort_registered_cases_in_this_hospital_trust title="Completed Patient Records - Trust" pie_size='med' %}
+                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Trust" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
-                                            <p><small>{{selected_hospital.ParentName}}</small></p>
+                                            <p><small>{{selected_organisation.ParentName}}</small></p>
                                         </div>
                                     </div>
                                     
@@ -237,7 +237,7 @@
             <div class="ui bottom attached active tab segment" data-tab="first">
                 <div 
                     class="sixteen wide stackable column" 
-                    hx-get="{% url 'selected_trust_kpis' hospital_id=selected_hospital.pk %}" 
+                    hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}" 
                     hx-trigger="load" hx-swap='innerHTML'
                     hx_indicator='#kpis'
                     hx-target="#kpis">
@@ -248,7 +248,7 @@
             </div>
 
             <div class="ui bottom attached tab segment" data-tab="second">
-                {% include 'epilepsy12/partials/hospital/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
+                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
             </div>
         
         </div>

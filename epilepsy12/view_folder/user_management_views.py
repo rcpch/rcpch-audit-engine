@@ -15,7 +15,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.html import strip_tags
 
 from django_htmx.http import HttpResponseClientRedirect
-from ..models import Epilepsy12User, HospitalTrust
+from ..models import Epilepsy12User, Organisation
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions.construct_confirm_email import construct_confirm_email
 
@@ -25,64 +25,64 @@ User = get_user_model()
 @login_required
 def epilepsy12_user_management(request):
 
-    if request.user.hospital_employer is not None:
-        # current user is affiliated with an existing hospital - set viewable trust to this
-        selected_hospital = HospitalTrust.objects.get(
-            OrganisationName=request.user.hospital_employer)
+    if request.user.organisation_employer is not None:
+        # current user is affiliated with an existing organisation - set viewable trust to this
+        selected_organisation = Organisation.objects.get(
+            OrganisationName=request.user.organisation_employer)
 
     else:
-        # current user is a member of the RCPCH audit team and also not affiliated with a hospital
-        # therefore set selected hospital to first of hospital on the list
+        # current user is a member of the RCPCH audit team and also not affiliated with a organisation
+        # therefore set selected organisation to first of organisation on the list
 
-        selected_hospital = HospitalTrust.objects.filter(
+        selected_organisation = Organisation.objects.filter(
             Sector="NHS Sector"
         ).order_by('OrganisationName').first()
 
     template_name = 'epilepsy12/epilepsy12_user_management.html'
 
     context = {
-        'selected_hospital': selected_hospital,
+        'selected_organisation': selected_organisation,
     }
     return render(request=request, template_name=template_name, context=context)
 
 
 @login_required
-def epilepsy12_user_list(request, hospital_id):
+def epilepsy12_user_list(request, organisation_id):
     """
-    Returns the list of users for the selected hospitals
-    Currently this includes RCPCH staff who are not associated with a hospital, though this breaks the update/delete and cancel
+    Returns the list of users for the selected organisations
+    Currently this includes RCPCH staff who are not associated with a organisation, though this breaks the update/delete and cancel
     buttons.
     """
 
-    # get currently selected hospital
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    # get currently selected organisation
+    organisation = Organisation.objects.get(pk=organisation_id)
 
     sort_flag = None
 
     filter_term = request.GET.get('filtered_epilepsy12_user_list')
 
-    # get all hospitals which are in the same parent trust
-    hospital_children = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).all()
+    # get all organisations which are in the same parent trust
+    organisation_children = Organisation.objects.filter(
+        ParentName=organisation.ParentName).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
-            # user has requested hospital level view
+            # user has requested organisation level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(hospital_employer__OrganisationName__icontains=hospital_trust.OrganisationName) &
+                Q(organisation_employer__OrganisationName__icontains=organisation.OrganisationName) &
                 (Q(first_name__icontains=filter_term) |
                  Q(surname__icontains=filter_term) |
-                 Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                 Q(organisation_employer__OrganisationName__icontains=filter_term) |
                  Q(email__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 1:
             # user has requested trust level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(hospital_employer__OrganisationName__icontains=hospital_trust.ParentName) &
+                Q(organisation_employer__OrganisationName__icontains=organisation.ParentName) &
                 (Q(first_name__icontains=filter_term) |
                  Q(surname__icontains=filter_term) |
-                 Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                 Q(organisation_employer__OrganisationName__icontains=filter_term) |
                  Q(email__icontains=filter_term))
             ).order_by('surname').all()
         elif request.user.view_preference == 2:
@@ -90,13 +90,13 @@ def epilepsy12_user_list(request, hospital_id):
             epilepsy12_user_list = Epilepsy12User.objects.filter(
                 Q(first_name__icontains=filter_term) |
                 Q(surname__icontains=filter_term) |
-                Q(hospital_employer__OrganisationName__icontains=filter_term) |
+                Q(organisation_employer__OrganisationName__icontains=filter_term) |
                 Q(email__icontains=filter_term)
             ).order_by('surname').all()
     else:
 
         """
-        Epilepsy12Users are filtered based on user preference (request.user.view_preference), where 0 is hospital level,
+        Epilepsy12Users are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
         1 is trust level and 2 is national level
         Only RCPCH audit staff have this final option.
         """
@@ -108,12 +108,12 @@ def epilepsy12_user_list(request, hospital_id):
 
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                hospital_employer__ParentName__contains=hospital_trust.ParentName,
+                organisation_employer__ParentName__contains=organisation.ParentName,
             )
         else:
-            # filters all primary centres at hospital level, irrespective of if active or inactive
+            # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                hospital_employer__OrganisationName__contains=hospital_trust.OrganisationName,
+                organisation_employer__OrganisationName__contains=organisation.OrganisationName,
             )
 
         if request.htmx.trigger_name == "sort_epilepsy12_users_by_name_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_name_up":
@@ -140,21 +140,21 @@ def epilepsy12_user_list(request, hospital_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 '-role').all()
             sort_flag = "sort_epilepsy12_users_by_role_down"
-        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_hospital_employer_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_hospital_employer_up":
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_organisation_employer_up" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_organisation_employer_up":
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-                'hospital_employer').all()
-            sort_flag = "sort_epilepsy12_users_by_hospital_employer_down"
-        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_hospital_employer_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_hospital_employer_down":
+                'organisation_employer').all()
+            sort_flag = "sort_epilepsy12_users_by_organisation_employer_down"
+        elif request.htmx.trigger_name == "sort_epilepsy12_users_by_organisation_employer_down" or request.GET.get('sort_flag') == "sort_epilepsy12_users_by_organisation_employer_down":
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
-                '-hospital_employer').all()
-            sort_flag = "sort_epilepsy12_users_by_hospital_employer_down"
+                '-organisation_employer').all()
+            sort_flag = "sort_epilepsy12_users_by_organisation_employer_down"
         else:
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 'surname').all()
 
     rcpch_choices = (
-        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
-        (1, f'Trust View ({hospital_trust.ParentName})'),
+        (0, f'Organisation View ({organisation.OrganisationName})'),
+        (1, f'Trust View ({organisation.ParentName})'),
         (2, 'National View'),
     )
 
@@ -165,8 +165,8 @@ def epilepsy12_user_list(request, hospital_id):
     context = {
         'epilepsy12_user_list': epilepsy12_user_list,
         'rcpch_choices': rcpch_choices,
-        'hospital_trust': hospital_trust,
-        'hospital_children': hospital_children,
+        'organisation': organisation,
+        'organisation_children': organisation_children,
         'sort_flag': sort_flag
     }
 
@@ -181,11 +181,11 @@ def epilepsy12_user_list(request, hospital_id):
 
 @login_required
 @permission_required('epilepsy12.add_epilepsy12user')
-def create_epilepsy12_user(request, hospital_id):
+def create_epilepsy12_user(request, organisation_id):
 
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    organisation = Organisation.objects.get(pk=organisation_id)
     prepopulated_data = {
-        'hospital_employer': hospital_trust,
+        'organisation_employer': organisation,
     }
     form = Epilepsy12UserAdminCreationForm(initial=prepopulated_data)
 
@@ -220,11 +220,11 @@ def create_epilepsy12_user(request, hospital_id):
 
             messages.success(
                 request, f"{new_user.email} account created successfully.")
-            return redirect('epilepsy12_user_list', hospital_id=hospital_id)
+            return redirect('epilepsy12_user_list', organisation_id=organisation_id)
 
     context = {
         'form': form,
-        'hospital_id': hospital_id,
+        'organisation_id': organisation_id,
         'admin_title': 'Add Epilepsy12 User',
         'is_superuser': False,
         'is_staff': False,
@@ -236,16 +236,16 @@ def create_epilepsy12_user(request, hospital_id):
 
 @login_required
 @permission_required('epilepsy12.change_epilepsy12user')
-def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
+def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     """
     Django model form to edit/update Epilepsy12user
     """
 
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    organisation = Organisation.objects.get(pk=organisation_id)
     epilepsy12_user_to_edit = get_object_or_404(
         Epilepsy12User, pk=epilepsy12_user_id)
     can_edit = False
-    if request.user.is_staff or request.user.hospital_employer == hospital_trust or request.user.is_rcpch_audit_team_member:
+    if request.user.is_staff or request.user.organisation_employer == organisation or request.user.is_rcpch_audit_team_member:
         can_edit = True
     if can_edit:
         form = Epilepsy12UserAdminCreationForm(
@@ -259,11 +259,11 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             messages.success(
                 request, f"{epilepsy12_user_to_edit.email} Deleted successfully.")
             redirect_url = reverse('epilepsy12_user_list', kwargs={
-                'hospital_id': hospital_id})
+                'organisation_id': organisation_id})
             return redirect(redirect_url)
         if 'cancel' in request.POST:
             redirect_url = reverse('epilepsy12_user_list', kwargs={
-                'hospital_id': hospital_id})
+                'organisation_id': organisation_id})
             return redirect(redirect_url)
         if 'resend' in request.POST:
             # send email with reset link to new user
@@ -284,7 +284,7 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
             messages.success(
                 request, f"Confirmation request sent to {epilepsy12_user_to_edit.email}.")
             redirect_url = reverse('epilepsy12_user_list', kwargs={
-                'hospital_id': hospital_id})
+                'organisation_id': organisation_id})
             return redirect(redirect_url)
 
         if request.POST and form.is_valid():
@@ -296,13 +296,13 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
 
             # Save was successful, so redirect to another page
             redirect_url = reverse('epilepsy12_user_list', kwargs={
-                'hospital_id': hospital_id})
+                'organisation_id': organisation_id})
             return redirect(redirect_url)
 
     template_name = 'registration/admin_create_user.html'
 
     return render(request, template_name, {
-        'hospital_id': hospital_id,
+        'organisation_id': organisation_id,
         'form': form,
         'admin_title': 'Edit Epilepsy12 User'
     })
@@ -310,14 +310,14 @@ def edit_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
 
 @login_required
 @permission_required('epilepsy12.delete_epilepsy12user')
-def delete_epilepsy12_user(request, hospital_id, epilepsy12_user_id):
+def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     try:
         Epilepsy12User.objects.get(pk=epilepsy12_user_id).delete()
     except ValueError as error:
         messages.error(
             request, f"Delete User Unsuccessful: {error}")
 
-    return HttpResponseClientRedirect(reverse('epilepsy12_user_list', kwargs={'hospital_id': hospital_id}))
+    return HttpResponseClientRedirect(reverse('epilepsy12_user_list', kwargs={'organisation_id': organisation_id}))
 
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):

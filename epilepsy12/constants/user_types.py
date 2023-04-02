@@ -6,7 +6,7 @@
 # AUDIT_ADMINISTRATOR = 6
 
 VIEW_PREFERENCES = (
-    (0, 'hospital'),
+    (0, 'organisation'),
     (1, 'trust'),
     (2, 'national'),
 )
@@ -54,16 +54,16 @@ EPILEPSY12_AUDIT_TEAM_VIEW_ONLY = 'epilepsy12_audit_team_view_only'
 # logged in user can edit but not delete national data. Cannot view or edit logs or permissions.
 EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS = 'epilepsy12_audit_team_edit_access'
 
-# logged in user access all areas: can create/update/delete any audit data, logs, epilepsy key words and hospital trusts, groups and permissions
+# logged in user access all areas: can create/update/delete any audit data, logs, epilepsy key words and organisation trusts, groups and permissions
 EPILEPSY12_AUDIT_TEAM_FULL_ACCESS = 'epilepsy12_audit_team_full_access'
 
 # logged in user can view all data relating to their trust(s) but not logs
 TRUST_AUDIT_TEAM_VIEW_ONLY = 'trust_audit_team_view_only'
 
-# logged in user can edit but not delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and hospital trusts, groups and permissions
+# logged in user can edit but not delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and organisation trusts, groups and permissions
 TRUST_AUDIT_TEAM_EDIT_ACCESS = 'trust_audit_team_edit_access'
 
-# logged in user can delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and hospital trusts, groups and permissions
+# logged in user can delete all data relating to their trust(s) but not view or edit logs, epilepsy key words and organisation trusts, groups and permissions
 TRUST_AUDIT_TEAM_FULL_ACCESS = 'trust_audit_team_full_access'
 
 # logged in user can view their own audit data, consent to participation and remove that consent/opt out. Opting out would delete all data relating to them, except the epilepsy12 unique identifier

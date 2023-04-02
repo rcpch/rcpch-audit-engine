@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 from django.contrib import messages
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import HospitalTrust, Site, Case
+from epilepsy12.models import Organisation, Site, Case
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
@@ -14,7 +14,7 @@ from ..constants import UNKNOWN_POSTCODES_NO_SPACES, RCPCH_AUDIT_ADMINISTRATOR, 
 
 
 @login_required
-def case_list(request, hospital_id):
+def case_list(request, organisation_id):
     """
     Returns a list of all children registered under the user's service.
     Path is protected to those logged in only
@@ -31,19 +31,19 @@ def case_list(request, hospital_id):
 
     filter_term = request.GET.get('filtered_case_list')
 
-    # get currently selected hospital
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    # get currently selected organisation
+    organisation = Organisation.objects.get(pk=organisation_id)
 
-    # get all hospitals which are in the same parent trust
-    hospital_children = HospitalTrust.objects.filter(
-        ParentName=hospital_trust.ParentName).all()
+    # get all organisations which are in the same parent trust
+    organisation_children = Organisation.objects.filter(
+        ParentName=organisation.ParentName).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
-            # user has requested hospital level view
+            # user has requested organisation level view
             all_cases = Case.objects.filter(
-                Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName) &
+                Q(organisations__OrganisationName__contains=organisation.OrganisationName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
                 (Q(first_name__icontains=filter_term) |
@@ -53,7 +53,7 @@ def case_list(request, hospital_id):
         elif request.user.view_preference == 1:
             # user has requested trust level view
             all_cases = Case.objects.filter(
-                Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName) &
+                Q(organisations__ParentName__contains=organisation.ParentName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
                 (Q(first_name__icontains=filter_term) |
@@ -73,7 +73,7 @@ def case_list(request, hospital_id):
     else:
 
         """
-        Cases are filtered based on user preference (request.user.view_preference), where 0 is hospital level,
+        Cases are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
         1 is trust level and 2 is national level
         Only RCPCH audit staff have this final option.
         """
@@ -85,14 +85,14 @@ def case_list(request, hospital_id):
 
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                hospital_trusts__ParentName__contains=hospital_trust.ParentName,
+                organisations__ParentName__contains=organisation.ParentName,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True
             )
         else:
-            # filters all primary centres at hospital level, irrespective of if active or inactive
+            # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName,
+                organisations__OrganisationName__contains=organisation.OrganisationName,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True
             )
@@ -181,8 +181,8 @@ def case_list(request, hospital_id):
     registered_count = registered_cases.count()
 
     rcpch_choices = (
-        (0, f'Hospital View ({hospital_trust.OrganisationName})'),
-        (1, f'Trust View ({hospital_trust.ParentName})'),
+        (0, f'Organisation View ({organisation.OrganisationName})'),
+        (1, f'Trust View ({organisation.ParentName})'),
         (2, 'National View'),
     )
 
@@ -191,10 +191,10 @@ def case_list(request, hospital_id):
         'total_cases': case_count,
         'total_registrations': registered_count,
         'sort_flag': sort_flag,
-        'hospital_trust': hospital_trust,
-        'hospital_children': hospital_children,
+        'organisation': organisation,
+        'organisation_children': organisation_children,
         'rcpch_choices': rcpch_choices,
-        'hospital_id': hospital_id
+        'organisation_id': organisation_id
     }
     if request.htmx:
         return render(request=request, template_name='epilepsy12/partials/case_table.html', context=context)
@@ -204,12 +204,12 @@ def case_list(request, hospital_id):
 
 
 @login_required
-def case_statistics(request, hospital_id):
+def case_statistics(request, organisation_id):
     """
-    GET request from cases template to update stats on toggle between RCPCH view and hospital view
+    GET request from cases template to update stats on toggle between RCPCH view and organisation view
     """
 
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    organisation = Organisation.objects.get(pk=organisation_id)
 
     if request.user.view_preference == 2:
         # user requesting national view - return all cases in the UK
@@ -217,12 +217,12 @@ def case_statistics(request, hospital_id):
     elif request.user.view_preference == 1:
         # user requesting trust view - return all cases in the same trust
         total_cases = Case.objects.filter(
-            Q(hospital_trusts__ParentName__contains=hospital_trust.ParentName)
+            Q(organisations__ParentName__contains=organisation.ParentName)
         )
     elif request.user.view_preference == 0:
-        # user requesting trust view - return all cases in the same hospital
+        # user requesting trust view - return all cases in the same organisation
         total_cases = Case.objects.filter(
-            Q(hospital_trusts__OrganisationName__contains=hospital_trust.OrganisationName)
+            Q(organisations__OrganisationName__contains=organisation.OrganisationName)
         )
 
     registered_cases = total_cases.filter(
@@ -232,7 +232,7 @@ def case_statistics(request, hospital_id):
     context = {
         'total_cases': total_cases.count(),
         'total_registrations': registered_cases.count(),
-        'hospital_trust': hospital_trust
+        'organisation': organisation
     }
 
     response = render(
@@ -243,7 +243,7 @@ def case_statistics(request, hospital_id):
 
 @login_required
 @permission_required('epilepsy12.change_case', )
-def case_submit(request, hospital_id, case_id):
+def case_submit(request, organisation_id, case_id):
     """
     POST request callback from submit button in case_list partial.
     Disables further editing of case information. Case considered submitted
@@ -252,7 +252,7 @@ def case_submit(request, hospital_id, case_id):
     case.locked = not case.locked
     case.save()
 
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'organisation_id': organisation_id}))
 
 
 @login_required
@@ -265,7 +265,7 @@ def case_performance_summary(request, case_id):
         site_is_primary_centre_of_epilepsy_care=True,
         case=case
     ).get()
-    organisation_id = site.hospital_trust.pk
+    organisation_id = site.organisation.pk
 
     context = {
         'case': case,
@@ -289,23 +289,23 @@ def case_performance_summary(request, case_id):
 
 
 """
-Case function based views - class based views not chosen as need to accept hospital_id also in URL
+Case function based views - class based views not chosen as need to accept organisation_id also in URL
 """
 
 
 @login_required
 @permission_required('epilepsy12.add_case')
-def create_case(request, hospital_id):
+def create_case(request, organisation_id):
     """
     Django function based - returns django form to create a new case, or saves a new case if a
     POST request. The only instance where htmx not used.
     """
-    hospital_trust = HospitalTrust.objects.filter(
-        OrganisationID=hospital_id).get()
+    organisation = Organisation.objects.filter(
+        OrganisationID=organisation_id).get()
 
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ993CZ', 'Address unspecified - England')
-    if hospital_trust.Country == 'Wales':
+    if organisation.Country == 'Wales':
         country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
@@ -321,25 +321,25 @@ def create_case(request, hospital_id):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.created_at = datetime.now()
-            hospital = HospitalTrust.objects.get(pk=hospital_id)
+            organisation = Organisation.objects.get(pk=organisation_id)
             # save the new child
             obj.save()
-            # allocate the child to the hospital supplied as primary E12 centre
+            # allocate the child to the organisation supplied as primary E12 centre
             Site.objects.create(
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_primary_centre_of_epilepsy_care=True,
-                hospital_trust=hospital,
+                organisation=organisation,
                 case=obj
             )
             messages.success(request, "You successfully created the case")
-            return redirect('cases', hospital_id=hospital_id)
+            return redirect('cases', organisation_id=organisation_id)
         else:
             messages.error(request=request,
                            message="It was not possible to save the case")
 
     context = {
-        "hospital_id": hospital_id,
-        "hospital_trust": hospital_trust,
+        "organisation_id": organisation_id,
+        "organisation": organisation,
         "form": form,
         'choices': choices,
         'child_has_unknown_postcode': False
@@ -349,19 +349,19 @@ def create_case(request, hospital_id):
 
 @login_required
 @permission_required('epilepsy12.change_case', raise_exception=True)
-def update_case(request, hospital_id, case_id):
+def update_case(request, organisation_id, case_id):
     """
     Django function based view. Receives POST request to update view or delete
     """
     case = get_object_or_404(Case, pk=case_id)
     form = CaseForm(instance=case)
 
-    hospital_trust = HospitalTrust.objects.filter(
-        OrganisationID=hospital_id).get()
+    organisation = Organisation.objects.filter(
+        OrganisationID=organisation_id).get()
 
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ993CZ', 'Address unspecified - England')
-    if hospital_trust.Country == 'Wales':
+    if organisation.Country == 'Wales':
         country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
@@ -375,7 +375,7 @@ def update_case(request, hospital_id, case_id):
             messages.success(
                 request, f"You successfully deleted {case}'s details")
             case.delete()
-            return redirect('cases', hospital_id=hospital_id)
+            return redirect('cases', organisation_id=organisation_id)
         form = CaseForm(request.POST, instance=case)
         if form.is_valid():
             obj = form.save()
@@ -392,7 +392,7 @@ def update_case(request, hospital_id, case_id):
             obj.save()
             messages.success(
                 request, f"You successfully updated {case}'s details")
-            return redirect('cases', hospital_id=hospital_id)
+            return redirect('cases', organisation_id=organisation_id)
 
     child_has_unknown_postcode = False
     test_positive = None
@@ -401,8 +401,8 @@ def update_case(request, hospital_id, case_id):
         test_positive = case.postcode
 
     context = {
-        "hospital_id": hospital_id,
-        "hospital_trust": hospital_trust,
+        "organisation_id": organisation_id,
+        "organisation": organisation,
         "form": form,
         'case': case,
         'child_has_unknown_postcode': child_has_unknown_postcode,
@@ -413,16 +413,16 @@ def update_case(request, hospital_id, case_id):
     return render(request=request, template_name='epilepsy12/cases/case.html', context=context)
 
 
-def unknown_postcode(request, hospital_id):
+def unknown_postcode(request, organisation_id):
     """
     POST call back from single choice multiple select if postcode does not exist
     """
     test_positive = request.htmx.trigger_name
 
-    hospital_trust = HospitalTrust.objects.get(pk=hospital_id)
+    organisation = Organisation.objects.get(pk=organisation_id)
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ993CZ', 'Address unspecified - England')
-    if hospital_trust.Country == 'Wales':
+    if organisation.Country == 'Wales':
         country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
@@ -434,7 +434,7 @@ def unknown_postcode(request, hospital_id):
     template_name = 'epilepsy12/cases/unknown_postcode.html'
     context = {
         'choices': choices,
-        'hospital_id': hospital_id,
+        'organisation_id': organisation_id,
         'test_positive': test_positive,
         'hide_completion_fields': True,
         'enabled': True
@@ -444,7 +444,7 @@ def unknown_postcode(request, hospital_id):
 
 @login_required
 @permission_required('epilepsy12.can_opt_out_child_from_inclusion_in_audit', raise_exception=True)
-def opt_out(request, hospital_id, case_id):
+def opt_out(request, organisation_id, case_id):
     """
     This child has opted out of Epilepsy12
     Their unique E12 ID will be retained but all associated fields will be set to None, and associated records deleted except their 
@@ -478,4 +478,4 @@ def opt_out(request, hospital_id, case_id):
         else:
             Site.objects.get(pk=site.pk).delete()
 
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': hospital_id}))
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'organisation_id': organisation_id}))

@@ -1,5 +1,5 @@
 {% load epilepsy12_template_tags %}
-<div hx-target='#case_table' hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}" hx-trigger='case_list from:body'
+<div hx-target='#case_table' hx-get="{% url 'cases' organisation_id=organisation.pk %}" hx-trigger='case_list from:body'
   hx-swap='innerHTML' name='case_table'>
   {% if case_list.end_index > 0 %}
   <table class="ui rcpch table cases_table">
@@ -10,13 +10,13 @@
             <p>Name</p>
             {% if sort_flag and sort_flag == "sort_by_name_down" %}
             <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_name_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% elif sort_flag and sort_flag == "sort_by_name_up" %}
             <i class="sort icon" id="sort_button" name="sort_by_name_down" hx-target="#case_table"
-              hx-get="{% url 'sort_by_name_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_name_down' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% else %}
             <i class="sort icon" id="sort_button" name="sort_by_name_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_name_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_name_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% endif %}
           </div>
         </th>
@@ -25,13 +25,13 @@
             <p>Sex</p>
             {% if sort_flag and sort_flag == "sort_by_sex_down" %}
             <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_sex_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% elif sort_flag and sort_flag == "sort_by_sex_up" %}
             <i class="sort icon" id="sort_button" name="sort_by_sex_down" hx-target="#case_table"
-              hx-get="{% url 'sort_by_sex_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_sex_down' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% else %}
             <i class="sort icon" id="sort_button" name="sort_by_sex_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_sex_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_sex_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% endif %}
           </div>
         </th>
@@ -40,13 +40,13 @@
             <p>NHS Number</p>
             {% if sort_flag and sort_flag == "sort_by_nhs_number_down" %}
             <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_nhs_number_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% elif sort_flag and sort_flag == "sort_by_nhs_number_up" %}
             <i class="sort icon" id="sort_button" name="sort_by_nhs_number_down" hx-target="#case_table"
-              hx-get="{% url 'sort_by_nhs_number_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_nhs_number_down' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% else %}
             <i class="sort icon" id="sort_button" name="sort_by_nhs_number_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_nhs_number_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_nhs_number_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% endif %}
           </div>
         </th>
@@ -55,13 +55,13 @@
             <p>Deadline</p>
             {% if sort_flag and sort_flag == "sort_by_deadline_down" %}
             <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_deadline_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% elif sort_flag and sort_flag == "sort_by_deadline_up" %}
             <i class="sort icon" id="sort_button" name="sort_by_deadline_down" hx-target="#case_table"
-              hx-get="{% url 'sort_by_deadline_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_deadline_down' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% else %}
             <i class="sort icon" id="sort_button" name="sort_by_deadline_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_deadline_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_deadline_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% endif %}
           </div>
         </th>
@@ -70,13 +70,13 @@
             <p>Cohort</p>
             {% if sort_flag and sort_flag == "sort_by_cohort_down" %}
             <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_cohort_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% elif sort_flag and sort_flag == "sort_by_cohort_up" %}
             <i class="sort icon" id="sort_button" name="sort_by_cohort_down" hx-target="#case_table"
-              hx-get="{% url 'sort_by_cohort_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_cohort_down' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% else %}
             <i class="sort icon" id="sort_button" name="sort_by_cohort_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_cohort_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_cohort_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% endif %}
           </div>
         </th>
@@ -85,13 +85,13 @@
             <p>Days remaining</p>
             {% if sort_flag and sort_flag == "sort_by_days_remaining_before_submission_down" %}
             <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_days_remaining_before_submission_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% elif sort_flag and sort_flag == "sort_by_days_remaining_before_submission_up" %}
             <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_down" hx-target="#case_table"
-              hx-get="{% url 'sort_by_days_remaining_before_submission_down' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_days_remaining_before_submission_down' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% else %}
             <i class="sort icon" id="sort_button" name="sort_by_days_remaining_before_submission_up" hx-target="#case_table"
-              hx-get="{% url 'sort_by_days_remaining_before_submission_up' hospital_id=hospital_trust.pk %}" hx-trigger="click"></i>
+              hx-get="{% url 'sort_by_days_remaining_before_submission_up' organisation_id=organisation.pk %}" hx-trigger="click"></i>
             {% endif %}
           </div>
         </th>
@@ -117,10 +117,10 @@
           <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
-              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' hospital_id=hospital_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
                 class="edit outline icon"></i></a></button>
               {% comment %}
-              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' hospital_id=hospital_id case_id=case.id%}"><i
+              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' organisation_id=organisation_id case_id=case.id%}"><i
                 class="trash alternate outline icon"></i></a></button>
               {% endcomment %}
               {% if case.registration.registration_date %}
@@ -171,7 +171,7 @@
             {% comment %}
               If the audit for this child is complete, the upload button is enabled only if the submission deadline has not yet passed.
             {% endcomment %}
-            {% url 'case_submit' hospital_id=hospital_id case_id=case.id as hx_post %}
+            {% url 'case_submit' organisation_id=organisation_id case_id=case.id as hx_post %}
             <td>
               <button
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -228,12 +228,12 @@
         <th colspan="10" class="right aligned">
           {% if case_list.has_previous %}
           <div class="ui rcpch_primary button" hx-target="#case_table"
-            hx-get="{% url 'cases' hospital_id=hospital_trust.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}"
+            hx-get="{% url 'cases' organisation_id=organisation.pk %}?page={{case_list.previous_page_number}}&sort_flag={{sort_flag}}"
             hx-swap="innerHTML">Previous 10</div>
           {% endif %}
           {% if case_list.has_next %}
           <div class="ui rcpch_primary button" name="next_button" hx-target="#case_table"
-            hx-get="{% url 'cases' hospital_id=hospital_trust.pk  %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}"
+            hx-get="{% url 'cases' organisation_id=organisation.pk  %}?page={{case_list.next_page_number}}&sort_flag={{sort_flag}}"
             hx-swap="innerHTML">Next 10</div>
           {% endif %}
         </th>

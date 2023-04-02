@@ -22,7 +22,7 @@ def validate_and_update_model(
     model_id
     model: the class, not the instance
     field_name
-    page_element: string one of 'date_field', 'toggle_button', 'multiple_choice_single_toggle_button', 'multiple_choic_multiple_toggle_button', 'select', 'snomed_select', 'hospital_select'
+    page_element: string one of 'date_field', 'toggle_button', 'multiple_choice_single_toggle_button', 'multiple_choic_multiple_toggle_button', 'select', 'snomed_select', 'organisation_select'
     comparison_date_field_name: string corresponding to field name for date in model
     is_earliest_date: boolean
 

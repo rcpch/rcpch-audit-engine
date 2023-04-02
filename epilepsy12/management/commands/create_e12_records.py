@@ -3,7 +3,7 @@ from random import randint, getrandbits
 from dateutil.relativedelta import relativedelta
 
 # epilepsy12 dependencies
-from ...models import FirstPaediatricAssessment, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Episode, Keyword, Comorbidity, Assessment, Site, HospitalTrust, Management, AntiEpilepsyMedicine, Case, AuditProgress, Registration, KPI, Investigations
+from ...models import FirstPaediatricAssessment, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Episode, Keyword, Comorbidity, Assessment, Site, Organisation, Management, AntiEpilepsyMedicine, Case, AuditProgress, Registration, KPI, Investigations
 from ...constants import OPT_OUT_UNCERTAIN, SYNDROMES, EPILEPSY_CAUSES, NEUROPSYCHIATRIC, DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_EEG_MANIFESTATIONS, LATERALITY, GENERALISED_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, MIGRAINES, EPIS_MISC, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_PAROXYSMS, ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
 from ...general_functions import random_date, current_cohort_start_date, first_tuesday_in_january, fetch_ecl
 from ...common_view_functions import test_fields_update_audit_progress, calculate_kpis
@@ -38,14 +38,14 @@ def create_registrations():
             management_total_expected_fields=0,
             management_total_completed_fields=0,
         )
-        lead_hospital = Site.objects.filter(
+        lead_organisation = Site.objects.filter(
             case=case,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True
         ).get()
         kpi = KPI.objects.create(
-            hospital_organisation=lead_hospital.hospital_trust,
-            parent_trust=lead_hospital.hospital_trust.ParentName,
+            organisation=lead_organisation.organisation,
+            parent_trust=lead_organisation.organisation.ParentName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -200,7 +200,7 @@ def create_multiaxial_diagnosis(registration_instance):
             comorbidity_choices = fetch_ecl(ecl)
             random_comorbidity = comorbidity_choices[randint(
                 0, len(comorbidity_choices)-1)]
-            
+
             Comorbidity.objects.create(
                 multiaxial_diagnosis=multiaxial_diagnosis,
                 comorbidity_diagnosis_date=random_date(
@@ -324,17 +324,17 @@ def create_assessment(registration_instance):
             start=registration_instance.registration_date, end=registration_instance.registration_close_date)
         assessment.consultant_paediatrician_input_date = assessment.consultant_paediatrician_referral_date + \
             relativedelta(weeks=randint(1, 5))
-        random_hospital = HospitalTrust.objects.filter(
+        random_organisation = Organisation.objects.filter(
             Sector="NHS Sector").order_by("?").first()
         if Site.objects.filter(
             site_is_actively_involved_in_epilepsy_care=True,
             case=registration_instance.case,
-            hospital_trust=random_hospital
+            organisation=random_organisation
         ).exists():
             site = Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 case=registration_instance.case,
-                hospital_trust=random_hospital
+                organisation=random_organisation
             ).get()
             site.site_is_general_paediatric_centre = True
             site.save()
@@ -343,7 +343,7 @@ def create_assessment(registration_instance):
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_general_paediatric_centre=True,
                 case=registration_instance.case,
-                hospital_trust=random_hospital
+                organisation=random_organisation
             )
 
     if assessment.paediatric_neurologist_referral_made:
@@ -351,17 +351,17 @@ def create_assessment(registration_instance):
             start=registration_instance.registration_date, end=registration_instance.registration_close_date)
         assessment.paediatric_neurologist_input_date = assessment.paediatric_neurologist_referral_date + \
             relativedelta(weeks=randint(1, 5))
-        random_hospital = HospitalTrust.objects.filter(
+        random_organisation = Organisation.objects.filter(
             Sector="NHS Sector").order_by("?").first()
         if Site.objects.filter(
             site_is_actively_involved_in_epilepsy_care=True,
             case=registration_instance.case,
-            hospital_trust=random_hospital
+            organisation=random_organisation
         ).exists():
             site = Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 case=registration_instance.case,
-                hospital_trust=random_hospital
+                organisation=random_organisation
             ).get()
             site.site_is_general_paediatric_centre = True
             site.save()
@@ -370,7 +370,7 @@ def create_assessment(registration_instance):
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_paediatric_neurology_centre=True,
                 case=registration_instance.case,
-                hospital_trust=random_hospital
+                organisation=random_organisation
             )
 
     if assessment.childrens_epilepsy_surgical_service_referral_made:
@@ -378,17 +378,17 @@ def create_assessment(registration_instance):
             start=registration_instance.registration_date, end=registration_instance.registration_close_date)
         assessment.childrens_epilepsy_surgical_service_input_date = assessment.childrens_epilepsy_surgical_service_referral_date + \
             relativedelta(weeks=randint(1, 5))
-        random_hospital = HospitalTrust.objects.filter(
+        random_organisation = Organisation.objects.filter(
             Sector="NHS Sector").order_by("?").first()
         if Site.objects.filter(
             site_is_actively_involved_in_epilepsy_care=True,
             case=registration_instance.case,
-            hospital_trust=random_hospital
+            organisation=random_organisation
         ).exists():
             site = Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 case=registration_instance.case,
-                hospital_trust=random_hospital
+                organisation=random_organisation
             ).get()
             site.site_is_general_paediatric_centre = True
             site.save()
@@ -397,7 +397,7 @@ def create_assessment(registration_instance):
                 site_is_actively_involved_in_epilepsy_care=True,
                 site_is_childrens_epilepsy_surgery_centre=True,
                 case=registration_instance.case,
-                hospital_trust=random_hospital
+                organisation=random_organisation
             )
 
     if assessment.epilepsy_specialist_nurse_referral_made:

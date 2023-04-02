@@ -8,7 +8,7 @@ from .semiology import *
 from .comorbidities import *
 from .ethnicities import *
 from .user_types import *
-from .hospital_trusts import *
+from .english_organisations import *
 from .keywords import *
 from .names import *
 from .syndromes import *
@@ -16,7 +16,7 @@ from .focal_seizures import *
 from .non_epilepsy_fields import *
 from .kpi import *
 from .integrated_care_boards import *
-from .welsh_hospitals import *
-from .irish_hospitals import *
-from .scottish_hospitals import *
+from .welsh_organisations import *
+from .irish_organisations import *
+from .scottish_organisations import *
 from .postcodes import UNKNOWN_POSTCODES, UNKNOWN_POSTCODES_NO_SPACES

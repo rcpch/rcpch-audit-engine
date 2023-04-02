@@ -55,7 +55,7 @@
                                 <label>Surgical centre actively involved in care</label>
                             <div class="ui right action input">
                                 
-                                <input disabled value="{{active_surgical_site.hospital_trust.OrganisationName}} ({{active_surgical_site.hospital_trust.ParentName}})">
+                                <input disabled value="{{active_surgical_site.organisation.OrganisationName}} ({{active_surgical_site.organisation.ParentName}})">
                                 <div class="ui buttons">
                                 
                                     {% if not surgery_edit_active %}
@@ -81,7 +81,7 @@
                                             hx-post="{% url 'delete_epilepsy_surgery_centre' site_id=active_surgical_site.pk assessment_id=assessment.pk %}"
                                             hx-target="#childrens_epilepsy_surgical_service"
                                             hx-swap="innerHTML"
-                                            hx-include="[name='hospital_trust']"
+                                            hx-include="[name='organisation']"
                                             hx-trigger="click"
                                         >Delete</button>
 
@@ -97,7 +97,7 @@
                         <div class="field" id="allocate_surgical_centre">
                             {% url 'edit_epilepsy_surgery_centre' assessment_id=assessment.pk site_id=active_surgical_site.pk as hx_post %}
                             {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
-                            {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                            {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="edit_epilepsy_surgery_centre" test_positive=active_surgical_site.pk label="Update Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
                         </div>
 
                     {% endif %}
@@ -108,7 +108,7 @@
                         <p>There is currently no surgical centre involved in the care of {{assessment.registration.case.first_name}} {{assessment.registration.case.surname}}</label>
                         {% url 'epilepsy_surgery_centre' assessment_id=assessment.pk as hx_post %}
                         {% url 'update_epilepsy_surgery_centre_pressed' assessment_id=assessment.pk site_id=active_surgical_site.pk action='cancel' as hx_cancel %}
-                        {% include 'epilepsy12/partials/page_elements/hospitals_select.html' with hospital_list=hospital_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                        {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#childrens_epilepsy_surgical_service" hx_trigger="click" hx_swap="innerHTML" hx_name="epilepsy_surgery_centre" test_positive=None label="Allocate Children's Surgical Centre" hx_default_text="Search children's surgical centres..." data_position="top left" enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
                     </div>
                     
                 {% endif %}

@@ -88,7 +88,7 @@
       relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
     </p>
     <button
-      hx-post="{% url 'opt_out' hospital_id case.pk %}"
+      hx-post="{% url 'opt_out' organisation_id case.pk %}"
       hx-trigger="click"
       class="ui rcpch_danger button"
       _="on htmx:confirm(issueRequest) 
@@ -105,10 +105,10 @@
   <div class="ui rcpch_info icon message">
     <i class="ui exclamation circle icon"></i>
     <div class="content">
-      <div class="header">Hospital</div>
+      <div class="header">Organisation</div>
       <p>
         <b
-          >{{hospital_trust.OrganisationName}}({{hospital_trust.ParentName}})</b
+          >{{organisation.OrganisationName}}({{organisation.ParentName}})</b
         >
         will be allocated automatically as the lead Epilepsy12 centre on saving
         this child's information.
@@ -131,7 +131,7 @@
     
   {% endif %}
 
-  <a href="{% url 'cases' hospital_id %}" class="ui rcpch_negative button"
+  <a href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button"
     >Cancel</a
   >
 

@@ -14,19 +14,19 @@ from django_htmx.http import trigger_client_event
 from django_htmx.http import HttpResponseClientRedirect
 
 # RCPCH
-from ..models import Case, AuditProgress, HospitalTrust, Registration, Site, KPI, Epilepsy12User
+from ..models import Case, AuditProgress, Organisation, Registration, Site, KPI, Epilepsy12User
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 from ..general_functions import construct_transfer_epilepsy12_site_email
 
 
 @login_required
 @permission_required('epilepsy12.view_registration', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def register(request, case_id):
     """
     Called on registration form page load. If first time, creates new Registration objectm KPI object and 
-    AuditProgress object. Creates a new Site with selected hospital and associates with this case.
+    AuditProgress object. Creates a new Site with selected organisation and associates with this case.
     Returns register.html template.
     """
     case = Case.objects.get(pk=case_id)
@@ -55,14 +55,14 @@ def register(request, case_id):
             management_total_expected_fields=0,
             management_total_completed_fields=0,
         )
-        lead_hospital = Site.objects.filter(
+        lead_organisation = Site.objects.filter(
             case=case,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True
         ).get()
         kpi = KPI.objects.create(
-            hospital_organisation=lead_hospital.hospital_trust,
-            parent_trust=lead_hospital.hospital_trust.ParentName,
+            organisation=lead_organisation.organisation,
+            parent_trust=lead_organisation.organisation.ParentName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -94,7 +94,7 @@ def register(request, case_id):
     else:
         registration = Registration.objects.filter(case=case).get()
 
-    hospital_list = HospitalTrust.objects.filter(
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     previously_registered = 0
@@ -122,13 +122,13 @@ def register(request, case_id):
     context = {
         "registration": registration,
         "case_id": case_id,
-        "hospital_list": hospital_list,
+        "organisation_list": organisation_list,
         "site": lead_site,
         "previously_registered_sites": previously_registered_sites,
         "audit_progress": registration.audit_progress,
         "active_template": active_template,
         # pass back organisation_id to steps for return to cases button
-        'organisation_id': lead_site.hospital_trust.pk,
+        'organisation_id': lead_site.organisation.pk,
         'field_enabled': False,
     }
 
@@ -152,7 +152,7 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_edit_epilepsy12_lead_centre', raise_exception=True)
 def allocate_lead_site(request, registration_id):
     """
@@ -160,12 +160,12 @@ def allocate_lead_site(request, registration_id):
     """
     registration = Registration.objects.get(pk=registration_id)
     new_trust_id = request.POST.get('allocate_lead_site')
-    selected_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
+    selected_organisation = Organisation.objects.get(pk=new_trust_id)
 
     # test if site exists
     if Site.objects.filter(
         case=registration.case,
-        hospital_trust=selected_hospital_trust,
+        organisation=selected_organisation,
         site_is_actively_involved_in_epilepsy_care=True
     ).exists():
         # this site already plays an active role in the care of this child
@@ -173,7 +173,7 @@ def allocate_lead_site(request, registration_id):
 
         Site.objects.filter(
             case=registration.case,
-            hospital_trust=selected_hospital_trust,
+            organisation=selected_organisation,
             site_is_actively_involved_in_epilepsy_care=True
         ).update(
             site_is_primary_centre_of_epilepsy_care=True,
@@ -185,7 +185,7 @@ def allocate_lead_site(request, registration_id):
         # it is therefore safe to create a new record
         Site.objects.create(
             case=registration.case,
-            hospital_trust=selected_hospital_trust,
+            organisation=selected_organisation,
             site_is_actively_involved_in_epilepsy_care=True,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_childrens_epilepsy_surgery_centre=False,
@@ -198,18 +198,18 @@ def allocate_lead_site(request, registration_id):
     # retrieve the current active site
     site = Site.objects.filter(
         case=registration.case,
-        hospital_trust=selected_hospital_trust,
+        organisation=selected_organisation,
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True,
     ).get()
 
     # get the new
 
-    hospital_list = HospitalTrust.objects.filter(
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
-        "hospital_list": hospital_list,
+        "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
         "edit": False,
@@ -229,7 +229,7 @@ def allocate_lead_site(request, registration_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_edit_epilepsy12_lead_centre', raise_exception=True)
 def edit_lead_site(request, registration_id, site_id):
     """
@@ -238,11 +238,11 @@ def edit_lead_site(request, registration_id, site_id):
     """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    hospital_list = HospitalTrust.objects.filter(
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
-        "hospital_list": hospital_list,
+        "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
         "edit": True,
@@ -262,7 +262,7 @@ def edit_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_transfer_epilepsy12_lead_centre', raise_exception=True)
 def transfer_lead_site(request, registration_id, site_id):
     """
@@ -272,11 +272,11 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
-    hospital_list = HospitalTrust.objects.filter(
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName').all()
 
     context = {
-        "hospital_list": hospital_list,
+        "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
         "edit": False,
@@ -295,12 +295,12 @@ def transfer_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_registration', raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    hospital_list = HospitalTrust.objects.filter(
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
@@ -308,7 +308,7 @@ def cancel_lead_site(request, registration_id, site_id):
         "site": site,
         "edit": False,
         "transfer": False,
-        'hospital_site': hospital_list
+        'organisation_site': organisation_list
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -324,7 +324,7 @@ def cancel_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_transfer_epilepsy12_lead_centre', raise_exception=True)
 def update_lead_site(request, registration_id, site_id, update):
     """
@@ -348,23 +348,23 @@ def update_lead_site(request, registration_id, site_id, update):
 
     if update == "edit":
         new_trust_id = request.POST.get('edit_lead_site')
-        new_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
+        new_organisation = Organisation.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
-            hospital_trust=new_hospital_trust,
+            organisation=new_organisation,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user)
     elif update == "transfer":
         new_trust_id = request.POST.get('transfer_lead_site')
-        new_hospital_trust = HospitalTrust.objects.get(pk=new_trust_id)
+        new_organisation = Organisation.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=False,
             updated_at=timezone.now(),
             updated_by=request.user)
         Site.objects.create(
-            hospital_trust=new_hospital_trust,
+            organisation=new_organisation,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
@@ -378,7 +378,7 @@ def update_lead_site(request, registration_id, site_id, update):
         ).all()
         for recipient in recipients:
             email = construct_transfer_epilepsy12_site_email(
-                request=request, user=recipient, target_hospital=new_hospital_trust.ParentName, child=registration.case)
+                request=request, user=recipient, target_organisation=new_organisation.ParentName, child=registration.case)
             try:
                 send_mail(
                     subject=subject,
@@ -391,13 +391,13 @@ def update_lead_site(request, registration_id, site_id, update):
                 return HttpResponse('Invalid header found.')
 
         messages.success(
-            request, f"{registration.case} has been successfully transferred to {new_hospital_trust.ParentName}.")
+            request, f"{registration.case} has been successfully transferred to {new_organisation.ParentName}.")
 
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'hospital_id': previous_lead_site.hospital_trust.pk}))
+    return HttpResponseClientRedirect(reverse('cases', kwargs={'organisation_id': previous_lead_site.organisation.pk}))
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_delete_epilepsy12_lead_centre', raise_exception=True)
 def delete_lead_site(request, registration_id, site_id):
     """
@@ -436,7 +436,7 @@ def delete_lead_site(request, registration_id, site_id):
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
-    hospital_list = HospitalTrust.objects.filter(
+    organisation_list = Organisation.objects.filter(
         Sector="NHS Sector").order_by('OrganisationName')
 
     context = {
@@ -444,7 +444,7 @@ def delete_lead_site(request, registration_id, site_id):
         "site": lead_site,
         "edit": False,
         "transfer": False,
-        'hospital_list': hospital_list
+        'organisation_list': organisation_list
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -460,7 +460,7 @@ def delete_lead_site(request, registration_id, site_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_registration', raise_exception=True)
 def previous_sites(request, registration_id):
 
@@ -493,7 +493,7 @@ Validation process
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_register_child_in_epilepsy12', raise_exception=True)
 def confirm_eligible(request, registration_id):
     """
@@ -539,7 +539,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_required
-# @user_can_access_this_hospital_trust()
+# @user_can_access_this_organisation()
 @permission_required('epilepsy12.change_registration', raise_exception=True)
 def registration_status(request, registration_id):
 
@@ -564,7 +564,7 @@ def registration_status(request, registration_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.can_register_child_in_epilepsy12', raise_exception=True)
 def registration_date(request, case_id):
     """

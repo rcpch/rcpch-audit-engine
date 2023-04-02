@@ -113,11 +113,11 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     history = HistoricalRecords()
 
     # relationships
-    hospital_trusts = models.ManyToManyField(
-        'epilepsy12.HospitalTrust',
+    organisations = models.ManyToManyField(
+        'epilepsy12.Organisation',
         through='Site',
         related_name='cases',
-        through_fields=('case', 'hospital_trust')
+        through_fields=('case', 'organisation')
     )
 
     @property

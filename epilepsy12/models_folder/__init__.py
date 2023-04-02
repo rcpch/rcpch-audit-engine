@@ -4,7 +4,7 @@ from .assessment import Assessment
 from .case import Case
 from .comorbidity import Comorbidity
 from .epilepsy_context import EpilepsyContext
-from .hospital_trust import HospitalTrust
+from .organisation import Organisation
 from .first_paediatric_assessment import FirstPaediatricAssessment
 from .investigations import Investigations
 from .management import Management

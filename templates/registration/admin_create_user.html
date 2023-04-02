@@ -69,10 +69,10 @@
           
           {% if not user.is_staff or user.is_superuser %}
             <div class='field'>
-              <label for="{{form.hospital_employer.id_for_label}}">Employer</label>
-              {{ form.hospital_employer }}
-              {% if form.hospital_employer.errors %}
-                <div class="ui pointing red basic label">{{form.hospital_employer.errors}}</div>
+              <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
+              {{ form.organisation_employer }}
+              {% if form.organisation_employer.errors %}
+                <div class="ui pointing red basic label">{{form.organisation_employer.errors}}</div>
               {% endif %}
             </div>
           {% endif %}
@@ -164,7 +164,7 @@
                   cancelButtonColor: '#e60700', 
                   confirmButtonText: 'Remove user from Epilepsy12' 
                 })
-                if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' hospital_id user.pk %}
+                if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %}
                 {
                   method: 'post',
                   headers: {
@@ -182,7 +182,7 @@
           <a 
             class="ui rcpch_negative button"
             name="cancel"
-            href="{% url 'epilepsy12_user_list' hospital_id=hospital_id %}"
+            href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}"
           >Cancel</a>
 
         </form>
