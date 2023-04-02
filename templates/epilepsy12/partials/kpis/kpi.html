@@ -40,7 +40,7 @@
         {{case.registration.kpi.epilepsy_specialist_nurse|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.tertiary_input == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.tertiary_input == 2 %} class='kpi_unscored' {% endif %} class="subcategory-header">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
@@ -55,7 +55,7 @@
         {{case.registration.kpi.tertiary_input|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.epilepsy_surgery_referral == 2 %} class='kpi_unscored' {% endif %}>
+    <tr {% if case.registration.kpi.epilepsy_surgery_referral == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
           class="rcpch question circle icon"
