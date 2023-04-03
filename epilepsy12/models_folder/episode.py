@@ -17,6 +17,18 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     Each epileptic episode is classified at to whether focal/general or unknown onset, or unclassified.
     For each episode there is one D (description), E (epilepsy definition), S (seizure type).
     """
+    expected_score = models.IntegerField(
+        # a continuous tally of expected number of scored fields for this episode
+        blank=True,
+        default=None,
+        null=True
+    )
+    calculated_score = models.IntegerField(
+        # a continuous tally of scored fields for this episode
+        blank=True,
+        default=None,
+        null=True
+    )
     seizure_onset_date = models.DateField(
         help_text={
             'label': 'When did the first episode of this type happen?',

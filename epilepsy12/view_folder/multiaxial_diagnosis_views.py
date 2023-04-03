@@ -13,7 +13,7 @@ from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
 from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site
-from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields, expected_score_for_single_episode
 from ..decorator import user_can_access_this_organisation
 
 """
@@ -258,7 +258,7 @@ def remove_episode(request, episode_id):
 
     context = {
         'multiaxial_diagnosis': multiaxial_diagnosis,
-        'episodes': episodes
+        'episodes': episodes,
     }
 
     response = recalculate_form_generate_response(
@@ -298,7 +298,7 @@ def close_episode(request, episode_id):
     context = {
         'multiaxial_diagnosis': multiaxial_diagnosis,
         'episodes': episodes,
-        'there_are_epileptic_episodes': there_are_epileptic_episodes
+        'there_are_epileptic_episodes': there_are_epileptic_episodes,
     }
 
     response = recalculate_form_generate_response(
