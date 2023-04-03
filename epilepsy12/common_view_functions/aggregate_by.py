@@ -151,12 +151,15 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
 
         for measure in all_kpi_measures:
             # filter cases for all kpi with a score < 2
-            q_objects = Q(**{f'registration__kpi__{measure}__lt': 2}
-                          ) & Q(**{f'registration__kpi__{measure}__isnull': False})
+            q_objects = Q(
+                **{f'registration__kpi__{measure}__lt': 2}
+            ) & Q(
+                **{f'registration__kpi__{measure}__isnull': False}
+            ) & Q(**{f'registration__kpi__{measure}__isnull': False})
             f_objects = F(f'registration__kpi__{measure}')
 
             # sum this measure
-            aggregation_fields[f'{measure}'] = Sum(
+            aggregation_fields[f'{measure}'] = Count(
                 DJANGO_CASE(When(q_objects,
                                  then=f_objects), default=0))
             # average of the sum of this measure
