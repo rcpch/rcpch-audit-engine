@@ -71,6 +71,7 @@ def test_fields_update_audit_progress(model_instance):
     else:
         registration = model_instance.registration
 
+    # update KPIs
     calculate_kpis(registration_instance=registration)
 
     try:
@@ -273,7 +274,7 @@ def avoid_fields(model_instance):
     elif model_class_name in ['Syndrome', 'Comorbidity']:
         return ['id', 'multiaxial_diagnosis', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'Episode':
-        return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at']
+        return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at', 'expected_score', 'calculated_score']
     elif model_class_name == 'AntiEpilepsyMedicine':
         return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date']
     elif model_class_name == 'Registration':
@@ -325,7 +326,7 @@ def count_episode_fields(all_episodes):
     based selections so far
     """
     cumulative_score = 0
-    is_epilepsy = False
+    at_least_one_episode_is_epileptic = False
     epilepsy_status_known = 0
 
     if all_episodes.count() == 0:
@@ -333,60 +334,17 @@ def count_episode_fields(all_episodes):
         return scoreable_fields_for_model_class_name('Episode')
 
     for episode in all_episodes:
-        # essential fields already accounted for are:
-        # seizure_onset_date
-        # seizure_onset_date_confidence
-        # episode_definition
-        # has_description_of_the_episode_or_episodes_been_gathered
-        # epilepsy_or_nonepilepsy_status
-        cumulative_score += 5
+        result = expected_score_for_single_episode(episode=episode)
+        cumulative_score += result['cumulative_score']
+        # store the total expected in the instance
+        episode.expected_score = result['cumulative_score']
+        episode.save()
+        epilepsy_status_known += result['epilepsy_status_known']
+        if result['is_epilepsy']:
+            at_least_one_episode_is_epileptic = True
 
-        if episode.has_description_of_the_episode_or_episodes_been_gathered:
-            # essential fields are:
-            # description
-            cumulative_score += 1
-        if episode.epilepsy_or_nonepilepsy_status == "E":
-            # epileptic seizure: essential fields:
-            # epileptic_seizure_onset_type
-
-            is_epilepsy = True
-            epilepsy_status_known += 1
-
-            cumulative_score += 1
-
-            if episode.epileptic_seizure_onset_type == 'GO':
-                # generalised onset: essential fields
-                # epileptic_generalised_onset
-                cumulative_score += 1
-            elif episode.epileptic_seizure_onset_type == 'FO':
-                # focal onset
-                # minimum score is laterality
-                cumulative_score += 1
-            else:
-                # either unclassified or unknown onset
-                # no further score
-                cumulative_score += 0
-
-        elif episode.epilepsy_or_nonepilepsy_status == "NE":
-            # nonepileptic seizure - essential fields:
-            # nonepileptic_seizure_unknown_onset
-            # nonepileptic_seizure_type
-            # AND ONE of behavioural/migraine/misc/paroxysmal/sleep related/syncope - essential fields:
-            # nonepileptic_seizure_behavioural or
-            # nonepileptic_seizure_migraine or
-            # nonepileptic_seizure_miscellaneous or
-            # nonepileptic_seizure_paroxysmal or
-            # nonepileptic_seizure_sleep
-            # nonepileptic_seizure_syncope
-            epilepsy_status_known += 1
-
-            cumulative_score += 3
-        elif episode.epilepsy_or_nonepilepsy_status == "U":
-            # uncertain status
-            cumulative_score += 0
-            epilepsy_status_known += 1
-
-    if is_epilepsy or not epilepsy_status_known == all_episodes.count():
+    # scoreable_fields_for_model_class_name('Episode')
+    if at_least_one_episode_is_epileptic:
         # at least one episode is epileptic or no episodes are as yet unscored
         return cumulative_score
     else:
@@ -394,6 +352,78 @@ def count_episode_fields(all_episodes):
         # increase the total by the minimum number of fields for an epileptic episode
         cumulative_score += scoreable_fields_for_model_class_name('Episode')
         return cumulative_score
+
+
+def expected_score_for_single_episode(episode):
+    """
+    returns a count of expected fields for a given episode based on what has been scored so far
+    """
+    # essential fields already accounted for are:
+    # seizure_onset_date
+    # seizure_onset_date_confidence
+    # episode_definition
+    # has_description_of_the_episode_or_episodes_been_gathered
+    # epilepsy_or_nonepilepsy_status
+
+    # initialize variables
+    is_epilepsy = False
+    cumulative_score = 0
+    epilepsy_status_known = 0
+
+    cumulative_score += 5
+
+    if episode.has_description_of_the_episode_or_episodes_been_gathered:
+        # essential fields are:
+        # description
+        cumulative_score += 1
+    if episode.epilepsy_or_nonepilepsy_status == "E":
+        # epileptic seizure: essential fields:
+        # epileptic_seizure_onset_type
+
+        is_epilepsy = True
+        epilepsy_status_known += 1
+
+        cumulative_score += 1
+
+        if episode.epileptic_seizure_onset_type == 'GO':
+            # generalised onset: essential fields
+            # epileptic_generalised_onset
+            cumulative_score += 1
+        elif episode.epileptic_seizure_onset_type == 'FO':
+            # focal onset
+            # minimum score is laterality
+            cumulative_score += 1
+        else:
+            # either unclassified or unknown onset
+            # no further score
+            cumulative_score += 0
+
+    elif episode.epilepsy_or_nonepilepsy_status == "NE":
+        # nonepileptic seizure - essential fields:
+        # nonepileptic_seizure_unknown_onset
+        # nonepileptic_seizure_type
+        # AND ONE of behavioural/migraine/misc/paroxysmal/sleep related/syncope - essential fields:
+        # nonepileptic_seizure_behavioural or
+        # nonepileptic_seizure_migraine or
+        # nonepileptic_seizure_miscellaneous or
+        # nonepileptic_seizure_paroxysmal or
+        # nonepileptic_seizure_sleep
+        # nonepileptic_seizure_syncope
+        epilepsy_status_known += 1
+        if episode.nonepileptic_seizure_type == 'Oth':
+            cumulative_score += 2
+        else:
+            cumulative_score += 3
+    elif episode.epilepsy_or_nonepilepsy_status == "U":
+        # uncertain status
+        cumulative_score += 0
+        epilepsy_status_known += 1
+
+    return {
+        'cumulative_score': cumulative_score,
+        'epilepsy_status_known': epilepsy_status_known,
+        'is_epilepsy': is_epilepsy
+    }
 
 
 def number_of_completed_fields_in_related_models(model_instance):
@@ -413,7 +443,11 @@ def number_of_completed_fields_in_related_models(model_instance):
             multiaxial_diagnosis=model_instance).all()
         if episodes.count() > 0:
             for episode in episodes:
-                cumulative_score += completed_fields(episode)
+                calculated_score = completed_fields(episode)
+                # save the episode calculated score in the model instance
+                episode.calculated_score = calculated_score
+                episode.save()
+                cumulative_score += calculated_score
         if syndromes.count() > 0:
             for syndrome in syndromes:
                 cumulative_score += completed_fields(syndrome)
