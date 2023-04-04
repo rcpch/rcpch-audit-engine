@@ -166,8 +166,6 @@ def selected_organisation_summary(request):
     else:
         total_percent_trust = 0
 
-    print(total_percent_organisation)
-
     return render(request=request, template_name='epilepsy12/partials/selected_organisation_summary.html', context={
         'user': request.user,
         'selected_organisation': selected_organisation,

@@ -1,43 +1,74 @@
-<canvas id="hospitals_ranked_by_kpi_measure"></canvas>
-<script
-  src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"
-  integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI="
-  crossorigin="anonymous"
-></script>
-<script>
-  var ctx = document.getElementById('hospitals_ranked_by_kpi_measure').getContext('2d');
-  var myChart = new Chart(ctx, {
+{% load epilepsy12_template_tags %}
+<div class="rcpch_padded">
+  <canvas id="{{data_id}}"></canvas>
+</div>
+  <script>
+    /* secondary colours */
+    var rcpch_red='#e60700';
+    var rcpch_light_red='#ffe7e6';
+    var rcpch_orange='#ff8000';
+    var rcpch_light_orange='#ffdab5';
+    var rcpch_yellow='#fdc300';
+    var rcpch_gold='#c2a712';
+    var rcpch_vivid_green='#c8d400';
+    var rcpch_aqua_green='#00dbaa';
+    var rcpch_purple='#7159aa';
+    var rcpch_magenta='#E00087';
+    var rcpch_strong_green='#66cc33';
+    var rcpch_dark_red='#9a0500';
+    var myChart = new Chart(document.getElementById('{{data_id}}'), {
       type: 'bar',
       data: {
-          labels: [{% for data in ranked %}'{{ data.hospital.OrganisationName }}',{% endfor %}], //loop through queryset,
-          datasets: [{
-              label: '{{series_name}}',
-              data: [{% for kpi in ranked %}{{ kpi.kpi }},{% endfor %}],
-              backgroundColor: [
-                  'rgba(17, 167, 242, 1.0)',
-              ],
-              borderColor: [
-                  'rgba(17, 167, 242, 1.0)',
-              ],
-              borderWidth: 1,
-          }]
+        labels: [{% for item in data %}'{% split_label_to_list item.region.1 %}',{% endfor %}],
+        datasets: [
+        {
+            type: 'line',
+            data: [{% for val in data %}{% kpi_average_for_kpi_name val kpi_name %},{% endfor %}],
+            borderColor: '#000000',
+            backgroundColor: '#000000',
+            label: 'Average'
+          },
+          {
+            label: 'Number Achieving this measure',
+            data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
+            borderWidth: 1,
+            backgroundColor: [
+                rcpch_orange,
+                rcpch_light_orange,
+                rcpch_yellow,
+                rcpch_gold,
+                rcpch_vivid_green,
+                rcpch_aqua_green,
+                rcpch_purple,
+                rcpch_magenta,
+                rcpch_strong_green,
+                rcpch_dark_red
+            ]
+          }
+        ]
       },
       options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            title: {
-              display: true,
-              text: "Hospitals ranked",
-              position: 'top',
-              align: 'start'
-            },
-            legend: {
-              display: true,
-              position: 'right'
-            }
+        indexAxis: 'y',
+        plugins: {
+          title: {
+            text: '{{data_title}}',
+            display: true
           }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          },
+          x: 
+            {
+                // ticks: {
+                //             autoSkip: true,
+                //             maxRotation: 90,
+                //             minRotation: 90,
+                //         }
+            }
+          
+        }
       }
-  });
-
-</script>
+    });
+  </script>
