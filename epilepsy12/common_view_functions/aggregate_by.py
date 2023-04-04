@@ -129,8 +129,11 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     if kpi_measure:
         # a single measure selected for aggregation
 
-        q_objects = Q(**{f'registration__kpi__{kpi_measure}__lt': 2}
-                      ) & Q(**{f'registration__kpi__{kpi_measure}__isnull': False})
+        q_objects = Q(
+            **{f'registration__kpi__{kpi_measure}__lt': 2}
+        ) & Q(
+            **{f'registration__kpi__{kpi_measure}__isnull': False}
+        ) & Q(**{f'registration__kpi__{kpi_measure}__isnull': False})
         f_objects = F(f'registration__kpi__{kpi_measure}')
 
         # sum this measure
@@ -159,21 +162,21 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
             f_objects = F(f'registration__kpi__{measure}')
 
             # sum this measure
-            aggregation_fields[f'{measure}'] = Count(
+            aggregation_fields[f'{measure}'] = Sum(
                 DJANGO_CASE(When(q_objects,
                                  then=f_objects), default=0))
             # average of the sum of this measure
             aggregation_fields[f'{measure}_average'] = Avg(
                 DJANGO_CASE(When(q_objects,
-                                 then=f_objects), default=0))
+                                 then=f_objects), default=None))
             # total cases scored for this measure
             aggregation_fields[f'{measure}_total'] = Count(
                 DJANGO_CASE(When(q_objects,
-                                 then=f_objects), default=0))
+                                 then=f_objects), default=None))
         # total_cases scored for all measures
         aggregation_fields['total_number_of_cases'] = Count(
             DJANGO_CASE(When(q_objects,
-                        then=f_objects), default=0))
+                        then=f_objects), default=None))
 
     return filtered_cases.aggregate(**aggregation_fields)
 

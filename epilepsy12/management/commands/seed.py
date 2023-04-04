@@ -214,6 +214,13 @@ def run_dummy_cases_seed():
 
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
 
+    random_organisations = []
+    for j in range(round((len(DUMMY_NAMES)-1)/10)):
+        random_organisation = Organisation.objects.filter(
+            Sector="NHS Sector").order_by("?").first()
+        for i in range(1, 11):
+            random_organisations.append(random_organisation)
+
     for index in range(len(DUMMY_NAMES)-1):
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         nhs_number = randint(1000000000, 9999999999)
@@ -229,8 +236,7 @@ def run_dummy_cases_seed():
         ethnicity = choice(ETHNICITIES)[0]
 
         # get a random organisation
-        organisation = Organisation.objects.filter(
-            Sector="NHS Sector").order_by("?").first()
+        organisation = random_organisations[index]
 
         case_has_error = False
 
