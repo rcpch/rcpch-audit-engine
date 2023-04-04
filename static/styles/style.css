@@ -1533,3 +1533,13 @@ table.ui.rcpch.table.cases_table tbody {
     vertical-align: middle;
 }
 
+.rcpch_padded {
+    margin-top: 50px;
+}
+
+.centred {
+    margin-left: auto;
+    margin-right: auto;
+    width: 8em;
+    text-align: center;
+}

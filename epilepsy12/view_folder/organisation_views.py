@@ -61,7 +61,7 @@ def organisation_reports(request):
         abstraction_level='organisation'
     ).count()
     # query to return all completed E12 cases in the current cohort in this organisation trust
-    count_of_current_cohort_registered_completed_cases_in_this_organisation = all_registered_cases_for_cohort_and_abstraction_level(
+    count_of_current_cohort_registered_completed_cases_in_this_trust = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=selected_organisation,
         cohort=cohort_data['cohort'],
         case_complete=True,
@@ -75,7 +75,7 @@ def organisation_reports(request):
         abstraction_level='organisation'
     ).count()
     # query to return all cases registered in the current cohort at this organisation trust
-    count_of_current_cohort_registered_cases_in_this_organisation = all_registered_cases_for_cohort_and_abstraction_level(
+    count_of_current_cohort_registered_cases_in_this_trust = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=selected_organisation,
         cohort=cohort_data['cohort'],
         case_complete=False,
@@ -84,13 +84,13 @@ def organisation_reports(request):
 
     if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0:
         total_percent_organisation = round((count_of_current_cohort_registered_completed_cases_in_this_organisation /
-                                            count_of_current_cohort_registered_cases_in_this_organisation) * 100)
+                                            count_of_current_cohort_registered_cases_in_this_organisation))
     else:
         total_percent_organisation = 0
 
     if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0:
-        total_percent_trust = round((count_of_current_cohort_registered_completed_cases_in_this_organisation /
-                                    count_of_current_cohort_registered_cases_in_this_organisation) * 100)
+        total_percent_trust = round((count_of_current_cohort_registered_completed_cases_in_this_trust /
+                                    count_of_current_cohort_registered_cases_in_this_trust))
     else:
         total_percent_trust = 0
 
@@ -104,9 +104,9 @@ def organisation_reports(request):
         'percent_completed_organisation': total_percent_organisation,
         'percent_completed_trust': total_percent_trust,
         'count_of_current_cohort_registered_cases_in_this_organisation': count_of_current_cohort_registered_cases_in_this_organisation,
-        'count_of_current_cohort_registered_completed_cases_in_this_organisation': count_of_current_cohort_registered_completed_cases_in_this_organisation,
-        'count_of_current_cohort_registered_cases_in_this_organisation': count_of_current_cohort_registered_cases_in_this_organisation,
-        'count_of_current_cohort_registered_completed_cases_in_this_organisation': count_of_current_cohort_registered_completed_cases_in_this_organisation,
+        'count_of_current_cohort_registered_completed_cases_in_this_organisation': count_of_current_cohort_registered_completed_cases_in_this_trust,
+        'count_of_current_cohort_registered_cases_in_this_trust': count_of_current_cohort_registered_cases_in_this_trust,
+        'count_of_current_cohort_registered_completed_cases_in_this_trust': count_of_current_cohort_registered_completed_cases_in_this_trust,
         'cohort_data': cohort_data,
         'all_models': all_models,
         'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'organisation', 'comorbidity', 'episode', 'syndrome', 'keyword'),
@@ -133,7 +133,7 @@ def selected_organisation_summary(request):
         abstraction_level='organisation'
     ).count()
     # query to return all completed E12 cases in the current cohort in this organisation trust
-    count_of_current_cohort_registered_completed_cases_in_this_organisation = all_registered_cases_for_cohort_and_abstraction_level(
+    count_of_current_cohort_registered_completed_cases_in_this_trust = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=selected_organisation,
         cohort=cohort_data['cohort'],
         case_complete=True,
@@ -147,7 +147,7 @@ def selected_organisation_summary(request):
         abstraction_level='organisation'
     ).count()
     # query to return all cases registered in the current cohort at this organisation trust
-    count_of_current_cohort_registered_cases_in_this_organisation = all_registered_cases_for_cohort_and_abstraction_level(
+    count_of_current_cohort_registered_cases_in_this_trust = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=selected_organisation,
         cohort=cohort_data['cohort'],
         case_complete=False,
@@ -156,13 +156,13 @@ def selected_organisation_summary(request):
 
     if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0:
         total_percent_organisation = round((count_of_current_cohort_registered_cases_in_this_organisation /
-                                            count_of_current_cohort_registered_completed_cases_in_this_organisation) * 100)
+                                            count_of_current_cohort_registered_completed_cases_in_this_organisation))*10
     else:
         total_percent_organisation = 0
 
     if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0:
         total_percent_trust = round((count_of_current_cohort_registered_cases_in_this_organisation /
-                                    count_of_current_cohort_registered_completed_cases_in_this_organisation) * 100)
+                                    count_of_current_cohort_registered_completed_cases_in_this_organisation))*10
     else:
         total_percent_trust = 0
 
@@ -177,8 +177,8 @@ def selected_organisation_summary(request):
         'percent_completed_trust': total_percent_trust,
         'count_of_current_cohort_registered_cases_in_this_organisation': count_of_current_cohort_registered_cases_in_this_organisation,
         'count_of_current_cohort_registered_completed_cases_in_this_organisation': count_of_current_cohort_registered_completed_cases_in_this_organisation,
-        'count_of_current_cohort_registered_cases_in_this_organisation': count_of_current_cohort_registered_cases_in_this_organisation,
-        'count_of_current_cohort_registered_completed_cases_in_this_organisation': count_of_current_cohort_registered_completed_cases_in_this_organisation,
+        'count_of_current_cohort_registered_cases_in_this_trust': count_of_current_cohort_registered_cases_in_this_trust,
+        'count_of_current_cohort_registered_completed_cases_in_this_trust': count_of_current_cohort_registered_completed_cases_in_this_trust,
         'cohort_data': cohort_data,
         'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
     })

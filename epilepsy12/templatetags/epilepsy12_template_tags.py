@@ -47,7 +47,26 @@ def percentage_of_total(numerator, denominator):
 
 @register.simple_tag
 def kpi_for_kpi_name(aggregated_kpi, kpi_name):
-    return aggregated_kpi['aggregated_kpis'][kpi_name]
+    if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
+        return 0
+    else:
+        return aggregated_kpi['aggregated_kpis'][kpi_name]
+
+
+@register.simple_tag
+def kpi_average_for_kpi_name(aggregated_kpi, kpi_name):
+    if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
+        return 0
+    else:
+        return aggregated_kpi['aggregated_kpis'][f'{kpi_name}_average']
+
+
+@register.simple_tag
+def split_label_to_list(label):
+    if label is None:
+        return 'Unclassified'
+    else:
+        return label.strip()
 
 
 @register.filter
@@ -78,7 +97,7 @@ def permission_text(add_permission, change_permission, delete_permission, model_
             return_string += f' add {model_name}.'
         else:
             return_string = ""
-    print(return_string)
+
     return return_string
 
 

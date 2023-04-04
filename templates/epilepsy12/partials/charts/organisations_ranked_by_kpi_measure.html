@@ -1,20 +1,54 @@
 {% load epilepsy12_template_tags %}
-<div>
+<div class="rcpch_padded">
   <canvas id="{{data_id}}"></canvas>
 </div>
   <script>
+    /* secondary colours */
+    var rcpch_red='#e60700';
+    var rcpch_light_red='#ffe7e6';
+    var rcpch_orange='#ff8000';
+    var rcpch_light_orange='#ffdab5';
+    var rcpch_yellow='#fdc300';
+    var rcpch_gold='#c2a712';
+    var rcpch_vivid_green='#c8d400';
+    var rcpch_aqua_green='#00dbaa';
+    var rcpch_purple='#7159aa';
+    var rcpch_magenta='#E00087';
+    var rcpch_strong_green='#66cc33';
+    var rcpch_dark_red='#9a0500';
     var myChart = new Chart(document.getElementById('{{data_id}}'), {
       type: 'bar',
       data: {
-        labels: [{% for item in data %}'{{ item.region.1 }}',{% endfor %}],
-        datasets: [{
-          label: 'KPIs',
-          data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
-          borderWidth: 1,
-          backgroundColor: ['#3366cc']
-        }]
+        labels: [{% for item in data %}'{% split_label_to_list item.region.1 %}',{% endfor %}],
+        datasets: [
+        {
+            type: 'line',
+            data: [{% for val in data %}{% kpi_average_for_kpi_name val kpi_name %},{% endfor %}],
+            borderColor: '#000000',
+            backgroundColor: '#000000',
+            label: 'Average'
+          },
+          {
+            label: 'Number Achieving this measure',
+            data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
+            borderWidth: 1,
+            backgroundColor: [
+                rcpch_orange,
+                rcpch_light_orange,
+                rcpch_yellow,
+                rcpch_gold,
+                rcpch_vivid_green,
+                rcpch_aqua_green,
+                rcpch_purple,
+                rcpch_magenta,
+                rcpch_strong_green,
+                rcpch_dark_red
+            ]
+          }
+        ]
       },
       options: {
+        indexAxis: 'y',
         plugins: {
           title: {
             text: '{{data_title}}',
@@ -27,11 +61,11 @@
           },
           x: 
             {
-                ticks: {
-                            autoSkip: false,
-                            maxRotation: 90,
-                            minRotation: 90
-                        }
+                // ticks: {
+                //             autoSkip: true,
+                //             maxRotation: 90,
+                //             minRotation: 90,
+                //         }
             }
           
         }
