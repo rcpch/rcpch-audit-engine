@@ -2,7 +2,7 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %} 
 
-<div class="ui grid container">
+<div class="ui grid container selected_organisation_container">
     
         {% if request.user.is_rcpch_audit_team_member %}
             <div class='sixteen wide column'>
