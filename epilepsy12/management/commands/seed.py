@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from ...constants import ETHNICITIES, DUMMY_NAMES
 from ...models import Organisation, Keyword, Case, Site, Registration
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
-from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date
+from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, imd_for_postcode
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from .add_codes_to_organisations import add_codes_to_organisation
@@ -215,7 +215,7 @@ def run_dummy_cases_seed():
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
 
     random_organisations = []
-    for j in range(round((len(DUMMY_NAMES)-1)/10)):
+    for j in range(10):
         random_organisation = Organisation.objects.filter(
             Sector="NHS Sector").order_by("?").first()
         for i in range(1, 11):

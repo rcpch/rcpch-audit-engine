@@ -33,6 +33,12 @@ services:
       - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
       - DJANGO_SUPERUSER_ROLE=1
       - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
+      - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
+      - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1
+      # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001
+      # COMMENT THIS LINE BACK IN AND COMMENT LINE 37 OUT IF RUNNING RCPCH CENSUS PLATFORM LOCALLY
+    env_file:
+      - .env # this contains the token for RCPCH Census Platform and is not entered into git
     command: >
       sh -c "pip install --upgrade pip &&
             pip install -r requirements/development-requirements.txt &&
