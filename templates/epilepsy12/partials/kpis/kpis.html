@@ -1,6 +1,6 @@
 {% load epilepsy12_template_tags %}
 
-<div class="ui rcpch container">
+
     <div class="sixteen wide column">
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
             <div class='ui header'>
@@ -22,89 +22,92 @@
             </div>
         </div>
 
-        <div class="ui raised attached inverted rcpch_dark_blue segment" id="audit_body_segment">
+        <div class="ui raised attached inverted rcpch_dark_blue  segment" id="audit_body_segment">
 
                 <h3>Clinical Team</h3>
-                <table class='ui rcpch table kpi_table'>
+                <table class='ui rcpch stackable small table kpi_table'>
                     <thead>
                         <tr>
                             <th class='three wide'>Indicator</th>
-                            <th class='right aligned'>
-                                Organisation
-                                <i 
-                                    class="info circle icon"
-                                    id='totals_organisation'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this organisation."
-                                    data-position='top right'
-                                    _="init js $('#totals_organisation').popup(); end"
-                                ></i>({{organisation_kpis.total_number_of_cases}})
+                            <th class='right aligned '>
+                                
+                                
+                                    <p>Organisation</p>
+                                    <p><i
+                                        class="info circle icon"
+                                        id='totals_organisation'
+                                        data-title='Epilepsy12 totals'
+                                        data-content="Number of children registered in this organisation."
+                                        data-position='top right'
+                                        _="init js $('#totals_organisation').popup(); end"
+                                    ></i>({{organisation_kpis.total_number_of_cases}})</p>
+                                
                             </th>
                             <th class='right aligned'>
-                                Health Board/Trust
-                                <i 
+                                <p>Health Board/Trust</p>
+                                <p><i 
                                     class="info circle icon"
                                     id='totals_trust'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered in this Trust."
                                     data-position='top right'
                                     _="init js $('#totals_trust').popup(); end"
-                                ></i>({{trust_kpis.total_number_of_cases}})
+                                ></i>({{trust_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                Integrated Care Board ({{organisation.ICBName}})
-                                <i 
+                                <p>Integrated Care Board ({{organisation.ICBName}})</p>
+                                <p><i 
                                     class="info circle icon"
                                     id='totals_icb'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered in this Integrated Care Board."
                                     data-position='top right'
                                     _="init js $('#totals_icb').popup(); end"
-                                ></i>({{icb_kpis.total_number_of_cases}})
+                                ></i>({{icb_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                NHS Region ({{organisation.NHSEnglandRegion}})
-                                <i 
+                                <p>NHS Region ({{organisation.NHSEnglandRegion}})</p>
+                                <p><i 
                                     class="info circle icon"
                                     id='totals_nhs'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered in this NHS Region."
                                     data-position='top right'
                                     _="init js $('#totals_nhs').popup(); end"
-                                ></i>({{nhs_kpis.total_number_of_cases}})
+                                ></i>({{nhs_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                OPEN UK Region ({{organisation.OPENUKNetworkName}})
-                                <i 
+                                <p>OPEN UK Region ({{organisation.OPENUKNetworkName}})</p>
+                                <p><i 
                                     class="info circle icon"
                                     id='totals_open_uk'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered in this OPEN UK Region."
                                     data-position='top right'
                                     _="init js $('#totals_open_uk').popup(); end"
-                                ></i>({{open_uk_kpis.total_number_of_cases}})
+                                ></i>({{open_uk_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                Country ({{organisation.Country}})
-                                <i 
+                                <p>Country ({{organisation.Country}})</p>
+                                <p><i 
                                     class="info circle icon"
                                     id='totals_country'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered in this country."
                                     data-position='top right'
                                     _="init js $('#totals_country').popup(); end"
-                                ></i>({{country_kpis.total_number_of_cases}})
+                                ></i>({{country_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                England & Wales Combined
-                                <i 
+                                <p>England & Wales Combined</p>
+                                <p><i 
                                     class="info circle icon"
                                     id='totals_national'
                                     data-title='Epilepsy12 totals'
                                     data-content="Number of children registered nationally."
                                     data-position='top right'
                                     _="init js $('#totals_national').popup(); end"
-                                ></i>({{national_kpis.total_number_of_cases}})
+                                ></i>({{national_kpis.total_number_of_cases}})</p>
                             </th>
                         </tr>
                     </thead>
@@ -226,7 +229,7 @@
                 </table>
 
                 <h3>Investigations</h3>
-                <table class='ui rcpch table'>
+                <table class='ui rcpch small table'>
                     <thead>
                         <tr>
                             <th class='three wide'>Indicator</th>
@@ -300,7 +303,7 @@
                 </table>
 
                 <h3>Mental Health</h3>
-                <table class='ui rcpch table'>
+                <table class='ui rcpch small table'>
                     <thead>
                         <tr>
                             <th class='three wide'>Indicator</th>
@@ -376,7 +379,7 @@
                 </table>
                 
                 <h3>Medication</h3>
-                <table class='ui rcpch table'>
+                <table class='ui rcpch small table'>
                     <thead>
                         <tr>
                             <th class='three wide'>Indicator</th>
@@ -425,7 +428,7 @@
                 </table>
 
                 <h3>Care Planning</h3>
-                <table class='ui rcpch table'>
+                <table class='ui rcpch small table'>
                     <thead>
                         <tr>
                             <th class='three wide'>Indicator</th>
@@ -808,4 +811,3 @@
     
     </div>
 
-</div>
