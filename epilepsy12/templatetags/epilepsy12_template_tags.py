@@ -66,7 +66,7 @@ def split_label_to_list(label):
     if label is None:
         return 'Unclassified'
     else:
-        return label.strip()
+        return label.strip().replace('INTEGRATED CARE BOARD', 'ICB')
 
 
 @register.filter

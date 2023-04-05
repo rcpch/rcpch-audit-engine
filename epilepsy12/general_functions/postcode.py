@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 from ..constants import UNKNOWN_POSTCODES
 
 
@@ -17,7 +18,7 @@ def is_valid_postcode(postcode):
         return True
 
     # check against API
-    url = f"https://api.postcodes.io/postcodes/{postcode}/validate"
+    url = f"{settings.POSTCODES_IO_API_URL}/{postcode}/validate"
     response = requests.get(url=url)
     if response.status_code == 404:
         print("Postcode validation failure. Could not validate postcode.")

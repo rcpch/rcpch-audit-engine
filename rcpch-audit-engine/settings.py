@@ -37,7 +37,13 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + ["127.0.0.1",
                                                                     "localhost",
                                                                     "0.0.0.0"]
 
-RCPCH_CENSUS_TOKEN = os.getenv("DJANGO_REST_FRAMEWORK_TOKEN", None)
+# This is the token required for getting deprivation quintiles from the RCPCH Census Platform
+RCPCH_CENSUS_PLATFORM_URL = os.getenv('RCPCH_CENSUS_PLATFORM_URL')
+RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv(
+    "RCPCH_CENSUS_PLATFORM_TOKEN")
+
+# this is the url for api.postcodes.io, a free service reporting postcode data off a postcode
+POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
 
 # Application definition
 
