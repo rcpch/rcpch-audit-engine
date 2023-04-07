@@ -110,7 +110,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     epileptic_seizure_onset_type = models.CharField(
         help_text={
             'label': "How best would describe the onset of the epileptic episode?",
-            'reference': "How best would describe the onset of the epileptic episode?",
+            'reference': "The citation is Operational classification of seizure types by the International League Against Epilepsy: Position Paper of the ILAE Commission for Classification and Terminology. Epilepsia, 58(4):522–530, 2017.",
         },
         max_length=3,
         choices=EPILEPSY_SEIZURE_TYPE,
@@ -260,7 +260,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     nonepileptic_seizure_unknown_onset = models.CharField(
         help_text={
             'label': 'How best describes the onset of the nonepileptic episode(s)?',
-            'reference': 'How best describes the onset of the nonepileptic episode(s)?',
+            'reference': 'The citation is Operational classification of seizure types by the International League Against Epilepsy: Position Paper of the ILAE Commission for Classification and Terminology. Epilepsia, 58(4):522–530, 2017.',
         },
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_ONSET,
