@@ -111,6 +111,7 @@ admin.site.register(AuditProgress)
 admin.site.register(Episode, SimpleHistoryAdmin)
 admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
 admin.site.register(Syndrome, SimpleHistoryAdmin)
+admin.site.register(SyndromeEntity, SimpleHistoryAdmin)
 admin.site.register(KPI)
 admin.site.register(VisitActivity)
 

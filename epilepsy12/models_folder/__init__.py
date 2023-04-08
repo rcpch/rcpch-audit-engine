@@ -19,3 +19,4 @@ from .multiaxial_diagnosis import MultiaxialDiagnosis
 from .kpi import KPI
 from .visitactivity import VisitActivity
 from .help_text_mixin import HelpTextMixin
+from .syndrome_entity import SyndromeEntity

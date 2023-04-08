@@ -143,6 +143,14 @@ def match_two_values(val1, val2):
     return val1 == val2
 
 
+@register.simple_tag
+def value_for_field_name(model, field_name):
+    """
+    Returns the field value for a given field name in a model
+    """
+    return getattr(model, field_name, None)
+
+
 @register.filter
 def to_class_name(value):
     if value.__class__.__name__ == "Registration":

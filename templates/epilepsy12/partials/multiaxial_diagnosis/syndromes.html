@@ -14,6 +14,9 @@
         {% for syndrome in syndromes %}
             <tr>
                 <td>
+                    {% if syndrome.syndrome_diagnosis_date and syndrome.syndrome %}
+                        <i class="rcpch_pink check circle outline icon"></i>
+                    {% endif %}
                     {% if syndrome.syndrome_diagnosis_date %}
                         {{syndrome.syndrome_diagnosis_date}}
                     {% else %}
@@ -24,8 +27,8 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if syndrome.syndrome_name is not None %}
-                        {{syndrome.get_syndrome_name_display}}
+                    {% if syndrome.syndrome is not None %}
+                        {{syndrome.syndrome.syndrome_name}}
                     {% else %}
                         <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
