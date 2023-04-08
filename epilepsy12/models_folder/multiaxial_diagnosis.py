@@ -105,9 +105,15 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         self.updated_by = value
 
     # relationships
+    registration = models.OneToOneField(
+        'epilepsy12.Registration',
+        on_delete=models.CASCADE,
+        related_name='multiaxialdiagnosis'
+    )
+
     epilepsy_cause = models.ForeignKey(
         'epilepsy12.EpilepsyCauseEntity',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         help_text={
             'label': "What is the main identified cause of the epilepsy?",
             'reference': "What is the main identified cause of the epilepsy?",
@@ -116,12 +122,6 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         default=None,
         blank=True,
         null=True
-    )
-
-    registration = models.OneToOneField(
-        'epilepsy12.Registration',
-        on_delete=models.CASCADE,
-        related_name='multiaxialdiagnosis'
     )
 
     # Meta class
