@@ -176,8 +176,6 @@ class Migration(migrations.Migration):
             model_name="comorbidity",
             name="comorbidity",
             field=models.ForeignKey(
-                blank=True,
-                db_constraint=False,
                 default=None,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="epilepsy12.comorbidityentity",
