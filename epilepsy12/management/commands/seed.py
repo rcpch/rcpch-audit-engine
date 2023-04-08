@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 
 
 from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES
-from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity
+from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, imd_for_postcode, fetch_ecl
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
@@ -45,6 +45,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_epilepsy_causes'):
             self.stdout.write('seeding epilepsy causes...')
             run_epilepsy_causes_seed()
+        elif (options['mode'] == 'seed_comorbidities'):
+            self.stdout.write('seeding comorbidities...')
+            run_comorbidities_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
@@ -67,7 +70,7 @@ class Command(BaseCommand):
             self.stdout.write('No options supplied...')
         print('\033[38;2;17;167;142m')
         self.stdout.write(image())
-        print('\033[38;2;17;167;142m')
+        print('\033[38;2;17;167;107m')
         self.stdout.write('done.')
 
 
@@ -143,6 +146,36 @@ def run_epilepsy_causes_seed():
             index += 1
         except Exception as e:
             print(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
+    print(f"{index} epilepsy causes added")
+
+
+def run_comorbidities_seed():
+    """
+    This returns all the snomed ct definitions and codes for epilepsy causes.
+    Should be run periodically to compare with value in database and update record if has changed
+    """
+    index = 0
+    ecl = '<< 35919005'
+    comorbidity_choices = fetch_ecl(ecl)
+    for comorbidity_choice in comorbidity_choices:
+        new_comorbidity = ComorbidityEntity(
+            conceptId=comorbidity_choice['conceptId'],
+            term=comorbidity_choice['term'],
+            preferredTerm=comorbidity_choice['preferredTerm'],
+            description=None,
+            snomed_ct_edition=None,
+            snomed_ct_version=None,
+            icd_code=None,
+            icd_version=None,
+            dsm_code=None,
+            dsm_version=None,
+        )
+        try:
+            new_comorbidity.save()
+            index += 1
+        except Exception as e:
+            print(
+                f"Epilepsy cause {comorbidity_choice.preferredTerm} not added. {e}")
     print(f"{index} epilepsy causes added")
 
 

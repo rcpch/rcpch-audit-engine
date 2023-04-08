@@ -12,7 +12,7 @@ from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
-from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity, EpilepsyCauseEntity
+from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
 from ..decorator import user_can_access_this_organisation
 
@@ -1462,16 +1462,18 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     comorbidity = Comorbidity.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
         comorbidity_diagnosis_date=None,
-        comorbidity_diagnosis=None
+        comorbidity=None
     )
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity.pk)
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices
     }
 
     response = recalculate_form_generate_response(
@@ -1492,12 +1494,14 @@ def edit_comorbidity(request, comorbidity_id):
     POST request from comorbidities.html partial on button click to edit episode
     """
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1594,13 +1598,15 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
         error_message = error
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
+    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
 
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1631,20 +1637,23 @@ def comorbidity_diagnosis(request, comorbidity_id):
             request=request,
             model=Comorbidity,
             model_id=comorbidity_id,
-            field_name='comorbidity_diagnosis',
+            field_name='comorbidity',
             page_element='snomed_select'
         )
     except ValueError as error:
         error_message = error
 
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     comorbidity = Comorbidity.objects.get(
         pk=comorbidity_id)
 
     context = {
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices,
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
         "comorbidity": comorbidity,
     }
 

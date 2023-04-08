@@ -28,17 +28,6 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
         null=True
     )
 
-    comorbidity_diagnosis = models.CharField(
-        # this currently stores a SNOMED conceptId which looks up the preferredTerm in the select
-        help_text={
-            'label': 'What is the comorbidity?',
-            'reference': 'What is the comorbidity?',
-        },
-        max_length=250,
-        default=None,
-        null=True
-    )
-
     history = HistoricalRecords()
 
     @property
@@ -58,9 +47,21 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
         related_name='multiaxial_diagnosis'
     )
 
+    comorbidity = models.ForeignKey(
+        'epilepsy12.ComorbidityEntity',
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        default=None,
+        help_text={
+            'label': 'What is the comorbidity?',
+            'reference': 'What is the comorbidity?',
+        },
+    )
+
     class Meta:
         verbose_name = "Comorbidity"
         verbose_name_plural = "Comorbidities"
 
     def __str__(self) -> str:
-        return self.comorbidity_diagnosis
+        return self.comorbidity.preferredTerm
