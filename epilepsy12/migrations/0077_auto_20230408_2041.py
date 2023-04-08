@@ -8,7 +8,7 @@ def fill_comorbidity(apps, schema_editor):
     ComorbidityEntity = apps.get_model('epilepsy12', 'ComorbidityEntity')
     for comorbidity in Comorbidity.objects.all():
         if comorbidity.comorbidity_diagnosis is not None:
-            comorbidity.comorbidity = ComorbidityEntity.objects.filter(
+            comorbidity.comorbidityentity = ComorbidityEntity.objects.filter(
                 conceptId=comorbidity.comorbidity_diagnosis).first()
             comorbidity.save()
 

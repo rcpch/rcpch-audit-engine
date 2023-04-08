@@ -47,7 +47,7 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
         related_name='multiaxial_diagnosis'
     )
 
-    comorbidity = models.ForeignKey(
+    comorbidityentity = models.ForeignKey(
         'epilepsy12.ComorbidityEntity',
         on_delete=models.CASCADE,
         null=True,

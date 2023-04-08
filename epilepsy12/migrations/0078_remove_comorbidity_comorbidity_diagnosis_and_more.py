@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="comorbidity",
-            name="comorbidity",
+            name="comorbidityentity",
             field=models.ForeignKey(
                 default=None,
                 help_text={
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="historicalcomorbidity",
-            name="comorbidity",
+            name="comorbidityentity",
             field=models.ForeignKey(
                 blank=True,
                 db_constraint=False,
