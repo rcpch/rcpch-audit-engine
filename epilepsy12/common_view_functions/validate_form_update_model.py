@@ -57,6 +57,10 @@ def validate_and_update_model(
             syndrome_entity = SyndromeEntity.objects.get(
                 pk=request.POST.get(request.htmx.trigger_name))
             field_value = syndrome_entity  # note field name here is syndrome
+        elif request.htmx.trigger_name == 'epilepsy_cause':
+            epilepsy_cause_entity = EpilepsyCauseEntity.objects.get(
+                pk=request.POST.get(request.htmx.trigger_name))
+            field_value = epilepsy_cause_entity  # note field name here is epilepsy_cause
         field_value = request.POST.get(request.htmx.trigger_name)
 
     # validate

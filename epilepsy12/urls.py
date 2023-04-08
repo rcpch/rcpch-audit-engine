@@ -1,10 +1,10 @@
 from . import views
 from .view_folder import *
-from django.urls import path
+from django.conf.urls import include
 
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
-from django.urls import path, include
+from django.urls import path
 from django.contrib.auth.views import PasswordResetView
 
 router = routers.DefaultRouter()

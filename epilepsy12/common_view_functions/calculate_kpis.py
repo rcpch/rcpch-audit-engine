@@ -199,7 +199,7 @@ def calculate_kpis(registration_instance):
                 Syndrome.objects.filter(
                     Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                     # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                    ~Q(sydrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
+                    ~Q(syndrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
                        'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
                 ).exists() or
 
@@ -216,8 +216,8 @@ def calculate_kpis(registration_instance):
                     Syndrome.objects.filter(
                         Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                         # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                        ~Q(sydrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
-                                                       'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
+                        ~Q(syndrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
+                                                        'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
                     ).exists() or
 
                 age_at_first_paediatric_assessment <= 2

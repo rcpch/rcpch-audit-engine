@@ -33,10 +33,10 @@ def organisation_reports(request):
     management = Management.objects.filter()
     registration = Registration.objects.filter()
 
-    all_models = sorted(
-        chain(registration, first_paediatric_assessment, site, epilepsy_context, multiaxial_diagnosis,
-              episode, syndrome, comorbidity, assessment, investigations, management),
-        key=lambda x: x.updated_at, reverse=True)[:5]
+    # all_models = sorted(
+    #     chain(registration, first_paediatric_assessment, site, epilepsy_context, multiaxial_diagnosis,
+    #           episode, syndrome, comorbidity, assessment, investigations, management),
+    #     key=lambda x: x.updated_at, reverse=True)[:5]
 
     template_name = 'epilepsy12/organisation.html'
 
@@ -108,7 +108,7 @@ def organisation_reports(request):
         'count_of_current_cohort_registered_cases_in_this_trust': count_of_current_cohort_registered_cases_in_this_trust,
         'count_of_current_cohort_registered_completed_cases_in_this_trust': count_of_current_cohort_registered_completed_cases_in_this_trust,
         'cohort_data': cohort_data,
-        'all_models': all_models,
+        # 'all_models': all_models,
         'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'organisation', 'comorbidity', 'episode', 'syndrome', 'keyword'),
         'individual_kpi_choices': INDIVIDUAL_KPI_MEASURES
     })

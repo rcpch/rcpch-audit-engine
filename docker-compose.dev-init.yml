@@ -47,6 +47,8 @@ services:
             python manage.py migrate &&
             python manage.py seed --mode=seed_organisations &&
             python manage.py seed --mode=seed_semiology_keywords &&
+            python manage.py seed --mode=seed_syndromes &&
+            python manage.py seed --mode=seed_epilepsy_causes &&
             python manage.py seed --mode=seed_dummy_cases &&
             python manage.py seed --mode=seed_registrations &&
             python manage.py seed --mode=seed_groups_and_permissions &&
