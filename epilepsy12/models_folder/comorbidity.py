@@ -50,7 +50,7 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
     comorbidity = models.ForeignKey(
         'epilepsy12.ComorbidityEntity',
         on_delete=models.CASCADE,
-        null=False,
+        null=True,
         blank=False,
         default=None,
         help_text={
