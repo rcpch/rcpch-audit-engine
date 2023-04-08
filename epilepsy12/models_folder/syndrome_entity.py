@@ -51,6 +51,14 @@ class SyndromeEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
 
     history = HistoricalRecords()
 
+    @property
+    def _history_user(self):
+        return self.updated_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.updated_by = value
+
     class Meta:
         verbose_name = "SyndromeEntity"
         verbose_name_plural = "SyndromeEntities"

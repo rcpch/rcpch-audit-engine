@@ -3,7 +3,7 @@ from random import randint, getrandbits
 from dateutil.relativedelta import relativedelta
 
 # epilepsy12 dependencies
-from ...models import FirstPaediatricAssessment, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Episode, Keyword, Comorbidity, Assessment, Site, Organisation, Management, AntiEpilepsyMedicine, Case, AuditProgress, Registration, KPI, Investigations
+from ...models import FirstPaediatricAssessment, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Episode, Keyword, Comorbidity, Assessment, Site, Organisation, Management, AntiEpilepsyMedicine, Case, AuditProgress, Registration, KPI, Investigations, SyndromeEntity
 from ...constants import OPT_OUT_UNCERTAIN, SYNDROMES, EPILEPSY_CAUSES, NEUROPSYCHIATRIC, DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_EEG_MANIFESTATIONS, LATERALITY, GENERALISED_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, MIGRAINES, EPIS_MISC, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_PAROXYSMS, ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
 from ...general_functions import random_date, current_cohort_start_date, first_tuesday_in_january, fetch_ecl
 from ...common_view_functions import test_fields_update_audit_progress, calculate_kpis
@@ -169,10 +169,12 @@ def create_multiaxial_diagnosis(registration_instance):
 
     if multiaxial_diagnosis.syndrome_present:
         # create a related syndrome
+        syndrome_entity = SyndromeEntity.objects.filter(
+            syndrome_name=SYNDROMES[randint(0, len(SYNDROMES)-1)][1]).get()
         Syndrome.objects.create(
             syndrome_diagnosis_date=random_date(
                 start=registration_instance.registration_date, end=registration_instance.registration_close_date),
-            syndrome_name=SYNDROMES[randint(0, len(SYNDROMES)-1)][0],
+            syndrome=syndrome_entity,
             multiaxial_diagnosis=multiaxial_diagnosis
         )
 

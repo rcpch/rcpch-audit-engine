@@ -20,3 +20,4 @@ from .kpi import KPI
 from .visitactivity import VisitActivity
 from .help_text_mixin import HelpTextMixin
 from .syndrome_entity import SyndromeEntity
+from .epilepsy_cause_entity import EpilepsyCauseEntity

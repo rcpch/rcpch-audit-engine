@@ -8,9 +8,9 @@ from django.core.management.base import BaseCommand
 
 
 from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES
-from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity
+from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
-from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, imd_for_postcode
+from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, imd_for_postcode, fetch_ecl
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from .add_codes_to_organisations import add_codes_to_organisation
@@ -42,6 +42,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_syndromes'):
             self.stdout.write('seeding syndromes...')
             run_syndromes_seed()
+        elif (options['mode'] == 'seed_epilepsy_causes'):
+            self.stdout.write('seeding epilepsy causes...')
+            run_epilepsy_causes_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
@@ -111,6 +114,36 @@ def run_semiology_keywords_seed():
             f"added {semiology_keyword['title']} in category {semiology_keyword['category']}")
     image()
     print(f"Keywords added: {added}")
+
+
+def run_epilepsy_causes_seed():
+    """
+    This returns all the snomed ct definitions and codes for epilepsy causes.
+    Should be run periodically to compare with value in database and update record if has changed
+    """
+    index = 0
+    ecl = '<< 363235000'
+    # calls the rcpch deprivare server for a list of causes using ECL query language
+    epilepsy_causes = fetch_ecl(ecl)
+    for cause in epilepsy_causes:
+        new_cause = EpilepsyCauseEntity(
+            conceptId=cause['conceptId'],
+            term=cause['term'],
+            preferredTerm=cause['preferredTerm'],
+            description=None,
+            snomed_ct_edition=None,
+            snomed_ct_version=None,
+            icd_code=None,
+            icd_version=None,
+            dsm_code=None,
+            dsm_version=None
+        )
+        try:
+            new_cause.save()
+            index += 1
+        except Exception as e:
+            print(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
+    print(f"{index} epilepsy causes added")
 
 
 def run_organisations_seed():

@@ -13,7 +13,7 @@ from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
 from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity
-from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields, expected_score_for_single_episode
+from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
 from ..decorator import user_can_access_this_organisation
 
 """
@@ -72,7 +72,7 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    ecl = '<< 363235000 '
+    ecl = '<< 363235000'
     epilepsy_causes = fetch_ecl(ecl)
 
     site = Site.objects.filter(
