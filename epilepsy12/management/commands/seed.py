@@ -1,3 +1,5 @@
+# python
+from operator import itemgetter
 from random import randint, choice
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -5,8 +7,8 @@ from random import randint
 from django.core.management.base import BaseCommand
 
 
-from ...constants import ETHNICITIES, DUMMY_NAMES
-from ...models import Organisation, Keyword, Case, Site, Registration
+from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES
+from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, imd_for_postcode
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
@@ -37,6 +39,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_semiology_keywords'):
             self.stdout.write('seeding organisation data...')
             run_semiology_keywords_seed()
+        elif (options['mode'] == 'seed_syndromes'):
+            self.stdout.write('seeding syndromes...')
+            run_syndromes_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
@@ -61,6 +66,29 @@ class Command(BaseCommand):
         self.stdout.write(image())
         print('\033[38;2;17;167;142m')
         self.stdout.write('done.')
+
+
+def run_syndromes_seed():
+    added = 0
+    for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
+        if SyndromeEntity.objects.filter(syndrome_name=syndrome[1]).exists():
+            print(
+                f'Syndromes already exist. Skipping this step...')
+            return
+        new_syndrome = SyndromeEntity(
+            syndrome_name=syndrome[1],
+            snomed_ct_code=None,
+            icd_10_code=None,
+            icd_10_name=None
+        )
+        try:
+            new_syndrome.save()
+        except Exception as e:
+            print(f"Error at {syndrome[1]}: error: {e}")
+        added += 1
+        print(
+            f"added {syndrome[1]}")
+    print(f"Syndromes added...{added}")
 
 
 def run_semiology_keywords_seed():

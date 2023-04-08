@@ -7,12 +7,12 @@ from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
 from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
 from epilepsy12.constants import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES, NONEPILEPSY_FIELDS, NONEPILEPSY_SEIZURE_TYPES
-from epilepsy12.constants.syndromes import SYNDROMES
+# from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
-from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site
+from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields, expected_score_for_single_episode
 from ..decorator import user_can_access_this_organisation
 
@@ -1085,12 +1085,15 @@ def add_syndrome(request, multiaxial_diagnosis_id):
     syndrome = Syndrome.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
         syndrome_diagnosis_date=None,
-        syndrome_name=None,
+        syndrome=None,
     )
+
+    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
 
     context = {
         'syndrome': syndrome,
-        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        # sorted(SYNDROMES, key=itemgetter(1)),
+        "syndrome_selection": syndrome_selection
     }
 
     response = recalculate_form_generate_response(
@@ -1114,9 +1117,12 @@ def edit_syndrome(request, syndrome_id):
 
     keywords = Keyword.objects.all()
 
+    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+
     context = {
         'syndrome': syndrome,
-        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        # sorted(SYNDROMES, key=itemgetter(1)),
+        "syndrome_selection": syndrome_selection,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
         'keyword_selection': keywords,

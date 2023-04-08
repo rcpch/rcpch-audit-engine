@@ -53,6 +53,10 @@ def validate_and_update_model(
             request.htmx.trigger_name), "%Y-%m-%d").date()
 
     elif page_element == 'select' or page_element == 'snomed_select':
+        if request.htmx.trigger_name == 'syndrome_name':
+            syndrome_entity = SyndromeEntity.objects.get(
+                pk=request.POST.get(request.htmx.trigger_name))
+            field_value = syndrome_entity  # note field name here is syndrome
         field_value = request.POST.get(request.htmx.trigger_name)
 
     # validate
