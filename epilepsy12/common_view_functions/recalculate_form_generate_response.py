@@ -304,7 +304,7 @@ def scoreable_fields_for_model_class_name(model_class_name):
     elif model_class_name == 'Syndrome':
         return len(['syndrome_diagnosis_date', 'syndrome__syndrome_name'])
     elif model_class_name == 'Comorbidity':
-        return len(['comorbidity_diagnosis_date', 'comorbidity_diagnosis'])
+        return len(['comorbidity_diagnosis_date'])
     elif model_class_name == 'Assessment':
         return len(['childrens_epilepsy_surgical_service_referral_criteria_met', 'consultant_paediatrician_referral_made', 'paediatric_neurologist_referral_made', 'childrens_epilepsy_surgical_service_referral_made', 'epilepsy_specialist_nurse_referral_made'])
     elif model_class_name == 'Investigations':

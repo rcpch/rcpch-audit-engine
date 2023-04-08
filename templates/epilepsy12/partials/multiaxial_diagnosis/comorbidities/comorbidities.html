@@ -23,8 +23,8 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if comorbidity.comorbidity_diagnosis %}
-                        {{comorbidity.comorbidity_diagnosis|snomed_concept }}
+                    {% if comorbidity.comorbidity %}
+                        {{comorbidity.comorbidty.preferredTerm }}
                     {% else %}
                         <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
