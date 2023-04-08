@@ -126,7 +126,7 @@ class ComorbiditySerializer(serializers.HyperlinkedModelSerializer):
         model = Comorbidity
         multiaxial_diagnosis = serializers.PrimaryKeyRelatedField(
             queryset=MultiaxialDiagnosis.objects.all())
-        fields = ['comorbidity_diagnosis_date', 'comorbidity']
+        fields = ['comorbidity_diagnosis_date', 'comorbidityentity']
 
 
 class InvestigationsSerializer(serializers.HyperlinkedModelSerializer):

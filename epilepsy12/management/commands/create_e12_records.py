@@ -211,7 +211,7 @@ def create_multiaxial_diagnosis(registration_instance):
                 multiaxial_diagnosis=multiaxial_diagnosis,
                 comorbidity_diagnosis_date=random_date(
                     start=registration_instance.registration_date, end=registration_instance.registration_close_date),
-                comorbidity=random_comorbidity
+                comorbidityentity=random_comorbidity
             )
 
     # create a random number of episodes to a maximum of 5

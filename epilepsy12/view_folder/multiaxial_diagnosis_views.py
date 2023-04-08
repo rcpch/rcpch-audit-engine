@@ -1462,7 +1462,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     comorbidity = Comorbidity.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
         comorbidity_diagnosis_date=None,
-        comorbidity=None
+        comorbidityentity=None
     )
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity.pk)
@@ -1637,7 +1637,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
             request=request,
             model=Comorbidity,
             model_id=comorbidity_id,
-            field_name='comorbidity',
+            field_name='comorbidityentity',
             page_element='snomed_select'
         )
     except ValueError as error:
