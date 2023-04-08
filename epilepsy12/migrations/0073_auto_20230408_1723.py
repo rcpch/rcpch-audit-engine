@@ -8,8 +8,8 @@ def fill_epilepsy_cause_fk(apps, schema_editor):
     EpilepsyCauseEntity = apps.get_model('epilepsy12', 'EpilepsyCauseEntity')
     for multiaxialdiagnosis in MultiaxialDiagnosis.objects.all():
         if multiaxialdiagnosis.epilepsy_cause is not None:
-            multiaxialdiagnosis.epilepsy_cause_fk = EpilepsyCauseEntity.objects.get(
-                conceptId=multiaxialdiagnosis.epilepsy_cause)
+            multiaxialdiagnosis.epilepsy_cause_fk = EpilepsyCauseEntity.objects.filter(
+                conceptId=multiaxialdiagnosis.epilepsy_cause).first()
             multiaxialdiagnosis.save()
 
 
