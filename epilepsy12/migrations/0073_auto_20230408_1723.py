@@ -7,9 +7,10 @@ def fill_epilepsy_cause_fk(apps, schema_editor):
     MultiaxialDiagnosis = apps.get_model('epilepsy12', 'MultiaxialDiagnosis')
     EpilepsyCauseEntity = apps.get_model('epilepsy12', 'EpilepsyCauseEntity')
     for multiaxialdiagnosis in MultiaxialDiagnosis.objects.all():
-        multiaxialdiagnosis.epilepsy_cause_fk = EpilepsyCauseEntity.objects.get(
-            conceptId=multiaxialdiagnosis.epilepsy_cause)
-        multiaxialdiagnosis.save()
+        if multiaxialdiagnosis.epilepsy_cause is not None:
+            multiaxialdiagnosis.epilepsy_cause_fk = EpilepsyCauseEntity.objects.get(
+                conceptId=multiaxialdiagnosis.epilepsy_cause)
+            multiaxialdiagnosis.save()
 
 
 class Migration(migrations.Migration):
