@@ -39,18 +39,6 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         default=None
     )
 
-    epilepsy_cause = models.CharField(
-        # this currently stores a SNOMED conceptId which looks up the preferredTerm in the select
-        help_text={
-            'label': "What is the main identified cause of the epilepsy?",
-            'reference': "What is the main identified cause of the epilepsy?",
-        },
-        max_length=250,
-        default=None,
-        blank=True,
-        null=True
-    )
-
     epilepsy_cause_categories = ArrayField(
         models.CharField(
             max_length=500
@@ -117,6 +105,19 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         self.updated_by = value
 
     # relationships
+    epilepsy_cause = models.ForeignKey(
+        'epilepsy12.EpilepsyCauseEntity',
+        on_delete=models.CASCADE,
+        help_text={
+            'label': "What is the main identified cause of the epilepsy?",
+            'reference': "What is the main identified cause of the epilepsy?",
+        },
+        max_length=250,
+        default=None,
+        blank=True,
+        null=True
+    )
+
     registration = models.OneToOneField(
         'epilepsy12.Registration',
         on_delete=models.CASCADE,

@@ -19,7 +19,7 @@
 
     <div class="field">
       {% url 'syndrome_name' syndrome_id=syndrome.pk as hx_post %} 
-      {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="outerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." test_positive=syndrome.syndrome.pk label=syndrome.get_syndrome_help_label_text reference=syndrome.get_syndrome_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome %}
+      {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=syndrome_selection hx_post=hx_post hx_target="#syndrome" hx_trigger='change' hx_swap="outerHTML" hx_name='syndrome_name' hx_default_text="Select a syndrome..." field_name='syndrome_name' test_positive=syndrome.syndrome.pk label=syndrome.get_syndrome_help_label_text reference=syndrome.get_syndrome_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_syndrome has_permission=perms.epilepsy12.change_syndrome %}
     </div>
 
     <div class="field">

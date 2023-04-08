@@ -12,7 +12,7 @@ from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
-from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity
+from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity, EpilepsyCauseEntity
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
 from ..decorator import user_can_access_this_organisation
 
@@ -72,8 +72,9 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    ecl = '<< 363235000'
-    epilepsy_causes = fetch_ecl(ecl)
+    # ecl = '<< 363235000'
+    # epilepsy_causes = fetch_ecl(ecl)
+    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by('preferredTerm')
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -91,7 +92,7 @@ def multiaxial_diagnosis(request, case_id):
         'comorbidities': comorbidities,
         "keyword_choices": keyword_choices,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-        'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
+        'epilepsy_causes': epilepsy_causes,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
@@ -1286,14 +1287,14 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
             updated_by=request.user
         )
     else:
-        print("Some mistake happened")
-        # TODO need to handle this
+        raise Exception("Was not possible to save epilepsy cause.")
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
-    ecl = '<< 363235000'
-    epilepsy_causes = fetch_ecl(ecl)
+    # ecl = '<< 363235000'
+    # epilepsy_causes = fetch_ecl(ecl)
+    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by('preferredTerm')
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1317,7 +1318,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
-    Choices for causes fed from SNOMED server
+    Choices for causes come from EpilepsyCauseEntity table
     """
 
     try:
@@ -1332,15 +1333,16 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     except ValueError as error:
         error_message = error
 
-    # SNOMED term populating epilepsy cause dropdown
-    ecl = '<< 363235000'
-    epilepsy_causes = fetch_ecl(ecl)
+    # # SNOMED term populating epilepsy cause dropdown
+    # ecl = '<< 363235000'
+    # epilepsy_causes = fetch_ecl(ecl)
+    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by("preferredTerm")
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
     context = {
-        'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
+        'epilepsy_causes': epilepsy_causes,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
