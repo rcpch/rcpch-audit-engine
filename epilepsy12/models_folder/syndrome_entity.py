@@ -54,3 +54,6 @@ class SyndromeEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
     class Meta:
         verbose_name = "SyndromeEntity"
         verbose_name_plural = "SyndromeEntities"
+
+    def __str__(self) -> str:
+        return f'{self.syndrome_name}'

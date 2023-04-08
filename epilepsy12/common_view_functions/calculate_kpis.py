@@ -14,9 +14,9 @@ def calculate_kpis(registration_instance):
     Identifies completed KPIs for a given registered child and passes these back to update the KPI model
     It accepts the registration instance and is called each time a related model is updated
     The outcome of a measure follows 4 potential states:
+    0 - measure failed
     1 - measure achieved
-    2 - measure failed
-    3 - measure scored but not applicable (eg ECG in nonconvulsive seizure)
+    2 - measure not applicable (eg ECG in nonconvulsive seizure)
     None - measure not scored yet
     """
 
@@ -199,7 +199,8 @@ def calculate_kpis(registration_instance):
                 Syndrome.objects.filter(
                     Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                     # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                    ~Q(syndrome_name__in=[3, 16, 17, 18])
+                    ~Q(sydrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
+                       'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
                 ).exists() or
 
                 age_at_first_paediatric_assessment <= 2
@@ -215,7 +216,8 @@ def calculate_kpis(registration_instance):
                     Syndrome.objects.filter(
                         Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                         # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                        ~Q(syndrome_name__in=[3, 16, 17, 18])
+                        ~Q(sydrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
+                                                       'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
                     ).exists() or
 
                 age_at_first_paediatric_assessment <= 2

@@ -56,7 +56,7 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     )
 
     def __str__(self) -> str:
-        return f'{self.syndrome_diagnosis_date}'
+        return f'{self.syndrome.syndrome_name} on {self.syndrome_diagnosis_date}'
 
     class Meta:
         verbose_name = 'Syndrome'

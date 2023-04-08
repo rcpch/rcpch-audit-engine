@@ -302,7 +302,7 @@ def scoreable_fields_for_model_class_name(model_class_name):
         # returns minimum number of fields that could be scored for an epileptic episode
         return len(['seizure_onset_date', 'seizure_onset_date_confidence', 'episode_definition', 'has_description_of_the_episode_or_episodes_been_gathered', 'epilepsy_or_nonepilepsy_status'])
     elif model_class_name == 'Syndrome':
-        return len(['syndrome_diagnosis_date', 'syndrome_name'])
+        return len(['syndrome_diagnosis_date', 'syndrome__syndrome_name'])
     elif model_class_name == 'Comorbidity':
         return len(['comorbidity_diagnosis_date', 'comorbidity_diagnosis'])
     elif model_class_name == 'Assessment':
