@@ -1459,20 +1459,19 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
+    comorbidityentity = ComorbidityEntity.objects.all().first()
+
     comorbidity = Comorbidity.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
         comorbidity_diagnosis_date=None,
-        comorbidityentity=None
+        comorbidityentity=comorbidityentity
     )
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity.pk)
     comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
-    # ecl = '<< 35919005'
-    # comorbidity_choices = fetch_ecl(ecl)
 
     context = {
         'comorbidity': comorbidity,
-        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
         'comorbidity_choices': comorbidity_choices
     }
 

@@ -271,7 +271,7 @@ def avoid_fields(model_instance):
         return ['id', 'registration', 'multiaxial_diagnosis', 'episode', 'syndrome', 'comorbidity', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'Management':
         return ['id', 'registration', 'antiepilepsymedicine', 'created_by', 'created_at', 'updated_by', 'updated_at']
-    elif model_class_name in ['Syndrome', 'Comorbidity']:
+    elif model_class_name in ['Syndrome', 'Comorbidity', 'ComorbidityEntity']:
         return ['id', 'multiaxial_diagnosis', 'created_by', 'created_at', 'updated_by', 'updated_at']
     elif model_class_name == 'Episode':
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at', 'expected_score', 'calculated_score']
@@ -286,7 +286,7 @@ def avoid_fields(model_instance):
 
 def scoreable_fields_for_model_class_name(model_class_name):
     """
-    Returns the minimum number of scoreable fields best on the model instance at the time
+    Returns the minimum number of scoreable fields based on the model instance at the time
     """
 
     if model_class_name == 'EpilepsyContext':
@@ -304,7 +304,7 @@ def scoreable_fields_for_model_class_name(model_class_name):
     elif model_class_name == 'Syndrome':
         return len(['syndrome_diagnosis_date', 'syndrome__syndrome_name'])
     elif model_class_name == 'Comorbidity':
-        return len(['comorbidity_diagnosis_date'])
+        return len(['comorbidity_diagnosis_date', 'comorbidity__comorbidityentity__conceptId'])
     elif model_class_name == 'Assessment':
         return len(['childrens_epilepsy_surgical_service_referral_criteria_met', 'consultant_paediatrician_referral_made', 'paediatric_neurologist_referral_made', 'childrens_epilepsy_surgical_service_referral_made', 'epilepsy_specialist_nurse_referral_made'])
     elif model_class_name == 'Investigations':
