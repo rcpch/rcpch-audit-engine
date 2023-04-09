@@ -58,7 +58,8 @@ class Migration(migrations.Migration):
                     "preferredTerm",
                     models.CharField(blank=True, default=None, null=True),
                 ),
-                ("description", models.CharField(blank=True, default=None, null=True)),
+                ("description", models.CharField(
+                    blank=True, default=None, null=True)),
                 (
                     "snomed_ct_edition",
                     models.CharField(blank=True, default=None, null=True),
@@ -79,11 +80,13 @@ class Migration(migrations.Migration):
                 ),
                 ("history_id", models.AutoField(primary_key=True, serialize=False)),
                 ("history_date", models.DateTimeField(db_index=True)),
-                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                ("history_change_reason", models.CharField(
+                    max_length=100, null=True)),
                 (
                     "history_type",
                     models.CharField(
-                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        choices=[("+", "Created"), ("~", "Changed"),
+                                 ("-", "Deleted")],
                         max_length=1,
                     ),
                 ),
@@ -149,7 +152,8 @@ class Migration(migrations.Migration):
                     "preferredTerm",
                     models.CharField(blank=True, default=None, null=True),
                 ),
-                ("description", models.CharField(blank=True, default=None, null=True)),
+                ("description", models.CharField(
+                    blank=True, default=None, null=True)),
                 (
                     "snomed_ct_edition",
                     models.CharField(blank=True, default=None, null=True),
@@ -199,6 +203,7 @@ class Migration(migrations.Migration):
             name="comorbidityentity",
             field=models.ForeignKey(
                 default=None,
+                null=True,
                 help_text={
                     "label": "What is the comorbidity?",
                     "reference": "What is the comorbidity?",
