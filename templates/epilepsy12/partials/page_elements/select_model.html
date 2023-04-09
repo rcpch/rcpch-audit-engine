@@ -11,6 +11,7 @@
             hx_swap: usually 'innerHTML'
             hx_name: the model field to update
             field_name: the name of the field returning the value to go in the dropdown
+            field_name2: the name of the field returning the value to go in the dropdown
             test_positive: the model boolean field 
             label: this is the label text
             hx_default_text: default text of an unselected element
@@ -61,7 +62,7 @@
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
                     {% for item in choices %}
-                        <div class="item" data-value="{{item.pk}}">{% value_for_field_name item field_name %}</div>
+                        <div class="item" data-value="{{item.pk}}">{% value_for_field_name item field_name %} {% if field_name2 %}({% value_for_field_name item field_name2 %}){% endif %}</div>
                     {% endfor %}
                 </div>
                 

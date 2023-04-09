@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 # epilepsy12 dependencies
 from ...models import FirstPaediatricAssessment, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Episode, Keyword, Comorbidity, Assessment, Site, Organisation, Management, AntiEpilepsyMedicine, Case, AuditProgress, Registration, KPI, Investigations, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity
 from ...constants import OPT_OUT_UNCERTAIN, SYNDROMES, EPILEPSY_CAUSES, NEUROPSYCHIATRIC, DATE_ACCURACY, EPISODE_DEFINITION, EPILEPSY_DIAGNOSIS_STATUS, EPILEPSY_SEIZURE_TYPE, FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS, FOCAL_EPILEPSY_EEG_MANIFESTATIONS, LATERALITY, GENERALISED_SEIZURE_TYPE, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, MIGRAINES, EPIS_MISC, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES, NON_EPILEPSY_PAROXYSMS, ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
-from ...general_functions import random_date, current_cohort_start_date, first_tuesday_in_january, fetch_ecl
+from ...general_functions import random_date, current_cohort_start_date, first_tuesday_in_january, fetch_ecl, fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set
 from ...common_view_functions import test_fields_update_audit_progress, calculate_kpis
 
 
@@ -200,8 +200,9 @@ def create_multiaxial_diagnosis(registration_instance):
     if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
         # add upto 5 comorbidities
         for count_item in range(1, randint(1, 5)):
-            ecl = '<< 35919005'
-            comorbidity_choices = fetch_ecl(ecl)
+            # ecl = '<< 35919005'
+            # comorbidity_choices = fetch_ecl(ecl)
+            comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
             random_comorbidities = comorbidity_choices[randint(
                 0, len(comorbidity_choices)-1)]
             random_comorbidity = ComorbidityEntity.objects.filter(

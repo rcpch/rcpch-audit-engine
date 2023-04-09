@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand
 from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES
 from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
-from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, imd_for_postcode, fetch_ecl
+from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, fetch_ecl, fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from .add_codes_to_organisations import add_codes_to_organisation
@@ -155,8 +155,10 @@ def run_comorbidities_seed():
     Should be run periodically to compare with value in database and update record if has changed
     """
     index = 0
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
+
     for comorbidity_choice in comorbidity_choices:
         new_comorbidity = ComorbidityEntity(
             conceptId=comorbidity_choice['conceptId'],
