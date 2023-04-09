@@ -64,7 +64,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'delete_all_groups_and_recreate'):
             self.stdout.write(
                 'deleting all groups/permissions and reallocating...')
-            delete_and_reallocate_permissions()
+        elif (options['mode'] == 'replace_comorbidities_with_refset'):
+            self.stdout.write(
+                'replacing comorbidites with refset...')
+            replace_existing_comorbidities_with_refset()
 
         else:
             self.stdout.write('No options supplied...')
@@ -177,8 +180,35 @@ def run_comorbidities_seed():
             index += 1
         except Exception as e:
             print(
-                f"Epilepsy cause {comorbidity_choice.preferredTerm} not added. {e}")
-    print(f"{index} epilepsy causes added")
+                f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
+    print(f"{index} comorbidities added")
+
+
+def replace_existing_comorbidities_with_refset():
+    index = 0
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
+    for comorbidity in ComorbidityEntity.objects.all():
+        comorbidity.conceptId = comorbidity_choices[index]['conceptId']
+        comorbidity.term = comorbidity_choices[index]['term']
+        comorbidity.preferredTerm = comorbidity_choices[index]['preferredTerm']
+        comorbidity.save()
+        index += 1
+    for comorbidity_choice in range(index, len(comorbidity_choices)-1):
+        ComorbidityEntity.objects.create(
+            conceptId=comorbidity_choice['conceptId'],
+            term=comorbidity_choice['term'],
+            preferredTerm=comorbidity_choice['preferredTerm'],
+            description=None,
+            snomed_ct_edition=None,
+            snomed_ct_version=None,
+            icd_code=None,
+            icd_version=None,
+            dsm_code=None,
+            dsm_version=None,
+        )
+    print('Update all comorbidites with refset')
 
 
 def run_organisations_seed():
