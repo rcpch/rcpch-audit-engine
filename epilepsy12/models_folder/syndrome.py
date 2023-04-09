@@ -29,8 +29,8 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     syndrome = models.ForeignKey(
         'epilepsy12.SyndromeEntity',
         help_text={
-            'label': "The date the syndrome diagnosis was made.",
-            'reference': "The date the syndrome diagnosis was made.",
+            'label': "The syndrome name.",
+            'reference': "Methodology for classification and definition of epilepsy syndromes with list of syndromes: Report of the ILAE Task Force on Nosology and Definitions, Epilepsia 2017",
         },
         on_delete=models.CASCADE,
         blank=True,
