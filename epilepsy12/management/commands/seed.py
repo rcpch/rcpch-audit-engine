@@ -195,11 +195,11 @@ def replace_existing_comorbidities_with_refset():
         comorbidity.preferredTerm = comorbidity_choices[index]['preferredTerm']
         comorbidity.save()
         index += 1
-    for comorbidity_choice in range(index, len(comorbidity_choices)-1):
+    for counter in range(index, len(comorbidity_choices)-1):
         ComorbidityEntity.objects.create(
-            conceptId=comorbidity_choice['conceptId'],
-            term=comorbidity_choice['term'],
-            preferredTerm=comorbidity_choice['preferredTerm'],
+            conceptId=comorbidity_choices[counter]['conceptId'],
+            term=comorbidity_choices[counter]['term'],
+            preferredTerm=comorbidity_choices[counter]['preferredTerm'],
             description=None,
             snomed_ct_edition=None,
             snomed_ct_version=None,
