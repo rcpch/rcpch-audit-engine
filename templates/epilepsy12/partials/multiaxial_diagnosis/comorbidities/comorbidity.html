@@ -25,7 +25,7 @@
 
         <div class="field">
             {% url 'comorbidity_diagnosis' comorbidity_id=comorbidity.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidityentity' field_name='preferredTerm' field_name2='term' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidityentity.pk label=comorbidity.get_comorbidity_diagnosis_help_label_text reference=comorbidity.get_comorbidity_diagnosis_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_comorbidity %}
+            {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=comorbidity_choices hx_post=hx_post hx_target="#comorbidities" hx_trigger='change' hx_swap="innerHTML" hx_name='comorbidityentity' field_name='preferredTerm' field_name2='term' hx_default_text="Select a comorbidity..." test_positive=comorbidity.comorbidityentity.pk label=comorbidity.get_comorbidityentity_help_label_text reference=comorbidity.get_comorbidityentity_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_comorbidity %}
         </div>
 
         <div class='field'>

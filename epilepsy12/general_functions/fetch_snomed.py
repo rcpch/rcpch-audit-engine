@@ -189,7 +189,7 @@ def fetch_concept(concept_id):
 
 
 def fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set():
-    search_url = 'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint=^999001751000000105'
+    search_url = 'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/expand?ecl=^999001751000000105'
     response = requests.get(search_url)
 
     if response.status_code == 404:
