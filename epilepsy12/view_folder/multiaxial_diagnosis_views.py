@@ -2,6 +2,7 @@ from django.utils import timezone
 from operator import itemgetter
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Subquery
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
@@ -1468,7 +1469,12 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     )
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity.pk)
-    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
 
     context = {
         'comorbidity': comorbidity,
@@ -1493,7 +1499,12 @@ def edit_comorbidity(request, comorbidity_id):
     POST request from comorbidities.html partial on button click to edit episode
     """
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
-    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
 
@@ -1597,7 +1608,12 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
         error_message = error
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
-    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
 
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
@@ -1642,7 +1658,12 @@ def comorbidity_diagnosis(request, comorbidity_id):
     except ValueError as error:
         error_message = error
 
-    comorbidity_choices = ComorbidityEntity.objects.all().order_by('preferredTerm')
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
 
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
