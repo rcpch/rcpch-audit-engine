@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/home/app/webapp
+      - .:/app/
     environment:
       # these env vars are ONLY for development
       - E12_POSTGRES_DB_USER=epilepsy12user
@@ -40,9 +40,7 @@ services:
     env_file:
       - .env # this contains the token for RCPCH Census Platform and is not entered into git
     command: >
-      sh -c "pip install --upgrade pip &&
-            pip install -r requirements/development-requirements.txt &&
-            python manage.py collectstatic --noinput &&
+      sh -c "python manage.py collectstatic --noinput &&
             python manage.py makemigrations &&
             python manage.py migrate &&
             python manage.py seed --mode=seed_organisations &&
@@ -61,8 +59,8 @@ services:
   # db container - runs postgres
   db:
     image: postgres:latest
-    # volumes:
-    #   - ./data/db:/var/lib/postgresql/data
+    volumes:
+      - ./.data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password

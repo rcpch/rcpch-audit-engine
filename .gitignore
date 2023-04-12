@@ -123,3 +123,6 @@ start/hermes-v0.7.5.jar
 .code-workspace
 .vscode/
 .vscode/*
+
+# exclude dev data files
+.data
