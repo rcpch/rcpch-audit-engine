@@ -60,9 +60,12 @@ services:
   db:
     image: postgres:latest
     volumes:
-      - ./.data/db:/var/lib/postgresql/data
+      - "auditenginedb:/var/lib/postgresql/data"
     environment:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=epilepsy12db
       - TZ="Europe/London"
+
+volumes:
+  auditenginedb:
