@@ -19,11 +19,11 @@ class KPI(models.Model, HelpTextMixin):
 
     4. ECG  - % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
 
-    5. MRI	 - % of children and young people with defined indications for an MRI, who had who had timely MRI within 6 weeks of request
+    5. MRI	 - % of children and young people with defined indications for an MRI, who had timely MRI within 6 weeks of request
 
-    6. Assessment of mental health issues  - %  of children with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure
+    6. Assessment of mental health issues  - %  of children and young people with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure
 
-    7. Mental health support - %  of children with epilepsy and a mental health problem who have evidence of mental health support"
+    7. Mental health support - %  of children and young people with epilepsy and a mental health problem who have evidence of mental health support"
 
     8. Sodium Valproate - % of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
 
@@ -38,18 +38,24 @@ class KPI(models.Model, HelpTextMixin):
     9. (b) Comprehensive Care Planning content - % of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning
 
             9a. Parental prolonged seizures care plan
+                Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.
 
             9b. Water safety
+                Percentage of children and young people with epilepsy with evidence of discussion regarding water safety.
 
             9c. First aid
+                Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.
 
             9d. General participation and risk
+                Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.
 
-            9e. Service contact details
+            9e. SUDEP
+                Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
 
-            9f. SUDEP
-
-    10. School Individual Healthcare Plan - % of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.              
+            9f. Service contact details
+                Percentage of children and young people with epilepsy with evidence of being given service contact details.
+                
+    10. School Individual Healthcare Plan - % of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment..              
 
     """
 
@@ -74,7 +80,7 @@ class KPI(models.Model, HelpTextMixin):
     
     Calculation Method
     Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
-    Denominator = Number ofchildren and young people [diagnosed with epilepsy] at first year
+    Denominator = Number of children and young people [diagnosed with epilepsy] at first year
     """
     epilepsy_specialist_nurse = models.IntegerField(
         help_text={
@@ -135,7 +141,7 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """
-    5. Percentage of children and young people with defined indications for an MRI, who had who had timely MRI within 6 weeks of request
+    5. Percentage of children and young people with defined indications for an MRI, who had timely MRI within 6 weeks of request
     
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
@@ -144,7 +150,7 @@ class KPI(models.Model, HelpTextMixin):
     mri = models.IntegerField(
         help_text={
             'label': '5. MRI',
-            'reference': "Percentage of children and young people with defined indications for an MRI, who had who had timely MRI within 6 weeks of request"
+            'reference': "Percentage of children and young people with defined indications for an MRI, who had timely MRI within 6 weeks of request"
         },
 
         default=None,
@@ -152,7 +158,7 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """
-    6. Percentage of children with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure.
+    6. Percentage of children and young people with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure.
 
     Calculation Method
     Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
@@ -161,14 +167,14 @@ class KPI(models.Model, HelpTextMixin):
     assessment_of_mental_health_issues = models.IntegerField(
         help_text={
             'label': '6. Assessment of mental health issues',
-            'reference': "Percentage of children with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure."
+            'reference': "Percentage of children and young people with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure."
         },
         default=None,
         null=True
     )
 
     """
-    7. Percentage of children with epilepsy and a mental health problem who have evidence of mental health support
+    7. Percentage of children and young people with epilepsy and a mental health problem who have evidence of mental health support
     
     Calculation Method
     Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue identified AND had evidence of mental health support received
@@ -178,7 +184,7 @@ class KPI(models.Model, HelpTextMixin):
 
         help_text={
             'label': '7. Mental health support',
-            'reference': "Percentage of children with epilepsy and a mental health problem who have evidence of mental health support"
+            'reference': "Percentage of children and young people with epilepsy and a mental health problem who have evidence of mental health support"
         },
         default=None,
         null=True
@@ -275,96 +281,113 @@ class KPI(models.Model, HelpTextMixin):
     comprehensive_care_planning_content = models.IntegerField(
         help_text={
             'label': '9B. Comprehensive care planning content',
-            'reference': "Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning."
+            'reference': "Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning (items a - f)."
         },
         default=None,
         null=True
     )
 
     """
+    9a. Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.
     
-    9a. Calculation Method
+    Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan 
     Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
     """
     parental_prolonged_seizures_care_plan = models.IntegerField(
         help_text={
             'label': '9a. Parental prolonged seizures care plan',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan."
         },
         default=None,
         null=True
     )
 
     """
-    9b. Calculation Method
+    9b. Water Safety
+
+    Percentage of children and young people with epilepsy with evidence of discussion regarding water safety.
+
+    Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     water_safety = models.IntegerField(
         help_text={
             'label': '9b. Water safety',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding water safety."
         },
         default=None,
         null=True
     )
 
-    """
-    
-    9c. Calculation Method
+    """    
+    9c. First Aid
+
+    Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.
+
+    Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     first_aid = models.IntegerField(
         help_text={
             'label': '9c. First aid',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding first aid."
         },
         default=None,
         null=True
     )
 
     """
+    9d. General participation and risk
+
+    Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.
     
-    9d. Calculation Method
+    Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     general_participation_and_risk = models.IntegerField(
         help_text={
             'label': '9d. General participation and risk',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk."
         },
         default=None,
         null=True
     )
 
     """
-    
-    9e. Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    9e. SUDEP
+
+    Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
+
+    Calculation Method
+    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
+    Denominator = Number of children diagnosed with epilepsy at first year
     """
     service_contact_details = models.IntegerField(
         help_text={
             'label': '9e. Service contact details',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan."
         },
         default=None,
         null=True
     )
 
-    """
-    
-    9f. Calculation Method
-    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
-    Denominator = Number of children diagnosed with epilepsy at first year
+    """    
+    9f. Service contact details
+
+    Percentage of children and young people with epilepsy with evidence of being given service contact details.
+
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     sudep = models.IntegerField(
         help_text={
             'label': '9f. Sudden unexplained death in epilepsy',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy with evidence of being given service contact details."
         },
         default=None,
         null=True
@@ -373,16 +396,16 @@ class KPI(models.Model, HelpTextMixin):
     """
     10. School Individual Healthcare Plan
 
-    Percentage of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.	
+    Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.	
     
     Calculation Method
-    Numerator = Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
-    Denominator =Number of children and young people aged 5 years and above diagnosed with epilepsy at first year
+    Numerator = Number of children and young people aged 4 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
+    Denominator =Number of children and young people aged 4 years and above diagnosed with epilepsy at first year
     """
     school_individual_healthcare_plan = models.IntegerField(
         help_text={
             'label': '10. School individualised health care plan',
-            'reference': ""
+            'reference': "Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment."
         },
         default=None,
         null=True
