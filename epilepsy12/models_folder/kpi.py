@@ -366,9 +366,9 @@ class KPI(models.Model, HelpTextMixin):
     Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
     Denominator = Number of children diagnosed with epilepsy at first year
     """
-    service_contact_details = models.IntegerField(
+    sudep = models.IntegerField(
         help_text={
-            'label': '9e. Service contact details',
+            'label': '9e. Sudden unexplained death in epilepsy',
             'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan."
         },
         default=None,
@@ -384,9 +384,10 @@ class KPI(models.Model, HelpTextMixin):
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
-    sudep = models.IntegerField(
+
+    service_contact_details = models.IntegerField(
         help_text={
-            'label': '9f. Sudden unexplained death in epilepsy',
+            'label': '9f. Service contact details',
             'reference': "Percentage of children and young people with epilepsy with evidence of being given service contact details."
         },
         default=None,
