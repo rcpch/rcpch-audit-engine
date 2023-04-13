@@ -9,7 +9,7 @@ import simple_history.models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("epilepsy12", "0080_alter_comorbidity_comorbidityentity_and_more"),
+        ("epilepsy12", "0081_alter_case_first_name_alter_case_surname_and_more"),
     ]
 
     operations = [

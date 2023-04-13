@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("epilepsy12", "0085_alter_antiepilepsymedicine_medicine_entity"),
+        ("epilepsy12", "0086_alter_antiepilepsymedicine_medicine_entity"),
     ]
 
     operations = [

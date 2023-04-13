@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("epilepsy12", "0081_alter_case_first_name_alter_case_surname_and_more"),
+        ("epilepsy12", "0087_remove_antiepilepsymedicine_antiepilepsy_medicine_snomed_code_and_more"),
     ]
 
     operations = [
