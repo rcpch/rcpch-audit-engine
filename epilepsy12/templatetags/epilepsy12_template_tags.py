@@ -1,8 +1,10 @@
+import re
+
 from django import template
 from django.utils.safestring import mark_safe
+
 from ..general_functions import fetch_concept
 
-import re
 
 register = template.Library()
 
@@ -318,3 +320,4 @@ def icon_for_score(score):
                 _="init js $('.rcpch.dot.circle.icon').popup(); end"
                 ></i>
                 """)
+
