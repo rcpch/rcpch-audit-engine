@@ -68,7 +68,6 @@ def split_label_to_list(label):
     if label is None:
         return 'Unclassified'
     else:
-        print(label)
         nhs_icb_string = re.search(r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)',label)
         if nhs_icb_string:
             return nhs_icb_string.group(2).title()
