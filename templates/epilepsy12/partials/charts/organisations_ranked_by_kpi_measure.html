@@ -57,15 +57,16 @@
         },
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            grid: {
+              display: false,
+            }
           },
           x: 
             {
-                // ticks: {
-                //             autoSkip: true,
-                //             maxRotation: 90,
-                //             minRotation: 90,
-                //         }
+              ticks: {
+                stepSize: 1
+              },
             }
           
         }
