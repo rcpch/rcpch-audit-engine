@@ -19,7 +19,7 @@
     var myChart = new Chart(document.getElementById('{{data_id}}'), {
       type: 'bar',
       data: {
-        labels: [{% for item in data %}'{% split_label_to_list item.region.1 %}',{% endfor %}],
+        labels: [{% for item in data %}'{% split_label_to_list item.region.1|escapejs %}',{% endfor %}],
         datasets: [
         {
             type: 'line',
