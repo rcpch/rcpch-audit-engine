@@ -412,7 +412,6 @@ def selected_trust_select_kpi(request, organisation_id):
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='country', kpi_measure=kpi_name)
-
     context = {
         'kpi_name': kpi_name,
         'kpi_value': kpi_value,

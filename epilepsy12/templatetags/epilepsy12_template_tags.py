@@ -2,6 +2,8 @@ from django import template
 from django.utils.safestring import mark_safe
 from ..general_functions import fetch_concept
 
+import re
+
 register = template.Library()
 
 
@@ -66,9 +68,10 @@ def split_label_to_list(label):
     if label is None:
         return 'Unclassified'
     else:
-        processed = label.strip().replace(
-            'INTEGRATED CARE BOARD', "").replace('&#x27;', "\'")
-        return processed
+        nhs_icb_string = re.search(r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)',label)
+        if nhs_icb_string:
+            return nhs_icb_string.group(2).title()
+        return label
 
 
 @register.filter
