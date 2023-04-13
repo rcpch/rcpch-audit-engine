@@ -33,6 +33,46 @@ ANTIEPILEPSY_MEDICINE_TYPES = (
     (0, "Other")
 )
 
+SNOMED_ANTIEPILEPSY_MEDICINE_TYPES = (
+    (774413005, "Acetazolamide"),
+    (40789008, "ACTH"),
+    (775043009, "Carbamazepine"),
+    (775294007, "Clobazam"),
+    (775309006, "Clonazepam"),
+    (775832002, "Eslicarbazepine acetate"),
+    (775876009, "Ethosuximide"),
+    (776060008, "Gabapentin"),
+    (776457006, "Lacosamide"),
+    (776470002, "Lamotrigine"),
+    (776508005, "Levetiracetam"),
+    (776754003, "Methylprednisolone"),
+    (776924001, "Nitrazepam"),
+    (777017007, "Oxcarbazepine"),
+    (777126008, "Perampanel"),
+    (777218005, "Piracetam"),
+    (777167003, "Phenobarbital"),
+    (777187002, "Phenytoin"),
+    (777311001, "Pregabalin"),
+    (777309005, "Prednisolone"),
+    (777315005, "Primidone"),
+    (777475004, "Rufinamide"),
+    (387481005, "Sodium valproate"),
+    (777610008, "Stiripentol"),
+    (50580004, "Sulthiame"),
+    (777762000, "Tiagabine"),
+    (777808008, "Topiramate"),
+    (777931009, "Vigabatrin"),
+    (777991006, "Zonisamide"),
+    (1001, "Other")
+)
+
+SNOMED_BENZODIAZEPINE_TYPES = (
+    (776785007, "Buccal midazolam"),
+    (775545008, "Rectal diazepam"),
+    (1002, "Other"),
+    (776574008, "Lorazepam")
+)
+
 BENZODIAZEPINE_TYPES = (
     (1000, "Buccal midazolam"),
     (1001, "Rectal diazepam"),

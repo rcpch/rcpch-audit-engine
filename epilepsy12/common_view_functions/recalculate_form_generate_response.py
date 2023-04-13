@@ -210,14 +210,16 @@ def total_fields_expected(model_instance):
 
                     cumulative_score += 3
 
-                    if medicine.medicine_id == 21 and model_instance.registration.case.sex == 2:
-                        # essential fields are:
-                        # 'is_a_pregnancy_prevention_programme_needed'
-                        cumulative_score += 1
-                        if medicine.is_a_pregnancy_prevention_programme_needed:
-                            # essential fields are:
-                            # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
-                            cumulative_score += 2
+                    if hasattr(medicine, "medicine_entity") and model_instance.registration.case.sex == 2:
+                        if medicine.medicine_entity is not None:
+                            if medicine.medicine_entity.medicine_name == 'Sodium valproate':
+                                # essential fields are:
+                                # 'is_a_pregnancy_prevention_programme_needed'
+                                cumulative_score += 1
+                                if medicine.is_a_pregnancy_prevention_programme_needed:
+                                    # essential fields are:
+                                    # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
+                                    cumulative_score += 2
             else:
                 # user has said AED given but not scored yet
                 cumulative_score += scoreable_fields_for_model_class_name(
@@ -276,7 +278,7 @@ def avoid_fields(model_instance):
     elif model_class_name == 'Episode':
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at', 'expected_score', 'calculated_score']
     elif model_class_name == 'AntiEpilepsyMedicine':
-        return ['id', 'management', 'medicine_id', 'is_rescue_medicine', 'antiepilepsy_medicine_snomed_code', 'antiepilepsy_medicine_snomed_preferred_name', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date']
+        return ['id', 'management', 'is_rescue_medicine', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date']
     elif model_class_name == 'Registration':
         return ['id', 'management', 'assessment', 'investigations', 'multiaxialdiagnosis', 'registration', 'epilepsycontext', 'firstpaediatricassessment', 'registration_close_date', 'registration_date_one_year_on', 'audit_submission_date', 'cohort', 'case', 'audit_progress', 'created_by', 'created_at', 'updated_by', 'updated_at', 'kpi']
     else:

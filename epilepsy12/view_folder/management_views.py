@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
-from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine, Site
+from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine, Site, MedicineEntity
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 from ..decorator import user_can_access_this_organisation
 
@@ -148,23 +148,23 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     else:
         is_rescue = False
 
+    # medicine = MedicineEntity.objects.filter(is_rescue=is_rescue).first()
+
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.create(
-        medicine_id=None,
-        medicine_name=None,
         is_rescue_medicine=is_rescue,
-        antiepilepsy_medicine_snomed_code=None,
-        antiepilepsy_medicine_snomed_preferred_name=None,
         antiepilepsy_medicine_start_date=None,
         antiepilepsy_medicine_stop_date=None,
         antiepilepsy_medicine_risk_discussed=None,
         is_a_pregnancy_prevention_programme_needed=None,
-        management=management
+        management=management,
+        medicine_entity=None
     )
 
     if is_rescue:
 
         context = {
-            'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
+            # 'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
+            'choices': MedicineEntity.objects.filter(is_rescue=True).order_by('medicine_name'),
             'antiepilepsy_medicine': antiepilepsy_medicine,
             'management_id': management_id,
             'is_rescue_medicine': is_rescue
@@ -173,7 +173,8 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     else:
 
         context = {
-            'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+            # 'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+            'choices': MedicineEntity.objects.filter(is_rescue=False).order_by('medicine_name'),
             'antiepilepsy_medicine': antiepilepsy_medicine,
             'management_id': management_id,
             'is_rescue_medicine': is_rescue
@@ -245,9 +246,13 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -255,7 +260,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -288,7 +293,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
     # if all the fields are none this was not completed - delete the record
     if (
-        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None and antiepilepsy_medicine.antiepilepsy_medicine_stop_date is None and antiepilepsy_medicine.medicine_id is None and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
+        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None and antiepilepsy_medicine.antiepilepsy_medicine_stop_date is None and antiepilepsy_medicine.medicine_entity is None and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
     ):
         antiepilepsy_medicine.delete()
 
@@ -328,27 +333,29 @@ def medicine_id(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = BENZODIAZEPINE_TYPES
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = ANTIEPILEPSY_MEDICINES
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
-    # get id of medicine - TODO this should be the SNOMEDCTID
+    # get id of medicine entity
     medicine_id = request.POST.get('medicine_id')
 
-    # look up the medicine name from the constant
-    medicine_name = None
-    for medicine in choices:
-        if int(medicine_id) == int(medicine[0]):
-            medicine_name = medicine[1]
+    # look up the medicine from the pk
+    medicine_entity = MedicineEntity.objects.get(pk=medicine_id)
 
-    antiepilepsy_medicine.medicine_name = medicine_name
-    antiepilepsy_medicine.medicine_id = medicine_id
+    antiepilepsy_medicine.medicine_entity = medicine_entity
 
-    if int(antiepilepsy_medicine.medicine_id) == 21 and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
-        # sodium valproate selected and patient is female
-        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
-        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
-        antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
+    if hasattr(antiepilepsy_medicine, 'medicine_entity'):
+        if antiepilepsy_medicine.medicine_entity is not None:
+            if antiepilepsy_medicine.medicine_entity.medicine_name == 'Sodium valproate' and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
+                # sodium valproate selected and patient is female
+                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
+                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+                antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
     else:
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = None
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
@@ -362,7 +369,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -406,9 +413,13 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -449,9 +460,13 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
     context = {
         'choices': choices,
@@ -498,10 +513,8 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     context = {
         'choices': choices,
@@ -546,10 +559,8 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -557,7 +568,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -599,10 +610,8 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -610,7 +619,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -652,10 +661,8 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, ant
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -663,7 +670,7 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, ant
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date

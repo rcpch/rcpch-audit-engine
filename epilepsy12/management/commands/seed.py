@@ -7,10 +7,10 @@ from random import randint
 from django.core.management.base import BaseCommand
 
 
-from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES
-from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity
+from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES, SNOMED_BENZODIAZEPINE_TYPES, SNOMED_ANTIEPILEPSY_MEDICINE_TYPES
+from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity, MedicineEntity, AntiEpilepsyMedicine
 from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS
-from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, fetch_ecl, fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set
+from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, fetch_ecl, fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set, fetch_concept
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from .create_e12_records import create_epilepsy12_record, create_registrations
 from .add_codes_to_organisations import add_codes_to_organisation
@@ -48,6 +48,9 @@ class Command(BaseCommand):
         elif (options['mode'] == 'seed_comorbidities'):
             self.stdout.write('seeding comorbidities...')
             run_comorbidities_seed()
+        elif (options['mode'] == 'seed_medicines'):
+            self.stdout.write('seeding medicines...')
+            run_medicines_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
@@ -68,6 +71,13 @@ class Command(BaseCommand):
             self.stdout.write(
                 'replacing comorbidites with refset...')
             replace_existing_comorbidities_with_refset()
+        elif (options['mode'] == 'add_existing_medicines_as_foreign_keys'):
+            self.stdout.write(
+                'replacing medicines with medicine entity...')
+        elif (options['mode'] == 'update_medicine_entity_with_snomed'):
+            self.stdout.write(
+                'updating medicine_entities with SNOMED...')
+            update_medicine_entity_with_snomed()
 
         else:
             self.stdout.write('No options supplied...')
@@ -127,6 +137,9 @@ def run_epilepsy_causes_seed():
     This returns all the snomed ct definitions and codes for epilepsy causes.
     Should be run periodically to compare with value in database and update record if has changed
     """
+    if EpilepsyCauseEntity.objects.count() > 0:
+        print('Causes already exist. Skipping this step...')
+        return
     index = 0
     ecl = '<< 363235000'
     # calls the rcpch deprivare server for a list of causes using ECL query language
@@ -157,6 +170,9 @@ def run_comorbidities_seed():
     This returns all the snomed ct definitions and codes for epilepsy causes.
     Should be run periodically to compare with value in database and update record if has changed
     """
+    if ComorbidityEntity.objects.count() > 0:
+        print('Comorbidities already exist. Skipping...')
+        return
     index = 0
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
@@ -209,6 +225,121 @@ def replace_existing_comorbidities_with_refset():
             dsm_version=None,
         )
     print('Update all comorbidites with refset')
+
+
+def run_medicines_seed():
+    for benzo in SNOMED_BENZODIAZEPINE_TYPES:
+        concept = fetch_concept(benzo[0])
+        if not MedicineEntity.objects.filter(
+                medicine_name=benzo[1]).exists():
+            # if the drug is not in the database already
+            new_drug = MedicineEntity(
+                medicine_name=benzo[1],
+                is_rescue=True,
+                conceptId=concept[0]['conceptId'],
+                term=concept[0]['term'],
+                preferredTerm=concept[0]['preferredTerm']
+            )
+            new_drug.save()
+        else:
+            print(f"{benzo[1]} exists. Skipping...")
+    for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
+        if not MedicineEntity.objects.filter(
+            medicine_name=aem[1],
+            is_rescue=False
+        ).exists():
+            # if the drug is not in the database already
+            concept = fetch_concept(aem[0])
+            aem_drug = MedicineEntity(
+                medicine_name=aem[1],
+                conceptId=concept[0]['conceptId'],
+                term=concept[0]['term'],
+                preferredTerm=concept[0]['preferredTerm']
+            )
+            aem_drug.save()
+        else:
+            print(f"{aem_drug[1]} exists. Skipping...")
+    # drugs = fetch_ecl('<<255632006')
+    # for drug in drugs:
+    #     if not MedicineEntity.objects.filter(conceptId=drug['conceptId']).exists():
+    #         # if this drug is not in the table already
+    #         for benzo in SNOMED_BENZODIAZEPINE_TYPES:
+    #             if not MedicineEntity.objects.filter(
+    #                     medicine_name=benzo[1]).exists():
+    #                 # if the drug is not in the database already
+    #                 new_drug = MedicineEntity(
+    #                     medicine_name=benzo[1]
+    #                 )
+    #                 if drug['preferredTerm'] == benzo[1]:
+    #                     # The is a match for this benzodiazepine in SNOMED
+    #                     # add SNOMED details to the database
+    #                     new_drug.conceptId = drug['conceptId']
+    #                     new_drug.term = drug['term']
+    #                     new_drug.preferredTerm = drug['preferredTerm']
+    #                 new_drug.save()
+    #         for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
+    #             if not MedicineEntity.objects.filter(
+    #                 medicine_name=aem[1]
+    #             ).exists():
+    #                 # if the drug is not in the database already
+    #                 aem_drug = MedicineEntity(
+    #                     medicine_name=aem[1]
+    #                 )
+    #                 if drug['preferredTerm'] == aem[1]:
+    #                     # There is a match for this Antiepilepsy medicine in SNOMED
+    #                     # add SNOMED details to the database
+    #                     aem_drug.conceptId = drug['conceptId']
+    #                     aem_drug.term = drug['term']
+    #                     aem_drug.preferredTerm = drug['preferredTerm']
+    #                 aem_drug.save()
+
+
+def add_existing_medicines_as_foreign_keys():
+    for antiepilepsy_medicine in AntiEpilepsyMedicine.objects.all():
+        if antiepilepsy_medicine.medicine_entity is None and antiepilepsy_medicine.medicine_name is not None:
+            # no relationship exists with MedicineEntity yet and a medicine has been allocated previously
+            if MedicineEntity.objects.filter(medicine_name=antiepilepsy_medicine.medicine_name).exists():
+                new_medicine = MedicineEntity.objects.filter(
+                    medicine_name=antiepilepsy_medicine.medicine_name).first()
+                antiepilepsy_medicine.medicine_entity = new_medicine
+                print(f'Adding {antiepilepsy_medicine.medicine_name}')
+                antiepilepsy_medicine.save()
+
+
+def update_medicine_entity_with_snomed():
+    for benzo in SNOMED_BENZODIAZEPINE_TYPES:
+        if MedicineEntity.objects.filter(
+                medicine_name=benzo[1]).exists():
+            # if the drug is not in the database already
+            new_drug = MedicineEntity.objects.filter(
+                medicine_name=benzo[1],
+            ).first()
+            new_drug.is_rescue = True
+            if benzo[0] not in [1001, 1002]:
+                concept = fetch_ecl(benzo[0])
+                new_drug.conceptId = concept[0]['conceptId']
+                new_drug.term = concept[0]['term']
+                new_drug.preferredTerm = concept[0]['preferredTerm']
+            new_drug.save()
+        else:
+            print(f"{benzo[1]} does not exist. Skipping...")
+    for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
+        if MedicineEntity.objects.filter(
+            medicine_name=aem[1],
+        ).exists():
+            # if the drug is not in the database already
+            aem_drug = MedicineEntity.objects.filter(
+                medicine_name=aem[1],
+            ).first()
+            aem_drug.is_rescue = False
+            if aem[0] not in [1001, 1002]:
+                concept = fetch_ecl(aem[0])
+                aem_drug.conceptId = concept[0]['conceptId']
+                aem_drug.term = concept[0]['term']
+                aem_drug.preferredTerm = concept[0]['preferredTerm']
+            aem_drug.save()
+        else:
+            print(f"{aem_drug[1]} does not exist. Skipping...")
 
 
 def run_organisations_seed():

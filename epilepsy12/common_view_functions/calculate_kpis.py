@@ -294,7 +294,8 @@ def calculate_kpis(registration_instance):
             registration_instance.management.has_an_aed_been_given and
             AntiEpilepsyMedicine.objects.filter(
                 management=registration_instance.management,
-                medicine_id=21
+                medicine_entity=MedicineEntity.objects.filter(
+                    medicine_name__icontains='valproate').first()
             ).exists()
         ):
 
@@ -307,7 +308,8 @@ def calculate_kpis(registration_instance):
                 registration_instance.management.has_an_aed_been_given and
                 AntiEpilepsyMedicine.objects.filter(
                     management=registration_instance.management,
-                    medicine_id=21,
+                    medicine_entity=MedicineEntity.objects.filter(
+                    medicine_name__icontains='valproate').first(),
                     is_a_pregnancy_prevention_programme_needed=True,
                     has_a_valproate_annual_risk_acknowledgement_form_been_completed=True
                 ).exists()

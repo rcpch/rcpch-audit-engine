@@ -22,3 +22,4 @@ from .help_text_mixin import HelpTextMixin
 from .syndrome_entity import SyndromeEntity
 from .epilepsy_cause_entity import EpilepsyCauseEntity
 from .comorbidy_entity import ComorbidityEntity
+from .medicine_entity import MedicineEntity

@@ -59,8 +59,8 @@ services:
   # db container - runs postgres
   db:
     image: postgres:latest
-    volumes:
-      - "auditenginedb:/var/lib/postgresql/data"
+    # volumes:
+    #   - "auditenginedb:/var/lib/postgresql/data"
     environment:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password

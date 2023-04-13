@@ -152,6 +152,28 @@ def value_for_field_name(model, field_name):
 
 
 @register.filter
+def record_complete(model):
+    # helper largely for medicines table to report if complete or not
+
+    minimum_requirement_met = False
+    if hasattr(model, 'medicine_entity'):
+        if model.medicine_entity is not None:
+            minimum_requirement_met = (
+                model.antiepilepsy_medicine_start_date is not None and
+                model.antiepilepsy_medicine_risk_discussed is not None and
+                model.medicine_entity.medicine_name is not None
+            )
+            if model.management.registration.case.sex == 2 and model.medicine_entity.medicine_name == 'Sodium valproate':
+                return minimum_requirement_met and (
+                    model.is_a_pregnancy_prevention_programme_needed is not None and
+                    model.has_a_valproate_annual_risk_acknowledgement_form_been_completed is not None and
+                    model.is_a_pregnancy_prevention_programme_in_place is not None
+                )
+
+    return minimum_requirement_met
+
+
+@register.filter
 def to_class_name(value):
     if value.__class__.__name__ == "Registration":
         return 'Verification/Registration'

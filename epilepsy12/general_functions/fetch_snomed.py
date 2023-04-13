@@ -1,5 +1,6 @@
 
 import requests
+from ..constants import BENZODIAZEPINE_TYPES, ANTIEPILEPSY_MEDICINE_TYPES
 
 
 def fetch_snomed(sctid, syntax):
@@ -85,7 +86,7 @@ def fetch_all_hereditary_epilepsy():
 
 
 def fetch_ecl(ecl):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint={ecl}&offset=0&limit=1000'
+    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint={ecl}'
 
     response = requests.get(search_url)
 
@@ -199,3 +200,18 @@ def fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
     serialised = response.json()
 
     return serialised
+
+
+def compare_snomed_with_constant_drugs():
+    drugs = fetch_ecl('<<255632006')
+    index = 0
+    for drug in drugs:
+        print(f"{drug['preferredTerm']}")
+        for benzo in BENZODIAZEPINE_TYPES:
+            if drug['preferredTerm'] == benzo[1]:
+                print(f"{drug['preferredTerm']} is a match with {benzo[1]}")
+        for aem in ANTIEPILEPSY_MEDICINE_TYPES:
+            if drug['preferredTerm'] == aem[1]:
+                print(f"{drug['preferredTerm']} is a match with {aem[1]}")
+        index += 1
+    print(f"{index} drugs checked for matches")

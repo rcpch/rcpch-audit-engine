@@ -116,6 +116,7 @@ admin.site.register(KPI)
 admin.site.register(VisitActivity)
 admin.site.register(EpilepsyCauseEntity)
 admin.site.register(ComorbidityEntity)
+admin.site.register(MedicineEntity)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'
