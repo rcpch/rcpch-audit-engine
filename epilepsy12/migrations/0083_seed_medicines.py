@@ -49,7 +49,7 @@ def seed_medicines(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("epilepsy12", "0081_medicineentity_historicalmedicineentity"),
+        ("epilepsy12", "0082_medicineentity_historicalmedicineentity"),
     ]
 
     operations = [

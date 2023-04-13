@@ -21,7 +21,7 @@ def create_foreign_key_for_existing_medications(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("epilepsy12", "0083_antiepilepsymedicine_medicine_entity_and_more"),
+        ("epilepsy12", "0084_antiepilepsymedicine_medicine_entity_and_more"),
     ]
 
     operations = [
