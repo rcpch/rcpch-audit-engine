@@ -14,5 +14,5 @@ whitenoise
 django-semantic-admin
 djangorestframework
 django-simple-history
-
+django-auto-logout
 # RCPCH imports

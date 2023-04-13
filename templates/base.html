@@ -57,6 +57,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{% static 'jquery_mask/jquery.mask.min.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- ADDS AUTO LOGOUT REDIRECT TO LOGIN PAGE SCRIPT -->
+  {{ redirect_to_login_immediately }}
+  
   <script>
     // $('#id_nhs_number').mask('0000 000 000');
     $('.message .close').on('click', function () {
