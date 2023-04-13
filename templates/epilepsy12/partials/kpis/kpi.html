@@ -266,7 +266,7 @@
           class="rcpch question circle icon"
           id="comprehensive_care_planning_content"
           data-title="Comprehensive care planning content"
-          data-content="{{case.registration.audit_procomprehensive_care_planning_contentiary_input_help_reference_text}}"
+          data-content="{{case.registration.kpi.get_comprehensive_care_planning_content_help_reference_text}}"
           data-position="top right"
           _="init js $('#comprehensive_care_planning_content').popup(); end"
         ></i>
@@ -338,22 +338,7 @@
         {{case.registration.kpi.general_participation_and_risk|icon_for_score}}
       </td>
     </tr>
-    <tr {% if case.registration.kpi.service_contact_details == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
-      <td class="left aligned">
-        <i
-          class="rcpch question circle icon"
-          id="service_contact_details"
-          data-title="Service contact details"
-          data-content="{{case.registration.kpi.service_contact_details.get_service_contact_details_help_reference_text}}"
-          data-position="top right"
-          _="init js $('#service_contact_details').popup(); end"
-        ></i>
-        {{case.registration.kpi.get_service_contact_details_help_label_text}}
-      </td>
-      <td class="right aligned">
-        {{case.registration.kpi.service_contact_details|icon_for_score}}
-      </td>
-    </tr>
+    
     <tr {% if case.registration.kpi.sudep == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
       <td class="left aligned">
         <i
@@ -369,6 +354,24 @@
         {{case.registration.kpi.sudep|icon_for_score}}
       </td>
     </tr>
+
+    <tr {% if case.registration.kpi.service_contact_details == 2 %} class='kpi_unscored' {% endif %} class="subcategory-row">
+      <td class="left aligned">
+        <i
+          class="rcpch question circle icon"
+          id="service_contact_details"
+          data-title="Service contact details"
+          data-content="{{case.registration.kpi.get_service_contact_details_help_reference_text}}"
+          data-position="top right"
+          _="init js $('#service_contact_details').popup(); end"
+        ></i>
+        {{case.registration.kpi.get_service_contact_details_help_label_text}}
+      </td>
+      <td class="right aligned">
+        {{case.registration.kpi.service_contact_details|icon_for_score}}
+      </td>
+    </tr>
+
     <tr {% if case.registration.kpi.school_individual_healthcare_plan == 2 %} class='kpi_unscored' {% endif %}>
       <td class="left aligned">
         <i
