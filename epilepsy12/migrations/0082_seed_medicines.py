@@ -25,8 +25,8 @@ def seed_medicines(apps, schema_editor):
             )
             if benzo[0] not in [1001, 1002]:
                 concept = fetch_ecl(benzo[0])
-                new_drug.conceptId = concept[0]['conceptId'],
-                new_drug.term = concept[0]['term'],
+                new_drug.conceptId = concept[0]['conceptId']
+                new_drug.term = concept[0]['term']
                 new_drug.preferredTerm = concept[0]['preferredTerm']
             new_drug.save()
     for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
@@ -40,8 +40,8 @@ def seed_medicines(apps, schema_editor):
             )
             if aem[0] not in [1001, 1002]:
                 concept = fetch_ecl(int(aem[0]))
-                aem_drug.conceptId = concept[0]['conceptId'],
-                aem_drug.term = concept[0]['term'],
+                aem_drug.conceptId = concept[0]['conceptId']
+                aem_drug.term = concept[0]['term']
                 aem_drug.preferredTerm = concept[0]['preferredTerm']
             aem_drug.save()
 
