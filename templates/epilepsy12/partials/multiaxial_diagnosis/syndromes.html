@@ -20,20 +20,20 @@
                     {% if syndrome.syndrome_diagnosis_date %}
                         {{syndrome.syndrome_diagnosis_date}}
                     {% else %}
-                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
                         </span>
-                        Uncompleted field
+                        Incompleted field
                     {% endif %}
                 </td>
                 <td>
                     {% if syndrome.syndrome is not None %}
                         {{syndrome.syndrome.syndrome_name}}
                     {% else %}
-                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
                         </span>
-                        Uncompleted field
+                        Incompleted field
                     {% endif %}
                 </td>
                 <td>
@@ -73,7 +73,7 @@
         </table>
     {% else %}
         <div class='field'>
-            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+            <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                 <i class="rcpch_light_blue dot circle outline icon"></i>
             </span>
             There are no documented syndromes so far...

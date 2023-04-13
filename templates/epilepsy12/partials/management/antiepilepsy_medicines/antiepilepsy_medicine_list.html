@@ -16,13 +16,16 @@
                     {% if medicine|record_complete %}
                         <i class="rcpch_pink check circle outline icon"></i>
                     {% else %}
-                        <span data-tooltip="Uncompleted record. This medicine contains uncompleted measures." data-inverted="" data-position="top left">
+                        <span data-tooltip="Incompleted record. This medicine contains incompleted measures." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
                         </span>
                     {% endif %}
                     {% if medicine.antiepilepsy_medicine_start_date %}
                         {{ medicine.antiepilepsy_medicine_start_date }}
                     {% else %}
+                        <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                            <i class="rcpch_light_blue dot circle outline icon"></i>
+                        </span>
                         None
                     {% endif %}
                 </td>
@@ -30,7 +33,7 @@
                     {% if medicine.medicine_entity.medicine_name %}
                         {{medicine.medicine_entity.medicine_name }}
                     {% else %}
-                        <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
                         </span>
                         None
@@ -81,7 +84,7 @@
         </table>
     {% else %}
         <div class='field'>
-            <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+            <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
                 <i class="rcpch_light_blue dot circle outline icon"></i>
             </span>
             There are no documented medicines so far...
