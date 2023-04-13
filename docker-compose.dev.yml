@@ -25,6 +25,10 @@ services:
       - E12_SECRET_KEY=mysecretkey
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
+      - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
+      - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
+      - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
+      # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
     # ensures that docker compose always displays log output

@@ -6,4 +6,5 @@
 # starts the postgres and application containers
 # migrates db, seeds db, creates superuser, runs server
 
-docker compose -f docker-compose.dev-init.yml up
+docker compose -f docker-compose.dev.yml down -v # removes all the containers AND the DB volume
+docker compose -f docker-compose.dev-init.yml up # starts everything up again

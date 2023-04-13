@@ -25,6 +25,11 @@ services:
       - E12_SECRET_KEY=mysecretkey
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
+      - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
+      - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
+      - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
+      # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
+      # Below ENV vars are only needed for first creation of the superuser
       - DJANGO_SUPERUSER_USERNAME=e12-dev-user
       - DJANGO_SUPERUSER_PASSWORD=pw
       - DJANGO_SUPERUSER_FIRST_NAME=dev
@@ -32,16 +37,10 @@ services:
       - DJANGO_SUPERUSER_EMAIL=e12-dev-user@rcpch.tech
       - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
       - DJANGO_SUPERUSER_ROLE=1
-      - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
-      - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
-      - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1
-      # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001
-      # COMMENT THIS LINE BACK IN AND COMMENT LINE 37 OUT IF RUNNING RCPCH CENSUS PLATFORM LOCALLY
     env_file:
-      - .env # this contains the token for RCPCH Census Platform and is not entered into git
+      - .env # env file with the token for RCPCH Census Platform, not committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
-            python manage.py makemigrations &&
             python manage.py migrate &&
             python manage.py seed --mode=seed_organisations &&
             python manage.py seed --mode=seed_semiology_keywords &&
