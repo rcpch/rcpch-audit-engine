@@ -10,7 +10,7 @@ name: Build and deploy Python app to Azure Web App - epilepsy12
 on:
   push:
     branches:
-      - development
+      - adding-commit-hash
   workflow_dispatch:
 
 jobs:
