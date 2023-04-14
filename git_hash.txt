@@ -1,1 +1,1 @@
-GIT_HASH=cbea0a2
+GIT_HASH=6fb21a6
