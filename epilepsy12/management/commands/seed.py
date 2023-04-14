@@ -472,13 +472,7 @@ def run_dummy_cases_seed():
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
 
     random_organisations = []
-    
-    # first populate 1b St Catherines Way Gorleston for ease of dev testing
-    for _ in range(1, 11):
-        random_organisations.append(Organisation.objects.get(OrganisationID='3775035'))
-    
-    # seed the remaining 9
-    for j in range(9):
+    for j in range(10):
         random_organisation = Organisation.objects.filter(
             Sector="NHS Sector").order_by("?").first()
         for i in range(1, 11):
