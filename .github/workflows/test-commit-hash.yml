@@ -1,0 +1,27 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+
+# DEPLOYS CHANGES IN THE 'DEVELOPMENT' BRANCH TO THE 'DEVELOPMENT' DEPLOYMENT SLOT ON AZURE
+# epilepsy12/development
+
+name: Build and deploy Python app to Azure Web App - epilepsy12
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3      
+      - name: Get Hash
+        id: hash
+        run: echo "GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
+
+      - name: Check Hash
+        run: echo "${{ env.GIT_HASH }}"
