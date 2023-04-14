@@ -4,6 +4,7 @@
 <div class="ui text menu signin">
     <div class="right menu">
       {% if user.is_authenticated %}
+      {% if user.is_superuser %}{{GIT_HASH}}{% endif %}
         <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
       {% else %}
         <a class="item signin_button" href="{% url 'login' %}"><i class="arrow right icon"></i><span class="signin_text">Sign in</span></a>
