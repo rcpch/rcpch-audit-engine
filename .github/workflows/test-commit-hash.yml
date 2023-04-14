@@ -21,7 +21,5 @@ jobs:
       - uses: actions/checkout@v3      
       - name: Get Hash
         id: hash
-        run: echo "GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
-
-      - name: Check Hash
-        run: echo "${{ env.GIT_HASH }}"
+        run: echo "GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
+        
