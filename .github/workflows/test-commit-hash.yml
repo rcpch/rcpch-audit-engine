@@ -22,4 +22,9 @@ jobs:
       - name: Get Hash
         id: hash
         run: echo "GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
-        
+      
+      # Commit git_hash.txt back to the repository
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: 'git_hash.txt'
+          commit_message: 'Autopopulates git_hash.txt via Actions'
