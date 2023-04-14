@@ -2,7 +2,7 @@
 {% load epilepsy12_template_tags %}
 
 <div class="ui text menu signin">
-  {% if user.is_superuser %}<div class="git_hash">Most recent git commit hash: {{GIT_HASH}}</div>{% endif %}
+  {% if user.is_superuser %}<div class="git_hash">Most recent GitHub branch commit hash: {{GIT_HASH}}</div>{% endif %}
     <div class="right menu">
       {% if user.is_authenticated %}
         <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
