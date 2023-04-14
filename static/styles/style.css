@@ -932,7 +932,7 @@ div.ui.card > div.content > div.organisation_address_container {
   transform: translate(-50%, -50%);
   counter-reset: percent var(--percent);
   content: counter(percent) "%";
-  color: var(--rcpch_light_blue);
+  color: var(--rcpch_dark_blue);
   font-weight: bold;
 }
 
