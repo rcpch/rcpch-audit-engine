@@ -7,8 +7,8 @@ def export_vars(request):
     # Load the txt file containing hash
     try:
         with open('git_hash.txt', 'r') as f:
-            git_hash = f.read()
-            
+            git_hash = f.read().replace('GIT_HASH=','')
+
             # if file is empty
             if not git_hash:
                 git_hash = 'Empty commit file'
