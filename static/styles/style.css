@@ -227,7 +227,7 @@ a.rcpch_index_card_link {
   border-radius: 0%;
   height: 200px;
   width: auto;
-  background-color: var(--rcpch_light_grey);
+  /* background-color: var(--rcpch_light_grey); */
 }
 
 #bottom_attached_message {
@@ -1614,4 +1614,26 @@ table.ui.rcpch.table.cases_table tbody {
   border: none;
   background: none transparent;
   border-bottom: 2.5px solid var(--rcpch_light_blue);
+}
+
+div.ui.three.stackable.cards.individual_measures{
+  margin-top: 1em;
+}
+
+.individual_measures_pies_wrapper {
+  margin-bottom: -1em;
+}
+
+.individual_measures_pies_wrapper .ui.rcpch_chart_container.segment {
+  padding: 0em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+div.ui.three.stackable.cards.individual_measures .ui.card {
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
 }
