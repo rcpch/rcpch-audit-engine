@@ -120,6 +120,13 @@ ul {
   padding: 2rem;
 }
 
+@media only screen and (max-width: 767px) {
+  .ui.rcpch.container {
+    padding: 0rem;
+    margin: 0rem !important;
+  }
+}
+
 .ui.label {
   list-style: none;
   font-family: var(--rcpch_standard_font);
@@ -1175,9 +1182,12 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 @media only screen and (max-width: 767px) {
-  /* REMOVE FOOTER CONTAINER MARGIN SMALL SCREEN */
-   .footer_container.ui.fluid.container {
-    margin: 0em 0em !important;
+  .ui.fluid.container {
+    margin: 0em !important;
+  }
+  .ui.grid.container.selected_organisation_container {
+    width: 100% !important;
+    margin: 0rem !important;
   }
 }
 
