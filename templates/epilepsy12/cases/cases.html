@@ -4,15 +4,12 @@
   <div class="ui rcpch container">
 
     <div class='ui top attached rcpch_dark_blue clearing segment'>
-  
-          <h5 class="ui header">
-            Children and Young People
-          </h5>
-  
-          <div class="ui header column" id='cases_view_preference'>
-              {% include 'epilepsy12/partials/cases/view_preference.html' with organisation=organisation rcpch_choices=rcpch_choices test_positive=request.user.view_preference template_name='cases' hx_target='#cases_view_preference' %}
-          </div>
-
+            <h5 class="ui left floated header">
+                Children and Young People
+              </h5>
+              <div id='cases_view_preference'>
+                  {% include 'epilepsy12/partials/cases/view_preference.html' with organisation=organisation rcpch_choices=rcpch_choices test_positive=request.user.view_preference template_name='cases' hx_target='#cases_view_preference' %}
+              </div>
     </div>
     <div class="ui raised attached segment">
       <div class="ui grid">

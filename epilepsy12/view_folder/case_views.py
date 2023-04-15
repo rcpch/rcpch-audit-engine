@@ -180,11 +180,17 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
-    rcpch_choices = (
-        (0, f'Organisation View ({organisation.OrganisationName})'),
-        (1, f'Trust View ({organisation.ParentName})'),
-        (2, 'National View'),
-    )
+    if request.user.is_rcpch_audit_team_member:
+        rcpch_choices = (
+            (0, f'Organisation View ({organisation.OrganisationName})'),
+            (1, f'Trust View ({organisation.ParentName})'),
+            (2, 'National View'),
+        )
+    else:
+        rcpch_choices = (
+            (0, f'Organisation View ({organisation.OrganisationName})'),
+            (1, f'Trust View ({organisation.ParentName})'),
+        )
 
     context = {
         'case_list': case_list,

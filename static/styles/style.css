@@ -1105,6 +1105,7 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 .ui.rcpch.dropdown {
+  font-size: small;
   border: 3px solid rgba(17, 167, 242, 1) !important;
   -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
   box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;

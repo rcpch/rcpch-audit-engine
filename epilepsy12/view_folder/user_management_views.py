@@ -152,11 +152,17 @@ def epilepsy12_user_list(request, organisation_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 'surname').all()
 
-    rcpch_choices = (
-        (0, f'Organisation View ({organisation.OrganisationName})'),
-        (1, f'Trust View ({organisation.ParentName})'),
-        (2, 'National View'),
-    )
+    if request.user.is_rcpch_audit_team_member:
+        rcpch_choices = (
+            (0, f'Organisation View ({organisation.OrganisationName})'),
+            (1, f'Trust View ({organisation.ParentName})'),
+            (2, 'National View'),
+        )
+    else:
+        rcpch_choices = (
+            (0, f'Organisation View ({organisation.OrganisationName})'),
+            (1, f'Trust View ({organisation.ParentName})'),
+        )
 
     paginator = Paginator(epilepsy12_user_list, 10)
     page_number = request.GET.get('page', 1)
