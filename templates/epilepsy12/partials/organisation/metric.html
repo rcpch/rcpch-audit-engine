@@ -2,16 +2,16 @@
 {% load epilepsy12_template_tags %}
 {% csrf_token %} 
 
-<div class='ui grid container'>
+<div class='ui rcpch grid stackable container'>
 
     <div class="four wide stackable bottom aligned centered column">
-        <h5 class="centred">Organisation</h5>
+        <h5 class="progress_label centred">Organisation</h5>
         {% percentage_of_total organisation_kpi total_organisation_kpi_cases as total_percent %}
         {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent numerator=organisation_kpi denominator=total_organisation_kpi_cases title=selected_organisation.OrganisationName pie_size='med' %}
     </div>
     
     <div class="four wide stackable bottom aligned centered column">
-        <h5 class="centred">Trust</h5>
+        <h5 class="progress_label centred">Trust</h5>
         {% if total_trust_kpi_cases is not None and total_trust_kpi_cases > 0 %}
             {% percentage_of_total trust_kpi total_trust_kpi_cases as total_percent %}
             {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.ParentName numerator=trust_kpi denominator=total_trust_kpi_cases pie_size='med' %}
@@ -22,7 +22,7 @@
 
     {% if selected_organisation.ICBODSCode %}
         <div class="four wide stackable bottom aligned centered column">
-            <h5 class="centred">Integrated Care Board</h5>
+            <h5 class="progress_label centred">Integrated Care Board</h5>
             {% if total_icb_kpi_cases is not None and total_icb_kpi_cases > 0 %}
                 {% percentage_of_total icb_kpi total_icb_kpi_cases as total_percent %}
                 {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.ICBName numerator=icb_kpi denominator=total_icb_kpi_cases pie_size='med' %}
@@ -34,7 +34,7 @@
 
     {% if selected_organisation.NHSEnglandRegionCode %}
         <div class="four wide stackable bottom aligned centered column">
-            <h5 class="centred">NHS Region</h5>
+            <h5 class="progress_label centred">NHS Region</h5>
             {% if total_nhs_kpi_cases is not None and total_nhs_kpi_cases > 0 %}
                 {% percentage_of_total nhs_kpi total_nhs_kpi_cases as total_percent %}
                 {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.NHSEnglandRegion numerator=nhs_kpi denominator=total_nhs_kpi_cases pie_size='med' %}
@@ -46,7 +46,7 @@
     
     {% if selected_organisation.OPENUKNetworkCode %}
         <div class="four wide stackable bottom aligned centered column">
-            <h5 class="centred">OPENUK Region</h5>
+            <h5 class="progress_label centred">OPENUK Region</h5>
             {% if total_open_uk_kpi_cases is not None and total_open_uk_kpi_cases > 0 %}
                 {% percentage_of_total open_uk_kpi total_open_uk_kpi_cases as total_percent %}
                 {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.OPENUKNetworkName numerator=open_uk_kpi denominator=total_open_uk_kpi_cases pie_size='med' %}
@@ -58,7 +58,7 @@
         
     {% if selected_organisation.CountryONSCode %}
         <div class="four wide stackable bottom aligned centered column">
-            <h5 class="centred">Country</h5>
+            <h5 class="progress_label centred">Country</h5>
             {% if total_nhs_kpi_cases is not None and total_nhs_kpi_cases > 0 %}
                 {% percentage_of_total country_kpi total_country_kpi_cases as total_percent %}
                 {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.Country numerator=country_kpi denominator=total_country_kpi_cases pie_size='med' %}
