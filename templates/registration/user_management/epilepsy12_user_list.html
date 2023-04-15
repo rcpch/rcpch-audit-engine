@@ -20,7 +20,7 @@
                     </div>
                 </div>
 
-                <div class="twelve wide column">
+                <div class="sixteen wide column">
     
                     <a href="{% url 'create_epilepsy12_user' organisation_id=organisation.pk %}"><button class="ui rcpch_primary button">Add a new User to {{organisation.OrganisationName}}</button></a>
                     
@@ -29,6 +29,7 @@
                         <i class="ui rcpch_light_blue circular search link icon"></i>
                     </div>
                     
+                    <a href="{% url 'organisation_reports' %}"><button class="ui right floated rcpch_positive button">Return to organisation view</button></a>
                 </div>
                 
                 {% comment %} <div class="four wide column" id='case_statistics'>
