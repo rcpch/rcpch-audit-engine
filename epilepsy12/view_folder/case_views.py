@@ -79,7 +79,7 @@ def case_list(request, organisation_id):
         """
 
         if request.user.view_preference == 2:
-            # this is an RCPCH audit team member requesting national view
+            # this is an RCPCH audit team member requesting National level
             filtered_cases = Case.objects.all()
         elif request.user.view_preference == 1:
 
@@ -182,14 +182,14 @@ def case_list(request, organisation_id):
 
     if request.user.is_rcpch_audit_team_member:
         rcpch_choices = (
-            (0, f'Organisation View ({organisation.OrganisationName})'),
-            (1, f'Trust View ({organisation.ParentName})'),
-            (2, 'National View'),
+            (0, f'Organisation level ({organisation.OrganisationName})'),
+            (1, f'Trust level ({organisation.ParentName})'),
+            (2, 'National level'),
         )
     else:
         rcpch_choices = (
-            (0, f'Organisation View ({organisation.OrganisationName})'),
-            (1, f'Trust View ({organisation.ParentName})'),
+            (0, f'Organisation level ({organisation.OrganisationName})'),
+            (1, f'Trust level ({organisation.ParentName})'),
         )
 
     context = {
@@ -212,21 +212,21 @@ def case_list(request, organisation_id):
 @login_required
 def case_statistics(request, organisation_id):
     """
-    GET request from cases template to update stats on toggle between RCPCH view and organisation view
+    GET request from cases template to update stats on toggle between RCPCH view and Organisation level
     """
 
     organisation = Organisation.objects.get(pk=organisation_id)
 
     if request.user.view_preference == 2:
-        # user requesting national view - return all cases in the UK
+        # user requesting National level - return all cases in the UK
         total_cases = Case.objects.all()
     elif request.user.view_preference == 1:
-        # user requesting trust view - return all cases in the same trust
+        # user requesting Trust level - return all cases in the same trust
         total_cases = Case.objects.filter(
             Q(organisations__ParentName__contains=organisation.ParentName)
         )
     elif request.user.view_preference == 0:
-        # user requesting trust view - return all cases in the same organisation
+        # user requesting Trust level - return all cases in the same organisation
         total_cases = Case.objects.filter(
             Q(organisations__OrganisationName__contains=organisation.OrganisationName)
         )

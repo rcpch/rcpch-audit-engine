@@ -310,7 +310,7 @@ def view_preference(request, organisation_id, template_name):
     """
     POST request from Toggle in has rcpch_view_preference.html template
     Users can toggle between national, trust and organisation views.
-    Only RCPCH staff can request a national view.
+    Only RCPCH staff can request a National level.
     """
     organisation = Organisation.objects.get(pk=organisation_id)
 

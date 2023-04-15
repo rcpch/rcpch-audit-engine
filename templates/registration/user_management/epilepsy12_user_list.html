@@ -9,15 +9,17 @@
                 Epilepsy12 Users
             </h5>
             
-            <div id='epilepsy12_user_list_view_preference'>
-                {% include 'epilepsy12/partials/cases/view_preference.html' with organisation=organisation test_positive=request.user.view_preference rcpch_choices=rcpch_choices template_name='epilepsy12_user_list' hx_target='#epilepsy12_user_list_view_preference' %}
-            </div>
-            
         </div>
 
         <div class="ui raised attached segment">
             <div class="ui grid">
                 
+                <div class="sixteen wide column">
+                    <div id='epilepsy12_user_list_view_preference'>
+                        {% include 'epilepsy12/partials/cases/view_preference.html' with organisation=organisation test_positive=request.user.view_preference rcpch_choices=rcpch_choices template_name='epilepsy12_user_list' hx_target='#epilepsy12_user_list_view_preference' %}
+                    </div>
+                </div>
+
                 <div class="twelve wide column">
     
                     <a href="{% url 'create_epilepsy12_user' organisation_id=organisation.pk %}"><button class="ui rcpch_primary button">Add a new User to {{organisation.OrganisationName}}</button></a>
