@@ -16,14 +16,14 @@
   font-family: Montserrat-Italic;
   src: local("Montserrat-Italic"),
     url("fonts/Montserrat/static/Montserrat-Italic.ttf") format("truetype");
-  font-weight: normal;
+  font-weight: 400;
 }
 
 @font-face {
   font-family: Montserrat-Regular;
   src: local("Montserrat-Regular"),
     url("fonts/Montserrat/static/Montserrat-Regular.ttf") format("truetype");
-  font-weight: normal;
+  font-weight: 400;
 }
 
 :root {
@@ -328,7 +328,6 @@ div.ui.card > div.content > div.organisation_address_container {
 
 #chat {
   background-color: white;
-  font-family: "var(--rcpch_standard_font)";
   font-family: var(--rcpch_standard_font);
 }
 
@@ -819,7 +818,7 @@ div.ui.card > div.content > div.organisation_address_container {
 /* Steps */
 
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .title {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--rcpch_standard_font);
   color: var(--rcpch_black);
 }
 
@@ -978,7 +977,7 @@ div.ui.card > div.content > div.organisation_address_container {
 
 .rcpch_pie_title {
   color: var(--rcpch_charcoal);
-  font-family: "Arial";
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   padding-top: 10px;
 }
@@ -1575,7 +1574,7 @@ table.ui.rcpch.table.cases_table tbody {
 }
 
 .progress_label {
-  font-family: Montserrat-Bold;
+  font-family: var(--rcpch_bold_font);
 }
 
 .ui.tab.segment {
