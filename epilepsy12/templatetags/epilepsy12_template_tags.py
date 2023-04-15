@@ -61,12 +61,14 @@ def kpi_average_for_kpi_name(aggregated_kpi, kpi_name):
         return aggregated_kpi['aggregated_kpis'][f'{kpi_name}_average']
 
 
-@register.simple_tag
+@register.filter
 def split_label_to_list(label):
     if label is None:
         return 'Unclassified'
     else:
-        return label.strip().replace('INTEGRATED CARE BOARD', 'ICB')
+        processed = label.strip().replace(
+            'INTEGRATED CARE BOARD', "").replace('&#x27;', "\'")
+        return processed
 
 
 @register.filter
