@@ -22,7 +22,7 @@
         {% load epilepsy12_template_tags %}
 
         <label class="toggle_button_label">{{label}}</label>
-        <div class="field multiple_toggle_buttons_wrapper " hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        <div class="field multiple_toggle_buttons_wrapper" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                 {% if test_positive is None %}
                     
                         <div class="column">

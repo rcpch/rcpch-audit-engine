@@ -93,7 +93,7 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_rcpch_audit_team_member', True)
         extra_fields.setdefault('email_confirmed', True)
-        # national view preference
+        # National level preference
         extra_fields.setdefault('view_preference', 2)
 
         if extra_fields.get('is_active') is not True:
@@ -192,7 +192,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     )
     view_preference = models.SmallIntegerField(
         choices=VIEW_PREFERENCES,
-        default=0,  # organisation view is default
+        default=0,  # Organisation level is default
         blank=False,
         null=False
     )

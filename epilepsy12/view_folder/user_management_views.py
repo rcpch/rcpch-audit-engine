@@ -102,7 +102,7 @@ def epilepsy12_user_list(request, organisation_id):
         """
 
         if request.user.view_preference == 2:
-            # this is an RCPCH audit team member requesting national view
+            # this is an RCPCH audit team member requesting National level
             filtered_epilepsy12_users = Epilepsy12User.objects.all()
         elif request.user.view_preference == 1:
 
@@ -154,14 +154,14 @@ def epilepsy12_user_list(request, organisation_id):
 
     if request.user.is_rcpch_audit_team_member:
         rcpch_choices = (
-            (0, f'Organisation View ({organisation.OrganisationName})'),
-            (1, f'Trust View ({organisation.ParentName})'),
-            (2, 'National View'),
+            (0, f'Organisation level ({organisation.OrganisationName})'),
+            (1, f'Trust level ({organisation.ParentName})'),
+            (2, 'National level'),
         )
     else:
         rcpch_choices = (
-            (0, f'Organisation View ({organisation.OrganisationName})'),
-            (1, f'Trust View ({organisation.ParentName})'),
+            (0, f'Organisation level ({organisation.OrganisationName})'),
+            (1, f'Trust level ({organisation.ParentName})'),
         )
 
     paginator = Paginator(epilepsy12_user_list, 10)

@@ -1543,7 +1543,7 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 5px;
 }
 
 .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
