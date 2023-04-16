@@ -229,7 +229,7 @@ def replace_existing_comorbidities_with_refset():
 
 def run_medicines_seed():
     for benzo in SNOMED_BENZODIAZEPINE_TYPES:
-        concept = fetch_concept(benzo[0])
+        concept = fetch_ecl(benzo[0])
         if not MedicineEntity.objects.filter(
                 medicine_name=benzo[1]).exists():
             # if the drug is not in the database already
@@ -249,7 +249,7 @@ def run_medicines_seed():
             is_rescue=False
         ).exists():
             # if the drug is not in the database already
-            concept = fetch_concept(aem[0])
+            concept = fetch_ecl(aem[0])
             aem_drug = MedicineEntity(
                 medicine_name=aem[1],
                 conceptId=concept[0]['conceptId'],
