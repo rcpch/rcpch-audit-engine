@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 class Epilepsy12UserTests(TestCase):
 
     def test_new_superuser(self):
-        # These are required fields: 'role', 'hospital_trust', 'username', 'first_name'
+        # These are required fields: 'role', 'organisation', 'username', 'first_name'
         db = get_user_model()
         superuser = db.objects.create_superuser(
             email="testuser@epilepsy12.com",
@@ -14,7 +14,7 @@ class Epilepsy12UserTests(TestCase):
             first_name="John",
             surname="Gastaut",
             role=1,
-            hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
+            organisation="Walton Community Hospital - Virgin Care Services Ltd"
         )
         self.assertEqual(
             superuser.email,
@@ -33,7 +33,7 @@ class Epilepsy12UserTests(TestCase):
             1
         )
         self.assertEqual(
-            superuser.hospital_trust,
+            superuser.organisation,
             "Walton Community Hospital - Virgin Care Services Ltd"
         )
         self.assertTrue(
@@ -58,7 +58,7 @@ class Epilepsy12UserTests(TestCase):
                 password="epilepsy12password",
                 first_name="John",
                 role="Audit Analyst",
-                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd",
+                organisation="Walton Community Hospital - Virgin Care Services Ltd",
                 is_superuser=False
             )
 
@@ -70,7 +70,7 @@ class Epilepsy12UserTests(TestCase):
                 password="epilepsy12password",
                 first_name="John",
                 role=1,
-                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd",
+                organisation="Walton Community Hospital - Virgin Care Services Ltd",
                 is_staff=False
             )
 
@@ -82,7 +82,7 @@ class Epilepsy12UserTests(TestCase):
                 password="epilepsy12password",
                 first_name="John",
                 role=1,
-                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd",
+                organisation="Walton Community Hospital - Virgin Care Services Ltd",
                 is_active=False
             )
 
@@ -98,7 +98,7 @@ class Epilepsy12UserTests(TestCase):
             first_name="Henry",
             surname="Gastaut",
             role=1,
-            hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
+            organisation="Walton Community Hospital - Virgin Care Services Ltd"
         )
 
         self.assertEqual(
@@ -122,7 +122,7 @@ class Epilepsy12UserTests(TestCase):
             1
         )
         self.assertEqual(
-            user.hospital_trust,
+            user.organisation,
             "Walton Community Hospital - Virgin Care Services Ltd"
         )
         self.assertFalse(
@@ -157,10 +157,10 @@ class Epilepsy12UserTests(TestCase):
                 title=4,
                 password="epilepsy12password",
                 role=1,
-                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
+                organisation="Walton Community Hospital - Virgin Care Services Ltd"
             )
         with self.assertRaises(ValueError):
-            # no hospital trust
+            # no organisation trust
             db.objects.create_user(
                 email="testuser2@epilepsy12.com",
                 username="epilepsy12user",
@@ -169,7 +169,7 @@ class Epilepsy12UserTests(TestCase):
                 title=4,
                 password="epilepsy12password",
                 role=1,
-                hospital_trust=""
+                organisation=""
             )
         with self.assertRaises(ValueError):
             # no username
@@ -181,5 +181,5 @@ class Epilepsy12UserTests(TestCase):
                 title=4,
                 password="epilepsy12password",
                 role=1,
-                hospital_trust="Walton Community Hospital - Virgin Care Services Ltd"
+                organisation="Walton Community Hospital - Virgin Care Services Ltd"
             )

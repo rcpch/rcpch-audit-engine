@@ -1,14 +1,14 @@
 from operator import itemgetter
 from django.contrib.auth.decorators import login_required, permission_required
 
-from ..models import Syndrome
+from ..models import Syndrome, SyndromeEntity
 from epilepsy12.constants.syndromes import SYNDROMES
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.add_syndrome', raise_exception=True)
 def syndrome_diagnosis_date(request, syndrome_id):
     """
@@ -29,8 +29,11 @@ def syndrome_diagnosis_date(request, syndrome_id):
 
     syndrome = Syndrome.objects.get(pk=syndrome_id)
 
+    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+
     context = {
-        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        # sorted(SYNDROMES, key=itemgetter(1)),
+        "syndrome_selection": syndrome_selection,
         'syndrome': syndrome
     }
 
@@ -46,7 +49,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_syndrome', raise_exception=True)
 def syndrome_name(request, syndrome_id):
     """
@@ -59,7 +62,7 @@ def syndrome_name(request, syndrome_id):
             request=request,
             model=Syndrome,
             model_id=syndrome_id,
-            field_name='syndrome_name',
+            field_name='syndrome',
             page_element='select',
         )
     except ValueError as error:
@@ -67,8 +70,11 @@ def syndrome_name(request, syndrome_id):
 
     syndrome = Syndrome.objects.get(pk=syndrome_id)
 
+    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+
     context = {
-        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        # sorted(SYNDROMES, key=itemgetter(1)),
+        "syndrome_selection": syndrome_selection,
         'syndrome': syndrome
     }
 

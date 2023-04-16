@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required, permission_required
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
-from ..models import EpilepsyContext, Registration
+from ..models import EpilepsyContext, Registration, Site
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_epilepsycontext', raise_exception=True)
 def epilepsy_context(request, case_id):
 
@@ -15,13 +15,21 @@ def epilepsy_context(request, case_id):
     epilepsy_context, created = EpilepsyContext.objects.get_or_create(
         registration=registration)
 
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.organisation.pk
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "epilepsy_context": epilepsy_context,
         "uncertain_choices": OPT_OUT_UNCERTAIN,
         "audit_progress": epilepsy_context.registration.audit_progress,
-        "active_template": "epilepsy_context"
+        "active_template": "epilepsy_context",
+        "organisation_id": organisation_id
     }
 
     response = recalculate_form_generate_response(
@@ -35,7 +43,7 @@ def epilepsy_context(request, case_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
@@ -76,7 +84,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
@@ -117,7 +125,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
@@ -158,7 +166,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
@@ -199,7 +207,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
@@ -239,7 +247,7 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
@@ -280,7 +288,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
@@ -321,7 +329,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """

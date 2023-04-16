@@ -1,5 +1,5 @@
 <div class="ui two mini statistics"
-    hx-get="{% url 'case_statistics' hospital_id=hospital_trust.pk %}"
+    hx-get="{% url 'case_statistics' organisation_id=organisation.pk %}"
     hx-swap='innerHTML'
     name='case_statistics'
     hx-trigger='case_statistics from:body'

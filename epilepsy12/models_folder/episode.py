@@ -17,6 +17,18 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     Each epileptic episode is classified at to whether focal/general or unknown onset, or unclassified.
     For each episode there is one D (description), E (epilepsy definition), S (seizure type).
     """
+    expected_score = models.IntegerField(
+        # a continuous tally of expected number of scored fields for this episode
+        blank=True,
+        default=None,
+        null=True
+    )
+    calculated_score = models.IntegerField(
+        # a continuous tally of scored fields for this episode
+        blank=True,
+        default=None,
+        null=True
+    )
     seizure_onset_date = models.DateField(
         help_text={
             'label': 'When did the first episode of this type happen?',
@@ -62,7 +74,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     description = models.TextField(
         help_text={
             'label': "What is the episode(s) like and is the description adequate?",
-            'reference': "What is the episode(s) like and is the description adequate?",
+            'reference': "Glossary of Descriptive Terminology for Ictal Semiology: Report of the ILAE Task Force on Classification and Terminology, 2002",
         },
         default="",
         blank=True,
@@ -98,7 +110,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     epileptic_seizure_onset_type = models.CharField(
         help_text={
             'label': "How best would describe the onset of the epileptic episode?",
-            'reference': "How best would describe the onset of the epileptic episode?",
+            'reference': "Operational classification of seizure types by the International League Against Epilepsy: Position Paper of the ILAE Commission for Classification and Terminology. Epilepsia, 58(4):522–530, 2017.",
         },
         max_length=3,
         choices=EPILEPSY_SEIZURE_TYPE,
@@ -248,7 +260,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     nonepileptic_seizure_unknown_onset = models.CharField(
         help_text={
             'label': 'How best describes the onset of the nonepileptic episode(s)?',
-            'reference': 'How best describes the onset of the nonepileptic episode(s)?',
+            'reference': 'Operational classification of seizure types by the International League Against Epilepsy: Position Paper of the ILAE Commission for Classification and Terminology. Epilepsia, 58(4):522–530, 2017.',
         },
         max_length=3,
         choices=NON_EPILEPSY_SEIZURE_ONSET,

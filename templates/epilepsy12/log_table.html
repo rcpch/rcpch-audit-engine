@@ -5,7 +5,7 @@
 {% if activities|length > 0 %}
     <div 
         hx-target='#log_table' 
-        hx-get="{% url 'log_list' hospital_id=hospital.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
+        hx-get="{% url 'log_list' organisation_id=organisation.pk epilepsy12_user_id=epilepsy12_user.pk %}" 
         hx-trigger='log_table from:body'
         hx-swap='innerHTML' 
         name='log_table'>

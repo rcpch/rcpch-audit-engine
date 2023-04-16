@@ -14,10 +14,10 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
     ordering = ['email']
     model = Epilepsy12User
     search_fields = ('email', 'surname',
-                     'role', 'hospital_employer', 'is_active',)
+                     'role', 'organisation_employer', 'is_active',)
     list_display = ('id', "email", "title", "first_name", "surname",
-                    "is_active", "twitter_handle", "role", "hospital_employer", 'is_superuser', "is_rcpch_audit_team_member", "email_confirmed")
-    list_filter = ("is_active", "role", "hospital_employer",)
+                    "is_active", "twitter_handle", "role", "organisation_employer", 'is_superuser', "is_rcpch_audit_team_member", "email_confirmed")
+    list_filter = ("is_active", "role", "organisation_employer",)
     fieldsets = (
         (
             None, {
@@ -31,7 +31,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         (
             'Epilepsy12 Centre', {
                 'fields': (
-                    'hospital_employer',
+                    'organisation_employer',
                     'role'
                 )
             }
@@ -73,13 +73,13 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'title', 'first_name', 'surname', 'is_staff', 'is_active', 'is_rcpch_audit_team_member', 'role', 'hospital_employer', 'is_superuser', 'groups')
+            'fields': ('email', 'title', 'first_name', 'surname', 'is_staff', 'is_active', 'is_rcpch_audit_team_member', 'role', 'organisation_employer', 'is_superuser', 'groups')
         }),
     )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields['hospital_employer'].required = False
+        form.base_fields['organisation_employer'].required = False
         if not request.user.is_superuser:
             self.exclude = ['is_superuser']
         else:
@@ -101,7 +101,7 @@ admin.site.register(Case, SimpleHistoryAdmin)
 admin.site.register(Comorbidity, SimpleHistoryAdmin)
 admin.site.register(EpilepsyContext, SimpleHistoryAdmin)
 admin.site.register(Investigations, SimpleHistoryAdmin)
-admin.site.register(HospitalTrust, SimpleHistoryAdmin)
+admin.site.register(Organisation, SimpleHistoryAdmin)
 admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
 admin.site.register(Management, SimpleHistoryAdmin)
 admin.site.register(Registration, SimpleHistoryAdmin)
@@ -111,8 +111,12 @@ admin.site.register(AuditProgress)
 admin.site.register(Episode, SimpleHistoryAdmin)
 admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
 admin.site.register(Syndrome, SimpleHistoryAdmin)
+admin.site.register(SyndromeEntity, SimpleHistoryAdmin)
 admin.site.register(KPI)
 admin.site.register(VisitActivity)
+admin.site.register(EpilepsyCauseEntity)
+admin.site.register(ComorbidityEntity)
+admin.site.register(MedicineEntity)
 
 admin.site.site_header = 'Epilepsy12 admin'
 admin.site.site_title = 'Epilepsy12 admin'

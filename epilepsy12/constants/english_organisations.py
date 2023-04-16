@@ -17561,7 +17561,7 @@ ALL_HOSPITALS = [
         "Latitude": "53.466327667236328",
         "Longitude": "-2.9310894012451172",
         "ParentODSCode": "NMW",
-        "ParentName": "Abbey Sefton Hospital (University Hospital Aintree)",
+        "ParentName": "University Hospital Aintree",
         "Phone": "0151 330 6551",
         "Email": "",
         "Website": "",

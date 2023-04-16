@@ -2,19 +2,20 @@ from django.utils import timezone
 from operator import itemgetter
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Subquery
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
 from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
 from epilepsy12.constants import EPILEPSY_SEIZURE_TYPE, EPIS_MISC, MIGRAINES, NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS, NON_EPILEPSY_PAROXYSMS, NON_EPILEPSY_SEIZURE_ONSET, NON_EPILEPSY_SEIZURE_TYPE, NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS, NON_EPILEPTIC_SYNCOPES, NONEPILEPSY_FIELDS, NONEPILEPSY_SEIZURE_TYPES
-from epilepsy12.constants.syndromes import SYNDROMES
+# from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
 from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
 
-from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis
+from ..models import Registration, Keyword, Comorbidity, Episode, Syndrome, MultiaxialDiagnosis, Site, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response, completed_fields
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 
 """
 Constants for selections
@@ -39,7 +40,7 @@ ALL_FIELDS = NONEPILEPSY_FIELDS + EPILEPSY_FIELDS
 
 @login_required
 @permission_required('epilepsy12.view_multiaxialdiagnosis', raise_exception=True)
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def multiaxial_diagnosis(request, case_id):
     """
     Called on load of form. If no instance exists, one is created.
@@ -72,11 +73,16 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    ecl = '<< 363235000 '
-    epilepsy_causes = fetch_ecl(ecl)
+    # ecl = '<< 363235000'
+    # epilepsy_causes = fetch_ecl(ecl)
+    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by('preferredTerm')
 
-
-# TODO: #218 epilepsy cause cause selection needs to have 'Not Known' last in the list, not alphabetically sorted.
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.organisation.pk
 
     context = {
         "case_id": registration.case_id,
@@ -87,12 +93,13 @@ def multiaxial_diagnosis(request, case_id):
         'comorbidities': comorbidities,
         "keyword_choices": keyword_choices,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
-        'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
+        'epilepsy_causes': epilepsy_causes,
         "case_id": case_id,
         "audit_progress": registration.audit_progress,
         "active_template": "multiaxial_diagnosis",
         'there_are_epileptic_episodes': there_are_epileptic_episodes,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "organisation_id": organisation_id
     }
 
     response = recalculate_form_generate_response(
@@ -106,7 +113,7 @@ def multiaxial_diagnosis(request, case_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.add_episode', raise_exception=True)
 def add_episode(request, multiaxial_diagnosis_id):
     """
@@ -193,7 +200,7 @@ def add_episode(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def edit_episode(request, episode_id):
     """
@@ -238,7 +245,7 @@ def edit_episode(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.delete_episode', raise_exception=True)
 def remove_episode(request, episode_id):
     """
@@ -253,7 +260,7 @@ def remove_episode(request, episode_id):
 
     context = {
         'multiaxial_diagnosis': multiaxial_diagnosis,
-        'episodes': episodes
+        'episodes': episodes,
     }
 
     response = recalculate_form_generate_response(
@@ -267,7 +274,7 @@ def remove_episode(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_episode', raise_exception=True)
 def close_episode(request, episode_id):
     """
@@ -293,7 +300,7 @@ def close_episode(request, episode_id):
     context = {
         'multiaxial_diagnosis': multiaxial_diagnosis,
         'episodes': episodes,
-        'there_are_epileptic_episodes': there_are_epileptic_episodes
+        'there_are_epileptic_episodes': there_are_epileptic_episodes,
     }
 
     response = recalculate_form_generate_response(
@@ -307,7 +314,7 @@ def close_episode(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def seizure_onset_date(request, episode_id):
     """
@@ -364,7 +371,7 @@ def seizure_onset_date(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def seizure_onset_date_confidence(request, episode_id):
     """
@@ -423,7 +430,7 @@ def seizure_onset_date_confidence(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def episode_definition(request, episode_id):
     """
@@ -481,7 +488,7 @@ def episode_definition(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def has_description_of_the_episode_or_episodes_been_gathered(request, episode_id):
     """
@@ -551,7 +558,7 @@ Description fields
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def edit_description(request, episode_id):
     """
@@ -595,7 +602,7 @@ def edit_description(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def delete_description_keyword(request, episode_id, description_keyword_id):
     """
@@ -639,7 +646,7 @@ Epilepsy status
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def epilepsy_or_nonepilepsy_status(request, episode_id):
     """
@@ -716,7 +723,7 @@ Epilepsy fields
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def epileptic_seizure_onset_type(request, episode_id):
     """
@@ -784,7 +791,7 @@ def epileptic_seizure_onset_type(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def focal_onset_epilepsy_checked_changed(request, episode_id):
     """
@@ -858,7 +865,7 @@ def focal_onset_epilepsy_checked_changed(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def epileptic_generalised_onset(request, episode_id):
     """
@@ -903,7 +910,7 @@ Nonepilepsy
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def nonepilepsy_generalised_onset(request, episode_id):
     """
@@ -948,7 +955,7 @@ def nonepilepsy_generalised_onset(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def nonepileptic_seizure_type(request, episode_id):
     """
@@ -1009,7 +1016,7 @@ def nonepileptic_seizure_type(request, episode_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_episode', raise_exception=True)
 def nonepileptic_seizure_subtype(request, episode_id):
     """
@@ -1067,7 +1074,7 @@ Syndromes
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.add_syndrome', raise_exception=True)
 def add_syndrome(request, multiaxial_diagnosis_id):
     """
@@ -1080,12 +1087,15 @@ def add_syndrome(request, multiaxial_diagnosis_id):
     syndrome = Syndrome.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
         syndrome_diagnosis_date=None,
-        syndrome_name=None,
+        syndrome=None,
     )
+
+    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
 
     context = {
         'syndrome': syndrome,
-        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        # sorted(SYNDROMES, key=itemgetter(1)),
+        "syndrome_selection": syndrome_selection
     }
 
     response = recalculate_form_generate_response(
@@ -1099,7 +1109,7 @@ def add_syndrome(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_syndrome', raise_exception=True)
 def edit_syndrome(request, syndrome_id):
     """
@@ -1109,9 +1119,12 @@ def edit_syndrome(request, syndrome_id):
 
     keywords = Keyword.objects.all()
 
+    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+
     context = {
         'syndrome': syndrome,
-        "syndrome_selection": sorted(SYNDROMES, key=itemgetter(1)),
+        # sorted(SYNDROMES, key=itemgetter(1)),
+        "syndrome_selection": syndrome_selection,
         'seizure_onset_date_confidence_selection': DATE_ACCURACY,
         'episode_definition_selection': EPISODE_DEFINITION,
         'keyword_selection': keywords,
@@ -1143,7 +1156,7 @@ def edit_syndrome(request, syndrome_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.delete_syndrome', raise_exception=True)
 def remove_syndrome(request, syndrome_id):
     """
@@ -1172,7 +1185,7 @@ def remove_syndrome(request, syndrome_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_episode', raise_exception=True)
 def close_syndrome(request, syndrome_id):
     """
@@ -1206,7 +1219,7 @@ def close_syndrome(request, syndrome_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def syndrome_present(request, multiaxial_diagnosis_id):
     """
@@ -1253,7 +1266,7 @@ def syndrome_present(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def epilepsy_cause_known(request, multiaxial_diagnosis_id):
     """
@@ -1275,14 +1288,14 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
             updated_by=request.user
         )
     else:
-        print("Some mistake happened")
-        # TODO need to handle this
+        raise Exception("Was not possible to save epilepsy cause.")
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
-    ecl = '<< 363235000'
-    epilepsy_causes = fetch_ecl(ecl)
+    # ecl = '<< 363235000'
+    # epilepsy_causes = fetch_ecl(ecl)
+    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by('preferredTerm')
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1301,12 +1314,12 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
-    Choices for causes fed from SNOMED server
+    Choices for causes come from EpilepsyCauseEntity table
     """
 
     try:
@@ -1321,15 +1334,16 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     except ValueError as error:
         error_message = error
 
-    # SNOMED term populating epilepsy cause dropdown
-    ecl = '<< 363235000'
-    epilepsy_causes = fetch_ecl(ecl)
+    # # SNOMED term populating epilepsy cause dropdown
+    # ecl = '<< 363235000'
+    # epilepsy_causes = fetch_ecl(ecl)
+    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by("preferredTerm")
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
     context = {
-        'epilepsy_causes': sorted(epilepsy_causes, key=itemgetter('preferredTerm')),
+        'epilepsy_causes': epilepsy_causes,
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "epilepsy_cause_selection": EPILEPSY_CAUSES,
     }
@@ -1346,7 +1360,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
     """
@@ -1395,7 +1409,7 @@ Comorbidities
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_id):
     """
@@ -1437,7 +1451,7 @@ def relevant_impairments_behavioural_educational(request, multiaxial_diagnosis_i
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.add_comorbidity', raise_exception=True)
 def add_comorbidity(request, multiaxial_diagnosis_id):
     """
@@ -1446,19 +1460,25 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
         pk=multiaxial_diagnosis_id)
 
+    comorbidityentity = ComorbidityEntity.objects.all().first()
+
     comorbidity = Comorbidity.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
         comorbidity_diagnosis_date=None,
-        comorbidity_diagnosis=None
+        comorbidityentity=comorbidityentity
     )
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity.pk)
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices
     }
 
     response = recalculate_form_generate_response(
@@ -1472,19 +1492,26 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_comorbidity', raise_exception=True)
 def edit_comorbidity(request, comorbidity_id):
     """
     POST request from comorbidities.html partial on button click to edit episode
     """
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1498,7 +1525,7 @@ def edit_comorbidity(request, comorbidity_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.delete_comorbidity', raise_exception=True)
 def remove_comorbidity(request, comorbidity_id):
     """
@@ -1527,7 +1554,7 @@ def remove_comorbidity(request, comorbidity_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_comorbidity', raise_exception=True)
 def close_comorbidity(request, comorbidity_id):
     """
@@ -1561,7 +1588,7 @@ def close_comorbidity(request, comorbidity_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_comorbidity', raise_exception=True)
 def comorbidity_diagnosis_date(request, comorbidity_id):
     """
@@ -1581,13 +1608,20 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
         error_message = error
 
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
 
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     context = {
         'comorbidity': comorbidity,
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
     }
 
     response = recalculate_form_generate_response(
@@ -1602,7 +1636,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_comorbidity', raise_exception=True)
 def comorbidity_diagnosis(request, comorbidity_id):
     """
@@ -1618,20 +1652,28 @@ def comorbidity_diagnosis(request, comorbidity_id):
             request=request,
             model=Comorbidity,
             model_id=comorbidity_id,
-            field_name='comorbidity_diagnosis',
+            field_name='comorbidityentity',
             page_element='snomed_select'
         )
     except ValueError as error:
         error_message = error
 
-    ecl = '<< 35919005'
-    comorbidity_choices = fetch_ecl(ecl)
+    comorbidity_choices = ComorbidityEntity.objects.filter(
+        pk__in=Subquery(
+            ComorbidityEntity.objects.all().distinct(
+                'conceptId').values('pk')
+        )
+    ).order_by('preferredTerm')
+
+    # ecl = '<< 35919005'
+    # comorbidity_choices = fetch_ecl(ecl)
 
     comorbidity = Comorbidity.objects.get(
         pk=comorbidity_id)
 
     context = {
-        'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
+        'comorbidity_choices': comorbidity_choices,
+        # 'comorbidity_choices': sorted(comorbidity_choices, key=itemgetter('preferredTerm')),
         "comorbidity": comorbidity,
     }
 
@@ -1647,7 +1689,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_comorbidity', raise_exception=True)
 def comorbidities(request, multiaxial_diagnosis_id):
     """
@@ -1674,7 +1716,7 @@ def comorbidities(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def mental_health_screen(request, multiaxial_diagnosis_id):
     """
@@ -1713,7 +1755,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     """
@@ -1760,7 +1802,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_multiaxialdiagnosis', raise_exception=True)
 def mental_health_issue(request, multiaxial_diagnosis_id):
     """

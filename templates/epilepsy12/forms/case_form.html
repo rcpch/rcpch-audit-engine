@@ -64,7 +64,7 @@
   
   {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
   <div class="field">
-    <label>NHS/CHI Number</label>
+    <label>NHS Number</label>
     {{form.nhs_number}} {% if form.nhs_number.errors %}
     <div class="ui pointing red basic label">{{form.nhs_number.errors}}</div>
     {% endif %}
@@ -88,12 +88,12 @@
       relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
     </p>
     <button
-      hx-post="{% url 'opt_out' hospital_id case.pk %}"
+      hx-post="{% url 'opt_out' organisation_id case.pk %}"
       hx-trigger="click"
       class="ui rcpch_danger button"
       _="on htmx:confirm(issueRequest) 
               halt the event 
-              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
+              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
               if result.isConfirmed issueRequest()"
     >
       Opt out of Epilepsy12
@@ -105,10 +105,10 @@
   <div class="ui rcpch_info icon message">
     <i class="ui exclamation circle icon"></i>
     <div class="content">
-      <div class="header">Hospital</div>
+      <div class="header">Organisation</div>
       <p>
         <b
-          >{{hospital_trust.OrganisationName}}({{hospital_trust.ParentName}})</b
+          >{{organisation.OrganisationName}}({{organisation.ParentName}})</b
         >
         will be allocated automatically as the lead Epilepsy12 centre on saving
         this child's information.
@@ -125,21 +125,15 @@
     type="submit"
     class="ui rcpch_danger button"
     name="delete"
-    value="delete"
+    value="Delete"
     form="create_case_form"
   />
     
   {% endif %}
 
-  <a href="{% url 'cases' hospital_id %}" class="ui rcpch_negative button"
+  <a href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button"
     >Cancel</a
   >
 
-  
 </form>
-
-<!-- _="on click(issueRequest) 
-          halt the event 
-          call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
-          if result.isConfirmed issueRequest()" -->
 

@@ -12,6 +12,7 @@ only user sees the form The chosen value is stored as the name of the button and
 accessed in the view as request.htmx.trigger_name Which choices are selected
 from is obvious because the endpoint posted to is specific to the choices. {% endcomment %}
 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
   <h5 class="rcpch_plain_label">
     {{label|safe}}&nbsp;
     <span
@@ -26,12 +27,12 @@ from is obvious because the endpoint posted to is specific to the choices. {% en
     </span>
   </h5>
 
-  <div class="ui rcpch_light_blue fluid search selection dropdown">
+  <div class="ui rcpch fluid search selection dropdown">
 
       <i class="dropdown icon"></i>
       <input
         type="hidden"
-        _="init js $('.ui.rcpch_light_blue.fluid.search.selection.dropdown').dropdown(); end"
+        _="init js $('.ui.rcpch.fluid.search.selection.dropdown').dropdown(); end"
         name="{{hx_name}}"
         hx-post="{{hx_post}}"
         hx-target="{{hx_target}}"
@@ -45,7 +46,7 @@ from is obvious because the endpoint posted to is specific to the choices. {% en
         <div class="item" data-value="{{item.0}}">{{item.1}}</div>
         {% endfor %}
       </div>
-    </div>
     
   </div>
+
 </div>

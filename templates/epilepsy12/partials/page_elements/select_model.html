@@ -1,0 +1,74 @@
+{% load epilepsy12_template_tags %}
+{% comment %}
+        This is a single choice select which is reused in multiple places.
+        It accepts only django models as lookup
+        Note requires jquery to work.
+        This select accepts the following parameters:
+            choices: these are the choices available
+            hx_post: the url posted to including parameters
+            hx_target: the id of the html element to target the server response
+            hx_trigger: usually 'change' but can be any event
+            hx_swap: usually 'innerHTML'
+            hx_name: the model field to update
+            field_name: the name of the field returning the value to go in the dropdown
+            field_name2: the name of the field returning the value to go in the dropdown
+            test_positive: the model boolean field 
+            label: this is the label text
+            hx_default_text: default text of an unselected element
+            data_position: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
+            enabled: this is set to false if a view only user sees the form
+        The chosen value is stored as the name of the button and accessed in the view as request.htmx.trigger_name
+        Which choices are selected from is obvious because the endpoint posted to is specific to the choices.
+    {% endcomment %}
+    <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+        <h5 class='rcpch_plain_label'>
+            {{label|safe}}&nbsp;
+            <span 
+                id="{{hx_name}}"
+                data-title="Reference"
+                data-content="{{reference|safe}}"
+                data-position="{{data_position}}"
+                data-variation="basic"
+                _="init js $('#{{hx_name}}').popup(); end"
+            >
+                <i class="rcpch question circle icon"></i>
+            </span>
+        </h5>
+            {% if enabled %}
+                <div class="ui rcpch_light_blue fluid search selection dropdown">
+            {% else %}
+                <div class="ui rcpch_light_blue fluid search selection disabled dropdown">
+            {% endif %}
+            
+                {% if test_positive %}
+                    <i class="rcpch_pink check circle outline icon"></i>
+                {% else %}
+                    <span data-tooltip="Uncompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <i class="rcpch_light_blue dot circle outline icon"></i>
+                    </span>
+                {% endif %}
+
+                <i class="dropdown icon"></i>
+                <input type="hidden"
+                    _="init js $('.ui.rcpch_light_blue.fluid.search.selection.dropdown').dropdown(); end"
+                    name={{hx_name}}
+                    hx-post="{{hx_post}}"
+                    hx-target="{{hx_target}}"
+                    hx-swap="{{hx_swap}}"
+                    hx-trigger="{{hx_trigger}}"
+                    value="{{test_positive}}"
+                >
+                <div class="default text">{{hx_default_text}}</div>
+                <div class="menu" >
+                    {% for item in choices %}
+                        <div class="item" data-value="{{item.pk}}">{% value_for_field_name item field_name %} {% if field_name2 %}({% value_for_field_name item field_name2 %}){% endif %}</div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+            {% if not enabled %}
+                <small class='rcpch_warning_label'>You do not have permission to update this field</small>
+            {% endif %}
+
+    </div>

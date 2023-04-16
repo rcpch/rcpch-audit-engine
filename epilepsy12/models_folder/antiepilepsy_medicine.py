@@ -10,50 +10,11 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     This class records information about antiepilepsy medicines. 
     It references the Episode class, as one episode can involve several antiepilepsy medicines.
     """
-    medicine_id = models.IntegerField(
-        help_text={
-            'label': "Medicine Name",
-            'reference': "Please enter the medicine.",
-        },
-        default=None,
-        null=True,
-        blank=True
-    )
-    medicine_name = models.CharField(
-        max_length=200,
-        help_text={
-            'label': "Medicine name",
-            'reference': "Please enter the medicine name.",
-        },
-        default=None,
-        null=True,
-        blank=True,
-    )
     is_rescue_medicine = models.BooleanField(
         help_text={
             'label': "Is the medicine a rescue medicine?",
             'reference': "Is the medicine a rescue medicine?",
         },
-        default=None,
-        null=True,
-        blank=True
-    )
-    antiepilepsy_medicine_snomed_code = models.CharField(
-        help_text={
-            'label': "Antiseizure/rescue medicine SNOMED-CT code",
-            'reference': "Antiseizure medicine SNOMED-CT code",
-        },
-        max_length=50,
-        default=None,
-        null=True,
-        blank=True
-    )
-    antiepilepsy_medicine_snomed_preferred_name = models.CharField(
-        help_text={
-            'label': "Antiseizure/rescue medicine SNOMED-CT preferred name",
-            'reference': "Antiseizure medicine SNOMED-CT preferred name",
-        },
-        max_length=50,
         default=None,
         null=True,
         blank=True
@@ -138,6 +99,17 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
         verbose_name="related management"
     )
 
+    medicine_entity = models.ForeignKey(
+        'epilepsy12.MedicineEntity',
+        on_delete=models.PROTECT,
+        help_text={
+            'label': "Medicine Name",
+            'reference': "Please enter the medicine.",
+        },
+        default=None,
+        null=True
+    )
+
     class Meta:
         verbose_name = "Antiepilepsy Medicine"
         verbose_name_plural = "Antiepilepsy Medicines"
@@ -159,4 +131,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
                 "Cannot calculate length of treatment without 2 dates.")
 
     def __str__(self) -> str:
-        return self.antiepilepsy_medicine_snomed_code
+        if self.medicine_entity is not None:
+            return self.medicine_entity.medicine_name
+        else:
+            return 'No medicine supplied'

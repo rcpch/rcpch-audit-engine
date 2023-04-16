@@ -1,9 +1,11 @@
 # django
-from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group, Permission
+from django.contrib.auth.models import AbstractUser, PermissionsMixin, Group
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.db.models.functions import Lower
+from django.db.models import UniqueConstraint
 # 3rd party
 from simple_history.models import HistoricalRecords
 
@@ -17,8 +19,8 @@ class Epilepsy12UserManager(BaseUserManager):
     for authentication instead of usernames.
 
     RCPCH Audit team members can be clinicians or RCPCH staff
-    RCPCH staff cannot be associated with a hospital trust
-    All clinicians must be associated with a hospital trust
+    RCPCH staff cannot be associated with a organisation trust
+    All clinicians must be associated with a organisation trust
     """
 
     def create_user(self, email, password, first_name, role, **extra_fields):
@@ -29,10 +31,10 @@ class Epilepsy12UserManager(BaseUserManager):
         if not email:
             raise ValueError(_('You must provide an email address'))
 
-        if not extra_fields.get('hospital_employer') and not extra_fields.get('is_staff'):
-            # Non-RCPCH staff (is_staff) are not affiliated with a hospital
+        if not extra_fields.get('organisation_employer') and not extra_fields.get('is_staff'):
+            # Non-RCPCH staff (is_staff) are not affiliated with a organisation
             raise ValueError(
-                _('You must provide the name of your main hospital trust.'))
+                _('You must provide the name of your main organisation trust.'))
 
         if not role:
             raise ValueError(
@@ -43,7 +45,7 @@ class Epilepsy12UserManager(BaseUserManager):
                           role=role,  **extra_fields)
 
         user.set_password(password)
-        user.view_preference = 0  # hospital level view preference
+        user.view_preference = 0  # organisation level view preference
         if not extra_fields.get('is_superuser'):
             user.is_superuser = False
         if not extra_fields.get('is_active'):
@@ -91,7 +93,7 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_rcpch_audit_team_member', True)
         extra_fields.setdefault('email_confirmed', True)
-        # national view preference
+        # National level preference
         extra_fields.setdefault('view_preference', 2)
 
         if extra_fields.get('is_active') is not True:
@@ -177,7 +179,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         default=False
     )
     is_staff = models.BooleanField(
-        # reflects if user is an RCPCH member of staff. This means they are not affiliated with a hospital trust
+        # reflects if user is an RCPCH member of staff. This means they are not affiliated with a organisation trust
         default=False
     )
     is_superuser = models.BooleanField(
@@ -185,12 +187,12 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     )
     is_rcpch_audit_team_member = models.BooleanField(
         # reflects is a member of the RCPCH audit team. If is_staff is false, user is also a clinician and therefore must
-        # be affiliated with a hospital trust
+        # be affiliated with a organisation trust
         default=False
     )
     view_preference = models.SmallIntegerField(
         choices=VIEW_PREFERENCES,
-        default=0,  # hospital view is default
+        default=0,  # Organisation level is default
         blank=False,
         null=False
     )
@@ -220,8 +222,8 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     objects = Epilepsy12UserManager()
 
-    hospital_employer = models.ForeignKey(
-        'epilepsy12.HospitalTrust',
+    organisation_employer = models.ForeignKey(
+        'epilepsy12.Organisation',
         on_delete=models.CASCADE,
         blank=True,
         null=True
@@ -259,6 +261,12 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     class Meta:
         verbose_name = "Epilepsy12 User"
         verbose_name_plural = "Epilepsy12 Users"
+        constraints = [
+            UniqueConstraint(
+                Lower("email"),
+                name="user_email_ci_uniqueness",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.get_full_name()

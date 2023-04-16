@@ -1,0 +1,2 @@
+{% url 'child_organisation_select' organisation_id=organisation.pk template_name=template_name as hx_post %}
+{% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_children test_positive=organisation.pk hx_default_text='Select Organisation to view' hx_target=hx_target hx_swap='innerHTML' hx_post=hx_post hx_name='child_organisation_select' label='Select Organisation' hx_trigger='change' %}

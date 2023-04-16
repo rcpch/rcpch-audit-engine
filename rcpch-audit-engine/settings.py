@@ -37,6 +37,14 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + ["127.0.0.1",
                                                                     "localhost",
                                                                     "0.0.0.0"]
 
+# This is the token required for getting deprivation quintiles from the RCPCH Census Platform
+RCPCH_CENSUS_PLATFORM_URL = os.getenv('RCPCH_CENSUS_PLATFORM_URL')
+RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv(
+    "RCPCH_CENSUS_PLATFORM_TOKEN")
+
+# this is the url for api.postcodes.io, a free service reporting postcode data off a postcode
+POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.admindocs',
     'rest_framework',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
@@ -72,7 +81,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'rcpch-audit-engine.urls'
 
-LOGIN_REDIRECT_URL = "/hospital"
+LOGIN_REDIRECT_URL = "/organisation"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = '/registration/login/'
 
@@ -152,9 +161,9 @@ PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 

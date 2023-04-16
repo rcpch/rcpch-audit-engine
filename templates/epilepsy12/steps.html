@@ -14,7 +14,13 @@
         {% url 'register' case_id as active_url %}
         {% include 'epilepsy12/step.html' with active_url=active_url title="Verification and registration" description="Getting started..." active_template=active_template template_name='register' complete_instance=audit_progress.registration_complete registration_status=audit_progress.registration_complete %}
     {% else %}
-        <a href="{% url 'register' case_id %}" {% if active_template == 'register' or active_template == 'none' %}class='active step'{% else %}class='step' {% endif %}>
+        <a href="{% url 'register' case_id %}" 
+            {% if active_template == 'register' or active_template == 'none' %}
+                class='active step'
+            {% else %}
+                class='step' 
+            {% endif %}
+        >
             <div class='content'>
             <div class="title">Verification and registration</div>
             <div class="description">Getting started...</div>
@@ -39,11 +45,6 @@
     
     {% url 'management' case_id as active_url %}
     {% include 'epilepsy12/step.html' with active_url=active_url title="Treatment and care planning" description="Medication, other treatment,<br>teams and care plans" active_template=active_template template_name='management' complete_instance=audit_progress.management_complete registration_status=audit_progress.registration_complete %}
-        
-    
-    {% comment %}
-        Performance summary
-    {% endcomment %}
     
         <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
           <div class='content'>
@@ -51,10 +52,6 @@
             <div class="description">Key performance indicators</div>
           </div>
         </a>
-    
-    {% comment %}
-        Progress bar
-    {% endcomment %}
 
     {% if active_template == "register" %}
         {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.registration_total_expected_fields total_completed_fields=audit_progress.registration_total_completed_fields title="Verification and registration" %}
@@ -85,3 +82,4 @@
     {% endif %}
 
   </div>
+  <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=organisation_id %}">Back to list</a>

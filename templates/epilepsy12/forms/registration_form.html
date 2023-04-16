@@ -19,7 +19,7 @@
           <li>previously been diagnosed with epilepsy before the first paediatric assessment</li>
           <li>previously had a paediatric assessment for earlier seizure episodes considered to be epileptic</li>
           <li>previously been registered in the Epilepsy12 audit</li>
-          <li>has gone on to have ongoing care within the first year of care for their epilepsy provided by adult or non-NHS services by an inpatient our outpatient, hospital or community paediatric service, or a dedicated paediatric team based in ED.</li>
+          <li>has gone on to have ongoing care within the first year of care for their epilepsy provided by adult or non-NHS services by an inpatient or outpatient, organisation or community paediatric service, or a dedicated paediatric team based in ED.</li>
         </ul>
         <p>* paediatric service, or a dedicated paediatric team based in A&E. They should not have been referred or assessed by an adult service/team.</p>
         
@@ -46,7 +46,7 @@
     </div>
     
     <div id="lead_site" class="field">
-        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False hospital_list=hospital_list %}
+        {% include 'epilepsy12/partials/registration/lead_site.html' with registration=registration site=site edit=False transfer=False organisation_list=organisation_list %}
     </div>
 
     <div id="previous_sites" class="ui segment">

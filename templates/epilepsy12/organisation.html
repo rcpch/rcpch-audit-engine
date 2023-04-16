@@ -1,8 +1,8 @@
 {% extends "base.html" %} {% load static %} {% load epilepsy12_template_tags %}
 {% csrf_token %} {% block content %}
 <div class="ui rcpch container">
-  <div id="rcpch_hospital_select">
-    {% include 'epilepsy12/partials/selected_hospital_summary.html' with hospital_list=hospital_list selected_hospital=selected_hospital hospital_list=hospital_list cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity cases_aggregated_by_sex=cases_aggregated_by_sex cases_aggregated_by_deprivation=cases_aggregated_by_deprivation percent_completed_registrations=percent_completed_registrations total_registrations=total_registrations total_cases=total_cases cohort_data=cohort_data total_referred_to_neurology=total_referred_to_neurology total_referred_to_surgery=total_referred_to_surgery %}
+  <div id="rcpch_organisation_select">
+    {% include 'epilepsy12/partials/selected_organisation_summary.html' with organisation_list=organisation_list selected_organisation=selected_organisation organisation_list=organisation_list cases_aggregated_by_ethnicity=cases_aggregated_by_ethnicity cases_aggregated_by_sex=cases_aggregated_by_sex cases_aggregated_by_deprivation=cases_aggregated_by_deprivation percent_completed_registrations=percent_completed_registrations total_registrations=total_registrations total_cases=total_cases cohort_data=cohort_data total_referred_to_neurology=total_referred_to_neurology total_referred_to_surgery=total_referred_to_surgery %}
   </div>
 
   {% if request.user|has_group:'epilepsy12_audit_team_full_access' %}

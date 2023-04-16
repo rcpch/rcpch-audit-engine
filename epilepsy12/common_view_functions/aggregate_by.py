@@ -1,15 +1,17 @@
+from typing import Literal
 # Django imports
 from django.db.models import Q, F, Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
 from ..models import Case
+from .report_queries import get_all_organisations, get_all_trusts, get_all_icbs, get_all_nhs_regions, get_all_open_uk_regions, get_all_countries
 """
 Reporting
 """
 
 
-def cases_aggregated_by_sex(selected_hospital):
+def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
 
     sex_long_list = [When(sex=k, then=Value(v))
@@ -17,7 +19,7 @@ def cases_aggregated_by_sex(selected_hospital):
 
     cases_aggregated_by_sex = (
         Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
+            organisations__OrganisationName__contains=selected_organisation)
         .values('sex')
         .annotate(
             sex_display=DJANGO_CASE(
@@ -32,7 +34,7 @@ def cases_aggregated_by_sex(selected_hospital):
     return cases_aggregated_by_sex
 
 
-def cases_aggregated_by_deprivation_score(selected_hospital):
+def cases_aggregated_by_deprivation_score(selected_organisation):
     # aggregate queries on trust level cases
 
     deprivation_quintiles = (
@@ -48,7 +50,7 @@ def cases_aggregated_by_deprivation_score(selected_hospital):
 
     cases_aggregated_by_deprivation = (
         Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
+            organisations__OrganisationName__contains=selected_organisation)
         .values('index_of_multiple_deprivation_quintile')
         .annotate(
             index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
@@ -64,7 +66,7 @@ def cases_aggregated_by_deprivation_score(selected_hospital):
     return cases_aggregated_by_deprivation
 
 
-def cases_aggregated_by_ethnicity(selected_hospital):
+def cases_aggregated_by_ethnicity(selected_organisation):
 
     # aggregate queries on trust level cases
 
@@ -73,7 +75,7 @@ def cases_aggregated_by_ethnicity(selected_hospital):
 
     cases_aggregated_by_ethnicity = (
         Case.objects.filter(
-            hospital_trusts__OrganisationName__contains=selected_hospital)
+            organisations__OrganisationName__contains=selected_organisation)
         .values('ethnicity')
         .annotate(
             ethnicity_display=DJANGO_CASE(
@@ -127,8 +129,11 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     if kpi_measure:
         # a single measure selected for aggregation
 
-        q_objects = Q(**{f'registration__kpi__{kpi_measure}__lt': 2}
-                      ) & Q(**{f'registration__kpi__{kpi_measure}__isnull': False})
+        q_objects = Q(
+            **{f'registration__kpi__{kpi_measure}__lt': 2}
+        ) & Q(
+            **{f'registration__kpi__{kpi_measure}__isnull': False}
+        ) & Q(**{f'registration__kpi__{kpi_measure}__isnull': False})
         f_objects = F(f'registration__kpi__{kpi_measure}')
 
         # sum this measure
@@ -149,8 +154,11 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
 
         for measure in all_kpi_measures:
             # filter cases for all kpi with a score < 2
-            q_objects = Q(**{f'registration__kpi__{measure}__lt': 2}
-                          ) & Q(**{f'registration__kpi__{measure}__isnull': False})
+            q_objects = Q(
+                **{f'registration__kpi__{measure}__lt': 2}
+            ) & Q(
+                **{f'registration__kpi__{measure}__isnull': False}
+            ) & Q(**{f'registration__kpi__{measure}__isnull': False})
             f_objects = F(f'registration__kpi__{measure}')
 
             # sum this measure
@@ -160,14 +168,82 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
             # average of the sum of this measure
             aggregation_fields[f'{measure}_average'] = Avg(
                 DJANGO_CASE(When(q_objects,
-                                 then=f_objects), default=0))
+                                 then=f_objects), default=None))
             # total cases scored for this measure
             aggregation_fields[f'{measure}_total'] = Count(
                 DJANGO_CASE(When(q_objects,
-                                 then=f_objects), default=0))
+                                 then=f_objects), default=None))
         # total_cases scored for all measures
         aggregation_fields['total_number_of_cases'] = Count(
             DJANGO_CASE(When(q_objects,
-                        then=f_objects), default=0))
+                        then=f_objects), default=None))
 
     return filtered_cases.aggregate(**aggregation_fields)
+
+
+def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(cohort, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation', kpi_measure=None):
+    """
+    Returns aggregated KPIS for given cohort against sublevel of abstraction (eg all NHS England regions)
+    """
+
+    if abstraction_level == 'organisation':
+        abstraction_sublevels = get_all_organisations()
+
+    if abstraction_level == 'trust':
+        abstraction_sublevels = get_all_trusts()
+
+    if abstraction_level == 'icb':
+        abstraction_sublevels = get_all_icbs()
+
+    if abstraction_level == 'nhs_region':
+        abstraction_sublevels = get_all_nhs_regions()
+
+    if abstraction_level == 'open_uk':
+        abstraction_sublevels = get_all_open_uk_regions()
+
+    if abstraction_level == 'country':
+        abstraction_sublevels = get_all_countries()
+
+    # if abstraction_level == 'national':
+    #     abstraction_sublevels = get_all_countries()
+    #     abstraction_sublevel_Q = Q(site__organisation__CountryONSCode=abstraction_sublevel[0])
+    # NOT NEEDED AS COVERED BY  ALL ORGANISATIONS
+
+    final_object = []
+    for abstraction_sublevel in abstraction_sublevels:
+
+        if abstraction_level == 'organisation':
+            abstraction_sublevel_Q = Q(
+                site__organisation__OrganisationODSCode=abstraction_sublevel[0])
+        if abstraction_level == 'trust':
+            abstraction_sublevel_Q = Q(
+                site__organisation__ParentODSCode=abstraction_sublevel[0])
+        if abstraction_level == 'icb':
+            abstraction_sublevel_Q = Q(
+                site__organisation__ICBODSCode=abstraction_sublevel[0])
+        if abstraction_level == 'nhs_region':
+            abstraction_sublevel_Q = Q(
+                site__organisation__NHSEnglandRegionCode=abstraction_sublevel[0])
+        if abstraction_level == 'open_uk':
+            abstraction_sublevel_Q = Q(
+                site__organisation__OPENUKNetworkCode=abstraction_sublevel[0])
+        if abstraction_level == 'country':
+            abstraction_sublevel_Q = Q(
+                site__organisation__CountryONSCode=abstraction_sublevel[0])
+
+        filtered_cases = Case.objects.filter(
+            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
+            Q(site__site_is_primary_centre_of_epilepsy_care=True) &
+            abstraction_sublevel_Q &
+            Q(registration__cohort=cohort)
+        )
+        aggregated_kpis = aggregate_all_eligible_kpi_fields(
+            filtered_cases, kpi_measure=kpi_measure)
+        final_object.append(
+            {
+                "region": abstraction_sublevel,
+                "aggregated_kpis": aggregated_kpis
+            }
+        )
+
+    return final_object
