@@ -51,9 +51,13 @@ def epilepsy12_login(request):
                 last_logged_in = VisitActivity.objects.filter(
                     activity=1,
                     epilepsy12user=user
-                ).order_by('-activity_datetime').first()
-                messages.info(
-                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in.ip_address}")
+                ).order_by('-activity_datetime')[:2]
+                if len(last_logged_in) > 0:
+                    messages.info(
+                        request, f"You are now logged in as {email}. You last logged in at {last_logged_in[1].activity_datetime.strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}")
+                else:
+                    messages.info(
+                        request, f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({last_logged_in[0].activity_datetime.strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).")
                 return redirect("organisation_reports")
             else:
                 messages.error(request, "Invalid email or password.")
