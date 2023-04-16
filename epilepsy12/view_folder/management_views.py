@@ -160,25 +160,12 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
         medicine_entity=None
     )
 
-    if is_rescue:
-
-        context = {
-            # 'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
-            'choices': MedicineEntity.objects.filter(is_rescue=True).order_by('medicine_name'),
-            'antiepilepsy_medicine': antiepilepsy_medicine,
-            'management_id': management_id,
-            'is_rescue_medicine': is_rescue
-        }
-
-    else:
-
-        context = {
-            # 'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
-            'choices': MedicineEntity.objects.filter(is_rescue=False).order_by('medicine_name'),
-            'antiepilepsy_medicine': antiepilepsy_medicine,
-            'management_id': management_id,
-            'is_rescue_medicine': is_rescue
-        }
+    context = {
+        'choices': MedicineEntity.objects.filter(is_rescue=is_rescue).order_by('medicine_name'),
+        'antiepilepsy_medicine': antiepilepsy_medicine,
+        'management_id': management_id,
+        'is_rescue_medicine': is_rescue
+    }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
 
@@ -245,14 +232,8 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = MedicineEntity.objects.filter(
-            is_rescue=True).order_by('medicine_name')
-        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = MedicineEntity.objects.filter(
-            is_rescue=False).order_by('medicine_name')
-        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine).order_by('medicine_name')
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -332,14 +313,8 @@ def medicine_id(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = MedicineEntity.objects.filter(
-            is_rescue=True).order_by('medicine_name')
-        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = MedicineEntity.objects.filter(
-            is_rescue=False).order_by('medicine_name')
-        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine).order_by('medicine_name')
 
     # get id of medicine entity
     medicine_id = request.POST.get('medicine_id')
@@ -412,14 +387,8 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = MedicineEntity.objects.filter(
-            is_rescue=True).order_by('medicine_name')
-        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = MedicineEntity.objects.filter(
-            is_rescue=False).order_by('medicine_name')
-        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine).order_by('medicine_name')
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
