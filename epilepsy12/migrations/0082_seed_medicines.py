@@ -37,6 +37,7 @@ def seed_medicines(apps, schema_editor):
             # if the drug is not in the database already
             aem_drug = MedicineEntity(
                 medicine_name=aem[1],
+                is_rescue=False,
             )
             if aem[0] not in [1001, 1002]:
                 concept = fetch_ecl(int(aem[0]))
