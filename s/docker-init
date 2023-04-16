@@ -6,5 +6,4 @@
 # starts the postgres and application containers
 # migrates db, seeds db, creates superuser, runs server
 
-docker compose -f docker-compose.dev.yml down
 docker compose -f docker-compose.dev-init.yml up

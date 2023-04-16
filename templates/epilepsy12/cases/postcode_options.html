@@ -17,14 +17,25 @@
         <button
             style="margin-top: 1.5em;"
             class="ui large rcpch_primary button"
-            _="on click halt the event then hide #postcode_field then hide #no_postcode then show #unknown_postcode then show #add_postcode"
+            _="on click 
+              halt the event then 
+              set id_postcode.value to '' then
+              hide #postcode_field then 
+              hide #no_postcode then 
+              show #unknown_postcode then 
+              show #add_postcode"
           >No postcode</button>
     </div>
     <div class="row">
         <button 
           id="add_postcode" 
           class="ui rcpch_primary button"
-          _="on click halt the event then show #postcode_field then hide #unknown_postcode then show #no_postcode then hide me"
+          _="on click 
+            halt the event then 
+            set id_postcode.value to '' then
+            show #postcode_field then 
+            hide #unknown_postcode then 
+            show #no_postcode then hide me"
         >Add postcode</button>
     </div>
 
@@ -33,6 +44,7 @@
   <div 
     class="twelve wide left aligned column"
     id="unknown_postcode"
+    name="unknown_postcode"
   >
       {% include 'epilepsy12/cases/unknown_postcode.html' with choices=choices test_positive=test_positive %}
   </div>

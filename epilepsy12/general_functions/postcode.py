@@ -1,31 +1,27 @@
-import re
+import requests
+from django.conf import settings
+from ..constants import UNKNOWN_POSTCODES
 
 
-def valid_postcode(postcode) -> bool:
+def is_valid_postcode(postcode):
     """
-    Validation function for UK postcodes
-    Returns either a regexp match or 'not matched'
-    ACKNOWLEDGEMENT: with thanks to https://kodey.co.uk/2020/09/03/a-uk-postcode-validation-script-in-python/
+    Test if valid postcode using api.postcodes.io 
+    Allow any no fixed abode etc standard codes
     """
-    pattern = 'not matched'
 
-    #e.g. W27XX
-    if len(postcode.replace(" ", "")) == 5:
-        pattern = re.compile("^[a-zA-Z]{1}[0-9]{2}[a-zA-Z]{2}")
-    #e.g. TW27XX
-    elif len(postcode.replace(" ", "")) == 6:
-        pattern = re.compile("^[a-zA-Z]{2}[0-9]{2}[a-zA-Z]{2}")
-    #e.g. TW218FF
-    elif len(postcode.replace(" ", "")) == 7:
-        pattern = re.compile("^[a-zA-Z]{2}[0-9]{3}[a-zA-Z]{2}")
-    if pattern.match(postcode):
-        print("matched!")
-    return pattern
+    # convert to upper case and remove spaces
+    formatted = postcode.upper().replace(' ', '')
+    # look for unknown postcodes
+    unknown = [code for code in UNKNOWN_POSTCODES if code.replace(
+        ' ', '') == formatted]
+    if len(unknown) > 0:
+        return True
 
-
-def validate_postcode(postcode: str) -> bool:
-    valid_postcode_regex = valid_postcode(postcode=postcode)
-    if(valid_postcode_regex.match('not matched')):
+    # check against API
+    url = f"{settings.POSTCODES_IO_API_URL}/{postcode}/validate"
+    response = requests.get(url=url)
+    if response.status_code == 404:
+        print("Postcode validation failure. Could not validate postcode.")
         return False
     else:
-        return True
+        return response.json()["result"]

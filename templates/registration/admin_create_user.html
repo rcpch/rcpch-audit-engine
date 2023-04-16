@@ -1,190 +1,193 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
 
-<div class='ui container'>
+<div class='ui rcpch container'>
+  <div class="rcpch_padding">
 
-  <div class="ui two column centered grid">
-    
-    <div class="column">
+    <div class="ui two column centered grid">
       
-      <div class="ui header">
-        <img src='{% static "images/epilepsy12-logo-1.png" %}'>
-        <div class="content">
-          <h2>{{admin_title}}</h2>
-        </div>
-      </div>
-      
-      <form class='ui rcpch form' method="POST" action="" name='create_epilepsy12_user_form'>
-        {% csrf_token %}
-
-        <div class='three fields'>
-          <div class='three wide field'>
-            <label for="{{form.title.id_for_label}}">Title</label>
-            {{ form.title }}
-            <div class='field error'>
-              {{ form.title.errors }}
-            </div>
-          </div>
-          <div class='six wide field'>
-            <label for="{{form.first_name.id_for_label}}">First name</label>
-            {{ form.first_name }}
-            <div class='field error'>
-              {{ form.first_name.errors }}
-            </div>
-          </div>
-          <div class='seven wide field'>
-            <label for="{{form.surname.id_for_label}}">Surname</label>
-            {{ form.surname }}
-            <div class='field error'>
-              {{ form.surname.errors }}
-            </div>
+      <div class="column">
+        
+        <div class="ui header">
+          <img src='{% static "images/epilepsy12-logo-1.png" %}'>
+          <div class="content">
+            <h2>{{admin_title}}</h2>
           </div>
         </div>
         
-        <div class='two fields'>
+        <form 
+          class='ui rcpch form' 
+          method="POST" 
+          action="" 
+          name='create_epilepsy12_user_form'>
+          {% csrf_token %}
 
-          <div class='field'>
-            <label for="{{form.email.id_for_label}}">Email address</label>
-            {{ form.email }}
-            {{ form.email.errors }}
-          </div>
-          
-          <div class='field'>
-            <label for="{{form.role.id_for_label}}">Role</label>
-            {{ form.role }}
-            <div class='field error'>
-              {{ form.role.errors }}
+          <div class='three fields'>
+            <div class='three wide field'>
+              <label for="{{form.title.id_for_label}}">Title</label>
+              {{ form.title }}
+              {% if form.title.errors %}
+                <div class="ui pointing red basic label">{{form.title.errors}}</div>
+              {% endif %}
             </div>
-          </div>
-        
-        </div>
-        
-        {% if not user.is_staff or user.is_superuser %}
-          <div class='field'>
-            <label for="{{form.hospital_employer.id_for_label}}">Employer</label>
-            {{ form.hospital_employer }}
-            <div class='field error'>
-              {{ form.hospital_employer.errors }}
-            </div>
-          </div>
-        {% endif %}
-
-        <div class='three fields'>
-
-          {% if user.is_staff or user.is_superuser%}
             <div class='six wide field'>
-              <label for="{{form.email.id_for_label}}">RCPCH Audit Team member</label>
-              <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                {{ form.is_rcpch_audit_team_member }}
-              </div>
-              <div class='field error'>
-                {{ form.is_rcpch_audit_team_member.errors }}
-              </div>
+              <label for="{{form.first_name.id_for_label}}">First name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <div class="ui pointing red basic label">{{form.first_name.errors}}</div>
+              {% endif %}
             </div>
-          {% endif %}
-          
-          {% if user.is_staff or user.is_superuser%}
-            <div class='five wide field'>
-              <label for="{{form.email.id_for_label}}">RCPCH Staff</label>
-              <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                {{ form.is_staff }}
-              </div>
-              <div class='field error'>
-                {{ form.is_staff.errors }}
-              </div>
-            </div>
-          {% endif %}
-          
-          {% if user.is_superuser %}
-            <div class='five wide field'>
-              <label for="{{form.is_superuser.id_for_label}}">Superuser</label>
-              <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                {{ form.is_superuser }}
-              </div>
-              <div class='field error'>
-                {{ form.is_superuser.errors }}
-              </div>
-            </div>
-          {% endif %}
-
-        </div>
-
-        {% comment %} <div class="two fields">
-
-          <div class='field'>
-            <label for="{{form.password1.id_for_label}}">Password</label>
-            {{ form.password1 }}
-            {{ form.password1.errors }}
-          </div>
-          
-          <div class='field'>
-            <label for="{{form.password2.id_for_label}}">Repeat password</label>
-            {{ form.password2 }}
-            <div class='field error'>
-              {{ form.password2.errors }}
+            <div class='seven wide field'>
+              <label for="{{form.surname.id_for_label}}">Surname</label>
+              {{ form.surname }}
+              {% if form.surname.errors %}
+                <div class="ui pointing red basic label">{{form.surname.errors}}</div>
+              {% endif %}
             </div>
           </div>
+          
+          <div class='two fields'>
 
-        </div> {% endcomment %}
+            <div class='field'>
+              <label for="{{form.email.id_for_label}}">Email address</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="ui pointing red basic label">{{form.email.errors}}</div>
+              {% endif %}
+            </div>
+            
+            <div class='field'>
+              <label for="{{form.role.id_for_label}}">Role</label>
+              {{ form.role }}
+              {% if form.role.errors %}
+                <div class="ui pointing red basic label">{{form.role.errors}}</div>
+              {% endif %}
+            </div>
+          
+          </div>
+          
+          {% if not user.is_staff or user.is_superuser %}
+            <div class='field'>
+              <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
+              {{ form.organisation_employer }}
+              {% if form.organisation_employer.errors %}
+                <div class="ui pointing red basic label">{{form.organisation_employer.errors}}</div>
+              {% endif %}
+            </div>
+          {% endif %}
 
-        <input 
-          class="ui rcpch_primary button" 
-          type="submit" 
-          value="{{admin_title}}" 
-          name='edit'/>
+          <div class='three fields'>
 
-        {% if not user.email_confirmed %}
-
-          <button 
-            type="submit" 
-            {% if perms.epilepsy12.change_epilepsy12user %}
-              class="ui rcpch_primary icon button"
-              {% else %}
-              class="ui rcpch_primary disabled icon button"
+            {% if user.is_staff or user.is_superuser%}
+              <div class='six wide field'>
+                <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
+                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
+                  {{ form.is_rcpch_audit_team_member }}
+                </div>
+                {% if form.is_rcpch_audit_team_member.errors %}
+                  <div class="ui pointing red basic label">{{form.is_rcpch_audit_team_member.errors}}</div>
+                {% endif %}
+              </div>
             {% endif %}
-            name="resend"
-            value="resend"
-          >
-            <i class="envelope outline icon"></i>
-            Resend Email
-          </button>
+            
+            {% if user.is_staff or user.is_superuser%}
+              <div class='five wide field'>
+                <label for="{{form.is_staff.id_for_label}}">RCPCH Staff</label>
+                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
+                  {{ form.is_staff }}
+                </div>
+                {% if form.is_staff.errors %}
+                  <div class="ui pointing red basic label">{{form.is_staff.errors}}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+            
+            {% if user.is_superuser %}
+              <div class='five wide field'>
+                <label for="{{form.is_superuser.id_for_label}}">Superuser</label>
+                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
+                  {{ form.is_superuser }}
+                </div>
+                {% if form.is_superuser.errors %}
+                  <div class="ui pointing red basic label">{{form.is_superuser.errors}}</div>
+                {% endif %}
+              </div>
+            {% endif %}
 
-        {% endif %}
+          </div>
 
-        <input 
-          type="submit" 
-          {% if perms.epilepsy12.delete_epilepsy12user %}
-            class="ui rcpch_danger button"
-          {% else %}
-            class="ui rcpch_danger disabled button"
+          <input 
+            class="ui rcpch_primary button" 
+            type="submit" 
+            value="{{admin_title}}" 
+            name='edit'/>
+
+          {% if not form.email_confirmed.value %}
+
+            <button 
+              type="submit" 
+              {% if perms.epilepsy12.change_epilepsy12user %}
+                class="ui rcpch_primary icon button"
+                {% else %}
+                class="ui rcpch_primary disabled icon button"
+              {% endif %}
+              name="resend"
+              value="resend"
+            >
+              Resend Email
+            </button>
+
           {% endif %}
-          name="delete"
-          value="Delete"
-          hx_post="{% url 'edit_epilepsy12_user' hospital_id user.pk %}"
-            _= "on click
-            halt the event
-            call Swal.fire({ 
-              title: 'Confirmation Required', 
-              text: 'This will irreversibly remove user and related dated from Epilepsy12.', 
-              icon: 'warning', 
-              iconColor: '#e00087', 
-              showCancelButton: true, 
-              confirmButtonColor: '#11a7f2', 
-              cancelButtonColor: '#e60700', 
-              confirmButtonText: 'Remove user from Epilepsy12' 
-            })
-            if result.isConfirmed " 
-        />
-        
-        <a 
-          class="ui rcpch_negative button"
-          name="cancel"
-          href="{% url 'epilepsy12_user_list' hospital_id=hospital_id %}"
-        >Cancel</a>
 
-      </form>
+          {% if admin_title != 'Add Epilepsy12 User' %}
+
+            <input 
+              type="submit" 
+              {% if perms.epilepsy12.delete_epilepsy12user %}
+                class="ui rcpch_danger button"
+              {% else %}
+                class="ui rcpch_danger disabled button"
+              {% endif %}
+              name="delete"
+              id="delete"
+              value="Delete"
+                _= "on click
+                halt the event
+                call Swal.fire({ 
+                  title: 'Confirmation Required', 
+                  text: 'This will irreversibly remove user and related dated from Epilepsy12.', 
+                  icon: 'warning', 
+                  iconColor: '#e00087', 
+                  showCancelButton: true, 
+                  confirmButtonColor: '#11a7f2', 
+                  cancelButtonColor: '#e60700', 
+                  confirmButtonText: 'Remove user from Epilepsy12' 
+                })
+                if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %}
+                {
+                  method: 'post',
+                  headers: {
+                    'X-CSRFToken': {{csrf_token}},
+                    'Accept': 'network/json',
+                    'Content-Type': 'network/json',
+                  }
+                }
+                end
+                " 
+            />
+          
+          {% endif %}
+          
+          <a 
+            class="ui rcpch_negative button"
+            name="cancel"
+            href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}"
+          >Cancel</a>
+
+        </form>
+      </div>
+
     </div>
 
   </div>

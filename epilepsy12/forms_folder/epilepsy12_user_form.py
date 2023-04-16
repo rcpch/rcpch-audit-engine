@@ -3,32 +3,40 @@ from django import forms
 from django.core import validators
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordResetForm, SetPasswordForm, AuthenticationForm
 from epilepsy12.constants.user_types import ROLES, TITLES
-from ..models import Epilepsy12User, HospitalTrust
+from ..models import Epilepsy12User, Organisation
 
 
 class Epilepsy12LoginForm(AuthenticationForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "password")
+        fields = ("username", "password")
+
+    def clean_username(self):
+        data = self.cleaned_data['username']
+        return data.lower()
 
 
 class Epilepsy12UserCreationForm(UserCreationForm):
 
-    title = forms.CharField()
+    title = forms.CharField(
+        required=False
+    )
 
     email = forms.EmailField(
         max_length=255,
-        help_text="Required. Please enter a valid NHS email address."
+        help_text="Required. Please enter a valid NHS email address.",
+        required=True
     )
 
     role = forms.ChoiceField(
         choices=ROLES,
-        widget=forms.Select(attrs={'class': 'ui fluid rcpch dropdown'})
+        widget=forms.Select(attrs={'class': 'ui fluid rcpch dropdown'}),
+        required=True
     )
 
-    hospital_employer = forms.ModelChoiceField(
-        queryset=HospitalTrust.objects.all(),
+    organisation_employer = forms.ModelChoiceField(
+        queryset=Organisation.objects.all(),
         widget=forms.Select(
             attrs={'class': 'ui fluid search rcpch dropdown', 'readonly': True}),
         required=False
@@ -37,32 +45,39 @@ class Epilepsy12UserCreationForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=255,
         help_text='Please enter your first name',
+        required=True
     )
 
     surname = forms.CharField(
         max_length=255,
-        help_text='Please enter your surname'
+        help_text='Please enter your surname',
+        required=True
     )
 
     is_rcpch_audit_team_member = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'})
+        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
+        required=True
     )
 
     is_staff = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'})
+        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
+        required=True
     )
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
+        fields = ("email", "role", "organisation_employer", 'first_name', 'surname',
                   "is_rcpch_audit_team_member", 'is_staff', 'is_active')
+
+    def __init__(self, *args, **kwargs) -> None:
+        super(Epilepsy12UserCreationForm, self).__init__(*args, **kwargs)
 
 
 class Epilepsy12UserChangeForm(UserChangeForm):
 
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer", 'first_name', 'surname',
+        fields = ("email", "role", "organisation_employer", 'first_name', 'surname',
                   "is_rcpch_audit_team_member", 'is_staff', 'is_active')
 
 
@@ -75,18 +90,19 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(UserCreationForm, self).__init__(*args, **kwargs)
+        super(Epilepsy12UserAdminCreationForm, self).__init__(*args, **kwargs)
         self.fields['password1'].required = False
         self.fields['password2'].required = False
         # If one field gets autocompleted but not the other, our 'neither
         # password or both password' validation will be triggered.
         self.fields['password1'].widget.attrs['autocomplete'] = 'off'
         self.fields['password2'].widget.attrs['autocomplete'] = 'off'
+        self.user_existing_email = self.instance.email
 
     email = forms.EmailField(
         max_length=255,
         help_text="Required. Please enter a valid NHS email address.",
-        initial='Enter your email', required=True, validators=[validators.EmailValidator(message="Invalid Email")]
+        required=True, validators=[validators.EmailValidator(message="Invalid Email")]
     )
 
     role = forms.ChoiceField(
@@ -95,8 +111,8 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
         required=True
     )
 
-    hospital_employer = forms.ModelChoiceField(
-        queryset=HospitalTrust.objects.all(),
+    organisation_employer = forms.ModelChoiceField(
+        queryset=Organisation.objects.all(),
         widget=forms.Select(
             attrs={'class': 'ui fluid search rcpch disabled dropdown'})
     )
@@ -109,12 +125,14 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
 
     first_name = forms.CharField(
         max_length=255,
-        help_text='Please enter your first name'
+        help_text='Please enter your first name',
+        required=True
     )
 
     surname = forms.CharField(
         max_length=255,
-        help_text='Please enter your surname'
+        help_text='Please enter your surname',
+        required=True
     )
 
     is_superuser = forms.BooleanField(
@@ -134,14 +152,33 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
         required=False
     )
 
+    email_confirmed = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'class': 'ui toggle checkbox'}),
+        initial=False,
+        required=False
+    )
+
     class Meta:
         model = Epilepsy12User
-        fields = ("email", "role", "hospital_employer", 'title', 'first_name', 'surname', "is_staff",
+        fields = ("email", "role", "organisation_employer", 'title', 'first_name', 'surname', "is_staff",
                   "is_rcpch_audit_team_member", "is_superuser", "email_confirmed")
 
-    def clean(self):
-        cleaned_data = super(Epilepsy12UserAdminCreationForm, self).clean()
-        return cleaned_data
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        if self.user_existing_email is not None:
+            # this user is being updated
+            if self.user_existing_email != data.lower():
+                # test to check this email does not exist
+                if Epilepsy12User.objects.filter(email=data.lower()).exists():
+                    raise forms.ValidationError(
+                        f"{data.lower()} is already associated with an account.")
+        else:
+            # this is a new account - check email is unique
+            if Epilepsy12User.objects.filter(email=data.lower()).exists():
+                raise forms.ValidationError(
+                    "The email is already associated with an account.")
+
+        return data.lower()
 
 
 class Epilepsy12UserPasswordResetForm(SetPasswordForm):

@@ -45,6 +45,32 @@ def percentage_of_total(numerator, denominator):
             return round(int(numerator)/int(denominator)*100)
 
 
+@register.simple_tag
+def kpi_for_kpi_name(aggregated_kpi, kpi_name):
+    if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
+        return 0
+    else:
+        return aggregated_kpi['aggregated_kpis'][kpi_name]
+
+
+@register.simple_tag
+def kpi_average_for_kpi_name(aggregated_kpi, kpi_name):
+    if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
+        return 0
+    else:
+        return aggregated_kpi['aggregated_kpis'][f'{kpi_name}_average']
+
+
+@register.filter
+def split_label_to_list(label):
+    if label is None:
+        return 'Unclassified'
+    else:
+        processed = label.strip().replace(
+            'INTEGRATED CARE BOARD', "").replace('&#x27;', "\'")
+        return processed
+
+
 @register.filter
 def custom_filter(text, color):
     safe_text = '<span style="color:{color}">{text}</span>'.format(
@@ -73,7 +99,7 @@ def permission_text(add_permission, change_permission, delete_permission, model_
             return_string += f' add {model_name}.'
         else:
             return_string = ""
-    print(return_string)
+
     return return_string
 
 
@@ -117,6 +143,36 @@ def match_two_values(val1, val2):
     Matches two values
     """
     return val1 == val2
+
+
+@register.simple_tag
+def value_for_field_name(model, field_name):
+    """
+    Returns the field value for a given field name in a model
+    """
+    return getattr(model, field_name, None)
+
+
+@register.filter
+def record_complete(model):
+    # helper largely for medicines table to report if complete or not
+
+    minimum_requirement_met = False
+    if hasattr(model, 'medicine_entity'):
+        if model.medicine_entity is not None:
+            minimum_requirement_met = (
+                model.antiepilepsy_medicine_start_date is not None and
+                model.antiepilepsy_medicine_risk_discussed is not None and
+                model.medicine_entity.medicine_name is not None
+            )
+            if model.management.registration.case.sex == 2 and model.medicine_entity.medicine_name == 'Sodium valproate':
+                return minimum_requirement_met and (
+                    model.is_a_pregnancy_prevention_programme_needed is not None and
+                    model.has_a_valproate_annual_risk_acknowledgement_form_been_completed is not None and
+                    model.is_a_pregnancy_prevention_programme_in_place is not None
+                )
+
+    return minimum_requirement_met
 
 
 @register.filter

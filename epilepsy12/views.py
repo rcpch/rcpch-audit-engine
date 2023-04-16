@@ -40,6 +40,7 @@ def epilepsy12_login(request):
         if form.is_valid():
             email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            print(email)
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
@@ -52,8 +53,8 @@ def epilepsy12_login(request):
                     epilepsy12user=user
                 ).order_by('-activity_datetime').first()
                 messages.info(
-                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%-H:%-M (%S seconds) on %A, %-d %B %Y')} from {last_logged_in.ip_address}")
-                return redirect("hospital_reports")
+                    request, f"You are now logged in as {email}. You last logged in at {last_logged_in.activity_datetime.strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in.ip_address}")
+                return redirect("organisation_reports")
             else:
                 messages.error(request, "Invalid email or password.")
         else:
@@ -72,12 +73,12 @@ def database(request):
     return render(request, template_name, {})
 
 
-@ login_required
-def logs(request, hospital_id, epilepsy12_user_id):
+@login_required
+def logs(request, organisation_id, epilepsy12_user_id):
     """
-    returns logs for given hospital
+    returns logs for given organisation
     """
-    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    organisation = Organisation.objects.get(pk=organisation_id)
     epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
 
     activities = VisitActivity.objects.filter(
@@ -86,19 +87,19 @@ def logs(request, hospital_id, epilepsy12_user_id):
     template_name = 'epilepsy12/logs.html'
     context = {
         'epilepsy12_user': epilepsy12_user,
-        'hospital': hospital,
+        'organisation': organisation,
         'activities': activities
     }
 
     return render(request=request, template_name=template_name, context=context)
 
 
-@ login_required
-def log_list(request, hospital_id, epilepsy12_user_id):
+@login_required
+def log_list(request, organisation_id, epilepsy12_user_id):
     """
     GET request to return log table
     """
-    hospital = HospitalTrust.objects.get(pk=hospital_id)
+    organisation = Organisation.objects.get(pk=organisation_id)
     epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
 
     activities = VisitActivity.objects.filter(
@@ -107,16 +108,11 @@ def log_list(request, hospital_id, epilepsy12_user_id):
     template_name = 'epilepsy12/logs.html'
     context = {
         'epilepsy12_user': epilepsy12_user,
-        'hospital': hospital,
+        'organisation': organisation,
         'activities': activities
     }
 
     return render(request=request, template_name=template_name, context=context)
-
-
-def tsandcs(request):
-    template_name = 'epilepsy12/terms_and_conditions.html'
-    return render(request, template_name, {})
 
 
 def patient(request):
@@ -176,7 +172,7 @@ def signup(request, *args, **kwargs):
             login(request, logged_in_user,
                   backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, "Sign up successful.")
-            return redirect('hospital_reports')
+            return redirect('organisation_reports')
         for msg in form.error_messages:
             messages.error(
                 request, f"Registration Unsuccessful: {form.error_messages[msg]}")
@@ -193,6 +189,12 @@ def registration_active(request, case_id, active_template):
     """
     registration = Registration.objects.get(case=case_id)
     audit_progress = registration.audit_progress
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.organisation.pk
 
     # enable the steps if has just registered
     if audit_progress.registration_complete:
@@ -202,7 +204,8 @@ def registration_active(request, case_id, active_template):
     context = {
         'audit_progress': audit_progress,
         'active_template': active_template,
-        'case_id': case_id
+        'case_id': case_id,
+        'organisation_id': organisation_id
     }
 
     return render(request=request, template_name='epilepsy12/steps.html', context=context)
@@ -218,7 +221,7 @@ def download_select(request):
 
     context = {
         'selected_model': model,
-        'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'hospitaltrust', 'comorbidity', 'episode', 'syndrome', 'keyword'),
+        'model_list': ('allregisteredcases', 'registration', 'firstpaediatricassessment', 'epilepsycontext', 'multiaxialdiagnosis', 'assessment', 'investigations', 'management', 'site', 'case', 'epilepsy12user', 'organisation', 'comorbidity', 'episode', 'syndrome', 'keyword'),
         'is_selected': True
     }
 
@@ -251,7 +254,7 @@ def download(request, model_name):
                         relative_field_name = field.name
                     else:
                         relative_field_name = f'{one_to_one_table}__{field.name}'
-                        if field.name == 'hospital_trusts':
+                        if field.name == 'organisations':
                             relative_field_name += '__OrganisationName'
                     field_list.append(relative_field_name)
         model_class = Registration
@@ -428,7 +431,7 @@ class CaseViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def add_case_to_hospital_list(self, request):
+    def add_case_to_organisation_list(self, request):
         # params
         nhs_number = request.POST.get('nhs_number')
         organisationID = request.POST.get('OrganisationID')
@@ -451,8 +454,8 @@ class CaseViewSet(viewsets.ModelViewSet):
                 if organisationID:
 
                     if serializer.is_valid(raise_exception=True):
-                        if HospitalTrust.objects.filter(OrganisationID=request.POST.get('OrganisationID')).exists():
-                            hospital_trust = HospitalTrust.objects.filter(
+                        if Organisation.objects.filter(OrganisationID=request.POST.get('OrganisationID')).exists():
+                            organisation = Organisation.objects.filter(
                                 OrganisationID=request.POST.get('OrganisationID')).get()
                         else:
                             raise serializers.ValidationError(
@@ -469,7 +472,7 @@ class CaseViewSet(viewsets.ModelViewSet):
                         try:
                             Site.objects.create(
                                 case=case,
-                                hospital_trust=hospital_trust,
+                                organisation=organisation,
                                 site_is_actively_involved_in_epilepsy_care=True,
                                 site_is_primary_centre_of_epilepsy_care=True
                             )
@@ -527,8 +530,8 @@ class RegistrationViewSet(viewsets.ModelViewSet):
 
             # validate parameters relating to related models
             if lead_centre_id:
-                if HospitalTrust.objects.filter(OrganisationID=lead_centre_id).exists():
-                    lead_centre = HospitalTrust.objects.get(
+                if Organisation.objects.filter(OrganisationID=lead_centre_id).exists():
+                    lead_centre = Organisation.objects.get(
                         OrganisationID=lead_centre_id)
                 else:
                     raise serializers.ValidationError(
@@ -556,7 +559,7 @@ class RegistrationViewSet(viewsets.ModelViewSet):
                     site_is_actively_involved_in_epilepsy_care=True,
                     site_is_primary_centre_of_epilepsy_care=True,
                     case=case,
-                    hospital_trust=lead_centre
+                    organisation=lead_centre
                 )
             except Exception as error:
                 raise serializers.ValidationError(error)
@@ -700,12 +703,12 @@ class SiteViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class HospitalTrustViewSet(viewsets.ModelViewSet):
+class OrganisationViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows a list of hospital and community trusts to be viewed or edited.
+    API endpoint that allows a list of organisation and community trusts to be viewed or edited.
     """
-    queryset = HospitalTrust.objects.all()
-    serializer_class = HospitalTrustSerializer
+    queryset = Organisation.objects.all()
+    serializer_class = OrganisationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 

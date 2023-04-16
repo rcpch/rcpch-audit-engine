@@ -76,7 +76,7 @@ def get_current_cohort_data() -> dict:
         'cohort_start_date': current_cohort_start_date(),
         'cohort_end_date': date(current_cohort_start_date().year+1, 11, 30),
         'cohort': current_cohort,
-        'submission_date': first_tuesday_in_january(current_cohort_start_date().year+1) + relativedelta(days=7),
+        'submission_date': first_tuesday_in_january(current_cohort_start_date().year+2) + relativedelta(days=7),
         'days_remaining':  relativedelta(first_tuesday_in_january(current_cohort_start_date().year+1) + relativedelta(days=7) - date.today()).days
     }
 

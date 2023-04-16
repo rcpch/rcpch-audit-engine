@@ -4,13 +4,13 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
-from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine
+from epilepsy12.models import Management, Registration, AntiEpilepsyMedicine, AntiEpilepsyMedicine, Site, MedicineEntity
 from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_hospital_trust
+from ..decorator import user_can_access_this_organisation
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 def management(request, case_id):
     # function called on form load
     # creates a new management object if one does not exist
@@ -32,15 +32,22 @@ def management(request, case_id):
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False).all()
 
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=registration.case
+    ).get()
+    organisation_id = site.organisation.pk
+
     context = {
         "case_id": case_id,
         "registration": registration,
         "management": management,
         "rescue_medicines": rescue_medicines,
         "antiepilepsy_medicines": antiepilepsy_medicines,
-        # 'snomed_items': snomed_items,
         "audit_progress": registration.audit_progress,
-        "active_template": "management"
+        "active_template": "management",
+        "organisation_id": organisation_id
     }
 
     template_name = 'epilepsy12/management.html'
@@ -59,7 +66,7 @@ def management(request, case_id):
 HTMX fields
 There is a function/hx route for each field in the form
 Each one is protected by @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 Each one updates the record.
 
 
@@ -70,7 +77,7 @@ Fields relating to rescue medication begin here
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def has_an_aed_been_given(request, management_id):
     # HTMX call back from management template
@@ -127,7 +134,7 @@ def has_an_aed_been_given(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.add_antiepilepsymedicine', raise_exception=True)
 def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     """
@@ -141,23 +148,23 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     else:
         is_rescue = False
 
+    # medicine = MedicineEntity.objects.filter(is_rescue=is_rescue).first()
+
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.create(
-        medicine_id=None,
-        medicine_name=None,
         is_rescue_medicine=is_rescue,
-        antiepilepsy_medicine_snomed_code=None,
-        antiepilepsy_medicine_snomed_preferred_name=None,
         antiepilepsy_medicine_start_date=None,
         antiepilepsy_medicine_stop_date=None,
         antiepilepsy_medicine_risk_discussed=None,
         is_a_pregnancy_prevention_programme_needed=None,
-        management=management
+        management=management,
+        medicine_entity=None
     )
 
     if is_rescue:
 
         context = {
-            'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
+            # 'choices': sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1)),
+            'choices': MedicineEntity.objects.filter(is_rescue=True).order_by('medicine_name'),
             'antiepilepsy_medicine': antiepilepsy_medicine,
             'management_id': management_id,
             'is_rescue_medicine': is_rescue
@@ -166,7 +173,8 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     else:
 
         context = {
-            'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+            # 'choices': sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1)),
+            'choices': MedicineEntity.objects.filter(is_rescue=False).order_by('medicine_name'),
             'antiepilepsy_medicine': antiepilepsy_medicine,
             'management_id': management_id,
             'is_rescue_medicine': is_rescue
@@ -185,7 +193,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.delete_antiepilepsymedicine', raise_exception=True)
 def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
@@ -226,7 +234,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
@@ -238,9 +246,13 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -248,7 +260,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -267,7 +279,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.view_antiepilepsymedicine', raise_exception=True)
 def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
@@ -281,7 +293,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
     # if all the fields are none this was not completed - delete the record
     if (
-        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None and antiepilepsy_medicine.antiepilepsy_medicine_stop_date is None and antiepilepsy_medicine.medicine_id is None and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
+        antiepilepsy_medicine.antiepilepsy_medicine_start_date is None and antiepilepsy_medicine.antiepilepsy_medicine_stop_date is None and antiepilepsy_medicine.medicine_entity is None and antiepilepsy_medicine.antiepilepsy_medicine_risk_discussed is None
     ):
         antiepilepsy_medicine.delete()
 
@@ -309,7 +321,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def medicine_id(request, antiepilepsy_medicine_id):
     """
@@ -321,27 +333,29 @@ def medicine_id(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = BENZODIAZEPINE_TYPES
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = ANTIEPILEPSY_MEDICINES
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
-    # get id of medicine - TODO this should be the SNOMEDCTID
+    # get id of medicine entity
     medicine_id = request.POST.get('medicine_id')
 
-    # look up the medicine name from the constant
-    medicine_name = None
-    for medicine in choices:
-        if int(medicine_id) == int(medicine[0]):
-            medicine_name = medicine[1]
+    # look up the medicine from the pk
+    medicine_entity = MedicineEntity.objects.get(pk=medicine_id)
 
-    antiepilepsy_medicine.medicine_name = medicine_name
-    antiepilepsy_medicine.medicine_id = medicine_id
+    antiepilepsy_medicine.medicine_entity = medicine_entity
 
-    if int(antiepilepsy_medicine.medicine_id) == 21 and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
-        # sodium valproate selected and patient is female
-        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
-        antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
-        antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
+    if hasattr(antiepilepsy_medicine, 'medicine_entity'):
+        if antiepilepsy_medicine.medicine_entity is not None:
+            if antiepilepsy_medicine.medicine_entity.medicine_name == 'Sodium valproate' and int(antiepilepsy_medicine.management.registration.case.sex) == 2:
+                # sodium valproate selected and patient is female
+                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = True
+                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
+                antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = None
     else:
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = None
         antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = None
@@ -355,7 +369,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -374,7 +388,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     """
@@ -399,9 +413,13 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -429,7 +447,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
     """
@@ -442,9 +460,13 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id)
 
     if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=True).order_by('medicine_name')
+        # choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
     else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+        choices = MedicineEntity.objects.filter(
+            is_rescue=False).order_by('medicine_name')
+        # choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
 
     context = {
         'choices': choices,
@@ -467,7 +489,7 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     """
@@ -491,10 +513,8 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     context = {
         'choices': choices,
@@ -517,7 +537,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     """
@@ -539,10 +559,8 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -550,7 +568,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -570,7 +588,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
     """
@@ -592,10 +610,8 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -603,7 +619,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -623,7 +639,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, antiepilepsy_medicine_id):
     """
@@ -645,10 +661,8 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, ant
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
         pk=antiepilepsy_medicine_id)
 
-    if antiepilepsy_medicine.is_rescue_medicine:
-        choices = sorted(BENZODIAZEPINE_TYPES, key=itemgetter(1))
-    else:
-        choices = sorted(ANTIEPILEPSY_MEDICINES, key=itemgetter(1))
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -656,7 +670,7 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(request, ant
         show_end_date = False
 
     context = {
-        'choices': sorted(choices, key=itemgetter(1)),
+        'choices': choices,
         'antiepilepsy_medicine': antiepilepsy_medicine,
         'is_rescue_medicine': antiepilepsy_medicine.is_rescue_medicine,
         'show_end_date': show_end_date
@@ -681,7 +695,7 @@ Fields relating to rescue medication begin here
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def has_rescue_medication_been_prescribed(request, management_id):
     """
@@ -744,7 +758,7 @@ Fields relating to individual care plans begin here
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_antiepilepsymedicine', raise_exception=True)
 def individualised_care_plan_in_place(request, management_id):
     """
@@ -805,7 +819,7 @@ def individualised_care_plan_in_place(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_date(request, management_id):
     """
@@ -846,7 +860,7 @@ def individualised_care_plan_date(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
     """
@@ -887,7 +901,7 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_includes_service_contact_details(request, management_id):
     """
@@ -927,7 +941,7 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_include_first_aid(request, management_id):
     """
@@ -966,7 +980,7 @@ def individualised_care_plan_include_first_aid(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
     """
@@ -1006,7 +1020,7 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_includes_general_participation_risk(request, management_id):
     """
@@ -1045,7 +1059,7 @@ def individualised_care_plan_includes_general_participation_risk(request, manage
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_addresses_water_safety(request, management_id):
     """
@@ -1084,7 +1098,7 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_addresses_sudep(request, management_id):
     """
@@ -1123,7 +1137,7 @@ def individualised_care_plan_addresses_sudep(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def individualised_care_plan_includes_ehcp(request, management_id):
     """
@@ -1162,7 +1176,7 @@ def individualised_care_plan_includes_ehcp(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
     """
@@ -1202,7 +1216,7 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def has_been_referred_for_mental_health_support(request, management_id):
     """
@@ -1242,7 +1256,7 @@ def has_been_referred_for_mental_health_support(request, management_id):
 
 
 @login_required
-@user_can_access_this_hospital_trust()
+@user_can_access_this_organisation()
 @permission_required('epilepsy12.change_management', raise_exception=True)
 def has_support_for_mental_health_support(request, management_id):
     """

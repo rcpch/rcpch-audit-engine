@@ -16,14 +16,14 @@ class FirstPaediatricAssessment(TimeStampAbstractBaseClass, UserStampAbstractBas
     This class references the Case class as a case can have multiple episodes.
     This class references the EEG class as an episode can have multiple EEGs
 
-    This whole clase might better belong in the initial assessment
+    This whole class might better belong in the initial assessment
 
     """
 
     first_paediatric_assessment_in_acute_or_nonacute_setting = models.IntegerField(
         help_text={
-            'label': "Is the first paediatric assessment in an acute or nonacute setting?",
-            'reference': "Is the first paediatric assessment in an acute or nonacute setting?"
+            'label': "Was the first paediatric assessment in an acute or nonacute setting?",
+            'reference': "Was the first paediatric assessment in an acute or nonacute setting?"
         },
         choices=CHRONICITY,
         null=True,

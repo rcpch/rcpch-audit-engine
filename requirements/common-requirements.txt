@@ -4,6 +4,7 @@ python-dateutil
 
 # third party imports
 django
+docutils
 psycopg2-binary
 rapidfuzz
 dj_database_url

@@ -14,9 +14,9 @@ def calculate_kpis(registration_instance):
     Identifies completed KPIs for a given registered child and passes these back to update the KPI model
     It accepts the registration instance and is called each time a related model is updated
     The outcome of a measure follows 4 potential states:
+    0 - measure failed
     1 - measure achieved
-    2 - measure failed
-    3 - measure scored but not applicable (eg ECG in nonconvulsive seizure)
+    2 - measure not applicable (eg ECG in nonconvulsive seizure)
     None - measure not scored yet
     """
 
@@ -199,7 +199,8 @@ def calculate_kpis(registration_instance):
                 Syndrome.objects.filter(
                     Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                     # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                    ~Q(syndrome_name__in=[3, 16, 17, 18])
+                    ~Q(syndrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
+                       'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
                 ).exists() or
 
                 age_at_first_paediatric_assessment <= 2
@@ -215,7 +216,8 @@ def calculate_kpis(registration_instance):
                     Syndrome.objects.filter(
                         Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis) &
                         # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                        ~Q(syndrome_name__in=[3, 16, 17, 18])
+                        ~Q(syndrome__syndrome_name__in=['Self-limited epilepsy with centrotemporal spikes',
+                                                        'Juvenile myoclonic epilepsy', 'Juvenile absence epilepsy', 'Childhood absence epilepsy'])
                     ).exists() or
 
                 age_at_first_paediatric_assessment <= 2
@@ -292,7 +294,8 @@ def calculate_kpis(registration_instance):
             registration_instance.management.has_an_aed_been_given and
             AntiEpilepsyMedicine.objects.filter(
                 management=registration_instance.management,
-                medicine_id=21
+                medicine_entity=MedicineEntity.objects.filter(
+                    medicine_name__icontains='valproate').first()
             ).exists()
         ):
 
@@ -305,7 +308,8 @@ def calculate_kpis(registration_instance):
                 registration_instance.management.has_an_aed_been_given and
                 AntiEpilepsyMedicine.objects.filter(
                     management=registration_instance.management,
-                    medicine_id=21,
+                    medicine_entity=MedicineEntity.objects.filter(
+                    medicine_name__icontains='valproate').first(),
                     is_a_pregnancy_prevention_programme_needed=True,
                     has_a_valproate_annual_risk_acknowledgement_form_been_completed=True
                 ).exists()
@@ -538,15 +542,15 @@ def calculate_kpis(registration_instance):
         pk=registration_instance.kpi.pk).update(**kpis)
 
 
-def annotate_kpis(filtered_hospitals, kpi_name="all"):
+def annotate_kpis(filtered_organisations, kpi_name="all"):
     """
     Single function to rationalize all functions calculatirng KPIs
-    Accepts query_list of hospitals
+    Accepts query_list of organisations
     Accepts flag for kpi_name if only individual kpi_name requested
     """
     if kpi_name == "all":
-        return filtered_hospitals.annotate(paediatrician_with_expertise_in_epilepsies_sum=Sum('kpi__paediatrician_with_expertise_in_epilepsies')).annotate(epilepsy_specialist_nurse_sum=Sum('kpi__epilepsy_specialist_nurse')).annotate(tertiary_input_sum=Sum('kpi__tertiary_input')).annotate(epilepsy_surgery_referral_sum=Sum('kpi__epilepsy_surgery_referral')).annotate(ecg_sum=Sum('kpi__ecg')).annotate(mri_sum=Sum('kpi__mri')).annotate(assessment_of_mental_health_issues_sum=Sum('kpi__assessment_of_mental_health_issues')).annotate(mental_health_support_sum=Sum('kpi__mental_health_support')).annotate(comprehensive_care_planning_agreement_sum=Sum('kpi__comprehensive_care_planning_agreement')).annotate(patient_held_individualised_epilepsy_document_sum=Sum('kpi__patient_held_individualised_epilepsy_document')).annotate(
+        return filtered_organisations.annotate(paediatrician_with_expertise_in_epilepsies_sum=Sum('kpi__paediatrician_with_expertise_in_epilepsies')).annotate(epilepsy_specialist_nurse_sum=Sum('kpi__epilepsy_specialist_nurse')).annotate(tertiary_input_sum=Sum('kpi__tertiary_input')).annotate(epilepsy_surgery_referral_sum=Sum('kpi__epilepsy_surgery_referral')).annotate(ecg_sum=Sum('kpi__ecg')).annotate(mri_sum=Sum('kpi__mri')).annotate(assessment_of_mental_health_issues_sum=Sum('kpi__assessment_of_mental_health_issues')).annotate(mental_health_support_sum=Sum('kpi__mental_health_support')).annotate(comprehensive_care_planning_agreement_sum=Sum('kpi__comprehensive_care_planning_agreement')).annotate(patient_held_individualised_epilepsy_document_sum=Sum('kpi__patient_held_individualised_epilepsy_document')).annotate(
             care_planning_has_been_updated_when_necessary_sum=Sum('kpi__care_planning_has_been_updated_when_necessary')).annotate(comprehensive_care_planning_content_sum=Sum('kpi__comprehensive_care_planning_content')).annotate(parental_prolonged_seizures_care_plan_sum=Sum('kpi__parental_prolonged_seizures_care_plan')).annotate(water_safety_sum=Sum('kpi__water_safety')).annotate(first_aid_sum=Sum('kpi__first_aid')).annotate(general_participation_and_risk_sum=Sum('kpi__general_participation_and_risk')).annotate(service_contact_details_sum=Sum('kpi__service_contact_details')).annotate(sudep_sum=Sum('kpi__sudep')).annotate(school_individual_healthcare_plan_sum=Sum('kpi__school_individual_healthcare_plan'))
     else:
-        ans = filtered_hospitals.annotate(kpi_sum=Sum(f"kpi__{kpi_name}"))
+        ans = filtered_organisations.annotate(kpi_sum=Sum(f"kpi__{kpi_name}"))
         return ans

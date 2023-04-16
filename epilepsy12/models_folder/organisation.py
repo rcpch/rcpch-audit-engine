@@ -6,10 +6,10 @@ from simple_history.models import HistoricalRecords
 from .time_and_user_abstract_base_classes import *
 
 
-class HospitalTrust(models.Model):
+class Organisation(models.Model):
     """
-    This class details information about hospital trusts.
-    It represents a list of hospital trusts that can be looked up to populate fields in the Site class
+    This class details information about organisations.
+    It represents a list of organisations that can be looked up to populate fields in the Site class
     """
 
     OrganisationID = models.CharField(
@@ -245,8 +245,8 @@ class HospitalTrust(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=['OrganisationName'])]
-        verbose_name = 'Hospital Trust'
-        verbose_name_plural = 'Hospital Trusts'
+        verbose_name = 'Organisation'
+        verbose_name_plural = 'Organisations'
         ordering = ('OrganisationName',)
 
     def __str__(self) -> str:

@@ -26,14 +26,15 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
         null=True
     )
 
-    syndrome_name = models.IntegerField(
+    syndrome = models.ForeignKey(
+        'epilepsy12.SyndromeEntity',
         help_text={
-            'label': "Select an identifiable epilepsy syndrome?",
-            'reference': "Select an identifiable epilepsy syndrome?",
+            'label': "The syndrome name.",
+            'reference': "Methodology for classification and definition of epilepsy syndromes with list of syndromes: Report of the ILAE Task Force on Nosology and Definitions, Epilepsia 2017",
         },
-        choices=sorted(SYNDROMES, key=itemgetter(1)),
-        null=True,
+        on_delete=models.CASCADE,
         blank=True,
+        null=True,
         default=None
     )
 
@@ -55,7 +56,7 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     )
 
     def __str__(self) -> str:
-        return f'{self.get_syndrome_name_display()}'
+        return f'{self.syndrome.syndrome_name} on {self.syndrome_diagnosis_date}'
 
     class Meta:
         verbose_name = 'Syndrome'

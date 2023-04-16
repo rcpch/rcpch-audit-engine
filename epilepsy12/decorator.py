@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from .models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, HospitalTrust, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine, Comorbidity, Assessment
+from .models import FirstPaediatricAssessment, MultiaxialDiagnosis, EpilepsyContext, Organisation, Investigations, Management, Registration, Case, Site, Episode, Syndrome, AntiEpilepsyMedicine, Comorbidity, Assessment
 
 
 model_primary_keys = [
@@ -24,7 +24,7 @@ def editor_access_for_this_child(*outer_args, **outer_kwargs):
     Receives argument outer_args which is a list of groups with access to view
     The inner function decorated() receives argument kwargs which is the view parameters and args (the request)
     The decorator uses the id passed into the view to identify the child and the request to get the user group
-    If the user has editor access and the user is either a clinician at the same hospital, or an RCPCH administrator
+    If the user has editor access and the user is either a clinician at the same organisation, or an RCPCH administrator
     access is granted. 
     If access is denied, a PermissionDenied 403 error is raised which returns a custom 403 template
     """
@@ -55,7 +55,7 @@ def editor_access_for_this_child(*outer_args, **outer_kwargs):
                     if Site.objects.filter(
                         registration=case.registration,
                         site_is_actively_involved_in_epilepsy_care=True,
-                        hospital_trust=request.user.hospital_employer
+                        organisation=request.user.organisation_employer
                     ).exists():
                         # user is involved in the care of this child
 
@@ -132,21 +132,21 @@ def group_required(*group_names):
                 #     child = Case.objects.get(pk=kwargs.get('case_id'))
 
                 if user.is_rcpch_audit_team_member:
-                    hospital = HospitalTrust.objects.filter(
+                    organisation = Organisation.objects.filter(
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
                     )
                 else:
-                    # filter for object where trust (not just hospital) where case is registered is the same as that of user
-                    hospital = HospitalTrust.objects.filter(
+                    # filter for object where trust (not just organisation) where case is registered is the same as that of user
+                    organisation = Organisation.objects.filter(
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentName=request.user.hospital_employer.ParentName
+                        ParentName=request.user.organisation_employer.ParentName
                     )
 
-                if hospital.exists() or user.is_rcpch_audit_team_member:
+                if organisation.exists() or user.is_rcpch_audit_team_member:
                     return view(request, *args, **kwargs)
                 else:
                     raise PermissionDenied()
@@ -157,7 +157,7 @@ def group_required(*group_names):
     return decorator
 
 
-def user_can_access_this_hospital_trust():
+def user_can_access_this_organisation():
     # decorator receives case_id or registration_id from view as argument.
     # access is granted only to users who are either:
     # 1. superusers
@@ -218,21 +218,21 @@ def user_can_access_this_hospital_trust():
                     child = case
 
                 if user.is_rcpch_audit_team_member:
-                    hospital = HospitalTrust.objects.filter(
+                    organisation = Organisation.objects.filter(
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
                     )
                 else:
-                    # filter for object where trust (not just hospital) where case is registered is the same as that of user
-                    hospital = HospitalTrust.objects.filter(
+                    # filter for object where trust (not just organisation) where case is registered is the same as that of user
+                    organisation = Organisation.objects.filter(
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentName=request.user.hospital_employer.ParentName
+                        ParentName=request.user.organisation_employer.ParentName
                     )
 
-                if hospital.exists() or user.is_rcpch_audit_team_member:
+                if organisation.exists() or user.is_rcpch_audit_team_member:
                     return view(request, *args, **kwargs)
                 else:
                     raise PermissionDenied()

@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% load static %} {% block content %}
 <div class="ui segment">
   <div class="ui container">
-    {% include '../forms/case_form.html' with form=form hospital_id=hospital_id hospital_trust=hospital_trust choices=choices hide_completion_fields=True %}
+    {% include '../forms/case_form.html' with form=form organisation_id=organisation_id organisation=organisation choices=choices hide_completion_fields=True %}
   </div>
 </div>
 {% endblock %}

@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/home/app/webapp
+      - .:/app/
     environment:
       # these env vars are ONLY for development
       - E12_POSTGRES_DB_USER=epilepsy12user
@@ -27,13 +27,23 @@ services:
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
+    # ensures that docker compose always displays log output
+    tty: true
+    stdin_open: true
   
   # db container - runs postgres
   db:
     image: postgres:latest
-    # volumes:
-    #   - ./data/db:/var/lib/postgresql/data
+    volumes:
+        - "auditenginedb:/var/lib/postgresql/data"
     environment:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=epilepsy12db
+      - TZ="Europe/London"
+    # ensures that docker compose always displays log output
+    tty: true
+    stdin_open: true
+
+volumes:
+  auditenginedb:

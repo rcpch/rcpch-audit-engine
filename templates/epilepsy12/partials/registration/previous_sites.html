@@ -13,12 +13,12 @@
                 </h5>
                 <ul>
                     {% for previously_registered_site in previously_registered_sites %}
-                        <li>{{previously_registered_site.hospital_trust.ParentName}} ({{previously_registered_site.hospital_trust.OrganisationName}})</li>
+                        <li>{{previously_registered_site.organisation.ParentName}} ({{previously_registered_site.organisation.OrganisationName}})</li>
                     {% endfor %}
                 </ul>
                     
             {% else %}
-            <p>No hospitals have previously led the care of {{registration.case}}</p>
+            <p>No organisations have previously led the care of {{registration.case}}</p>
             {% endif %}
             
 </div>

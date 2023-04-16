@@ -24,7 +24,7 @@ class CaseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Case
         fields = ['locked', 'locked_at', 'locked_by', 'nhs_number', 'first_name', 'surname', 'sex',
-                  'date_of_birth', 'postcode', 'ethnicity', 'index_of_multiple_deprivation_quintile', 'hospital_trusts']
+                  'date_of_birth', 'postcode', 'ethnicity', 'index_of_multiple_deprivation_quintile', 'organisations']
 
 
 def is_future_date(value):
@@ -118,7 +118,7 @@ class SyndromeSerializer(serializers.HyperlinkedModelSerializer):
         model = Syndrome
         multiaxial_diagnosis = serializers.PrimaryKeyRelatedField(
             queryset=MultiaxialDiagnosis.objects.all())
-        fields = ['syndrome_diagnosis_date', 'syndrome_name']
+        fields = ['syndrome_diagnosis_date', 'syndrome']
 
 
 class ComorbiditySerializer(serializers.HyperlinkedModelSerializer):
@@ -126,7 +126,7 @@ class ComorbiditySerializer(serializers.HyperlinkedModelSerializer):
         model = Comorbidity
         multiaxial_diagnosis = serializers.PrimaryKeyRelatedField(
             queryset=MultiaxialDiagnosis.objects.all())
-        fields = ['comorbidity_diagnosis_date', 'comorbidity_diagnosis']
+        fields = ['comorbidity_diagnosis_date', 'comorbidityentity']
 
 
 class InvestigationsSerializer(serializers.HyperlinkedModelSerializer):
@@ -172,15 +172,15 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         model = Site
         case = serializers.PrimaryKeyRelatedField(
             queryset=Case.objects.all())
-        hospital_trust = serializers.PrimaryKeyRelatedField(
-            queryset=HospitalTrust.objects.all())
+        organisation = serializers.PrimaryKeyRelatedField(
+            queryset=Organisation.objects.all())
         fields = ['site_is_actively_involved_in_epilepsy_care', 'site_is_primary_centre_of_epilepsy_care',
-                  'site_is_childrens_epilepsy_surgery_centre', 'site_is_paediatric_neurology_centre', 'site_is_general_paediatric_centre', 'case', 'hospital_trust', 'child_name']
+                  'site_is_childrens_epilepsy_surgery_centre', 'site_is_paediatric_neurology_centre', 'site_is_general_paediatric_centre', 'case', 'organisation', 'child_name']
 
 
-class HospitalTrustSerializer(serializers.HyperlinkedModelSerializer):
+class OrganisationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = HospitalTrust
+        model = Organisation
         fields = ['OrganisationID', 'OrganisationCode', 'OrganisationType', 'SubType', 'Sector', 'OrganisationStatus', 'IsPimsManaged', 'OrganisationName',
                   'Address1', 'Address2', 'Address3', 'City', 'County', 'Postcode', 'Latitude', 'Longitude', 'ParentODSCode', 'ParentName', 'Phone', 'Email', 'Website', 'Fax']
 

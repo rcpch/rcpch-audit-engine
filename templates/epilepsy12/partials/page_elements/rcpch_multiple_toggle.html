@@ -22,61 +22,64 @@
         {% load epilepsy12_template_tags %}
 
         <label class="toggle_button_label">{{label}}</label>
-        <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-
-            <span>
+        <div class="field multiple_toggle_buttons_wrapper" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                 {% if test_positive is None %}
-                    <div class="ui rcpch_dark_blue buttons">
-                        {% for choice in choices %}
-                            <div 
-                                {% if enabled %}
-                                    class="ui mini compact rcpch_dark_blue button"
-                                {% else %}
-                                    class="ui mini compact rcpch_dark_blue disabled button"
-                                {% endif %}
-                                hx-target="{{hx_target}}"
-                                hx-post="{{hx_post}}"
-                                hx-swap="{{hx_swap}}"
-                                hx-trigger='{{hx_trigger}}'
-                                name="{{choice.0}}"
-                            >
-                            {{choice.1}}
-                            </div>
-                        {% endfor %}
-                    </div>
-                        
-                {% else %}
-                
-                <div class="ui rcpch_dark_blue buttons">
-                    {% for choice in choices %}
-                            {% match_two_values test_positive choice.0 as match %}
-                            {% if match %}
-                                <div 
-                                    class="ui mini compact positive rcpch_dark_blue button"
-                                >{{choice.1}}</div>
-                            {% else %}
+                    
+                        <div class="column">
+                            {% for choice in choices %}
                                 <div
                                     {% if enabled %}
-                                        class="ui mini compact rcpch_dark_blue button"
+                                        class="ui   rcpch_dark_blue button"
                                     {% else %}
-                                        class="ui mini compact disabled rcpch_dark_blue button"
+                                        class="ui  rcpch_dark_blue disabled button"
                                     {% endif %}
                                     hx-target="{{hx_target}}"
                                     hx-post="{{hx_post}}"
                                     hx-swap="{{hx_swap}}"
                                     hx-trigger='{{hx_trigger}}'
                                     name="{{choice.0}}"
-                                >{{choice.1}}
-                                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+                                >
+                                {{choice.1}}
                                 </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+                            {% endfor %}
+                        </div>
+
+                        
+                {% else %}
+                
+
+                        {% for choice in choices %}
+                                {% match_two_values test_positive choice.0 as match %}
+                                {% if match %}
+                           
+                                        <button
+                                            class="ui  positive rcpch_dark_blue button"
+                                        >{{choice.1}}</button>
+                                    
+                                {% else %}
+
+                                            <button
+                                                {% if enabled %}
+                                                    class="ui  rcpch_dark_blue button"
+                                                {% else %}
+                                                    class="ui  disabled rcpch_dark_blue button"
+                                                {% endif %}
+                                                hx-target="{{hx_target}}"
+                                                hx-post="{{hx_post}}"
+                                                hx-swap="{{hx_swap}}"
+                                                hx-trigger='{{hx_trigger}}'
+                                                name="{{choice.0}}"
+                                            >{{choice.1}}
+                                            <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+                                            </button>
+
+
+                                {% endif %}
+                            {% endfor %}
+
 
                 {% endif %}
             
-            </span>
-
         </div>
         {% if not enabled %}
             <div class='ui rcpch_warning basic label'>You do not have permission to update this field</div>

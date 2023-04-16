@@ -1,41 +1,43 @@
 {% extends "base.html" %}  
 {% block content %}
 
-  <div class="ui container">
+  <div class="ui rcpch container">
 
     <div class='ui top attached rcpch_dark_blue clearing segment'>
-      <h5 class="ui left floated header">
-        Children and Young People
-      </h5>
-              
-
-      <h5 class="ui right floated header" id='cases_view_preference'>
-          {% include 'epilepsy12/partials/cases/view_preference.html' with hospital_trust=hospital_trust rcpch_choices=rcpch_choices test_positive=request.user.view_preference template_name='cases' hx_target='#cases_view_preference' %}
-      </h5>
-
+            <h5 class="ui left floated header">
+                Children and young people view
+              </h5>
     </div>
     <div class="ui raised attached segment">
-      <div id="case_table">
-        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated hospital_trust=hospital_trust %}
-      </div>
-      
       <div class="ui grid">
-        
-          <div class="twelve wide column">
-
-              <a href="{% url 'create_case' hospital_id %}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
+          
+        <div class="sixteen wide fluid column">
+          <div id='cases_view_preference'>
+            {% include 'epilepsy12/partials/cases/view_preference.html' with organisation=organisation rcpch_choices=rcpch_choices test_positive=request.user.view_preference template_name='cases' hx_target='#cases_view_preference' %}
+          </div>
+        </div>
+          
+        <div class="twelve wide column">
+            
+              <a href="{% url 'create_case' organisation_id %}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
               
               <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
-                <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' hospital_id=hospital_trust.pk %}" hx-swap="innerHTML">
+                <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
                 <i class="ui rcpch_light_blue circular search link icon"></i>
               </div>
-              
+  
+              <a href="{% url 'organisation_reports' %}"><button class="ui rcpch_positive button">Return to organisation view</button></a>
+                  
           </div>
           
           <div class="four wide column" id='case_statistics'>
-              {% include 'epilepsy12/partials/cases/case_statistics.html' with hospital_trust=hospital_trust total_cases=total_cases total_registrations=total_registrations %}
+              {% include 'epilepsy12/partials/cases/case_statistics.html' with organisation=organisation total_cases=total_cases total_registrations=total_registrations %}
           </div>
       </div>
+      <div id="case_table">
+        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated organisation=organisation %}
+      </div>
+      
     </div>
     <div class="ui bottom attached rcpch_footer message">
       <i class="warning info circle icon"></i>
