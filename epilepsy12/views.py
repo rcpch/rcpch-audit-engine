@@ -2,6 +2,7 @@
 # django
 from datetime import datetime
 from django.apps import apps
+from django.utils import timezone
 # from django.db.models import Case as DJANGO_CASE
 from django.conf import settings
 from django.contrib.auth import login, get_user_model, authenticate
@@ -52,12 +53,12 @@ def epilepsy12_login(request):
                     activity=1,
                     epilepsy12user=user
                 ).order_by('-activity_datetime')[:2]
-                if len(last_logged_in) > 0:
+                if last_logged_in.count() > 0:
                     messages.info(
-                        request, f"You are now logged in as {email}. You last logged in at {last_logged_in[1].activity_datetime.strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}")
+                        request, f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}")
                 else:
                     messages.info(
-                        request, f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({last_logged_in[0].activity_datetime.strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).")
+                        request, f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).")
                 return redirect("organisation_reports")
             else:
                 messages.error(request, "Invalid email or password.")

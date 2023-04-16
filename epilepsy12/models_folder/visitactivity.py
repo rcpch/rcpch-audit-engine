@@ -34,3 +34,6 @@ class VisitActivity(models.Model):
         "epilepsy12.Epilepsy12User",
         on_delete=models.CASCADE
     )
+
+    def __str__(self) -> str:
+        return f'{self.epilepsy12user} on {self.activity_datetime}'
