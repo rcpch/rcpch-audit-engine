@@ -1,3 +1,5 @@
+from dateutil import relativedelta
+from datetime import date
 from django_htmx.http import trigger_client_event
 from django.shortcuts import render
 from psycopg2 import DatabaseError
@@ -210,12 +212,15 @@ def total_fields_expected(model_instance):
 
                     cumulative_score += 3
 
-                    if hasattr(medicine, "medicine_entity") and model_instance.registration.case.sex == 2:
+                    today = date.today()
+                    calculated_age = relativedelta.relativedelta(
+                        today, model_instance.registration.case.date_of_birth)
+
+                    if hasattr(medicine, "medicine_entity") and model_instance.registration.case.sex == 2 and calculated_age.years >= 12:
                         if medicine.medicine_entity is not None:
                             if medicine.medicine_entity.medicine_name == 'Sodium valproate':
                                 # essential fields are:
-                                # 'is_a_pregnancy_prevention_programme_needed'
-                                cumulative_score += 1
+                                # 'is_a_pregnancy_prevention_programme_needed' - this is not scored
                                 if medicine.is_a_pregnancy_prevention_programme_needed:
                                     # essential fields are:
                                     # 'is_a_pregnancy_prevention_programme_in_place, 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
@@ -278,9 +283,11 @@ def avoid_fields(model_instance):
     elif model_class_name == 'Episode':
         return ['id', 'multiaxial_diagnosis', 'description_keywords', 'created_by', 'created_at', 'updated_by', 'updated_at', 'expected_score', 'calculated_score']
     elif model_class_name == 'AntiEpilepsyMedicine':
-        return ['id', 'management', 'is_rescue_medicine', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date']
+        return ['id', 'management', 'is_rescue_medicine', 'created_by', 'created_at', 'updated_by', 'updated_at', 'antiepilepsy_medicine_stop_date', 'is_a_pregnancy_prevention_programme_needed']
     elif model_class_name == 'Registration':
         return ['id', 'management', 'assessment', 'investigations', 'multiaxialdiagnosis', 'registration', 'epilepsycontext', 'firstpaediatricassessment', 'registration_close_date', 'registration_date_one_year_on', 'audit_submission_date', 'cohort', 'case', 'audit_progress', 'created_by', 'created_at', 'updated_by', 'updated_at', 'kpi']
+    elif model_class_name == 'MedicineEntity':
+        return ['id', 'conceptId', 'term', 'preferredTerm', 'description', 'snomed_ct_edition', 'snomed_ct_version', 'icd_code', 'cd_version', 'dsm_code', 'dsm_version', 'is_rescue', 'history']
     else:
         raise ValueError(
             f'Form scoring error: {model_class_name} not found to return fields to avoid in form calculation.')
@@ -480,9 +487,12 @@ def number_of_completed_fields_in_related_models(model_instance):
             if medicines.count() > 0:
                 for medicine in medicines:
                     # essential fields are:
-                    # medicine_name', 'antiepilepsy_medicine_start_date',
-                    # 'antiepilepsy_medicine_stop_date', 'antiepilepsy_medicine_risk_discussed'
-                    cumulative_score += completed_fields(medicine)
+                    # medicineentity_medicine_name', 'antiepilepsy_medicine_start_date',
+                    # 'antiepilepsy_medicine_risk_discussed', and if valproate prescribed
+                    # in a girl > 12y, 'is_a_pregnancy_prevention_programme_in_place'
+                    # 'has_a_valproate_annual_risk_acknowledgement_form_been_completed'
+                    cumulative_score += completed_fields(
+                        medicine)
 
         if model_instance.has_rescue_medication_been_prescribed:
             # rescue drugs
@@ -495,7 +505,8 @@ def number_of_completed_fields_in_related_models(model_instance):
                     # essential fields are:
                     # medicine_name', 'antiepilepsy_medicine_start_date',
                     # 'antiepilepsy_medicine_risk_discussed'
-                    cumulative_score += completed_fields(medicine)
+                    cumulative_score += completed_fields(
+                        medicine)
 
     elif model_instance.__class__.__name__ == 'Registration':
         # also need to count associate record in Site
