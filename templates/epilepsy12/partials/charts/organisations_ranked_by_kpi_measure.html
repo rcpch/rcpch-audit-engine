@@ -19,7 +19,7 @@
     var myChart = new Chart(document.getElementById('{{data_id}}'), {
       type: 'bar',
       data: {
-        labels: [{% for item in data %}'{{ item.region.1|split_label_to_list  }}',{% endfor %}],
+        labels: [{% for item in data %}'{% split_label_to_list item.region.1|escapejs %}',{% endfor %}],
         datasets: [
         {
             type: 'line',
@@ -57,15 +57,16 @@
         },
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            grid: {
+              display: false,
+            }
           },
           x: 
             {
-                // ticks: {
-                //             autoSkip: true,
-                //             maxRotation: 90,
-                //             minRotation: 90,
-                //         }
+              ticks: {
+                stepSize: 1
+              },
             }
           
         }

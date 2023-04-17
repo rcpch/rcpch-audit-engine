@@ -65,13 +65,13 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         # )]
     )  # TODO #13 NHS Number must be hidden - use case_uuid as proxy
     first_name = CharField(
-        "first name",
+        "First name",
         max_length=100,
         blank=True,
         null=True,
     )
     surname = CharField(
-        "surname",
+        "Surname",
         max_length=100,
         blank=True,
         null=True,

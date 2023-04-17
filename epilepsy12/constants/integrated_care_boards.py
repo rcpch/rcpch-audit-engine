@@ -3993,7 +3993,7 @@ OPEN_UK_NETWORKS = [
     },
     {
         "ods trust code": "RDR",
-        "OPEN UK Network Name": "SSouth East Thames Paediatric Epilepsy Group",
+        "OPEN UK Network Name": "South East Thames Paediatric Epilepsy Group",
         "OPEN UK Network Code": "SETPEG",
         "country": "England"
     },

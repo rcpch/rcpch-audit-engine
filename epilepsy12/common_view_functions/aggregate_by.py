@@ -63,6 +63,19 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         .order_by('cases_aggregated_by_deprivation')
     )
 
+    # map quintile num to string repr
+    deprivation_quintile_str_map = {
+        1 : '1st quintile',
+        2 : '2nd quintile',
+        3 : '3rd quintile',
+        4 : '4th quintile',
+        5 : '5th quintile',
+    }
+    
+    for q in cases_aggregated_by_deprivation:
+        q['index_of_multiple_deprivation_quintile_display'] = deprivation_quintile_str_map[q['index_of_multiple_deprivation_quintile_display']]
+
+
     return cases_aggregated_by_deprivation
 
 

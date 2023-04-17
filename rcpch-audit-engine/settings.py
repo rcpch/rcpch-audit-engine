@@ -15,6 +15,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 import sys
+import datetime
 
 # third party imports
 from django.core.management.utils import get_random_secret_key
@@ -76,10 +77,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware'
+    'simple_history.middleware.HistoryRequestMiddleware',
+    'django_auto_logout.middleware.auto_logout',
 ]
 
 ROOT_URLCONF = 'rcpch-audit-engine.urls'
+
+# AUTO LOGOUT SESSION EXPIRATION
+AUTO_LOGOUT = {
+    'IDLE_TIME': datetime.timedelta(minutes=30),
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
+    'MESSAGE': 'You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.',
+}
 
 LOGIN_REDIRECT_URL = "/organisation"
 LOGOUT_REDIRECT_URL = "/"
@@ -96,6 +105,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_auto_logout.context_processors.auto_logout_client',
+                'rcpch-audit-engine.context_processors.export_vars',
             ]
         }
     },
@@ -170,6 +181,7 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)

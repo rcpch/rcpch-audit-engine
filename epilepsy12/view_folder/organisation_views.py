@@ -412,7 +412,6 @@ def selected_trust_select_kpi(request, organisation_id):
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='country', kpi_measure=kpi_name)
-
     context = {
         'kpi_name': kpi_name,
         'kpi_value': kpi_value,
@@ -432,16 +431,16 @@ def selected_trust_select_kpi(request, organisation_id):
         'national_kpi': national_kpi[kpi_name],
         'total_national_kpi_cases': national_kpi['total_number_of_cases'],
         'open_uk': all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-        'open_uk_title': f'{kpi_value} by against OPEN UK Region',
+        'open_uk_title': f'{kpi_value} by OPEN UK Region',
         'open_uk_id': 'open_uk_id',
         'icb': all_aggregated_kpis_by_icb_in_current_cohort,
         'icb_title': f'{kpi_value} by Integrated Care Board',
         'icb_id': 'icb_id',
         'nhs_region': all_aggregated_kpis_by_nhs_region_in_current_cohort,
-        'nhs_region_title': f'{kpi_value} by against NHS Region',
+        'nhs_region_title': f'{kpi_value} by NHS Region',
         'nhs_region_id': 'nhs_region_id',
         'country': all_aggregated_kpis_by_country_in_current_cohort,
-        'country_title': f'{kpi_value} by against Country',
+        'country_title': f'{kpi_value} by Country',
         'country_id': 'country_id'
     }
 
