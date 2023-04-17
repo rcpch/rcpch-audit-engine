@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("epilepsy12", "0085_create_foreign_keys_for_existing_meds"),
+        ("epilepsy12", "0084_create_foreign_keys_for_existing_meds"),
     ]
 
     operations = [
