@@ -53,7 +53,7 @@ def epilepsy12_login(request):
                     activity=1,
                     epilepsy12user=user
                 ).order_by('-activity_datetime')[:2]
-                if last_logged_in.count() > 0:
+                if last_logged_in.count() > 1:
                     messages.info(
                         request, f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}")
                 else:

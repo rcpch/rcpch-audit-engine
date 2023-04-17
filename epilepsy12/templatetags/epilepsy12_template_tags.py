@@ -65,12 +65,13 @@ def kpi_average_for_kpi_name(aggregated_kpi, kpi_name):
         return aggregated_kpi['aggregated_kpis'][f'{kpi_name}_average']
 
 
-@register.filter
-def split_label_to_list(label):
+@register.simple_tag
+def formatlabel(label):
     if label is None:
         return 'Unclassified'
     else:
-        nhs_icb_string = re.search(r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)',label)
+        nhs_icb_string = re.search(
+            r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)', label)
         if nhs_icb_string:
             return nhs_icb_string.group(2).title()
         return label
@@ -320,4 +321,3 @@ def icon_for_score(score):
                 _="init js $('.rcpch.dot.circle.icon').popup(); end"
                 ></i>
                 """)
-
