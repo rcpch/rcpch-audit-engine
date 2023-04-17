@@ -23,7 +23,7 @@ jobs:
       # Creates git_hash.txt file current commit hash
       - name: Get Hash
         id: hash
-        run: echo 'GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")' > git_hash.txt
+        run: echo "GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
 
       - name: Set up Python version
         uses: actions/setup-python@v4
