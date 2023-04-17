@@ -1584,48 +1584,6 @@ table.ui.rcpch.table.cases_table tbody {
   text-align: center;
 }
 
-.progress_label {
-  font-family: var(--rcpch_bold_font);
-}
-
-.ui.tab.segment {
-  background: none #FFFFFF;
-  border-color: var(--rcpch_light_blue);
-  border-width: medium;
-  margin: -1px 0px 0px 0px;
-  border-radius: 0px 0px 0 0 !important;
-}
-
-.ui.tabular.menu .active.item {
-  background: none #FFFFFF;
-  border-top-width: medium;
-  border-left-width: medium;
-  border-right-width: medium;
-  border-color: var(--rcpch_light_blue);
-  font-weight: bold;
-  margin-bottom: -2.5px;
-  box-shadow: none;
-  border-radius: 0px 0px 0px 0px !important;
-}
-
-.ui.tabular.menu .item {
-  background: transparent;
-  border-bottom: none;
-  border-left: medium solid transparent;
-  border-right: medium solid transparent;
-  border-top: medium solid transparent;
-  padding: 0.92857143em 1.42857143em;
-  color: var(--rcpch_light_blue);
-}
-
-.ui.tabular.menu {
-  border-radius: 0em;
-  box-shadow: none !important;
-  border: none;
-  background: none transparent;
-  border-bottom: 2.5px solid var(--rcpch_light_blue);
-}
-
 div.ui.three.stackable.cards.individual_measures{
   margin-top: 1em;
 }
