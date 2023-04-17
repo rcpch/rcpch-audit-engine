@@ -19,7 +19,7 @@
                     {% if comorbidity.comorbidity_diagnosis_date %}
                         {{comorbidity.comorbidity_diagnosis_date}}
                     {% else %}
-                        <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <span data-tooltip="Incomplete field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
                         </span>
                         None
@@ -29,7 +29,7 @@
                     {% if comorbidity.comorbidityentity %}
                         {{comorbidity.comorbidityentity.preferredTerm}} ({{comorbidity.comorbidityentity.term }})
                     {% else %}
-                        <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+                        <span data-tooltip="Incomplete field. This must be scored to complete the record." data-inverted="" data-position="top left">
                             <i class="rcpch_light_blue dot circle outline icon"></i>
                         </span>
                         None
@@ -72,7 +72,7 @@
         </table>
     {% else %}
         <div class='field'>
-            <span data-tooltip="Incompleted field. This must be scored to complete the record." data-inverted="" data-position="top left">
+            <span data-tooltip="Incomplete field. This must be scored to complete the record." data-inverted="" data-position="top left">
                 <i class="rcpch_light_blue dot circle outline icon"></i>
             </span>
             There are no documented comorbidities so far...
