@@ -1605,3 +1605,10 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   justify-content: space-evenly;
   align-items: center;
 }
+
+.org_view_all_buttons_wrapper a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
