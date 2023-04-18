@@ -899,6 +899,10 @@ div.ui.card > div.content > div.organisation_address_container {
   margin-bottom: 0.5em;
 }
 
+.rcpch_steps_wrapper a {
+  flex-wrap: nowrap !important;
+}
+
 /* radial progress */
 
 /* (thanks to Keith Clark on codepen for the ideas behind this implementation: https://codepen.io/keithclark/pen/aEbEoo */
