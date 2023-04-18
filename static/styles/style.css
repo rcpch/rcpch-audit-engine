@@ -1404,12 +1404,23 @@ a label {
   margin-top: 1em;
 }
 
-img.ui.spaced.avatar.image {
+.rcpch_team_member_image_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rcpch_team_member_image_wrapper > * {
+  margin: 0 2px;
+}
+
+img.ui.image.rcpch_member_image {
   border-color: var(--rcpch_pink);
-  border-width: 3px;
+  border-width: 2px;
   background-color: var(--rcpch_pink);
   border-style: solid;
 }
+
 
 .star.outline.icon {
   color: var(--rcpch_pink);
