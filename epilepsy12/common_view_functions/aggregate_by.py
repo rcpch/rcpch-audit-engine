@@ -73,7 +73,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
     }
 
     for q in cases_aggregated_by_deprivation:
-        if q in range(1, 6):
+        if q['index_of_multiple_deprivation_quintile_display'] in range(1, 6):
             q['index_of_multiple_deprivation_quintile_display'] = deprivation_quintile_str_map[q['index_of_multiple_deprivation_quintile_display']]
 
     return cases_aggregated_by_deprivation
