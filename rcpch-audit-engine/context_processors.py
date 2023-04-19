@@ -8,7 +8,7 @@ def export_vars(request):
     try:
         with open('git_hash.txt', 'r') as f:
             
-            git_hash, git_branch = f.read().split(',')
+            git_branch, git_hash = f.read().split(',')
             git_hash = git_hash.replace('GIT_HASH=','')
             git_branch = git_branch.replace('GIT_BRANCH=','')
             print(f"{git_hash = }, {git_branch = }")
