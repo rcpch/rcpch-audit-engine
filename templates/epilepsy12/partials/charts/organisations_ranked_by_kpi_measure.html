@@ -29,7 +29,7 @@
           label: 'Average'
         },
         {
-          label: 'Number of Health Boards/Trusts Achieving this measure',
+          label: 'Percentage achieving this measure',
           data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
           borderWidth: 1,
           backgroundColor: [
@@ -72,12 +72,11 @@
         },
         x:
           {
-            ticks: {
-              stepSize: 1
-            },
+            min: 0,
+            max: 100,
             title : {
               display: true,
-              text: 'Number of Health Boards/Trusts Achieving this measure',
+              text: 'Percentage of Health Boards/Trusts Achieving this measure',
             }
           }
 

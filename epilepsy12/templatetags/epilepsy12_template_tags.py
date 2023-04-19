@@ -54,7 +54,8 @@ def kpi_for_kpi_name(aggregated_kpi, kpi_name):
     if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
         return 0
     else:
-        return aggregated_kpi['aggregated_kpis'][kpi_name]
+        pct = 100*aggregated_kpi['aggregated_kpis'][kpi_name] / aggregated_kpi['aggregated_kpis']['total_number_of_cases']
+        return pct
 
 
 @register.simple_tag
