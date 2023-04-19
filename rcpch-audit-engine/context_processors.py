@@ -1,4 +1,5 @@
-import os 
+import os
+
 
 def export_vars(request):
     """
@@ -7,12 +8,16 @@ def export_vars(request):
     # Load the txt file containing hash
     try:
         with open('git_hash.txt', 'r') as f:
-            git_hash = f.read().replace('GIT_HASH=','')
+
+            git_branch, git_hash = f.read().split(',')
+
+            git_hash = git_hash.replace('GIT_HASH=', '')
+            git_branch = git_branch.replace('GIT_BRANCH=', '')
 
             # if file is empty
             if not git_hash:
                 git_hash = 'Empty commit file'
-                
+
     except FileNotFoundError:
         git_hash = 'No commit hash found! Ignore if running locally.'
-    return {'GIT_HASH': git_hash}
+    return {'GIT_HASH': git_hash, 'GIT_BRANCH': git_branch}

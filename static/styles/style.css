@@ -899,6 +899,10 @@ div.ui.card > div.content > div.organisation_address_container {
   margin-bottom: 0.5em;
 }
 
+.rcpch_steps_wrapper a {
+  flex-wrap: nowrap !important;
+}
+
 /* radial progress */
 
 /* (thanks to Keith Clark on codepen for the ideas behind this implementation: https://codepen.io/keithclark/pen/aEbEoo */
@@ -1404,12 +1408,23 @@ a label {
   margin-top: 1em;
 }
 
-img.ui.spaced.avatar.image {
+.rcpch_team_member_image_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rcpch_team_member_image_wrapper > * {
+  margin: 0 2px;
+}
+
+img.ui.image.rcpch_member_image {
   border-color: var(--rcpch_pink);
-  border-width: 3px;
+  border-width: 2px;
   background-color: var(--rcpch_pink);
   border-style: solid;
 }
+
 
 .star.outline.icon {
   color: var(--rcpch_pink);
@@ -1604,4 +1619,11 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
+}
+
+.org_view_all_buttons_wrapper a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }

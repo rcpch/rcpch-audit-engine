@@ -54,7 +54,8 @@ def kpi_for_kpi_name(aggregated_kpi, kpi_name):
     if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
         return 0
     else:
-        return aggregated_kpi['aggregated_kpis'][kpi_name]
+        pct = 100*aggregated_kpi['aggregated_kpis'][kpi_name] / aggregated_kpi['aggregated_kpis']['total_number_of_cases']
+        return pct
 
 
 @register.simple_tag
@@ -73,7 +74,8 @@ def formatlabel(label):
         nhs_icb_string = re.search(
             r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)', label)
         if nhs_icb_string:
-            return nhs_icb_string.group(2).title()
+            # \u002D fixes hyphen render for 'Stoke-on-trent'
+            return nhs_icb_string.group(2).replace(r'\u002D','-').title()
         return label
 
 
