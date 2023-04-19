@@ -42,7 +42,8 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         (2, 2),
         (3, 3),
         (4, 4),
-        (5, 5)
+        (5, 5),
+        (None, 6)
     )
 
     imd_long_list = [When(index_of_multiple_deprivation_quintile=k, then=Value(v))
@@ -60,7 +61,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         .values('index_of_multiple_deprivation_quintile_display')
         .annotate(
             cases_aggregated_by_deprivation=Count('index_of_multiple_deprivation_quintile'))
-        .order_by('cases_aggregated_by_deprivation')
+        .order_by('index_of_multiple_deprivation_quintile')
     )
 
     # map quintile num to string repr
@@ -70,11 +71,12 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         3: '3rd quintile',
         4: '4th quintile',
         5: '5th quintile',
+        6: 'Not known'
     }
 
-    for q in cases_aggregated_by_deprivation:
-        if q['index_of_multiple_deprivation_quintile_display'] in range(1, 6):
-            q['index_of_multiple_deprivation_quintile_display'] = deprivation_quintile_str_map[q['index_of_multiple_deprivation_quintile_display']]
+    for index, q in enumerate(cases_aggregated_by_deprivation):
+        q['index_of_multiple_deprivation_quintile_display'] = deprivation_quintile_str_map.get(
+            q.get('index_of_multiple_deprivation_quintile_display'))
 
     return cases_aggregated_by_deprivation
 
