@@ -73,7 +73,8 @@ def formatlabel(label):
         nhs_icb_string = re.search(
             r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)', label)
         if nhs_icb_string:
-            return nhs_icb_string.group(2).title()
+            # \u002D fixes hyphen render for 'Stoke-on-trent'
+            return nhs_icb_string.group(2).replace(r'\u002D','-').title()
         return label
 
 
