@@ -3,7 +3,7 @@ name: Build and deploy Python app to Azure Web App - epilepsy12
 on:
   push:
     branches:
-      - fixing_misc_issues
+      - *
   workflow_dispatch:
 
 
