@@ -20,4 +20,5 @@ def export_vars(request):
 
     except FileNotFoundError:
         git_hash = 'No commit hash found! Ignore if running locally.'
+        git_branch= 'No branch found!'
     return {'GIT_HASH': git_hash, 'GIT_BRANCH': git_branch}
