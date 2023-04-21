@@ -50,6 +50,7 @@ POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
 
 INSTALLED_APPS = [
     "semantic_admin",
+    "'django.contrib.gis'",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -125,7 +126,7 @@ WSGI_APPLICATION = 'rcpch-audit-engine.wsgi.application'
 
 DATABASES = {
     "default": {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
         'USER': os.environ.get('E12_POSTGRES_DB_USER'),
         'PASSWORD': os.environ.get('E12_POSTGRES_DB_PASSWORD'),

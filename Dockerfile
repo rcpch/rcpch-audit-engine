@@ -16,6 +16,10 @@ WORKDIR /app/requirements/
 RUN pip install --upgrade pip 
 RUN pip install -r /app/requirements/development-requirements.txt
 
+# Setup GDAL
+RUN apt-get update &&\
+    apt-get install -y binutils libproj-dev gdal-bin python-gdal python3-gdal
+
 # Set working directory back to main app
 WORKDIR /app/
 
