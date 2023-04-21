@@ -401,22 +401,22 @@ def selected_trust_select_kpi(request, organisation_id):
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='open_uk', kpi_measure=kpi_name)
     open_uk_avg = calculate_kpi_average(
-        kpi_data=all_aggregated_kpis_by_open_uk_region_in_current_cohort, kpi=kpi_name)
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_open_uk_region_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
     nhs_region_avg = calculate_kpi_average(
-        kpi_data=all_aggregated_kpis_by_nhs_region_in_current_cohort, kpi=kpi_name)
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_nhs_region_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='icb', kpi_measure=kpi_name)
     icb_avg = calculate_kpi_average(
-        kpi_data=all_aggregated_kpis_by_icb_in_current_cohort, kpi=kpi_name)
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_icb_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='country', kpi_measure=kpi_name)
     country_avg = calculate_kpi_average(
-        kpi_data=all_aggregated_kpis_by_country_in_current_cohort, kpi=kpi_name)
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_country_in_current_cohort, kpi=kpi_name)
 
     context = {
         'kpi_name': kpi_name,
@@ -454,6 +454,8 @@ def selected_trust_select_kpi(request, organisation_id):
         'country_id': 'country_id',
     }
 
+    print(context['icb'])
+    
     template_name = 'epilepsy12/partials/organisation/metric.html'
 
     return render(request=request, template_name=template_name, context=context)

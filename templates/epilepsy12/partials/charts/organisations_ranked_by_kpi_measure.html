@@ -13,23 +13,18 @@
   var rcpch_vivid_green='#c8d400';
   var rcpch_aqua_green='#00dbaa';
   var rcpch_purple='#7159aa';
-  var rcpch_magenta='#E00087';
+  var rcpch_dark_blue='#0d0d58';
   var rcpch_strong_green='#66cc33';
   var rcpch_dark_red='#9a0500';
+  var rcpch_pink='#e00087';
+  var rcpch_pink_transparent='rgba(224, 0, 134, 0.45)';
   var myChart = new Chart(document.getElementById('{{data_id}}'), {
     type: 'bar',
     data: {
       labels: [{% for item in data %}'{% formatlabel item.region.1|escapejs %}',{% empty %}"Empty",{% endfor %}],
       datasets: [
-      {
-          type: 'line',
-          data: [{% for val in data %}{% kpi_average_for_kpi_name val kpi_name %},{% endfor %}],
-          borderColor: '#000000',
-          backgroundColor: '#000000',
-          label: 'Average'
-        },
         {
-          label: 'Percentage achieving this measure',
+          label: '% achieving measure',
           data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
           borderWidth: 1,
           backgroundColor: [
@@ -40,11 +35,11 @@
               rcpch_vivid_green,
               rcpch_aqua_green,
               rcpch_purple,
-              rcpch_magenta,
+              rcpch_dark_blue,
               rcpch_strong_green,
               rcpch_dark_red
           ]
-        }
+        },
       ]
     },
     options: {
@@ -60,8 +55,35 @@
             filter: function (legendItem, chartData) {
               return legendItem.datasetIndex !== 1;
             },
-        }
-        }
+          },
+          display: false,
+        },
+        annotation: {
+          annotations: {
+            line1: {
+              type: 'line',
+              xMin:{{avg_pct}},
+              xMax:{{avg_pct}},
+              borderColor: rcpch_pink,
+              borderWidth: 5,
+              label: {
+                    content: 'hello',
+                    enabled: true,
+                    // position: 'start',
+                    // yOffset: 10,
+                },
+            },
+            label1: {
+              type: 'label',
+              xValue: {{avg_pct}}+10,
+              backgroundColor: rcpch_pink_transparent,
+              content: ['Average: {{avg_pct}}%'],
+              font: {
+                size: 12
+              }
+            }
+          }
+    }
       },
       scales: {
         y: {
