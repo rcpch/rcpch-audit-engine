@@ -23,3 +23,5 @@ from .syndrome_entity import SyndromeEntity
 from .epilepsy_cause_entity import EpilepsyCauseEntity
 from .comorbidy_entity import ComorbidityEntity
 from .medicine_entity import MedicineEntity
+from .open_uk_network_entity import OPENUKNetworkEntity
+from .integrated_care_board_entity import IntegratedCareBoardEntity
