@@ -14,7 +14,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, Organisation, KPI
 from ..common_view_functions import trigger_client_event, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level, aggregate_all_eligible_kpi_fields, return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel
-from ..general_functions import get_current_cohort_data, value_from_key
+from ..general_functions import get_current_cohort_data, value_from_key, calculate_kpi_average
 
 
 @login_required
@@ -400,18 +400,24 @@ def selected_trust_select_kpi(request, organisation_id):
 
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='open_uk', kpi_measure=kpi_name)
+    open_uk_avg = calculate_kpi_average(
+        kpi_data=all_aggregated_kpis_by_open_uk_region_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
-
-    all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
+    nhs_region_avg = calculate_kpi_average(
+        kpi_data=all_aggregated_kpis_by_nhs_region_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='icb', kpi_measure=kpi_name)
+    icb_avg = calculate_kpi_average(
+        kpi_data=all_aggregated_kpis_by_icb_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='country', kpi_measure=kpi_name)
+    country_avg = calculate_kpi_average(
+        kpi_data=all_aggregated_kpis_by_country_in_current_cohort, kpi=kpi_name)
+
     context = {
         'kpi_name': kpi_name,
         'kpi_value': kpi_value,
@@ -431,17 +437,21 @@ def selected_trust_select_kpi(request, organisation_id):
         'national_kpi': national_kpi[kpi_name],
         'total_national_kpi_cases': national_kpi['total_number_of_cases'],
         'open_uk': all_aggregated_kpis_by_open_uk_region_in_current_cohort,
+        'open_uk_avg' : open_uk_avg,
         'open_uk_title': f'{kpi_value} by OPEN UK Region',
         'open_uk_id': 'open_uk_id',
         'icb': all_aggregated_kpis_by_icb_in_current_cohort,
+        'icb_avg' : icb_avg,
         'icb_title': f'{kpi_value} by Integrated Care Board',
         'icb_id': 'icb_id',
         'nhs_region': all_aggregated_kpis_by_nhs_region_in_current_cohort,
+        'nhs_region_avg' : nhs_region_avg,
         'nhs_region_title': f'{kpi_value} by NHS Region',
         'nhs_region_id': 'nhs_region_id',
         'country': all_aggregated_kpis_by_country_in_current_cohort,
+        'country_avg': country_avg,
         'country_title': f'{kpi_value} by Country',
-        'country_id': 'country_id'
+        'country_id': 'country_id',
     }
 
     template_name = 'epilepsy12/partials/organisation/metric.html'
