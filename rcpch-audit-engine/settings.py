@@ -50,7 +50,7 @@ POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
 
 INSTALLED_APPS = [
     "semantic_admin",
-    "'django.contrib.gis'",
+    "django.contrib.gis",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
