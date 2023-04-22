@@ -3,9 +3,9 @@ from django.db import models
 # 3rd party
 from simple_history.models import HistoricalRecords
 # rcpch
-from .help_text_mixin import HelpTextMixin
-from ..constants import SYNDROMES
-from .time_and_user_abstract_base_classes import *
+from ..help_text_mixin import HelpTextMixin
+from ...constants import SYNDROMES
+from ..time_and_user_abstract_base_classes import *
 
 
 class SyndromeEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):

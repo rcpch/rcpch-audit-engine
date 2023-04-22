@@ -3,7 +3,7 @@ from django.db import models
 # 3rd party
 from simple_history.models import HistoricalRecords
 # rcpch
-from .time_and_user_abstract_base_classes import *
+from ..time_and_user_abstract_base_classes import *
 
 
 class Organisation(models.Model):
@@ -234,6 +234,26 @@ class Organisation(models.Model):
     )
 
     history = HistoricalRecords()
+
+    nhs_region = models.ForeignKey(
+        'epilepsy12.NHSRegionEntity',
+        on_delete=models.PROTECT
+    )
+
+    integrated_care_board = models.ForeignKey(
+        'epilepsy12.IntegratedCareBoardEntity',
+        on_delete=models.PROTECT
+    )
+
+    country_ons_region = models.ForeignKey(
+        'epilepsy12.CountryONSRegionEntity',
+        on_delete=models.PROTECT
+    )
+
+    openuk_network = models.ForeignKey(
+        'epilepsy12.OPENUKNetworkEntity',
+        on_delete=models.PROTECT
+    )
 
     @property
     def _history_user(self):

@@ -1,25 +1,20 @@
+
 # django
 from django.db import models
+
 # 3rd party
 from simple_history.models import HistoricalRecords
+
 # rcpch
-from .help_text_mixin import HelpTextMixin
-from .time_and_user_abstract_base_classes import *
+from ..time_and_user_abstract_base_classes import *
 
 
-class MedicineEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
+class EpilepsyCauseEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
-    This class stores information on each medicine and serves as a look up for the medicine link table
+    The model holds the look up values for all epilepsy causes
+    It is seeded from SNOMED CT, and updated periodically
+    Date of update is stored by the mixin in updated_at
     """
-    medicine_name = models.CharField(
-        help_text={
-            'label': "Medicine Name",
-            'reference': "Please enter the medicine.",
-        },
-        null=True,
-        blank=True,
-        default=None
-    )
     conceptId = models.CharField(
         default=None,
         null=True,
@@ -70,11 +65,6 @@ class MedicineEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
         null=True,
         blank=True
     )
-    is_rescue = models.BooleanField(
-        default=None,
-        null=True,
-        blank=True
-    )
 
     history = HistoricalRecords()
 
@@ -87,8 +77,8 @@ class MedicineEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, Hel
         self.updated_by = value
 
     class Meta:
-        verbose_name = "MedicineEntity"
-        verbose_name_plural = "MedicineEntities"
+        verbose_name = "Epilepsy Cause"
+        verbose_name_plural = "Epilepsy Causes"
 
     def __str__(self) -> str:
-        return f'{self.medicine_name}'
+        return self.preferredTerm

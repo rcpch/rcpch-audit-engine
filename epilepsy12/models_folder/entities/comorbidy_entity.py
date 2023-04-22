@@ -1,19 +1,17 @@
-
 # django
 from django.db import models
 
 # 3rd party
 from simple_history.models import HistoricalRecords
 
-# rcpch
-from .time_and_user_abstract_base_classes import *
+# RCPCH
+from ..time_and_user_abstract_base_classes import *
 
 
-class EpilepsyCauseEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
+class ComorbidityEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
-    The model holds the look up values for all epilepsy causes
-    It is seeded from SNOMED CT, and updated periodically
-    Date of update is stored by the mixin in updated_at
+    This class records information on all mental health, behavioural and developmental comorbidities
+    It is a lookup table for the Comorbidity table
     """
     conceptId = models.CharField(
         default=None,
@@ -77,8 +75,8 @@ class EpilepsyCauseEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         self.updated_by = value
 
     class Meta:
-        verbose_name = "Epilepsy Cause"
-        verbose_name_plural = "Epilepsy Causes"
+        verbose_name = "ComorbidityEntity"
+        verbose_name_plural = "ComorbidityEntities"
 
     def __str__(self) -> str:
-        return self.preferredTerm
+        return f'{self.preferredTerm}'
