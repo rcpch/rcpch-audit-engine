@@ -21,3 +21,4 @@ from .irish_organisations import *
 from .scottish_organisations import *
 from .postcodes import UNKNOWN_POSTCODES, UNKNOWN_POSTCODES_NO_SPACES
 from .rcpch_organisations import *
+from .severity import *
