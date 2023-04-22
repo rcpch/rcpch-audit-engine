@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 # 3rd party
 from simple_history.models import HistoricalRecords
 # rcpch
-from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
+from epilepsy12.constants import NEUROPSYCHIATRIC, SEVERITY
 from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
@@ -60,6 +60,38 @@ class MultiaxialDiagnosis(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
         default=None,
         blank=True,
         null=True
+    )
+
+    global_developmental_delay_or_learning_difficulties = models.BooleanField(
+        help_text={
+            "label": "Has global developmental delay (under 5 years) or learning disability/intellectual disability (over 5 years) been identified?",
+            "reference": "Has global developmental delay (under 5 years) or learning disability/intellectual disability (over 5 years) been identified?"
+        },
+        default=None,
+        blank=True,
+        null=True
+    )
+
+    global_developmental_delay_or_learning_difficulties_severity = models.CharField(
+        choices=SEVERITY,
+        help_text={
+            "label": "Add details on the severity of the neurodevelopmental condition.",
+            "reference": "Add details on the severity of the neurodevelopmental condition."
+        },
+        default=None,
+        blank=True,
+        null=True
+    )
+
+    autistic_spectrum_disorder = models.BooleanField(
+        help_text={
+            "label": "Has there been a diagnosis of autistic spectrum disorder?",
+            "reference": "Has there been a diagnosis of autistic spectrum disorder?"
+        },
+        default=None,
+        blank=True,
+        null=True
+
     )
 
     mental_health_screen = models.BooleanField(
