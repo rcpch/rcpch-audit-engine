@@ -369,7 +369,7 @@ def update_case(request, organisation_id, case_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ993CZ', 'Address unspecified - England')
-    if organisation.Country == 'Wales':
+    if organisation.ons_region.ons_country.Country_ONS_Name == 'Wales':
         country_choice = ('ZZ993GZ', 'Address unspecified - Wales')
 
     choices = (
