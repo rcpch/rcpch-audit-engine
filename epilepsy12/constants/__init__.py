@@ -22,3 +22,8 @@ from .scottish_organisations import *
 from .postcodes import UNKNOWN_POSTCODES, UNKNOWN_POSTCODES_NO_SPACES
 from .rcpch_organisations import *
 from .severity import *
+from .welsh_regions import *
+from .open_uk_networks import *
+from .country_codes import *
+from .nhs_england_regions import *
+from .uk_ons_region_codes import *

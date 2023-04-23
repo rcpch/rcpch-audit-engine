@@ -1,5 +1,5 @@
 # django
-from django.db import models
+from django.contrib.gis.db import models
 
 # 3rd party
 from simple_history.models import HistoricalRecords

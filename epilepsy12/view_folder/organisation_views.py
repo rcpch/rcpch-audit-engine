@@ -5,7 +5,7 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-from django.db.models import Sum, Count, Avg
+from django.contrib.gis.db.models import Sum, Count, Avg
 from pprint import pprint
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
@@ -21,17 +21,17 @@ from ..general_functions import get_current_cohort_data, value_from_key
 def organisation_reports(request):
 
     # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
-    first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
-    site = Site.objects.filter()
-    epilepsy_context = EpilepsyContext.objects.filter()
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
-    episode = Episode.objects.filter()
-    syndrome = Syndrome.objects.filter()
-    comorbidity = Comorbidity.objects.filter()
-    assessment = Assessment.objects.filter()
-    investigations = Investigations.objects.filter()
-    management = Management.objects.filter()
-    registration = Registration.objects.filter()
+    # first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
+    # site = Site.objects.filter()
+    # epilepsy_context = EpilepsyContext.objects.filter()
+    # multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
+    # episode = Episode.objects.filter()
+    # syndrome = Syndrome.objects.filter()
+    # comorbidity = Comorbidity.objects.filter()
+    # assessment = Assessment.objects.filter()
+    # investigations = Investigations.objects.filter()
+    # management = Management.objects.filter()
+    # registration = Registration.objects.filter()
 
     # all_models = sorted(
     #     chain(registration, first_paediatric_assessment, site, epilepsy_context, multiaxial_diagnosis,
@@ -49,9 +49,8 @@ def organisation_reports(request):
     else:
         # current user is a member of the RCPCH audit team and also not affiliated with a organisation
         # therefore set selected organisation to first of organisation on the list
-        selected_organisation = Organisation.objects.filter(
-            Sector="NHS Sector"
-        ).order_by('OrganisationName').first()
+        selected_organisation = Organisation.objects.order_by(
+            'OrganisationName').first()
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = all_registered_cases_for_cohort_and_abstraction_level(
@@ -97,7 +96,7 @@ def organisation_reports(request):
     return render(request=request, template_name=template_name, context={
         'user': request.user,
         'selected_organisation': selected_organisation,
-        'organisation_list': Organisation.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
+        'organisation_list': Organisation.objects.order_by('OrganisationName').all(),
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity(selected_organisation=selected_organisation),
         'cases_aggregated_by_sex': cases_aggregated_by_sex(selected_organisation=selected_organisation),
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation_score(selected_organisation=selected_organisation),
@@ -169,7 +168,7 @@ def selected_organisation_summary(request):
     return render(request=request, template_name='epilepsy12/partials/selected_organisation_summary.html', context={
         'user': request.user,
         'selected_organisation': selected_organisation,
-        'organisation_list': Organisation.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
+        'organisation_list': Organisation.objects.order_by('OrganisationName').all(),
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity(selected_organisation=selected_organisation),
         'cases_aggregated_by_sex': cases_aggregated_by_sex(selected_organisation=selected_organisation),
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation_score(selected_organisation=selected_organisation),
@@ -260,7 +259,7 @@ def selected_trust_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
     kpis = KPI.objects.create(
         organisation=organisation,
-        parent_trust=organisation.ParentName
+        parent_trust=organisation.ParentOrganisation_OrganisationName
     )
 
     template_name = 'epilepsy12/partials/kpis/kpis.html'

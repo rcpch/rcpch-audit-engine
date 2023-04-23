@@ -36,12 +36,14 @@ services:
       - DJANGO_SUPERUSER_EMAIL=e12-dev-user@rcpch.tech
       - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
       - DJANGO_SUPERUSER_ROLE=1
+      - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
     env_file:
       - .env # env file with the token for RCPCH Census Platform, not committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py makemigrations &&
             python manage.py migrate &&
+            python manage.py seed --mode=seed_regions &&
             python manage.py seed --mode=seed_organisations &&
             python manage.py seed --mode=seed_semiology_keywords &&
             python manage.py seed --mode=seed_syndromes &&

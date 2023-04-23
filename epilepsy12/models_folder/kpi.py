@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
 from .help_text_mixin import HelpTextMixin
 
@@ -54,7 +54,7 @@ class KPI(models.Model, HelpTextMixin):
 
             9f. Service contact details
                 Percentage of children and young people with epilepsy with evidence of being given service contact details.
-                
+
     10. School Individual Healthcare Plan - % of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment..              
 
     """

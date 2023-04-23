@@ -2,7 +2,7 @@
 from dateutil.relativedelta import relativedelta
 from typing import Literal
 # django imports
-from django.db.models import Q, Sum
+from django.contrib.gis.db.models import Q, Sum
 # E12 imports
 from ..models import *
 from ..constants import ALL_NHS_TRUSTS

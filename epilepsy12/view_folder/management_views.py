@@ -2,7 +2,7 @@ from dateutil import relativedelta
 from datetime import date
 from django.utils import timezone
 from operator import itemgetter
-from django.db.models import Q
+from django.contrib.gis.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES

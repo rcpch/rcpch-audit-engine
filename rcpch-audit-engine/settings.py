@@ -46,6 +46,9 @@ RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv(
 # this is the url for api.postcodes.io, a free service reporting postcode data off a postcode
 POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
 
+NHS_ODS_API_URL = os.getenv('NHS_ODS_API_URL')
+NHS_ODS_API_KEY = os.getenv('NHS_ODS_API_KEY')
+
 # Application definition
 
 INSTALLED_APPS = [

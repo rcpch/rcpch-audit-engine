@@ -3,7 +3,7 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Q
+from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import Organisation, Site, Case
@@ -36,7 +36,7 @@ def case_list(request, organisation_id):
 
     # get all organisations which are in the same parent trust
     organisation_children = Organisation.objects.filter(
-        ParentName=organisation.ParentName).all()
+        ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -53,7 +53,7 @@ def case_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # user has requested trust level view
             all_cases = Case.objects.filter(
-                Q(organisations__ParentName__contains=organisation.ParentName) &
+                Q(organisations__ParentOrganisation_ParentName__contains=organisation.ParentOrganisation_OrganisationName) &
                 Q(site__site_is_primary_centre_of_epilepsy_care=True) &
                 Q(site__site_is_actively_involved_in_epilepsy_care=True) &
                 (Q(first_name__icontains=filter_term) |
@@ -85,7 +85,7 @@ def case_list(request, organisation_id):
 
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__ParentName__contains=organisation.ParentName,
+                organisations__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True
             )
@@ -183,13 +183,15 @@ def case_list(request, organisation_id):
     if request.user.is_rcpch_audit_team_member:
         rcpch_choices = (
             (0, f'Organisation level ({organisation.OrganisationName})'),
-            (1, f'Trust level ({organisation.ParentName})'),
+            (1,
+             f'Trust level ({organisation.ParentOrganisation_OrganisationName})'),
             (2, 'National level'),
         )
     else:
         rcpch_choices = (
             (0, f'Organisation level ({organisation.OrganisationName})'),
-            (1, f'Trust level ({organisation.ParentName})'),
+            (1,
+             f'Trust level ({organisation.ParentOrganisation_OrganisationName})'),
         )
 
     context = {
@@ -223,7 +225,7 @@ def case_statistics(request, organisation_id):
     elif request.user.view_preference == 1:
         # user requesting Trust level - return all cases in the same trust
         total_cases = Case.objects.filter(
-            Q(organisations__ParentName__contains=organisation.ParentName)
+            Q(organisations__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName)
         )
     elif request.user.view_preference == 0:
         # user requesting Trust level - return all cases in the same organisation
@@ -307,7 +309,7 @@ def create_case(request, organisation_id):
     POST request. The only instance where htmx not used.
     """
     organisation = Organisation.objects.filter(
-        OrganisationID=organisation_id).get()
+        pk=organisation_id).get()
 
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ993CZ', 'Address unspecified - England')
@@ -363,7 +365,7 @@ def update_case(request, organisation_id, case_id):
     form = CaseForm(instance=case)
 
     organisation = Organisation.objects.filter(
-        OrganisationID=organisation_id).get()
+        pk=organisation_id).get()
 
     # set select boxes for situations when postcode unknown
     country_choice = ('ZZ993CZ', 'Address unspecified - England')

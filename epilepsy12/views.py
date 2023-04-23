@@ -3,7 +3,6 @@
 from datetime import datetime
 from django.apps import apps
 from django.utils import timezone
-# from django.db.models import Case as DJANGO_CASE
 from django.conf import settings
 from django.contrib.auth import login, get_user_model, authenticate
 from django.contrib.auth.decorators import login_required

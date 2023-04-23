@@ -15,7 +15,7 @@ def add_codes_to_organisation(organisation: Organisation):
     """
 
     parent_codes = next(
-        (item for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES if item["ODS Trust Code"] == organisation.ParentODSCode), None)
+        (item for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES if item["ODS Trust Code"] == organisation.ParentOrganisation_ODSCode), None)
 
     if parent_codes:
         print('Adding NHS England regions and local authorities....')
@@ -40,14 +40,16 @@ def add_codes_to_organisation(organisation: Organisation):
             print('Adding NHS England regions ONS codes....')
             organisation.NHSEnglandRegionONSCode = nhs_region["NHS_ENGLAND_REGION_ONS_CODE"]
         else:
-            print(f'{organisation.ParentName} has no NHS Region.')
+            print(
+                f'{organisation.ParentOrganisation_OrganisationName} has no NHS Region.')
 
     else:
-        print(f'{organisation.ParentName} has no ICB or Local Authority.')
+        print(
+            f'{organisation.ParentOrganisation_OrganisationName} has no ICB or Local Authority.')
 
     # get the OPEN UK Netwok names/codes and country
     open_uk_network = next(
-        (item for item in OPEN_UK_NETWORKS if item["ods trust code"] == organisation.ParentODSCode), None)
+        (item for item in OPEN_UK_NETWORKS if item["ods trust code"] == organisation.ParentOrganisation_ODSCode), None)
     if open_uk_network:
         print('Adding OPEN UK regions and codes....')
         organisation.OPENUKNetworkCode = open_uk_network.get(
@@ -56,7 +58,8 @@ def add_codes_to_organisation(organisation: Organisation):
             "OPEN UK Network Name", None)
         organisation.Country = open_uk_network.get("country", None)
     else:
-        print(f'{organisation.ParentName} has no OPEN UK Network Code.')
+        print(
+            f'{organisation.ParentOrganisation_OrganisationName} has no OPEN UK Network Code.')
 
     # get the country codes
     country = next(
@@ -65,13 +68,14 @@ def add_codes_to_organisation(organisation: Organisation):
         organisation.CountryONSCode = country["Country_ONS_Code"]
         print('Adding country codes....')
     else:
-        print(f'{organisation.ParentName} has no Country codes.')
+        print(
+            f'{organisation.ParentOrganisation_OrganisationName} has no Country codes.')
 
     organisation.DateValid = timezone.now()
 
     organisation.save()
     print(
-        f'{organisation.OrganisationName}({organisation.ParentName}) updated.')
+        f'{organisation.OrganisationName}({organisation.ParentOrganisation_OrganisationName}) updated.')
 
 
 def add_codes_to_all_organisations():
@@ -1602,8 +1606,8 @@ def create_welsh_organisation():
             'City': location.get('Town'),
             'County': location.get('County'),
             'Postcode': location.get('PostCode'),
-            'ParentODSCode': organisation.get("RegionCode"),
-            'ParentName': organisation.get("Region"),
+            'ParentOrganisation_ODSCode': organisation.get("RegionCode"),
+            'ParentOrganisation_OrganisationName': organisation.get("Region"),
             'CountryONSCode': "W92000004",
             'Country': location.get('Country', None),
             'Phone': None,

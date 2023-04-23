@@ -1,6 +1,6 @@
 from typing import Literal
 # Django imports
-from django.db.models import Q, F, Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
+from django.contrib.gis.db.models import Q, F, Count, Sum, Avg, When, Value, CharField, PositiveSmallIntegerField, Case as DJANGO_CASE
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
@@ -229,22 +229,22 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
         if abstraction_level == 'organisation':
             abstraction_sublevel_Q = Q(
-                site__organisation__OrganisationODSCode=abstraction_sublevel[0])
+                site__organisation__ODSCode=abstraction_sublevel)
         if abstraction_level == 'trust':
             abstraction_sublevel_Q = Q(
-                site__organisation__ParentODSCode=abstraction_sublevel[0])
+                site__organisation__ParentOrganisation_ODSCode=abstraction_sublevel)
         if abstraction_level == 'icb':
             abstraction_sublevel_Q = Q(
-                site__organisation__ICBODSCode=abstraction_sublevel[0])
+                site__organisation__integrated_care_board__ODS_ICB_Code=abstraction_sublevel)
         if abstraction_level == 'nhs_region':
             abstraction_sublevel_Q = Q(
-                site__organisation__NHSEnglandRegionCode=abstraction_sublevel[0])
+                site__organisation__nhs_region__NHS_Region_Code=abstraction_sublevel)
         if abstraction_level == 'open_uk':
             abstraction_sublevel_Q = Q(
-                site__organisation__OPENUKNetworkCode=abstraction_sublevel[0])
+                site__organisation__openuk_network__OPEN_UK_Network_Code=abstraction_sublevel)
         if abstraction_level == 'country':
             abstraction_sublevel_Q = Q(
-                site__organisation__CountryONSCode=abstraction_sublevel[0])
+                site__organisation__ons_region__ons_country__Country_ONS_Code=abstraction_sublevel)
 
         filtered_cases = Case.objects.filter(
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &

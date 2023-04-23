@@ -4,9 +4,8 @@ from datetime import date
 import math
 
 # django
-from django.db import models
-from django.db.models.deletion import CASCADE
-from django.db.models.fields import CharField, DateField
+from django.contrib.gis.db import models
+from django.contrib.gis.db.models import CharField, DateField
 from django.conf import settings
 
 # 3rd party
@@ -48,7 +47,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     )
     locked_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=CASCADE,
+        on_delete=models.CASCADE,
         verbose_name="locked by",
         null=True,
         blank=True

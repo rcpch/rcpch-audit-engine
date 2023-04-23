@@ -1,10 +1,11 @@
-from django.db import models
+from django.contrib.gis.db import models
 from ..time_and_user_abstract_base_classes import *
 
 
 class NHSRegionEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     NHS_Region = models.CharField()
-    NHS_Region_Code = models.CharField()
+    NHS_Region_Code = models.CharField(unique=True)
+    year = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'NHS Region Name'

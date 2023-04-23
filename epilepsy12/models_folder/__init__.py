@@ -54,10 +54,11 @@ from .semiology_keyword import Keyword
 # when calculating KPIs. NHS Structure is often subject to change, so having their
 # own model(s) abstracts away any changes that may need to be made in future.
 # Organisation has many to one relationship with OPENUKNetworkEntity, IntegratedCareBoardEntity,
-# CountryONSRegionEntity and NHSRegionEntity
+# ONSCountryEntity, ONSRegionEntity and NHSRegionEntity
 # IntegratedCareBoardEntity has a one to many relationship with NHSRegionEntity
 from .entities.open_uk_network_entity import OPENUKNetworkEntity
 from .entities.integrated_care_board_entity import IntegratedCareBoardEntity
-from .entities.country_ons_region_entity import CountryONSRegionEntity
+from .entities.ons_region_entity import ONSRegionEntity
+from .entities.ons_country_entity import ONSCountryEntity
 from .entities.nhs_region_entity import NHSRegionEntity
 from .entities.organisation import Organisation

@@ -46,7 +46,7 @@ def create_registrations():
             ).get()
             kpi = KPI.objects.create(
                 organisation=lead_organisation.organisation,
-                parent_trust=lead_organisation.organisation.ParentName,
+                parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
                 paediatrician_with_expertise_in_epilepsies=0,
                 epilepsy_specialist_nurse=0,
                 tertiary_input=0,
@@ -320,7 +320,7 @@ def create_multiaxial_diagnosis(registration_instance):
                     episode.nonepileptic_seizure_paroxysmal = NON_EPILEPSY_PAROXYSMS[len(
                         NON_EPILEPSY_PAROXYSMS)-1][0]
                 else:
-                    print("Other likely selected")
+                    pass
 
             episode.save()
 
@@ -353,8 +353,7 @@ def create_assessment(registration_instance):
                 start=registration_instance.registration_date, end=registration_instance.registration_close_date)
             assessment.consultant_paediatrician_input_date = assessment.consultant_paediatrician_referral_date + \
                 relativedelta(weeks=randint(1, 5))
-            random_organisation = Organisation.objects.filter(
-                Sector="NHS Sector").order_by("?").first()
+            random_organisation = Organisation.objects.order_by("?").first()
             if Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 case=registration_instance.case,
@@ -380,8 +379,7 @@ def create_assessment(registration_instance):
                 start=registration_instance.registration_date, end=registration_instance.registration_close_date)
             assessment.paediatric_neurologist_input_date = assessment.paediatric_neurologist_referral_date + \
                 relativedelta(weeks=randint(1, 5))
-            random_organisation = Organisation.objects.filter(
-                Sector="NHS Sector").order_by("?").first()
+            random_organisation = Organisation.objects.order_by("?").first()
             if Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 case=registration_instance.case,
@@ -407,8 +405,7 @@ def create_assessment(registration_instance):
                 start=registration_instance.registration_date, end=registration_instance.registration_close_date)
             assessment.childrens_epilepsy_surgical_service_input_date = assessment.childrens_epilepsy_surgical_service_referral_date + \
                 relativedelta(weeks=randint(1, 5))
-            random_organisation = Organisation.objects.filter(
-                Sector="NHS Sector").order_by("?").first()
+            random_organisation = Organisation.objects.order_by("?").first()
             if Site.objects.filter(
                 site_is_actively_involved_in_epilepsy_care=True,
                 case=registration_instance.case,
