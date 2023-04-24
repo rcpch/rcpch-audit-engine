@@ -24,10 +24,7 @@ class Command(BaseCommand):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'seed_syndromes'):
-            self.stdout.write('seeding syndromes...')
-            run_syndromes_seed()
-        elif (options['mode'] == 'seed_comorbidities'):
+        if (options['mode'] == 'seed_comorbidities'):
             self.stdout.write('seeding comorbidities...')
             run_comorbidities_seed()
         elif (options['mode'] == 'seed_medicines'):
@@ -63,53 +60,6 @@ class Command(BaseCommand):
         self.stdout.write(image())
         print('\033[38;2;17;167;107m')
         self.stdout.write('done.')
-
-
-def run_syndromes_seed():
-    added = 0
-    print('\033[33m', 'Seeding all the syndromes...', '\033[33m')
-    for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
-        if SyndromeEntity.objects.filter(syndrome_name=syndrome[1]).exists():
-            print(
-                f'Syndromes already exist. Skipping this step...')
-            return
-        new_syndrome = SyndromeEntity(
-            syndrome_name=syndrome[1],
-            snomed_ct_code=None,
-            icd_10_code=None,
-            icd_10_name=None
-        )
-        try:
-            new_syndrome.save()
-        except Exception as e:
-            print(f"Error at {syndrome[1]}: error: {e}")
-        added += 1
-        print(
-            f"added {syndrome[1]}")
-    print(f"Syndromes added...{added}")
-
-
-# def run_semiology_keywords_seed():
-#     added = 0
-#     print('\033[33m', 'Seeding all the epilepsy semiology keywords...', '\033[33m')
-#     for index, semiology_keyword in enumerate(KEYWORDS):
-#         if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
-#             print(
-#                 f'Keywords already exist. Skipping this step...')
-#             return
-#         new_keyword = Keyword(
-#             keyword=semiology_keyword["title"],
-#             category=semiology_keyword["category"]
-#         )
-#         try:
-#             new_keyword.save()
-#         except Exception as e:
-#             print(f"Error at {semiology_keyword['title']}: error: {e}")
-#         added += 1
-#         print(
-#             f"added {semiology_keyword['title']} in category {semiology_keyword['category']}")
-#     image()
-#     print(f"Keywords added: {added}")
 
 def run_comorbidities_seed():
     """
