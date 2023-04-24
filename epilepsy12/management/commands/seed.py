@@ -24,13 +24,7 @@ class Command(BaseCommand):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'delete_organisations'):
-            self.stdout.write('Deleting organisation trust data...')
-            delete_organisations()
-        elif (options['mode'] == 'seed_organisations'):
-            self.stdout.write('seeding organisation data...')
-            run_organisations_seed()
-        elif (options['mode'] == 'seed_semiology_keywords'):
+        if (options['mode'] == 'seed_semiology_keywords'):
             self.stdout.write('seeding organisation data...')
             run_semiology_keywords_seed()
         elif (options['mode'] == 'seed_syndromes'):
@@ -126,41 +120,6 @@ def run_semiology_keywords_seed():
             f"added {semiology_keyword['title']} in category {semiology_keyword['category']}")
     image()
     print(f"Keywords added: {added}")
-
-
-def run_epilepsy_causes_seed():
-    """
-    This returns all the snomed ct definitions and codes for epilepsy causes.
-    Should be run periodically to compare with value in database and update record if has changed
-    """
-    print('\033[33m', 'Seeding all the epilepsy causes from SNOMED...', '\033[33m')
-    if EpilepsyCauseEntity.objects.count() > 0:
-        print('Causes already exist. Skipping this step...')
-        return
-    index = 0
-    ecl = '<< 363235000'
-    # calls the rcpch deprivare server for a list of causes using ECL query language
-    epilepsy_causes = fetch_ecl(ecl)
-    for cause in epilepsy_causes:
-        new_cause = EpilepsyCauseEntity(
-            conceptId=cause['conceptId'],
-            term=cause['term'],
-            preferredTerm=cause['preferredTerm'],
-            description=None,
-            snomed_ct_edition=None,
-            snomed_ct_version=None,
-            icd_code=None,
-            icd_version=None,
-            dsm_code=None,
-            dsm_version=None
-        )
-        try:
-            new_cause.save()
-            index += 1
-        except Exception as e:
-            print(f"Epilepsy cause {cause['preferredTerm']} not added. {e}")
-    print(f"{index} epilepsy causes added")
-
 
 def run_comorbidities_seed():
     """
