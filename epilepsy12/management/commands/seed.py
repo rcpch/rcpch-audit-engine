@@ -14,7 +14,6 @@ from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS, INTEGRATED_CA
 from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, fetch_ecl, fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set, ons_region_for_postcode
 from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
 from .create_e12_records import create_epilepsy12_record, create_registrations
-from .add_codes_to_organisations import add_codes_to_organisation
 
 
 class Command(BaseCommand):
@@ -86,6 +85,7 @@ class Command(BaseCommand):
 
 def run_syndromes_seed():
     added = 0
+    print('\033[33m', 'Seeding all the syndromes...', '\033[33m')
     for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
         if SyndromeEntity.objects.filter(syndrome_name=syndrome[1]).exists():
             print(
@@ -109,6 +109,7 @@ def run_syndromes_seed():
 
 def run_semiology_keywords_seed():
     added = 0
+    print('\033[33m', 'Seeding all the epilepsy semiology keywords...', '\033[33m')
     for index, semiology_keyword in enumerate(KEYWORDS):
         if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
             print(
@@ -134,6 +135,7 @@ def run_epilepsy_causes_seed():
     This returns all the snomed ct definitions and codes for epilepsy causes.
     Should be run periodically to compare with value in database and update record if has changed
     """
+    print('\033[33m', 'Seeding all the epilepsy causes from SNOMED...', '\033[33m')
     if EpilepsyCauseEntity.objects.count() > 0:
         print('Causes already exist. Skipping this step...')
         return
@@ -167,6 +169,7 @@ def run_comorbidities_seed():
     This returns all the snomed ct definitions and codes for epilepsy causes.
     Should be run periodically to compare with value in database and update record if has changed
     """
+    print('\033[33m', 'Seeding comorbidities from paediatric neurodisability reference set...', '\033[33m')
     if ComorbidityEntity.objects.count() > 0:
         print('Comorbidities already exist. Skipping...')
         return
@@ -197,47 +200,32 @@ def run_comorbidities_seed():
     print(f"{index} comorbidities added")
 
 
-def replace_existing_comorbidities_with_refset():
-    index = 0
-    # ecl = '<< 35919005'
-    # comorbidity_choices = fetch_ecl(ecl)
-    comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
-    for comorbidity in ComorbidityEntity.objects.all():
-        comorbidity.conceptId = comorbidity_choices[index]['conceptId']
-        comorbidity.term = comorbidity_choices[index]['term']
-        comorbidity.preferredTerm = comorbidity_choices[index]['preferredTerm']
-        comorbidity.save()
-        index += 1
-    for counter in range(index, len(comorbidity_choices)-1):
-        ComorbidityEntity.objects.create(
-            conceptId=comorbidity_choices[counter]['conceptId'],
-            term=comorbidity_choices[counter]['term'],
-            preferredTerm=comorbidity_choices[counter]['preferredTerm'],
-            description=None,
-            snomed_ct_edition=None,
-            snomed_ct_version=None,
-            icd_code=None,
-            icd_version=None,
-            dsm_code=None,
-            dsm_version=None,
-        )
-    print('Update all comorbidites with refset')
-
-
 def run_medicines_seed():
+    print('\033[33m', 'Seeding all the medicines from SNOMED and local Epilepsy12 list...', '\033[33m')
     for benzo in SNOMED_BENZODIAZEPINE_TYPES:
-        concept = fetch_ecl(benzo[0])
         if not MedicineEntity.objects.filter(
                 medicine_name=benzo[1]).exists():
             # if the drug is not in the database already
-            new_drug = MedicineEntity(
-                medicine_name=benzo[1],
-                is_rescue=True,
-                conceptId=concept[0]['conceptId'],
-                term=concept[0]['term'],
-                preferredTerm=concept[0]['preferredTerm']
-            )
-            new_drug.save()
+            if benzo[0] not in [1001, 1002]:
+                concept = fetch_ecl(benzo[0])
+                new_drug = MedicineEntity(
+                    medicine_name=benzo[1],
+                    is_rescue=True,
+                    conceptId=concept[0]['conceptId'],
+                    term=concept[0]['term'],
+                    preferredTerm=concept[0]['preferredTerm']
+                )
+                new_drug.save()
+            else:
+                # these are for options other or unknow
+                new_drug = MedicineEntity(
+                    medicine_name=benzo[1],
+                    is_rescue=True,
+                    conceptId=None,
+                    term=None,
+                    preferredTerm=None
+                )
+                new_drug.save()
         else:
             print(f"{benzo[1]} exists. Skipping...")
     for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
@@ -246,19 +234,35 @@ def run_medicines_seed():
             is_rescue=False
         ).exists():
             # if the drug is not in the database already
-            concept = fetch_ecl(aem[0])
-            aem_drug = MedicineEntity(
-                medicine_name=aem[1],
-                conceptId=concept[0]['conceptId'],
-                term=concept[0]['term'],
-                preferredTerm=concept[0]['preferredTerm']
-            )
-            aem_drug.save()
+            if aem[0] not in [1001, 1002]:
+                concept = fetch_ecl(aem[0])
+                aem_drug = MedicineEntity(
+                    is_rescue=False,
+                    medicine_name=aem[1],
+                    conceptId=concept[0]['conceptId'],
+                    term=concept[0]['term'],
+                    preferredTerm=concept[0]['preferredTerm']
+                )
+                aem_drug.save()
+            else:
+                aem_drug = MedicineEntity(
+                    medicine_name=aem[1],
+                    conceptId=None,
+                    term=None,
+                    preferredTerm=None,
+                    is_rescue=False
+                )
+                aem_drug.save()
         else:
             print(f"{aem_drug[1]} exists. Skipping...")
+    print('All medicines added.')
 
 
 def update_medicine_entity_with_snomed():
+    """
+    Deprecating
+    Updates any existing medicines with local list and SNOMED
+    """
     for benzo in SNOMED_BENZODIAZEPINE_TYPES:
         if MedicineEntity.objects.filter(
                 medicine_name=benzo[1]).exists():
@@ -300,6 +304,8 @@ def seed_regions():
     """
     # seed icbs and nhs regions regions
 
+    print('\033[38;2;17;167;142m',
+          'Seeding Integrated Care Boards and England NHS Regions', '\033[38;2;17;167;142m')
     for icb_la in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES:
 
         if IntegratedCareBoardEntity.objects.filter(ODS_ICB_Code=icb_la["ODS ICB Code"]).exists():
@@ -321,8 +327,10 @@ def seed_regions():
                 year=2019
             ).save()
             print(
-                f"{icb_la['NHS England Region']} added to the database.")
+                f"{icb_la['NHS England Region']} added to the database.", end='\r')
 
+    print('\033[38;2;17;167;142m',
+          'Seeding Welsh health boards', '\033[38;2;17;167;142m')
     for health_board in WELSH_REGIONS:
         if NHSRegionEntity.objects.filter(NHS_Region_Code=health_board["NHS_Region_Code"]).exists():
             pass
@@ -335,6 +343,8 @@ def seed_regions():
             print(
                 f"{health_board['NHS_Region']} added to the database.")
 
+    print('\033[38;2;17;167;142m',
+          'Seeding OPENUK Regions', '\033[38;2;17;167;142m')
     for region in OPEN_UK_NETWORKS:
         if OPENUKNetworkEntity.objects.filter(OPEN_UK_Network_Code=region["OPEN UK Network Code"]).exists():
             pass
@@ -347,6 +357,8 @@ def seed_regions():
             print(
                 f"{region['OPEN UK Network Name']} added to the database.")
 
+    print('\033[38;2;17;167;142m',
+          'Seeding ONS countries and codes...', '\033[38;2;17;167;142m')
     for country in COUNTRY_CODES:
         if ONSCountryEntity.objects.filter(Country_ONS_Code=country["country_ons_code"]).exists():
             pass
@@ -357,6 +369,8 @@ def seed_regions():
                 year=2021
             ).save()
 
+    print('\033[38;2;17;167;142m',
+          'Seeding ONS regions and codes...', '\033[38;2;17;167;142m')
     for ons_region in UK_ONS_REGIONS:
         if ONSRegionEntity.objects.filter(Region_ONS_Code=ons_region['Region_ONS_Code']).exists():
             pass
@@ -368,6 +382,7 @@ def seed_regions():
                 Region_ONS_Name=ons_region['Region_ONS_Name'],
                 ons_country=country
             ).save()
+    print('All regions added.')
 
 
 def run_organisations_seed():
@@ -472,10 +487,12 @@ def run_organisations_seed():
                     nhs_region=nhs_region,
                     ons_region=ons_region
                 ).save()
-                print(f"{added+1}: {rcpch_organisation['OrganisationName']}")
+                print(
+                    f"{added+1}: {rcpch_organisation['OrganisationName']}")
             except Exception as error:
                 print(
                     f"Unable to save {rcpch_organisation['OrganisationName']}: {error}")
+    print('All organisations added.')
 
 
 def delete_organisations():
@@ -488,7 +505,7 @@ def delete_organisations():
 
 def run_dummy_cases_seed():
     added = 0
-
+    print('\033[33m', 'Seeding fictional cases...', '\033[33m')
     # there should not be any cases yet, but sometimes seed gets run more than once
     if Case.objects.all().exists():
         print(f'Cases already exist. Skipping this step...')
@@ -566,6 +583,8 @@ def run_registrations():
     """
     Calling function to register all cases in Epilepsy12 and complete all fields with random answers
     """
+    print('\033[33m', 'Registering fictional cases in Epilepsy12...', '\033[33m')
+
     create_registrations()
 
     complete_registrations()
@@ -575,6 +594,7 @@ def complete_registrations():
     """
     Loop through the registrations and score all fields
     """
+    print('\033[33m', 'Completing all the Epilepsy12 fields for the fictional cases...', '\033[33m')
     for registration in Registration.objects.all():
         current_cohort_end_date = first_tuesday_in_january(
             current_cohort_start_date().year + 2) + relativedelta(days=7)
@@ -584,9 +604,6 @@ def complete_registrations():
         registration.save()
 
         create_epilepsy12_record(registration_instance=registration)
-
-    # calculate national level kpis
-    # kpis_for_abstraction_level()
 
 
 def image():

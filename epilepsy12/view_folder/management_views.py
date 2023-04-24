@@ -237,6 +237,9 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     choices = MedicineEntity.objects.filter(
         is_rescue=antiepilepsy_medicine.is_rescue_medicine).order_by('medicine_name')
 
+    for medicine in MedicineEntity.objects.all():
+        print(medicine)
+
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
     else:
