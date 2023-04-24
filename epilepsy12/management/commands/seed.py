@@ -296,128 +296,6 @@ def update_medicine_entity_with_snomed():
             print(f"{aem_drug[1]} does not exist. Skipping...")
 
 
-def run_organisations_seed():
-    """
-    Seed function to replace the seed function which populates the Organisation table from JSON.
-    This instead uses a list provided by RCPCH E12 team of all organisations in England
-    and Wales that care for children with Epilepsy
-    """
-
-    if len(RCPCH_ORGANISATIONS) == Organisation.objects.all().count():
-        # TODO run a conditional here to identify if this is a more up to date list of organisations and therefor update the database
-        print(f"{Organisation.objects.all().count()} Organisations already exist in the database. Skipping seeding...")
-        return
-    else:
-        # The database needs seeding
-        print('\033[31m', "Adding new organisations...", '\033[31m')
-        for added, rcpch_organisation in enumerate(RCPCH_ORGANISATIONS):
-
-            # get openuk network code from ods code in constants list
-            # this gets openuk network object from table
-            open_uk_code = next(
-                item for item in OPEN_UK_NETWORKS if item["ods trust code"] == rcpch_organisation["ParentODSCode"])
-            open_uk_network = OPENUKNetworkEntity.objects.get(
-                OPEN_UK_Network_Code=open_uk_code["OPEN UK Network Code"])
-
-            if open_uk_code['country'] == 'England':
-                # get icb from icb list in constants
-                # then get icb object from table
-                icb_code = next(
-                    item for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES if item["ODS Trust Code"] == rcpch_organisation["ParentODSCode"])
-                integrated_care_board = IntegratedCareBoardEntity.objects.get(
-                    ODS_ICB_Code=icb_code["ODS ICB Code"])
-
-                # get nhs england region from icb list in constants
-                # then get NHSRegion object from table
-                nhs_region = NHSRegionEntity.objects.get(
-                    NHS_Region_Code=icb_code["NHS England Region Code"]
-                )
-
-                if rcpch_organisation['ParentODSCode'] == "RXP":
-                    # postcodes io error - postcodes not found: hacky work around
-                    ons_region_name = "North East"
-                elif rcpch_organisation['ParentODSCode'] == "RN3":
-                    ons_region_name = "South West"
-                elif rcpch_organisation['ParentODSCode'] == "RM3":
-                    ons_region_name = "North West"
-                else:
-                    ons_region_name = ons_region_for_postcode(
-                        rcpch_organisation['Postcode'])
-                ons_region = ONSRegionEntity.objects.filter(
-                    Region_ONS_Name=ons_region_name).get()
-
-            elif open_uk_code['country'] == 'Wales':
-                #
-                health_board = next(
-                    item for item in WELSH_REGIONS if item['ODS_Code'] == rcpch_organisation["ParentODSCode"]
-                )
-                integrated_care_board = None
-                nhs_region = NHSRegionEntity.objects.get(
-                    NHS_Region_Code=health_board["ODS_Code"])
-                ons_region = ONSRegionEntity.objects.filter(
-                    Region_ONS_Name="Wales").get()
-
-            else:
-                raise Exception(
-                    f"{open_uk_code['ods trust code']} is not allocated to a country.")
-
-            if hasattr(rcpch_organisation, "longitude") and hasattr(rcpch_organisation, 'latitude'):
-                if len(rcpch_organisation["longitude"]) > 0 and len(rcpch_organisation['latitude']) > 1:
-                    latitude = rcpch_organisation['latitude']
-                    longitude = rcpch_organisation['longitude']
-                    new_point = Point(
-                        x=rcpch_organisation["longitude"], y=rcpch_organisation['latitude'])
-                else:
-                    latitude = None
-                    longitude = None
-                    new_point = None
-            else:
-                latitude = None
-                longitude = None
-                new_point = None
-
-            update_date = datetime(year=2023, month=4, day=19)
-            timezone_aware_update_date = timezone.make_aware(
-                update_date, timezone.utc)
-
-            try:
-                Organisation.objects.create(
-                    ODSCode=rcpch_organisation['OrganisationCode'],
-                    OrganisationName=rcpch_organisation['OrganisationName'],
-                    Website=rcpch_organisation['Website'],
-                    Address1=rcpch_organisation['Address1'],
-                    Address2=rcpch_organisation['Address2'],
-                    Address3=rcpch_organisation['Address3'],
-                    City=rcpch_organisation['City'],
-                    County=rcpch_organisation['County'],
-                    Latitude=latitude,
-                    Longitude=longitude,
-                    Postcode=rcpch_organisation['Postcode'],
-                    Geocode_Coordinates=new_point,
-                    ParentOrganisation_ODSCode=rcpch_organisation['ParentODSCode'],
-                    ParentOrganisation_OrganisationName=rcpch_organisation['ParentName'],
-                    LastUpdatedDate=timezone_aware_update_date,
-                    openuk_network=open_uk_network,
-                    integrated_care_board=integrated_care_board,
-                    nhs_region=nhs_region,
-                    ons_region=ons_region
-                ).save()
-                print(
-                    f"{added+1}: {rcpch_organisation['OrganisationName']}")
-            except Exception as error:
-                print(
-                    f"Unable to save {rcpch_organisation['OrganisationName']}: {error}")
-    print('All organisations added.')
-
-
-def delete_organisations():
-    try:
-        Organisation.objects.all().delete()
-    except:
-        print("Unable to delete Organisation table")
-    print("...all organisations deleted.")
-
-
 def run_dummy_cases_seed():
     added = 0
     print('\033[33m', 'Seeding fictional cases...', '\033[33m')
@@ -441,7 +319,7 @@ def run_dummy_cases_seed():
         for i in range(1, 11):
             random_organisations.append(random_organisation)
 
-    for index in range(len(DUMMY_NAMES)-1):
+    for index in range(len(DUMMY_NAMES) - 1):
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         nhs_number = randint(1000000000, 9999999999)
         first_name = DUMMY_NAMES[index]['firstname']

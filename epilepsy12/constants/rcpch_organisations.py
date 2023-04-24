@@ -1,10 +1,5 @@
 """
-THis is the list provided by E12 team of organisations providing epilepsy care to children across England and Wales
-Looking through it though lots of fields are wrong with postcodes in the lattitude field, for example,
-and as in the first record Addenbrooke's, even Latitude is spelled wrong.
-The Lists above therefore are the ODSCodes only of this same RCPCH list to be used to look up against the ODS API as 
-the 'source of truth'
-The unmatched list are ODSCodes of organisations currently not found in our database.
+This is the list provided by E12 team of organisations providing epilepsy care to children across England and Wales
 """
 
 RCPCH_ORGANISATIONS = [
