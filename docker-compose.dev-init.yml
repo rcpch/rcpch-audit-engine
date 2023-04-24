@@ -43,7 +43,6 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py makemigrations &&
             python manage.py migrate &&
-            python manage.py seed --mode=seed_regions &&
             python manage.py seed --mode=seed_organisations &&
             python manage.py seed --mode=seed_semiology_keywords &&
             python manage.py seed --mode=seed_syndromes &&

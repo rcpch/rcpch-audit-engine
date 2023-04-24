@@ -1,9 +1,10 @@
 # python
 from operator import itemgetter
 from random import randint, choice
-from datetime import date
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from random import randint
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import Point
 
@@ -26,9 +27,6 @@ class Command(BaseCommand):
         if (options['mode'] == 'delete_organisations'):
             self.stdout.write('Deleting organisation trust data...')
             delete_organisations()
-        elif (options['mode'] == 'seed_regions'):
-            self.stdout.write('seeding regional data...')
-            seed_regions()
         elif (options['mode'] == 'seed_organisations'):
             self.stdout.write('seeding organisation data...')
             run_organisations_seed()
@@ -298,93 +296,6 @@ def update_medicine_entity_with_snomed():
             print(f"{aem_drug[1]} does not exist. Skipping...")
 
 
-def seed_regions():
-    """
-    Seeds the region tables from JSON constants
-    """
-    # seed icbs and nhs regions regions
-
-    print('\033[38;2;17;167;142m',
-          'Seeding Integrated Care Boards and England NHS Regions', '\033[38;2;17;167;142m')
-    for icb_la in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES:
-
-        if IntegratedCareBoardEntity.objects.filter(ODS_ICB_Code=icb_la["ODS ICB Code"]).exists():
-            pass
-        else:
-            IntegratedCareBoardEntity(
-                ODS_ICB_Code=icb_la["ODS ICB Code"],
-                ONS_ICB_Boundary_Code=icb_la["ONS ICB Boundary Code"],
-                ICB_Name=icb_la["ICB Name"],
-            ).save()
-            print(f"{icb_la['ICB Name']} added to the database.")
-
-        if NHSRegionEntity.objects.filter(NHS_Region_Code=icb_la["NHS England Region Code"]).exists():
-            pass
-        else:
-            NHSRegionEntity(
-                NHS_Region=icb_la["NHS England Region"],
-                NHS_Region_Code=icb_la["NHS England Region Code"],
-                year=2019
-            ).save()
-            print(
-                f"{icb_la['NHS England Region']} added to the database.", end='\r')
-
-    print('\033[38;2;17;167;142m',
-          'Seeding Welsh health boards', '\033[38;2;17;167;142m')
-    for health_board in WELSH_REGIONS:
-        if NHSRegionEntity.objects.filter(NHS_Region_Code=health_board["NHS_Region_Code"]).exists():
-            pass
-        else:
-            NHSRegionEntity(
-                NHS_Region=health_board["NHS_Region"],
-                NHS_Region_Code=health_board["ODS_Code"],
-                year=health_board['year']
-            ).save()
-            print(
-                f"{health_board['NHS_Region']} added to the database.")
-
-    print('\033[38;2;17;167;142m',
-          'Seeding OPENUK Regions', '\033[38;2;17;167;142m')
-    for region in OPEN_UK_NETWORKS:
-        if OPENUKNetworkEntity.objects.filter(OPEN_UK_Network_Code=region["OPEN UK Network Code"]).exists():
-            pass
-        else:
-            OPENUKNetworkEntity(
-                OPEN_UK_Network_Name=region["OPEN UK Network Name"],
-                OPEN_UK_Network_Code=region["OPEN UK Network Code"],
-                country=region["country"]
-            ).save()
-            print(
-                f"{region['OPEN UK Network Name']} added to the database.")
-
-    print('\033[38;2;17;167;142m',
-          'Seeding ONS countries and codes...', '\033[38;2;17;167;142m')
-    for country in COUNTRY_CODES:
-        if ONSCountryEntity.objects.filter(Country_ONS_Code=country["country_ons_code"]).exists():
-            pass
-        else:
-            ONSCountryEntity(
-                Country_ONS_Code=country['country_ons_code'],
-                Country_ONS_Name=country['country_ons_name'],
-                year=2021
-            ).save()
-
-    print('\033[38;2;17;167;142m',
-          'Seeding ONS regions and codes...', '\033[38;2;17;167;142m')
-    for ons_region in UK_ONS_REGIONS:
-        if ONSRegionEntity.objects.filter(Region_ONS_Code=ons_region['Region_ONS_Code']).exists():
-            pass
-        else:
-            country = ONSCountryEntity.objects.get(
-                Country_ONS_Code=ons_region['Country_ONS_Code'])
-            ONSRegionEntity(
-                Region_ONS_Code=ons_region['Region_ONS_Code'],
-                Region_ONS_Name=ons_region['Region_ONS_Name'],
-                ons_country=country
-            ).save()
-    print('All regions added.')
-
-
 def run_organisations_seed():
     """
     Seed function to replace the seed function which populates the Organisation table from JSON.
@@ -465,6 +376,10 @@ def run_organisations_seed():
                 longitude = None
                 new_point = None
 
+            update_date = datetime(year=2023, month=4, day=19)
+            timezone_aware_update_date = timezone.make_aware(
+                update_date, timezone.utc)
+
             try:
                 Organisation.objects.create(
                     ODSCode=rcpch_organisation['OrganisationCode'],
@@ -481,7 +396,7 @@ def run_organisations_seed():
                     Geocode_Coordinates=new_point,
                     ParentOrganisation_ODSCode=rcpch_organisation['ParentODSCode'],
                     ParentOrganisation_OrganisationName=rcpch_organisation['ParentName'],
-                    LastUpdatedDate=date(year=2023, month=4, day=19),
+                    LastUpdatedDate=timezone_aware_update_date,
                     openuk_network=open_uk_network,
                     integrated_care_board=integrated_care_board,
                     nhs_region=nhs_region,
