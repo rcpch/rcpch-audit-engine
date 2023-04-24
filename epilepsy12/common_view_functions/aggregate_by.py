@@ -229,22 +229,22 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
         if abstraction_level == 'organisation':
             abstraction_sublevel_Q = Q(
-                site__organisation__ODSCode=abstraction_sublevel)
+                site__organisation__ODSCode=abstraction_sublevel.ODSCode)
         if abstraction_level == 'trust':
             abstraction_sublevel_Q = Q(
-                site__organisation__ParentOrganisation_ODSCode=abstraction_sublevel)
+                site__organisation__ParentOrganisation_ODSCode=abstraction_sublevel.ParentOrganisation_ODSCode)
         if abstraction_level == 'icb':
             abstraction_sublevel_Q = Q(
-                site__organisation__integrated_care_board__ODS_ICB_Code=abstraction_sublevel)
+                site__organisation__integrated_care_board__ODS_ICB_Code=abstraction_sublevel.ODS_ICB_Code)
         if abstraction_level == 'nhs_region':
             abstraction_sublevel_Q = Q(
-                site__organisation__nhs_region__NHS_Region_Code=abstraction_sublevel)
+                site__organisation__nhs_region__NHS_Region_Code=abstraction_sublevel.NHS_Region_Code)
         if abstraction_level == 'open_uk':
             abstraction_sublevel_Q = Q(
-                site__organisation__openuk_network__OPEN_UK_Network_Code=abstraction_sublevel)
+                site__organisation__openuk_network__OPEN_UK_Network_Code=abstraction_sublevel.OPEN_UK_Network_Code)
         if abstraction_level == 'country':
             abstraction_sublevel_Q = Q(
-                site__organisation__ons_region__ons_country__Country_ONS_Code=abstraction_sublevel)
+                site__organisation__ons_region__ons_country__Country_ONS_Code=abstraction_sublevel.Country_ONS_Code)
 
         filtered_cases = Case.objects.filter(
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
