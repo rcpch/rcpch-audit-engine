@@ -11,8 +11,15 @@ from ..general_functions import fetch_paediatric_neurodisability_outpatient_diag
 
 def seed_comorbidities(apps, schema_editor):
     """
-    This returns all the snomed ct definitions and codes for epilepsy causes.
-    Should be run periodically to compare with value in database and update record if has changed
+    This function seeds the ComorbidityEntity model with SNOMED CT definitions and codes for epilepsy causes. 
+    It should be run periodically to compare the stored value in the database and update records if there is a change. 
+
+    Parameters:
+        apps (list): A list of installed apps
+        schema_editor (object): A database schema editor object
+        
+    Returns:
+        None
     """
     print('\033[33m', 'Seeding comorbidities from paediatric neurodisability reference set...', '\033[33m')
     if ComorbidityEntity.objects.count() > 0:

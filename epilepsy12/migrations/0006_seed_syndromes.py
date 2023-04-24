@@ -11,6 +11,17 @@ from ..constants import SYNDROMES
 from ..models import SyndromeEntity
 
 def seed_syndromes(apps, schema_editor):
+    """
+    This function seeds the SyndromeEntity model with a list of syndromes. 
+    It should be run periodically to check if the data has already been seeded and to avoid duplicates.
+
+    Parameters:
+        apps (list): A list of installed apps
+        schema_editor (object): A database schema editor object
+        
+    Returns:
+        None
+    """
     added = 0
     print('\033[33m', 'Seeding all the syndromes...', '\033[33m')
     for syndrome in sorted(SYNDROMES, key=itemgetter(1)):

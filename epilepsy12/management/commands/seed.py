@@ -24,10 +24,7 @@ class Command(BaseCommand):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'seed_medicines'):
-            self.stdout.write('seeding medicines...')
-            run_medicines_seed()
-        elif (options['mode'] == 'seed_dummy_cases'):
+        if (options['mode'] == 'seed_dummy_cases'):
             self.stdout.write('seeding with dummy case data...')
             run_dummy_cases_seed()
         elif (options['mode'] == 'seed_registrations'):
@@ -57,64 +54,6 @@ class Command(BaseCommand):
         self.stdout.write(image())
         print('\033[38;2;17;167;107m')
         self.stdout.write('done.')
-
-def run_medicines_seed():
-    print('\033[33m', 'Seeding all the medicines from SNOMED and local Epilepsy12 list...', '\033[33m')
-    for benzo in SNOMED_BENZODIAZEPINE_TYPES:
-        if not MedicineEntity.objects.filter(
-                medicine_name=benzo[1]).exists():
-            # if the drug is not in the database already
-            if benzo[0] not in [1001, 1002]:
-                concept = fetch_ecl(benzo[0])
-                new_drug = MedicineEntity(
-                    medicine_name=benzo[1],
-                    is_rescue=True,
-                    conceptId=concept[0]['conceptId'],
-                    term=concept[0]['term'],
-                    preferredTerm=concept[0]['preferredTerm']
-                )
-                new_drug.save()
-            else:
-                # these are for options other or unknow
-                new_drug = MedicineEntity(
-                    medicine_name=benzo[1],
-                    is_rescue=True,
-                    conceptId=None,
-                    term=None,
-                    preferredTerm=None
-                )
-                new_drug.save()
-        else:
-            print(f"{benzo[1]} exists. Skipping...")
-    for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
-        if not MedicineEntity.objects.filter(
-            medicine_name=aem[1],
-            is_rescue=False
-        ).exists():
-            # if the drug is not in the database already
-            if aem[0] not in [1001, 1002]:
-                concept = fetch_ecl(aem[0])
-                aem_drug = MedicineEntity(
-                    is_rescue=False,
-                    medicine_name=aem[1],
-                    conceptId=concept[0]['conceptId'],
-                    term=concept[0]['term'],
-                    preferredTerm=concept[0]['preferredTerm']
-                )
-                aem_drug.save()
-            else:
-                aem_drug = MedicineEntity(
-                    medicine_name=aem[1],
-                    conceptId=None,
-                    term=None,
-                    preferredTerm=None,
-                    is_rescue=False
-                )
-                aem_drug.save()
-        else:
-            print(f"{aem_drug[1]} exists. Skipping...")
-    print('All medicines added.')
-
 
 def run_dummy_cases_seed():
     added = 0
