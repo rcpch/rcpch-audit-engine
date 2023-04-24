@@ -18,16 +18,15 @@ def seed_comorbidities(apps, schema_editor):
     if ComorbidityEntity.objects.count() > 0:
         print('Comorbidities already exist. Skipping...')
         return
-    index = 0
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
     comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
 
-    for comorbidity_choice in comorbidity_choices:
+    for index,comorbidity_choice in enumerate(comorbidity_choices):
         
         # filters out Autism-related entries
         if comorbidity_choice['conceptId'] == 35919005:
-            print(f"Filtering out autism-related SNOMED conceptId {comorbidity_choice['preferredTerm']}")
+            print(f"Filtering out autism-related SNOMED conceptId: {comorbidity_choice['preferredTerm']}")
             continue
         
         new_comorbidity = ComorbidityEntity(
@@ -44,7 +43,6 @@ def seed_comorbidities(apps, schema_editor):
         )
         try:
             new_comorbidity.save()
-            index += 1
         except Exception as e:
             print(
                 f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
