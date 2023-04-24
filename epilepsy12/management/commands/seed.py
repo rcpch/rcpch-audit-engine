@@ -256,46 +256,6 @@ def run_medicines_seed():
     print('All medicines added.')
 
 
-def update_medicine_entity_with_snomed():
-    """
-    Deprecating
-    Updates any existing medicines with local list and SNOMED
-    """
-    for benzo in SNOMED_BENZODIAZEPINE_TYPES:
-        if MedicineEntity.objects.filter(
-                medicine_name=benzo[1]).exists():
-            # if the drug is not in the database already
-            new_drug = MedicineEntity.objects.filter(
-                medicine_name=benzo[1],
-            ).first()
-            new_drug.is_rescue = True
-            if benzo[0] not in [1001, 1002]:
-                concept = fetch_ecl(benzo[0])
-                new_drug.conceptId = concept[0]['conceptId']
-                new_drug.term = concept[0]['term']
-                new_drug.preferredTerm = concept[0]['preferredTerm']
-            new_drug.save()
-        else:
-            print(f"{benzo[1]} does not exist. Skipping...")
-    for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
-        if MedicineEntity.objects.filter(
-            medicine_name=aem[1],
-        ).exists():
-            # if the drug is not in the database already
-            aem_drug = MedicineEntity.objects.filter(
-                medicine_name=aem[1],
-            ).first()
-            aem_drug.is_rescue = False
-            if aem[0] not in [1001, 1002]:
-                concept = fetch_ecl(aem[0])
-                aem_drug.conceptId = concept[0]['conceptId']
-                aem_drug.term = concept[0]['term']
-                aem_drug.preferredTerm = concept[0]['preferredTerm']
-            aem_drug.save()
-        else:
-            print(f"{aem_drug[1]} does not exist. Skipping...")
-
-
 def run_dummy_cases_seed():
     added = 0
     print('\033[33m', 'Seeding fictional cases...', '\033[33m')
