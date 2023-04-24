@@ -24,10 +24,7 @@ class Command(BaseCommand):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'seed_comorbidities'):
-            self.stdout.write('seeding comorbidities...')
-            run_comorbidities_seed()
-        elif (options['mode'] == 'seed_medicines'):
+        if (options['mode'] == 'seed_medicines'):
             self.stdout.write('seeding medicines...')
             run_medicines_seed()
         elif (options['mode'] == 'seed_dummy_cases'):
@@ -60,42 +57,6 @@ class Command(BaseCommand):
         self.stdout.write(image())
         print('\033[38;2;17;167;107m')
         self.stdout.write('done.')
-
-def run_comorbidities_seed():
-    """
-    This returns all the snomed ct definitions and codes for epilepsy causes.
-    Should be run periodically to compare with value in database and update record if has changed
-    """
-    print('\033[33m', 'Seeding comorbidities from paediatric neurodisability reference set...', '\033[33m')
-    if ComorbidityEntity.objects.count() > 0:
-        print('Comorbidities already exist. Skipping...')
-        return
-    index = 0
-    # ecl = '<< 35919005'
-    # comorbidity_choices = fetch_ecl(ecl)
-    comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
-
-    for comorbidity_choice in comorbidity_choices:
-        new_comorbidity = ComorbidityEntity(
-            conceptId=comorbidity_choice['conceptId'],
-            term=comorbidity_choice['term'],
-            preferredTerm=comorbidity_choice['preferredTerm'],
-            description=None,
-            snomed_ct_edition=None,
-            snomed_ct_version=None,
-            icd_code=None,
-            icd_version=None,
-            dsm_code=None,
-            dsm_version=None,
-        )
-        try:
-            new_comorbidity.save()
-            index += 1
-        except Exception as e:
-            print(
-                f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
-    print(f"{index} comorbidities added")
-
 
 def run_medicines_seed():
     print('\033[33m', 'Seeding all the medicines from SNOMED and local Epilepsy12 list...', '\033[33m')
