@@ -404,9 +404,6 @@ def selected_trust_select_kpi(request, organisation_id):
         cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
 
     all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
-
-    all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='icb', kpi_measure=kpi_name)
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
