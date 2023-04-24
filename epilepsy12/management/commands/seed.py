@@ -63,10 +63,10 @@ class Command(BaseCommand):
         elif (options['mode'] == 'delete_all_groups_and_recreate'):
             self.stdout.write(
                 'deleting all groups/permissions and reallocating...')
-        elif (options['mode'] == 'replace_comorbidities_with_refset'):
-            self.stdout.write(
-                'replacing comorbidites with refset...')
-            replace_existing_comorbidities_with_refset()
+        # elif (options['mode'] == 'replace_comorbidities_with_refset'):
+        #     self.stdout.write(
+        #         'replacing comorbidites with refset...')
+        #     replace_existing_comorbidities_with_refset()
         elif (options['mode'] == 'add_existing_medicines_as_foreign_keys'):
             self.stdout.write(
                 'replacing medicines with medicine entity...')
