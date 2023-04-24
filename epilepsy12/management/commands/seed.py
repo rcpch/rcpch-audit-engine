@@ -24,15 +24,9 @@ class Command(BaseCommand):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'seed_semiology_keywords'):
-            self.stdout.write('seeding organisation data...')
-            run_semiology_keywords_seed()
-        elif (options['mode'] == 'seed_syndromes'):
+        if (options['mode'] == 'seed_syndromes'):
             self.stdout.write('seeding syndromes...')
             run_syndromes_seed()
-        elif (options['mode'] == 'seed_epilepsy_causes'):
-            self.stdout.write('seeding epilepsy causes...')
-            run_epilepsy_causes_seed()
         elif (options['mode'] == 'seed_comorbidities'):
             self.stdout.write('seeding comorbidities...')
             run_comorbidities_seed()
@@ -62,10 +56,6 @@ class Command(BaseCommand):
         elif (options['mode'] == 'add_existing_medicines_as_foreign_keys'):
             self.stdout.write(
                 'replacing medicines with medicine entity...')
-        elif (options['mode'] == 'update_medicine_entity_with_snomed'):
-            self.stdout.write(
-                'updating medicine_entities with SNOMED...')
-            update_medicine_entity_with_snomed()
 
         else:
             self.stdout.write('No options supplied...')
@@ -99,27 +89,27 @@ def run_syndromes_seed():
     print(f"Syndromes added...{added}")
 
 
-def run_semiology_keywords_seed():
-    added = 0
-    print('\033[33m', 'Seeding all the epilepsy semiology keywords...', '\033[33m')
-    for index, semiology_keyword in enumerate(KEYWORDS):
-        if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
-            print(
-                f'Keywords already exist. Skipping this step...')
-            return
-        new_keyword = Keyword(
-            keyword=semiology_keyword["title"],
-            category=semiology_keyword["category"]
-        )
-        try:
-            new_keyword.save()
-        except Exception as e:
-            print(f"Error at {semiology_keyword['title']}: error: {e}")
-        added += 1
-        print(
-            f"added {semiology_keyword['title']} in category {semiology_keyword['category']}")
-    image()
-    print(f"Keywords added: {added}")
+# def run_semiology_keywords_seed():
+#     added = 0
+#     print('\033[33m', 'Seeding all the epilepsy semiology keywords...', '\033[33m')
+#     for index, semiology_keyword in enumerate(KEYWORDS):
+#         if Keyword.objects.filter(keyword=semiology_keyword["title"]).exists():
+#             print(
+#                 f'Keywords already exist. Skipping this step...')
+#             return
+#         new_keyword = Keyword(
+#             keyword=semiology_keyword["title"],
+#             category=semiology_keyword["category"]
+#         )
+#         try:
+#             new_keyword.save()
+#         except Exception as e:
+#             print(f"Error at {semiology_keyword['title']}: error: {e}")
+#         added += 1
+#         print(
+#             f"added {semiology_keyword['title']} in category {semiology_keyword['category']}")
+#     image()
+#     print(f"Keywords added: {added}")
 
 def run_comorbidities_seed():
     """
