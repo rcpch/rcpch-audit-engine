@@ -452,8 +452,6 @@ def selected_trust_select_kpi(request, organisation_id):
         'country_title': f'{kpi_value} by Country',
         'country_id': 'country_id',
     }
-
-    print(context['icb'])
     
     template_name = 'epilepsy12/partials/organisation/metric.html'
 

@@ -21,7 +21,6 @@ def calculate_kpi_average(kpi_data: list[dict], kpi: str, decimal_places: int=2)
         if (region_eligible_passing is not None) and (region_eligible_cases is not None):
             pct_achieving_measure = 100 * \
                 (region_eligible_passing / region_eligible_cases)
-            # print(f"Adding {pct_achieving_measure}%")
             total_pct_achieving_measure += pct_achieving_measure
             num_eligible_rows += 1
 
