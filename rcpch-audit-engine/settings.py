@@ -49,6 +49,9 @@ POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
 NHS_ODS_API_URL = os.getenv('NHS_ODS_API_URL')
 NHS_ODS_API_KEY = os.getenv('NHS_ODS_API_KEY')
 
+# SNOMED Terminology server
+RCPCH_HERMES_SERVER_URL = os.getenv('RCPCH_HERMES_SERVER_URL')
+
 # Application definition
 
 INSTALLED_APPS = [

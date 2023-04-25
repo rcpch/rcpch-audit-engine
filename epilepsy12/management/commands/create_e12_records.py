@@ -186,7 +186,7 @@ def create_multiaxial_diagnosis(registration_instance):
         if multiaxial_diagnosis.syndrome_present:
             # create a related syndrome
             syndrome_entity = SyndromeEntity.objects.filter(
-                syndrome_name=SYNDROMES[randint(0, len(SYNDROMES)-1)][1]).get()
+                syndrome_name=SYNDROMES[randint(0, len(SYNDROMES) - 1)][1]).get()
             Syndrome.objects.create(
                 syndrome_diagnosis_date=random_date(
                     start=registration_instance.registration_date, end=registration_instance.registration_close_date),
@@ -198,7 +198,7 @@ def create_multiaxial_diagnosis(registration_instance):
             ecl = '<< 363235000'
             epilepsy_causes = fetch_ecl(ecl)
             random_cause = EpilepsyCauseEntity.objects.filter(
-                conceptId=epilepsy_causes[randint(0, len(epilepsy_causes)-1)]['conceptId']).first()
+                conceptId=epilepsy_causes[randint(0, len(epilepsy_causes) - 1)]['conceptId']).first()
 
             multiaxial_diagnosis.epilepsy_cause = random_cause
             total_cause_choices = len(EPILEPSY_CAUSES)
@@ -206,43 +206,46 @@ def create_multiaxial_diagnosis(registration_instance):
             choices = []
             for choice in range(0, random_number_of_choices):
                 choices.append(EPILEPSY_CAUSES
-                               [randint(0, len(EPILEPSY_CAUSES)-1)][0])
+                               [randint(0, len(EPILEPSY_CAUSES) - 1)][0])
             multiaxial_diagnosis.epilepsy_cause_categories = choices
 
         if multiaxial_diagnosis.mental_health_issue_identified:
             multiaxial_diagnosis.mental_health_issue = NEUROPSYCHIATRIC[randint(
-                0, len(NEUROPSYCHIATRIC)-1)][0]
+                0, len(NEUROPSYCHIATRIC) - 1)][0]
 
         if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
             # add upto 5 comorbidities
             for count_item in range(1, randint(1, 5)):
-                # ecl = '<< 35919005'
-                # comorbidity_choices = fetch_ecl(ecl)
                 comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
                 random_comorbidities = comorbidity_choices[randint(
-                    0, len(comorbidity_choices)-1)]
+                    0, len(comorbidity_choices) - 1)]
                 random_comorbidity = ComorbidityEntity.objects.filter(
                     conceptId=random_comorbidities['conceptId']).first()
 
-                Comorbidity.objects.create(
-                    multiaxial_diagnosis=multiaxial_diagnosis,
-                    comorbidity_diagnosis_date=random_date(
-                        start=registration_instance.registration_date, end=registration_instance.registration_close_date),
-                    comorbidityentity=random_comorbidity
-                )
+                try:
+                    Comorbidity.objects.create(
+                        multiaxial_diagnosis=multiaxial_diagnosis,
+                        comorbidity_diagnosis_date=random_date(
+                            start=registration_instance.registration_date, end=registration_instance.registration_close_date),
+                        comorbidityentity=random_comorbidity
+                    )
+                except Exception as e:
 
-        # create a random number of episodes to a maximum of 5
+                    print(
+                        f'Failed to create Comorbidity with {random_comorbidity}:{e=}')
+
+                    # create a random number of episodes to a maximum of 5
         for count_item in range(1, randint(1, 5)):
             current_cohort_end_date = first_tuesday_in_january(
-                current_cohort_start_date().year+2)+relativedelta(days=7)
+                current_cohort_start_date().year + 2) + relativedelta(days=7)
             episode = Episode.objects.create(
                 multiaxial_diagnosis=multiaxial_diagnosis,
                 seizure_onset_date=random_date(
                     start=registration_instance.registration_date, end=current_cohort_end_date),
                 seizure_onset_date_confidence=DATE_ACCURACY[randint(
-                    0, len(DATE_ACCURACY)-1)][0],
+                    0, len(DATE_ACCURACY) - 1)][0],
                 episode_definition=EPISODE_DEFINITION[randint(
-                    0, len(EPISODE_DEFINITION)-1)][0]
+                    0, len(EPISODE_DEFINITION) - 1)][0]
             )
 
             if count_item == 1:
@@ -250,7 +253,7 @@ def create_multiaxial_diagnosis(registration_instance):
                 episode.epilepsy_or_nonepilepsy_status = 'E'
             else:
                 episode.epilepsy_or_nonepilepsy_status = EPILEPSY_DIAGNOSIS_STATUS[randint(
-                    0, len(EPILEPSY_DIAGNOSIS_STATUS)-1)][0]
+                    0, len(EPILEPSY_DIAGNOSIS_STATUS) - 1)][0]
 
             episode.has_description_of_the_episode_or_episodes_been_gathered = bool(
                 getrandbits(1))
@@ -266,7 +269,7 @@ def create_multiaxial_diagnosis(registration_instance):
 
                 description_string += f'{activity_choices[random_number]} when they developed '
                 for index, semiology_keyword in enumerate(keyword_array):
-                    if index == len(keyword_array)-1:
+                    if index == len(keyword_array) - 1:
                         description_string += f'and {semiology_keyword}.'
                     else:
                         description_string += f'{semiology_keyword}, '
@@ -276,16 +279,16 @@ def create_multiaxial_diagnosis(registration_instance):
 
             if episode.epilepsy_or_nonepilepsy_status == 'E':
                 episode.epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[randint(
-                    0, len(EPILEPSY_SEIZURE_TYPE)-1)][0]
+                    0, len(EPILEPSY_SEIZURE_TYPE) - 1)][0]
 
                 if episode.epileptic_seizure_onset_type == 'FO':
-                    laterality = LATERALITY[randint(0, len(LATERALITY)-1)]
+                    laterality = LATERALITY[randint(0, len(LATERALITY) - 1)]
                     motor_manifestation = FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS[randint(
-                        0, len(FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS)-1)]
+                        0, len(FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS) - 1)]
                     nonmotor_manifestation = FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS[randint(
-                        0, len(FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS)-1)]
+                        0, len(FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS) - 1)]
                     eeg_manifestations = FOCAL_EPILEPSY_EEG_MANIFESTATIONS[randint(
-                        0, len(FOCAL_EPILEPSY_EEG_MANIFESTATIONS)-1)]
+                        0, len(FOCAL_EPILEPSY_EEG_MANIFESTATIONS) - 1)]
                     setattr(episode, laterality['name'], True)
                     setattr(episode, motor_manifestation['name'], True)
                     setattr(episode, nonmotor_manifestation['name'], True)
@@ -293,32 +296,32 @@ def create_multiaxial_diagnosis(registration_instance):
 
                 elif episode.epileptic_seizure_onset_type == 'GO':
                     episode.epileptic_generalised_onset = GENERALISED_SEIZURE_TYPE[randint(
-                        0, len(GENERALISED_SEIZURE_TYPE)-1)][0]
+                        0, len(GENERALISED_SEIZURE_TYPE) - 1)][0]
 
             elif episode.epilepsy_or_nonepilepsy_status == 'NE':
                 episode.nonepileptic_seizure_unknown_onset = NON_EPILEPSY_SEIZURE_ONSET[randint(
-                    0, len(NON_EPILEPSY_SEIZURE_ONSET)-1)][0]
+                    0, len(NON_EPILEPSY_SEIZURE_ONSET) - 1)][0]
                 episode.nonepileptic_seizure_type = NON_EPILEPSY_SEIZURE_TYPE[randint(
-                    0, len(NON_EPILEPSY_SEIZURE_TYPE)-1)][0]
+                    0, len(NON_EPILEPSY_SEIZURE_TYPE) - 1)][0]
 
                 if episode.nonepileptic_seizure_type == 'BPP':
                     episode.nonepileptic_seizure_behavioural = NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS[len(
-                        NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS)-1][0]
+                        NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS) - 1][0]
                 elif episode.nonepileptic_seizure_type == 'MAD':
                     episode.nonepileptic_seizure_migraine = MIGRAINES[len(
-                        MIGRAINES)-1][0]
+                        MIGRAINES) - 1][0]
                 elif episode.nonepileptic_seizure_type == 'ME':
                     episode.nonepileptic_seizure_miscellaneous = EPIS_MISC[len(
-                        EPIS_MISC)-1][0]
+                        EPIS_MISC) - 1][0]
                 elif episode.nonepileptic_seizure_type == 'SRC':
                     episode.nonepileptic_seizure_sleep = NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS[len(
-                        NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS)-1][0]
+                        NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS) - 1][0]
                 elif episode.nonepileptic_seizure_type == 'SAS':
                     episode.nonepileptic_seizure_syncope = NON_EPILEPTIC_SYNCOPES[len(
-                        NON_EPILEPTIC_SYNCOPES)-1][0]
+                        NON_EPILEPTIC_SYNCOPES) - 1][0]
                 elif episode.nonepileptic_seizure_type == 'PMD':
                     episode.nonepileptic_seizure_paroxysmal = NON_EPILEPSY_PAROXYSMS[len(
-                        NON_EPILEPSY_PAROXYSMS)-1][0]
+                        NON_EPILEPSY_PAROXYSMS) - 1][0]
                 else:
                     pass
 

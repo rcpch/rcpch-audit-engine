@@ -30,12 +30,7 @@ def seed_comorbidities(apps, schema_editor):
     comorbidity_choices = fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
 
     for index,comorbidity_choice in enumerate(comorbidity_choices):
-        
-        # filters out Autism-related entries
-        if comorbidity_choice['conceptId'] == 35919005:
-            print(f"Filtering out autism-related SNOMED conceptId: {comorbidity_choice['preferredTerm']}")
-            continue
-        
+                
         new_comorbidity = ComorbidityEntity(
             conceptId=comorbidity_choice['conceptId'],
             term=comorbidity_choice['term'],

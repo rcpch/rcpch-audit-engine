@@ -29,6 +29,8 @@ services:
       - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
+      - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
+      - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
     # ensures that docker compose always displays log output
@@ -37,7 +39,7 @@ services:
   
   # db container - runs postgres
   db:
-    image: postgres:latest
+    image: postgis/postgis:15-3.3
     volumes:
         - "auditenginedb:/var/lib/postgresql/data"
     environment:
