@@ -24,8 +24,11 @@ class Command(BaseCommand):
         parser.add_argument('--mode', type=str, help="Mode")
 
     def handle(self, *args, **options):
-        
-        if (options['mode'] == 'seed_groups_and_permissions'):
+        if (options['mode'] == 'seed_registrations'):
+            self.stdout.write(
+                'register cases in audit and complete all fields with random answers...')
+            run_registrations()
+        elif (options['mode'] == 'seed_groups_and_permissions'):
             self.stdout.write('setting up groups and permissions...')
             create_groups()
         elif (options['mode'] == 'add_permissions_to_existing_groups'):
@@ -48,6 +51,33 @@ class Command(BaseCommand):
         self.stdout.write(image())
         print('\033[38;2;17;167;107m')
         self.stdout.write('done.')
+
+def run_registrations():
+    """
+    Calling function to register all cases in Epilepsy12 and complete all fields with random answers
+    """
+    print('\033[33m', 'Registering fictional cases in Epilepsy12...', '\033[33m')
+
+    create_registrations()
+
+    complete_registrations()
+
+
+def complete_registrations():
+    """
+    Loop through the registrations and score all fields
+    """
+    print('\033[33m', 'Completing all the Epilepsy12 fields for the fictional cases...', '\033[33m')
+    for registration in Registration.objects.all():
+        current_cohort_end_date = first_tuesday_in_january(
+            current_cohort_start_date().year + 2) + relativedelta(days=7)
+        registration.registration_date = random_date(
+            start=current_cohort_start_date(), end=current_cohort_end_date)
+        registration.eligibility_criteria_met = True
+        registration.save()
+
+        create_epilepsy12_record(registration_instance=registration)
+
 
 def image():
     return """
