@@ -302,7 +302,7 @@ def user_may_view_this_child():
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentOrganisation_OrganisationName=request.user.organisation_employer.ParentName,
+                        ParentOrganisation_ODSCode=request.user.organisation_employer.ParentOrganisation_ODSCode,
                     )
 
                 if organisation.exists() or user.is_rcpch_audit_team_member:
