@@ -1872,4 +1872,15 @@ div.sixteen.wide.column.add_search_return_wrapper > #case_statistics {
 
 div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   width: 100%;
+.ui.form.field>label {
+  font-weight: 400;
+}
+
+.unpadded {
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+.notupperpadded {
+  padding-top: 0 !important;
 }
