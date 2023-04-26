@@ -17,7 +17,7 @@ class CaseForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "first name"
+                "placeholder": "First name"
             }
         ),
         required=True
@@ -27,7 +27,7 @@ class CaseForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "surname"
+                "placeholder": "Surname"
             }
         ),
         required=True
@@ -36,7 +36,7 @@ class CaseForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "date of birth",
+                "placeholder": "Date of Birth",
                 "type": "date"
             }
         ),

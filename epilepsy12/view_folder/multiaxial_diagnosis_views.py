@@ -2,7 +2,7 @@ from django.utils import timezone
 from operator import itemgetter
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Subquery
+from django.contrib.gis.db.models import Subquery
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 

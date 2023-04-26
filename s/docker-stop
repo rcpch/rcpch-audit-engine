@@ -6,4 +6,4 @@
 # starts the postgres and application containers (does not do any setup)
 # runs the django development server
 
-docker compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml down -v # removes the container and the volume

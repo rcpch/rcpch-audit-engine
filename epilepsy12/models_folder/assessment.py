@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 

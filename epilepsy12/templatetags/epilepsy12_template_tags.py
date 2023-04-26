@@ -1,6 +1,10 @@
+import re
+
 from django import template
 from django.utils.safestring import mark_safe
+
 from ..general_functions import fetch_concept
+
 
 register = template.Library()
 
@@ -50,7 +54,8 @@ def kpi_for_kpi_name(aggregated_kpi, kpi_name):
     if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
         return 0
     else:
-        return aggregated_kpi['aggregated_kpis'][kpi_name]
+        pct = 100*aggregated_kpi['aggregated_kpis'][kpi_name] / aggregated_kpi['aggregated_kpis']['total_number_of_cases']
+        return pct
 
 
 @register.simple_tag
@@ -61,14 +66,17 @@ def kpi_average_for_kpi_name(aggregated_kpi, kpi_name):
         return aggregated_kpi['aggregated_kpis'][f'{kpi_name}_average']
 
 
-@register.filter
-def split_label_to_list(label):
+@register.simple_tag
+def formatlabel(label):
     if label is None:
         return 'Unclassified'
     else:
-        processed = label.strip().replace(
-            'INTEGRATED CARE BOARD', "").replace('&#x27;', "\'")
-        return processed
+        nhs_icb_string = re.search(
+            r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)', label)
+        if nhs_icb_string:
+            # \u002D fixes hyphen render for 'Stoke-on-trent'
+            return nhs_icb_string.group(2).replace(r'\u002D','-').title()
+        return label
 
 
 @register.filter

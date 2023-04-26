@@ -2,7 +2,7 @@ from dateutil import relativedelta
 from datetime import date
 from django.utils import timezone
 from operator import itemgetter
-from django.db.models import Q
+from django.contrib.gis.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
 from epilepsy12.constants.medications import ANTIEPILEPSY_MEDICINES, BENZODIAZEPINE_TYPES
@@ -236,6 +236,9 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
     choices = MedicineEntity.objects.filter(
         is_rescue=antiepilepsy_medicine.is_rescue_medicine).order_by('medicine_name')
+
+    for medicine in MedicineEntity.objects.all():
+        print(medicine)
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True

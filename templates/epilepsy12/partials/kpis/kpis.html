@@ -7,7 +7,7 @@
                 <div class='content kpi_header'>
                     <p>Real-time Key Performance Indicator (KPI) Metrics</p>
                     <!-- <div class="sub header"> -->
-                    <p>{{organisation.OrganisationName}} ({{ organisation.ParentName }})</p>
+                    <p>{{organisation.OrganisationName}} ({{ organisation.ParentOrganisation_OrganisationName }})</p>
                     <!-- </div>     -->
                 </div>
                 <button 
@@ -88,7 +88,7 @@
                                 ></i>({{open_uk_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>Country ({{organisation.Country}})</p>
+                                <p>Country ({{organisation.ons_region.ons_country.Country_ONS_Name}})</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_country'
@@ -581,7 +581,7 @@
                                         class="rcpch question circle icon"
                                         id='comprehensive_care_planning_content'
                                         data-title='Comprehensive care planning content'
-                                        data-content="{{audit_procomprehensive_care_planning_contentiary_input_help_reference_text}} Note: different measures have different denominators."
+                                        data-content="{{kpis.get_comprehensive_care_planning_content_help_reference_text}} Note: different measures have different denominators."
                                         data-position='top right' _="init js $('#comprehensive_care_planning_content').popup(); end">
                                     </i>
                                 </div>
@@ -711,7 +711,33 @@
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.general_participation_and_risk_total}}){% endif %}</td>
                         </tr>
 
-                        <tr class="subcategory-row"> <!-- 9B (e) service_contact_details -->
+                        <tr class="subcategory-row"> <!-- 9B (e) sudep -->
+                            {% percentage_of_total organisation_kpis.sudep organisation_kpis.sudep_total as organisation_percentage %}
+                            {% percentage_of_total trust_kpis.sudep trust_kpis.sudep_total as trust_percentage %}
+                            {% percentage_of_total icb_kpis.sudep icb_kpis.sudep_total as icb_percentage %}
+                            {% percentage_of_total nhs_kpis.sudep nhs_kpis.sudep_total as nhs_percentage %}
+                            {% percentage_of_total open_uk_kpis.sudep open_uk_kpis.sudep_total as open_uk_percentage %}
+                            {% percentage_of_total country_kpis.sudep country_kpis.sudep_total as country_percentage %}
+                            {% percentage_of_total national_kpis.sudep national_kpis.sudep_total as national_percentage %}
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{{kpis.get_sudep_help_label_text}}</p>
+                                    <i class="rcpch question circle icon" id='sudep' data-title='Sudden unexplained death in epilepsy'
+                                        data-content="{{kpis.get_sudep_help_reference_text}} Note: different measures have different denominators."
+                                        data-position='top right' _="init js $('#sudep').popup(); end">
+                                    </i>
+                                </div>
+                            </td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.sudep_total}}){% endif %}</td>
+                        </tr>
+
+                        <tr class="subcategory-row"> <!-- 9B (f) service_contact_details -->
                             {% percentage_of_total organisation_kpis.service_contact_details organisation_kpis.service_contact_details_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.service_contact_details trust_kpis.service_contact_details_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.service_contact_details icb_kpis.service_contact_details_total as icb_percentage %}
@@ -726,7 +752,7 @@
                                         class="rcpch question circle icon"
                                         id='service_contact_details'
                                         data-title='Service contact details'
-                                        data-content="{{kpis.service_contact_details.get_service_contact_details_help_reference_text}} Note: different measures have different denominators."
+                                        data-content="{{kpis.get_service_contact_details_help_reference_text}} Note: different measures have different denominators."
                                         data-position='top right' _="init js $('#service_contact_details').popup(); end">
                                     </i>
                                 </div>
@@ -738,35 +764,6 @@
                             <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.service_contact_details_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.service_contact_details_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.service_contact_details_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (f) sudep -->
-                            {% percentage_of_total organisation_kpis.sudep organisation_kpis.sudep_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.sudep trust_kpis.sudep_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.sudep icb_kpis.sudep_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.sudep nhs_kpis.sudep_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.sudep open_uk_kpis.sudep_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.sudep country_kpis.sudep_total as country_percentage %}
-                            {% percentage_of_total national_kpis.sudep national_kpis.sudep_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_sudep_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='sudep'
-                                        data-title='Sudden unexplained death in epilepsy'
-                                        data-content="{{kpis.get_sudep_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#sudep').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.sudep_total}}){% endif %}</td>
                         </tr>
 
                         <tr> <!-- 10 school_individual_healthcare_plan -->

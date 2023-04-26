@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
-from django.db.models import Q
+from django.contrib.gis.db.models import Q
 from django.urls import reverse
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
@@ -62,7 +62,7 @@ def register(request, case_id):
         ).get()
         kpi = KPI.objects.create(
             organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.ParentName,
+            parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -94,8 +94,7 @@ def register(request, case_id):
     else:
         registration = Registration.objects.filter(case=case).get()
 
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     previously_registered = 0
 
@@ -205,8 +204,7 @@ def allocate_lead_site(request, registration_id):
 
     # get the new
 
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "organisation_list": organisation_list,
@@ -238,8 +236,7 @@ def edit_lead_site(request, registration_id, site_id):
     """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "organisation_list": organisation_list,
@@ -272,8 +269,7 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName').all()
+    organisation_list = Organisation.objects.order_by('OrganisationName').all()
 
     context = {
         "organisation_list": organisation_list,
@@ -300,8 +296,7 @@ def transfer_lead_site(request, registration_id, site_id):
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "registration": registration,
@@ -436,8 +431,7 @@ def delete_lead_site(request, registration_id, site_id):
         site_is_primary_centre_of_epilepsy_care=True,
         site_is_actively_involved_in_epilepsy_care=True).first()
 
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "registration": registration,
