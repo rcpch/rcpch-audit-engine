@@ -1,9 +1,9 @@
 {% extends "base.html" %}  
 {% block content %}
 
-  <div class="ui rcpch container">
+<div class="ui rcpch container">
 
-    <div class='ui top attached rcpch_dark_blue clearing segment'>
+    <div class='ui top attached rcpch_purple clearing segment'> 
             <h5 class="ui left floated header">
                 Children and young people view
               </h5>
@@ -17,31 +17,36 @@
           </div>
         </div>
           
-        <div class="sixteen wide column add_search_return_wrapper">
+        <div class="twelve wide notupperpadded column">
             
-              <a href="{% url 'create_case' organisation_id %}" class="ui rcpch_primary button">Add a new Child/Young Person</a>
+              <a href="{% url 'create_case' organisation_id %}"><button class="ui rcpch_purple button">Add a new Child/Young Person</button></a>
               
-              <div class="four wide column" id='case_statistics'>
-                  {% include 'epilepsy12/partials/cases/case_statistics.html' with organisation=organisation total_cases=total_cases total_registrations=total_registrations %}
-              </div>
+              <a href="{% url 'organisation_reports' %}"><button class="ui rcpch_dark_purple button">Return to organisation view</button></a>
+              
+        </div>
+            
+        <div class="four wide notupperpadded column" id='case_statistics'>
+            {% include 'epilepsy12/partials/cases/case_statistics.html' with organisation=organisation total_cases=total_cases total_registrations=total_registrations %}
+        </div>
 
-              <a href="{% url 'organisation_reports' %}" class="ui rcpch_positive button">Return to organisation view</a>
-                  
+        <div class="sixteen wide notupperpadded column">
+
+          <div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name or NHS Number.">
+            <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
+            <i class="ui rcpch_light_blue circular search link icon"></i>
           </div>
-          
-          <div class="sixteen wide column search_field_wrapper">
-            <div class="ui rcpch icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
-              <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
-              <i class="ui rcpch_light_blue circular search link icon"></i>
-            </div>
-          </div>
+
+        </div>
+
       </div>
+
       <div id="case_table">
         {% include '../partials/case_table.html' with case_list=case_list paginated=paginated organisation=organisation %}
       </div>
+
       
     </div>
-    <div class="ui bottom attached rcpch_footer message">
+    <div class="ui bottom attached rcpch_purple_footer message">
       <i class="warning info circle icon"></i>
       These are all the children and young people registered in all audits since 2022.
     </div>
