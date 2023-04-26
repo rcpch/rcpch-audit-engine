@@ -1,5 +1,5 @@
 # django
-from django.db import models
+from django.contrib.gis.db import models
 # 3rd party
 from simple_history.models import HistoricalRecords
 # rcpch
@@ -82,4 +82,4 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         ]
 
     def __str__(self) -> str:
-        return self.organisation.ParentName
+        return self.organisation.ParentOrganisation_OrganisationName

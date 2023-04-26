@@ -51,8 +51,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
                                 site_is_general_paediatric_centre=True).update(site_is_actively_involved_in_epilepsy_care=False)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         'assessment': assessment,
@@ -106,8 +105,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -162,8 +160,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -235,8 +232,7 @@ def general_paediatric_centre(request, assessment_id):
         site.save()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -313,8 +309,7 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
         )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -359,8 +354,7 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
         general_paediatric_edit_active = False
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -422,8 +416,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -505,8 +498,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
                                 site_is_paediatric_neurology_centre=True).update(site_is_actively_involved_in_epilepsy_care=False)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -563,8 +555,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -622,8 +613,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -691,8 +681,7 @@ def paediatric_neurology_centre(request, assessment_id):
         site.save()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -759,8 +748,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
         )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -804,8 +792,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
         neurology_edit_active = False
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -868,8 +855,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -925,8 +911,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
 
     assessment = Assessment.objects.get(pk=assessment_id)
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -995,8 +980,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
                                 site_is_childrens_epilepsy_surgery_centre=True).update(site_is_actively_involved_in_epilepsy_care=False)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -1051,8 +1035,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         'assessment': assessment,
@@ -1107,8 +1090,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         'assessment': assessment,
@@ -1175,8 +1157,7 @@ def epilepsy_surgery_centre(request, assessment_id):
         site.save()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -1246,8 +1227,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
         )
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": assessment,
@@ -1290,8 +1270,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
         surgery_edit_active = False
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -1355,8 +1334,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
     assessment = Assessment.objects.get(pk=assessment_id)
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     context = {
         "assessment": Assessment.objects.get(pk=assessment_id),
@@ -1543,8 +1521,7 @@ def assessment(request, case_id):
     assessment = Assessment.objects.filter(registration=registration).get()
 
     # filter list to include only NHS organisations
-    organisation_list = Organisation.objects.filter(
-        Sector="NHS Sector").order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by('OrganisationName')
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,

@@ -15,6 +15,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 import sys
+import datetime
 
 # third party imports
 from django.core.management.utils import get_random_secret_key
@@ -45,10 +46,17 @@ RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv(
 # this is the url for api.postcodes.io, a free service reporting postcode data off a postcode
 POSTCODES_IO_API_URL = os.getenv('POSTCODES_IO_API_URL')
 
+NHS_ODS_API_URL = os.getenv('NHS_ODS_API_URL')
+NHS_ODS_API_KEY = os.getenv('NHS_ODS_API_KEY')
+
+# SNOMED Terminology server
+RCPCH_HERMES_SERVER_URL = os.getenv('RCPCH_HERMES_SERVER_URL')
+
 # Application definition
 
 INSTALLED_APPS = [
     "semantic_admin",
+    "django.contrib.gis",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,10 +84,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware'
+    'simple_history.middleware.HistoryRequestMiddleware',
+    'django_auto_logout.middleware.auto_logout',
 ]
 
 ROOT_URLCONF = 'rcpch-audit-engine.urls'
+
+# AUTO LOGOUT SESSION EXPIRATION
+AUTO_LOGOUT = {
+    'IDLE_TIME': datetime.timedelta(minutes=30),
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
+    'MESSAGE': 'You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.',
+}
 
 LOGIN_REDIRECT_URL = "/organisation"
 LOGOUT_REDIRECT_URL = "/"
@@ -96,6 +112,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_auto_logout.context_processors.auto_logout_client',
+                'rcpch-audit-engine.context_processors.export_vars',
             ]
         }
     },
@@ -114,7 +132,7 @@ WSGI_APPLICATION = 'rcpch-audit-engine.wsgi.application'
 
 DATABASES = {
     "default": {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get('E12_POSTGRES_DB_NAME'),
         'USER': os.environ.get('E12_POSTGRES_DB_USER'),
         'PASSWORD': os.environ.get('E12_POSTGRES_DB_PASSWORD'),

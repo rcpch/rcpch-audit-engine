@@ -143,7 +143,7 @@ def group_required(*group_names):
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentName=request.user.organisation_employer.ParentName
+                        ParentOrganisation_OrganisationName=request.user.organisation_employer.ParentName
                     )
 
                 if organisation.exists() or user.is_rcpch_audit_team_member:
@@ -229,7 +229,7 @@ def user_can_access_this_organisation():
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentName=request.user.organisation_employer.ParentName
+                        ParentOrganisation_OrganisationName=request.user.organisation_employer.ParentName
                     )
 
                 if organisation.exists() or user.is_rcpch_audit_team_member:

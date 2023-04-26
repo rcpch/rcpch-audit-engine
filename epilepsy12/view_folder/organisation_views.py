@@ -5,7 +5,7 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-from django.db.models import Sum, Count, Avg
+from django.contrib.gis.db.models import Sum, Count, Avg
 from pprint import pprint
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
@@ -14,24 +14,24 @@ from django_htmx.http import HttpResponseClientRedirect
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
 from epilepsy12.models import Case, FirstPaediatricAssessment, Assessment, FirstPaediatricAssessment, Assessment, Site, EpilepsyContext, MultiaxialDiagnosis, Syndrome, Investigations, Management, Comorbidity, Registration, Episode, Organisation, KPI
 from ..common_view_functions import trigger_client_event, cases_aggregated_by_sex, cases_aggregated_by_ethnicity, cases_aggregated_by_deprivation_score, all_registered_cases_for_cohort_and_abstraction_level, aggregate_all_eligible_kpi_fields, return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel
-from ..general_functions import get_current_cohort_data, value_from_key
+from ..general_functions import get_current_cohort_data, value_from_key, calculate_kpi_average
 
 
 @login_required
 def organisation_reports(request):
 
     # Audit trail - filter all models and sort in order of updated_at, returning the latest 5 updates
-    first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
-    site = Site.objects.filter()
-    epilepsy_context = EpilepsyContext.objects.filter()
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
-    episode = Episode.objects.filter()
-    syndrome = Syndrome.objects.filter()
-    comorbidity = Comorbidity.objects.filter()
-    assessment = Assessment.objects.filter()
-    investigations = Investigations.objects.filter()
-    management = Management.objects.filter()
-    registration = Registration.objects.filter()
+    # first_paediatric_assessment = FirstPaediatricAssessment.objects.filter()
+    # site = Site.objects.filter()
+    # epilepsy_context = EpilepsyContext.objects.filter()
+    # multiaxial_diagnosis = MultiaxialDiagnosis.objects.filter()
+    # episode = Episode.objects.filter()
+    # syndrome = Syndrome.objects.filter()
+    # comorbidity = Comorbidity.objects.filter()
+    # assessment = Assessment.objects.filter()
+    # investigations = Investigations.objects.filter()
+    # management = Management.objects.filter()
+    # registration = Registration.objects.filter()
 
     # all_models = sorted(
     #     chain(registration, first_paediatric_assessment, site, epilepsy_context, multiaxial_diagnosis,
@@ -49,9 +49,8 @@ def organisation_reports(request):
     else:
         # current user is a member of the RCPCH audit team and also not affiliated with a organisation
         # therefore set selected organisation to first of organisation on the list
-        selected_organisation = Organisation.objects.filter(
-            Sector="NHS Sector"
-        ).order_by('OrganisationName').first()
+        selected_organisation = Organisation.objects.order_by(
+            'OrganisationName').first()
 
     # query to return all completed E12 cases in the current cohort in this organisation
     count_of_current_cohort_registered_completed_cases_in_this_organisation = all_registered_cases_for_cohort_and_abstraction_level(
@@ -97,7 +96,7 @@ def organisation_reports(request):
     return render(request=request, template_name=template_name, context={
         'user': request.user,
         'selected_organisation': selected_organisation,
-        'organisation_list': Organisation.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
+        'organisation_list': Organisation.objects.order_by('OrganisationName').all(),
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity(selected_organisation=selected_organisation),
         'cases_aggregated_by_sex': cases_aggregated_by_sex(selected_organisation=selected_organisation),
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation_score(selected_organisation=selected_organisation),
@@ -169,7 +168,7 @@ def selected_organisation_summary(request):
     return render(request=request, template_name='epilepsy12/partials/selected_organisation_summary.html', context={
         'user': request.user,
         'selected_organisation': selected_organisation,
-        'organisation_list': Organisation.objects.filter(Sector="NHS Sector").order_by('OrganisationName').all(),
+        'organisation_list': Organisation.objects.order_by('OrganisationName').all(),
         'cases_aggregated_by_ethnicity': cases_aggregated_by_ethnicity(selected_organisation=selected_organisation),
         'cases_aggregated_by_sex': cases_aggregated_by_sex(selected_organisation=selected_organisation),
         'cases_aggregated_by_deprivation': cases_aggregated_by_deprivation_score(selected_organisation=selected_organisation),
@@ -260,7 +259,7 @@ def selected_trust_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
     kpis = KPI.objects.create(
         organisation=organisation,
-        parent_trust=organisation.ParentName
+        parent_trust=organisation.ParentOrganisation_OrganisationName
     )
 
     template_name = 'epilepsy12/partials/kpis/kpis.html'
@@ -400,18 +399,23 @@ def selected_trust_select_kpi(request, organisation_id):
 
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='open_uk', kpi_measure=kpi_name)
+    open_uk_avg = calculate_kpi_average(
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_open_uk_region_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
-
-    all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data['cohort'], abstraction_level='nhs_region', kpi_measure=kpi_name)
+    nhs_region_avg = calculate_kpi_average(
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_nhs_region_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='icb', kpi_measure=kpi_name)
+    icb_avg = calculate_kpi_average(
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_icb_in_current_cohort, kpi=kpi_name)
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data['cohort'], abstraction_level='country', kpi_measure=kpi_name)
+    country_avg = calculate_kpi_average(
+        decimal_places=1,kpi_data=all_aggregated_kpis_by_country_in_current_cohort, kpi=kpi_name)
 
     context = {
         'kpi_name': kpi_name,
@@ -432,19 +436,23 @@ def selected_trust_select_kpi(request, organisation_id):
         'national_kpi': national_kpi[kpi_name],
         'total_national_kpi_cases': national_kpi['total_number_of_cases'],
         'open_uk': all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-        'open_uk_title': f'{kpi_value} by against OPEN UK Region',
+        'open_uk_avg' : open_uk_avg,
+        'open_uk_title': f'{kpi_value} by OPEN UK Region',
         'open_uk_id': 'open_uk_id',
         'icb': all_aggregated_kpis_by_icb_in_current_cohort,
+        'icb_avg' : icb_avg,
         'icb_title': f'{kpi_value} by Integrated Care Board',
         'icb_id': 'icb_id',
         'nhs_region': all_aggregated_kpis_by_nhs_region_in_current_cohort,
-        'nhs_region_title': f'{kpi_value} by against NHS Region',
+        'nhs_region_avg' : nhs_region_avg,
+        'nhs_region_title': f'{kpi_value} by NHS Region',
         'nhs_region_id': 'nhs_region_id',
         'country': all_aggregated_kpis_by_country_in_current_cohort,
-        'country_title': f'{kpi_value} by against Country',
-        'country_id': 'country_id'
+        'country_avg': country_avg,
+        'country_title': f'{kpi_value} by Country',
+        'country_id': 'country_id',
     }
-
+    
     template_name = 'epilepsy12/partials/organisation/metric.html'
 
     return render(request=request, template_name=template_name, context=context)

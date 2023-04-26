@@ -15,3 +15,5 @@ from .construct_confirm_email import *
 from .construct_transfer_email import *
 from .random_generator import *
 from .nhs_number import *
+from .ods_search import *
+from .calculate_kpi_average import *

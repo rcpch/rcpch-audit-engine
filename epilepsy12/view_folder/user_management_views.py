@@ -2,7 +2,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.db.models import Q
+from django.contrib.gis.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -63,7 +63,7 @@ def epilepsy12_user_list(request, organisation_id):
 
     # get all organisations which are in the same parent trust
     organisation_children = Organisation.objects.filter(
-        ParentName=organisation.ParentName).all()
+        ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -79,7 +79,7 @@ def epilepsy12_user_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # user has requested trust level view
             epilepsy12_user_list = Epilepsy12User.objects.filter(
-                Q(organisation_employer__OrganisationName__icontains=organisation.ParentName) &
+                Q(organisation_employer__OrganisationName__icontains=organisation.ParentOrganisation_OrganisationName) &
                 (Q(first_name__icontains=filter_term) |
                  Q(surname__icontains=filter_term) |
                  Q(organisation_employer__OrganisationName__icontains=filter_term) |
@@ -108,7 +108,7 @@ def epilepsy12_user_list(request, organisation_id):
 
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                organisation_employer__ParentName__contains=organisation.ParentName,
+                organisation_employer__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName,
             )
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
@@ -155,13 +155,15 @@ def epilepsy12_user_list(request, organisation_id):
     if request.user.is_rcpch_audit_team_member:
         rcpch_choices = (
             (0, f'Organisation level ({organisation.OrganisationName})'),
-            (1, f'Trust level ({organisation.ParentName})'),
+            (1,
+             f'Trust level ({organisation.ParentOrganisation_OrganisationName})'),
             (2, 'National level'),
         )
     else:
         rcpch_choices = (
             (0, f'Organisation level ({organisation.OrganisationName})'),
-            (1, f'Trust level ({organisation.ParentName})'),
+            (1,
+             f'Trust level ({organisation.ParentOrganisation_OrganisationName})'),
         )
 
     paginator = Paginator(epilepsy12_user_list, 10)

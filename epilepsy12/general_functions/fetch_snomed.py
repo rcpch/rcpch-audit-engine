@@ -1,5 +1,10 @@
-
+# standard imports
 import requests
+
+# third party imports
+from django.conf import settings
+
+# RCPCH imports
 from ..constants import BENZODIAZEPINE_TYPES, ANTIEPILEPSY_MEDICINE_TYPES
 
 
@@ -30,7 +35,7 @@ def fetch_snomed(sctid, syntax):
 
     # epilepsy = <<84757009
 
-    ecl_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/expand?ecl={VALID_SYNTAX[syntax]}{sctid}'
+    ecl_url = f'{settings.RCPCH_HERMES_SERVER_URL}/expand?ecl={VALID_SYNTAX[syntax]}{sctid}'
 
     response = requests.get(ecl_url)
 
@@ -44,7 +49,7 @@ def fetch_snomed(sctid, syntax):
 
 
 def snomed_search(search_term):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_term}\&constraint=<64572001'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}\&constraint=<64572001'
 
     response = requests.get(search_url)
 
@@ -58,7 +63,7 @@ def snomed_search(search_term):
 
 
 def fetch_all_epilepsy():
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint=<<84757009&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?constraint=<<84757009&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -72,7 +77,7 @@ def fetch_all_epilepsy():
 
 
 def fetch_all_hereditary_epilepsy():
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -86,8 +91,7 @@ def fetch_all_hereditary_epilepsy():
 
 
 def fetch_ecl(ecl):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?constraint={ecl}'
-
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?constraint={ecl}'
     response = requests.get(search_url)
 
     if response.status_code == 404:
@@ -100,7 +104,7 @@ def fetch_ecl(ecl):
 
 
 def search_ecl(search, ecl):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search}&constraint={ecl}&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}&constraint={ecl}&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -114,7 +118,7 @@ def search_ecl(search, ecl):
 
 
 def search_all_epilepsy(search):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search}\&constraint=<<84757009&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}\&constraint=<<84757009&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -128,7 +132,7 @@ def search_all_epilepsy(search):
 
 
 def search_all_hereditary_epilepsy(search):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search}\&constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}\&constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -148,7 +152,7 @@ def snomed_search_congenital_neurology(search_term):
     # 363235000 |Hereditary disorder of nervous system (disorder)| +
 
     # 39367000 |Inflammatory disease of the central nervous system (disorder)|
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_term}\&constraint=<84757009'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}\&constraint=<84757009'
 
     response = requests.get(search_url)
 
@@ -162,7 +166,7 @@ def snomed_search_congenital_neurology(search_term):
 
 
 def snomed_medicine_search(search_term):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/search?s={search_term}\&constraint=<373873005'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}\&constraint=<373873005'
 
     response = requests.get(search_url)
 
@@ -176,7 +180,7 @@ def snomed_medicine_search(search_term):
 
 
 def fetch_concept(concept_id):
-    search_url = f'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/concepts/{concept_id}/extended'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/concepts/{concept_id}/extended'
 
     response = requests.get(search_url)
 
@@ -190,16 +194,18 @@ def fetch_concept(concept_id):
 
 
 def fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set():
-    search_url = 'http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed/expand?ecl=^999001751000000105'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/expand?ecl=^999001751000000105'
     response = requests.get(search_url)
 
     if response.status_code == 404:
         print("Could not get SNOMED data from server...")
         return None
 
-    serialised = response.json()
+    # filters out Autism-related entries
+    response_no_asd = [
+        item for item in response.json() if item['conceptId'] != 35919005]
 
-    return serialised
+    return response_no_asd
 
 
 def compare_snomed_with_constant_drugs():

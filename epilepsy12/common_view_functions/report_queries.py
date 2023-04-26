@@ -1,10 +1,10 @@
 # python imports
 from typing import Literal
 # django imports
-from django.db.models import Q
+from django.contrib.gis.db.models import Q
 
 # E12 imports
-from ..models import Case, Organisation
+from ..models import Case, Organisation, NHSRegionEntity, OPENUKNetworkEntity, IntegratedCareBoardEntity, ONSCountryEntity
 
 
 def all_registered_cases_for_cohort_and_abstraction_level(organisation_instance, cohort, case_complete=True, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation'):
@@ -44,37 +44,37 @@ def all_registered_cases_for_cohort_and_abstraction_level(organisation_instance,
 
     if abstraction_level == 'organisation':
         q_filter = (
-            Q(site__organisation__OrganisationID=organisation_instance.OrganisationID) &
+            Q(site__organisation__pk=organisation_instance.pk) &
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == 'trust':
         q_filter = (
-            Q(site__organisation__ParentODSCode=organisation_instance.ParentODSCode) &
+            Q(site__organisation__ParentOrganisation_ODSCode=organisation_instance.ParentOrganisation_ODSCode) &
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == 'icb':
         q_filter = (
-            Q(site__organisation__ICBODSCode=organisation_instance.ICBODSCode) &
+            Q(site__organisation__integrated_care_board__ODS_ICB_Code=organisation_instance.integrated_care_board.ODS_ICB_Code) &
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == 'nhs_region':
         q_filter = (
-            Q(site__organisation__NHSEnglandRegionCode=organisation_instance.NHSEnglandRegionCode) &
+            Q(site__organisation__nhs_region__NHS_Region_Code=organisation_instance.nhs_region.NHS_Region_Code) &
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == 'open_uk':
         q_filter = (
-            Q(site__organisation__OPENUKNetworkCode=organisation_instance.OPENUKNetworkCode) &
+            Q(site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.OPEN_UK_Network_Code) &
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == 'country':
         q_filter = (
-            Q(site__organisation__CountryONSCode=organisation_instance.CountryONSCode) &
+            Q(site__organisation__ons_region__ons_country=organisation_instance.ons_region.ons_country) &
             Q(site__site_is_actively_involved_in_epilepsy_care=True) &
             Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
@@ -93,11 +93,12 @@ def all_registered_cases_for_cohort_and_abstraction_level(organisation_instance,
 def get_all_countries():
     """
     Returns a list of all Countries
-    [('Y56', 'London'), ('Y58', 'South West'), ('Y59', 'South East'), ('Y60', 'Midlands (Y60)'), ('Y61', 'East of England'), ('Y62', 'North West'), ('Y63', 'North East and Yorkshire'), (None, None)]
+
     """
-    return Organisation.objects.order_by('CountryONSCode',
-                                         'Country').values_list('CountryONSCode',
-                                                                'Country').distinct()
+    # return Organisation.objects.order_by('CountryONSCode',
+    #                                      'Country').values_list('CountryONSCode',
+    #                                                             'Country').distinct()
+    return ONSCountryEntity.objects.order_by('Country_ONS_Name')
 
 
 def get_all_nhs_regions():
@@ -105,9 +106,10 @@ def get_all_nhs_regions():
     Returns a list of all NHS Regions
     [('Y56', 'London'), ('Y58', 'South West'), ('Y59', 'South East'), ('Y60', 'Midlands (Y60)'), ('Y61', 'East of England'), ('Y62', 'North West'), ('Y63', 'North East and Yorkshire'), (None, None)]
     """
-    return Organisation.objects.order_by('NHSEnglandRegionCode',
-                                         'NHSEnglandRegion').values_list('NHSEnglandRegionCode',
-                                                                         'NHSEnglandRegion').distinct()
+    # return Organisation.objects.order_by('NHSEnglandRegionCode',
+    #                                      'NHSEnglandRegion').values_list('NHSEnglandRegionCode',
+    #                                                                      'NHSEnglandRegion').distinct()
+    return NHSRegionEntity.objects.order_by('NHS_Region', 'NHS_Region_Code')
 
 
 def get_all_open_uk_regions():
@@ -115,29 +117,31 @@ def get_all_open_uk_regions():
     Returns a list of all OPEN UK Networks
     [('BRPNF', 'Birmingham Regional Paediatric Neurology Forum'), ('CEWT', "Children's Epilepsy Workstream in Trent"), ('EPEN', 'Eastern Paediatric Epilepsy Network'), ('EPIC', "Mersey and North Wales network 'Epilepsy In Childhood' interest group"), ('NTPEN', 'North Thames Paediatric Epilepsy Network'), ('NWEIG', "North West Children and Young People's Epilepsy Interest Group"), ('ORENG', 'Oxford region epilepsy interest group'), ('PENNEC', 'Paediatric Epilepsy Network for the North East and Cumbria'), ('SETPEG', 'South East Thames Paediatric Epilepsy Group'), ('SETPEG', 'SSouth East Thames Paediatric Epilepsy Group'), ('SWEP', 'South Wales Epilepsy Forum'), ('SWIPE', 'South West Interest Group Paediatric Epilepsy'), ('SWTPEG', 'South West Thames Paediatric Epilepsy Group'), ('TEN', 'Trent Epilepsy Network'), ('WPNN', 'Wessex Paediatric Neurosciences Network'), ('YPEN', 'Yorkshire Paediatric Neurology Network'), (None, None)]
     """
-    return Organisation.objects.order_by('OPENUKNetworkCode',
-                                         'OPENUKNetworkName').values_list('OPENUKNetworkCode',
-                                                                          'OPENUKNetworkName').distinct()
+    # return Organisation.objects.order_by('OPENUKNetworkCode',
+    #                                      'OPENUKNetworkName').values_list('OPENUKNetworkCode',
+    #                                                                       'OPENUKNetworkName').distinct()
+    return OPENUKNetworkEntity.objects.order_by('OPEN_UK_Network_Name', 'country')
 
 
 def get_all_icbs():
     """
     Returns a list of all Integrated Care Boards
     """
-    return Organisation.objects.order_by('ICBODSCode',
-                                         'ICBName').values_list('ICBODSCode',
-                                                                'ICBName').distinct()
+    # return Organisation.objects.order_by('ICBODSCode',
+    #                                      'ICBName').values_list('ICBODSCode',
+    #                                                             'ICBName').distinct()
+    return IntegratedCareBoardEntity.objects.order_by('ICB_Name')
 
 
 def get_all_trusts():
     """
     Returns a list of all Trusts
     """
-    return Organisation.objects.order_by('ParentODSCode', 'ParentName').values_list('ParentODSCode', 'ParentName').distinct()
+    return Organisation.objects.order_by('ParentOrganisation_OrganisationName', 'ParentOrganisation_ODSCode').values_list('ParentOrganisation_ODSCode', 'ParentOrganisation_OrganisationName').distinct()
 
 
 def get_all_organisations():
     """
     Returns a list of all Organisations
     """
-    return Organisation.objects.order_by('OrganisationODSCode', 'OrganisationName').values_list('OrganisationODSCode', 'OrganisationName').distinct()
+    return Organisation.objects.order_by('OrganisationName', 'ODSCode').values_list('OrganisationName', 'ODSCode').distinct()

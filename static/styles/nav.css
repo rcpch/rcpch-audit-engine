@@ -1,5 +1,12 @@
 /* entire */
 
+/* git commit hash */
+
+.git_hash {
+  color: var(--rcpch_dark_blue);
+  margin: auto 0em auto 4em;
+}
+
 /*  SIGNIN*/
 
 .ui.text.menu.signin {
