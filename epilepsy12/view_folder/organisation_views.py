@@ -92,6 +92,10 @@ def organisation_reports(request):
                                     count_of_current_cohort_registered_cases_in_this_trust))
     else:
         total_percent_trust = 0
+    
+    org_list=Organisation.objects.order_by('OrganisationName').all()
+    print(dir(org_list[0]))
+    print(f"{org_list[0].OrganisationName=}{org_list[0].ParentOrganisation_OrganisationName=}")
 
     return render(request=request, template_name=template_name, context={
         'user': request.user,
@@ -164,6 +168,8 @@ def selected_organisation_summary(request):
                                     count_of_current_cohort_registered_completed_cases_in_this_organisation))*10
     else:
         total_percent_trust = 0
+        
+    
 
     return render(request=request, template_name='epilepsy12/partials/selected_organisation_summary.html', context={
         'user': request.user,
