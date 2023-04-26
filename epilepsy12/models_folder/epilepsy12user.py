@@ -62,7 +62,7 @@ class Epilepsy12UserManager(BaseUserManager):
         elif user.role == AUDIT_CENTRE_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
         elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+            group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
         elif user.role == AUDIT_CENTRE_MANAGER:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
         elif user.role == RCPCH_AUDIT_LEAD:
