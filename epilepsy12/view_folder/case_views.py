@@ -385,7 +385,7 @@ Case function based views - class based views not chosen as need to accept organ
 
 
 @login_required
-@user_may_view_this_child()
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.add_case")
 def create_case(request, organisation_id):
     """
