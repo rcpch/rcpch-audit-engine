@@ -10,12 +10,16 @@
             <div class="ui card">
                 <div class="content">
                     <h3 >Organisation</h3>
-                    </div>
+                </div>
                     <div class='description'>
                         <div class="rcpch_chart_container">
                             <div class="four wide stackable bottom aligned centered column">
-                            {% percentage_of_total organisation_kpi total_organisation_kpi_cases as total_percent %}
-                            {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent numerator=organisation_kpi denominator=total_organisation_kpi_cases title=selected_organisation.OrganisationName pie_size='med' %}
+                                {% if total_organisation_kpi_cases is not None and total_organisation_kpi_cases > 0 %}
+                                    {% percentage_of_total organisation_kpi total_organisation_kpi_cases as total_percent %}
+                                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent numerator=organisation_kpi denominator=total_organisation_kpi_cases title=selected_organisation.OrganisationName pie_size='med' %}
+                                {% else %}
+                                    <h5>No data yet!<h5>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -45,14 +49,14 @@
                     <div class='description'>
                         <div class="rcpch_chart_container">
                             <div class="four wide stackable bottom aligned centered column">
-                                {% if selected_organisation.ICBODSCode %}
-                                    {% if total_icb_kpi_cases is not None and total_icb_kpi_cases > 0 %}
-                                        {% percentage_of_total icb_kpi total_icb_kpi_cases as total_percent %}
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.ICBName numerator=icb_kpi denominator=total_icb_kpi_cases pie_size='med' %}
-                                    {% else %}
-                                        <h5>No data yet!<h5>
-                                    {% endif %}
+                                
+                                {% if total_icb_kpi_cases is not None and total_icb_kpi_cases > 0 %}
+                                    {% percentage_of_total icb_kpi total_icb_kpi_cases as total_percent %}
+                                    {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.ICBName numerator=icb_kpi denominator=total_icb_kpi_cases pie_size='med' %}
+                                {% else %}
+                                    <h5>No data yet!<h5>
                                 {% endif %}
+                                
                             </div>
                         </div>
                     </div>
@@ -67,14 +71,12 @@
                     <div class='description'>
                         <div class="rcpch_chart_container">
                             <div class="four wide stackable bottom aligned centered column">
-                            {% if selected_organisation.NHSEnglandRegionCode %}
                                 {% if total_nhs_kpi_cases is not None and total_nhs_kpi_cases > 0 %}
                                     {% percentage_of_total nhs_kpi total_nhs_kpi_cases as total_percent %}
                                     {% include 'epilepsy12/partials/charts/progress.html' with percentage=total_percent title=selected_organisation.NHSEnglandRegion numerator=nhs_kpi denominator=total_nhs_kpi_cases pie_size='med' %}
-                                    {% else %}
+                                {% else %}
                                     <h5>No data yet!<h5>
                                 {% endif %}
-                            {% endif %}
                             </div>
                         </div>
                     </div>
@@ -120,16 +122,16 @@
 <div class='ui grid container'>
     <div class='sixteen wide right fluid column'>
         <div id="open_uk_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=open_uk data_title=open_uk_title data_id=open_uk_id  %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=open_uk data_title=open_uk_title data_id=open_uk_id avg_pct=open_uk_avg  %}
         </div>
         <div id="icb_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=icb data_title=icb_title data_id=icb_id  %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=icb data_title=icb_title data_id=icb_id avg_pct=icb_avg %}
         </div>
         <div id="nhs_region_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=nhs_region data_title=nhs_region_title data_id=nhs_region_id  %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=nhs_region data_title=nhs_region_title data_id=nhs_region_id avg_pct=nhs_region_avg %}
         </div>
         <div id="country_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id  %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id avg_pct=country_avg %}
         </div>
     </div>
 
