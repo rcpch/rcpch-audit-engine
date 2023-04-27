@@ -17,7 +17,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, Organisation
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email
-from ..common_view_functions import return_selected_organisation
+from ..common_view_functions import group_for_role
 from ..decorator import user_may_view_this_organisation
 
 
@@ -119,7 +119,6 @@ def epilepsy12_user_list(request, organisation_id):
                 organisation_employer__OrganisationName__contains=organisation.OrganisationName
             )
         else:
-            print(request.user.view_preference)
             raise Exception("No View Preference supplied")
 
         if (
@@ -138,7 +137,6 @@ def epilepsy12_user_list(request, organisation_id):
                 )
             else:
                 # national view
-                print("national view")
                 filtered_epilepsy12_users = (
                     Epilepsy12User.objects.filter().order_by("surname").all()
                 )
@@ -284,7 +282,9 @@ def create_epilepsy12_user(request, organisation_id, user_type):
             new_user.email_confirmed = False
             new_user.view_preference = 0
             new_user.save()
-            get_user_model().objects.allocate_group_based_on_role(new_user)
+
+            new_group = group_for_role(new_user.role)
+            new_user.groups.add(new_group)
 
             # user created - send email with reset link to new user
             subject = "Password Reset Requested"
@@ -386,7 +386,12 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         else:
             if form.is_valid():
                 # this will not include the password which will be empty
-                form.save()
+                new_user = form.save()
+
+                # update group
+                new_group = group_for_role(new_user.role)
+                new_user.groups.clear()
+                new_user.groups.add(new_group)
 
                 # adds success message
                 messages.success(
