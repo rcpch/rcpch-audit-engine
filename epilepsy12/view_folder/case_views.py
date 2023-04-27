@@ -56,7 +56,7 @@ def case_list(request, organisation_id):
             all_cases = (
                 Case.objects.filter(
                     Q(
-                        organisations__OrganisationName__contains=organisation.OrganisationName
+                        site__organisation__OrganisationName__contains=organisation.OrganisationName
                     )
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
@@ -74,7 +74,7 @@ def case_list(request, organisation_id):
             all_cases = (
                 Case.objects.filter(
                     Q(
-                        organisations__ParentOrganisation_ParentName__contains=organisation.ParentOrganisation_OrganisationName
+                        site__organisation__ParentOrganisation_ODSCode__contains=organisation.ParentOrganisation_ODSCode
                     )
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
