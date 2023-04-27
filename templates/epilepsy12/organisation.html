@@ -11,43 +11,6 @@
   </div>
   {% endif %}
 
-  <div class="ui rcpch container">
-    <div class="sixteen wide column">
-      <div class="ui inverted segment" id="chat">
-        <h5 class="header">Activity</h5>
-
-        <div class="ui feed">
-          {% if all_models|length > 0%} {% for model in all_models %}
-
-          <div class="event">
-            <div class="label">
-              <div class="rcpch_circle">
-                <img src='{% static "images/rcpch-logo.jpg" %}' />
-              </div>
-            </div>
-            <div class="content">
-              <div class="summary">
-                {{model.updated_by}} updated a record in {{model|to_class_name}}
-                for {{model|return_case}}
-                <div class="date">{{model.updated_at}}</div>
-              </div>
-              <div class="meta">
-                <a class="like"> <i class="like icon"></i> 4 Likes </a>
-              </div>
-            </div>
-          </div>
-
-          {% endfor %} {% else %}
-
-          <div class="ui rcpch_info message">
-            No one has made any changes yet...
-          </div>
-
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 {% endblock content %}

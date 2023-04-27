@@ -19,9 +19,11 @@ from ..constants import (
     TRUST_AUDIT_TEAM_FULL_ACCESS,
     TRUST_AUDIT_TEAM_VIEW_ONLY,
 )
+from ..decorator import user_may_view_this_organisation, user_may_view_this_child
 
 
 @login_required
+@user_may_view_this_organisation()
 def case_list(request, organisation_id):
     """
     Returns a list of all children registered under the user's service.
@@ -249,7 +251,11 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
-    if request.user.is_rcpch_audit_team_member:
+    if (
+        request.user.is_rcpch_audit_team_member
+        or request.user.is_staff
+        or request.user.is_superuser
+    ):
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
             (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
@@ -283,6 +289,7 @@ def case_list(request, organisation_id):
 
 
 @login_required
+@user_may_view_this_organisation()
 def case_statistics(request, organisation_id):
     """
     GET request from cases template to update stats on toggle between RCPCH view and Organisation level
@@ -326,6 +333,7 @@ def case_statistics(request, organisation_id):
 
 
 @login_required
+@user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_case",
 )
@@ -344,6 +352,7 @@ def case_submit(request, organisation_id, case_id):
 
 
 @login_required
+@user_may_view_this_child()
 @permission_required("epilepsy12.view_case")
 def case_performance_summary(request, case_id):
     case = Case.objects.get(pk=case_id)
@@ -380,6 +389,7 @@ Case function based views - class based views not chosen as need to accept organ
 
 
 @login_required
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.add_case")
 def create_case(request, organisation_id):
     """
@@ -434,6 +444,7 @@ def create_case(request, organisation_id):
 
 
 @login_required
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_case", raise_exception=True)
 def update_case(request, organisation_id, case_id):
     """
@@ -498,6 +509,9 @@ def update_case(request, organisation_id, case_id):
     )
 
 
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_case", raise_exception=True)
 def unknown_postcode(request, organisation_id):
     """
     POST call back from single choice multiple select if postcode does not exist
@@ -528,6 +542,7 @@ def unknown_postcode(request, organisation_id):
 
 
 @login_required
+@user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_opt_out_child_from_inclusion_in_audit", raise_exception=True
 )
