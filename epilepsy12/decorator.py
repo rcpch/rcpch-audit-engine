@@ -217,6 +217,10 @@ def user_may_view_this_organisation():
                             == organisation_requested.ParentOrganisation_ODSCode
                         ):
                             # user's employing trust is the same as the trust of the organisation requested
+                            if kwargs.get("user_type") is not None:
+                                if kwargs.get("user_type") == "rcpch-staff":
+                                    # this route is for rcpch staff to create new rcpch staff members only
+                                    raise PermissionDenied()
                             return view(request, *args, **kwargs)
                         else:
                             raise PermissionDenied()
