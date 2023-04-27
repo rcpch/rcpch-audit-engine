@@ -218,6 +218,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
         data = self.cleaned_data["is_staff"]
         if data:
             self.cleaned_data["view_preference"] = 0
+            self.organisation_employer = None
         return data
 
     def clean_is_rcpch_audit_team_member(self):
@@ -241,6 +242,14 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     def clean_organisation_employer(self):
         data = self.cleaned_data["organisation_employer"]
         return data
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_staff = cleaned_data.get("is_staff")
+        if is_staff:
+            # RCPCH staff are not affiliated with any organisation
+            cleaned_data["organisation_employer"] = None
+        return cleaned_data
 
 
 class Epilepsy12UserPasswordResetForm(SetPasswordForm):
