@@ -20,11 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # Creates git_hash.txt file current commit hash
-      - name: Get Hash
-        id: hash
-        run: echo "GIT_BRANCH=$(echo ${GITHUB_REF#refs/heads/}),GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
-
       - name: Set up Python version
         uses: actions/setup-python@v4
         with:
@@ -46,6 +41,8 @@ jobs:
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       
+      # some files from .git are explicitly included in the build as they are used to show
+      # the current active Git branch and commit in the Django UI (admin users only)
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
@@ -53,6 +50,9 @@ jobs:
           path: |
             . 
             !venv/
+            !.git/**
+            .git/refs/**
+            .git/HEAD
 
   deploy:
     runs-on: ubuntu-latest
