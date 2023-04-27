@@ -4,7 +4,7 @@
 
 <div class="ui grid container selected_organisation_container">
     
-        {% if request.user.is_rcpch_audit_team_member %}
+        {% if request.user.is_rcpch_audit_team_member or request.user.is_staff or request.user.is_superuser %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                     {% url 'selected_organisation_summary' as hx_post %}

@@ -1,31 +1,36 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.constants import *
-from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..common_view_functions import (
+    validate_and_update_model,
+    recalculate_form_generate_response,
+)
 from ..models import Registration, FirstPaediatricAssessment, Site
-from ..decorator import user_can_access_this_organisation
+from ..decorator import user_may_view_this_child
 
 
 @login_required
-@permission_required('epilepsy12.view_firstpaediatricassessment', raise_exception=True)
-@user_can_access_this_organisation()
+@permission_required("epilepsy12.view_firstpaediatricassessment", raise_exception=True)
+@user_may_view_this_child()
 def first_paediatric_assessment(request, case_id):
     registration = Registration.objects.get(case=case_id)
 
     if FirstPaediatricAssessment.objects.filter(registration=registration).exists():
         first_paediatric_assessment = FirstPaediatricAssessment.objects.filter(
-            registration=registration).get()
+            registration=registration
+        ).get()
     else:
         FirstPaediatricAssessment.objects.create(
             registration=registration
             # will autoupdate date and user on creation
         )
         first_paediatric_assessment = FirstPaediatricAssessment.objects.filter(
-            registration=registration).get()
+            registration=registration
+        ).get()
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True,
-        case=registration.case
+        case=registration.case,
     ).get()
     organisation_id = site.organisation.pk
 
@@ -38,23 +43,27 @@ def first_paediatric_assessment(request, case_id):
         "diagnostic_status_selection": DIAGNOSTIC_STATUS,
         "audit_progress": registration.audit_progress,
         "active_template": "first_paediatric_assessment",
-        "organisation_id": organisation_id
+        "organisation_id": organisation_id,
     }
 
     response = recalculate_form_generate_response(
         model_instance=first_paediatric_assessment,
         request=request,
-        template='epilepsy12/first_paediatric_assessment.html',
-        context=context
+        template="epilepsy12/first_paediatric_assessment.html",
+        context=context,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_firstpaediatricassessment', raise_exception=True)
-def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paediatric_assessment_id):
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.change_firstpaediatricassessment", raise_exception=True
+)
+def first_paediatric_assessment_in_acute_or_nonacute_setting(
+    request, first_paediatric_assessment_id
+):
     """
     HTMX callback from first_paediatric_assessment_in_acute_or_nonacute_setting partial, itself
     parent to single_choice_multiple_choice_toggle partial, whose button name stores the selected value
@@ -67,19 +76,20 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paed
             request,
             first_paediatric_assessment_id,
             FirstPaediatricAssessment,
-            field_name='first_paediatric_assessment_in_acute_or_nonacute_setting',
-            page_element='multiple_choice_multiple_toggle_button',
+            field_name="first_paediatric_assessment_in_acute_or_nonacute_setting",
+            page_element="multiple_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
         error_message = error
 
     first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-        pk=first_paediatric_assessment_id)
+        pk=first_paediatric_assessment_id
+    )
 
     context = {
         "chronicity_selection": CHRONICITY,
-        "first_paediatric_assessment": first_paediatric_assessment
+        "first_paediatric_assessment": first_paediatric_assessment,
     }
 
     response = recalculate_form_generate_response(
@@ -87,16 +97,20 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(request, first_paed
         request=request,
         template="epilepsy12/partials/first_paediatric_assessment/first_paediatric_assessment_in_acute_or_nonacute_setting.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_firstpaediatricassessment', raise_exception=True)
-def has_number_of_episodes_since_the_first_been_documented(request, first_paediatric_assessment_id):
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.change_firstpaediatricassessment", raise_exception=True
+)
+def has_number_of_episodes_since_the_first_been_documented(
+    request, first_paediatric_assessment_id
+):
     """
     POST request from toggle in has_number_of_episodes_since_the_first_been_documented partial
     """
@@ -107,15 +121,16 @@ def has_number_of_episodes_since_the_first_been_documented(request, first_paedia
             request,
             first_paediatric_assessment_id,
             FirstPaediatricAssessment,
-            field_name='has_number_of_episodes_since_the_first_been_documented',
-            page_element='toggle_button',
+            field_name="has_number_of_episodes_since_the_first_been_documented",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
         error_message = error
 
     first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-        pk=first_paediatric_assessment_id)
+        pk=first_paediatric_assessment_id
+    )
 
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
@@ -127,15 +142,17 @@ def has_number_of_episodes_since_the_first_been_documented(request, first_paedia
         request=request,
         template="epilepsy12/partials/first_paediatric_assessment/when_the_first_epileptic_episode_occurred.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_firstpaediatricassessment', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.change_firstpaediatricassessment", raise_exception=True
+)
 def general_examination_performed(request, first_paediatric_assessment_id):
     """
     POST request from toggle in has_general_examination_performed partial
@@ -146,15 +163,16 @@ def general_examination_performed(request, first_paediatric_assessment_id):
             request,
             first_paediatric_assessment_id,
             FirstPaediatricAssessment,
-            field_name='general_examination_performed',
-            page_element='toggle_button',
+            field_name="general_examination_performed",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
         error_message = error
 
     first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-        pk=first_paediatric_assessment_id)
+        pk=first_paediatric_assessment_id
+    )
 
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
@@ -166,15 +184,17 @@ def general_examination_performed(request, first_paediatric_assessment_id):
         request=request,
         template="epilepsy12/partials/first_paediatric_assessment/when_the_first_epileptic_episode_occurred.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_firstpaediatricassessment', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.change_firstpaediatricassessment", raise_exception=True
+)
 def neurological_examination_performed(request, first_paediatric_assessment_id):
     """
     POST request from toggle in neurological_examination_performed partial
@@ -185,15 +205,16 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
             request,
             first_paediatric_assessment_id,
             FirstPaediatricAssessment,
-            field_name='neurological_examination_performed',
-            page_element='toggle_button',
+            field_name="neurological_examination_performed",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
         error_message = error
 
     first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-        pk=first_paediatric_assessment_id)
+        pk=first_paediatric_assessment_id
+    )
 
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
@@ -205,16 +226,20 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
         request=request,
         template="epilepsy12/partials/first_paediatric_assessment/when_the_first_epileptic_episode_occurred.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_firstpaediatricassessment', raise_exception=True)
-def developmental_learning_or_schooling_problems(request, first_paediatric_assessment_id):
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.change_firstpaediatricassessment", raise_exception=True
+)
+def developmental_learning_or_schooling_problems(
+    request, first_paediatric_assessment_id
+):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
     """
@@ -224,15 +249,16 @@ def developmental_learning_or_schooling_problems(request, first_paediatric_asses
             request,
             first_paediatric_assessment_id,
             FirstPaediatricAssessment,
-            field_name='developmental_learning_or_schooling_problems',
-            page_element='toggle_button',
+            field_name="developmental_learning_or_schooling_problems",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
         error_message = error
 
     first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-        pk=first_paediatric_assessment_id)
+        pk=first_paediatric_assessment_id
+    )
 
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
@@ -244,15 +270,17 @@ def developmental_learning_or_schooling_problems(request, first_paediatric_asses
         request=request,
         template="epilepsy12/partials/first_paediatric_assessment/when_the_first_epileptic_episode_occurred.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_firstpaediatricassessment', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.change_firstpaediatricassessment", raise_exception=True
+)
 def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
     """
     POST request from toggle in developmental_learning_or_schooling_problems partial
@@ -263,15 +291,16 @@ def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
             request,
             first_paediatric_assessment_id,
             FirstPaediatricAssessment,
-            field_name='behavioural_or_emotional_problems',
-            page_element='toggle_button',
+            field_name="behavioural_or_emotional_problems",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
         error_message = error
 
     first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-        pk=first_paediatric_assessment_id)
+        pk=first_paediatric_assessment_id
+    )
 
     context = {
         "first_paediatric_assessment": first_paediatric_assessment,
@@ -283,7 +312,7 @@ def behavioural_or_emotional_problems(request, first_paediatric_assessment_id):
         request=request,
         template="epilepsy12/partials/first_paediatric_assessment/when_the_first_epileptic_episode_occurred.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
