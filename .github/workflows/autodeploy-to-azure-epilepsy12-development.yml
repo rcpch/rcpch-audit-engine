@@ -14,17 +14,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: 'development'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          clean: false
       
-      # Creates git_hash.txt file current commit hash
-      - name: Get Hash
-        id: hash
-        run: echo "GIT_BRANCH=$(echo ${GITHUB_REF#refs/heads/}),GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" > git_hash.txt
-
+      - name: List all files
+        run: ls -al
+      
       - name: Set up Python version
         uses: actions/setup-python@v4
         with:
@@ -44,30 +47,7 @@ jobs:
       - name: collect static files
         run: python manage.py collectstatic --noinput
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
-        with:
-          name: python-app
-          path: |
-            . 
-            !venv/
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: python-app
-          path: .
-          
+      # Deploy to Azure
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
@@ -75,3 +55,4 @@ jobs:
           app-name: 'epilepsy12-development'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
+          
