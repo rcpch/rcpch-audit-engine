@@ -353,20 +353,36 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             )
             return redirect(redirect_url)
 
-        if request.POST and form.is_valid():
-            print(form.cleaned_data["email_confirmed"])
-            form.save()
+        else:
+            if form.is_valid():
+                # this will not include the password which will be empty
+                print(form.cleaned_data["email"])
+                # update_fields = {
+                #     "username": form.cleaned_data["email"],
+                #     "role": form.cleaned_data["role"],
+                #     "title": form.cleaned_data["title"],
+                #     "first_name": form.cleaned_data["first_name"],
+                #     "surname": form.cleaned_data["surname"],
+                #     "is_staff": form.cleaned_data["is_staff"],
+                #     "is_rcpch_audit_team_member": form.cleaned_data[
+                #         "is_rcpch_audit_team_member"
+                #     ],
+                #     "is_superuser": form.cleaned_data["is_superuser"],
+                #     "email_confirmed": form.cleaned_data["email_confirmed"],
+                # }
+                form.save()
 
-            # adds success message
-            messages.success(
-                request, f"You successfully updated {epilepsy12_user_to_edit}'s details"
-            )
+                # adds success message
+                messages.success(
+                    request,
+                    f"You have successfully updated {epilepsy12_user_to_edit}'s details",
+                )
 
-            # Save was successful, so redirect to another page
-            redirect_url = reverse(
-                "epilepsy12_user_list", kwargs={"organisation_id": organisation_id}
-            )
-            return redirect(redirect_url)
+                # Save was successful, so redirect to another page
+                redirect_url = reverse(
+                    "epilepsy12_user_list", kwargs={"organisation_id": organisation_id}
+                )
+                return redirect(redirect_url)
 
     template_name = "registration/admin_create_user.html"
 

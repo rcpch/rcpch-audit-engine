@@ -60,11 +60,6 @@ class Epilepsy12UserCreationForm(UserCreationForm):
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
     )
 
-    email_confirmed = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
-        show_hidden_initial=True,
-    )
-
     class Meta:
         model = Epilepsy12User
         fields = (
@@ -95,10 +90,30 @@ class Epilepsy12UserChangeForm(UserChangeForm):
             "is_rcpch_audit_team_member",
             "is_staff",
             "is_active",
+            "email_confirmed",
         )
 
+    def clean_email(self):
+        data = self.cleaned_data["email"]
+        if self.user_existing_email is not None:
+            # this user is being updated
+            if self.user_existing_email != data.lower():
+                # test to check this email does not exist
+                if Epilepsy12User.objects.filter(email=data.lower()).exists():
+                    raise forms.ValidationError(
+                        f"{data.lower()} is already associated with an account."
+                    )
+        else:
+            # this is a new account - check email is unique
+            if Epilepsy12User.objects.filter(email=data.lower()).exists():
+                raise forms.ValidationError(
+                    "The email is already associated with an account."
+                )
 
-class Epilepsy12UserAdminCreationForm(UserCreationForm):
+        return data.lower()
+
+
+class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     """
     This is a standard Django form to be used by admin to create a user without a password
     """
@@ -107,12 +122,6 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super(Epilepsy12UserAdminCreationForm, self).__init__(*args, **kwargs)
-        self.fields["password1"].required = False
-        self.fields["password2"].required = False
-        # If one field gets autocompleted but not the other, our 'neither
-        # password or both password' validation will be triggered.
-        self.fields["password1"].widget.attrs["autocomplete"] = "off"
-        self.fields["password2"].widget.attrs["autocomplete"] = "off"
         self.user_existing_email = self.instance.email
 
     email = forms.EmailField(
@@ -131,6 +140,7 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
     organisation_employer = forms.ModelChoiceField(
         queryset=Organisation.objects.all(),
         widget=forms.Select(attrs={"class": "ui fluid search rcpch disabled dropdown"}),
+        required=False,
     )
 
     title = forms.ChoiceField(
@@ -200,6 +210,10 @@ class Epilepsy12UserAdminCreationForm(UserCreationForm):
                 )
 
         return data.lower()
+
+    def clean_organisation_employer(self):
+        data = self.cleaned_data["organisation_employer"]
+        return data
 
 
 class Epilepsy12UserPasswordResetForm(SetPasswordForm):
