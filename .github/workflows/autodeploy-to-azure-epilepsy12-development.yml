@@ -25,6 +25,9 @@ jobs:
         with:
           clean: false
       
+      - name: List all files
+        run: ls -al
+      
       - name: Set up Python version
         uses: actions/setup-python@v4
         with:
