@@ -139,7 +139,8 @@ urlpatterns = [
         name="epilepsy12_user_list",
     ),
     path(
-        "organisation/<int:organisation_id>/epilepsy12_users/create",
+        "organisation/<int:organisation_id>/epilepsy12_users/<str:user_type>/create",
+        # accepts params organisation-staff or rcpch-staff
         views.create_epilepsy12_user,
         name="create_epilepsy12_user",
     ),
