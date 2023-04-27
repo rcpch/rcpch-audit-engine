@@ -95,9 +95,9 @@ class Epilepsy12UserChangeForm(UserChangeForm):
 
     def clean_email(self):
         data = self.cleaned_data["email"]
-        if self.user_existing_email is not None:
+        if data is not None:
             # this user is being updated
-            if self.user_existing_email != data.lower():
+            if data != data.lower():
                 # test to check this email does not exist
                 if Epilepsy12User.objects.filter(email=data.lower()).exists():
                     raise forms.ValidationError(
@@ -122,7 +122,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
     def __init__(self, *args, **kwargs):
         super(Epilepsy12UserAdminCreationForm, self).__init__(*args, **kwargs)
-        self.user_existing_email = self.instance.email
+        # self.user_existing_email = self.instance.email
 
     email = forms.EmailField(
         max_length=255,
