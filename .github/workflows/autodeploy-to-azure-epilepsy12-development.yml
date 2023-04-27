@@ -14,8 +14,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: 'development'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
       - uses: actions/checkout@v3
@@ -41,34 +44,7 @@ jobs:
       - name: collect static files
         run: python manage.py collectstatic --noinput
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      # some files from .git are explicitly included in the build as they are used to show
-      # the current active Git branch and commit in the Django UI (admin users only)
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
-        with:
-          name: python-app
-          path: |
-            . 
-            !venv/
-            .git/refs/**
-            .git/HEAD
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: python-app
-          path: .
-          
+      # Deploy to Azure
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
@@ -76,3 +52,4 @@ jobs:
           app-name: 'epilepsy12-development'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
+          
