@@ -194,9 +194,9 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
     def clean_email(self):
         data = self.cleaned_data["email"]
-        if self.user_existing_email is not None:
+        if data is not None:
             # this user is being updated
-            if self.user_existing_email != data.lower():
+            if data != data.lower():
                 # test to check this email does not exist
                 if Epilepsy12User.objects.filter(email=data.lower()).exists():
                     raise forms.ValidationError(

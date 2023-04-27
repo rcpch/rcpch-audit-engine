@@ -41,15 +41,30 @@ def epilepsy12_user_list(request, organisation_id):
         ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName
     ).all()
 
+    # create a Q object filter for all users with no affiliated organisation
+    # this can be included in results to all those that are superusers, or RCPCH audit team/staff members
+    if (
+        request.user.is_staff
+        or request.user.is_rcpch_audit_team_member
+        or request.user.is_superuser
+    ):
+        # user is RCPCH or E12 audit staff so can see RCPCH staff also
+        rcpch_filter = Q(organisation_employer__isnull=True)
+    else:
+        # no extra filter - cannot see RCPCH staff
+        rcpch_filter = Q()
+
     if filter_term:
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
+
             epilepsy12_user_list = (
                 Epilepsy12User.objects.filter(
                     Q(
                         organisation_employer__OrganisationName__icontains=organisation.OrganisationName
                     )
+                    | rcpch_filter
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -69,6 +84,7 @@ def epilepsy12_user_list(request, organisation_id):
                     Q(
                         organisation_employer__OrganisationName__icontains=organisation.ParentOrganisation_OrganisationName
                     )
+                    | rcpch_filter
                     & (
                         Q(first_name__icontains=filter_term)
                         | Q(surname__icontains=filter_term)
@@ -85,7 +101,7 @@ def epilepsy12_user_list(request, organisation_id):
             # user has requested national level view
             epilepsy12_user_list = (
                 Epilepsy12User.objects.filter(
-                    Q(first_name__icontains=filter_term)
+                    rcpch_filter & Q(first_name__icontains=filter_term)
                     | Q(surname__icontains=filter_term)
                     | Q(organisation_employer__OrganisationName__icontains=filter_term)
                     | Q(email__icontains=filter_term)
@@ -99,20 +115,31 @@ def epilepsy12_user_list(request, organisation_id):
         1 is trust level and 2 is national level
         Only RCPCH audit staff have this final option.
         """
-
         if request.user.view_preference == 2:
             # this is an RCPCH audit team member requesting National level
-            filtered_epilepsy12_users = Epilepsy12User.objects.all()
+            # No filter requirements - see all users, including those with no trust affiliation
+            filtered_epilepsy12_users = Epilepsy12User.objects.filter().all()
+
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                organisation_employer__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName,
+                Q(
+                    organisation_employer__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName
+                )
+                | rcpch_filter
             )
-        else:
+
+        elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                organisation_employer__OrganisationName__contains=organisation.OrganisationName,
+                Q(
+                    organisation_employer__OrganisationName__contains=organisation.OrganisationName
+                )
+                | rcpch_filter
             )
+        else:
+            print(request.user.view_preference)
+            raise Exception("No View Preference supplied")
 
         if (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_name_up"
