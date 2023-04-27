@@ -200,7 +200,11 @@ def epilepsy12_user_list(request, organisation_id):
         else:
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("surname").all()
 
-    if request.user.is_rcpch_audit_team_member:
+    if (
+        request.user.is_rcpch_audit_team_member
+        or request.user.is_staff
+        or request.user.is_superuser
+    ):
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
             (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
@@ -359,20 +363,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         else:
             if form.is_valid():
                 # this will not include the password which will be empty
-                print(form.cleaned_data["email"])
-                # update_fields = {
-                #     "username": form.cleaned_data["email"],
-                #     "role": form.cleaned_data["role"],
-                #     "title": form.cleaned_data["title"],
-                #     "first_name": form.cleaned_data["first_name"],
-                #     "surname": form.cleaned_data["surname"],
-                #     "is_staff": form.cleaned_data["is_staff"],
-                #     "is_rcpch_audit_team_member": form.cleaned_data[
-                #         "is_rcpch_audit_team_member"
-                #     ],
-                #     "is_superuser": form.cleaned_data["is_superuser"],
-                #     "email_confirmed": form.cleaned_data["email_confirmed"],
-                # }
                 form.save()
 
                 # adds success message

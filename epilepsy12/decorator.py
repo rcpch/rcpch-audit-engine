@@ -67,7 +67,11 @@ def editor_access_for_this_child(*outer_args, **outer_kwargs):
                 # You shall not pass!
                 authorisation = False
             else:
-                if request.user.is_rcpch_audit_team_member:
+                if (
+                    request.user.is_rcpch_audit_team_member
+                    or request.user.is_staff
+                    or request.user.is_superuser
+                ):
                     # user is an editor member of the RCPCH audit team
                     authorisation = True
                 else:
@@ -305,7 +309,11 @@ def user_may_view_this_child():
                         ParentOrganisation_ODSCode=request.user.organisation_employer.ParentOrganisation_ODSCode,
                     )
 
-                if organisation.exists() or user.is_rcpch_audit_team_member:
+                if (
+                    organisation.exists()
+                    or user.is_rcpch_audit_team_member
+                    or user.is_staff
+                ):
                     return view(request, *args, **kwargs)
                 else:
                     raise PermissionDenied()

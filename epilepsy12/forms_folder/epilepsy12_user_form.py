@@ -211,6 +211,33 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
         return data.lower()
 
+    def clean_is_staff(self):
+        """
+        if is_staff is positive, set view_preference to organisation_view
+        """
+        data = self.cleaned_data["is_staff"]
+        if data:
+            self.cleaned_data["view_preference"] = 0
+        return data
+
+    def clean_is_rcpch_audit_team_member(self):
+        """
+        if is_rcpch_audit_team_member is positive, set view_preference to organisation_view
+        """
+        data = self.cleaned_data["is_rcpch_audit_team_member"]
+        if data:
+            self.cleaned_data["view_preference"] = 0
+        return data
+
+    def clean_is_superuser(self):
+        """
+        if is_superuser is positive, set view_preference to organisation_view
+        """
+        data = self.cleaned_data["is_superuser"]
+        if data:
+            self.cleaned_data["view_preference"] = 0
+        return data
+
     def clean_organisation_employer(self):
         data = self.cleaned_data["organisation_employer"]
         return data

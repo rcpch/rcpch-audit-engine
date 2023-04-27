@@ -251,7 +251,11 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
-    if request.user.is_rcpch_audit_team_member:
+    if (
+        request.user.is_rcpch_audit_team_member
+        or request.user.is_staff
+        or request.user.is_superuser
+    ):
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
             (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
