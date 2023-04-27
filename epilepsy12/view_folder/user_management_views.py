@@ -16,37 +16,11 @@ from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, Organisation
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
-from ..general_functions.construct_confirm_email import construct_confirm_email
-
-User = get_user_model()
-
-
-@login_required
-def epilepsy12_user_management(request):
-    if request.user.organisation_employer is not None:
-        # current user is affiliated with an existing organisation - set viewable trust to this
-        selected_organisation = Organisation.objects.get(
-            OrganisationName=request.user.organisation_employer
-        )
-
-    else:
-        # current user is a member of the RCPCH audit team and also not affiliated with a organisation
-        # therefore set selected organisation to first of organisation on the list
-
-        selected_organisation = (
-            Organisation.objects.filter(Sector="NHS Sector")
-            .order_by("OrganisationName")
-            .first()
-        )
-
-    template_name = "epilepsy12/epilepsy12_user_management.html"
-
-    context = {
-        "selected_organisation": selected_organisation,
-    }
-    return render(request=request, template_name=template_name, context=context)
+from ..general_functions import construct_confirm_email
+from ..decorator import user_may_view_this_organisation
 
 
+@user_may_view_this_organisation()
 @login_required
 def epilepsy12_user_list(request, organisation_id):
     """
@@ -233,6 +207,7 @@ def epilepsy12_user_list(request, organisation_id):
 
 
 @login_required
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.add_epilepsy12user")
 def create_epilepsy12_user(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
@@ -289,6 +264,7 @@ def create_epilepsy12_user(request, organisation_id):
 
 
 @login_required
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.change_epilepsy12user")
 def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     """
@@ -398,6 +374,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
 
 @login_required
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.delete_epilepsy12user")
 def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     try:
