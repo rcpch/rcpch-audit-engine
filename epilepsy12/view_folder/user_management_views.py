@@ -41,74 +41,60 @@ def epilepsy12_user_list(request, organisation_id):
         ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName
     ).all()
 
-    # create a Q object filter for all users with no affiliated organisation
-    # this can be included in results to all those that are superusers, or RCPCH audit team/staff members
-    if (
-        request.user.is_staff
-        or request.user.is_rcpch_audit_team_member
-        or request.user.is_superuser
-    ):
-        # user is RCPCH or E12 audit staff so can see RCPCH staff also
-        rcpch_filter = Q(organisation_employer__isnull=True)
-    else:
-        # no extra filter - cannot see RCPCH staff
-        rcpch_filter = Q()
-
     if filter_term:
+        filter_term_Q = (
+            Q(first_name__icontains=filter_term)
+            | Q(surname__icontains=filter_term)
+            | Q(organisation_employer__OrganisationName__icontains=filter_term)
+            | Q(email__icontains=filter_term)
+        )
+
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
-
-            epilepsy12_user_list = (
-                Epilepsy12User.objects.filter(
-                    Q(
-                        organisation_employer__OrganisationName__icontains=organisation.OrganisationName
-                    )
-                    | rcpch_filter
-                    & (
-                        Q(first_name__icontains=filter_term)
-                        | Q(surname__icontains=filter_term)
-                        | Q(
-                            organisation_employer__OrganisationName__icontains=filter_term
-                        )
-                        | Q(email__icontains=filter_term)
-                    )
-                )
-                .order_by("surname")
-                .all()
+            basic_filter = Q(
+                organisation_employer__OrganisationName__icontains=organisation.OrganisationName
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
-            epilepsy12_user_list = (
-                Epilepsy12User.objects.filter(
-                    Q(
-                        organisation_employer__OrganisationName__icontains=organisation.ParentOrganisation_OrganisationName
-                    )
-                    | rcpch_filter
-                    & (
-                        Q(first_name__icontains=filter_term)
-                        | Q(surname__icontains=filter_term)
-                        | Q(
-                            organisation_employer__OrganisationName__icontains=filter_term
-                        )
-                        | Q(email__icontains=filter_term)
-                    )
-                )
-                .order_by("surname")
-                .all()
+            basic_filter = Q(
+                organisation_employer__OrganisationName__icontains=organisation.ParentOrganisation_OrganisationName
             )
         elif request.user.view_preference == 2:
             # user has requested national level view
-            epilepsy12_user_list = (
-                Epilepsy12User.objects.filter(
-                    rcpch_filter & Q(first_name__icontains=filter_term)
-                    | Q(surname__icontains=filter_term)
-                    | Q(organisation_employer__OrganisationName__icontains=filter_term)
-                    | Q(email__icontains=filter_term)
+            basic_filter = None
+
+        if basic_filter:
+            # the basic filter filters users based on the selected organisation view
+            # the filter_term_Q filters based on what the user has put in the search box
+            if (
+                request.user.is_staff
+                or request.user.is_rcpch_audit_team_member
+                or request.user.is_superuser
+            ):
+                # user is RCPCH or E12 audit staff so can see RCPCH staff also
+                # who will not be affiliated with any organisation
+                epilepsy12_user_list = (
+                    Epilepsy12User.objects.filter(
+                        basic_filter
+                        | Q(organisation_employer__isnull=True) & filter_term_Q
+                    )
+                    .order_by("surname")
+                    .all()
                 )
-                .order_by("surname")
-                .all()
+            else:
+                # These are non RCPCH staff / not superusers
+                epilepsy12_user_list = (
+                    Epilepsy12User.objects.filter(basic_filter & filter_term_Q)
+                    .order_by("surname")
+                    .all()
+                )
+        else:
+            # national view
+            epilepsy12_user_list = (
+                Epilepsy12User.objects.filter(filter_term_Q).order_by("surname").all()
             )
+
     else:
         """
         Epilepsy12Users are filtered based on user preference (request.user.view_preference), where 0 is organisation level,
@@ -118,28 +104,57 @@ def epilepsy12_user_list(request, organisation_id):
         if request.user.view_preference == 2:
             # this is an RCPCH audit team member requesting National level
             # No filter requirements - see all users, including those with no trust affiliation
-            filtered_epilepsy12_users = Epilepsy12User.objects.filter().all()
+            basic_filter = None
 
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
-            filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                Q(
-                    organisation_employer__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName
-                )
-                | rcpch_filter
+            basic_filter = Q(
+                organisation_employer__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName
             )
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            filtered_epilepsy12_users = Epilepsy12User.objects.filter(
-                Q(
-                    organisation_employer__OrganisationName__contains=organisation.OrganisationName
-                )
-                | rcpch_filter
+            basic_filter = Q(
+                organisation_employer__OrganisationName__contains=organisation.OrganisationName
             )
         else:
             print(request.user.view_preference)
             raise Exception("No View Preference supplied")
+
+        if (
+            request.user.is_staff
+            or request.user.is_rcpch_audit_team_member
+            or request.user.is_superuser
+        ):
+            if basic_filter:
+                # organisational or trust view
+                filtered_epilepsy12_users = (
+                    Epilepsy12User.objects.filter(
+                        basic_filter | Q(organisation_employer__isnull=True)
+                    )
+                    .order_by("surname")
+                    .all()
+                )
+            else:
+                # national view
+                print("national view")
+                filtered_epilepsy12_users = (
+                    Epilepsy12User.objects.filter().order_by("surname").all()
+                )
+        else:
+            # not RCPCH staff or superusers
+            if basic_filter:
+                # organisation or trust view
+                filtered_epilepsy12_users = (
+                    Epilepsy12User.objects.filter(basic_filter)
+                    .order_by("surname")
+                    .all()
+                )
+            else:
+                # national view
+                filtered_epilepsy12_users = (
+                    Epilepsy12User.objects.filter().order_by("surname").all()
+                )
 
         if (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_name_up"
