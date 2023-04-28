@@ -117,10 +117,10 @@
           <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
-              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked or not perms.epilepsy12.change_case %}disabled{% endif %}><a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
                 class="edit outline icon"></i></a></button>
               {% comment %}
-              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' organisation_id=organisation_id case_id=case.id%}"><i
+              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked or not perms.epilepsy12.delete_case %}disabled{% endif %}><a href="{% url 'delete_case' organisation_id=organisation_id case_id=case.id%}"><i
                 class="trash alternate outline icon"></i></a></button>
               {% endcomment %}
               {% if case.registration.registration_date %}

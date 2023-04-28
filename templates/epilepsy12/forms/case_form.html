@@ -78,7 +78,7 @@
     {% endif %}
   </div>
 
-  {% if case %}
+  {% if case and perms.epilepsy.can_opt_out_child_from_inclusion_in_audit %}
 
   <div class="ui icon rcpch_info message">
     <i class="ui exclamation circle icon"></i>

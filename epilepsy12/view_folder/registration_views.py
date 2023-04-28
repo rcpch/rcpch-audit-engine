@@ -14,18 +14,29 @@ from django_htmx.http import trigger_client_event
 from django_htmx.http import HttpResponseClientRedirect
 
 # RCPCH
-from ..models import Case, AuditProgress, Organisation, Registration, Site, KPI, Epilepsy12User
-from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
-from ..decorator import user_can_access_this_organisation
+from ..models import (
+    Case,
+    AuditProgress,
+    Organisation,
+    Registration,
+    Site,
+    KPI,
+    Epilepsy12User,
+)
+from ..common_view_functions import (
+    validate_and_update_model,
+    recalculate_form_generate_response,
+)
+from ..decorator import user_may_view_this_child
 from ..general_functions import construct_transfer_epilepsy12_site_email
 
 
 @login_required
-@permission_required('epilepsy12.view_registration', raise_exception=True)
-@user_can_access_this_organisation()
+@permission_required("epilepsy12.view_registration", raise_exception=True)
+@user_may_view_this_child()
 def register(request, case_id):
     """
-    Called on registration form page load. If first time, creates new Registration objectm KPI object and 
+    Called on registration form page load. If first time, creates new Registration objectm KPI object and
     AuditProgress object. Creates a new Site with selected organisation and associates with this case.
     Returns register.html template.
     """
@@ -58,7 +69,7 @@ def register(request, case_id):
         lead_organisation = Site.objects.filter(
             case=case,
             site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=True
+            site_is_actively_involved_in_epilepsy_care=True,
         ).get()
         kpi = KPI.objects.create(
             organisation=lead_organisation.organisation,
@@ -83,18 +94,16 @@ def register(request, case_id):
             general_participation_and_risk=0,
             service_contact_details=0,
             sudep=0,
-            school_individual_healthcare_plan=0
+            school_individual_healthcare_plan=0,
         )
         registration = Registration.objects.create(
-            case=case,
-            audit_progress=audit_progress,
-            kpi=kpi
+            case=case, audit_progress=audit_progress, kpi=kpi
         )
 
     else:
         registration = Registration.objects.filter(case=case).get()
 
-    organisation_list = Organisation.objects.order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by("OrganisationName")
 
     previously_registered = 0
 
@@ -102,7 +111,10 @@ def register(request, case_id):
 
     registered_sites = Site.objects.filter(case=case)
     for registered_site in registered_sites:
-        if registered_site.site_is_primary_centre_of_epilepsy_care and registered_site.site_is_actively_involved_in_epilepsy_care:
+        if (
+            registered_site.site_is_primary_centre_of_epilepsy_care
+            and registered_site.site_is_actively_involved_in_epilepsy_care
+        ):
             lead_site = registered_site
         elif not registered_site.site_is_actively_involved_in_epilepsy_care:
             previously_registered += 1
@@ -110,10 +122,17 @@ def register(request, case_id):
     previously_registered_sites = None
     if previously_registered > 0:
         previously_registered_sites = Site.objects.filter(
-            case=case, site_is_actively_involved_in_epilepsy_care=False, site_is_primary_centre_of_epilepsy_care=True).all()
+            case=case,
+            site_is_actively_involved_in_epilepsy_care=False,
+            site_is_primary_centre_of_epilepsy_care=True,
+        ).all()
 
     # test if registration_date and lead_centre exist, and eligibility criteria met
-    if registration.registration_date and lead_site and registration.eligibility_criteria_met:
+    if (
+        registration.registration_date
+        and lead_site
+        and registration.eligibility_criteria_met
+    ):
         active_template = "register"
     else:
         active_template = "none"
@@ -127,20 +146,21 @@ def register(request, case_id):
         "audit_progress": registration.audit_progress,
         "active_template": active_template,
         # pass back organisation_id to steps for return to cases button
-        'organisation_id': lead_site.organisation.pk,
-        'field_enabled': False,
+        "organisation_id": lead_site.organisation.pk,
+        "field_enabled": False,
     }
 
-    template_name = 'epilepsy12/register.html'
+    template_name = "epilepsy12/register.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
+
 
 # HTMX endpoints
 
@@ -151,21 +171,21 @@ Lead site allocation, deletion, updating and transfer
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_edit_epilepsy12_lead_centre', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
 def allocate_lead_site(request, registration_id):
     """
     Allocate site when none have been assigned
     """
     registration = Registration.objects.get(pk=registration_id)
-    new_trust_id = request.POST.get('allocate_lead_site')
+    new_trust_id = request.POST.get("allocate_lead_site")
     selected_organisation = Organisation.objects.get(pk=new_trust_id)
 
     # test if site exists
     if Site.objects.filter(
         case=registration.case,
         organisation=selected_organisation,
-        site_is_actively_involved_in_epilepsy_care=True
+        site_is_actively_involved_in_epilepsy_care=True,
     ).exists():
         # this site already plays an active role in the care of this child
         # update the status therefore to include the lead role
@@ -173,11 +193,11 @@ def allocate_lead_site(request, registration_id):
         Site.objects.filter(
             case=registration.case,
             organisation=selected_organisation,
-            site_is_actively_involved_in_epilepsy_care=True
+            site_is_actively_involved_in_epilepsy_care=True,
         ).update(
             site_is_primary_centre_of_epilepsy_care=True,
             updated_at=timezone.now(),
-            updated_by=request.user
+            updated_by=request.user,
         )
     else:
         # this site may still be associated with this registration but not actively
@@ -191,7 +211,7 @@ def allocate_lead_site(request, registration_id):
             site_is_paediatric_neurology_centre=False,
             site_is_general_paediatric_centre=True,
             created_at=timezone.now(),
-            created_by=request.user
+            created_by=request.user,
         )
 
     # retrieve the current active site
@@ -204,14 +224,14 @@ def allocate_lead_site(request, registration_id):
 
     # get the new
 
-    organisation_list = Organisation.objects.order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by("OrganisationName")
 
     context = {
         "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
         "edit": False,
-        "transfer": False
+        "transfer": False,
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -220,15 +240,15 @@ def allocate_lead_site(request, registration_id):
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_edit_epilepsy12_lead_centre', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
 def edit_lead_site(request, registration_id, site_id):
     """
     Edit lead centre button call back from lead_site partial
@@ -236,14 +256,14 @@ def edit_lead_site(request, registration_id, site_id):
     """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by("OrganisationName")
 
     context = {
         "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
         "edit": True,
-        "transfer": False
+        "transfer": False,
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -252,15 +272,17 @@ def edit_lead_site(request, registration_id, site_id):
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_transfer_epilepsy12_lead_centre', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
+)
 def transfer_lead_site(request, registration_id, site_id):
     """
     POST request from lead_site.html on click of transfer lead centre button
@@ -269,41 +291,43 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
-    organisation_list = Organisation.objects.order_by('OrganisationName').all()
+    organisation_list = Organisation.objects.order_by("OrganisationName").all()
 
     context = {
         "organisation_list": organisation_list,
         "registration": registration,
         "site": site,
         "edit": False,
-        "transfer": True
+        "transfer": True,
     }
 
     response = render(
-        request=request, template_name="epilepsy12/partials/registration/lead_site.html", context=context)
+        request=request,
+        template_name="epilepsy12/partials/registration/lead_site.html",
+        context=context,
+    )
 
     # activate registration button if eligibility and lead centre set
     trigger_client_event(
-        response=response,
-        name="registration_status",
-        params={})  # updates the registration status bar with date in the client
+        response=response, name="registration_status", params={}
+    )  # updates the registration status bar with date in the client
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.view_registration', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.view_registration", raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by("OrganisationName")
 
     context = {
         "registration": registration,
         "site": site,
         "edit": False,
         "transfer": False,
-        'organisation_site': organisation_list
+        "organisation_site": organisation_list,
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -312,20 +336,22 @@ def cancel_lead_site(request, registration_id, site_id):
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_transfer_epilepsy12_lead_centre', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
+)
 def update_lead_site(request, registration_id, site_id, update):
     """
     HTMX POST request on button click from the lead_site partial
-    If the update parameter is 'transfer', 
-    updates the lead centre by creating a new Site and 
+    If the update parameter is 'transfer',
+    updates the lead centre by creating a new Site and
     setting site_is_actively_involved_in_epilepsy_care
     to False in the current record - this is a transfer of care.
     If the update parameter is 'edit'
@@ -342,58 +368,69 @@ def update_lead_site(request, registration_id, site_id, update):
     previous_lead_site = Site.objects.get(pk=site_id)
 
     if update == "edit":
-        new_trust_id = request.POST.get('edit_lead_site')
+        new_trust_id = request.POST.get("edit_lead_site")
         new_organisation = Organisation.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
             organisation=new_organisation,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
-            updated_by=request.user)
+            updated_by=request.user,
+        )
     elif update == "transfer":
-        new_trust_id = request.POST.get('transfer_lead_site')
+        new_trust_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=False,
             updated_at=timezone.now(),
-            updated_by=request.user)
+            updated_by=request.user,
+        )
         Site.objects.create(
             organisation=new_organisation,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
             updated_at=timezone.now(),
             updated_by=request.user,
-            case=registration.case)
+            case=registration.case,
+        )
 
         subject = "Epilepsy12 Lead Site Transfer"
-        recipients = Epilepsy12User.objects.filter(
-            is_active=True,
-            role=4
-        ).all()
+        recipients = Epilepsy12User.objects.filter(is_active=True, role=4).all()
         for recipient in recipients:
             email = construct_transfer_epilepsy12_site_email(
-                request=request, user=recipient, target_organisation=new_organisation.ParentName, child=registration.case)
+                request=request,
+                user=recipient,
+                target_organisation=new_organisation.ParentName,
+                child=registration.case,
+            )
             try:
                 send_mail(
                     subject=subject,
                     recipient_list=[recipient.email],
                     message=strip_tags(email),
                     html_message=email,
-                    from_email='admin@epilepsy12.rcpch.tech',
-                    fail_silently=False)
+                    from_email="admin@epilepsy12.rcpch.tech",
+                    fail_silently=False,
+                )
             except BadHeaderError:
-                return HttpResponse('Invalid header found.')
+                return HttpResponse("Invalid header found.")
 
         messages.success(
-            request, f"{registration.case} has been successfully transferred to {new_organisation.ParentName}.")
+            request,
+            f"{registration.case} has been successfully transferred to {new_organisation.ParentName}.",
+        )
 
-    return HttpResponseClientRedirect(reverse('cases', kwargs={'organisation_id': previous_lead_site.organisation.pk}))
+    return HttpResponseClientRedirect(
+        reverse("cases", kwargs={"organisation_id": previous_lead_site.organisation.pk})
+    )
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_delete_epilepsy12_lead_centre', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_delete_epilepsy12_lead_centre", raise_exception=True
+)
 def delete_lead_site(request, registration_id, site_id):
     """
     HTMX POST request on button click from the lead_site partial
@@ -405,21 +442,20 @@ def delete_lead_site(request, registration_id, site_id):
     # test first to see if this site is associated with other roles
     # either past or present
     if Site.objects.filter(
-        Q(case=registration.case) &
-        Q(pk=site_id) &
-        Q(
-            Q(site_is_childrens_epilepsy_surgery_centre=True) |
-            Q(site_is_paediatric_neurology_centre=True) |
-            Q(site_is_general_paediatric_centre=True)
+        Q(case=registration.case)
+        & Q(pk=site_id)
+        & Q(
+            Q(site_is_childrens_epilepsy_surgery_centre=True)
+            | Q(site_is_paediatric_neurology_centre=True)
+            | Q(site_is_general_paediatric_centre=True)
         )
     ).exists():
         # remove the lead role allocation
-        Site.objects.filter(
-            pk=site_id
-        ).update(
+        Site.objects.filter(pk=site_id).update(
             site_is_primary_centre_of_epilepsy_care=False,
             updated_at=timezone.now(),
-            updated_by=request.user)
+            updated_by=request.user,
+        )
 
     else:
         # there are no other roles (previous or current)
@@ -429,16 +465,17 @@ def delete_lead_site(request, registration_id, site_id):
     lead_site = Site.objects.filter(
         case=registration.case,
         site_is_primary_centre_of_epilepsy_care=True,
-        site_is_actively_involved_in_epilepsy_care=True).first()
+        site_is_actively_involved_in_epilepsy_care=True,
+    ).first()
 
-    organisation_list = Organisation.objects.order_by('OrganisationName')
+    organisation_list = Organisation.objects.order_by("OrganisationName")
 
     context = {
         "registration": registration,
         "site": lead_site,
         "edit": False,
         "transfer": False,
-        'organisation_list': organisation_list
+        "organisation_list": organisation_list,
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -447,26 +484,26 @@ def delete_lead_site(request, registration_id, site_id):
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.view_registration', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.view_registration", raise_exception=True)
 def previous_sites(request, registration_id):
-
     registration = Registration.objects.get(pk=registration_id)
     previous_sites = Site.objects.filter(
         case=registration.case,
         site_is_actively_involved_in_epilepsy_care=False,
-        site_is_primary_centre_of_epilepsy_care=True)
+        site_is_primary_centre_of_epilepsy_care=True,
+    )
 
     context = {
-        'previously_registered_sites': previous_sites,
-        'registration': registration
+        "previously_registered_sites": previous_sites,
+        "registration": registration,
     }
 
     template_name = "epilepsy12/partials/registration/lead_site.html"
@@ -475,7 +512,7 @@ def previous_sites(request, registration_id):
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
@@ -487,8 +524,10 @@ Validation process
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_register_child_in_epilepsy12', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
+)
 def confirm_eligible(request, registration_id):
     """
     HTMX POST request on button press in registration_form confirming child
@@ -497,53 +536,47 @@ def confirm_eligible(request, registration_id):
     to True and replace the button with the is_eligible partial, a label confirming
     eligibility. The button will not be shown again.
     """
-    context = {
-        'has_error': False,
-        'message': 'Eligibility Criteria Confirmed.'
-    }
+    context = {"has_error": False, "message": "Eligibility Criteria Confirmed."}
     try:
-        Registration.objects.update_or_create(pk=registration_id, defaults={
-            'eligibility_criteria_met': True
-        })
+        Registration.objects.update_or_create(
+            pk=registration_id, defaults={"eligibility_criteria_met": True}
+        )
     except Exception as error:
-        context = {
-            'has_error': True,
-            'message': error
-        }
+        context = {"has_error": True, "message": error}
 
     registration = Registration.objects.filter(pk=registration_id).get()
 
-    template_name = 'epilepsy12/partials/registration/is_eligible_label.html'
+    template_name = "epilepsy12/partials/registration/is_eligible_label.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
-    if registration.eligibility_criteria_met and Site.objects.filter(case=registration.case, site_is_primary_centre_of_epilepsy_care=True).exists():
+    if (
+        registration.eligibility_criteria_met
+        and Site.objects.filter(
+            case=registration.case, site_is_primary_centre_of_epilepsy_care=True
+        ).exists()
+    ):
         # activate registration button if eligibility and lead centre set
         trigger_client_event(
-            response=response,
-            name="registration_status",
-            params={})  # updates the registration status bar with date in the client
+            response=response, name="registration_status", params={}
+        )  # updates the registration status bar with date in the client
 
     return response
 
 
 @login_required
-# @user_can_access_this_organisation()
-@permission_required('epilepsy12.change_registration', raise_exception=True)
+# @user_may_view_this_child()
+@permission_required("epilepsy12.change_registration", raise_exception=True)
 def registration_status(request, registration_id):
-
     registration = Registration.objects.get(pk=registration_id)
     case = registration.case
 
-    context = {
-        'case_id': case.pk,
-        'registration': registration
-    }
+    context = {"case_id": case.pk, "registration": registration}
 
     template_name = "epilepsy12/partials/registration/registration_dates.html"
 
@@ -551,18 +584,20 @@ def registration_status(request, registration_id):
         model_instance=registration,
         request=request,
         context=context,
-        template=template_name
+        template=template_name,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.can_register_child_in_epilepsy12', raise_exception=True)
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
+)
 def registration_date(request, case_id):
     """
-    This defines registration in the audit and refers to the date of first paediatric assessment. 
+    This defines registration in the audit and refers to the date of first paediatric assessment.
     Call back from POST request on button press of register button
     in registration_dates partial.
     This sets the registration date, and in turn, the cohort number
@@ -578,8 +613,8 @@ def registration_date(request, case_id):
             request,
             registration.pk,
             Registration,
-            field_name='registration_date',
-            page_element='date_field',
+            field_name="registration_date",
+            page_element="date_field",
         )
 
     except ValueError as error:
@@ -588,10 +623,7 @@ def registration_date(request, case_id):
     # requery to get most up to date instance
     registration = Registration.objects.filter(case=case).get()
 
-    context = {
-        'case_id': case_id,
-        'registration': registration
-    }
+    context = {"case_id": case_id, "registration": registration}
 
     template_name = "epilepsy12/partials/registration/registration_dates.html"
 
@@ -600,7 +632,7 @@ def registration_date(request, case_id):
         request=request,
         context=context,
         template=template_name,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
