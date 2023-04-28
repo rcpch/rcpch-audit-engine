@@ -56,4 +56,7 @@ jobs:
           app-name: 'epilepsy12-development'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
-          package: .
+          package: |
+            **/*
+            !.git/HEAD
+            !.git/refs/*
