@@ -7,8 +7,14 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
     AuthenticationForm,
 )
-from epilepsy12.constants.user_types import ROLES, TITLES
+from epilepsy12.constants.user_types import (
+    ROLES,
+    RCPCH_AUDIT_TEAM_ROLES,
+    AUDIT_CENTRE_ROLES,
+    TITLES,
+)
 from ..models import Epilepsy12User, Organisation
+from ..general_functions import match_in_choice_key
 
 
 class Epilepsy12LoginForm(AuthenticationForm):
@@ -22,6 +28,9 @@ class Epilepsy12LoginForm(AuthenticationForm):
 
 
 class Epilepsy12UserCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super(Epilepsy12UserCreationForm, self).__init__(*args, **kwargs)
+
     title = forms.CharField(required=False)
 
     email = forms.EmailField(
@@ -118,11 +127,21 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     This is a standard Django form to be used by admin to create a user without a password
     """
 
-    admin_title = forms.CharField(required=False)
+    rcpch_organisation = ""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, rcpch_organisation, *args, **kwargs):
         super(Epilepsy12UserAdminCreationForm, self).__init__(*args, **kwargs)
-        # self.user_existing_email = self.instance.email
+        if rcpch_organisation == "organisation-staff":
+            choices = AUDIT_CENTRE_ROLES
+        elif rcpch_organisation == "rcpch-staff":
+            choices = RCPCH_AUDIT_TEAM_ROLES
+        else:
+            raise ValueError(
+                "No user-type supplied to create user form. Arguments are rcpch-staff or organisation-staff."
+            )
+
+        self.rcpch_organisation = rcpch_organisation
+        self.fields["role"].choices = choices
 
     email = forms.EmailField(
         max_length=255,
@@ -132,7 +151,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     )
 
     role = forms.ChoiceField(
-        choices=ROLES,
         widget=forms.Select(attrs={"class": "ui fluid rcpch dropdown"}),
         required=True,
     )
@@ -211,16 +229,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
         return data.lower()
 
-    def clean_is_staff(self):
-        """
-        if is_staff is positive, set view_preference to organisation_view
-        """
-        data = self.cleaned_data["is_staff"]
-        if data:
-            self.cleaned_data["view_preference"] = 0
-            self.organisation_employer = None
-        return data
-
     def clean_is_rcpch_audit_team_member(self):
         """
         if is_rcpch_audit_team_member is positive, set view_preference to organisation_view
@@ -245,10 +253,13 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
     def clean(self):
         cleaned_data = super().clean()
-        is_staff = cleaned_data.get("is_staff")
-        if is_staff:
+
+        if self.rcpch_organisation == "rcpch-staff":
             # RCPCH staff are not affiliated with any organisation
+            cleaned_data["is_staff"] = True
             cleaned_data["organisation_employer"] = None
+            cleaned_data["is_rcpch_audit_team_member"] = True
+            cleaned_data["view_preference"] = 0
         return cleaned_data
 
 
@@ -287,7 +298,6 @@ class Epilepsy12UserPasswordResetForm(SetPasswordForm):
 
     def clean(self):
         cleaned_data = super(Epilepsy12UserPasswordResetForm, self).clean()
-        print("cleaning reset password form")
         return cleaned_data
 
 

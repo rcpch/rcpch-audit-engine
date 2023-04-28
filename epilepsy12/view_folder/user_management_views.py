@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
-from django.core.mail import send_mail, BadHeaderError, EmailMessage
+from django.core.mail import send_mail, BadHeaderError
 
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
@@ -16,9 +16,10 @@ from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, Organisation
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
-from ..general_functions import construct_confirm_email
-from ..common_view_functions import return_selected_organisation
+from ..general_functions import construct_confirm_email, match_in_choice_key
+from ..common_view_functions import group_for_role
 from ..decorator import user_may_view_this_organisation
+from ..constants import RCPCH_AUDIT_TEAM_ROLES, AUDIT_CENTRE_ROLES
 
 
 @user_may_view_this_organisation()
@@ -119,7 +120,6 @@ def epilepsy12_user_list(request, organisation_id):
                 organisation_employer__OrganisationName__contains=organisation.OrganisationName
             )
         else:
-            print(request.user.view_preference)
             raise Exception("No View Preference supplied")
 
         if (
@@ -138,7 +138,6 @@ def epilepsy12_user_list(request, organisation_id):
                 )
             else:
                 # national view
-                print("national view")
                 filtered_epilepsy12_users = (
                     Epilepsy12User.objects.filter().order_by("surname").all()
                 )
@@ -268,13 +267,20 @@ def create_epilepsy12_user(request, organisation_id, user_type):
         prepopulated_data = {
             "organisation_employer": organisation,
         }
-        form = Epilepsy12UserAdminCreationForm(initial=prepopulated_data)
+        form = Epilepsy12UserAdminCreationForm(
+            rcpch_organisation=user_type, initial=prepopulated_data
+        )
     elif user_type == "rcpch-staff":
         admin_title = "Add RCPCH Epilepsy12 staff member"
-        form = Epilepsy12UserAdminCreationForm(initial=None)
+        form = Epilepsy12UserAdminCreationForm(
+            rcpch_organisation=user_type, initial=None
+        )
 
     if request.method == "POST":
-        form = Epilepsy12UserAdminCreationForm(request.POST or None)
+        form = Epilepsy12UserAdminCreationForm(
+            user_type,
+            request.POST or None,
+        )
 
         if form.is_valid():
             # success message - return to user list
@@ -284,7 +290,9 @@ def create_epilepsy12_user(request, organisation_id, user_type):
             new_user.email_confirmed = False
             new_user.view_preference = 0
             new_user.save()
-            get_user_model().objects.allocate_group_based_on_role(new_user)
+
+            new_group = group_for_role(new_user.role)
+            new_user.groups.add(new_group)
 
             # user created - send email with reset link to new user
             subject = "Password Reset Requested"
@@ -308,6 +316,7 @@ def create_epilepsy12_user(request, organisation_id, user_type):
         "form": form,
         "organisation_id": organisation_id,
         "admin_title": admin_title,
+        "user_type": user_type,
     }
 
     return render(
@@ -334,9 +343,15 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         or request.user.is_rcpch_audit_team_member
     ):
         can_edit = True
+    if match_in_choice_key(AUDIT_CENTRE_ROLES, epilepsy12_user_to_edit.role):
+        user_type = "organisation-staff"
+    elif match_in_choice_key(RCPCH_AUDIT_TEAM_ROLES, epilepsy12_user_to_edit.role):
+        user_type = "rcpch-staff"
     if can_edit:
         form = Epilepsy12UserAdminCreationForm(
-            request.POST or None, instance=epilepsy12_user_to_edit
+            user_type,
+            request.POST or None,
+            instance=epilepsy12_user_to_edit,
         )
     else:
         return HttpResponseForbidden()
@@ -386,7 +401,12 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         else:
             if form.is_valid():
                 # this will not include the password which will be empty
-                form.save()
+                new_user = form.save()
+
+                # update group
+                new_group = group_for_role(new_user.role)
+                new_user.groups.clear()
+                new_user.groups.add(new_group)
 
                 # adds success message
                 messages.success(
@@ -404,13 +424,20 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     if epilepsy12_user_to_edit.is_staff:
         admin_title = "Edit RCPCH Epilepsy12 staff member"
+        user_type = "rcpch-staff"
     else:
         admin_title = "Edit Epilepsy12 User"
+        user_type = "organisation-staff"
 
     return render(
         request,
         template_name,
-        {"organisation_id": organisation_id, "form": form, "admin_title": admin_title},
+        {
+            "organisation_id": organisation_id,
+            "form": form,
+            "admin_title": admin_title,
+            "user_type": user_type,
+        },
     )
 
 
