@@ -111,6 +111,10 @@ def organisation_reports(request):
         )
     else:
         total_percent_trust = 0
+    
+    org_list=Organisation.objects.order_by('OrganisationName').all()
+    print(dir(org_list[0]))
+    print(f"{org_list[0].OrganisationName=}{org_list[0].ParentOrganisation_OrganisationName=}")
 
     return render(
         request=request,
@@ -238,6 +242,8 @@ def selected_organisation_summary(request):
         )
     else:
         total_percent_trust = 0
+        
+    
 
     return render(
         request=request,
