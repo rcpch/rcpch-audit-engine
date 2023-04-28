@@ -346,6 +346,16 @@ htmx_paths = [
         views.autistic_spectrum_disorder,
         name="autistic_spectrum_disorder",
     ),
+    path(
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/global_developmental_delay_or_learning_difficulties",
+        views.global_developmental_delay_or_learning_difficulties,
+        name="global_developmental_delay_or_learning_difficulties",
+    ),
+    path(
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/global_developmental_delay_or_learning_difficulties_severity",
+        views.global_developmental_delay_or_learning_difficulties_severity,
+        name="global_developmental_delay_or_learning_difficulties_severity",
+    ),
     # epilepsy12_user
     path(
         "organisation/<int:organisation_id>/filtered_epilepsy12_user_list",

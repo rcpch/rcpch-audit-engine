@@ -6,7 +6,7 @@ from django.contrib.gis.db.models import Subquery
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
-from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE
+from ..constants import EPILEPSY_CAUSES, GENERALISED_SEIZURE_TYPE, SEVERITY
 from epilepsy12.constants import (
     EPILEPSY_SEIZURE_TYPE,
     EPIS_MISC,
@@ -138,6 +138,7 @@ def multiaxial_diagnosis(request, case_id):
         "active_template": "multiaxial_diagnosis",
         "there_are_epileptic_episodes": there_are_epileptic_episodes,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
         "organisation_id": organisation_id,
     }
 
@@ -1785,6 +1786,7 @@ def mental_health_screen(request, multiaxial_diagnosis_id):
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
     }
 
     response = recalculate_form_generate_response(
@@ -1831,6 +1833,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
     }
 
     response = recalculate_form_generate_response(
@@ -1869,12 +1872,105 @@ def mental_health_issue(request, multiaxial_diagnosis_id):
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
     }
 
     response = recalculate_form_generate_response(
         model_instance=multiaxial_diagnosis,
         request=request,
         template="epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html",
+        context=context,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
+def global_developmental_delay_or_learning_difficulties(
+    request, multiaxial_diagnosis_id
+):
+    """
+    POST request callback for mental_health_issue_identified toggle
+    """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name="global_developmental_delay_or_learning_difficulties",
+            page_element="toggle_button",
+        )
+    except ValueError as error:
+        error_message = error
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
+
+    # tidy up
+    if not multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties:
+        # if no issue identified, remove any previously stored mental health issues
+        multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties_severity = (
+            None
+        )
+        multiaxial_diagnosis.updated_at = (timezone.now(),)
+        multiaxial_diagnosis.updated_by = request.user
+        multiaxial_diagnosis.save()
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=multiaxial_diagnosis,
+        request=request,
+        template="epilepsy12/partials/multiaxial_diagnosis/global_developmental_delay_or_learning_difficulties_section.html",
+        context=context,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
+def global_developmental_delay_or_learning_difficulties_severity(
+    request, multiaxial_diagnosis_id
+):
+    """
+    POST callback from global_developmental_delay_or_learning_difficulties_severity multiple toggle
+    """
+
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name="global_developmental_delay_or_learning_difficulties_severity",
+            page_element="single_choice_multiple_toggle_button",
+        )
+    except ValueError as error:
+        error_message = error
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=multiaxial_diagnosis,
+        request=request,
+        template="epilepsy12/partials/multiaxial_diagnosis/global_developmental_delay_or_learning_difficulties_section.html",
         context=context,
         error_message=error_message,
     )
@@ -1906,6 +2002,7 @@ def autistic_spectrum_disorder(request, multiaxial_diagnosis_id):
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
         "mental_health_issues_choices": NEUROPSYCHIATRIC,
+        "global_developmental_delay_or_learning_difficulties_severity_choices": SEVERITY,
     }
 
     response = recalculate_form_generate_response(

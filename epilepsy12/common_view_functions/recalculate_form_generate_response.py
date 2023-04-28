@@ -200,6 +200,11 @@ def total_fields_expected(model_instance):
             # mental_health_issue
             cumulative_score += 1
 
+        if model_instance.global_developmental_delay_or_learning_difficulties:
+            # essential fields increase to include
+            # global_developmental_delay_or_learning_difficulties_severity
+            cumulative_score += 1
+
     elif model_class_name == "Assessment":
         if model_instance.consultant_paediatrician_referral_made:
             # add essential fields: date referred, date seen, centre
@@ -458,9 +463,10 @@ def scoreable_fields_for_model_class_name(model_class_name):
                 "syndrome_present",
                 "epilepsy_cause_known",
                 "relevant_impairments_behavioural_educational",
+                "autistic_spectrum_disorder",
+                "global_developmental_delay_or_learning_difficulties",
                 "mental_health_screen",
                 "mental_health_issue_identified",
-                "autistic_spectrum_disorder",
             ]
         )
     elif model_class_name == "Episode":
