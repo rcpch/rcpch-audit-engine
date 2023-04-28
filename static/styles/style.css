@@ -1219,9 +1219,6 @@ div.ui.card > div.content > div.organisation_address_container {
   border-color: var(--rcpch_light_blue);
   border-width: medium;
   margin-bottom: 10px;
-}
-
-.ui.rcpch.table {
   margin-top: 10px;
 }
 
@@ -1431,6 +1428,7 @@ a label {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 5em;
 }
 
 .rcpch_team_member_image_wrapper > * {
