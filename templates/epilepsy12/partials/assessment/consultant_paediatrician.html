@@ -8,7 +8,7 @@
 
     {% if assessment.consultant_paediatrician_referral_made %}
 
-        <div class="ui rcpch_lightest_blue message">
+        <div class="ui rcpch_important message">
 
             {% url 'consultant_paediatrician_referral_date' assessment_id=assessment.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#general_paediatric" hx_trigger="change delay:1s" label=assessment.get_consultant_paediatrician_referral_date_help_label_text reference=assessment.get_consultant_paediatrician_referral_date_help_reference_text date_value=assessment.consultant_paediatrician_referral_date input_date_field_name="consultant_paediatrician_referral_date" data_position="top left" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
