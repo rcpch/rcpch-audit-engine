@@ -1,24 +1,27 @@
 from django.contrib.auth.decorators import login_required, permission_required
-from ..decorator import user_can_access_this_organisation
+from ..decorator import user_may_view_this_child
 from epilepsy12.constants.common import OPT_OUT_UNCERTAIN
 from ..models import EpilepsyContext, Registration, Site
-from ..common_view_functions import validate_and_update_model, recalculate_form_generate_response
+from ..common_view_functions import (
+    validate_and_update_model,
+    recalculate_form_generate_response,
+)
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.view_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.view_epilepsycontext", raise_exception=True)
 def epilepsy_context(request, case_id):
-
     registration = Registration.objects.filter(case=case_id).first()
 
     epilepsy_context, created = EpilepsyContext.objects.get_or_create(
-        registration=registration)
+        registration=registration
+    )
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
         site_is_primary_centre_of_epilepsy_care=True,
-        case=registration.case
+        case=registration.case,
     ).get()
     organisation_id = site.organisation.pk
 
@@ -29,25 +32,25 @@ def epilepsy_context(request, case_id):
         "uncertain_choices": OPT_OUT_UNCERTAIN,
         "audit_progress": epilepsy_context.registration.audit_progress,
         "active_template": "epilepsy_context",
-        "organisation_id": organisation_id
+        "organisation_id": organisation_id,
     }
 
     response = recalculate_form_generate_response(
         model_instance=epilepsy_context,
         request=request,
-        template='epilepsy12/epilepsy_context.html',
-        context=context
+        template="epilepsy12/epilepsy_context.html",
+        context=context,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def previous_febrile_seizure(request, epilepsy_context_id):
     """
-    HTMX callback from the previous_febrile_seizure partial, 
+    HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -58,8 +61,8 @@ def previous_febrile_seizure(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='previous_febrile_seizure',
-            page_element='single_choice_multiple_toggle_button',
+            field_name="previous_febrile_seizure",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -69,7 +72,7 @@ def previous_febrile_seizure(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
@@ -77,18 +80,18 @@ def previous_febrile_seizure(request, epilepsy_context_id):
         request=request,
         template="epilepsy12/partials/epilepsy_context/previous_febrile_seizure.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
     """
-    HTMX callback from the previous_febrile_seizure partial, 
+    HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -99,8 +102,8 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='previous_acute_symptomatic_seizure',
-            page_element='single_choice_multiple_toggle_button',
+            field_name="previous_acute_symptomatic_seizure",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -110,7 +113,7 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
@@ -118,18 +121,18 @@ def previous_acute_symptomatic_seizure(request, epilepsy_context_id):
         request=request,
         template="epilepsy12/partials/epilepsy_context/previous_acute_symptomatic_seizure.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
     """
-    HTMX callback from the previous_febrile_seizure partial, 
+    HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -140,8 +143,8 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='is_there_a_family_history_of_epilepsy',
-            page_element='single_choice_multiple_toggle_button',
+            field_name="is_there_a_family_history_of_epilepsy",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -151,7 +154,7 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
@@ -159,18 +162,18 @@ def is_there_a_family_history_of_epilepsy(request, epilepsy_context_id):
         request=request,
         template="epilepsy12/partials/epilepsy_context/is_there_a_family_history_of_epilepsy.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def previous_neonatal_seizures(request, epilepsy_context_id):
     """
-    HTMX callback from the previous_febrile_seizure partial, 
+    HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -181,8 +184,8 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='previous_neonatal_seizures',
-            page_element='single_choice_multiple_toggle_button',
+            field_name="previous_neonatal_seizures",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -192,7 +195,7 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
@@ -200,15 +203,15 @@ def previous_neonatal_seizures(request, epilepsy_context_id):
         request=request,
         template="epilepsy12/partials/epilepsy_context/previous_neonatal_seizures.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
     """
     Post request from multiple choice toggle within epilepsy partial.
@@ -221,8 +224,8 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='were_any_of_the_epileptic_seizures_convulsive',
-            page_element='toggle_button',
+            field_name="were_any_of_the_epileptic_seizures_convulsive",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
@@ -232,26 +235,26 @@ def were_any_of_the_epileptic_seizures_convulsive(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
         model_instance=epilepsy_context,
         request=request,
-        template='epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html',
+        template="epilepsy12/partials/epilepsy_context/were_any_of_the_epileptic_seizures_convulsive.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_context_id):
     """
-    HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial, 
+    HTMX callback from the experienced_prolonged_generalized_convulsive_seizures partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -262,8 +265,8 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='experienced_prolonged_generalized_convulsive_seizures',
-            page_element='single_choice_multiple_toggle_button',
+            field_name="experienced_prolonged_generalized_convulsive_seizures",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -273,7 +276,7 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
@@ -281,18 +284,18 @@ def experienced_prolonged_generalized_convulsive_seizures(request, epilepsy_cont
         request=request,
         template="epilepsy12/partials/epilepsy_context/experienced_prolonged_generalized_convulsive_seizures.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
     """
-    HTMX callback from the experienced_prolonged_focal_seizures partial, 
+    HTMX callback from the experienced_prolonged_focal_seizures partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -303,8 +306,8 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='experienced_prolonged_focal_seizures',
-            page_element='single_choice_multiple_toggle_button',
+            field_name="experienced_prolonged_focal_seizures",
+            page_element="single_choice_multiple_toggle_button",
         )
 
     except ValueError as error:
@@ -314,7 +317,7 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
 
     context = {
         "epilepsy_context": epilepsy_context,
-        "uncertain_choices": OPT_OUT_UNCERTAIN
+        "uncertain_choices": OPT_OUT_UNCERTAIN,
     }
 
     response = recalculate_form_generate_response(
@@ -322,18 +325,18 @@ def experienced_prolonged_focal_seizures(request, epilepsy_context_id):
         request=request,
         template="epilepsy12/partials/epilepsy_context/experienced_prolonged_focal_seizures.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response
 
 
 @login_required
-@user_can_access_this_organisation()
-@permission_required('epilepsy12.change_epilepsycontext', raise_exception=True)
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_epilepsycontext", raise_exception=True)
 def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
     """
-    HTMX callback from the previous_febrile_seizure partial, 
+    HTMX callback from the previous_febrile_seizure partial,
     parent of single_choice_multiple_toggle
     Updates the model and returns the same partial
     """
@@ -344,8 +347,8 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
             request,
             epilepsy_context_id,
             EpilepsyContext,
-            field_name='diagnosis_of_epilepsy_withdrawn',
-            page_element='toggle_button',
+            field_name="diagnosis_of_epilepsy_withdrawn",
+            page_element="toggle_button",
         )
 
     except ValueError as error:
@@ -353,16 +356,14 @@ def diagnosis_of_epilepsy_withdrawn(request, epilepsy_context_id):
 
     epilepsy_context = EpilepsyContext.objects.get(pk=epilepsy_context_id)
 
-    context = {
-        "epilepsy_context": epilepsy_context
-    }
+    context = {"epilepsy_context": epilepsy_context}
 
     response = recalculate_form_generate_response(
         model_instance=epilepsy_context,
         request=request,
         template="epilepsy12/partials/epilepsy_context/epilepsy_diagnosis_withdrawn.html",
         context=context,
-        error_message=error_message
+        error_message=error_message,
     )
 
     return response

@@ -1,9 +1,9 @@
 /* entire */
 
-/* git commit hash */
+/* admin data - git branch and latest commit hash */
 
-.git_hash {
-  color: var(--rcpch_dark_blue);
+.admin-data {
+  color: var(--rcpch_red);
   margin: auto 0em auto 4em;
 }
 

@@ -67,8 +67,8 @@
           
           </div>
           
-          {% if not user.is_staff or user.is_superuser %}
-            <div class='field'>
+          {% if form.organisation_employer.value %}
+            <div class='field' id="organisation_employer">
               <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
               {{ form.organisation_employer }}
               {% if form.organisation_employer.errors %}
@@ -76,11 +76,12 @@
               {% endif %}
             </div>
           {% endif %}
+          
 
-          <div class='three fields'>
+          <div class='two fields'>
 
-            {% if user.is_staff or user.is_superuser%}
-              <div class='six wide field'>
+            {% if user_type == 'organisation-staff' %}
+              <div class='eight wide field'>
                 <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
                   {{ form.is_rcpch_audit_team_member }}
@@ -91,20 +92,8 @@
               </div>
             {% endif %}
             
-            {% if user.is_staff or user.is_superuser%}
-              <div class='five wide field'>
-                <label for="{{form.is_staff.id_for_label}}">RCPCH Staff</label>
-                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                  {{ form.is_staff }}
-                </div>
-                {% if form.is_staff.errors %}
-                  <div class="ui pointing red basic label">{{form.is_staff.errors}}</div>
-                {% endif %}
-              </div>
-            {% endif %}
-            
             {% if user.is_superuser %}
-              <div class='five wide field'>
+              <div class='eight wide field'>
                 <label for="{{form.is_superuser.id_for_label}}">Superuser</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
                   {{ form.is_superuser }}
@@ -123,7 +112,7 @@
             value="{{admin_title}}" 
             name='edit'/>
 
-          {% if not form.email_confirmed.value %}
+          {% if not form.email_confirmed.value and admin_title != "Add RCPCH Epilepsy12 staff member" and admin_title != 'Add Epilepsy12 User' %}
 
             <button 
               type="submit" 
@@ -140,7 +129,9 @@
 
           {% endif %}
 
-          {% if admin_title != 'Add Epilepsy12 User' %}
+          {{form.email_confirmed.as_hidden}}
+
+          {% if admin_title != 'Add Epilepsy12 User' and admin_title != "Add RCPCH Epilepsy12 staff member" %}
 
             <input 
               type="submit" 
