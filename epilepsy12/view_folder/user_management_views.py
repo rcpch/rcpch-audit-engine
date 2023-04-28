@@ -17,6 +17,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from ..models import Epilepsy12User, Organisation
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email
+from ..common_view_functions import return_selected_organisation
 from ..decorator import user_may_view_this_organisation
 
 
@@ -255,12 +256,22 @@ def epilepsy12_user_list(request, organisation_id):
 @login_required
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.add_epilepsy12user")
-def create_epilepsy12_user(request, organisation_id):
+def create_epilepsy12_user(request, organisation_id, user_type):
+    """
+    Creates an epilepsy12 user. It is called from epilepsy12 list of users
+    If from the create epilepsy12 user button, the originating organisation is added to
+    the saved user. If from the create rcpch-staff button, the originating organisation is removed.
+    """
     organisation = Organisation.objects.get(pk=organisation_id)
-    prepopulated_data = {
-        "organisation_employer": organisation,
-    }
-    form = Epilepsy12UserAdminCreationForm(initial=prepopulated_data)
+    if user_type == "organisation-staff":
+        admin_title = "Add Epilepsy12 User"
+        prepopulated_data = {
+            "organisation_employer": organisation,
+        }
+        form = Epilepsy12UserAdminCreationForm(initial=prepopulated_data)
+    elif user_type == "rcpch-staff":
+        admin_title = "Add RCPCH Epilepsy12 staff member"
+        form = Epilepsy12UserAdminCreationForm(initial=None)
 
     if request.method == "POST":
         form = Epilepsy12UserAdminCreationForm(request.POST or None)
@@ -296,10 +307,7 @@ def create_epilepsy12_user(request, organisation_id):
     context = {
         "form": form,
         "organisation_id": organisation_id,
-        "admin_title": "Add Epilepsy12 User",
-        "is_superuser": False,
-        "is_staff": False,
-        "is_rcpch_audit_team_member": False,
+        "admin_title": admin_title,
     }
 
     return render(
@@ -394,14 +402,15 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     template_name = "registration/admin_create_user.html"
 
+    if epilepsy12_user_to_edit.is_staff:
+        admin_title = "Edit RCPCH Epilepsy12 staff member"
+    else:
+        admin_title = "Edit Epilepsy12 User"
+
     return render(
         request,
         template_name,
-        {
-            "organisation_id": organisation_id,
-            "form": form,
-            "admin_title": "Edit Epilepsy12 User",
-        },
+        {"organisation_id": organisation_id, "form": form, "admin_title": admin_title},
     )
 
 
