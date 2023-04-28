@@ -1,4 +1,7 @@
 
+{% url 'autistic_spectrum_disorder' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.autistic_spectrum_disorder tooltip_id='autistic_spectrum_disorder_tooltip' label=multiaxial_diagnosis.get_autistic_spectrum_disorder_help_label_text reference=multiaxial_diagnosis.get_autistic_spectrum_disorder_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
+
 {% url 'mental_health_screen' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
 {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#mental_health_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.mental_health_screen tooltip_id='mental_health_screen_tooltip' label=multiaxial_diagnosis.get_mental_health_screen_help_label_text reference=multiaxial_diagnosis.get_mental_health_screen_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
 

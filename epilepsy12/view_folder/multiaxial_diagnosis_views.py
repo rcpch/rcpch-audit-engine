@@ -1880,3 +1880,40 @@ def mental_health_issue(request, multiaxial_diagnosis_id):
     )
 
     return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
+def autistic_spectrum_disorder(request, multiaxial_diagnosis_id):
+    """
+    POST callback from autistic_spectrum_disorder multiple toggle
+    """
+    try:
+        error_message = None
+        validate_and_update_model(
+            request=request,
+            model=MultiaxialDiagnosis,
+            model_id=multiaxial_diagnosis_id,
+            field_name="autistic_spectrum_disorder",
+            page_element="toggle_button",
+        )
+    except ValueError as error:
+        error_message = error
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
+
+    context = {
+        "multiaxial_diagnosis": multiaxial_diagnosis,
+        "mental_health_issues_choices": NEUROPSYCHIATRIC,
+    }
+
+    response = recalculate_form_generate_response(
+        model_instance=multiaxial_diagnosis,
+        request=request,
+        template="epilepsy12/partials/multiaxial_diagnosis/mental_health_section.html",
+        context=context,
+        error_message=error_message,
+    )
+
+    return response

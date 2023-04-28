@@ -341,6 +341,11 @@ htmx_paths = [
         views.mental_health_issue,
         name="mental_health_issue",
     ),
+    path(
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/autistic_spectrum_disorder",
+        views.autistic_spectrum_disorder,
+        name="autistic_spectrum_disorder",
+    ),
     # epilepsy12_user
     path(
         "organisation/<int:organisation_id>/filtered_epilepsy12_user_list",
