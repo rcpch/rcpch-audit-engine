@@ -118,6 +118,7 @@
 body {
   color: black;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 h1,
@@ -137,22 +138,26 @@ button,
 th {
   font-family: var(--rcpch_standard_font) !important;
   color: black;
+  font-weight: 400;
 }
 
 textarea {
   font-family: var(--rcpch_standard_font);
   color: var(--rcpch_black);
+  font-weight: 400;
 }
 
 ul {
   list-style-type: square;
   font-family: var(--rcpch_standard_font);
   color: var(--rcpch_charcoal);
+  font-weight: 400;
 }
 
 .rcpch_link {
   font-family: var(--rcpch_standard_font);
   color: black;
+  font-weight: 400;
 }
 
 .ui.fluid.rcpch.container {
@@ -173,6 +178,7 @@ ul {
 .ui.label {
   list-style: none;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .patient {
@@ -271,6 +277,7 @@ a.rcpch_index_card_link {
   background-color: white;
   border-color: #d9d9d9;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .ui.rcpch_chart_container.segment {
@@ -292,6 +299,7 @@ a.rcpch_index_card_link {
   font-family: var(--rcpch_standard_font);
   color: black;
   text-align: center;
+  font-weight: 400;
 }
 
 .ui.rcpch_light_blue.card > .ui.header {
@@ -303,6 +311,7 @@ a.rcpch_index_card_link {
 .ui.rcpch_light_blue.card .content .description {
   font-family: var(--rcpch_standard_font);
   color: black;
+  font-weight: 400;
 }
 
 .ui.rcpch_light_blue.card div.content > h3 {
@@ -345,6 +354,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: white;
   width: auto;
 }
@@ -353,6 +363,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: white;
 }
 
@@ -364,22 +375,26 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: white;
 }
 
 .ui.white.card {
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #description {
   color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #chat {
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #stats_box {
@@ -391,6 +406,7 @@ div.ui.card > div.content > div.organisation_address_container {
 #cases_list_segment {
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #cases_list_segment_header {
@@ -402,6 +418,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0%;
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #table_header {
@@ -409,6 +426,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   border-radius: 0%;
   font-family: Arial, Helvetica, sans-serif;
+  font-weight: 400;
 }
 
 .rcpch_centred_text {
@@ -422,6 +440,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #warning_message {
@@ -429,6 +448,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0%;
   color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #audit_top_attached_segment {
@@ -436,6 +456,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: #3366cc;
   color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #audit_top_attached_segment > h5 {
@@ -447,6 +468,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0%;
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   padding-bottom: 2em;
 }
 
@@ -870,11 +892,13 @@ div.ui.card > div.content > div.organisation_address_container {
 
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .title {
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: var(--rcpch_black);
 }
 
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .description {
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: var(--rcpch_charcoal);
 }
 
@@ -976,7 +1000,7 @@ div.ui.card > div.content > div.organisation_address_container {
   counter-reset: percent var(--percent);
   content: counter(percent) "%";
   color: var(--rcpch_dark_blue);
-  font-weight: bold;
+  font-weight: 900;
 }
 
 .pie--disc::before {
@@ -1074,6 +1098,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch.form input[type="select"],
 .ui.rcpch.form input[type="url"] {
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   margin: 0em;
   outline: none;
   border: 3px solid rgba(17, 167, 242, 1);
@@ -1264,7 +1289,8 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch.table th {
   background-color: var(--rcpch_light_blue);
   color: var(--rcpch_black);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .ui.rcpch.table tr:first-child() .ui.rcpch.table td {
@@ -1280,6 +1306,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch.table .subcategory-header {
   background-color: var(--rcpch_light_blue_tint2);
   font-family: var(--rcpch_bold_font);
+  font-weight: 900;
 }
 
 .ui.rcpch.table .subcategory-row {
@@ -1484,11 +1511,13 @@ img.ui.image.rcpch_member_image {
 .ui.statistic .value {
   color: var(--rcpch_light_blue);
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .ui.statistic div.label {
   font-family: var(--rcpch_standard_font);
   color: var(--rcpch_charcoal);
+  font-weight: 400;
 }
 
 .kpi_unscored {
@@ -1595,6 +1624,7 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   color: var(--rcpch_dark_red);
   list-style-type: none;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   padding-left: 10px;
   padding-right: 10px;
 }
