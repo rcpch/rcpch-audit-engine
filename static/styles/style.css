@@ -753,6 +753,12 @@ div.ui.card > div.content > div.organisation_address_container {
   font-weight:400;
 }
 
+a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .ui.rcpch_positive.button:hover {
   border-radius: 0% !important;
   color: white;
@@ -1848,4 +1854,22 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
 
 .notupperpadded {
   padding-top: 0 !important;
+.twelve.wide.column.add_search_return_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+div.sixteen.wide.column.add_search_return_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+div.sixteen.wide.column.add_search_return_wrapper > #case_statistics {
+  flex-grow: 2;
+}
+
+div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
+  width: 100%;
 }
