@@ -759,6 +759,12 @@ a.ui.button {
   align-items: center;
 }
 
+a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .ui.rcpch_positive.button:hover {
   border-radius: 0% !important;
   color: white;
@@ -1406,7 +1412,7 @@ a.ui.button {
 /* purple table */
 
 .ui.rcpch.purple.table th {
-  background-color: var(--rcpch_purple_light_tint1);
+  background-color: var(--rcpch_purple_dark_tint);
   color: white;
   font-family: 400;
   border-radius: 0%;
@@ -1414,7 +1420,7 @@ a.ui.button {
 
 .ui.rcpch.purple.table {
   border-radius: 0%;
-  border-color: var(--rcpch_purple_light_tint1);
+  border-color: var(--rcpch_purple_dark_tint);
   border-width: medium;
   margin-bottom: 10px;
 }
@@ -1676,6 +1682,14 @@ img.ui.image.rcpch_member_image {
   justify-content: space-between;
 }
 
+.ui.rcpch.purple.table.cases_table .rcpch_td_data_indicator_wrapper > * {
+  color: var(--rcpch_white);
+}
+
+.ui.rcpch.purple.table.cases_table .rcpch_td_data_indicator_wrapper:hover > * {
+  color: var(--rcpch_pink_light_tint3);
+}
+
 @media only screen and (max-width: 1119px) {
   .rcpch_td_data_indicator_wrapper {
     flex-direction: column;
@@ -1872,6 +1886,8 @@ div.sixteen.wide.column.add_search_return_wrapper > #case_statistics {
 
 div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   width: 100%;
+}
+
 .ui.form.field>label {
   font-weight: 400;
 }
