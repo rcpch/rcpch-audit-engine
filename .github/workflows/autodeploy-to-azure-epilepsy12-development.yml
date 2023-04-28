@@ -22,8 +22,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          clean: false
       
       - name: List all files
         run: ls -al
@@ -56,7 +54,4 @@ jobs:
           app-name: 'epilepsy12-development'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
-          package: |
-            **/*
-            !.git/HEAD
-            !.git/refs/*
+          package: .
