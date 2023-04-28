@@ -633,6 +633,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: black;
   background-color: var(--rcpch_light_blue);
   border-color: var(--rcpch_light_blue);
+  font-weight: 400;
 }
 
 .ui.rcpch_grey.button {
@@ -640,6 +641,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: black;
   background-color: var(--rcpch_mid_grey);
   border-color: var(--rcpch_mid_grey);
+  font-weight: 400;
 }
 
 .ui.rcpch_grey.button:hover {
@@ -647,6 +649,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 #first_paediatric_assessment_date_button {
@@ -658,6 +661,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 .ui.rcpch_primary.button .icon:hover {
@@ -665,12 +669,14 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 .ui.rcpch_negative.button {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_yellow);
+  font-weight: 400;
 }
 
 .ui.rcpch_negative.button:hover {
@@ -678,6 +684,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_orange);
   transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 .ui.rcpch_positive.button {
@@ -725,6 +732,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border: 1px solid rgba(224, 0, 135, 0.3);
   color: var(--rcpch_pink);
   background: transparent;
+  font-weight: 400;
 }
 
 /* spinner */
@@ -1708,4 +1716,8 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+
+.ui.form.field>label {
+  font-weight: 400;
 }
