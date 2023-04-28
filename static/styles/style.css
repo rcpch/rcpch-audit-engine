@@ -519,18 +519,21 @@ div.ui.card > div.content > div.organisation_address_container {
 
 .ui.rcpch_dark_blue.button {
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.button {
   background-color: var(--rcpch_light_grey);
   color: black;
   border-radius: 0% !important;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.button:active {
   background-color: var(--rcpch_pink);
   color: white;
   border-radius: 0% !important;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.positive.button {
@@ -543,6 +546,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   color: white;
   border-radius: 0% !important;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.positive.button:hover {
@@ -680,6 +684,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_strong_blue);
+  font-weight:400;
 }
 
 .ui.rcpch_positive.button:hover {
@@ -687,12 +692,14 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_danger.button {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_red);
+  font-weight:400;
 }
 
 .ui.rcpch_danger.button:hover {
@@ -700,6 +707,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: #8a0400;
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_danger.button .icon:hover {
@@ -707,6 +715,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: #8a0400;
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 /* eligible label */
