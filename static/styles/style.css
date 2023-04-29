@@ -1721,3 +1721,12 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
 .ui.form.field>label {
   font-weight: 400;
 }
+
+.unpadded {
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+.notupperpadded {
+  padding-top: 0 !important;
+}

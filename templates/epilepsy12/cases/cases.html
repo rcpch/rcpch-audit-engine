@@ -17,7 +17,7 @@
           </div>
         </div>
           
-        <div class="twelve wide column">
+        <div class="twelve wide notupperpadded column">
             
               <a href="{% url 'create_case' organisation_id %}"><button class="ui rcpch_primary button">Add a new Child/Young Person</button></a>
               
@@ -25,11 +25,11 @@
               
         </div>
             
-        <div class="four wide column" id='case_statistics'>
+        <div class="four wide notupperpadded column" id='case_statistics'>
             {% include 'epilepsy12/partials/cases/case_statistics.html' with organisation=organisation total_cases=total_cases total_registrations=total_registrations %}
         </div>
 
-        <div class="sixteen wide column">
+        <div class="sixteen wide notupperpadded column">
 
           <div class="ui rcpch icon fluid input" data-tooltip="Start typing to Filter by name or NHS Number.">
             <input type="text" class='prompt' placeholder="Search..." name='filtered_case_list' hx-target="#case_table" hx-trigger="keyup" hx-get="{% url 'filter_case_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
@@ -38,11 +38,12 @@
 
         </div>
 
-        <div id="case_table">
-          {% include '../partials/case_table.html' with case_list=case_list paginated=paginated organisation=organisation %}
-        </div>
-
       </div>
+
+      <div id="case_table">
+        {% include '../partials/case_table.html' with case_list=case_list paginated=paginated organisation=organisation %}
+      </div>
+
       
     </div>
     <div class="ui bottom attached rcpch_footer message">
