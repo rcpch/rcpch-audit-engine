@@ -3,6 +3,10 @@
 {% csrf_token %} 
 
 <div class="ui grid container selected_organisation_container">
+
+        <div class="right aligned sixteen wide unpadded fluid column">
+            <div class="ui rcpch_light_blue label">Organisation View</div>
+        </div>
     
         {% if request.user.is_rcpch_audit_team_member or request.user.is_staff or request.user.is_superuser %}
             <div class='sixteen wide column'>
