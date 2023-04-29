@@ -1,6 +1,6 @@
 {% load epilepsy12_template_tags %}
 <div class="rcpch_padded">
-  <canvas id="{{data_id}}"></canvas>
+  <canvas id="{{data_id}}" {% if data_id == 'icb_id' %} height="400" {% else %} height="auto" {% endif %} width="auto"></canvas>
 </div>
 <script>
   /* secondary colours */
@@ -38,7 +38,8 @@
               rcpch_dark_blue,
               rcpch_strong_green,
               rcpch_dark_red
-          ]
+          ],
+          maxBarThickness: 25
         },
       ]
     },
@@ -90,7 +91,10 @@
           beginAtZero: true,
           grid: {
             display: false,
-          }
+          },
+          ticks: {
+            autoSkip: false
+          },
         },
         x:
           {
