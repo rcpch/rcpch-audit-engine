@@ -1868,6 +1868,8 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
 
 .notupperpadded {
   padding-top: 0 !important;
+}
+
 .twelve.wide.column.add_search_return_wrapper {
   display: flex;
   justify-content: space-between;
