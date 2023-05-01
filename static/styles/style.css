@@ -246,6 +246,8 @@ div.center.aligned.image.rcpch_index_card_image {
 
 .ui.card > .content.rcpch_index_card_content {
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .rcpch_index_card_content.content > h1.ui.header {
@@ -265,10 +267,27 @@ div.center.aligned.image.rcpch_index_card_image {
   margin-bottom: 1em;
 }
 
+.rcpch_index_card_content .rcpch_icon_text_group.rcpch_index_card_select {
+  margin-top: auto;
+}
+
+.rcpch_icon_text_group.rcpch_index_card_select>a{
+  margin-top: 4em;
+}
+
 a.rcpch_index_card_link {
   font-weight: 900;
   font-size: 1.4em;
   margin-right: 0.2em;
+}
+
+.rcpch.container .index_segment .card_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.card_container>.card_content_wrapper {
+  flex-grow: 1;
 }
 
 /* links */
