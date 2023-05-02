@@ -6,4 +6,10 @@ from django.core.management import call_command
 
 @pytest.mark.django_db
 def test_epilepsy12user():
-    print(f"{Organisation.objects.count() = }")
+    user = get_user_model().objects.create(
+        email='test@test.com',
+        password='password',
+        first_name='Test',
+        role=1,
+    )
+    print(get_user_model().objects.count())
