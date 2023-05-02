@@ -1902,3 +1902,8 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .notupperpadded {
   padding-top: 0 !important;
 }
+
+
+.case_create_buttons_wrapper {
+  display: flex;
+}
