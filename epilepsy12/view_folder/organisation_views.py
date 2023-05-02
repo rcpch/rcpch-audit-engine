@@ -543,6 +543,7 @@ def selected_trust_select_kpi(request, organisation_id):
         "national_kpi": national_kpi[kpi_name],
         "total_national_kpi_cases": national_kpi["total_number_of_cases"],
         "open_uk": all_aggregated_kpis_by_open_uk_region_in_current_cohort,
+        # "open_uk_data_colors": [color for color in all_aggregated_kpis_by_open_uk_region_in_current_cohort],
         "open_uk_avg": open_uk_avg,
         "open_uk_title": f"{kpi_value} by OPEN UK Region",
         "open_uk_id": "open_uk_id",
