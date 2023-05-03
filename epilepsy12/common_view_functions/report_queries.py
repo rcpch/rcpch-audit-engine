@@ -1,16 +1,31 @@
 # python imports
 from typing import Literal
+
 # django imports
 from django.contrib.gis.db.models import Q
 
 # E12 imports
-from ..models import Case, Organisation, NHSRegionEntity, OPENUKNetworkEntity, IntegratedCareBoardEntity, ONSCountryEntity
+from ..models import (
+    Case,
+    Organisation,
+    NHSRegionEntity,
+    OPENUKNetworkEntity,
+    IntegratedCareBoardEntity,
+    ONSCountryEntity,
+)
 
 
-def all_registered_cases_for_cohort_and_abstraction_level(organisation_instance, cohort, case_complete=True, abstraction_level: Literal['organisation', 'trust', 'icb', 'nhs_region', 'open_uk', 'country', 'national'] = 'organisation'):
+def all_registered_cases_for_cohort_and_abstraction_level(
+    organisation_instance,
+    cohort,
+    case_complete=True,
+    abstraction_level: Literal[
+        "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
+    ] = "organisation",
+):
     """
     Returns all Cases that have been registered for a given cohort at a given abstration level.
-    It can return cases that are only registered in E12 for a given cohort but have not yet completed the return, or 
+    It can return cases that are only registered in E12 for a given cohort but have not yet completed the return, or
     cases that are both registered and have also completed all required fields in the return.
     Parameters accepted:
     Organisation instance
@@ -26,66 +41,78 @@ def all_registered_cases_for_cohort_and_abstraction_level(organisation_instance,
 
     if case_complete:
         all_cases_for_cohort = Case.objects.filter(
-            Q(registration__isnull=False) &
-            Q(registration__audit_progress__registration_complete=True) &
-            Q(registration__audit_progress__first_paediatric_assessment_complete=True) &
-            Q(registration__audit_progress__assessment_complete=True) &
-            Q(registration__audit_progress__epilepsy_context_complete=True) &
-            Q(registration__audit_progress__multiaxial_diagnosis_complete=True) &
-            Q(registration__audit_progress__investigations_complete=True) &
-            Q(registration__audit_progress__management_complete=True) &
-            Q(registration__cohort=cohort)
+            Q(registration__isnull=False)
+            & Q(registration__audit_progress__registration_complete=True)
+            & Q(registration__audit_progress__first_paediatric_assessment_complete=True)
+            & Q(registration__audit_progress__assessment_complete=True)
+            & Q(registration__audit_progress__epilepsy_context_complete=True)
+            & Q(registration__audit_progress__multiaxial_diagnosis_complete=True)
+            & Q(registration__audit_progress__investigations_complete=True)
+            & Q(registration__audit_progress__management_complete=True)
+            & Q(registration__cohort=cohort)
         ).all()
     else:
         all_cases_for_cohort = Case.objects.filter(
-            Q(registration__isnull=False) &
-            Q(registration__cohort=cohort)
+            Q(registration__isnull=False) & Q(registration__cohort=cohort)
         ).all()
 
-    if abstraction_level == 'organisation':
+    if abstraction_level == "organisation":
         q_filter = (
-            Q(site__organisation__pk=organisation_instance.pk) &
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(site__organisation__pk=organisation_instance.pk)
+            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
-    elif abstraction_level == 'trust':
+    elif abstraction_level == "trust":
         q_filter = (
-            Q(site__organisation__ParentOrganisation_ODSCode=organisation_instance.ParentOrganisation_ODSCode) &
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(
+                site__organisation__ParentOrganisation_ODSCode=organisation_instance.ParentOrganisation_ODSCode
+            )
+            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
-    elif abstraction_level == 'icb':
+    elif abstraction_level == "icb":
         q_filter = (
-            Q(site__organisation__integrated_care_board__ODS_ICB_Code=organisation_instance.integrated_care_board.ODS_ICB_Code) &
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(
+                site__organisation__integrated_care_board__ODS_ICB_Code=organisation_instance.integrated_care_board.ODS_ICB_Code
+            )
+            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
-    elif abstraction_level == 'nhs_region':
+    elif abstraction_level == "nhs_region":
         q_filter = (
-            Q(site__organisation__nhs_region__NHS_Region_Code=organisation_instance.nhs_region.NHS_Region_Code) &
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(
+                site__organisation__nhs_region__NHS_Region_Code=organisation_instance.nhs_region.NHS_Region_Code
+            )
+            & Q(
+                site__organisation__ons_region__ons_country__Country_ONS_Name=organisation_instance.ons_region.ons_country.Country_ONS_Name
+            )
+            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
-    elif abstraction_level == 'open_uk':
+    elif abstraction_level == "open_uk":
         q_filter = (
-            Q(site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.OPEN_UK_Network_Code) &
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(
+                site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.OPEN_UK_Network_Code
+            )
+            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
-    elif abstraction_level == 'country':
+    elif abstraction_level == "country":
         q_filter = (
-            Q(site__organisation__ons_region__ons_country=organisation_instance.ons_region.ons_country) &
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            Q(
+                site__organisation__ons_region__ons_country=organisation_instance.ons_region.ons_country
+            )
+            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
-    elif abstraction_level == 'national':
-        q_filter = (
-            Q(site__site_is_actively_involved_in_epilepsy_care=True) &
-            Q(site__site_is_primary_centre_of_epilepsy_care=True)
+    elif abstraction_level == "national":
+        q_filter = Q(site__site_is_actively_involved_in_epilepsy_care=True) & Q(
+            site__site_is_primary_centre_of_epilepsy_care=True
         )
     else:
         raise ValueError(
-            f"Incorrect or invalid abstraction error f{abstraction_level} supplied.")
+            f"Incorrect or invalid abstraction error f{abstraction_level} supplied."
+        )
 
     return all_cases_for_cohort.filter(q_filter)
 
@@ -98,7 +125,7 @@ def get_all_countries():
     # return Organisation.objects.order_by('CountryONSCode',
     #                                      'Country').values_list('CountryONSCode',
     #                                                             'Country').distinct()
-    return ONSCountryEntity.objects.order_by('Country_ONS_Name')
+    return ONSCountryEntity.objects.order_by("Country_ONS_Name")
 
 
 def get_all_nhs_regions():
@@ -109,7 +136,9 @@ def get_all_nhs_regions():
     # return Organisation.objects.order_by('NHSEnglandRegionCode',
     #                                      'NHSEnglandRegion').values_list('NHSEnglandRegionCode',
     #                                                                      'NHSEnglandRegion').distinct()
-    return NHSRegionEntity.objects.order_by('NHS_Region', 'NHS_Region_Code')
+    return NHSRegionEntity.objects.filter(year=2019).order_by(
+        "NHS_Region", "NHS_Region_Code"
+    )
 
 
 def get_all_open_uk_regions():
@@ -120,7 +149,7 @@ def get_all_open_uk_regions():
     # return Organisation.objects.order_by('OPENUKNetworkCode',
     #                                      'OPENUKNetworkName').values_list('OPENUKNetworkCode',
     #                                                                       'OPENUKNetworkName').distinct()
-    return OPENUKNetworkEntity.objects.order_by('OPEN_UK_Network_Name', 'country')
+    return OPENUKNetworkEntity.objects.order_by("OPEN_UK_Network_Name", "country")
 
 
 def get_all_icbs():
@@ -130,18 +159,30 @@ def get_all_icbs():
     # return Organisation.objects.order_by('ICBODSCode',
     #                                      'ICBName').values_list('ICBODSCode',
     #                                                             'ICBName').distinct()
-    return IntegratedCareBoardEntity.objects.order_by('ICB_Name')
+    return IntegratedCareBoardEntity.objects.order_by("ICB_Name")
 
 
 def get_all_trusts():
     """
     Returns a list of all Trusts
     """
-    return Organisation.objects.order_by('ParentOrganisation_OrganisationName', 'ParentOrganisation_ODSCode').values_list('ParentOrganisation_ODSCode', 'ParentOrganisation_OrganisationName').distinct()
+    return (
+        Organisation.objects.order_by(
+            "ParentOrganisation_OrganisationName", "ParentOrganisation_ODSCode"
+        )
+        .values_list(
+            "ParentOrganisation_ODSCode", "ParentOrganisation_OrganisationName"
+        )
+        .distinct()
+    )
 
 
 def get_all_organisations():
     """
     Returns a list of all Organisations
     """
-    return Organisation.objects.order_by('OrganisationName', 'ODSCode').values_list('OrganisationName', 'ODSCode').distinct()
+    return (
+        Organisation.objects.order_by("OrganisationName", "ODSCode")
+        .values_list("OrganisationName", "ODSCode")
+        .distinct()
+    )
