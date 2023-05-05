@@ -264,7 +264,8 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
         final_object.append(
             {
                 "region": label,
-                "aggregated_kpis": aggregated_kpis
+                "aggregated_kpis": aggregated_kpis,
+                'color' : '#808080' if aggregated_kpis[kpi_measure] is None else '#000000',
             }
         )
 

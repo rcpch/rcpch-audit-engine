@@ -1,9 +1,12 @@
 {% load epilepsy12_template_tags %}
-{% url 'relevant_impairments_behavioural_educational' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#comorbidity_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.relevant_impairments_behavioural_educational tooltip_id='relevant_impairments_behavioural_educational_tooltip' label=multiaxial_diagnosis.get_relevant_impairments_behavioural_educational_help_label_text reference=multiaxial_diagnosis.get_relevant_impairments_behavioural_educational_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_comorbidity %}
 
-{% if multiaxial_diagnosis.relevant_impairments_behavioural_educational %}
-    <div class='fade-in fade-out field' id='comorbidities'>
-        {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html' with comorbidities=comorbidities %}
-    </div>
-{% endif %}
+<div class="ui rcpch_info message">
+    {% url 'relevant_impairments_behavioural_educational' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#comorbidity_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.relevant_impairments_behavioural_educational tooltip_id='relevant_impairments_behavioural_educational_tooltip' label=multiaxial_diagnosis.get_relevant_impairments_behavioural_educational_help_label_text reference=multiaxial_diagnosis.get_relevant_impairments_behavioural_educational_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_comorbidity %}
+    
+    {% if multiaxial_diagnosis.relevant_impairments_behavioural_educational %}
+        <div class='fade-in fade-out field' id='comorbidities'>
+            {% include 'epilepsy12/partials/multiaxial_diagnosis/comorbidities/comorbidities.html' with comorbidities=comorbidities %}
+        </div>
+    {% endif %}
+</div>

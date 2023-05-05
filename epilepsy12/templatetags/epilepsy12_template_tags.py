@@ -50,9 +50,13 @@ def percentage_of_total(numerator, denominator):
 
 
 @register.simple_tag
-def kpi_for_kpi_name(aggregated_kpi, kpi_name):
+def kpi_for_kpi_name(aggregated_kpi, kpi_name, color=False):
+    
+    # guard clause check if color should be returned
+    if color:
+        return aggregated_kpi['color']
     if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
-        return 0
+        return -1
     else:
         pct = 100*aggregated_kpi['aggregated_kpis'][kpi_name] / aggregated_kpi['aggregated_kpis']['total_number_of_cases']
         return pct

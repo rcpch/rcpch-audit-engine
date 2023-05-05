@@ -70,17 +70,17 @@
                             </div>
                         {% endfor %}
                     </div>
-                       
 
                 {% elif test_positive %}
+
                     {% if hide_completion_fields %}
                     {% else %}
                         <i class="rcpch_pink check circle outline icon"></i>
                     {% endif %}
-
+                        
                         <div class="ui rcpch_dark_blue buttons">
                             {% for choice in choices %}
-                                {% if choice.0 == test_positive %}
+                                {% if test_positive|slugify in choice.0|slugify %}
                                     <div 
                                         {% if enabled %}
                                             class="ui mini compact positive rcpch_dark_blue button"
@@ -108,6 +108,7 @@
                         </div>
                         
                 {% else %}
+
                     {% if hide_completion_fields %}
                     {% else %}
                         <span data-tooltip="Incomplete field. This must be scored to complete the record." data-inverted="" data-position="{{data_position}}">

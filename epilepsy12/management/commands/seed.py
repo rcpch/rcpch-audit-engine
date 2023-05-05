@@ -9,11 +9,55 @@ from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import Point
 
 
-from ...constants import ETHNICITIES, DUMMY_NAMES, SYNDROMES, SNOMED_BENZODIAZEPINE_TYPES, SNOMED_ANTIEPILEPSY_MEDICINE_TYPES, OPEN_UK_NETWORKS, RCPCH_ORGANISATIONS
-from ...models import Organisation, Keyword, Case, Site, Registration, SyndromeEntity, EpilepsyCauseEntity, ComorbidityEntity, MedicineEntity, AntiEpilepsyMedicine, IntegratedCareBoardEntity, OPENUKNetworkEntity, NHSRegionEntity, ONSRegionEntity, ONSCountryEntity
-from ...constants import ALL_HOSPITALS, KEYWORDS, WELSH_HOSPITALS, INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES, WELSH_REGIONS, COUNTRY_CODES, UK_ONS_REGIONS
-from ...general_functions import random_postcodes, random_date, first_tuesday_in_january, current_cohort_start_date, fetch_ecl, fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set, ons_region_for_postcode
-from .create_groups import create_groups, add_permissions_to_existing_groups, delete_and_reallocate_permissions
+from ...constants import (
+    ETHNICITIES,
+    DUMMY_NAMES,
+    SYNDROMES,
+    SNOMED_BENZODIAZEPINE_TYPES,
+    SNOMED_ANTIEPILEPSY_MEDICINE_TYPES,
+    OPEN_UK_NETWORKS,
+    RCPCH_ORGANISATIONS,
+)
+from ...models import (
+    Organisation,
+    Keyword,
+    Case,
+    Site,
+    Registration,
+    SyndromeEntity,
+    EpilepsyCauseEntity,
+    ComorbidityEntity,
+    MedicineEntity,
+    AntiEpilepsyMedicine,
+    IntegratedCareBoardEntity,
+    OPENUKNetworkEntity,
+    NHSRegionEntity,
+    ONSRegionEntity,
+    ONSCountryEntity,
+)
+from ...constants import (
+    ALL_HOSPITALS,
+    KEYWORDS,
+    WELSH_HOSPITALS,
+    INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES,
+    WELSH_REGIONS,
+    COUNTRY_CODES,
+    UK_ONS_REGIONS,
+)
+from ...general_functions import (
+    random_postcodes,
+    random_date,
+    first_tuesday_in_january,
+    current_cohort_start_date,
+    fetch_ecl,
+    fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
+    ons_region_for_postcode,
+)
+from .create_groups import (
+    create_groups,
+    add_permissions_to_existing_groups,
+    delete_and_reallocate_permissions,
+)
 from .create_e12_records import create_epilepsy12_record, create_registrations
 
 
@@ -21,52 +65,50 @@ class Command(BaseCommand):
     help = "seed database with organisation trust data for testing and development."
 
     def add_arguments(self, parser):
-        parser.add_argument('--mode', type=str, help="Mode")
+        parser.add_argument("--mode", type=str, help="Mode")
 
     def handle(self, *args, **options):
-        if (options['mode'] == 'seed_dummy_cases'):
-            self.stdout.write('seeding with dummy case data...')
+        if options["mode"] == "seed_dummy_cases":
+            self.stdout.write("seeding with dummy case data...")
             run_dummy_cases_seed()
-        elif (options['mode'] == 'seed_registrations'):
+        elif options["mode"] == "seed_registrations":
             self.stdout.write(
-                'register cases in audit and complete all fields with random answers...')
+                "register cases in audit and complete all fields with random answers..."
+            )
             run_registrations()
-        elif (options['mode'] == 'seed_groups_and_permissions'):
-            self.stdout.write('setting up groups and permissions...')
+        elif options["mode"] == "seed_groups_and_permissions":
+            self.stdout.write("setting up groups and permissions...")
             create_groups()
-        elif (options['mode'] == 'add_permissions_to_existing_groups'):
-            self.stdout.write('adding permissions to groups...')
+        elif options["mode"] == "add_permissions_to_existing_groups":
+            self.stdout.write("adding permissions to groups...")
             add_permissions_to_existing_groups()
-        elif (options['mode'] == 'delete_all_groups_and_recreate'):
-            self.stdout.write(
-                'deleting all groups/permissions and reallocating...')
-        # elif (options['mode'] == 'replace_comorbidities_with_refset'):
-        #     self.stdout.write(
-        #         'replacing comorbidites with refset...')
-        #     replace_existing_comorbidities_with_refset()
-        elif (options['mode'] == 'add_existing_medicines_as_foreign_keys'):
-            self.stdout.write(
-                'replacing medicines with medicine entity...')
+        elif options["mode"] == "delete_all_groups_and_recreate":
+            self.stdout.write("deleting all groups/permissions and reallocating...")
+        elif options["mode"] == "add_existing_medicines_as_foreign_keys":
+            self.stdout.write("replacing medicines with medicine entity...")
 
         else:
-            self.stdout.write('No options supplied...')
-        print('\033[38;2;17;167;142m')
+            self.stdout.write("No options supplied...")
+        print("\033[38;2;17;167;142m")
         self.stdout.write(image())
-        print('\033[38;2;17;167;107m')
-        self.stdout.write('done.')
+        print("\033[38;2;17;167;107m")
+        self.stdout.write("done.")
+
 
 def run_dummy_cases_seed():
     added = 0
-    print('\033[33m', 'Seeding fictional cases...', '\033[33m')
+    print("\033[33m", "Seeding fictional cases...", "\033[33m")
     # there should not be any cases yet, but sometimes seed gets run more than once
     if Case.objects.all().exists():
-        print(f'Cases already exist. Skipping this step...')
+        print(f"Cases already exist. Skipping this step...")
         return
 
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
 
-    random_organisations = []
+    random_organisations = ["RX1LK", "RK5BC"]
 
+    """
+    Commented out section creates cases across 10 organisations, the first being Addenbrooke's
     # first populate Addenbrooke's for ease of dev testing
     for _ in range(1, 11):
         random_organisations.append(
@@ -77,14 +119,16 @@ def run_dummy_cases_seed():
         random_organisation = Organisation.objects.order_by("?").first()
         for i in range(1, 11):
             random_organisations.append(random_organisation)
+    """
 
-    for index in range(len(DUMMY_NAMES) - 1):
+    # for index in range(len(DUMMY_NAMES) - 1): # commented out line populates all the names, not just first 20
+    for index in range(0, 20):  # first 20 names
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         nhs_number = randint(1000000000, 9999999999)
-        first_name = DUMMY_NAMES[index]['firstname']
-        surname = DUMMY_NAMES[index]['lastname']
-        gender_object = DUMMY_NAMES[index]['gender']
-        if gender_object == 'm':
+        first_name = DUMMY_NAMES[index]["firstname"]
+        surname = DUMMY_NAMES[index]["lastname"]
+        gender_object = DUMMY_NAMES[index]["gender"]
+        if gender_object == "m":
             sex = 1
         else:
             sex = 2
@@ -93,7 +137,11 @@ def run_dummy_cases_seed():
         ethnicity = choice(ETHNICITIES)[0]
 
         # get a random organisation
-        organisation = random_organisations[index]
+        if index < 11:
+            # organisation = random_organisations[index] # line used if populating random hospitals
+            organisation = Organisation.objects.get(ODSCode=random_organisations[0])
+        else:
+            organisation = Organisation.objects.get(ODSCode=random_organisations[1])
 
         case_has_error = False
 
@@ -106,7 +154,7 @@ def run_dummy_cases_seed():
                 sex=sex,
                 date_of_birth=date_of_birth,
                 postcode=postcode,
-                ethnicity=ethnicity
+                ethnicity=ethnicity,
             )
             new_case.save()
         except Exception as e:
@@ -119,7 +167,7 @@ def run_dummy_cases_seed():
                     organisation=organisation,
                     site_is_actively_involved_in_epilepsy_care=True,
                     site_is_primary_centre_of_epilepsy_care=True,
-                    case=new_case
+                    case=new_case,
                 )
                 new_site.save()
             except Exception as e:
@@ -127,7 +175,8 @@ def run_dummy_cases_seed():
 
             added += 1
             print(
-                f"{new_case.first_name} {new_case.surname} at {new_site.organisation.OrganisationName} ({new_site.organisation.ParentOrganisation_OrganisationName})...")
+                f"{new_case.first_name} {new_case.surname} at {new_site.organisation.OrganisationName} ({new_site.organisation.ParentOrganisation_OrganisationName})..."
+            )
     print(f"Saved {added} cases.")
 
 
@@ -135,7 +184,7 @@ def run_registrations():
     """
     Calling function to register all cases in Epilepsy12 and complete all fields with random answers
     """
-    print('\033[33m', 'Registering fictional cases in Epilepsy12...', '\033[33m')
+    print("\033[33m", "Registering fictional cases in Epilepsy12...", "\033[33m")
 
     create_registrations()
 
@@ -146,12 +195,18 @@ def complete_registrations():
     """
     Loop through the registrations and score all fields
     """
-    print('\033[33m', 'Completing all the Epilepsy12 fields for the fictional cases...', '\033[33m')
+    print(
+        "\033[33m",
+        "Completing all the Epilepsy12 fields for the fictional cases...",
+        "\033[33m",
+    )
     for registration in Registration.objects.all():
         current_cohort_end_date = first_tuesday_in_january(
-            current_cohort_start_date().year + 2) + relativedelta(days=7)
+            current_cohort_start_date().year + 2
+        ) + relativedelta(days=7)
         registration.registration_date = random_date(
-            start=current_cohort_start_date(), end=current_cohort_end_date)
+            start=current_cohort_start_date(), end=current_cohort_end_date
+        )
         registration.eligibility_criteria_met = True
         registration.save()
 
