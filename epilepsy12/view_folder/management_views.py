@@ -251,9 +251,6 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         is_rescue=antiepilepsy_medicine.is_rescue_medicine
     ).order_by("medicine_name")
 
-    for medicine in MedicineEntity.objects.all():
-        print(medicine)
-
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
     else:
@@ -501,6 +498,48 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
         "show_end_date": True,
+    }
+
+    template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
+
+    response = recalculate_form_generate_response(
+        model_instance=antiepilepsy_medicine.management,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
+def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
+    """
+    POST callback from antiepilepsy_medicine.html partial to toggle closed antiepilepsy_medicine_end_date
+    """
+
+    error_message = ""
+
+    antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+        pk=antiepilepsy_medicine_id
+    )
+
+    # set antiepilepsy_medicine_stop_date to None and save
+    antiepilepsy_medicine.antiepilepsy_medicine_stop_date = None
+    antiepilepsy_medicine.save()
+
+    choices = MedicineEntity.objects.filter(
+        is_rescue=antiepilepsy_medicine.is_rescue_medicine
+    ).order_by("medicine_name")
+
+    context = {
+        "choices": choices,
+        "antiepilepsy_medicine": antiepilepsy_medicine,
+        "is_rescue_medicine": antiepilepsy_medicine.is_rescue_medicine,
+        "show_end_date": False,
     }
 
     template_name = "epilepsy12/partials/management/antiepilepsy_medicines/antiepilepsy_medicine.html"
