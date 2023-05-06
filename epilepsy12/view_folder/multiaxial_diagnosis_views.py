@@ -372,6 +372,7 @@ def seizure_onset_date(request, episode_id):
     """
 
     try:
+        episode = Episode.objects.get(pk=episode_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -379,6 +380,7 @@ def seizure_onset_date(request, episode_id):
             model_id=episode_id,
             field_name="seizure_onset_date",
             page_element="date_field",
+            earliest_allowable_date=None,  # episodes may precede the first assessment date or cohort date
         )
     except ValueError as error:
         error_message = error
@@ -1645,6 +1647,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     """
 
     try:
+        comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -1652,6 +1655,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
             model_id=comorbidity_id,
             field_name="comorbidity_diagnosis_date",
             page_element="date_field",
+            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.registration_date,
         )
     except ValueError as error:
         error_message = error

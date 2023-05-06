@@ -14,6 +14,7 @@ def validate_and_update_model(
     page_element,
     comparison_date_field_name=None,
     is_earliest_date=None,
+    earliest_allowable_date=None,
 ):
     """
     This is called from the view to update the model or return an error
@@ -25,6 +26,7 @@ def validate_and_update_model(
     page_element: string one of 'date_field', 'toggle_button', 'multiple_choice_single_toggle_button', 'multiple_choic_multiple_toggle_button', 'select', 'snomed_select', 'organisation_select'
     comparison_date_field_name: string corresponding to field name for date in model
     is_earliest_date: boolean
+    first_paediatric_assessment_date: date - used to validate
 
     It replaces the decorator @update_model as decorators can only redirect the request,
     they cannot pass parameters to the function they wrap. This means that errors raised in updating the model
@@ -89,24 +91,40 @@ def validate_and_update_model(
         # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
         date_valid = None
 
+        if earliest_allowable_date:
+            if field_value < earliest_allowable_date:
+                # dates cannot be before the earliest allowable date (usually the first paediatric assessment or the cohort start date)
+                date_error = f"The date you chose ({field_value}) cannot not be before {earliest_allowable_date}."
+                errors = date_error
+                date_valid = False
+
         if comparison_date_field_name:
             instance = model.objects.get(pk=model_id)
             comparison_date = getattr(instance, comparison_date_field_name)
             if is_earliest_date:
                 if comparison_date:
                     date_valid = (
-                        field_value <= comparison_date and field_value <= date.today()
+                        field_value <= comparison_date
+                        and field_value <= date.today()
+                        and date_valid is None
                     )
-                    date_error = f"The date you chose ({field_value}) cannot not be after {comparison_date} or in the future."
+                    if field_value > comparison_date:
+                        date_error = f"The date you chose ({field_value}) cannot not be after {comparison_date}."
+                    if field_value > date.today():
+                        date_error = f"You cannot choose a date in the future."
+
                 else:
-                    date_valid = field_value <= date.today()
+                    date_valid = field_value <= date.today() and date_valid is None
                     date_error = f"The date you chose ({field_value}) cannot not be in the future."
+
                 if not date_valid:
                     errors = date_error
             else:
                 if comparison_date:
                     date_valid = (
-                        field_value >= comparison_date and field_value <= date.today()
+                        field_value >= comparison_date
+                        and field_value <= date.today()
+                        and date_valid is None
                     )
                     date_error = f"The date you chose ({field_value}) cannot not be before {comparison_date} or in the future."
                 else:
@@ -115,9 +133,7 @@ def validate_and_update_model(
                 if not date_valid:
                     errors = date_error
 
-        elif field_value > date.today() and (
-            is_earliest_date is None or is_earliest_date
-        ):
+        elif field_value > date.today():
             # dates cannot be in the future unless they are the second of 2 dates
             date_error = (
                 f"The date you chose ({field_value}) cannot not be in the future."
@@ -125,7 +141,7 @@ def validate_and_update_model(
             errors = date_error
             date_valid = False
         else:
-            date_valid = True
+            print("date valid now")
 
         if date_valid:
             pass

@@ -429,6 +429,9 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     """
 
     try:
+        antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+            pk=antiepilepsy_medicine_id
+        )
         error_message = None
         validate_and_update_model(
             request=request,
@@ -438,6 +441,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
             page_element="date_field",
             comparison_date_field_name="antiepilepsy_medicine_stop_date",
             is_earliest_date=True,
+            earliest_allowable_date=antiepilepsy_medicine.management.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -564,6 +568,9 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     """
 
     try:
+        antiepilepsy_medicine = AntiEpilepsyMedicine.objects.get(
+            pk=antiepilepsy_medicine_id
+        )
         error_message = None
         validate_and_update_model(
             request=request,
@@ -573,6 +580,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
             page_element="date_field",
             comparison_date_field_name="antiepilepsy_medicine_start_date",
             is_earliest_date=False,
+            earliest_allowable_date=antiepilepsy_medicine.management.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -903,6 +911,7 @@ def individualised_care_plan_date(request, management_id):
     """
 
     try:
+        management = Management.objects.get(pk=management_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -910,6 +919,7 @@ def individualised_care_plan_date(request, management_id):
             model_id=management_id,
             field_name="individualised_care_plan_date",
             page_element="date_field",
+            earliest_allowable_date=management.registration.registration_date,
         )
     except ValueError as error:
         error_message = error

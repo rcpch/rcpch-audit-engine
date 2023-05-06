@@ -124,8 +124,8 @@ def eeg_request_date(request, investigations_id):
     It is triggered by a toggle in the partial generating a post request on change in the date field.
     This updates the model and returns the same partial.
     """
-
     try:
+        investigations = Investigations.objects.get(pk=investigations_id)
         error_message = None
         validate_and_update_model(
             request,
@@ -135,6 +135,7 @@ def eeg_request_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="eeg_performed_date",
             is_earliest_date=True,
+            earliest_allowable_date=investigations.registration.registration_date,
         )
 
     except ValueError as error:
@@ -175,6 +176,7 @@ def eeg_performed_date(request, investigations_id):
     """
 
     try:
+        investigations = Investigations.objects.get(pk=investigations_id)
         error_message = None
         validate_and_update_model(
             request,
@@ -184,6 +186,7 @@ def eeg_performed_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="eeg_request_date",
             is_earliest_date=False,
+            earliest_allowable_date=investigations.registration.registration_date,
         )
 
     except ValueError as errors:
@@ -406,6 +409,7 @@ def mri_brain_requested_date(request, investigations_id):
     """
 
     try:
+        investigations = Investigations.objects.get(pk=investigations_id)
         error_message = None
         validate_and_update_model(
             request,
@@ -415,6 +419,7 @@ def mri_brain_requested_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="mri_brain_reported_date",
             is_earliest_date=True,
+            earliest_allowable_date=investigations.registration.registration_date,
         )
 
     except ValueError as errors:
@@ -456,6 +461,7 @@ def mri_brain_reported_date(request, investigations_id):
     """
 
     try:
+        investigations = Investigations.objects.get(pk=investigations_id)
         error_message = None
         validate_and_update_model(
             request,
@@ -465,6 +471,7 @@ def mri_brain_reported_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="mri_brain_requested_date",
             is_earliest_date=False,
+            earliest_allowable_date=investigations.registration.registration_date,
         )
 
     except ValueError as errors:
