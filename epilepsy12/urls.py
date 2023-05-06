@@ -780,6 +780,11 @@ htmx_paths = [
         views.mri_brain_reported_date,
         name="mri_brain_reported_date",
     ),
+    path(
+        "investigations/<int:investigations_id>/mri_brain_declined/<str:confirm>",
+        views.mri_brain_declined,
+        name="mri_brain_declined",
+    ),
     # management
     path(
         "management/<int:management_id>/has_an_aed_been_given",

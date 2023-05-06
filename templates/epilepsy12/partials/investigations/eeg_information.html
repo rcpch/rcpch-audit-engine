@@ -56,18 +56,27 @@
                         <input class="ui input" disabled value='{{investigations.eeg_wait}}'>
                     </div>
                 {% endif %}
+
+                {% if investigations.eeg_performed_date is None %}
+
+                    {% comment %}
+                    Only show the EEG declined button if the eeg_performed date has neither been declined already
+                    nor has already been set
+                    {% endcomment %}
                 
-                <div class="padded field">
-                    {% url 'eeg_declined' investigations_id=investigations.pk confirm='decline' as hx_post %}
-                    <div 
-                        class="ui rcpch_primary button"
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-                        name="eeg_request_date"
-                        hx-post="{{hx_post}}"
-                        hx-trigger="click"
-                        hx-target="#eeg_information"
-                    >EEG declined</div>
-                </div>
+                    <div class="padded field">
+                        {% url 'eeg_declined' investigations_id=investigations.pk confirm='decline' as hx_post %}
+                        <div 
+                            class="ui rcpch_primary button"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                            name="eeg_request_date"
+                            hx-post="{{hx_post}}"
+                            hx-trigger="click"
+                            hx-target="#eeg_information"
+                        >EEG declined</div>
+                    </div>
+                
+                {% endif %}
 
             {% endif %}
 

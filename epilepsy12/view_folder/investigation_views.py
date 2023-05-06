@@ -31,6 +31,11 @@ def investigations(request, case_id):
     else:
         eeg_declined = False
 
+    if investigations.mri_brain_reported_date == date(year=1915, month=4, day=15):
+        mri_brain_declined = True
+    else:
+        mri_brain_declined = False
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -39,6 +44,7 @@ def investigations(request, case_id):
         "active_template": "investigations",
         "organisation_id": organisation_id,
         "eeg_declined": eeg_declined,
+        "mri_brain_declined": mri_brain_declined,
     }
 
     template_name = "epilepsy12/investigations.html"
@@ -217,6 +223,7 @@ def eeg_declined(request, investigations_id, confirm):
     EEGs might be declined if the child is not cooperative or practical/technical issues relating to the EEG test.
     Failure to provide a completion date of the EEG however results in a fail for this measure.
     To denote failure, the completion date is persisted as 15/4/1915, the date of birth of Jean Henri Gestaut
+    The confirm flag can either be set to 'decline' or 'edit' reflecting the toggle state in the template
     This updates the model and returns the same partial.
     """
 
@@ -365,7 +372,15 @@ def mri_indicated(request, investigations_id):
         investigations.updated_by = request.user
         investigations.save()
 
-    context = {"investigations": investigations}
+    if investigations.mri_brain_reported_date == date(year=1915, month=4, day=15):
+        mri_brain_declined = True
+    else:
+        mri_brain_declined = False
+
+    context = {
+        "investigations": investigations,
+        "mri_brain_declined": mri_brain_declined,
+    }
 
     template_name = "epilepsy12/partials/investigations/mri_brain_information.html"
 
@@ -407,7 +422,15 @@ def mri_brain_requested_date(request, investigations_id):
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {"investigations": investigations}
+    if investigations.mri_brain_reported_date == date(year=1915, month=4, day=15):
+        mri_brain_declined = True
+    else:
+        mri_brain_declined = False
+
+    context = {
+        "investigations": investigations,
+        "mri_brain_declined": mri_brain_declined,
+    }
 
     template_name = "epilepsy12/partials/investigations/mri_brain_information.html"
 
@@ -449,7 +472,67 @@ def mri_brain_reported_date(request, investigations_id):
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {"investigations": investigations}
+    if investigations.mri_brain_reported_date == date(year=1915, month=4, day=15):
+        mri_brain_declined = True
+    else:
+        mri_brain_declined = False
+
+    context = {
+        "investigations": investigations,
+        "mri_brain_declined": mri_brain_declined,
+    }
+
+    template_name = "epilepsy12/partials/investigations/mri_brain_information.html"
+
+    response = recalculate_form_generate_response(
+        model_instance=investigations,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_investigations", raise_exception=True)
+def mri_brain_declined(request, investigations_id, confirm):
+    """
+    This is an HTMX callback from the mri_brain_information.html partial template
+    which contains fields on mri_indicated, mri_request_date and mri_performed_date.
+    It also contains a calculated field showing time to MRI from request.
+    It is triggered by a toggle in the partial generating a post request on click in the eeg_declined button.
+    MRIs might be declined if the child is not cooperative or practical/technical issues relating to the MRI test.
+    Failure to provide a completion date of the MRI however results in a fail for this measure.
+    To denote failure, the completion date is persisted as 15/4/1915, the date of birth of Jean Henri Gestaut
+    The confirm flag can either be set to 'decline' or 'edit' reflecting the toggle state in the template
+    This updates the model and returns the same partial.
+    """
+
+    error_message = None
+
+    investigations = Investigations.objects.get(pk=investigations_id)
+
+    if confirm == "decline":
+        investigations.mri_brain_reported_date = date(year=1915, month=4, day=15)
+        mri_brain_declined = True
+    elif confirm == "edit":
+        investigations.mri_brain_reported_date = None
+        mri_brain_declined = False
+    else:
+        raise ValueError("No confirm parameter passed to eeg_decline path.")
+
+    if investigations.mri_brain_reported_date == date(year=1915, month=4, day=15):
+        mri_brain_declined = True
+    else:
+        mri_brain_declined = False
+
+    context = {
+        "investigations": investigations,
+        "mri_brain_declined": mri_brain_declined,
+    }
 
     template_name = "epilepsy12/partials/investigations/mri_brain_information.html"
 
