@@ -823,6 +823,11 @@ htmx_paths = [
         name="antiepilepsy_medicine_add_stop_date",
     ),
     path(
+        "antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_remove_stop_date",
+        views.antiepilepsy_medicine_remove_stop_date,
+        name="antiepilepsy_medicine_remove_stop_date",
+    ),
+    path(
         "antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_stop_date",
         views.antiepilepsy_medicine_stop_date,
         name="antiepilepsy_medicine_stop_date",
