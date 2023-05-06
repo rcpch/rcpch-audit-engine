@@ -27,20 +27,31 @@
 }
 
 :root {
-  --rcpch_lightest_blue: #f0fafe;
   --rcpch_lightest_grey: #f3f3f3;
-  /* --rcpch_light_blue: #0c98dd; */
+  
+  --rcpch_dark_blue: #0d0d58;
   --rcpch_strong_blue: #3366cc;
   /* 51,102,204 */
-  --rcpch_dark_blue: #0d0d58;
+  --rcpch_strong_blue_light_tint1: #668cd9;
+  --rcpch_strong_blue_light_tint2: #99b3e6;
+  --rcpch_strong_blue_light_tint3: #ccd9f2;
+  --rcpch_strong_blue_dark_tint: #405a97;
+
   /* 45,49,109 */
   --rcpch_light_blue: #11a7f2;
+  --rcpch_light_blue_tint1: #4dbdf5;
+  --rcpch_light_blue_tint2: #88d3f9;
+  --rcpch_light_blue_tint3: #cfe9fc;
+  --rcpch_light_blue_dark_tint: #0082bc;
   /* 17,167,242 */
+  
   --rcpch_pink: #e00087;
   /* 224,0,135 */
-  --rcpch_light_pink: #ffe0f3;
-  --rcpch_lightest_pink: #fbe5f3;
-  /* 224,0,135 */
+  --rcpch_pink_light_tint1: #e840a5;
+  --rcpch_pink_light_tint2: #ef80c3;
+  --rcpch_pink_light_tint3: #f7bfe1;
+  --rcpch_pink_dark_tint: #ab1368;
+
   /* monochrome */
   --rcpch_white: #ffffff;
   --rcpch_light_grey: #d9d9d9;
@@ -53,20 +64,52 @@
   /* 77,77,77 */
   --rcpch_charcoal_dark: #191919;
   --rcpch_black: #000000;
-  /* secondary colours */
+  
+  /* secondary colours */  
   --rcpch_red: #e60700;
-  --rcpch_light_red: #ffe7e6;
+  --rcpch_red_light_tint1: #ec4540;
+  --rcpch_red_light_tint2: #f38380;
+  --rcpch_red_light_tint3: #f9c1bf;
+  --rcpch_red_dark_tint: #b11d23;
+
   --rcpch_orange: #ff8000;
-  --rcpch_light_orange: #ffdab5;
-  --rcpch_yellow: #fdc300;
+  --rcpch_orange_light_tint1: #ffa040;
+  --rcpch_orange_light_tint2: #ffc080;
+  --rcpch_orange_light_tint3: #ffdfbf;
+  --rcpch_orange_dark_tint: #bf6914;
+
+  --rcpch_yellow: #ffd200;
+  --rcpch_yellow_light_tint1: #ffdd40;
+  --rcpch_yellow_light_tint2: #ffe980;
+  --rcpch_yellow_light_tint3: #fff4bf;
+  --rcpch_yellow_dark_tint: #c5a000;
+
+  --rcpch_strong_green: #66cc33;
+  --rcpch_strong_green_light_tint1: #8cd966;
+  --rcpch_strong_green_light_tint2: #b3e699;
+  --rcpch_strong_green_light_tint3: #d9f2cc;
+  --rcpch_strong_green_dark_tint: #53861b;
+
+  --rcpch_aqua_green: #00bdaa;
+  --rcpch_aqua_green_light_tint1: #40ecbf;
+  --rcpch_aqua_green_light_tint2: #80ded4;
+  --rcpch_aqua_green_light_tint3: #bfeeea;
+  --rcpch_aqua_green_dark_tint: #2e888d;
+
+  --rcpch_purple: #7159aa;
+  --rcpch_purple_light_tint1: #ae4cbf;
+  --rcpch_purple_light_tint2: #c987d4;
+  --rcpch_purple_light_tint3: #e4c3ea;
+  --rcpch_purple_dark_tint: #66296c;
+
+/* old colours */
   --rcpch_gold: #c2a712;
   --rcpch_vivid_green: #c8d400;
-  --rcpch_aqua_green: #00dbaa;
-  /* SGA colours */
-  --rcpch_purple: #7159aa;
-  --rcpch_magenta: #e00087;
-  --rcpch_strong_green: #66cc33;
   --rcpch_dark_red: #9a0500;
+
+
+
+
   /* STANDARD FONT */
   --rcpch_standard_font: Montserrat-Regular;
   --rcpch_bold_font: Montserrat-Bold;
@@ -75,6 +118,7 @@
 body {
   color: black;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 h1,
@@ -94,22 +138,26 @@ button,
 th {
   font-family: var(--rcpch_standard_font) !important;
   color: black;
+  font-weight: 400;
 }
 
 textarea {
   font-family: var(--rcpch_standard_font);
   color: var(--rcpch_black);
+  font-weight: 400;
 }
 
 ul {
   list-style-type: square;
   font-family: var(--rcpch_standard_font);
   color: var(--rcpch_charcoal);
+  font-weight: 400;
 }
 
 .rcpch_link {
   font-family: var(--rcpch_standard_font);
   color: black;
+  font-weight: 400;
 }
 
 .ui.fluid.rcpch.container {
@@ -130,6 +178,7 @@ ul {
 .ui.label {
   list-style: none;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .patient {
@@ -197,6 +246,8 @@ div.center.aligned.image.rcpch_index_card_image {
 
 .ui.card > .content.rcpch_index_card_content {
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .rcpch_index_card_content.content > h1.ui.header {
@@ -216,10 +267,27 @@ div.center.aligned.image.rcpch_index_card_image {
   margin-bottom: 1em;
 }
 
+.rcpch_index_card_content .rcpch_icon_text_group.rcpch_index_card_select {
+  margin-top: auto;
+}
+
+.rcpch_icon_text_group.rcpch_index_card_select>a{
+  margin-top: 4em;
+}
+
 a.rcpch_index_card_link {
   font-weight: 900;
   font-size: 1.4em;
   margin-right: 0.2em;
+}
+
+.rcpch.container .index_segment .card_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.card_container>.card_content_wrapper {
+  flex-grow: 1;
 }
 
 /* links */
@@ -228,6 +296,7 @@ a.rcpch_index_card_link {
   background-color: white;
   border-color: #d9d9d9;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .ui.rcpch_chart_container.segment {
@@ -249,6 +318,7 @@ a.rcpch_index_card_link {
   font-family: var(--rcpch_standard_font);
   color: black;
   text-align: center;
+  font-weight: 400;
 }
 
 .ui.rcpch_light_blue.card > .ui.header {
@@ -260,6 +330,7 @@ a.rcpch_index_card_link {
 .ui.rcpch_light_blue.card .content .description {
   font-family: var(--rcpch_standard_font);
   color: black;
+  font-weight: 400;
 }
 
 .ui.rcpch_light_blue.card div.content > h3 {
@@ -302,6 +373,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: white;
   width: auto;
 }
@@ -310,6 +382,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: white;
 }
 
@@ -321,22 +394,26 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: white;
 }
 
 .ui.white.card {
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #description {
   color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #chat {
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #stats_box {
@@ -348,6 +425,7 @@ div.ui.card > div.content > div.organisation_address_container {
 #cases_list_segment {
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #cases_list_segment_header {
@@ -359,6 +437,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0%;
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #table_header {
@@ -366,6 +445,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   border-radius: 0%;
   font-family: Arial, Helvetica, sans-serif;
+  font-weight: 400;
 }
 
 .rcpch_centred_text {
@@ -379,6 +459,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   border-radius: 0%;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #warning_message {
@@ -386,6 +467,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0%;
   color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #audit_top_attached_segment {
@@ -393,6 +475,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: #3366cc;
   color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 #audit_top_attached_segment > h5 {
@@ -404,6 +487,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0%;
   background-color: white;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   padding-bottom: 2em;
 }
 
@@ -429,7 +513,7 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 .ui.rcpch_lightest_blue.message {
-  background-color: var(--rcpch_lightest_blue);
+  background-color: var(--rcpch_light_blue_tint2);
   color: var(--rcpch_black);
 }
 
@@ -454,18 +538,21 @@ div.ui.card > div.content > div.organisation_address_container {
 
 .ui.rcpch_dark_blue.button {
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.button {
   background-color: var(--rcpch_light_grey);
   color: black;
   border-radius: 0% !important;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.button:active {
   background-color: var(--rcpch_pink);
   color: white;
   border-radius: 0% !important;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.positive.button {
@@ -478,6 +565,7 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
   color: white;
   border-radius: 0% !important;
+  font-weight:400;
 }
 
 .ui.rcpch_dark_blue.positive.button:hover {
@@ -564,6 +652,31 @@ div.ui.card > div.content > div.organisation_address_container {
   color: black;
   background-color: var(--rcpch_light_blue);
   border-color: var(--rcpch_light_blue);
+  font-weight: 400;
+}
+
+.ui.rcpch_purple.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple_light_tint1);
+  border-color: var(--rcpch_purple_light_tint1);
+  font-weight: 400;
+}
+
+.ui.rcpch_dark_purple.button {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple);
+  border-color: var(--rcpch_purple);
+  font-weight: 400;
+}
+
+.ui.rcpch_dark_purple.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple_light_tint1);
+  transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_grey.button {
@@ -571,6 +684,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: black;
   background-color: var(--rcpch_mid_grey);
   border-color: var(--rcpch_mid_grey);
+  font-weight: 400;
 }
 
 .ui.rcpch_grey.button:hover {
@@ -578,6 +692,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 #first_paediatric_assessment_date_button {
@@ -589,6 +704,15 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_purple.button:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple);
+  transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 .ui.rcpch_primary.button .icon:hover {
@@ -596,12 +720,22 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight: 400;
+}
+
+.ui.rcpch_purple.button .icon:hover {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple_dark_tint);
+  transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 .ui.rcpch_negative.button {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_yellow);
+  font-weight: 400;
 }
 
 .ui.rcpch_negative.button:hover {
@@ -609,12 +743,26 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_orange);
   transition-duration: 0.4s;
+  font-weight: 400;
 }
 
 .ui.rcpch_positive.button {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_strong_blue);
+  font-weight:400;
+}
+
+a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+a.ui.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ui.rcpch_positive.button:hover {
@@ -622,12 +770,14 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: var(--rcpch_dark_blue);
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_danger.button {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_red);
+  font-weight:400;
 }
 
 .ui.rcpch_danger.button:hover {
@@ -635,6 +785,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: #8a0400;
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 .ui.rcpch_danger.button .icon:hover {
@@ -642,6 +793,7 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
   background-color: #8a0400;
   transition-duration: 0.4s;
+  font-weight:400;
 }
 
 /* eligible label */
@@ -651,6 +803,7 @@ div.ui.card > div.content > div.organisation_address_container {
   border: 1px solid rgba(224, 0, 135, 0.3);
   color: var(--rcpch_pink);
   background: transparent;
+  font-weight: 400;
 }
 
 /* spinner */
@@ -673,6 +826,13 @@ div.ui.card > div.content > div.organisation_address_container {
   border-radius: 0% !important;
   color: white;
   background-color: var(--rcpch_light_blue);
+  margin: 5px;
+}
+
+.ui.rcpch_purple.label {
+  border-radius: 0% !important;
+  color: white;
+  background-color: var(--rcpch_purple_light_tint1);
   margin: 5px;
 }
 
@@ -791,15 +951,15 @@ div.ui.card > div.content > div.organisation_address_container {
   color: white;
 }
 
-.ui.rcpch_light_pink.search.selection.fluid.dropdown {
+.ui.--rcpch_pink_light_tint2.search.selection.fluid.dropdown {
   border: 3px solid var(--rcpch_pink) !important;
   -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
   box-shadow: 0px 0px 0px 100px var(--rcpch_white) inset !important;
   border-radius: 0%;
 }
 
-.ui.rcpch_light_pink.dropdown .item:hover {
-  background-color: var(--rcpch_light_pink);
+.ui.--rcpch_pink_light_tint2.dropdown .item:hover {
+  background-color: var(--rcpch_pink_light_tint2);
   color: white;
 }
 
@@ -824,14 +984,19 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 /* Steps */
+.step {
+  border-radius: 0%;
+}
 
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .title {
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: var(--rcpch_black);
 }
 
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .description {
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   color: var(--rcpch_charcoal);
 }
 
@@ -897,6 +1062,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.vertical.ordered.mini.top.attached.rcpch.steps .completed.step::before {
   color: white;
   margin-bottom: 0.5em;
+  border-radius: 0%;
 }
 
 .rcpch_steps_wrapper a {
@@ -933,7 +1099,7 @@ div.ui.card > div.content > div.organisation_address_container {
   counter-reset: percent var(--percent);
   content: counter(percent) "%";
   color: var(--rcpch_dark_blue);
-  font-weight: bold;
+  font-weight: 900;
 }
 
 .pie--disc::before {
@@ -1031,6 +1197,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch.form input[type="select"],
 .ui.rcpch.form input[type="url"] {
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   margin: 0em;
   outline: none;
   border: 3px solid rgba(17, 167, 242, 1);
@@ -1053,8 +1220,8 @@ div.ui.card > div.content > div.organisation_address_container {
 
 .ui.form .field.field input:-webkit-autofill:focus {
   border: 3px solid rgba(17, 167, 242, 1) !important;
-  -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_lightest_blue) inset !important;
-  box-shadow: 0px 0px 0px 100px var(--rcpch_lightest_blue) inset !important;
+  -webkit-box-shadow: 0px 0px 0px 100px var(--rcpch_light_blue_tint2) inset !important;
+  box-shadow: 0px 0px 0px 100px var(--rcpch_light_blue_tint2) inset !important;
 }
 
 .ui.form .field.field input:-webkit-autofill {
@@ -1143,7 +1310,7 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 .ui.rcpch.selection.active.dropdown ::-webkit-scrollbar {
-  background-color: var(--rcpch_lightest_blue);
+  background-color: var(--rcpch_light_blue_tint2);
 }
 
 .ui.rcpch.selection.active.dropdown ::-webkit-scrollbar-thumb {
@@ -1200,9 +1367,6 @@ div.ui.card > div.content > div.organisation_address_container {
   border-color: var(--rcpch_light_blue);
   border-width: medium;
   margin-bottom: 10px;
-}
-
-.ui.rcpch.table {
   margin-top: 10px;
 }
 
@@ -1221,7 +1385,8 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch.table th {
   background-color: var(--rcpch_light_blue);
   color: var(--rcpch_black);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .ui.rcpch.table tr:first-child() .ui.rcpch.table td {
@@ -1235,12 +1400,41 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 .ui.rcpch.table .subcategory-header {
-  background-color: var(--rcpch_mid_grey);
+  background-color: var(--rcpch_light_blue_tint2);
   font-family: var(--rcpch_bold_font);
+  font-weight: 900;
 }
 
 .ui.rcpch.table .subcategory-row {
-  background-color: var(--rcpch_light_grey);
+  background-color: var(--rcpch_light_blue_tint3);
+}
+
+/* purple table */
+
+.ui.rcpch.purple.table th {
+  background-color: var(--rcpch_purple_dark_tint);
+  color: white;
+  font-family: 400;
+  border-radius: 0%;
+}
+
+.ui.rcpch.purple.table {
+  border-radius: 0%;
+  border-color: var(--rcpch_purple_dark_tint);
+  border-width: medium;
+  margin-bottom: 10px;
+}
+
+.ui.rcpch.purple.table tfoot tr:first-child > th:first-child {
+  border-radius: 0%;
+}
+
+.ui.rcpch.purple.table tfoot tr:first-child > th:last-child {
+  border-radius: 0%;
+}
+
+.ui.rcpch.purple.table tfoot tr:first-child > th:only-child {
+  border-radius: 0%;
 }
 
 /* rcpch message */
@@ -1248,7 +1442,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch_info.message {
   border-radius: 0%;
   color: var(--rcpch_dark_blue);
-  background-color: var(--rcpch_lightest_blue);
+  background-color: var(--rcpch_light_blue_tint3);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
     0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
@@ -1266,7 +1460,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch_important.message {
   border-radius: 0%;
   color: var(--rcpch_charcoal);
-  background-color: var(--rcpch_lightest_blue);
+  background-color: var(--rcpch_light_blue_tint3);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
     0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(51, 102, 204, 0.22) inset,
@@ -1280,7 +1474,7 @@ div.ui.card > div.content > div.organisation_address_container {
 .ui.rcpch_warning.message {
   border-radius: 0%;
   color: var(--rcpch_red);
-  background-color: var(--rcpch_light_red);
+  background-color: var(--rcpch_red_light_tint3);
   -webkit-box-shadow: 0px 0px 0px 1px rgba(90, 3, 0, 0.22) inset,
     0px 0px 0px 0px rgba(0, 0, 0, 0);
   box-shadow: 0px 0px 0px 1px rgba(90, 3, 0, 0.22) inset,
@@ -1297,6 +1491,11 @@ div.ui.card > div.content > div.organisation_address_container {
   background-color: var(--rcpch_dark_blue);
 }
 
+.ui.rcpch_purple_footer.message {
+  color: var(--rcpch_white);
+  background-color: var(--rcpch_purple);
+}
+
 .ui.top.attached.rcpch_dark_blue.clearing.segment {
   color: var(--rcpch_white);
   background-color: var(--rcpch_dark_blue);
@@ -1306,6 +1505,18 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 .ui.top.attached.rcpch_dark_blue.clearing.segment > h5 {
+  color: white;
+}
+
+.ui.top.attached.rcpch_purple.clearing.segment {
+  color: var(--rcpch_white);
+  background-color: var(--rcpch_purple);
+  border-radius: 0%;
+  border-width: medium;
+  border-color: var(--rcpch_purple);
+}
+
+.ui.top.attached.rcpch_purple.clearing.segment > h5 {
   color: white;
 }
 
@@ -1323,6 +1534,12 @@ div.ui.card > div.content > div.organisation_address_container {
   /* margin-top: -1em; */
   border-radius: 0%;
   box-shadow: 0em 0em 0em 1px rgba(34, 36, 38, 0.15) inset;
+}
+
+.ui.bottom.attached.rcpch_purple_footer.message {
+  /* margin-top: -1em; */
+  border-radius: 0%;
+  box-shadow: 0em 0em 0em 1px rgba(113, 89, 170, 0.15) inset;
 }
 
 .list-unstyled {
@@ -1379,7 +1596,7 @@ a label {
 }
 
 .ui.rcpch_secret.label {
-  background-color: var(--rcpch_lightest_blue);
+  background-color: var(--rcpch_light_blue_tint2);
   color: var(--rcpch_dark_grey);
   border-radius: 0%;
 }
@@ -1397,12 +1614,12 @@ a label {
 }
 
 .ui.bottom.attached.tiny.rcpch.progress .bar {
-  background-color: var(--rcpch_pink);
+  background-color: var(--rcpch_light_blue);
 }
 
 .ui.rcpch_warning.basic.label {
   color: var(--rcpch_dark_red);
-  background-color: var(--rcpch_light_red);
+  background-color: var(--rcpch_red_light_tint3);
   border-radius: 0%;
   border-color: var(--rcpch_dark_red);
   margin-top: 1em;
@@ -1412,6 +1629,7 @@ a label {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 5em;
 }
 
 .rcpch_team_member_image_wrapper > * {
@@ -1441,11 +1659,13 @@ img.ui.image.rcpch_member_image {
 .ui.statistic .value {
   color: var(--rcpch_light_blue);
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
 }
 
 .ui.statistic div.label {
   font-family: var(--rcpch_standard_font);
   color: var(--rcpch_charcoal);
+  font-weight: 400;
 }
 
 .kpi_unscored {
@@ -1460,6 +1680,14 @@ img.ui.image.rcpch_member_image {
 .rcpch_td_data_indicator_wrapper {
   display: flex;
   justify-content: space-between;
+}
+
+.ui.rcpch.purple.table.cases_table .rcpch_td_data_indicator_wrapper > * {
+  color: var(--rcpch_white);
+}
+
+.ui.rcpch.purple.table.cases_table .rcpch_td_data_indicator_wrapper:hover > * {
+  color: var(--rcpch_pink_light_tint3);
 }
 
 @media only screen and (max-width: 1119px) {
@@ -1552,6 +1780,7 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   color: var(--rcpch_dark_red);
   list-style-type: none;
   font-family: var(--rcpch_standard_font);
+  font-weight: 400;
   padding-left: 10px;
   padding-right: 10px;
 }
@@ -1626,4 +1855,55 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+
+.ui.form.field>label {
+  font-weight: 400;
+}
+
+.unpadded {
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+.notupperpadded {
+  padding-top: 0 !important;
+}
+
+.twelve.wide.column.add_search_return_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+div.sixteen.wide.column.add_search_return_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+div.sixteen.wide.column.add_search_return_wrapper > #case_statistics {
+  flex-grow: 2;
+}
+
+div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
+  width: 100%;
+}
+
+.ui.form.field>label {
+  font-weight: 400;
+}
+
+.unpadded {
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+.notupperpadded {
+  padding-top: 0 !important;
+}
+
+
+.case_create_buttons_wrapper {
+  display: flex;
 }

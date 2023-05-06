@@ -20,7 +20,7 @@
                     </div>
                 </div>
 
-                <div class="sixteen wide column">
+                <div class="sixteen wide notupperpadded column">
                     
                     <a href="{% url 'create_epilepsy12_user' organisation_id=organisation.pk user_type='organisation-staff' %}"><button {% if perms.epilepsy12.add_epilepsy12user %} class="ui rcpch_primary button" {% else %} class="ui rcpch_primary disabled button"  {% endif %}>Add a new User to {{organisation.OrganisationName}}</button></a>
                     
@@ -32,7 +32,7 @@
 
                 </div>
 
-                <div class="sixteen wide column">
+                <div class="sixteen wide notupperpadded column">
 
                     <div class="ui rcpch fluid icon input" data-tooltip="Start typing to Filter by name or NHS Number.">
                         <input type="text" class='prompt' placeholder="Search..." name='filtered_epilepsy12_user_list' hx-target="#epilepsy12_user_table" hx-trigger="keyup" hx-get="{% url 'filtered_epilepsy12_user_list' organisation_id=organisation.pk %}" hx-swap="innerHTML">
