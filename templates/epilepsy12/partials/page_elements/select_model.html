@@ -62,7 +62,7 @@
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
                     {% for item in choices %}
-                        <div class="item" data-value="{{item.pk}}">{% value_for_field_name item field_name %} {% if field_name2 %}({% value_for_field_name item field_name2 %}){% endif %}</div>
+                        <div class="item" data-value="{{item.pk}}">{% value_for_field_name item field_name False %} {% value_for_field_name item field_name2 True %}</div>
                     {% endfor %}
                 </div>
                 

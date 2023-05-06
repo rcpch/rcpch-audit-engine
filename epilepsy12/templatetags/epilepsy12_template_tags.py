@@ -34,10 +34,10 @@ def date_string(date):
 
 @register.simple_tag
 def characters_left(description):
-    length = 2000-len(description)
-    colour = 'black'
-    if (length < 100):
-        colour = 'red'
+    length = 2000 - len(description)
+    colour = "black"
+    if length < 100:
+        colour = "red"
     safe_text = f'<span style="color:{colour}">{length}</span>'
     return mark_safe(safe_text)
 
@@ -45,70 +45,73 @@ def characters_left(description):
 @register.simple_tag
 def percentage_of_total(numerator, denominator):
     if numerator and denominator:
-        if (int(denominator) > 0):
-            return round(int(numerator)/int(denominator)*100)
+        if int(denominator) > 0:
+            return round(int(numerator) / int(denominator) * 100)
 
 
 @register.simple_tag
 def kpi_for_kpi_name(aggregated_kpi, kpi_name, color=False):
-    
     # guard clause check if color should be returned
     if color:
-        return aggregated_kpi['color']
-    if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
+        return aggregated_kpi["color"]
+    if aggregated_kpi["aggregated_kpis"][kpi_name] is None:
         return -1
     else:
-        pct = 100*aggregated_kpi['aggregated_kpis'][kpi_name] / aggregated_kpi['aggregated_kpis']['total_number_of_cases']
+        pct = (
+            100
+            * aggregated_kpi["aggregated_kpis"][kpi_name]
+            / aggregated_kpi["aggregated_kpis"]["total_number_of_cases"]
+        )
         return pct
 
 
 @register.simple_tag
 def kpi_average_for_kpi_name(aggregated_kpi, kpi_name):
-    if aggregated_kpi['aggregated_kpis'][kpi_name] is None:
+    if aggregated_kpi["aggregated_kpis"][kpi_name] is None:
         return 0
     else:
-        return aggregated_kpi['aggregated_kpis'][f'{kpi_name}_average']
+        return aggregated_kpi["aggregated_kpis"][f"{kpi_name}_average"]
 
 
 @register.simple_tag
 def formatlabel(label):
     if label is None:
-        return 'Unclassified'
+        return "Unclassified"
     else:
-        nhs_icb_string = re.search(
-            r'(NHS\s)(.+)(\sINTEGRATED CARE BOARD)', label)
+        nhs_icb_string = re.search(r"(NHS\s)(.+)(\sINTEGRATED CARE BOARD)", label)
         if nhs_icb_string:
             # \u002D fixes hyphen render for 'Stoke-on-trent'
-            return nhs_icb_string.group(2).replace(r'\u002D','-').title()
+            return nhs_icb_string.group(2).replace(r"\u002D", "-").title()
         return label
 
 
 @register.filter
 def custom_filter(text, color):
     safe_text = '<span style="color:{color}">{text}</span>'.format(
-        color=color, text=text)
+        color=color, text=text
+    )
     return mark_safe(safe_text)
 
 
 @register.simple_tag
 def permission_text(add_permission, change_permission, delete_permission, model_name):
-    return_string = 'You do not have permission to'
+    return_string = "You do not have permission to"
     if add_permission:
         if change_permission and not delete_permission:
-            return_string += f' delete {model_name}.'
+            return_string += f" delete {model_name}."
         elif not change_permission and delete_permission:
-            return_string += f' edit {model_name}.'
+            return_string += f" edit {model_name}."
         elif not change_permission and not delete_permission:
-            return_string += f' edit or delete {model_name}.'
+            return_string += f" edit or delete {model_name}."
         else:
             return_string = ""
     else:
         if change_permission and not delete_permission:
-            return_string += f' add or delete {model_name}.'
+            return_string += f" add or delete {model_name}."
         elif not change_permission and not delete_permission:
-            return_string += f' add, edit or delete {model_name}.'
+            return_string += f" add, edit or delete {model_name}."
         elif change_permission and delete_permission:
-            return_string += f' add {model_name}.'
+            return_string += f" add {model_name}."
         else:
             return_string = ""
 
@@ -130,7 +133,7 @@ def snomed_concept(concept_id):
     if concept_id is None:
         return
     concept = fetch_concept(concept_id)
-    return concept['preferredDescription']['term']
+    return concept["preferredDescription"]["term"]
 
 
 @register.filter
@@ -142,7 +145,7 @@ def is_in(url_name, args):
     """
     if args is None:
         return None
-    arg_list = [arg.strip() for arg in args.split(',')]
+    arg_list = [arg.strip() for arg in args.split(",")]
     if url_name in arg_list:
         return True
     else:
@@ -158,11 +161,20 @@ def match_two_values(val1, val2):
 
 
 @register.simple_tag
-def value_for_field_name(model, field_name):
+def value_for_field_name(model, field_name, in_parentheses):
     """
     Returns the field value for a given field name in a model
+    If in_parentheses is true, return the value in parentheses.
     """
-    return getattr(model, field_name, None)
+    return_val = getattr(model, field_name, None)
+    if in_parentheses:
+        return_string = f"({return_val})"
+    else:
+        return_string = f"{return_val}"
+
+    if return_val is not None:
+        return return_string
+    return ""
 
 
 @register.filter
@@ -170,18 +182,22 @@ def record_complete(model):
     # helper largely for medicines table to report if complete or not
 
     minimum_requirement_met = False
-    if hasattr(model, 'medicine_entity'):
+    if hasattr(model, "medicine_entity"):
         if model.medicine_entity is not None:
             minimum_requirement_met = (
-                model.antiepilepsy_medicine_start_date is not None and
-                model.antiepilepsy_medicine_risk_discussed is not None and
-                model.medicine_entity.medicine_name is not None
+                model.antiepilepsy_medicine_start_date is not None
+                and model.antiepilepsy_medicine_risk_discussed is not None
+                and model.medicine_entity.medicine_name is not None
             )
-            if model.management.registration.case.sex == 2 and model.medicine_entity.medicine_name == 'Sodium valproate':
+            if (
+                model.management.registration.case.sex == 2
+                and model.medicine_entity.medicine_name == "Sodium valproate"
+            ):
                 return minimum_requirement_met and (
-                    model.is_a_pregnancy_prevention_programme_needed is not None and
-                    model.has_a_valproate_annual_risk_acknowledgement_form_been_completed is not None and
-                    model.is_a_pregnancy_prevention_programme_in_place is not None
+                    model.is_a_pregnancy_prevention_programme_needed is not None
+                    and model.has_a_valproate_annual_risk_acknowledgement_form_been_completed
+                    is not None
+                    and model.is_a_pregnancy_prevention_programme_in_place is not None
                 )
 
     return minimum_requirement_met
@@ -190,33 +206,33 @@ def record_complete(model):
 @register.filter
 def to_class_name(value):
     if value.__class__.__name__ == "Registration":
-        return 'Verification/Registration'
+        return "Verification/Registration"
     elif value.__class__.__name__ == "FirstPaediatricAssessment":
-        return 'First Paediatric Assessment'
+        return "First Paediatric Assessment"
     elif value.__class__.__name__ == "EpilepsyContext":
-        return 'Epilepsy Context'
+        return "Epilepsy Context"
     elif value.__class__.__name__ == "MultiaxialDiagnosis":
-        return 'Multiaxial Diagnosis'
+        return "Multiaxial Diagnosis"
     elif value.__class__.__name__ == "Assessment":
-        return 'Milestones'
+        return "Milestones"
     elif value.__class__.__name__ == "Investigations":
-        return 'Investigations'
+        return "Investigations"
     elif value.__class__.__name__ == "Management":
-        return 'Management'
+        return "Management"
     elif value.__class__.__name__ == "Site":
-        return 'Site'
+        return "Site"
     elif value.__class__.__name__ == "Episode":
-        return 'Episode'
+        return "Episode"
     elif value.__class__.__name__ == "Syndrome":
-        return 'Syndrome'
+        return "Syndrome"
     elif value.__class__.__name__ == "Comorbidity":
-        return 'Comorbidity'
+        return "Comorbidity"
     elif value.__class__.__name__ == "Epilepsy12User":
-        return 'Epilepsy12 User'
+        return "Epilepsy12 User"
     elif value.__class__.__name__ == "Antiepilepsy Medicine":
-        return 'Antiepilepsy Medicine'
+        return "Antiepilepsy Medicine"
     else:
-        return 'Error'
+        return "Error"
 
 
 @register.filter
@@ -244,22 +260,22 @@ def return_case(value):
     elif value.__class__.__name__ == "Comorbidity":
         return value.multiaxial_diagnosis.registration.case
     elif value.__class__.__name__ == "Epilepsy12User":
-        return 'Epilepsy12 User'
+        return "Epilepsy12 User"
     elif value.__class__.__name__ == "Antiepilepsy Medicine":
         return value.management.registration.case
     else:
-        return 'Error'
+        return "Error"
 
 
-@register.filter('has_group')
+@register.filter("has_group")
 def has_group(user, group_names_string):
     # thanks to Lucas Simon for this efficiency
     # https://stackoverflow.com/questions/1052531/get-user-group-in-a-template
     """
     Check if user has permission
     """
-    result = [x.strip() for x in group_names_string.split(',')]
-    groups = user.groups.all().values_list('name', flat=True)
+    result = [x.strip() for x in group_names_string.split(",")]
+    groups = user.groups.all().values_list("name", flat=True)
     match = False
     for group in groups:
         if group in result:
@@ -280,10 +296,10 @@ def none_percentage(field):
     if field is None:
         return "No data"
     else:
-        return f'{field} %'
+        return f"{field} %"
 
 
-@register.filter(name='icon_for_score')
+@register.filter(name="icon_for_score")
 def icon_for_score(score):
     if score is None:
         return
@@ -296,7 +312,8 @@ def icon_for_score(score):
                     data-position="top right"
                     _="init js $('.rcpch_light_blue.exclamation.triangle.icon').popup(); end"
                 ></i>
-            """)
+            """
+        )
     elif score > 1:
         return mark_safe(
             """<i 
@@ -316,7 +333,8 @@ def icon_for_score(score):
                 data-position="top right"
                 _="init js $('.check.circle.outline.rcpch_pink.icon').popup(); end"
                 ></i>
-                """)
+                """
+        )
     else:
         return mark_safe(
             """<i 
@@ -326,4 +344,5 @@ def icon_for_score(score):
                 data-position="top right"
                 _="init js $('.rcpch.dot.circle.icon').popup(); end"
                 ></i>
-                """)
+                """
+        )
