@@ -89,6 +89,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -98,6 +99,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="consultant_paediatrician_input_date",
             is_earliest_date=True,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -143,6 +145,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -152,6 +155,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="consultant_paediatrician_referral_date",
             is_earliest_date=False,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -533,6 +537,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -542,6 +547,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="paediatric_neurologist_input_date",
             is_earliest_date=True,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -590,6 +596,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -599,6 +606,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="paediatric_neurologist_referral_date",
             is_earliest_date=False,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -1014,6 +1022,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -1023,6 +1032,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="childrens_epilepsy_surgical_service_input_date",
             is_earliest_date=True,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -1068,6 +1078,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -1077,6 +1088,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="childrens_epilepsy_surgical_service_referral_date",
             is_earliest_date=False,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -1422,6 +1434,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -1431,6 +1444,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="epilepsy_specialist_nurse_input_date",
             is_earliest_date=True,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
@@ -1463,6 +1477,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
     """
 
     try:
+        assessment = Assessment.objects.get(pk=assessment_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -1472,6 +1487,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
             page_element="date_field",
             comparison_date_field_name="epilepsy_specialist_nurse_referral_date",
             is_earliest_date=False,
+            earliest_allowable_date=assessment.registration.registration_date,
         )
     except ValueError as error:
         error_message = error

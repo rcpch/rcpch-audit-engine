@@ -1911,3 +1911,11 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .padded.field {
   padding-top: 33px;
 }
+
+.padded_form {
+  margin-top: 13px !important;
+}
+
+.padded_field {
+  padding-top: 20px;
+}

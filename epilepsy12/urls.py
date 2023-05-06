@@ -751,6 +751,11 @@ htmx_paths = [
         name="eeg_performed_date",
     ),
     path(
+        "investigations/<int:investigations_id>/eeg_declined/<str:confirm>",
+        views.eeg_declined,
+        name="eeg_declined",
+    ),
+    path(
         "investigations/<int:investigations_id>/twelve_lead_ecg_status",
         views.twelve_lead_ecg_status,
         name="twelve_lead_ecg_status",
@@ -774,6 +779,11 @@ htmx_paths = [
         "investigations/<int:investigations_id>/mri_brain_reported_date",
         views.mri_brain_reported_date,
         name="mri_brain_reported_date",
+    ),
+    path(
+        "investigations/<int:investigations_id>/mri_brain_declined/<str:confirm>",
+        views.mri_brain_declined,
+        name="mri_brain_declined",
     ),
     # management
     path(

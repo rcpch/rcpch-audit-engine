@@ -1,12 +1,10 @@
 # python
-from operator import itemgetter
 from random import randint, choice
-from datetime import datetime, date
+from datetime import date
 from dateutil.relativedelta import relativedelta
 from random import randint
-from django.utils import timezone
 from django.core.management.base import BaseCommand
-from django.contrib.gis.geos import Point
+from ...general_functions import get_current_cohort_data
 
 
 from ...constants import (
@@ -200,12 +198,10 @@ def complete_registrations():
         "Completing all the Epilepsy12 fields for the fictional cases...",
         "\033[33m",
     )
+    current_cohort = get_current_cohort_data()
     for registration in Registration.objects.all():
-        current_cohort_end_date = first_tuesday_in_january(
-            current_cohort_start_date().year + 2
-        ) + relativedelta(days=7)
         registration.registration_date = random_date(
-            start=current_cohort_start_date(), end=current_cohort_end_date
+            start=current_cohort["cohort_start_date"], end=date.today()
         )
         registration.eligibility_criteria_met = True
         registration.save()

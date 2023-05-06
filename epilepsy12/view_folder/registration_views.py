@@ -28,7 +28,10 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
 )
 from ..decorator import user_may_view_this_child
-from ..general_functions import construct_transfer_epilepsy12_site_email
+from ..general_functions import (
+    construct_transfer_epilepsy12_site_email,
+    get_current_cohort_data,
+)
 
 
 @login_required
@@ -615,6 +618,7 @@ def registration_date(request, case_id):
             Registration,
             field_name="registration_date",
             page_element="date_field",
+            earliest_allowable_date=get_current_cohort_data()["cohort_start_date"],
         )
 
     except ValueError as error:
