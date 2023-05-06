@@ -751,6 +751,11 @@ htmx_paths = [
         name="eeg_performed_date",
     ),
     path(
+        "investigations/<int:investigations_id>/eeg_declined/<str:confirm>",
+        views.eeg_declined,
+        name="eeg_declined",
+    ),
+    path(
         "investigations/<int:investigations_id>/twelve_lead_ecg_status",
         views.twelve_lead_ecg_status,
         name="twelve_lead_ecg_status",

@@ -1,3 +1,4 @@
+from datetime import date
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, permission_required
 from epilepsy12.models import Investigations, Registration, Site
@@ -25,6 +26,11 @@ def investigations(request, case_id):
     ).get()
     organisation_id = site.organisation.pk
 
+    if investigations.eeg_performed_date == date(year=1915, month=4, day=15):
+        eeg_declined = True
+    else:
+        eeg_declined = False
+
     context = {
         "case_id": case_id,
         "registration": registration,
@@ -32,6 +38,7 @@ def investigations(request, case_id):
         "audit_progress": registration.audit_progress,
         "active_template": "investigations",
         "organisation_id": organisation_id,
+        "eeg_declined": eeg_declined,
     }
 
     template_name = "epilepsy12/investigations.html"
@@ -80,7 +87,12 @@ def eeg_indicated(request, investigations_id):
         investigations.updated_by = request.user
         investigations.save()
 
-    context = {"investigations": investigations}
+    if investigations.eeg_performed_date == date(year=1915, month=4, day=15):
+        eeg_declined = True
+    else:
+        eeg_declined = False
+
+    context = {"investigations": investigations, "eeg_declined": eeg_declined}
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
@@ -126,9 +138,12 @@ def eeg_request_date(request, investigations_id):
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
-    context = {
-        "investigations": investigations,
-    }
+    if investigations.eeg_performed_date == date(year=1915, month=4, day=15):
+        eeg_declined = True
+    else:
+        eeg_declined = False
+
+    context = {"investigations": investigations, "eeg_declined": eeg_declined}
 
     response = recalculate_form_generate_response(
         model_instance=investigations,
@@ -170,7 +185,56 @@ def eeg_performed_date(request, investigations_id):
 
     investigations = Investigations.objects.get(pk=investigations_id)
 
-    context = {"investigations": investigations}
+    if investigations.eeg_performed_date == date(year=1915, month=4, day=15):
+        eeg_declined = True
+    else:
+        eeg_declined = False
+
+    context = {"investigations": investigations, "eeg_declined": eeg_declined}
+
+    template_name = "epilepsy12/partials/investigations/eeg_information.html"
+
+    response = recalculate_form_generate_response(
+        model_instance=investigations,
+        request=request,
+        context=context,
+        template=template_name,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required("epilepsy12.change_investigations", raise_exception=True)
+def eeg_declined(request, investigations_id, confirm):
+    """
+    This is an HTMX callback from the ecg_information.html partial template
+    which contains fields on eeg_indicated, eeg_request_date and eeg_performed_date.
+    It also contains a calculated field showing time to EEG from request.
+    It is triggered by a toggle in the partial generating a post request on click in the eeg_declined button.
+    EEGs might be declined if the child is not cooperative or practical/technical issues relating to the EEG test.
+    Failure to provide a completion date of the EEG however results in a fail for this measure.
+    To denote failure, the completion date is persisted as 15/4/1915, the date of birth of Jean Henri Gestaut
+    This updates the model and returns the same partial.
+    """
+
+    error_message = None
+
+    investigations = Investigations.objects.get(pk=investigations_id)
+    if confirm == "decline":
+        investigations.eeg_performed_date = date(year=1915, month=4, day=15)
+        eeg_declined = True
+    elif confirm == "edit":
+        investigations.eeg_performed_date = None
+        eeg_declined = False
+    else:
+        raise ValueError("No confirm parameter passed to eeg_decline path.")
+
+    investigations.save()
+
+    context = {"investigations": investigations, "eeg_declined": eeg_declined}
 
     template_name = "epilepsy12/partials/investigations/eeg_information.html"
 
