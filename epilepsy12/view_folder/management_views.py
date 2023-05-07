@@ -920,6 +920,8 @@ def individualised_care_plan_date(request, management_id):
             field_name="individualised_care_plan_date",
             page_element="date_field",
             earliest_allowable_date=management.registration.registration_date,
+            comparison_date_field_name=None,
+            is_earliest_date=None,
         )
     except ValueError as error:
         error_message = error

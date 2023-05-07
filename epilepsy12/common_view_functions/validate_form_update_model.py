@@ -136,7 +136,7 @@ def validate_and_update_model(
             date_error = f"The date you chose ({field_value}) cannot be in the future."
             date_valid = False
 
-        if date_valid:
+        if date_valid or date_valid is None:
             pass
         else:
             raise ValueError(date_error)
