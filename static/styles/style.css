@@ -1907,3 +1907,15 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .case_create_buttons_wrapper {
   display: flex;
 }
+
+.padded.field {
+  padding-top: 33px;
+}
+
+.padded_form {
+  margin-top: 13px !important;
+}
+
+.padded_field {
+  padding-top: 20px;
+}

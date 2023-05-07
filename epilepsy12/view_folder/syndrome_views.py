@@ -19,6 +19,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
     """
 
     try:
+        syndrome = Syndrome.objects.get(pk=syndrome_id)
         error_message = None
         validate_and_update_model(
             request=request,
@@ -26,6 +27,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
             model_id=syndrome_id,
             field_name="syndrome_diagnosis_date",
             page_element="date_field",
+            earliest_allowable_date=syndrome.multiaxial_diagnosis.registration.registration_date,
         )
     except ValueError as error:
         error_message = error
