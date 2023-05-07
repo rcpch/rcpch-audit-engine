@@ -1,5 +1,10 @@
 {% load epilepsy12_template_tags %}
-
+{% comment %}
+This template is the kpis table and is called from selected_trust_kpis and selected_trust_kpis_open, that latter for 
+open access. The open_access flag passed in from both endpoints denotes this.
+Currently the aggregation queries are run with every page load, but in future, the open_access results
+will be persisted and run as a cron job once a day.
+{% endcomment %}
 
     <div class="sixteen wide column">
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
@@ -10,6 +15,7 @@
                     <p>{{organisation.OrganisationName}} ({{ organisation.ParentOrganisation_OrganisationName }})</p>
                     <!-- </div>     -->
                 </div>
+                {% if not open_access %}
                 <button 
                     class='ui right floated rcpch_primary button'
                     hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 
@@ -19,6 +25,7 @@
                     Refresh
                     <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                 </button>
+                {% endif %}
             </div>
         </div>
 
@@ -37,7 +44,7 @@
                                         class="info circle icon"
                                         id='totals_organisation'
                                         data-title='Epilepsy12 totals'
-                                        data-content="Number of children registered in this organisation."
+                                        data-content="Number of children registered in this organisation" {% if organisation.OrganisationName is not None %} + "{({{organisation.OrganisationName}})" {% endif %}
                                         data-position='top right'
                                         _="init js $('#totals_organisation').popup(); end"
                                     ></i>({{organisation_kpis.total_number_of_cases}})</p>
@@ -49,51 +56,51 @@
                                     class="info circle icon"
                                     id='totals_trust'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Trust."
+                                    data-content="Number of children registered in this Trust" {% if organisation.ParentOrganisation_OrganisationName is not None %} + "{({{organisation.ParentOrganisation_OrganisationName}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_trust').popup(); end"
                                 ></i>({{trust_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>Integrated Care Board ({{organisation.ICBName}})</p>
+                                <p>Integrated Care Board</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_icb'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Integrated Care Board."
+                                    data-content="Number of children registered in this Integrated Care Board" {% if organisation.ICBName is not None %} + "{({{organisation.ICBName}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_icb').popup(); end"
                                 ></i>({{icb_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>NHS Region ({{organisation.NHSEnglandRegion}})</p>
+                                <p>NHS Region</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_nhs'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this NHS Region."
+                                    data-content="Number of children registered in this NHS Region" {% if organisation.NHSEnglandRegion is not None %} + "{({{organisation.NHSEnglandRegion}})" {% endif %} 
                                     data-position='top right'
                                     _="init js $('#totals_nhs').popup(); end"
                                 ></i>({{nhs_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>OPEN UK Region ({{organisation.OPENUKNetworkName}})</p>
+                                <p>OPEN UK Region</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_open_uk'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this OPEN UK Region."
+                                    data-content="Number of children registered in this OPEN UK Region" {% if organisation.openuk_network is not None %} + "{({{organisation.openuk_network.OPEN_UK_Network_Name}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_open_uk').popup(); end"
                                 ></i>({{open_uk_kpis.total_number_of_cases}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>Country ({{organisation.ons_region.ons_country.Country_ONS_Name}})</p>
+                                <p>Country</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_country'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this country."
+                                    data-content="Number of children registered in this country" {% if organisation.ons_region.ons_country.Country_ONS_Name is not None %} + "{({{organisation.ons_region.ons_country.Country_ONS_Name}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_country').popup(); end"
                                 ></i>({{country_kpis.total_number_of_cases}})</p>

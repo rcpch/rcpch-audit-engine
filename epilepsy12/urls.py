@@ -103,6 +103,11 @@ urlpatterns = [
         name="selected_trust_kpis",
     ),
     path(
+        "selected_trust/<int:organisation_id>/kpis/open",
+        views.selected_trust_kpis_open,
+        name="selected_trust_kpis_open",
+    ),
+    path(
         "selected_trust_kpis/<int:organisation_id>/select_kpi",
         views.selected_trust_select_kpi,
         name="selected_trust_select_kpi",
@@ -131,7 +136,11 @@ urlpatterns = [
     path("epilepsy_context/<int:case_id>", epilepsy_context, name="epilepsy_context"),
     path("management/<int:case_id>", management, name="management"),
     path("docs", views.documentation, name="docs"),
-    path("patient", views.patient, name="patient"),
+    path(
+        "organisation/<int:organisation_id>/open_access",
+        views.open_access,
+        name="open_access",
+    ),
     path("investigations/<int:case_id>", investigations, name="investigations"),
     path(
         "organisation/<int:organisation_id>/epilepsy12_user_list/",
@@ -751,6 +760,11 @@ htmx_paths = [
         name="eeg_performed_date",
     ),
     path(
+        "investigations/<int:investigations_id>/eeg_declined/<str:confirm>",
+        views.eeg_declined,
+        name="eeg_declined",
+    ),
+    path(
         "investigations/<int:investigations_id>/twelve_lead_ecg_status",
         views.twelve_lead_ecg_status,
         name="twelve_lead_ecg_status",
@@ -774,6 +788,11 @@ htmx_paths = [
         "investigations/<int:investigations_id>/mri_brain_reported_date",
         views.mri_brain_reported_date,
         name="mri_brain_reported_date",
+    ),
+    path(
+        "investigations/<int:investigations_id>/mri_brain_declined/<str:confirm>",
+        views.mri_brain_declined,
+        name="mri_brain_declined",
     ),
     # management
     path(
@@ -821,6 +840,11 @@ htmx_paths = [
         "antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_add_stop_date",
         views.antiepilepsy_medicine_add_stop_date,
         name="antiepilepsy_medicine_add_stop_date",
+    ),
+    path(
+        "antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_remove_stop_date",
+        views.antiepilepsy_medicine_remove_stop_date,
+        name="antiepilepsy_medicine_remove_stop_date",
     ),
     path(
         "antiepilepsy_medicine/<int:antiepilepsy_medicine_id>/antiepilepsy_medicine_stop_date",
