@@ -111,8 +111,8 @@ def organisation_reports(request):
         )
     else:
         total_percent_trust = 0
-    
-    org_list=Organisation.objects.order_by('OrganisationName').all()
+
+    org_list = Organisation.objects.order_by("OrganisationName").all()
 
     return render(
         request=request,
@@ -240,8 +240,6 @@ def selected_organisation_summary(request):
         )
     else:
         total_percent_trust = 0
-        
-    
 
     return render(
         request=request,
@@ -369,6 +367,96 @@ def selected_trust_kpis(request, organisation_id):
     trigger_client_event(
         response=response, name="registration_active", params={}
     )  # reloads the form to show the active steps
+    return response
+
+
+def selected_trust_kpis_open(request, organisation_id):
+    """
+    Open access endpoint for KPIs table
+    """
+
+    #
+    organisation = Organisation.objects.get(pk=organisation_id)
+    cohort_data = get_current_cohort_data()
+    organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="organisation",
+    )
+    trust_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="trust",
+    )
+    icb_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="icb",
+    )
+    nhs_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="nhs_region",
+    )
+    open_uk_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="open_uk",
+    )
+    country_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="country",
+    )
+    national_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=organisation,
+        cohort=cohort_data["cohort"],
+        case_complete=True,
+        abstraction_level="national",
+    )
+
+    # aggregate at each level of abstraction
+    organisation_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
+    trust_kpis = aggregate_all_eligible_kpi_fields(trust_level)
+    icb_kpis = aggregate_all_eligible_kpi_fields(icb_level)
+    nhs_kpis = aggregate_all_eligible_kpi_fields(nhs_level)
+    open_uk_kpis = aggregate_all_eligible_kpi_fields(open_uk_level)
+    country_kpis = aggregate_all_eligible_kpi_fields(country_level)
+    national_kpis = aggregate_all_eligible_kpi_fields(national_level)
+
+    # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
+    # and has very little overhead
+    organisation = Organisation.objects.get(pk=organisation_id)
+    kpis = KPI.objects.create(
+        organisation=organisation,
+        parent_trust=organisation.ParentOrganisation_OrganisationName,
+    )
+
+    template_name = "epilepsy12/partials/kpis/kpis.html"
+    context = {
+        "organisation": organisation,
+        "organisation_kpis": organisation_kpis,
+        "trust_kpis": trust_kpis,
+        "icb_kpis": icb_kpis,
+        "nhs_kpis": nhs_kpis,
+        "open_uk_kpis": open_uk_kpis,
+        "country_kpis": country_kpis,
+        "national_kpis": national_kpis,
+        "kpis": kpis,
+        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+    }
+
+    # remove the temporary instance as otherwise would contribute to totals
+    kpis.delete()
+
+    response = render(request=request, template_name=template_name, context=context)
+
     return response
 
 

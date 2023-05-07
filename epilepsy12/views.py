@@ -36,6 +36,9 @@ user = get_user_model()
 
 
 def epilepsy12_login(request):
+    """
+    Callback from the login form
+    """
     if request.method == "POST":
         form = Epilepsy12LoginForm(request, data=request.POST)
 
@@ -87,8 +90,15 @@ def epilepsy12_login(request):
 
 
 def index(request):
+    """
+    This is the landing page for all site visitors. Any navigation on from here requires the user to login,
+    except the children and families page which requires an organisation id to filter against. An organisation is chosen
+    here at random, but in future might be chosen based on the location of the visitor's ISP.
+    """
+    random_organisation = Organisation.objects.order_by("?").first()
     template_name = "epilepsy12/epilepsy12index.html"
-    return render(request, template_name, {})
+    context = {"organisation": random_organisation}
+    return render(request=request, template_name=template_name, context=context)
 
 
 def database(request):
@@ -136,12 +146,24 @@ def log_list(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-def patient(request):
-    template_name = "epilepsy12/patient.html"
-    return render(request, template_name, {})
+def open_access(request, organisation_id):
+    """
+    Landing page for children and families - takes an organisation_id to present
+    the KPI table for that organisation, as well as load the dropdown with all organisations.
+    """
+    template_name = "epilepsy12/open_access.html"
+    organisation = Organisation.objects.get(pk=organisation_id)
+    context = {
+        "organisation": organisation,
+        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+    }
+    return render(request, template_name, context=context)
 
 
 def documentation(request):
+    """
+    Deprecated - docs are now hosted elsewhere
+    """
     template_name = "epilepsy12/docs.html"
     return render(request, template_name, {})
 
@@ -474,6 +496,10 @@ def download(request, model_name):
 
 
 def return_choice_for_instance_and_value(model, field, choice_value):
+    """
+    Helper function when cleaning the data for downloadable csv files of the different models,
+    accessed via the Frida button.
+    """
     query_object = {field: choice_value}
     temp_instance = model(**query_object)
     choice = getattr(temp_instance, "get_{}_display".format(field))()
@@ -503,19 +529,21 @@ def rcpch_403(request, exception):
 
 
 def redirect_403(request):
-    # return the custom 403 template. There is not context to add.
+    # return the custom 403 template. There is no context to add.
     return render(
         request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}
     )
 
 
 def rcpch_404(request, exception):
+    # return the custom 404 template. There is no context to add.
     return render(
         request, template_name="epilepsy12/error_pages/rcpch_404.html", context={}
     )
 
 
 def rcpch_500(request):
+    # return the custom 500 template. There is no context to add.
     return render(
         request, template_name="epilepsy12/error_pages/rcpch_500.html", status=500
     )
