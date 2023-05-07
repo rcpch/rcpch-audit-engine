@@ -1,5 +1,10 @@
 {% load epilepsy12_template_tags %}
-
+{% comment %}
+This template is the kpis table and is called from selected_trust_kpis and selected_trust_kpis_open, that latter for 
+open access. The open_access flag passed in from both endpoints denotes this.
+Currently the aggregation queries are run with every page load, but in future, the open_access results
+will be persisted and run as a cron job once a day.
+{% endcomment %}
 
     <div class="sixteen wide column">
         <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
@@ -10,6 +15,7 @@
                     <p>{{organisation.OrganisationName}} ({{ organisation.ParentOrganisation_OrganisationName }})</p>
                     <!-- </div>     -->
                 </div>
+                {% if not open_access %}
                 <button 
                     class='ui right floated rcpch_primary button'
                     hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 
@@ -19,6 +25,7 @@
                     Refresh
                     <i class="htmx-indicator spinner loading icon" id="spinner"></i>
                 </button>
+                {% endif %}
             </div>
         </div>
 

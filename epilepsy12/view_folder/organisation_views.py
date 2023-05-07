@@ -112,8 +112,6 @@ def organisation_reports(request):
     else:
         total_percent_trust = 0
 
-    org_list = Organisation.objects.order_by("OrganisationName").all()
-
     return render(
         request=request,
         template_name=template_name,
@@ -356,6 +354,7 @@ def selected_trust_kpis(request, organisation_id):
         "country_kpis": country_kpis,
         "national_kpis": national_kpis,
         "kpis": kpis,
+        "open_access": False,
     }
 
     # remove the temporary instance as otherwise would contribute to totals
@@ -450,6 +449,7 @@ def selected_trust_kpis_open(request, organisation_id):
         "national_kpis": national_kpis,
         "kpis": kpis,
         "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "open_access": True,
     }
 
     # remove the temporary instance as otherwise would contribute to totals
