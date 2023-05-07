@@ -71,24 +71,36 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == "icb":
-        q_filter = (
-            Q(
-                site__organisation__integrated_care_board__ODS_ICB_Code=organisation_instance.integrated_care_board.ODS_ICB_Code
+        if organisation_instance.integrated_care_board is not None:
+            """
+            Wales has no ICBs
+            """
+            q_filter = (
+                Q(
+                    site__organisation__integrated_care_board__ODS_ICB_Code=organisation_instance.integrated_care_board.ODS_ICB_Code
+                )
+                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
             )
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        )
+        else:
+            return all_cases_for_cohort
     elif abstraction_level == "nhs_region":
-        q_filter = (
-            Q(
-                site__organisation__nhs_region__NHS_Region_Code=organisation_instance.nhs_region.NHS_Region_Code
+        """
+        Wales has no NHS regions
+        """
+        if organisation_instance.nhs_region is not None:
+            q_filter = (
+                Q(
+                    site__organisation__nhs_region__NHS_Region_Code=organisation_instance.nhs_region.NHS_Region_Code
+                )
+                & Q(
+                    site__organisation__ons_region__ons_country__Country_ONS_Name=organisation_instance.ons_region.ons_country.Country_ONS_Name
+                )
+                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
             )
-            & Q(
-                site__organisation__ons_region__ons_country__Country_ONS_Name=organisation_instance.ons_region.ons_country.Country_ONS_Name
-            )
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        )
+        else:
+            return all_cases_for_cohort
     elif abstraction_level == "open_uk":
         q_filter = (
             Q(

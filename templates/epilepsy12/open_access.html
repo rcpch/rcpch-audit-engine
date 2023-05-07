@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class='ui rcpch container'>
+
+    {% url 'open_access' organisation_id=organisation.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list test_positive=organisation.pk hx_post=hx_post hx_name="selected_trust_kpis_open" hx_target="#organisation_summary" %}
+
+    <div class="ui rcpch_info message">
+        This represents all the Key Performance Indicators for the selected hospital
+    </div>
+    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+
+    <div 
+        id="organisation_summary"
+        hx-trigger="load"
+        hx-get="{% url 'selected_trust_kpis_open' organisation_id=organisation.pk %}"
+        hx-target="#organisation_summary"
+        hx-swap="innerHTML"
+    >
+
+    </div>
+</div>
+{% endblock %}

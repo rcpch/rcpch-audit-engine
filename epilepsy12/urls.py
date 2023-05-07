@@ -103,6 +103,11 @@ urlpatterns = [
         name="selected_trust_kpis",
     ),
     path(
+        "selected_trust/<int:organisation_id>/kpis/open",
+        views.selected_trust_kpis_open,
+        name="selected_trust_kpis_open",
+    ),
+    path(
         "selected_trust_kpis/<int:organisation_id>/select_kpi",
         views.selected_trust_select_kpi,
         name="selected_trust_select_kpi",
@@ -131,7 +136,11 @@ urlpatterns = [
     path("epilepsy_context/<int:case_id>", epilepsy_context, name="epilepsy_context"),
     path("management/<int:case_id>", management, name="management"),
     path("docs", views.documentation, name="docs"),
-    path("patient", views.patient, name="patient"),
+    path(
+        "organisation/<int:organisation_id>/open_access",
+        views.open_access,
+        name="open_access",
+    ),
     path("investigations/<int:case_id>", investigations, name="investigations"),
     path(
         "organisation/<int:organisation_id>/epilepsy12_user_list/",
