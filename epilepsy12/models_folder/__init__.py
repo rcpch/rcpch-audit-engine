@@ -1,4 +1,3 @@
-
 # These models represent the individual fields that clinicians must score
 # and drive the forms and templates in the audit.
 # Their division into discrete files is purely for semantic reasons as
@@ -38,7 +37,10 @@ from .kpi import KPI
 from .visitactivity import VisitActivity
 
 # These are helper classes to support the functioning of each model. Do not need to be globally available
-from .time_and_user_abstract_base_classes import TimeStampAbstractBaseClass, UserStampAbstractBaseClass
+from .time_and_user_abstract_base_classes import (
+    TimeStampAbstractBaseClass,
+    UserStampAbstractBaseClass,
+)
 from .help_text_mixin import HelpTextMixin
 
 # clinical entities seeded from clinical APIs (eg SNOMED CT)
@@ -62,3 +64,9 @@ from .entities.ons_region_entity import ONSRegionEntity
 from .entities.ons_country_entity import ONSCountryEntity
 from .entities.nhs_region_entity import NHSRegionEntity
 from .entities.organisation import Organisation
+
+# maps
+from .entities.nhs_england_region_boundaries import NHSEnglandRegionBoundaries
+from .entities.integrated_care_board_boundaries import IntegratedCareBoardBoundaries
+from .entities.local_health_board_boundaries import LocalHealthBoardBoundaries
+from .entities.country_boundaries import CountryBoundaries
