@@ -229,7 +229,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
-
 # Optional Logging for Debugging Purposes (esp with DEBUG=False)
 
 # LOGGING = {
