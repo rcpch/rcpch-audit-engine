@@ -29,6 +29,7 @@ from ..general_functions import (
     value_from_key,
     calculate_kpi_average,
 )
+from ..constants import colors
 
 
 @login_required
@@ -111,6 +112,8 @@ def organisation_reports(request):
         )
     else:
         total_percent_trust = 0
+
+    org_list = Organisation.objects.order_by('OrganisationName').all()
 
     return render(
         request=request,
@@ -360,7 +363,8 @@ def selected_trust_kpis(request, organisation_id):
     # remove the temporary instance as otherwise would contribute to totals
     kpis.delete()
 
-    response = render(request=request, template_name=template_name, context=context)
+    response = render(
+        request=request, template_name=template_name, context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
@@ -560,7 +564,8 @@ def selected_trust_select_kpi(request, organisation_id):
 
     # aggregate at each level of abstraction
     # organisation_level.aggregate(**aggregation_fields)
-    organisation_kpi = aggregate_all_eligible_kpi_fields(organisation_level, kpi_name)
+    organisation_kpi = aggregate_all_eligible_kpi_fields(
+        organisation_level, kpi_name)
     # trust_level.aggregate(**aggregation_fields)
     trust_kpi = aggregate_all_eligible_kpi_fields(trust_level, kpi_name)
     # icb_level.aggregate(**aggregation_fields)
@@ -575,7 +580,9 @@ def selected_trust_select_kpi(request, organisation_id):
     national_kpi = aggregate_all_eligible_kpi_fields(national_level, kpi_name)
 
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data["cohort"], abstraction_level="open_uk", kpi_measure=kpi_name
+        cohort=cohort_data["cohort"], 
+        abstraction_level="open_uk", 
+        kpi_measure=kpi_name
     )
     open_uk_avg = calculate_kpi_average(
         decimal_places=1,
@@ -631,7 +638,6 @@ def selected_trust_select_kpi(request, organisation_id):
         "national_kpi": national_kpi[kpi_name],
         "total_national_kpi_cases": national_kpi["total_number_of_cases"],
         "open_uk": all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-        # "open_uk_data_colors": [color for color in all_aggregated_kpis_by_open_uk_region_in_current_cohort],
         "open_uk_avg": open_uk_avg,
         "open_uk_title": f"{kpi_value} by OPEN UK Region",
         "open_uk_id": "open_uk_id",
@@ -647,6 +653,11 @@ def selected_trust_select_kpi(request, organisation_id):
         "country_avg": country_avg,
         "country_title": f"{kpi_value} by Country",
         "country_id": "country_id",
+        # ADD COLOR PER ABSTRACTION
+        'open_uk_color' : colors.RCPCH_RED_LIGHT_TINT1,
+        'icb_color' : colors.RCPCH_ORANGE_LIGHT_TINT1,
+        'nhs_region_color' : colors.RCPCH_YELLOW_LIGHT_TINT1,
+        'country_color' : colors.RCPCH_STRONG_GREEN_LIGHT_TINT1,
     }
 
     template_name = "epilepsy12/partials/organisation/metric.html"

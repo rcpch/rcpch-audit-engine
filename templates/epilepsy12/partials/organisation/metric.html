@@ -121,17 +121,17 @@
 </div>
 <div class='ui grid container'>
     <div class='sixteen wide right fluid column'>
-        <div id="open_uk_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=open_uk data_title=open_uk_title data_id=open_uk_id avg_pct=open_uk_avg  %}
-        </div>
         <div id="icb_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=icb data_title=icb_title data_id=icb_id avg_pct=icb_avg %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=icb data_title=icb_title data_id=icb_id avg_pct=icb_avg abstraction_color=icb_color %}
+        </div>
+        <div id="open_uk_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=open_uk data_title=open_uk_title data_id=open_uk_id avg_pct=open_uk_avg abstraction_color=open_uk_color %}
         </div>
         <div id="nhs_region_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=nhs_region data_title=nhs_region_title data_id=nhs_region_id avg_pct=nhs_region_avg %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=nhs_region data_title=nhs_region_title data_id=nhs_region_id avg_pct=nhs_region_avg abstraction_color=nhs_region_color %}
         </div>
         <div id="country_kpi_ranking" class="row">
-            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id avg_pct=country_avg %}
+            {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id avg_pct=country_avg abstraction_color=country_color %}
         </div>
     </div>
 
