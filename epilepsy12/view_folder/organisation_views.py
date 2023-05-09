@@ -654,10 +654,10 @@ def selected_trust_select_kpi(request, organisation_id):
         "country_title": f"{kpi_value} by Country",
         "country_id": "country_id",
         # ADD COLOR PER ABSTRACTION
-        'open_uk_color' : colors.RCPCH_RED_LIGHT_TINT1,
-        'icb_color' : colors.RCPCH_ORANGE_LIGHT_TINT1,
-        'nhs_region_color' : colors.RCPCH_YELLOW_LIGHT_TINT1,
-        'country_color' : colors.RCPCH_STRONG_GREEN_LIGHT_TINT1,
+        'icb_color' : colors.RCPCH_AQUA_GREEN,
+        'open_uk_color' : colors.RCPCH_LIGHT_BLUE,
+        'nhs_region_color' : colors.RCPCH_STRONG_BLUE,
+        'country_color' : colors.RCPCH_DARK_BLUE,
     }
 
     template_name = "epilepsy12/partials/organisation/metric.html"
