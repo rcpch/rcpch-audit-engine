@@ -2,18 +2,16 @@ import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+
+# RCPCH IMPORTS
 from epilepsy12.models import Organisation
-
-
+from epilepsy12.management.commands.create_groups import groups_seeder
 
 @pytest.mark.django_db
 def test_create_e12user_should_pass():
-   
-    from epilepsy12.management.commands.create_groups import create_groups
     
-    create_groups()
-    
-    print(f"{Group.objects.all() = }")
+    # this should be moved into fixture, session wide scope
+    groups_seeder(run_create_groups=True)
     
     db = get_user_model()
     user = db.objects.create_user(
@@ -25,7 +23,15 @@ def test_create_e12user_should_pass():
             role=1,
             organisation_employer = Organisation.objects.first()
         )
-    print(f"{user=}")
+    
+    test_user = db.objects.first()
+    assert db.objects.count() == 1
+    assert all([
+        test_user.email=="testuser@epilepsy12.com",
+        user.check_password('epilepsy12password'),
+        test_user.first_name=="Henry",
+        test_user.surname=="Gastaut", 
+    ])
     
 
     
