@@ -1,4 +1,5 @@
 # Python/Django imports
+from time import time
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
@@ -113,55 +114,49 @@ def organisation_reports(request):
     else:
         total_percent_trust = 0
 
-    org_list = Organisation.objects.order_by('OrganisationName').all()
+    context = {
+        "user": request.user,
+        "selected_organisation": selected_organisation,
+        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
+        "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
+            selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_sex": cases_aggregated_by_sex(
+            selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
+            selected_organisation=selected_organisation
+        ),
+        "percent_completed_organisation": total_percent_organisation,
+        "percent_completed_trust": total_percent_trust,
+        "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
+        "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_trust,
+        "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
+        "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
+        "cohort_data": cohort_data,
+        # 'all_models': all_models,
+        "model_list": (
+            "allregisteredcases",
+            "registration",
+            "firstpaediatricassessment",
+            "epilepsycontext",
+            "multiaxialdiagnosis",
+            "assessment",
+            "investigations",
+            "management",
+            "site",
+            "case",
+            "epilepsy12user",
+            "organisation",
+            "comorbidity",
+            "episode",
+            "syndrome",
+            "keyword",
+        ),
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+    }
 
-    return render(
-        request=request,
-        template_name=template_name,
-        context={
-            "user": request.user,
-            "selected_organisation": selected_organisation,
-            "organisation_list": Organisation.objects.order_by(
-                "OrganisationName"
-            ).all(),
-            "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
-                selected_organisation=selected_organisation
-            ),
-            "cases_aggregated_by_sex": cases_aggregated_by_sex(
-                selected_organisation=selected_organisation
-            ),
-            "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
-                selected_organisation=selected_organisation
-            ),
-            "percent_completed_organisation": total_percent_organisation,
-            "percent_completed_trust": total_percent_trust,
-            "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
-            "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_trust,
-            "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
-            "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
-            "cohort_data": cohort_data,
-            # 'all_models': all_models,
-            "model_list": (
-                "allregisteredcases",
-                "registration",
-                "firstpaediatricassessment",
-                "epilepsycontext",
-                "multiaxialdiagnosis",
-                "assessment",
-                "investigations",
-                "management",
-                "site",
-                "case",
-                "epilepsy12user",
-                "organisation",
-                "comorbidity",
-                "episode",
-                "syndrome",
-                "keyword",
-            ),
-            "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        },
-    )
+    return render(request=request, template_name=template_name, context=context)
 
 
 @login_required
@@ -187,6 +182,10 @@ def selected_organisation_summary(request):
             case_complete=True,
             abstraction_level="organisation",
         ).count()
+    )
+
+    print(
+        f"{count_of_current_cohort_registered_completed_cases_in_this_organisation} in this organisation"
     )
     # query to return all completed E12 cases in the current cohort in this organisation trust
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
@@ -220,8 +219,8 @@ def selected_organisation_summary(request):
         total_percent_organisation = (
             round(
                 (
-                    count_of_current_cohort_registered_cases_in_this_organisation
-                    / count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    / count_of_current_cohort_registered_cases_in_this_organisation
                 )
             )
             * 10
@@ -233,8 +232,8 @@ def selected_organisation_summary(request):
         total_percent_trust = (
             round(
                 (
-                    count_of_current_cohort_registered_cases_in_this_organisation
-                    / count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    / count_of_current_cohort_registered_cases_in_this_organisation
                 )
             )
             * 10
@@ -242,33 +241,33 @@ def selected_organisation_summary(request):
     else:
         total_percent_trust = 0
 
+    context = {
+        "user": request.user,
+        "selected_organisation": selected_organisation,
+        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
+        "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
+            selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_sex": cases_aggregated_by_sex(
+            selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
+            selected_organisation=selected_organisation
+        ),
+        "percent_completed_organisation": total_percent_organisation,
+        "percent_completed_trust": total_percent_trust,
+        "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
+        "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
+        "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
+        "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
+        "cohort_data": cohort_data,
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+    }
+
     return render(
         request=request,
         template_name="epilepsy12/partials/selected_organisation_summary.html",
-        context={
-            "user": request.user,
-            "selected_organisation": selected_organisation,
-            "organisation_list": Organisation.objects.order_by(
-                "OrganisationName"
-            ).all(),
-            "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
-                selected_organisation=selected_organisation
-            ),
-            "cases_aggregated_by_sex": cases_aggregated_by_sex(
-                selected_organisation=selected_organisation
-            ),
-            "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
-                selected_organisation=selected_organisation
-            ),
-            "percent_completed_organisation": total_percent_organisation,
-            "percent_completed_trust": total_percent_trust,
-            "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
-            "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
-            "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
-            "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
-            "cohort_data": cohort_data,
-            "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        },
+        context=context,
     )
 
 
@@ -363,13 +362,13 @@ def selected_trust_kpis(request, organisation_id):
     # remove the temporary instance as otherwise would contribute to totals
     kpis.delete()
 
-    response = render(
-        request=request, template_name=template_name, context=context)
+    response = render(request=request, template_name=template_name, context=context)
 
     # trigger a GET request from the steps template
     trigger_client_event(
         response=response, name="registration_active", params={}
     )  # reloads the form to show the active steps
+
     return response
 
 
@@ -378,7 +377,6 @@ def selected_trust_kpis_open(request, organisation_id):
     Open access endpoint for KPIs table
     """
 
-    #
     organisation = Organisation.objects.get(pk=organisation_id)
     cohort_data = get_current_cohort_data()
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
@@ -564,8 +562,7 @@ def selected_trust_select_kpi(request, organisation_id):
 
     # aggregate at each level of abstraction
     # organisation_level.aggregate(**aggregation_fields)
-    organisation_kpi = aggregate_all_eligible_kpi_fields(
-        organisation_level, kpi_name)
+    organisation_kpi = aggregate_all_eligible_kpi_fields(organisation_level, kpi_name)
     # trust_level.aggregate(**aggregation_fields)
     trust_kpi = aggregate_all_eligible_kpi_fields(trust_level, kpi_name)
     # icb_level.aggregate(**aggregation_fields)
@@ -580,9 +577,7 @@ def selected_trust_select_kpi(request, organisation_id):
     national_kpi = aggregate_all_eligible_kpi_fields(national_level, kpi_name)
 
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data["cohort"], 
-        abstraction_level="open_uk", 
-        kpi_measure=kpi_name
+        cohort=cohort_data["cohort"], abstraction_level="open_uk", kpi_measure=kpi_name
     )
     open_uk_avg = calculate_kpi_average(
         decimal_places=1,
@@ -654,10 +649,10 @@ def selected_trust_select_kpi(request, organisation_id):
         "country_title": f"{kpi_value} by Country",
         "country_id": "country_id",
         # ADD COLOR PER ABSTRACTION
-        'icb_color' : colors.RCPCH_AQUA_GREEN,
-        'open_uk_color' : colors.RCPCH_LIGHT_BLUE,
-        'nhs_region_color' : colors.RCPCH_STRONG_BLUE,
-        'country_color' : colors.RCPCH_DARK_BLUE,
+        "icb_color": colors.RCPCH_AQUA_GREEN,
+        "open_uk_color": colors.RCPCH_LIGHT_BLUE,
+        "nhs_region_color": colors.RCPCH_STRONG_BLUE,
+        "country_color": colors.RCPCH_DARK_BLUE,
     }
 
     template_name = "epilepsy12/partials/organisation/metric.html"

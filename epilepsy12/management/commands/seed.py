@@ -120,7 +120,7 @@ def run_dummy_cases_seed():
     """
 
     # for index in range(len(DUMMY_NAMES) - 1): # commented out line populates all the names, not just first 20
-    for index in range(0, 20):  # first 20 names
+    for index in range(0, 99):  # first 20 names
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         nhs_number = randint(1000000000, 9999999999)
         first_name = DUMMY_NAMES[index]["firstname"]
@@ -135,7 +135,7 @@ def run_dummy_cases_seed():
         ethnicity = choice(ETHNICITIES)[0]
 
         # get a random organisation
-        if index < 11:
+        if index < 50:
             # organisation = random_organisations[index] # line used if populating random hospitals
             organisation = Organisation.objects.get(ODSCode=random_organisations[0])
         else:
