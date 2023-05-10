@@ -118,9 +118,9 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     def length_of_treatment(self):
         "Returns length of treatment if dates supplied"
         if (self.antiepilepsy_medicine_start_date and self.antiepilepsy_medicine_stop_date):
-            if (self.antiepilepsy_medicine_stop_date > self.antiepilepsy_medicine_start_date):
+            if (self.antiepilepsy_medicine_stop_date <= self.antiepilepsy_medicine_start_date):
                 raise Exception(
-                    "The medication stop date cannot be before the medication start date.")
+                    "The medication stop date cannot be before or the same as the medication start date.")
 
             else:
                 difference = (self.antiepilepsy_medicine_stop_date -
