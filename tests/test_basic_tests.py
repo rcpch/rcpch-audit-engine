@@ -4,14 +4,24 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
 # RCPCH IMPORTS
-from epilepsy12.models import Organisation
-from epilepsy12.management.commands.create_groups import groups_seeder
+from epilepsy12.models import Organisation, Case
+
+@pytest.mark.django_db
+def test_groups_exist(seeds_groups):
+    
+    groups = Group.objects.count()
+    print(groups)
+    assert groups > 0
+
+@pytest.mark.django_db
+def test_cases_exist():
+    
+    cases = Case.objects.count()
+    print(cases)
+    assert cases > 0
 
 @pytest.mark.django_db
 def test_create_e12user_should_pass():
-    
-    # this should be moved into fixture, session wide scope
-    groups_seeder(run_create_groups=True)
     
     db = get_user_model()
     user = db.objects.create_user(
@@ -31,10 +41,7 @@ def test_create_e12user_should_pass():
         user.check_password('epilepsy12password'),
         test_user.first_name=="Henry",
         test_user.surname=="Gastaut", 
-    ])
-    
-
-    
+    ])   
 
 @pytest.mark.django_db
 def test_index_request_should_pass(client):
