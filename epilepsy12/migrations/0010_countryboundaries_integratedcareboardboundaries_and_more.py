@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ("globalid", models.CharField(max_length=38)),
                 (
                     "geom",
-                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326),
+                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=27700),
                 ),
             ],
         ),
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ("globalid", models.CharField(max_length=38)),
                 (
                     "geom",
-                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326),
+                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=27700),
                 ),
             ],
         ),
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
                 ("globalid", models.CharField(max_length=38)),
                 (
                     "geom",
-                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326),
+                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=27700),
                 ),
             ],
         ),
@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
                 ("globalid", models.CharField(max_length=38)),
                 (
                     "geom",
-                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326),
+                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=27700),
                 ),
             ],
         ),

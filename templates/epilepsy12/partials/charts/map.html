@@ -1,0 +1,22 @@
+{% load leaflet_tags %}
+
+{% leaflet_map "main" callback="our_layers" %}
+
+<script>
+    
+    function our_layers(map,options){
+        // var datasets = new L.GeoJSON.AJAX("{% url 'uk_shapes' %}",{
+        // });
+        datasets=L.geoJSON(JSON.parse('{{nhsregion_tiles|escapejs}}'), {
+                        style: function (feature) {
+                            return {
+                                color: '#11a7f2'
+                            };
+                        }
+                    }).bindPopup(function (layer) {
+                        return layer.feature.properties.nhser20nm;
+                    })
+        datasets.addTo(map);
+    }
+
+</script>

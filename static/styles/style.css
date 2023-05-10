@@ -1919,3 +1919,9 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .padded_field {
   padding-top: 20px;
 }
+
+#nhs_regions_map{
+  height:500px;
+  width:100%;
+  border: solid 3px var(--rcpch_light_blue);
+}

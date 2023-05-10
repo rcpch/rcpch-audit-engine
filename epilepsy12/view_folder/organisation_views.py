@@ -1,7 +1,10 @@
 # Python/Django imports
+import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.serializers import serialize
+from django.http import HttpResponse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
@@ -9,10 +12,7 @@ from django_htmx.http import HttpResponseClientRedirect
 # E12 imports
 from ..decorator import user_may_view_this_organisation
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
-from epilepsy12.models import (
-    Organisation,
-    KPI,
-)
+from epilepsy12.models import Organisation, KPI, NHSEnglandRegionBoundaries
 from ..common_view_functions import (
     return_selected_organisation,
     sanction_user,
@@ -45,6 +45,13 @@ def organisation_reports(request):
     with an organisation. If they somehow gain access, have no organisation affiliation but are not an RCPCH
     member or a superuser, access is denied
     """
+    nhsregion_tiles = serialize(
+        "geojson",
+        NHSEnglandRegionBoundaries.objects.all(),
+    )
+    newnhsregion_tiles = json.loads(nhsregion_tiles)
+    newnhsregion_tiles.pop("crs", None)
+    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
 
     # this function returns the users organisation or the first in list depending on affilation
     # or raises a permission error
@@ -157,6 +164,7 @@ def organisation_reports(request):
                 "keyword",
             ),
             "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+            "nhsregion_tiles": newnhsregion_tiles,
         },
     )
 
@@ -267,6 +275,20 @@ def selected_organisation_summary(request):
             "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
         },
     )
+
+
+def uk_shapes(request):
+    nhsregion_tiles = serialize(
+        "geojson",
+        NHSEnglandRegionBoundaries.objects.filter(
+            nhser20nm="North East and Yorkshire"
+        ).all(),
+    )
+    # strip the crs element
+    newnhsregion_tiles = json.loads(nhsregion_tiles)
+    newnhsregion_tiles.pop("crs", None)
+    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
+    return HttpResponse(newnhsregion_tiles, content_type="application/json")
 
 
 @login_required
