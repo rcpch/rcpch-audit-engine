@@ -238,7 +238,7 @@ LEAFLET_CONFIG = {
     "DEFAULT_CENTER": (54.9182901, -8.0),
     "DEFAULT_ZOOM": 4,
     "MIN_ZOOM": 3,
-    "MAX_ZOOM": 18,
+    "MAX_ZOOM": 12,
     "DEFAULT_PRECISION": 6,
     "ATTRIBUTION_PREFIX": "ONS data, Carto, OpenStreetMap",
 }
