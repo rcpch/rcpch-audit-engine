@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group
 # RCPCH IMPORTS
 from epilepsy12.models import Organisation, Case
 
+@pytest.mark.workshop
 @pytest.mark.django_db
 def test_groups_exist(seeder):
     
@@ -13,13 +14,15 @@ def test_groups_exist(seeder):
     print(groups)
     assert groups > 0
 
+@pytest.mark.workshop
 @pytest.mark.django_db
 def test_cases_exist():
     
     cases = Case.objects.count()
     print(cases)
     assert cases > 0
-
+    
+@pytest.mark.workshop
 @pytest.mark.django_db
 def test_create_e12user_should_pass():
     
@@ -43,6 +46,7 @@ def test_create_e12user_should_pass():
         test_user.surname=="Gastaut", 
     ])   
 
+@pytest.mark.workshop
 @pytest.mark.django_db
 def test_index_request_should_pass(client):
     url = reverse("index")
@@ -52,7 +56,7 @@ def test_index_request_should_pass(client):
     assert response.status_code == 200
     assert response.templates[0].name == EXPECTED_TEMPLATE_NAME
 
-
+@pytest.mark.workshop
 @pytest.mark.django_db
 def test_organisation_request_NOTAUTH_should_pass(client):
     """
