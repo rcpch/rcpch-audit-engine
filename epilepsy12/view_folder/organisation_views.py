@@ -12,7 +12,13 @@ from django_htmx.http import HttpResponseClientRedirect
 # E12 imports
 from ..decorator import user_may_view_this_organisation
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
-from epilepsy12.models import Organisation, KPI, NHSEnglandRegionBoundaries
+from epilepsy12.models import (
+    Organisation,
+    KPI,
+    NHSEnglandRegionBoundaries,
+    IntegratedCareBoardBoundaries,
+    CountryBoundaries,
+)
 from ..common_view_functions import (
     return_selected_organisation,
     sanction_user,
@@ -277,18 +283,31 @@ def selected_organisation_summary(request):
     )
 
 
-def uk_shapes(request):
-    nhsregion_tiles = serialize(
+def uk_shapes(request, abstraction_level):
+    """
+    return region shapes request from maps.html depending on abstraction_level
+    ['icb', 'nhs_region', 'country']
+    """
+    if abstraction_level == "nhs_region":
+        object_to_return = NHSEnglandRegionBoundaries
+    elif abstraction_level == "icb":
+        object_to_return = IntegratedCareBoardBoundaries
+    elif abstraction_level == "country":
+        object_to_return = CountryBoundaries
+    else:
+        raise ValueError(f"Cannot return region shape {abstraction_level}")
+
+    # serialize data to geojson
+    tiles = serialize(
         "geojson",
-        NHSEnglandRegionBoundaries.objects.filter(
-            nhser20nm="North East and Yorkshire"
-        ).all(),
+        object_to_return.objects.all(),
     )
     # strip the crs element
-    newnhsregion_tiles = json.loads(nhsregion_tiles)
-    newnhsregion_tiles.pop("crs", None)
-    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
-    return HttpResponse(newnhsregion_tiles, content_type="application/json")
+    deserialized_tiles = json.loads(tiles)
+    deserialized_tiles.pop("crs", None)
+    # reserialize
+    serialized_tiles = json.dumps(deserialized_tiles)
+    return HttpResponse(serialized_tiles, content_type="application/json")
 
 
 @login_required

@@ -163,7 +163,7 @@ urlpatterns = [
         views.edit_epilepsy12_user,
         name="edit_epilepsy12_user",
     ),
-    path("uk_shapes", views.uk_shapes, name="uk_shapes"),
+    path("uk_shapes/<str:abstraction_level>", views.uk_shapes, name="uk_shapes"),
 ]
 
 htmx_paths = [

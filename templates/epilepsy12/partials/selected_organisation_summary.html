@@ -242,7 +242,36 @@
         </div>
         
         <div class="sixteen wide right fluid column">
-            {% include 'epilepsy12/partials/charts/map.html' with nhsregion_tiles=nhsregion_tiles %}
+            <div class="ui three stackable cards">
+                               
+                <div class="ui rcpch_light_blue  card">
+                    <div class="content">
+                        <h3 >Integrated Care Board</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#11a7f2' %}
+                    </div>
+                </div>
+
+                <div class="ui rcpch_light_blue  card">
+                    <div class="content">
+                        <h3 >NHS Region</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_region' abstraction_level_border_colour='#3366cc' %}
+                    </div>
+                </div>
+                
+                <div class="ui rcpch_light_blue  card">
+                    <div class="content">
+                        <h3 >Country</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#e00087' %}
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <div class='sixteen wide right fluid column'>

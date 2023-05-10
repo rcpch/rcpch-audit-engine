@@ -1,21 +1,20 @@
 {% load leaflet_tags %}
 
-{% leaflet_map "main" callback="our_layers" %}
+{% leaflet_map "{{abstraction_level}}" callback="our_layers" %}
 
 <script>
     
     function our_layers(map,options){
-        // var datasets = new L.GeoJSON.AJAX("{% url 'uk_shapes' %}",{
-        // });
-        datasets=L.geoJSON(JSON.parse('{{nhsregion_tiles|escapejs}}'), {
+        var datasets = new L.GeoJSON.AJAX("{% url 'uk_shapes' abstraction_level=abstraction_level %}",{
                         style: function (feature) {
                             return {
-                                color: '#11a7f2'
+                                color: '{{abstraction_level_border_colour}}'
                             };
                         }
                     }).bindPopup(function (layer) {
                         return layer.feature.properties.nhser20nm;
-                    })
+                    });
+        // datasets=L.geoJSON(JSON.parse('{{nhsregion_tiles|escapejs}}'), )
         datasets.addTo(map);
     }
 
