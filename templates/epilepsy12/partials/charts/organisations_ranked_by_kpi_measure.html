@@ -43,19 +43,8 @@
           label: '% achieving measure',
           data: kpi_data_mapped,
           borderWidth: 1,
-          backgroundColor: [
-              rcpch_orange,
-              rcpch_light_orange,
-              rcpch_yellow,
-              rcpch_gold,
-              rcpch_vivid_green,
-              rcpch_aqua_green,
-              rcpch_purple,
-              rcpch_dark_blue,
-              rcpch_strong_green,
-              rcpch_dark_red,
-          ],
-          maxBarThickness: 25
+          backgroundColor: ['{{ abstraction_color }}'],
+          maxBarThickness: 25,
         },
       ]
     },
@@ -94,7 +83,7 @@
           }
         },
         datalabels: {
-            anchor: 'end',
+            anchor: 'center',
             clamp: true,
             align: 'end',
             formatter: function(value) {

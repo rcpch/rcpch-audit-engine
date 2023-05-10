@@ -1919,3 +1919,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .padded_field {
   padding-top: 20px;
 }
+
+.ui.card.clickable_card:hover {
+  cursor: pointer;
+}

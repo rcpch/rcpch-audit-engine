@@ -51,13 +51,8 @@ from ...general_functions import (
     fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
     ons_region_for_postcode,
 )
-from .create_groups import (
-    create_groups,
-    add_permissions_to_existing_groups,
-    delete_and_reallocate_permissions,
-)
+from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
-
 
 class Command(BaseCommand):
     help = "seed database with organisation trust data for testing and development."
@@ -76,10 +71,10 @@ class Command(BaseCommand):
             run_registrations()
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
-            create_groups()
+            groups_seeder(run_create_groups=True)
         elif options["mode"] == "add_permissions_to_existing_groups":
             self.stdout.write("adding permissions to groups...")
-            add_permissions_to_existing_groups()
+            groups_seeder(add_permissions_to_existing_groups=True)
         elif options["mode"] == "delete_all_groups_and_recreate":
             self.stdout.write("deleting all groups/permissions and reallocating...")
         elif options["mode"] == "add_existing_medicines_as_foreign_keys":

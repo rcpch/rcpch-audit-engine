@@ -5501,7 +5501,7 @@ class Migration(migrations.Migration):
                         default=None,
                         help_text={
                             "label": "Is a pregnancy prevention programme indicated?",
-                            "reference": "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+                            "reference": "For girls and young women who are prescribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
                         },
                         null=True,
                     ),
@@ -5513,7 +5513,7 @@ class Migration(migrations.Migration):
                         default=None,
                         help_text={
                             "label": "Has a Valproate - Annual Risk Acknowledgment Form been completed?",
-                            "reference": "For girls and young women who are presecribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
+                            "reference": "For girls and young women who are prescribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
                         },
                         null=True,
                     ),
@@ -5525,7 +5525,7 @@ class Migration(migrations.Migration):
                         default=None,
                         help_text={
                             "label": "Is the Valproate Pregnancy Prevention Programme in place?",
-                            "reference": "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+                            "reference": "For girls and young women who are prescribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
                         },
                         null=True,
                     ),
@@ -6739,7 +6739,7 @@ class Migration(migrations.Migration):
                         default=None,
                         help_text={
                             "label": "Is a pregnancy prevention programme indicated?",
-                            "reference": "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+                            "reference": "For girls and young women who are prescribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
                         },
                         null=True,
                     ),
@@ -6751,7 +6751,7 @@ class Migration(migrations.Migration):
                         default=None,
                         help_text={
                             "label": "Has a Valproate - Annual Risk Acknowledgment Form been completed?",
-                            "reference": "For girls and young women who are presecribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
+                            "reference": "For girls and young women who are prescribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
                         },
                         null=True,
                     ),
@@ -6763,7 +6763,7 @@ class Migration(migrations.Migration):
                         default=None,
                         help_text={
                             "label": "Is the Valproate Pregnancy Prevention Programme in place?",
-                            "reference": "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+                            "reference": "For girls and young women who are prescribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
                         },
                         null=True,
                     ),
