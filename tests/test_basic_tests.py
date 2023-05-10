@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from epilepsy12.models import Organisation, Case
 
 @pytest.mark.django_db
-def test_groups_exist(seeds_groups):
+def test_groups_exist(seeder):
     
     groups = Group.objects.count()
     print(groups)
