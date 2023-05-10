@@ -8,9 +8,9 @@ from epilepsy12.models import (
     )
 
 @pytest.mark.django_db
-def test_visitActivity(e12User_GOSH, client):
+def test_visitActivity(e12User_GOSH, e12User_GOSH_superuser, client):
     """
-    Test that visit activity logging works, using visitActivity fixture
+    Test that visit activity logging works, using e12User_GOSH fixture
     """
     
     client.force_login(e12User_GOSH)
@@ -23,14 +23,6 @@ def test_visitActivity(e12User_GOSH, client):
     
     assert len(visit_activity) == 2
     assert visit_activity[1].activity_datetime > visit_activity[0].activity_datetime
-
-@pytest.mark.django_db
-def test_organisation_view_correct_visit_activity_logging(e12User_GOSH, client):
-    """
-    Test that the message showing on organisation view after user logs is correct.
-    """
-    
-    print(client)
     
     
     
