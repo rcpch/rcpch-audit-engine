@@ -13,8 +13,16 @@ from simple_history.models import HistoricalRecords
 
 # epilepsy12
 from .help_text_mixin import HelpTextMixin
-from ..constants import SEX_TYPE, ETHNICITIES, UNKNOWN_POSTCODES, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT, CAN_CONSENT_TO_AUDIT_PARTICIPATION
-from ..general_functions import imd_for_postcode
+from ..constants import (
+    SEX_TYPE,
+    ETHNICITIES,
+    UNKNOWN_POSTCODES,
+    CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
+    CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
+    CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
+    CAN_CONSENT_TO_AUDIT_PARTICIPATION,
+)
+from ..general_functions import imd_for_postcode, stringify_time_elapsed
 from .time_and_user_abstract_base_classes import *
 
 
@@ -23,7 +31,8 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     This class holds information about each child or young person
     Each case is unique
     """
-    # _id = models.ObjectIdField()
+
+    # _id = models.ObjectIdField() #TODO #488
     locked = models.BooleanField(
         """
         This determines if the case is locked from editing
@@ -38,19 +47,15 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         "Locked",
         default=False,
         blank=True,
-        null=True
-    )
-    locked_at = models.DateTimeField(
-        "Date record locked",
         null=True,
-        blank=True
     )
+    locked_at = models.DateTimeField("Date record locked", null=True, blank=True)
     locked_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="locked by",
         null=True,
-        blank=True
+        blank=True,
     )
     nhs_number = models.CharField(  # the NHS number for England and Wales
         "NHS Number",
@@ -61,7 +66,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         # validators=[MinLengthValidator(  # should be other validation before saving - need to strip out spaces
         #     limit_value=10,
         #     message="The NHS number must be 10 digits long."
-        # )]
+        # )] #TODO #489
     )  # TODO #13 NHS Number must be hidden - use case_uuid as proxy
     first_name = CharField(
         "First name",
@@ -90,15 +95,10 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         max_length=8,
         blank=True,
         null=True,
-        # validators=[validate_postcode]
+        # validators=[validate_postcode] #TODO #490
     )
 
-    ethnicity = CharField(
-        max_length=4,
-        choices=ETHNICITIES,
-        blank=True,
-        null=True
-    )
+    ethnicity = CharField(max_length=4, choices=ETHNICITIES, blank=True, null=True)
 
     index_of_multiple_deprivation_quintile = models.PositiveSmallIntegerField(
         # this is a calculated field - it relies on the availability of the Deprivare server running
@@ -106,17 +106,17 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         "index of multiple deprivation calculated from MySociety data.",
         blank=True,
         editable=False,
-        null=True
+        null=True,
     )
 
     history = HistoricalRecords()
 
     # relationships
     organisations = models.ManyToManyField(
-        'epilepsy12.Organisation',
-        through='Site',
-        related_name='cases',
-        through_fields=('case', 'organisation')
+        "epilepsy12.Organisation",
+        through="Site",
+        related_name="cases",
+        through_fields=("case", "organisation"),
     )
 
     @property
@@ -127,74 +127,30 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     def _history_user(self, value):
         self.updated_by = value
 
-    @property
-    def age(self):
-        today = date.today()
-        calculated_age = relativedelta.relativedelta(
-            today, self.date_of_birth)
-        months = calculated_age.months
-        years = calculated_age.years
-        weeks = calculated_age.weeks
-        days = calculated_age.days
-        final = ''
-        if years == 1:
-            final += f'{calculated_age.years} year'
-            if (months/12) - years == 1:
-                final += f'{months} month'
-            elif (months/12)-years > 1:
-                final += f'{math.floor((months*12)-years)} months'
-            else:
-                return final
+    def age(self, today_date=date.today()):
+        """
+        Returns the age of the patient in years, months and days
+        This is a calculated field
+        Date of birth is required
+        Today's date is optional and defaults to date.today()
+        """
+        return stringify_time_elapsed(self.date_of_birth, today_date)
 
-        elif years > 1:
-            final += f'{calculated_age.years} years'
-            if (months/12) - years == 1:
-                final += f', {months} month'
-            elif (months/12)-years > 1:
-                final += f', {math.floor((months*12)-years)} months'
-            else:
-                return final
-        else:
-            # under a year of age
-            if months == 1:
-                final += f'{months} month'
-            elif months > 0:
-                final += f'{months} months, '
-                if weeks >= (months*4):
-                    if (weeks-(months*4)) == 1:
-                        final += '1 week'
-                    else:
-                        final += f'{math.floor(weeks-(months*4))} weeks'
-            else:
-                if weeks > 0:
-                    if weeks == 1:
-                        final += f'{math.floor(weeks)} week'
-                    else:
-                        final += f'{math.floor(weeks)} weeks'
-                else:
-                    if days > 0:
-                        if days == 1:
-                            final += f'{math.floor(days)} day'
-                        if days > 1:
-                            final += f'{math.floor(days)} days'
-                    else:
-                        final += 'Happy birthday'
-        return final
-
-    def save(
-            self,
-            *args, **kwargs) -> None:
-
+    def save(self, *args, **kwargs) -> None:
         # This field requires the deprivare api to be running
         # note if one of ['ZZ99 3CZ','ZZ99 3GZ','ZZ99 3WZ','ZZ99 3VZ'], represent not known, not known - England,
         # not known - Wales or no fixed abode
         if self.postcode:
             # test if unknown
-            unknown = [code for code in UNKNOWN_POSTCODES if code.replace(
-                ' ', '') == str(self.postcode).replace(' ', '')]
+            unknown = [
+                code
+                for code in UNKNOWN_POSTCODES
+                if code.replace(" ", "") == str(self.postcode).replace(" ", "")
+            ]
             if len(unknown) < 1:
                 self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-                    self.postcode)
+                    self.postcode
+                )
         return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -206,15 +162,15 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         super(Case, self).delete(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'Patient'
-        verbose_name_plural = 'Patients'
+        verbose_name = "Patient"
+        verbose_name_plural = "Patients"
         # custom permissions for Case class
         permissions = [
             CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
             CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
             CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
-            CAN_CONSENT_TO_AUDIT_PARTICIPATION
+            CAN_CONSENT_TO_AUDIT_PARTICIPATION,
         ]
 
     def __str__(self) -> str:
-        return f'{self.first_name} {self.surname}'
+        return f"{self.first_name} {self.surname}"
