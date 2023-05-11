@@ -1,7 +1,6 @@
 import time
 
 import pytest 
-from django.urls import reverse
 
 from epilepsy12.models import (
     VisitActivity,
