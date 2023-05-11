@@ -17,7 +17,6 @@ def stringify_time_elapsed(start_date, end_date):
     """
     if end_date and start_date:
         elapsed = relativedelta(end_date, start_date)
-        print(elapsed)
         # Initialise empty string
         string_delta = ""
 
