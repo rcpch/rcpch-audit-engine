@@ -2,15 +2,24 @@ import pytest
 
 from epilepsy12.models import (
     Syndrome,
+    SyndromeEntity,
+    MultiaxialDiagnosis,
     )
 
 @pytest.mark.django_db
-def test_syndrome(e12User_GOSH, e12User_GOSH_superuser):
+def test_syndrome(e12User_GOSH):
     """
     Tests for the Syndrome model.
+    
+    This should be seeded in migrations.
     """
     
-    
+    # verify syndromes (and their dependent foreign keys) exist
+    assert all([
+        SyndromeEntity.objects.exists(),
+        MultiaxialDiagnosis.objects.exists(),
+        Syndrome.objects.exists(),
+        ])
     
     
     
