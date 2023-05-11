@@ -38,6 +38,7 @@ def new_e12case_factory():
             site_is_primary_centre_of_epilepsy_care=True,
             case=new_case,
         )
+        new_site.save()
 
         return new_case
 
