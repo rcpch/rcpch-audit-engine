@@ -5,7 +5,8 @@ from ...constants import GROUPS
 from epilepsy12.constants.user_types import EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS, EPILEPSY12_AUDIT_TEAM_FULL_ACCESS, EPILEPSY12_AUDIT_TEAM_VIEW_ONLY, PATIENT_ACCESS, TRUST_AUDIT_TEAM_EDIT_ACCESS, TRUST_AUDIT_TEAM_FULL_ACCESS, TRUST_AUDIT_TEAM_VIEW_ONLY, CAN_CONSENT_TO_AUDIT_PARTICIPATION, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE, CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE, CAN_EDIT_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE, CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING, CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT
 from epilepsy12.models import AntiEpilepsyMedicine, Assessment, AuditProgress, Comorbidity, EpilepsyContext, Episode, FirstPaediatricAssessment, Investigations, Management, MultiaxialDiagnosis, Syndrome, Registration, Case, Organisation, Keyword, Site, Epilepsy12User
 
-def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=False):
+def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=False,
+                  verbose=True):
     caseContentType = ContentType.objects.get_for_model(Case)
     registrationContentType = ContentType.objects.get_for_model(
         Registration)
@@ -278,7 +279,7 @@ def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=Fa
 
     if add_permissions_to_existing_groups:
         for group in GROUPS:
-            print(f'...adding permissions to {group}...')
+            if verbose: print(f'...adding permissions to {group}...')
             # add permissions to group
             newGroup = Group.objects.filter(name=group).get()
 
@@ -344,7 +345,7 @@ def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=Fa
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
 
             else:
-                print("Error: group does not exist!")
+                if verbose: print("Error: group does not exist!")
 
     def add_permissions_to_group(permissions_list, group_to_add):
         for permission in permissions_list:
@@ -355,22 +356,22 @@ def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=Fa
                 content_type=content_type
             )
             if group_to_add.permissions.filter(codename=codename).exists():
-                print(f'{codename} already exists for this group. Skipping...')
+                if verbose: print(f'{codename} already exists for this group. Skipping...')
             else:
-                print(f'...Adding {codename}')
+                if verbose: print(f'...Adding {codename}')
                 group_to_add.permissions.add(newPermission)
                 
     if run_create_groups:
         for group in GROUPS:
             if not Group.objects.filter(name=group).exists():
-                print(f'...creating group: {group}')
+                if verbose: print(f'...creating group: {group}')
                 try:
                     newGroup = Group.objects.create(name=group)
                 except Exception as error:
-                    print(error)
+                    if verbose: print(error)
                     error = True
 
-                print(f'...adding permissions to {group}...')
+                if verbose: print(f'...adding permissions to {group}...')
                 # add permissions to group
 
                 if group == EPILEPSY12_AUDIT_TEAM_VIEW_ONLY:
@@ -441,9 +442,10 @@ def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=Fa
                     add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
 
                 else:
-                    print("Error: group does not exist!")
+                    if verbose: print("Error: group does not exist!")
             else:
-                print(f'{group} already exists. Skipping...')
+                if verbose: print(f'{group} already exists. Skipping...')
+        if not verbose: print('groups_seeder(verbose=False), no output, groups seeded.')
 
 
 
@@ -452,5 +454,5 @@ def groups_seeder(run_create_groups=False, add_permissions_to_existing_groups=Fa
     def delete_and_reallocate_permissions():
         for group in GROUPS:
             Group.objects.filter(name=group).delete()
-            print(f'Deleted {group}')
+            if verbose: print(f'Deleted {group}')
         create_groups()

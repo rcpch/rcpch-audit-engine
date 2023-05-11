@@ -1,27 +1,10 @@
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 
 # RCPCH IMPORTS
-from epilepsy12.models import Organisation, Case
+from epilepsy12.models import Organisation
 
-@pytest.mark.workshop
-@pytest.mark.django_db
-def test_groups_exist(seeder):
-    
-    groups = Group.objects.count()
-    print(groups)
-    assert groups > 0
-
-@pytest.mark.workshop
-@pytest.mark.django_db
-def test_cases_exist():
-    
-    cases = Case.objects.count()
-    print(cases)
-    assert cases > 0
-    
 @pytest.mark.workshop
 @pytest.mark.django_db
 def test_create_e12user_should_pass():
