@@ -7,7 +7,7 @@ from epilepsy12.models import (
     )
 
 @pytest.mark.django_db
-def test_syndrome(e12User_GOSH):
+def test_syndrome():
     """
     Tests for the Syndrome model.
     
