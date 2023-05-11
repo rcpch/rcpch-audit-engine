@@ -39,7 +39,7 @@ from ..general_functions import (
 @user_may_view_this_child()
 def register(request, case_id):
     """
-    Called on registration form page load. If first time, creates new Registration objectm KPI object and
+    Called on registration form page load. If first time, creates new Registration object KPI object and
     AuditProgress object. Creates a new Site with selected organisation and associates with this case.
     Returns register.html template.
     """
