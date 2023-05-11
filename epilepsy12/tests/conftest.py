@@ -7,15 +7,9 @@ from epilepsy12.models import (
     Organisation,
 )
 from epilepsy12.constants import user_types
+from epilepsy12.tests.factories import seeder
 
 
-@pytest.mark.django_db
-@pytest.fixture(scope="session")
-def seeder(django_db_setup, django_db_blocker):
-    with django_db_blocker.unblock():
-        call_command("seed", "--mode=seed_dummy_cases")
-        call_command("seed", "--mode=seed_registrations")
-        call_command("seed", "--mode=seed_groups_and_permissions")
 
 @pytest.mark.django_db
 @pytest.fixture()

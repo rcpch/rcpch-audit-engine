@@ -1,0 +1,1 @@
+from .groups_permissions_cases_seed_fixture import seeder
