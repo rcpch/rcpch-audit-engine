@@ -9,9 +9,7 @@ from epilepsy12.models import Case
 @pytest.mark.django_db
 def test_groups__cases_seeded_and_exist(seeder):
     """
-    This does not test anything.
-
-    It simply ensures the groups and cases are seeded for tests.
+    Ensures the groups and cases are seeded for tests.
     """
     
     groups = Group.objects.count()
