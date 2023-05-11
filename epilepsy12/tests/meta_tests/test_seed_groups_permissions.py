@@ -7,7 +7,7 @@ from epilepsy12.models import Case
 
 @pytest.mark.seed
 @pytest.mark.django_db
-def test_groups__cases_seeded_and_exist(seeder):
+def test_groups__cases_seeded_and_exist(groups_cases_seeder):
     """
     Ensures the groups and cases are seeded for tests.
     """

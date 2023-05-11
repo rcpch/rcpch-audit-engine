@@ -6,7 +6,7 @@ from epilepsy12.management.commands.seed import run_dummy_cases_seed, run_regist
 
 @pytest.mark.django_db
 @pytest.fixture(scope="session")
-def seeder(django_db_setup, django_db_blocker):
+def groups_cases_seeder(django_db_setup, django_db_blocker):
     """
     Fixture which runs once per session to seed groups + cases
     verbose=False
