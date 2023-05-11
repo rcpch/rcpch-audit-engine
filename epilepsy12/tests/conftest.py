@@ -1,6 +1,5 @@
 import pytest
 
-# Seeds the groups and cases
 from epilepsy12.tests.factories import (
     groups_cases_seeder, 
     new_e12user_factory

@@ -7,6 +7,9 @@ from epilepsy12.models import Organisation
 @pytest.mark.django_db
 @pytest.fixture()
 def new_e12user_factory():
+    """
+    Factory fn which returns a new user. See definition for available options.
+    """
     def create_e12user(
         email: str,
         password: str = 'password',
