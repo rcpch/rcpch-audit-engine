@@ -1,5 +1,14 @@
-import pytest
+"""
+Tests the Assessment model
+"""
+
+# Standard imports
 from datetime import date
+import pytest
+
+# Third party imports
+
+# RCPCH imports
 from epilepsy12.models import Assessment, Registration
 
 
