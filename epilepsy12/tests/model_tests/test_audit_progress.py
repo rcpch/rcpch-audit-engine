@@ -12,7 +12,7 @@ from epilepsy12.models import AuditProgress, Registration
 
 
 @pytest.mark.django_db
-def test_audit_progress_creation(db, registration):
+def test_audit_progress_creation(db):
     """
     Tests that an empty AuditProgress object can be created and has correct initial values
     """
