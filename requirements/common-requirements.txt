@@ -16,4 +16,3 @@ djangorestframework
 django-simple-history
 django-auto-logout
 pytest-django
-# RCPCH imports
