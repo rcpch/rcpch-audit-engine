@@ -23,7 +23,8 @@ def stringify_time_elapsed(start_date, end_date):
         # >= 1 year return "y years, m months"
         if elapsed.years >= 1:
             string_delta += handle_interval(elapsed.years, "year")
-            string_delta += f", {handle_interval(elapsed.months, 'month')}"
+            if elapsed.months > 0:
+                string_delta += f', {handle_interval(elapsed.months, "month")}'
             return string_delta
 
         # 0 years, 0 - 12 months
@@ -37,7 +38,7 @@ def stringify_time_elapsed(start_date, end_date):
                     string_delta += handle_interval(elapsed.weeks, "week")
                 else:
                     if elapsed.days > 0:
-                        string_delta += f"{handle_interval(elapsed.days, 'day')}"
+                        string_delta += handle_interval(elapsed.days, "day")
                     else:
                         string_delta += "Same day"
             return string_delta
