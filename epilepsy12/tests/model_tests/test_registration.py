@@ -9,7 +9,7 @@ from epilepsy12.models import (
     KPI,
     Site,
     )
-"""
+
 @pytest.fixture()
 def example_audit_progress():
     return AuditProgress.objects.create(
@@ -37,23 +37,19 @@ def example_audit_progress():
         )
 
 @pytest.fixture()
-def example_case():
-    return Case.objects.first()
-
-@pytest.fixture()
-def example_lead_organisation(example_case):
+def example_lead_organisation(e12Case):
     return Site.objects.create(
-            case=example_case,
+            case=e12Case,
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
         )
 
 @pytest.fixture()
-def example_kpi():
+def example_kpi(example_lead_organisation):
     return KPI.objects.create(
  
-            organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
+            organisation=example_lead_organisation.organisation,
+            parent_trust=example_lead_organisation.organisation.ParentOrganisation_OrganisationName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -76,7 +72,7 @@ def example_kpi():
             sudep=0,
             school_individual_healthcare_plan=0,
         )
-"""  
+  
 @pytest.mark.django_db
 def test_registration(e12Case):
     """
@@ -84,8 +80,13 @@ def test_registration(e12Case):
     
     """
     
-    
-    print(f"{e12Case = }")
+    print(e12Case)
+    # print(Site.objects.all())
+    # example_registration = Registration.objects.create(
+    #     case=e12Case,
+    #     audit_progress=example_audit_progress,
+    #     kpi=example_kpi,
+    # )
     
     
     

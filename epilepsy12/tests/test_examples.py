@@ -51,5 +51,3 @@ def test_organisation_request_NOTAUTH_should_pass(client):
 
     assert response.status_code != 200
 
-
-
