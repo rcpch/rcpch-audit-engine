@@ -9,10 +9,19 @@ import pytest
 
 # RCPCH imports
 from epilepsy12.models import AuditProgress, Registration
+from epilepsy12.common_view_functions.recalculate_form_generate_response import test_fields_update_audit_progress
+
+@pytest.fixture
+@pytest.mark.django_db
+def registration(db):
+    """
+    Creates a Registration object and returns it
+    """
+    return Registration.objects.create()
 
 
 @pytest.mark.django_db
-def test_audit_progress_creation(db):
+def test_audit_progress_creation(db, registration):
     """
     Tests that an empty AuditProgress object can be created and has correct initial values
     """
@@ -25,15 +34,11 @@ def test_audit_progress_creation(db):
     assert audit_progress.registration_total_completed_fields == 0
     assert audit_progress.audit_complete is False
 
+    # Standard registration
+    test_fields_update_audit_progress(registration)
 
-# The following are the fields in the AuditProgress model:
-# We need to step through each of these and check that the total_expected_fields
-# and total_completed_fields are updated correctly according to
-# the audit_progress model completeness calculations.
-
-# registration_complete
-# registration_total_expected_fields
-# registration_total_completed_fields
+    assert registration.audit_progress.registration_complete is True
+    assert registration.audit_progress.registration_total_expected_fields == 3
 
 # first_paediatric_assessment_complete
 # first_paediatric_assessment_total_expected_fields
