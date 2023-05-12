@@ -58,3 +58,12 @@ def test_case_save_postcode_obtain_imdq(db, case, organisation):
     case.postcode = "WC1X 8SH"  # RCPCH address
     case.save()
     assert case.index_of_multiple_deprivation_quintile == 4
+
+
+@pytest.mark.django_db
+def test_case_save_invalid_postcode(db, case, organisation):
+    # Tests that the save method works as expected using an invalid postcode
+    case.postcode = "GARBAGE"
+    case.save()
+    assert case.postcode == "GARBAGE"
+    assert case.index_of_multiple_deprivation_quintile is None
