@@ -2,58 +2,46 @@ from dateutil.relativedelta import relativedelta
 import math
 
 
-def calculate_time_elapsed(start_date, end_date):
-    """
-        Calculated field. Returns time elapsed between date EEG requested and performed as a string.
-        """
-    if end_date and start_date:
-        calculated_age = relativedelta(
-            end_date, start_date)
-        months = calculated_age.months
-        years = calculated_age.years
-        weeks = calculated_age.weeks
-        days = calculated_age.days
-        final = ''
-        if years == 1:
-            final += f'{calculated_age.years} year'
-            if (months/12) - years == 1:
-                final += f'{months} month'
-            elif (months/12)-years > 1:
-                final += f'{math.floor((months*12)-years)} months'
-            else:
-                return final
+def handle_interval(interval, singular_name):
+    if interval == 1:
+        return f"1 {singular_name}"
+    elif interval > 1:
+        return f"{interval} {singular_name}s"
+    else:
+        return ""
 
-        elif years > 1:
-            final += f'{calculated_age.years} years'
-            if (months/12) - years == 1:
-                final += f', {months} month'
-            elif (months/12)-years > 1:
-                final += f', {math.floor((months*12)-years)} months'
-            else:
-                return final
+
+def stringify_time_elapsed(start_date, end_date):
+    """
+    Calculated field. Returns time elapsed between two dates as a string.
+    """
+    if end_date and start_date:
+        elapsed = relativedelta(end_date, start_date)
+        # Initialise empty string
+        string_delta = ""
+
+        # >= 1 year return "y years, m months"
+        if elapsed.years >= 1:
+            string_delta += handle_interval(elapsed.years, "year")
+            if elapsed.months > 0:
+                string_delta += f', {handle_interval(elapsed.months, "month")}'
+            return string_delta
+
+        # 0 years, 0 - 12 months
         else:
-            # under a year of age
-            if months == 1:
-                final += f'{months} month'
-            elif months > 0:
-                final += f'{months} months, '
-                if weeks >= (months*4):
-                    if (weeks-(months*4)) == 1:
-                        final += '1 week'
-                    else:
-                        final += f'{math.floor(weeks-(months*4))} weeks'
+            # >1 month return "m months"
+            if elapsed.months > 0:
+                string_delta += handle_interval(elapsed.months, "month")
+            # <1 month return "d days"
             else:
-                if weeks > 0:
-                    if weeks == 1:
-                        final += f'{math.floor(weeks)} week'
-                    else:
-                        final += f'{math.floor(weeks)} weeks'
+                if elapsed.weeks > 0:
+                    string_delta += handle_interval(elapsed.weeks, "week")
                 else:
-                    if days > 0:
-                        if days == 1:
-                            final += f'{math.floor(days)} day'
-                        if days > 1:
-                            final += f'{math.floor(days)} days'
+                    if elapsed.days > 0:
+                        string_delta += handle_interval(elapsed.days, "day")
                     else:
-                        final += 'Performed today'
-            return final
+                        string_delta += "Same day"
+            return string_delta
+
+    else:
+        raise ValueError("Both start and end dates must be provided")

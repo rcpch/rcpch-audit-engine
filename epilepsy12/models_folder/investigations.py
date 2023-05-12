@@ -6,7 +6,7 @@ from simple_history.models import HistoricalRecords
 
 # rcpch
 from .help_text_mixin import HelpTextMixin
-from ..general_functions import calculate_time_elapsed
+from ..general_functions import stringify_time_elapsed
 from .time_and_user_abstract_base_classes import *
 
 
@@ -107,7 +107,7 @@ class Investigations(
         Calculated field. Returns time elapsed between date EEG requested and performed as a string.
         """
         if self.mri_brain_reported_date and self.mri_brain_requested_date:
-            return calculate_time_elapsed(
+            return stringify_time_elapsed(
                 self.mri_brain_requested_date, self.mri_brain_reported_date
             )
 
@@ -116,7 +116,7 @@ class Investigations(
         Calculated field. Returns time elapsed between date EEG requested and performed as a string.
         """
         if self.eeg_performed_date and self.eeg_request_date:
-            return calculate_time_elapsed(
+            return stringify_time_elapsed(
                 self.eeg_request_date, self.eeg_performed_date
             )
 

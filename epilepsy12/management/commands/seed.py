@@ -51,13 +51,8 @@ from ...general_functions import (
     fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
     ons_region_for_postcode,
 )
-from .create_groups import (
-    create_groups,
-    add_permissions_to_existing_groups,
-    delete_and_reallocate_permissions,
-)
+from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
-
 
 class Command(BaseCommand):
     help = "seed database with organisation trust data for testing and development."
@@ -76,10 +71,10 @@ class Command(BaseCommand):
             run_registrations()
         elif options["mode"] == "seed_groups_and_permissions":
             self.stdout.write("setting up groups and permissions...")
-            create_groups()
+            groups_seeder(run_create_groups=True)
         elif options["mode"] == "add_permissions_to_existing_groups":
             self.stdout.write("adding permissions to groups...")
-            add_permissions_to_existing_groups()
+            groups_seeder(add_permissions_to_existing_groups=True)
         elif options["mode"] == "delete_all_groups_and_recreate":
             self.stdout.write("deleting all groups/permissions and reallocating...")
         elif options["mode"] == "add_existing_medicines_as_foreign_keys":
@@ -93,12 +88,12 @@ class Command(BaseCommand):
         self.stdout.write("done.")
 
 
-def run_dummy_cases_seed():
+def run_dummy_cases_seed(verbose=True):
     added = 0
-    print("\033[33m", "Seeding fictional cases...", "\033[33m")
+    if verbose: print("\033[33m", "Seeding fictional cases...", "\033[33m")
     # there should not be any cases yet, but sometimes seed gets run more than once
     if Case.objects.all().exists():
-        print(f"Cases already exist. Skipping this step...")
+        if verbose: print("Cases already exist. Skipping this step...")
         return
 
     postcode_list = random_postcodes.generate_postcodes(requested_number=100)
@@ -156,7 +151,7 @@ def run_dummy_cases_seed():
             )
             new_case.save()
         except Exception as e:
-            print(f"Error saving case: {e}")
+            if verbose: print(f"Error saving case: {e}")
             case_has_error = True
 
         if not case_has_error:
@@ -169,31 +164,34 @@ def run_dummy_cases_seed():
                 )
                 new_site.save()
             except Exception as e:
-                print(f"Error saving site: {e}")
+                if verbose: print(f"Error saving site: {e}")
 
             added += 1
-            print(
+            if verbose: print(
                 f"{new_case.first_name} {new_case.surname} at {new_site.organisation.OrganisationName} ({new_site.organisation.ParentOrganisation_OrganisationName})..."
             )
     print(f"Saved {added} cases.")
 
 
-def run_registrations():
+def run_registrations(verbose=True):
+
     """
     Calling function to register all cases in Epilepsy12 and complete all fields with random answers
     """
-    print("\033[33m", "Registering fictional cases in Epilepsy12...", "\033[33m")
+    if verbose: print("\033[33m", "Registering fictional cases in Epilepsy12...", "\033[33m")
 
-    create_registrations()
+    create_registrations(verbose=verbose)
 
-    complete_registrations()
+    complete_registrations(verbose=verbose)
+    
+    if not verbose: print("run_registrations(verbose=False), no output, cases registered and completed.")
 
 
-def complete_registrations():
+def complete_registrations(verbose=True):
     """
     Loop through the registrations and score all fields
     """
-    print(
+    if verbose: print(
         "\033[33m",
         "Completing all the Epilepsy12 fields for the fictional cases...",
         "\033[33m",
@@ -206,7 +204,7 @@ def complete_registrations():
         registration.eligibility_criteria_met = True
         registration.save()
 
-        create_epilepsy12_record(registration_instance=registration)
+        create_epilepsy12_record(registration_instance=registration, verbose=verbose)
 
 
 def image():

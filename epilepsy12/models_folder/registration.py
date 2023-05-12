@@ -84,10 +84,13 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
     def _history_user(self, value):
         self.updated_by = value
 
+    def get_current_date(self):
+        return datetime.now().date()
+    
     @property
     def days_remaining_before_submission(self):
         if self.audit_submission_date:
-            today = datetime.now().date()
+            today = self.get_current_date()
             remaining_time = self.audit_submission_date - today
             if remaining_time.days < 0:
                 return 0
