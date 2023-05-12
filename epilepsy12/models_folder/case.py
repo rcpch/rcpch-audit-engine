@@ -16,7 +16,7 @@ from .help_text_mixin import HelpTextMixin
 from ..constants import (
     SEX_TYPE,
     ETHNICITIES,
-    UNKNOWN_POSTCODES,
+    UNKNOWN_POSTCODES_NO_SPACES,
     CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
@@ -137,17 +137,10 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         return stringify_time_elapsed(self.date_of_birth, today_date)
 
     def save(self, *args, **kwargs) -> None:
-        # This field requires the deprivare api to be running
-        # note if one of ['ZZ99 3CZ','ZZ99 3GZ','ZZ99 3WZ','ZZ99 3VZ'], represent not known, not known - England,
-        # not known - Wales or no fixed abode
+        # calculate the index of multiple deprivation quintile if the postcode is present
+        # Skips the calculation if the postcode is on the 'unknown' list
         if self.postcode:
-            # test if unknown
-            unknown = [
-                code
-                for code in UNKNOWN_POSTCODES
-                if code.replace(" ", "") == str(self.postcode).replace(" ", "")
-            ]
-            if len(unknown) < 1:
+            if str(self.postcode).replace(" ", "") not in UNKNOWN_POSTCODES_NO_SPACES:
                 self.index_of_multiple_deprivation_quintile = imd_for_postcode(
                     self.postcode
                 )
