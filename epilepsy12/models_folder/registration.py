@@ -91,13 +91,12 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         return datetime.now().date()
     
     @property
-    def days_remaining_before_submission(self):
+    def days_remaining_before_submission(self)->int:
+        """Returns remaining days between current datetime and submission datetime, minimum value 0.
+        """
         if self.audit_submission_date:
-            today = self.get_current_date()
-            remaining_time = self.audit_submission_date - today
-            if remaining_time.days < 0:
-                return 0
-            return remaining_time.days
+            remaining_dateime = self.audit_submission_date - self.get_current_date()
+            return remaining_dateime.days if remaining_dateime.days > 0 else 0
 
     # relationships
     case = models.OneToOneField(
