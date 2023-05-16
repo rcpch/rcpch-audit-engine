@@ -69,7 +69,8 @@ AVAILABLE CASES FOR TESTS
 
 @pytest.fixture
 def e12Case():
-    return E12CaseFactory
+    # create new e12 case (with associated site) and save to db
+    return E12CaseFactory.create()
 
 
 """

@@ -39,5 +39,4 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             # factory NOT called with .create() method
             return
         
-        print(f'creating associated site for {self}')
         E12SiteFactory.create(case=self)
