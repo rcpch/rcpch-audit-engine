@@ -16,4 +16,4 @@ djangorestframework
 django-simple-history
 django-auto-logout
 pytest-django
-factory_boy
+pytest-factoryboy
