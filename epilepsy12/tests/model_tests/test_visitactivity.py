@@ -12,7 +12,7 @@ def test_visitActivity(e12User_GOSH, client):
     """
     Test that visit activity logging works, using e12User_GOSH fixture
     """
-
+    
     client.force_login(e12User_GOSH)
 
     visit_activity = VisitActivity.objects.all()
