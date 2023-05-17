@@ -28,9 +28,10 @@ from epilepsy12.models import (
 
 
 @pytest.mark.django_db
-def test_create_registration(registration):
-    print(registration)
-    print(registration.case)
+def test_create_registration(e12Registration):
+    print(e12Registration)
+    print(e12Registration.registration_date)
+    print(e12Registration.kpi)
 
 
 @pytest.mark.django_db

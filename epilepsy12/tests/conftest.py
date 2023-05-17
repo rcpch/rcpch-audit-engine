@@ -267,17 +267,13 @@ AVAILABLE REGISTRATIONS FOR TESTS
 
 @pytest.mark.django_db
 @pytest.fixture()
-def e12Registration(e12Case, e12AuditProgress, e12KPI):
+def e12Registration():
     """
     Creates a single E12 Registration object instance for tests.
-
+    Overrides default registration date to 2022-1-1
     """
 
-    return Registration.objects.create(
-        case=e12Case,
-        audit_progress=e12AuditProgress,
-        kpi=e12KPI,
-    )
+    return E12RegistrationFactory.create(registration_date=date(2022,1,1))
 
 
 """
