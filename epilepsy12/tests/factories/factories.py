@@ -7,7 +7,6 @@ import datetime
 # third-party imports
 import pytest
 import factory
-from pytest_factoryboy import register
 from django.contrib.auth import get_user_model
 
 # rcpch imports
@@ -22,7 +21,6 @@ from epilepsy12.models import (
 from epilepsy12.constants import user_types
 
 
-@register
 class E12AuditProgressFactory(factory.django.DjangoModelFactory):
     """Factory fn to create new E12 AuditProgress"""
 

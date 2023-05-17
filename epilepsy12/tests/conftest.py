@@ -5,7 +5,6 @@ from pytest_factoryboy import register
 
 from epilepsy12.tests.factories import (
     groups_cases_seeder,
-    new_e12user_factory,
     E12CaseFactory,
     E12RegistrationFactory,
     E12UserFactory,
