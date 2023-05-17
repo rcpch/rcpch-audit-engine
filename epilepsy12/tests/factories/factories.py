@@ -74,7 +74,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Case
 
-    nhs_number = "4799637827"
+    nhs_number = factory.Sequence(lambda n: n+1000000000) # currently no constraint for this to be a valid number, nor going above 9999999999
     first_name = "Thomas"
     surname = factory.Sequence(lambda n: f"Anderson-{n}")  # Anderson-1, Anderson-2, ...
     sex = 1
