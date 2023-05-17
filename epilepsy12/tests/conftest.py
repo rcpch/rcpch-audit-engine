@@ -8,6 +8,7 @@ from epilepsy12.tests.factories import (
     E12CaseFactory,
     E12RegistrationFactory,
     E12UserFactory,
+    E12RegistrationFactory,
 )
 
 from epilepsy12.models import (
@@ -32,7 +33,7 @@ from epilepsy12.constants import (
 register(E12CaseFactory)  # => e12_case_factory
 register(E12RegistrationFactory)  # => e12_registration_factory
 register(E12UserFactory)  # => e12_user_factory
-
+register(E12RegistrationFactory)  # => e12_registration_factory
 
 """
 AVAILABLE USERS FOR TESTS
