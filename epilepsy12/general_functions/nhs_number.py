@@ -10,43 +10,37 @@ def validate_nhs_number(number_to_validate):
     # convert to string and strip any spaces
     cleaned_number_as_string = str(number_to_validate).replace(' ', '')
 
-    # check if the number is not exactly 10 digits
+    # guard clause - return invalid if the number is not exactly 10 digits
     if len(cleaned_number_as_string) != 10:
         return {
             'valid': False,
             'message': 'The NHS Number must be exactly 10 digits long.'
         }
+        
+    # turn nhs number into list of ints
+    nhs_nums = [int(digit) for digit in cleaned_number_as_string]
+    
+    # sum the first 9 digits using the weighted multiplication rule
+    first_nine_digits_weighted_sum = 0
+    for i, digit in enumerate(nhs_nums[:-1]):
+        first_nine_digits_weighted_sum += digit * (10-i)
+    
+    # calculate the check_sum_val using mod 11 rule -> result ranges betwee 0-11
+    check_sum_val = 11 - (first_nine_digits_weighted_sum % 11)
+    
+    # "If the result is 11 then a check digit of 0 is used."
+    if check_sum_val == 11:
+        check_sum_val = 0
+    
+    # nhs number valid only if check_sum_val == last digit. NOTE: they also specify an additional check to see whether check_sum_val == 10, which is invalid. However, directly checking whether check_sum_val == last digit inherently confirms check_sum_val is NOT 10.
+    if check_sum_val == nhs_nums[-1]:
+        return {
+            'valid': True,
+            'message': 'Valid NHS number'
+        }
     else:
-        # remove final digit
-        checksum = int(cleaned_number_as_string[-1])
-        modulus_eleven = 0
-        for i in range(1, 10):
-            # loop through the digits and apply multiplier which counts backwards from 11
-            # then sum all the products
-            multiplier = 11-i
-            # selects next digit in the number
-            digit = int(cleaned_number_as_string[i-1])
-            modulus_eleven += digit * multiplier
-        # divide the product by 11 and take the remainder
-        remainder = modulus_eleven % 11
-        # subtract remaind from 11 to get final checksum
-        final_check_digit = 11-remainder
-        # if final_check_digit is 11, return 0. If 10, invalid
-        if final_check_digit == 11:
-            final_check_digit = 0
-        elif final_check_digit == 10:
-            return {
-                'valid': False,
-                'message': f'{number_to_validate} is an invalid NHS Number.'
-            }
-
-        if final_check_digit == checksum:
-            return {
-                'valid': True,
-                'message': 'Valid NHS number'
-            }
-        else:
-            return {
-                'valid': False,
-                'message': f'{number_to_validate} is an invalid NHS Number.'
-            }
+        return {
+            'valid': False,
+            'message': f'{number_to_validate} is an invalid NHS Number.'
+        }
+    
