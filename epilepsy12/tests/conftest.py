@@ -13,7 +13,7 @@ from pytest_factoryboy import register
 from epilepsy12.tests.factories import (
     groups_cases_seeder,
     E12CaseFactory,
-    E12RegistrationFactory,
+    E12SiteFactory,
     E12UserFactory,
     E12RegistrationFactory,
 )
@@ -38,7 +38,7 @@ from epilepsy12.constants import (
 # register factories to be used across test directory if requiring custom fixture
 # factory object becomes lowercase-underscore form of the class name
 register(E12CaseFactory)  # => e12_case_factory
-register(E12RegistrationFactory)  # => e12_registration_factory
+register(E12SiteFactory)  # => e12_site_factory
 register(E12UserFactory)  # => e12_user_factory
 register(E12RegistrationFactory)  # => e12_registration_factory
 

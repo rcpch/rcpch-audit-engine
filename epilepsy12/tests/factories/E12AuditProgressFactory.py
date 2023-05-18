@@ -7,7 +7,6 @@ import datetime
 # third-party imports
 import pytest
 import factory
-from django.contrib.auth import get_user_model
 
 # rcpch imports
 from epilepsy12.models import (

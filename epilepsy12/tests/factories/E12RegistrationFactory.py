@@ -1,70 +1,21 @@
-"""
-Factories for creating test data for epilepsy12 app
-"""
+"""Factory fn to create new E12 Registrations"""
+
 # standard imports
 import datetime
 
 # third-party imports
-import pytest
 import factory
-from django.contrib.auth import get_user_model
 
 # rcpch imports
 from epilepsy12.models import (
-    Case,
-    Organisation,
     Site,
     Registration,
     KPI,
 )
-from epilepsy12.constants import user_types, VALID_NHS_NUMS
 from .E12AuditProgressFactory import E12AuditProgressFactory
-
-
-class E12SiteFactory(factory.django.DjangoModelFactory):
-    """Factory fn to create new E12 Sites
-
-    A new site is create automatically once `E12CaseFactory.create()` is called.
-    """
-
-    class Meta:
-        model = Site
-
-    # define many to many relationship
-    organisation = factory.LazyFunction(
-        lambda: Organisation.objects.filter(ODSCode="RP401").first()
-    )
-
-    site_is_actively_involved_in_epilepsy_care = True
-    site_is_primary_centre_of_epilepsy_care = True
-        
-
-class E12CaseFactory(factory.django.DjangoModelFactory):
-    """Factory fn to create new E12 Cases"""
-
-    class Meta:
-        model = Case
-
-    # TODO - once Case.nhs_number has appropriate validation + cleaning, won't need to strip spaces here
-    nhs_number = factory.Sequence(lambda n: VALID_NHS_NUMS[n].replace(' ','')) 
-    first_name = "Thomas"
-    surname = factory.Sequence(lambda n: f"Anderson-{n}")  # Anderson-1, Anderson-2, ...
-    sex = 1
-    date_of_birth = datetime.date(2021, 9, 2)
-    ethnicity = "A"
-    locked = False
-
-    @factory.post_generation
-    def organisations(self, create, extracted, **kwargs):
-        if not create:
-            # factory NOT called with .create() method
-            return
-
-        E12SiteFactory.create(case=self)
-
+from .E12CaseFactory import E12CaseFactory
 
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
-    """Factory fn to create new E12 Registrations"""
 
     class Meta:
         model = Registration
@@ -108,23 +59,3 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
                 sudep=0,
                 school_individual_healthcare_plan=0,
             )
-
-class E12UserFactory(factory.django.DjangoModelFactory):
-    """Factory fn to create new E12 Users"""
-
-    class Meta:
-        model = get_user_model() # returns the Epilepsy12User object
-
-    email = factory.Sequence(lambda n: f"e12_test_user_{n}@rcpch.com")
-    password = "password"
-    first_name = "Mandel"
-    surname = "Brot"
-    is_active = True
-    is_staff = True
-    is_rcpch_audit_team_member = True
-    is_superuser = False
-    role = user_types.AUDIT_CENTRE_LEAD_CLINICIAN
-    email_confirmed = True
-    organisation_employer = factory.LazyFunction(
-        lambda: Organisation.objects.filter(ODSCode="RP401").first()
-    ) 
