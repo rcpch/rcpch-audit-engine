@@ -1,2 +1,6 @@
 from .groups_permissions_cases_seed_fixture import groups_cases_seeder
-from .factories import *
+from .E12AuditProgressFactory import E12AuditProgressFactory
+from .E12SiteFactory import E12SiteFactory
+from .E12CaseFactory import E12CaseFactory
+from .E12RegistrationFactory import E12RegistrationFactory
+from .E12UserFactory import E12UserFactory
