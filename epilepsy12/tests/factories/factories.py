@@ -79,7 +79,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     first_name = "Thomas"
     surname = factory.Sequence(lambda n: f"Anderson-{n}")  # Anderson-1, Anderson-2, ...
     sex = 1
-    date_of_birth = datetime.date(1964, 9, 2)
+    date_of_birth = datetime.date(2021, 9, 2)
     ethnicity = "A"
     locked = False
 
