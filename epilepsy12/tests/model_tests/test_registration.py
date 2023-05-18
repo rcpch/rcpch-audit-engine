@@ -1,7 +1,7 @@
 """
 Tests the Registration model.
 
-Cases:
+Tests:
 
     - [x] Test a valid Registration
     - [x] Test for DOFPA in the future
