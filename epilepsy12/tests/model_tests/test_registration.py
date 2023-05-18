@@ -138,4 +138,8 @@ def test_registration_days_remaining_before_submission(
         e12_registration_factory(registration_date=date(2022,1,10))
 
     ]
-    print()
+    
+    for registration in registrations:
+        print(f"{registration.audit_submission_date=}")
+        print(f"{registration.days_remaining_before_submission=}")
+        print(f"{registration.days_remaining_before_submission - date(2022, 11, 30)}")
