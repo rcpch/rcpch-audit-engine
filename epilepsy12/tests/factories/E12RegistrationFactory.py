@@ -59,3 +59,4 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
                 sudep=0,
                 school_individual_healthcare_plan=0,
             )
+    
