@@ -59,7 +59,7 @@ from ...general_functions import (
     fetch_ecl,
     fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
 )
-from ...common_view_functions import test_fields_update_audit_progress, calculate_kpis
+from ...common_view_functions import update_audit_progress, calculate_kpis
 
 
 def create_registrations(verbose=True):
@@ -126,7 +126,8 @@ def create_registrations(verbose=True):
                 case=case, audit_progress=audit_progress, kpi=kpi
             )
         else:
-            if verbose: print(f"{case} is registered already. Skipping")
+            if verbose:
+                print(f"{case} is registered already. Skipping")
             return case.registration
 
 
@@ -135,49 +136,43 @@ def create_epilepsy12_record(registration_instance, verbose=True):
     Creates a full randomised record for a given registration instance.
     """
     # score registration_instance
-    test_fields_update_audit_progress(model_instance=registration_instance)
+    update_audit_progress(model_instance=registration_instance)
 
     # create random first paediatric assessment
     first_paediatric_assessment = create_first_paediatric_assessment(
-        registration_instance=registration_instance,
-        verbose=verbose
+        registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=first_paediatric_assessment)
+    update_audit_progress(model_instance=first_paediatric_assessment)
 
     # create random EpilepsyContext
     epilepsy_context = create_epilepsy_context(
-        registration_instance=registration_instance,
-        verbose=verbose
+        registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=epilepsy_context)
+    update_audit_progress(model_instance=epilepsy_context)
 
     # create random Multiaxial Diagnosis
     multiaxial_diagnosis = create_multiaxial_diagnosis(
-        registration_instance=registration_instance,
-        verbose=verbose
+        registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=multiaxial_diagnosis)
+    update_audit_progress(model_instance=multiaxial_diagnosis)
 
     # create random Assessment
     assessment = create_assessment(
-        registration_instance=registration_instance,
-        verbose=verbose
-        )
-    test_fields_update_audit_progress(model_instance=assessment)
+        registration_instance=registration_instance, verbose=verbose
+    )
+    update_audit_progress(model_instance=assessment)
 
     # create random Investigations
     assessment = create_investigations(
-        registration_instance=registration_instance,
-        verbose=verbose
-        )
-    test_fields_update_audit_progress(model_instance=assessment)
+        registration_instance=registration_instance, verbose=verbose
+    )
+    update_audit_progress(model_instance=assessment)
 
     # create random Management
     management = create_management(
-        registration_instance=registration_instance,
-        verbose=verbose
-        )
-    test_fields_update_audit_progress(model_instance=management)
+        registration_instance=registration_instance, verbose=verbose
+    )
+    update_audit_progress(model_instance=management)
 
     # calculate all the kpis
     calculate_kpis(registration_instance=registration_instance)
@@ -200,9 +195,10 @@ def create_first_paediatric_assessment(registration_instance, verbose=True):
             registration=registration_instance,
         )
     else:
-        if verbose: print(
-            f"First Paediatric assessment exists for {registration_instance.case}. Skipping..."
-        )
+        if verbose:
+            print(
+                f"First Paediatric assessment exists for {registration_instance.case}. Skipping..."
+            )
         return registration_instance.firstpaediatricassessment
 
 
@@ -225,7 +221,10 @@ def create_epilepsy_context(registration_instance, verbose=True):
             registration=registration_instance,
         )
     else:
-        if verbose: print(f"Epilepsy context exists for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(
+                f"Epilepsy context exists for {registration_instance.case}. Skipping..."
+            )
         return registration_instance.epilepsycontext
 
 
@@ -302,9 +301,10 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
                         comorbidityentity=random_comorbidity,
                     )
                 except Exception as e:
-                    if verbose: print(
-                        f"Failed to create Comorbidity with {random_comorbidity}:{e=}"
-                    )
+                    if verbose:
+                        print(
+                            f"Failed to create Comorbidity with {random_comorbidity}:{e=}"
+                        )
 
                     # create a random number of episodes to a maximum of 5
         for count_item in range(1, randint(1, 5)):
@@ -434,9 +434,10 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         multiaxial_diagnosis.save()
         return multiaxial_diagnosis
     else:
-        if verbose: print(
-            f"Multiaxial diagnosis exists for {registration_instance.case}. Skipping..."
-        )
+        if verbose:
+            print(
+                f"Multiaxial diagnosis exists for {registration_instance.case}. Skipping..."
+            )
         return registration_instance.multiaxialdiagnosis
 
 
@@ -555,7 +556,8 @@ def create_assessment(registration_instance, verbose=True):
         assessment.save()
         return assessment
     else:
-        if verbose: print(f"Assessment exists for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(f"Assessment exists for {registration_instance.case}. Skipping...")
         return registration_instance.assessment
 
 
@@ -589,7 +591,8 @@ def create_investigations(registration_instance, verbose=True):
         investigations.save()
         return investigations
     else:
-        if verbose: print(f"Investigations exist for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(f"Investigations exist for {registration_instance.case}. Skipping...")
         return registration_instance.investigations
 
 
@@ -656,7 +659,8 @@ def create_management(registration_instance, verbose=True):
                     medicine_entity=random_medicine,
                 )
     else:
-        if verbose: print(f"Management exists for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(f"Management exists for {registration_instance.case}. Skipping...")
         return registration_instance.management
 
     if management.individualised_care_plan_in_place:
