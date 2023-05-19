@@ -120,11 +120,11 @@ class E12EpisodeFactory(factory.django.DjangoModelFactory):
         # Set appropriate fields if unknown onset type
         epileptic_seizure_onset_type_unknown = factory.Trait(
             reset=True,
-            epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[3][0] # 'UO' "Unknown onset onset
+            epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[2][0] # 'UO' "Unknown onset onset
         )
         
         # Set appropriate fields if Generalised onset type
         epileptic_seizure_onset_type_Unclassified = factory.Trait(
             reset=True,
-            epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[4][0] # 'UO' Unclassified onset onset
+            epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[3][0] # 'UO' Unclassified onset onset
         )

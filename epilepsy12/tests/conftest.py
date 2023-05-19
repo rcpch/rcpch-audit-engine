@@ -160,29 +160,23 @@ def e12Registration_2022():
 - 
 """
 
-# @pytest.mark.django_db
-# @pytest.fixture()
-# def e12MultiaxialDiagnosis(e12Registration_2022):
-#     """
-#     Creates a single E12 Multiaxial Diagnosis object instance for tests.
-#     `epilepsy_cause` = Hereditary oculoleptomeningeal amyloid angiopathy
-#     `epilepsy_cause_categories` = Genetic + Structural
-#     `mental_health_issue` = Anxiety
-#     """
-#     epilepsy_cause = EpilepsyCauseEntity.objects.filter(conceptId="43532007").first()
-#     epilepsy_cause_categories = [EPILEPSY_CAUSES[0][0], EPILEPSY_CAUSES[4][0]]
-#     mental_health_issue = NEUROPSYCHIATRIC[0][0]
-#     return MultiaxialDiagnosis.objects.create(
-#         syndrome_present=True,
-#         epilepsy_cause_known=True,
-#         mental_health_screen=True,
-#         mental_health_issue_identified=True,
-#         mental_health_issue=mental_health_issue,
-#         registration=e12Registration_2022,
-#         epilepsy_cause=epilepsy_cause,
-#         epilepsy_cause_categories=epilepsy_cause_categories,
-#         relevant_impairments_behavioural_educational=False,
-#     )
+@pytest.mark.django_db
+@pytest.fixture()
+def e12MultiaxialDiagnosis_2022(e12Registration_2022):
+    """
+    Creates a single E12 Multiaxial Diagnosis object instance for tests. Attached to `e12Registration_2022` instance.
+
+    Episode:
+        1) Default:
+            - Seizure onset 7 days before registration date
+            - Approximate date confidence
+            - Single Episode
+            - Epileptic
+            - Description TODO
+            - seizure type = Focal Onset
+                - Left-sided, atonic with impaired awareness and temporal EEG findings
+    """
+    return MultiaxialDiagnosis.objects.get(registration=e12Registration_2022)
 
 
 # AVAILABLE SITES FOR TESTS
