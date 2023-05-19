@@ -1,6 +1,6 @@
-"""Factory fn to create new E12 Sites
+"""Factory fn to create new E12 FPAs
 
-A new site is create automatically once `E12CaseFactory.create()` is called.
+NOTE: calling this factory will cause dependencies to be created automatically e.g. Registration, Case related to an Organisation.
 """
 # standard imports
 

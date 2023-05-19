@@ -11,12 +11,14 @@ from pytest_factoryboy import register
 
 # rcpch imports
 from epilepsy12.tests.factories import (
+    E12EpilepsyContextFactory,
     groups_cases_seeder,
     E12CaseFactory,
     E12SiteFactory,
     E12UserFactory,
     E12RegistrationFactory,
     E12FirstPaediatricAssessmentFactory,
+    E12MultiaxialDiagnosisFactory,
 )
 
 from epilepsy12.models import (
@@ -42,7 +44,11 @@ register(E12CaseFactory)  # => e12_case_factory
 register(E12SiteFactory)  # => e12_site_factory
 register(E12UserFactory)  # => e12_user_factory
 register(E12RegistrationFactory)  # => e12_registration_factory
-register(E12FirstPaediatricAssessmentFactory) # => e12_first_paediatric_assessment_factory
+register(
+    E12FirstPaediatricAssessmentFactory
+)  # => e12_first_paediatric_assessment_factory
+register(E12EpilepsyContextFactory)  # => e12_epilepsy_context
+register(E12MultiaxialDiagnosisFactory) # => e12_multiaxial_diagnosis_factory
 
 # AVAILABLE AUDITPROGRESS FOR TESTS
 
@@ -148,31 +154,35 @@ def e12Registration_2022():
 
 
 # AVAILABLE MULTIAXIALDIAGNOSIS FOR TESTS
+"""MultiaxialDiagnosis is a more complex model, with certain fields opening depending on other fields. E.g. if syndrome_present = True, then there can be SyndromeEntities.
 
+- Each must have at least one `episode`
+- 
+"""
 
-@pytest.mark.django_db
-@pytest.fixture()
-def e12MultiaxialDiagnosis(e12Registration_2022):
-    """
-    Creates a single E12 Multiaxial Diagnosis object instance for tests.
-    `epilepsy_cause` = Hereditary oculoleptomeningeal amyloid angiopathy
-    `epilepsy_cause_categories` = Genetic + Structural
-    `mental_health_issue` = Anxiety
-    """
-    epilepsy_cause = EpilepsyCauseEntity.objects.filter(conceptId="43532007").first()
-    epilepsy_cause_categories = [EPILEPSY_CAUSES[0][0], EPILEPSY_CAUSES[4][0]]
-    mental_health_issue = NEUROPSYCHIATRIC[0][0]
-    return MultiaxialDiagnosis.objects.create(
-        syndrome_present=True,
-        epilepsy_cause_known=True,
-        mental_health_screen=True,
-        mental_health_issue_identified=True,
-        mental_health_issue=mental_health_issue,
-        registration=e12Registration_2022,
-        epilepsy_cause=epilepsy_cause,
-        epilepsy_cause_categories=epilepsy_cause_categories,
-        relevant_impairments_behavioural_educational=False,
-    )
+# @pytest.mark.django_db
+# @pytest.fixture()
+# def e12MultiaxialDiagnosis(e12Registration_2022):
+#     """
+#     Creates a single E12 Multiaxial Diagnosis object instance for tests.
+#     `epilepsy_cause` = Hereditary oculoleptomeningeal amyloid angiopathy
+#     `epilepsy_cause_categories` = Genetic + Structural
+#     `mental_health_issue` = Anxiety
+#     """
+#     epilepsy_cause = EpilepsyCauseEntity.objects.filter(conceptId="43532007").first()
+#     epilepsy_cause_categories = [EPILEPSY_CAUSES[0][0], EPILEPSY_CAUSES[4][0]]
+#     mental_health_issue = NEUROPSYCHIATRIC[0][0]
+#     return MultiaxialDiagnosis.objects.create(
+#         syndrome_present=True,
+#         epilepsy_cause_known=True,
+#         mental_health_screen=True,
+#         mental_health_issue_identified=True,
+#         mental_health_issue=mental_health_issue,
+#         registration=e12Registration_2022,
+#         epilepsy_cause=epilepsy_cause,
+#         epilepsy_cause_categories=epilepsy_cause_categories,
+#         relevant_impairments_behavioural_educational=False,
+#     )
 
 
 # AVAILABLE SITES FOR TESTS
