@@ -8,7 +8,7 @@ from epilepsy12.models import (
 
 
 @pytest.mark.django_db
-def test_visitActivity(e12User_GOSH, e12User_GOSH_superuser, client):
+def test_visitActivity(e12User_GOSH, client):
     """
     Test that visit activity logging works, using e12User_GOSH fixture
     """
