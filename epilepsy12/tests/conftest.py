@@ -154,11 +154,7 @@ def e12Registration_2022():
 
 
 # AVAILABLE MULTIAXIALDIAGNOSIS FOR TESTS
-"""MultiaxialDiagnosis is a more complex model, with certain fields opening depending on other fields. E.g. if syndrome_present = True, then there can be SyndromeEntities.
 
-- Each must have at least one `episode`
-- 
-"""
 
 @pytest.mark.django_db
 @pytest.fixture()
