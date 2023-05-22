@@ -71,20 +71,29 @@ import pytest
 # RCPCH imports
 from epilepsy12.models import (
     Episode,
+    Syndrome,
+    Comorbidity,
 )
 
 
 @pytest.mark.django_db
-def test_working_e12MultiaxialDiagnosis_e12Case_relation(
+def test_working_e12MultiaxialDiagnosis_relations_success(
     e12MultiaxialDiagnosis_2022
 ):
-    """Checks this multiaxialdiagnosis instance has a case attached
+    """Checks this multiaxialdiagnosis instance has relevant answers attached e.g. via reverse foreign keys.
     """
     
     multiaxial_diagnosis = e12MultiaxialDiagnosis_2022
     
-    assert multiaxial_diagnosis.registration.case
+    print()
     
+    # check case relation exists   
+    assert multiaxial_diagnosis.registration.case 
+    
+    # checks for relevant many to one relations
+    assert Syndrome.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
+    assert Comorbidity.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
+    assert Episode.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
     
     
 
