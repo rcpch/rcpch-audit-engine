@@ -9,7 +9,7 @@ from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import first_tuesday_in_january, cohort_number_from_enrolment_date
+from ..general_functions import nth_tuesday_of_year, cohort_number_from_enrolment_date
 
 
 class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -56,9 +56,9 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
             
             registration_plus_one_year = self.registration_date + relativedelta(years=1)
             
-            second_tuesday_next_year = first_tuesday_in_january(registration_plus_one_year.year) + relativedelta(days=7)
+            second_tuesday_next_year = nth_tuesday_of_year(registration_plus_one_year.year, n=2)
             
-            second_tuesday_two_years = first_tuesday_in_january(registration_plus_one_year.year+1) + relativedelta(days=7)
+            second_tuesday_two_years = nth_tuesday_of_year(registration_plus_one_year.year+1, n=2)
             
             if registration_plus_one_year <= second_tuesday_next_year:
                 return second_tuesday_next_year
