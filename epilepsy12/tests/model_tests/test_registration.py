@@ -120,27 +120,22 @@ def test_registration_cohort(
 @pytest.mark.django_db
 def test_registration_days_remaining_before_submission(
     mocked_get_current_date,
-    e12Registration_2022,
-    e12Registration_2023,
+    e12_registration_factory
 ):
     """
     Tests `days_remaining_before_submission` property calculated properly.
 
     Calculated as submission date - current date, return number of days left days as an int.
 
-    Test patches the example Registration instance's `.get_current_date`'s return value to always return 30 Nov 2022.
+    Test patches "today" - patches the example Registration instance's `.get_current_date`'s return value to always return 30 Nov 2022.
 
     NOTE: if `audit_submission_date` is before today, returns 0.
     """
 
-    expected_inputs_outputs = [
-        # (submission date, expected number of days left)
-        (e12Registration_2022.audit_submission_date, 0),
-        (e12Registration_2022.audit_submission_date, 365),
+    registrations = [
+
+        # submission date = 
+        e12_registration_factory(registration_date=date(2022,1,10))
+
     ]
-
-    for expected_input_output in expected_inputs_outputs:
-        reg = expected_input_output[0]
-        print(reg.days_remaining_before_submission())
-
-        
+    print()
