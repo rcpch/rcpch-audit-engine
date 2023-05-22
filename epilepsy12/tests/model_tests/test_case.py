@@ -9,7 +9,6 @@ from datetime import date
 # Third party imports
 
 # RCPCH imports
-from epilepsy12.models import Case, Organisation, Site
 
 
 @pytest.mark.django_db
