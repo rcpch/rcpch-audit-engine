@@ -30,7 +30,7 @@ def recalculate_form_generate_response(
     context.update({"error_message": error_message})
 
     # calculate totals on form
-    test_fields_update_audit_progress(model_instance)
+    update_audit_progress(model_instance)
 
     response = render(request=request, template_name=template, context=context)
 
@@ -41,10 +41,7 @@ def recalculate_form_generate_response(
     return response
 
 
-# test all fields
-
-
-def test_fields_update_audit_progress(model_instance):
+def update_audit_progress(model_instance):
     """
     Calculates all completed fields and compares expected fields
     Stores these values in AuditProgress
