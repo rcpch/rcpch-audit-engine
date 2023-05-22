@@ -14,6 +14,7 @@ from epilepsy12.models import (
 )
 from .E12AuditProgressFactory import E12AuditProgressFactory
 from .E12CaseFactory import E12CaseFactory
+from .E12MultiaxialDiagnosisFactory import E12MultiaxialDiagnosisFactory
 
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
 
@@ -60,3 +61,8 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
                 school_individual_healthcare_plan=0,
             )
     
+    # Reverse dependencies
+    multiaxial_diagnosis = factory.RelatedFactory(
+        E12MultiaxialDiagnosisFactory,
+        factory_related_name='registration'
+    )
