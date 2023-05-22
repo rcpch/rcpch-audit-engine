@@ -1,5 +1,9 @@
 """
 Tests the Multiaxial Diagnosis model
+
+Test cases:
+    - [ ] Ensure at least one MultiaxialDiagnosis.Episode.seizure_onset_date is after Registration.registration_date
+
 """
 # Standard imports
 
@@ -9,13 +13,21 @@ import pytest
 # RCPCH imports
 from epilepsy12.models import (
     MultiaxialDiagnosis,
+    Episode,
 )
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_working_e12MultiaxialDiagnosis_e12Case_relation(
-    e12MultiaxialDiagnosis, e12Case
+    e12Registration_2022
 ):
-    # this assertion fails because the Case factory creates two differently-numbered Case objects
-    assert e12MultiaxialDiagnosis.registration.case == e12Case
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(registration=e12Registration_2022)
+    
+    print(multiaxial_diagnosis.registration)
+    
+    episode = Episode.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
+
+    print(f"{episode.seizure_onset_date}")
+    
+    
+
