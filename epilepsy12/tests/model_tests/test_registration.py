@@ -48,9 +48,7 @@ def test_registration_custom_method_audit_submission_date_calculation(
         e12Registration_2022.registration_date = expected_input_output[0]
         e12Registration_2022.save()
 
-        assert (
-            e12Registration_2022.audit_submission_date == expected_input_output[1]
-        )
+        assert e12Registration_2022.audit_submission_date == expected_input_output[1]
 
 
 @pytest.mark.django_db
@@ -76,10 +74,7 @@ def test_registration_custom_method_registration_date_one_year_on(
         e12Registration_2022.registration_date = expected_input_output[0]
         e12Registration_2022.save()
 
-        assert (
-            e12Registration_2022.registration_close_date
-            == expected_input_output[1]
-        )
+        assert e12Registration_2022.registration_close_date == expected_input_output[1]
 
 
 @pytest.mark.django_db
@@ -119,8 +114,7 @@ def test_registration_cohort(
 @patch.object(Registration, "get_current_date", return_value=date(2022, 11, 30))
 @pytest.mark.django_db
 def test_registration_days_remaining_before_submission(
-    mocked_get_current_date,
-    e12_registration_factory
+    mocked_get_current_date, e12_registration_factory
 ):
     """
     Tests `days_remaining_before_submission` property calculated properly.
@@ -133,13 +127,11 @@ def test_registration_days_remaining_before_submission(
     """
 
     registrations = [
-
-        # submission date = 
-        e12_registration_factory(registration_date=date(2022,1,10))
-
+        # submission date =
+        e12_registration_factory(registration_date=date(2022, 1, 10))
     ]
-    
+
     for registration in registrations:
         print(f"{registration.audit_submission_date=}")
         print(f"{registration.days_remaining_before_submission=}")
-        print(f"{registration.days_remaining_before_submission - date(2022, 11, 30)}")
+        # print(f"{registration.days_remaining_before_submission - date(2022, 11, 30)}")
