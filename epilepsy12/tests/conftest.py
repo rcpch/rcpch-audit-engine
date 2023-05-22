@@ -263,18 +263,25 @@ def e12Syndrome(e12MultiaxialDiagnosis):
 AVAILABLE REGISTRATIONS FOR TESTS
 ------------------------------------------
 """
+@pytest.mark.django_db
+@pytest.fixture()
+def e12Registration_2023():
+    """
+    Creates a single E12 Registration object instance for tests.
+    Uses default registration_date of 2023-1-1.
+    """
 
+    return E12RegistrationFactory.create()
 
 @pytest.mark.django_db
 @pytest.fixture()
-def e12Registration():
+def e12Registration_2022():
     """
     Creates a single E12 Registration object instance for tests.
     Overrides default registration date to 2022-1-1
     """
 
     return E12RegistrationFactory.create(registration_date=date(2022,1,1))
-
 
 """
 ------------------------------------------
