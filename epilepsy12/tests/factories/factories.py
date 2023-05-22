@@ -8,6 +8,7 @@ import datetime
 import pytest
 import factory
 from pytest_factoryboy import register
+from django.contrib.auth import get_user_model
 
 # rcpch imports
 from epilepsy12.models import (
@@ -18,6 +19,8 @@ from epilepsy12.models import (
     AuditProgress,
     KPI,
 )
+from epilepsy12.constants import user_types
+
 
 @register
 class E12AuditProgressFactory(factory.django.DjangoModelFactory):
@@ -25,7 +28,7 @@ class E12AuditProgressFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = AuditProgress
-    
+
     registration_complete = False
     first_paediatric_assessment_complete = False
     assessment_complete = False
@@ -47,8 +50,7 @@ class E12AuditProgressFactory(factory.django.DjangoModelFactory):
     investigations_total_completed_fields = 0
     management_total_expected_fields = 0
     management_total_completed_fields = 0
-    
-    
+
 
 class E12SiteFactory(factory.django.DjangoModelFactory):
     """Factory fn to create new E12 Sites
@@ -90,16 +92,34 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
         E12SiteFactory.create(case=self)
 
+
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     """Factory fn to create new E12 Registrations"""
 
     class Meta:
         model = Registration
-        
 
-    
     # Sets the minimal 'required' fields for a registration to be valid
     registration_date = datetime.date(2023, 1, 1)
     eligibility_criteria_met = True
     case = factory.SubFactory(E12CaseFactory)
 
+class E12UserFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 Users"""
+
+    class Meta:
+        model = get_user_model() # returns the Epilepsy12User object
+
+    email = factory.Sequence(lambda n: f"e12_test_user_{n}@rcpch.com")
+    password = "password"
+    first_name = "Mandel"
+    surname = "Brot"
+    is_active = True
+    is_staff = True
+    is_rcpch_audit_team_member = True
+    is_superuser = False
+    role = user_types.AUDIT_CENTRE_LEAD_CLINICIAN
+    email_confirmed = True
+    organisation_employer = factory.LazyFunction(
+        lambda: Organisation.objects.filter(ODSCode="RP401").first()
+    ) 

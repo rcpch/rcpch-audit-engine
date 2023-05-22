@@ -8,7 +8,7 @@ from epilepsy12.tests.factories import (
     new_e12user_factory,
     E12CaseFactory,
     E12RegistrationFactory,
-    
+    E12UserFactory,
 )
 
 from epilepsy12.models import (
@@ -28,9 +28,11 @@ from epilepsy12.constants import (
 )
 
 
-
-register(E12CaseFactory)
-register(E12RegistrationFactory)
+# register factories to be used across test directory if requiring custom fixture
+# factory object becomes lowercase-underscore form of the class name
+register(E12CaseFactory)  # => e12_case_factory
+register(E12RegistrationFactory)  # => e12_registration_factory
+register(E12UserFactory)  # => e12_user_factory
 
 
 """
@@ -41,24 +43,22 @@ AVAILABLE USERS FOR TESTS
 
 @pytest.mark.django_db
 @pytest.fixture()
-def e12User_GOSH(new_e12user_factory):
+def e12User_GOSH():
     """
     Creates a single authenticated E12 User object instance for tests.
     """
 
-    return new_e12user_factory(first_name="Norm", email="normal.user@test.com")
+    return E12UserFactory.create()
 
 
 @pytest.mark.django_db
 @pytest.fixture()
-def e12User_GOSH_superuser(new_e12user_factory):
+def e12User_GOSH_superuser():
     """
     Creates a single authenticated SUPERUSER E12 User object instance for tests.
     """
 
-    return new_e12user_factory(
-        first_name="Zeus", email="superuser@test.com", is_superuser=True
-    )
+    return E12UserFactory.create(is_superuser=True)
 
 
 """
@@ -70,6 +70,7 @@ def e12User_GOSH_superuser(new_e12user_factory):
 AVAILABLE CASES FOR TESTS
 ------------------------------------------
 """
+
 
 @pytest.fixture
 def e12Case():
@@ -202,16 +203,16 @@ AVAILABLE MULTIAXIALDIAGNOSIS FOR TESTS
 def e12MultiaxialDiagnosis(e12Registration):
     """
     Creates a single E12 Multiaxial Diagnosis object instance for tests.
-    
+
     `epilepsy_cause` = Hereditary oculoleptomeningeal amyloid angiopathy
     `epilepsy_cause_categories` = Genetic + Structural
     `mental_health_issue` = Anxiety
     """
-    
-    epilepsy_cause = EpilepsyCauseEntity.objects.filter(conceptId='43532007').first()
-    epilepsy_cause_categories=[EPILEPSY_CAUSES[0][0], EPILEPSY_CAUSES[4][0]]
-    mental_health_issue=NEUROPSYCHIATRIC[0][0]
-    
+
+    epilepsy_cause = EpilepsyCauseEntity.objects.filter(conceptId="43532007").first()
+    epilepsy_cause_categories = [EPILEPSY_CAUSES[0][0], EPILEPSY_CAUSES[4][0]]
+    mental_health_issue = NEUROPSYCHIATRIC[0][0]
+
     return MultiaxialDiagnosis.objects.create(
         syndrome_present=True,
         epilepsy_cause_known=True,
@@ -283,4 +284,3 @@ def e12Registration(e12Case, e12AuditProgress, e12KPI):
 """
 ------------------------------------------
 """
-
