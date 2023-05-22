@@ -167,8 +167,6 @@ def test_registration_validate_dofpa_not_before_2009(e12_registration_factory):
 
     Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
 
-    Patches Registration's .get_current_date() method to always be 1 Jan 2023.
-
     """
 
     # Tests that dofpa (registration_date) can't be before E12 began in 2009.
@@ -185,8 +183,6 @@ def test_registration_validate_dofpa_not_before_child_dob(
     # TODO - add validation
 
     Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
-
-    Patches Registration's .get_current_date() method to always be 1 Jan 2023.
 
     """
     # Tests that dofpa (registration_date) can't be before the child's DoB
