@@ -80,7 +80,7 @@
                         
                         <div class="ui rcpch_dark_blue buttons">
                             {% for choice in choices %}
-                                {% if test_positive|slugify in choice.0|slugify %}
+                                {% if test_positive == choice.0 %}
                                     <div 
                                         {% if enabled %}
                                             class="ui mini compact positive rcpch_dark_blue button"

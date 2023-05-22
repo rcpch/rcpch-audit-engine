@@ -18,10 +18,10 @@ def nhs_number_validator(number_to_validate):
 
 
 def epilepsy12_date_validator(
-    first_date: date() = None,
-    second_date: date() = None,
-    earliest_allowable_date: date() = None,
-):
+    first_date: date = None,
+    second_date: date = None,
+    earliest_allowable_date: date = None,
+) -> bool:
     """
     Validator for Epilepsy12 dates
     Base validation is that:
@@ -33,31 +33,47 @@ def epilepsy12_date_validator(
 
     if first_date and second_date:
         # both dates supplied
-        if first_date > date() or second_date > date():
-            raise ValidationError("Neither date can be in the future!")
+        if first_date > date.today() or second_date > date.today():
+            raise ValueError("Neither date can be in the future!")
+        if earliest_allowable_date:
+            if earliest_allowable_date > first_date:
+                raise ValueError(
+                    f"Date supplied ({first_date}) cannot be before {earliest_allowable_date}!"
+                )
+            elif earliest_allowable_date > second_date:
+                raise ValueError(
+                    f"Date supplied ({second_date}) cannot be before {earliest_allowable_date}!"
+                )
+        if second_date < first_date:
+            raise ValueError(
+                f"Date supplied ({second_date}) cannot be before {first_date}!"
+            )
+        return True
 
     elif first_date:
         # only first_date supplied
-        if first_date > date():
-            raise ValidationError(
+        if first_date > date.today():
+            raise ValueError(
                 f"Date supplied ({first_date}) cannot be in the future for this measure!"
             )
         if earliest_allowable_date:
             if earliest_allowable_date > first_date:
-                raise ValidationError(
+                raise ValueError(
                     f"Date supplied ({first_date}) cannot be before {earliest_allowable_date}!"
                 )
+        return True
     elif second_date:
         # only second_date supplied
-        if second_date > date():
-            raise ValidationError(
+        if second_date > date.today():
+            raise ValueError(
                 f"Date supplied ({second_date}) cannot be in the future for this measure!"
             )
         if earliest_allowable_date:
             if earliest_allowable_date > second_date:
-                raise ValidationError(
+                raise ValueError(
                     f"Date supplied ({second_date}) cannot be before {earliest_allowable_date}!"
                 )
+        return True
     else:
         # no dates supplied
-        raise ValidationError("At least one date must be supplied!")
+        raise ValueError("At least one date must be supplied!")
