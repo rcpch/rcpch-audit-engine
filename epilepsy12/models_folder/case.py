@@ -1,7 +1,5 @@
 # python
-from dateutil import relativedelta
 from datetime import date
-import math
 
 # django
 from django.contrib.gis.db import models
@@ -141,9 +139,17 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         # Skips the calculation if the postcode is on the 'unknown' list
         if self.postcode:
             if str(self.postcode).replace(" ", "") not in UNKNOWN_POSTCODES_NO_SPACES:
-                self.index_of_multiple_deprivation_quintile = imd_for_postcode(
-                    self.postcode
-                )
+                try:
+                    self.index_of_multiple_deprivation_quintile = imd_for_postcode(
+                        self.postcode
+                    )
+                except Exception as error:
+                    # Deprivation score not persisted if deprivation score server down
+                    self.index_of_multiple_deprivation_quintile = None
+                    print(
+                        f"Cannot calculate deprivation score for {self.postcode}: {error}"
+                    )
+                    pass
         return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
