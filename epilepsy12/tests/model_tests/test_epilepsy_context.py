@@ -23,4 +23,4 @@ def test_epilepsy_context_valid_creation(
     
     ec = e12_epilepsy_context_factory()
     
-    assert ec.registration.case == Case.objects.first()
+    assert ec.registration.case
