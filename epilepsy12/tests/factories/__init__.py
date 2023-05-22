@@ -4,3 +4,4 @@ from .E12SiteFactory import E12SiteFactory
 from .E12CaseFactory import E12CaseFactory
 from .E12RegistrationFactory import E12RegistrationFactory
 from .E12UserFactory import E12UserFactory
+from .E12FirstPaediatricAssessmentFactory import E12FirstPaediatricAssessmentFactory
