@@ -1,0 +1,105 @@
+"""
+Factories for creating test data for epilepsy12 app
+"""
+# standard imports
+import datetime
+
+# third-party imports
+import pytest
+import factory
+from pytest_factoryboy import register
+
+# rcpch imports
+from epilepsy12.models import (
+    Case,
+    Organisation,
+    Site,
+    Registration,
+    AuditProgress,
+    KPI,
+)
+
+@register
+class E12AuditProgressFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 AuditProgress"""
+
+    class Meta:
+        model = AuditProgress
+    
+    registration_complete = False
+    first_paediatric_assessment_complete = False
+    assessment_complete = False
+    epilepsy_context_complete = False
+    multiaxial_diagnosis_complete = False
+    management_complete = False
+    investigations_complete = False
+    registration_total_expected_fields = 3
+    registration_total_completed_fields = 0
+    first_paediatric_assessment_total_expected_fields = 0
+    first_paediatric_assessment_total_completed_fields = 0
+    assessment_total_expected_fields = 0
+    assessment_total_completed_fields = 0
+    epilepsy_context_total_expected_fields = 0
+    epilepsy_context_total_completed_fields = 0
+    multiaxial_diagnosis_total_expected_fields = 0
+    multiaxial_diagnosis_total_completed_fields = 0
+    investigations_total_expected_fields = 0
+    investigations_total_completed_fields = 0
+    management_total_expected_fields = 0
+    management_total_completed_fields = 0
+    
+    
+
+class E12SiteFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 Sites
+
+    A new site is create automatically once `E12CaseFactory.create()` is called.
+    """
+
+    class Meta:
+        model = Site
+
+    # define many to many relationship
+    organisation = factory.LazyFunction(
+        lambda: Organisation.objects.filter(ODSCode="RP401").first()
+    )
+
+    site_is_actively_involved_in_epilepsy_care = True
+    site_is_primary_centre_of_epilepsy_care = True
+
+
+class E12CaseFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 Cases"""
+
+    class Meta:
+        model = Case
+
+    nhs_number = "4799637827"
+    first_name = "Thomas"
+    surname = factory.Sequence(lambda n: f"Anderson-{n}")  # Anderson-1, Anderson-2, ...
+    sex = 1
+    date_of_birth = datetime.date(1964, 9, 2)
+    ethnicity = "A"
+    locked = False
+
+    @factory.post_generation
+    def organisations(self, create, extracted, **kwargs):
+        if not create:
+            # factory NOT called with .create() method
+            return
+
+        E12SiteFactory.create(case=self)
+
+class E12RegistrationFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 Registrations"""
+
+    class Meta:
+        model = Registration
+        
+
+    
+    # Sets the minimal 'required' fields for a registration to be valid
+    registration_date = datetime.date(2023, 1, 1)
+    eligibility_criteria_met = True
+    case = factory.SubFactory(E12CaseFactory)
+

@@ -10,9 +10,9 @@ from datetime import date
 
 # RCPCH imports
 
-
 @pytest.mark.django_db
 def test_case_age_calculation(e12Case):
+    
     # Test that the age function works as expected
     fixed_testing_date = date(2023, 6, 17)
     e12Case.date_of_birth = date(2018, 5, 11)
