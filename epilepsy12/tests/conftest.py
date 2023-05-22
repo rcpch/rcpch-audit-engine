@@ -1,10 +1,12 @@
-import pytest
 from datetime import date
+
+import pytest
+from pytest_factoryboy import register
 
 from epilepsy12.tests.factories import (
     groups_cases_seeder,
     new_e12user_factory,
-    new_e12case_factory,
+    E12CaseFactory,
 )
 from epilepsy12.models import (
     AuditProgress,
@@ -21,6 +23,11 @@ from epilepsy12.constants import (
     EPILEPSY_CAUSES,
     NEUROPSYCHIATRIC,
 )
+
+
+
+register(E12CaseFactory)
+
 
 """
 AVAILABLE USERS FOR TESTS
@@ -60,17 +67,9 @@ AVAILABLE CASES FOR TESTS
 ------------------------------------------
 """
 
-
-@pytest.mark.django_db
-@pytest.fixture()
-def e12Case(new_e12case_factory):
-    """
-    Creates a single E12 Case object instance for tests.
-
-    Fresh, unregistered.
-    """
-
-    return new_e12case_factory()
+@pytest.fixture
+def e12Case():
+    return E12CaseFactory
 
 
 """
@@ -279,3 +278,4 @@ def e12Registration(e12Case, e12AuditProgress, e12KPI):
 """
 ------------------------------------------
 """
+

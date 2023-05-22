@@ -1,45 +1,43 @@
-from typing import Literal
 import datetime
 
 import pytest
+import factory
+from pytest_factoryboy import register
 
 from epilepsy12.models import Case, Organisation, Site
 
+class E12SiteFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 Sites"""
 
-@pytest.mark.django_db
-@pytest.fixture()
-def new_e12case_factory():
-    """
-    Factory fn which returns a new case. See definition for available options.
-    """
+    class Meta:
+        model = Site
+    
+    # define many to many relationship
+    organisation=factory.LazyFunction(lambda: Organisation.objects.filter(ODSCode="RP401").first())
+    
+    site_is_actively_involved_in_epilepsy_care=True
+    site_is_primary_centre_of_epilepsy_care=True
 
-    def create_e12case(
-        nhs_number: str = "4799637827",
-        first_name: str = "Thomas",
-        surname: str = "Anderson",
-        sex: int = 1,
-        date_of_birth: datetime.date = datetime.date(1964, 9, 2),
-        ethnicity: str = "A",
-        organisation=Organisation.objects.get(ODSCode="RP401"),
-        locked=False,
-    ):
-        new_case = Case.objects.create(
-            nhs_number=nhs_number,
-            first_name=first_name,
-            surname=surname,
-            date_of_birth=date_of_birth,
-            ethnicity=ethnicity,
-            locked=locked,
-        )
+
+class E12CaseFactory(factory.django.DjangoModelFactory):
+    """Factory fn to create new E12 Cases"""
+
+    class Meta:
+        model = Case
+
+    nhs_number = "4799637827"
+    first_name = "Thomas"
+    surname = factory.Sequence(lambda n: f"Anderson-{n}") # Anderson-1, Anderson-2, ...
+    sex = 1
+    date_of_birth = datetime.date(1964, 9, 2)
+    ethnicity = "A"
+    locked = False
+    
+    @factory.post_generation
+    def organisations(self, create, extracted, **kwargs):
+        if not create:
+            # factory NOT called with .create() method
+            return
         
-        new_site = Site.objects.create(
-            organisation=organisation,
-            site_is_actively_involved_in_epilepsy_care=True,
-            site_is_primary_centre_of_epilepsy_care=True,
-            case=new_case,
-        )
-        new_site.save()
-
-        return new_case
-
-    return create_e12case
+        print(f'creating associated site for {self}')
+        E12SiteFactory.create(case=self)

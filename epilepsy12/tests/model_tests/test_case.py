@@ -9,7 +9,15 @@ from datetime import date
 # Third party imports
 
 # RCPCH imports
-from epilepsy12.models import Case, Organisation
+from epilepsy12.models import Case, Organisation, Site
+
+@pytest.mark.django_db
+def test_create_e12case(e12Case):
+    
+    # create new e12 case (with associated site) and save to db
+    case = e12Case.create()
+    
+    assert case.organisations.count() > 0
 
 
 @pytest.fixture

@@ -54,3 +54,5 @@ def test_organisation_request_NOTAUTH_should_pass(client):
     EXPECTED_TEMPLATE_NAME = "epilepsy12/organisation.html"
 
     assert response.status_code != 200
+
+
