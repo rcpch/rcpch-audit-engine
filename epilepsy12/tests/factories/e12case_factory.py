@@ -2,12 +2,14 @@ import datetime
 
 import pytest
 import factory
-from pytest_factoryboy import register
 
 from epilepsy12.models import Case, Organisation, Site
 
 class E12SiteFactory(factory.django.DjangoModelFactory):
-    """Factory fn to create new E12 Sites"""
+    """Factory fn to create new E12 Sites
+
+    A new site is create automatically once `E12CaseFactory.create()` is called.
+    """
 
     class Meta:
         model = Site
