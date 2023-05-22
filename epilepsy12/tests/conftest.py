@@ -1,4 +1,5 @@
 import pytest
+from datetime import date
 
 from epilepsy12.tests.factories import (
     groups_cases_seeder,
@@ -9,7 +10,16 @@ from epilepsy12.models import (
     AuditProgress,
     Site,
     KPI,
+    MultiaxialDiagnosis,
     Registration,
+    Syndrome,
+    SyndromeEntity,
+    EpilepsyCauseEntity,
+)
+from epilepsy12.constants import (
+    SYNDROMES,
+    EPILEPSY_CAUSES,
+    NEUROPSYCHIATRIC,
 )
 
 """
@@ -178,6 +188,74 @@ def e12KPI(e12Site):
 """
 
 """
+AVAILABLE MULTIAXIALDIAGNOSIS FOR TESTS
+------------------------------------------
+"""
+
+
+@pytest.mark.django_db
+@pytest.fixture()
+def e12MultiaxialDiagnosis(e12Registration):
+    """
+    Creates a single E12 Multiaxial Diagnosis object instance for tests.
+    
+    `epilepsy_cause` = Hereditary oculoleptomeningeal amyloid angiopathy
+    `epilepsy_cause_categories` = Genetic + Structural
+    `mental_health_issue` = Anxiety
+    """
+    
+    epilepsy_cause = EpilepsyCauseEntity.objects.filter(conceptId='43532007').first()
+    epilepsy_cause_categories=[EPILEPSY_CAUSES[0][0], EPILEPSY_CAUSES[4][0]]
+    mental_health_issue=NEUROPSYCHIATRIC[0][0]
+    
+    return MultiaxialDiagnosis.objects.create(
+        syndrome_present=True,
+        epilepsy_cause_known=True,
+        mental_health_screen=True,
+        mental_health_issue_identified=True,
+        mental_health_issue=mental_health_issue,
+        registration=e12Registration,
+        epilepsy_cause=epilepsy_cause,
+        epilepsy_cause_categories=epilepsy_cause_categories,
+        relevant_impairments_behavioural_educational=False,
+    )
+
+
+"""
+------------------------------------------
+"""
+"""
+AVAILABLE SYNDROME FOR TESTS
+------------------------------------------
+"""
+
+
+@pytest.mark.django_db
+@pytest.fixture()
+def e12Syndrome(e12MultiaxialDiagnosis):
+    """
+    Creates a single E12 Syndrome object instance for tests.
+
+    Syndrome = Sturge Weber
+    `syndrome_diagnosis_date` = 27 Mar 1919 (date of 'William Allen Sturge's death)
+
+    """
+    syndrome_diagnosis_date = date(1919, 3, 19)
+    syndrome_name = SYNDROMES[30][1]
+    syndrome = SyndromeEntity.objects.filter(syndrome_name=syndrome_name)
+
+    return Syndrome.objects.create(
+        syndrome_diagnosis_date=syndrome_diagnosis_date,
+        syndrome=syndrome,
+        multiaxial_diagnosis=e12MultiaxialDiagnosis,
+    )
+
+
+"""
+------------------------------------------
+"""
+
+"""
 AVAILABLE REGISTRATIONS FOR TESTS
 ------------------------------------------
 """
@@ -192,8 +270,8 @@ def e12Registration(e12Case, e12AuditProgress, e12KPI):
     """
 
     return Registration.objects.create(
-        case=e12Case, 
-        audit_progress=e12AuditProgress, 
+        case=e12Case,
+        audit_progress=e12AuditProgress,
         kpi=e12KPI,
     )
 
