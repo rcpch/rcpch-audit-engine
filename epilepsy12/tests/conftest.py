@@ -19,6 +19,8 @@ from epilepsy12.tests.factories import (
     E12RegistrationFactory,
     E12FirstPaediatricAssessmentFactory,
     E12MultiaxialDiagnosisFactory,
+    E12ManagementFactory,
+    E12AntiEpilepsyMedicineFactory,
 )
 
 from epilepsy12.models import (
@@ -49,7 +51,8 @@ register(
 )  # => e12_first_paediatric_assessment_factory
 register(E12EpilepsyContextFactory)  # => e12_epilepsy_context
 register(E12MultiaxialDiagnosisFactory) # => e12_multiaxial_diagnosis_factory
-
+register(E12ManagementFactory) # => e12_management_factory
+register(E12AntiEpilepsyMedicineFactory) # => e12_anti_epilepsy_medicine_factory
 # AVAILABLE AUDITPROGRESS FOR TESTS
 
 
