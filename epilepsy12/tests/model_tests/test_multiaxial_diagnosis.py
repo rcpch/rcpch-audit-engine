@@ -1,4 +1,9 @@
 """
+
+TODO MOVE TO DIFFERENT TEST FILE:
+    - [ ] all MultiaxialDiagnosis.Episode.calculated_score == MultiaxialDiagnosis.Episode.expected_score when all fields completed
+    
+    
 Tests the Multiaxial Diagnosis model
 More complicated than the others as has 3 related models, each with a one to many relationship
 These are:
@@ -13,9 +18,8 @@ NONEPILEPSY_FIELDS
 Test cases ensure:
     Episode
     - [x] at least one MultiaxialDiagnosis.Episode.epilepsy_or_nonepilepsy_status is epileptic ('E')
-    - [ ] all MultiaxialDiagnosis.Episode.calculated_score == MultiaxialDiagnosis.Episode.expected_score when all fields completed
-    - [ ] a MultiaxialDiagnosis.Episode.description is present if MultiaxialDiagnosis.Episode.has_description_of_the_episode_or_episodes_been_gathered is True
-    - [ ] a MultiaxialDiagnosis.Episode.description_keywords are correct for the given description
+    - [x] a MultiaxialDiagnosis.Episode.description is present if MultiaxialDiagnosis.Episode.has_description_of_the_episode_or_episodes_been_gathered is True
+    - [x] a MultiaxialDiagnosis.Episode.description_keywords are correct for the given description
     - [ ] all nonepilepsy fields including nonepilepsy seizure type fields are None if MultiaxialDiagnosis.Episode.epilepsy_or_nonepilepsy_status == 'E' (epilepsy)
     - [ ] all epilepsy fields are None if MultiaxialDiagnosis.Episode.epilepsy_or_nonepilepsy_status == 'E' (epilepsy) or U (Unknown)
     - [ ] all generalised onset epilepsy fields are None if MultiaxialDiagnosis.Episode.epileptic_seizure_onset_type == 'FO' (focal onset)
@@ -64,6 +68,7 @@ from epilepsy12.models import (
     Episode,
     Syndrome,
     Comorbidity,
+    Keyword,
 )
 from epilepsy12.constants import (
     EPILEPSY_DIAGNOSIS_STATUS,
@@ -74,39 +79,84 @@ from epilepsy12.constants import (
 def test_working_e12MultiaxialDiagnosis_relations_success(
     e12MultiaxialDiagnosis_2022,
 ):
-    """Checks this multiaxialdiagnosis instance has relevant answers attached e.g. via reverse foreign keys.
-    """
-    
+    """Checks this multiaxialdiagnosis instance has relevant answers attached e.g. via reverse foreign keys."""
+
     multiaxial_diagnosis = e12MultiaxialDiagnosis_2022
-    
-    # check case relation exists   
-    assert multiaxial_diagnosis.registration.case 
-    
+
+    # check case relation exists
+    assert multiaxial_diagnosis.registration.case
+
     # checks for relevant many to one relations
     assert Syndrome.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
     assert Comorbidity.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
     assert Episode.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
-    
-    
+
+
 @pytest.mark.xfail
 @pytest.mark.django_db
-def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(e12_registration_factory):
-    
+def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(
+    e12_registration_factory,
+):
     # default multiaxial diagnosis contains 1 episode which is epileptic. Should pass
     multiaxial_diagnosis = e12_registration_factory().multiaxialdiagnosis
-    
+
     epilepsy_episodes = (
-        Episode
-        .objects
-        .filter(multiaxial_diagnosis=multiaxial_diagnosis)
+        Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
         .filter(epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[0][0])
         .exists()
     )
-    
+
     assert epilepsy_episodes
-    
-    # creates multiaxial diagnosis where only episode is non epileptic
+
+    # creates multiaxial diagnosis where only episode is non epileptic. Assert validation error on save (called automatically when creating subFactories)
     with pytest.raises(ValidationError):
         e12_registration_factory(
-            multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status = EPILEPSY_DIAGNOSIS_STATUS[1][0]
+            multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[
+                1
+            ][
+                0
+            ]
+        )
+
+@pytest.mark.xfail
+@pytest.mark.django_db
+def test_Episode_validation_description_must_be_present_when_DescriptionOfEpisode_True(
+    e12_registration_factory,
+):
+    with pytest.raises(ValidationError):
+        e12_registration_factory(
+            multiaxial_diagnosis__episode__has_description_of_the_episode_or_episodes_been_gathered=True,
+            multiaxial_diagnosis__episode__description=None,
+        )
+
+@pytest.mark.xfail
+@pytest.mark.django_db
+def test_Episode_validation_description_keywords_correct_for_description(
+    e12_registration_factory,
+):
+    KEYWORDS = Keyword.objects.all()
+    description = (
+        f"Patient was running when they {KEYWORDS[0]}, {KEYWORDS[1]}, and {KEYWORDS[2]}"
+    )
+
+    # create an Episode with the wrong keywords stored, try to save, should raise validation error
+    # ALL WRONG
+    with pytest.raises(ValidationError):
+        e12_registration_factory(
+            multiaxial_diagnosis__episode__description=description,
+            multiaxial_diagnosis__episode__description_keywords=[
+                KEYWORDS[3],
+                KEYWORDS[4],
+                KEYWORDS[5],
+            ],
+        )
+    # 1 WRONG
+    with pytest.raises(ValidationError):
+        e12_registration_factory(
+            multiaxial_diagnosis__episode__description=description,
+            multiaxial_diagnosis__episode__description_keywords=[
+                KEYWORDS[0],
+                KEYWORDS[1],
+                KEYWORDS[5],
+            ],
         )
