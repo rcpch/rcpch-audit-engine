@@ -62,4 +62,4 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
         verbose_name_plural = "Comorbidities"
 
     def __str__(self) -> str:
-        return self.comorbidity.preferredTerm
+        return self.comorbidityentity.preferredTerm
