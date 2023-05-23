@@ -78,14 +78,12 @@ from epilepsy12.models import (
 
 @pytest.mark.django_db
 def test_working_e12MultiaxialDiagnosis_relations_success(
-    e12MultiaxialDiagnosis_2022
+    e12MultiaxialDiagnosis_2022,
 ):
     """Checks this multiaxialdiagnosis instance has relevant answers attached e.g. via reverse foreign keys.
     """
     
     multiaxial_diagnosis = e12MultiaxialDiagnosis_2022
-    
-    print()
     
     # check case relation exists   
     assert multiaxial_diagnosis.registration.case 
