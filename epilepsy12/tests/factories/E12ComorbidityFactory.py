@@ -1,4 +1,4 @@
-"""Factory fn to create new E12 Multiaxial diagnoses, related to a created Case.
+"""Factory fn to create new E12 Comorbidity, related to a created Registration.
 """
 # standard imports
 from datetime import timedelta

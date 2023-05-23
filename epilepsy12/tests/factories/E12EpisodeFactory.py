@@ -1,4 +1,4 @@
-"""Factory fn to create new E12 Multiaxial diagnoses, related to a created Case.
+"""Factory fn to create new E12 Episodes, related to a Multiaxial Diagnosis.
 """
 # standard imports
 from datetime import timedelta
