@@ -21,6 +21,7 @@ from epilepsy12.tests.factories import (
     E12MultiaxialDiagnosisFactory,
     E12ManagementFactory,
     E12AntiEpilepsyMedicineFactory,
+    E12EpisodeFactory,
 )
 
 from epilepsy12.models import (
@@ -43,6 +44,7 @@ from epilepsy12.constants import (
 # register factories to be used across test directory if requiring custom fixture
 # factory object becomes lowercase-underscore form of the class name
 register(E12CaseFactory)  # => e12_case_factory
+register(E12EpisodeFactory) # => e12_episode_factory
 register(E12SiteFactory)  # => e12_site_factory
 register(E12UserFactory)  # => e12_user_factory
 register(E12RegistrationFactory)  # => e12_registration_factory
@@ -50,9 +52,9 @@ register(
     E12FirstPaediatricAssessmentFactory
 )  # => e12_first_paediatric_assessment_factory
 register(E12EpilepsyContextFactory)  # => e12_epilepsy_context
-register(E12MultiaxialDiagnosisFactory) # => e12_multiaxial_diagnosis_factory
-register(E12ManagementFactory) # => e12_management_factory
-register(E12AntiEpilepsyMedicineFactory) # => e12_anti_epilepsy_medicine_factory
+register(E12MultiaxialDiagnosisFactory)  # => e12_multiaxial_diagnosis_factory
+register(E12ManagementFactory)  # => e12_management_factory
+register(E12AntiEpilepsyMedicineFactory)  # => e12_anti_epilepsy_medicine_factory
 # AVAILABLE AUDITPROGRESS FOR TESTS
 
 

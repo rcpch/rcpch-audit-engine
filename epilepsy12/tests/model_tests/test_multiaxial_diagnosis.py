@@ -12,7 +12,7 @@ NONEPILEPSY_FIELDS
 
 Test cases ensure:
     Episode
-    - [ ] at least one MultiaxialDiagnosis.Episode.epilepsy_or_nonepilepsy_status is epileptic ('E')
+    - [x] at least one MultiaxialDiagnosis.Episode.epilepsy_or_nonepilepsy_status is epileptic ('E')
     - [ ] all MultiaxialDiagnosis.Episode.calculated_score == MultiaxialDiagnosis.Episode.expected_score when all fields completed
     - [ ] a MultiaxialDiagnosis.Episode.description is present if MultiaxialDiagnosis.Episode.has_description_of_the_episode_or_episodes_been_gathered is True
     - [ ] a MultiaxialDiagnosis.Episode.description_keywords are correct for the given description
@@ -52,27 +52,21 @@ Test cases ensure:
     - [ ] MultiaxialDiagnosis.global_developmental_delay_or_learning_difficulties_severity is not None if MultiaxialDiagnosis.global_developmental_delay_or_learning_difficulties is True
     - [ ] MultiaxialDiagnosis.mental_health_issue_identified is not None if MultiaxialDiagnosis.mental_health_screen is True
 
-
-
-    
-    
-
-
-
-
-
-
 """
 # Standard imports
 
 # Third party imports
 import pytest
+from django.core.exceptions import ValidationError
 
 # RCPCH imports
 from epilepsy12.models import (
     Episode,
     Syndrome,
     Comorbidity,
+)
+from epilepsy12.constants import (
+    EPILEPSY_DIAGNOSIS_STATUS,
 )
 
 
@@ -94,4 +88,25 @@ def test_working_e12MultiaxialDiagnosis_relations_success(
     assert Episode.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
     
     
-
+@pytest.mark.xfail
+@pytest.mark.django_db
+def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(e12_registration_factory):
+    
+    # default multiaxial diagnosis contains 1 episode which is epileptic. Should pass
+    multiaxial_diagnosis = e12_registration_factory().multiaxialdiagnosis
+    
+    epilepsy_episodes = (
+        Episode
+        .objects
+        .filter(multiaxial_diagnosis=multiaxial_diagnosis)
+        .filter(epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[0][0])
+        .exists()
+    )
+    
+    assert epilepsy_episodes
+    
+    # creates multiaxial diagnosis where only episode is non epileptic
+    with pytest.raises(ValidationError):
+        e12_registration_factory(
+            multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status = EPILEPSY_DIAGNOSIS_STATUS[1][0]
+        )
