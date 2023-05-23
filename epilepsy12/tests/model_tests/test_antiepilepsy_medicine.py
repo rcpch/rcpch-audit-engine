@@ -16,6 +16,13 @@ from epilepsy12.models import (
 def test_antiepilepsy_pregnancy_checks_set_only_when_female_child_bearing_age(
     e12_registration_factory,
 ):
+    """Testing the AntiEpilepsy factory sets up correctly.
+    
+    Should only set the fields related to pregnancy if:
+        1) case's sex is female
+        2) aed is sodium valproate
+        3) start date of valproate was >= when girl is of child bearing age
+    """
     management_boy = e12_registration_factory(
         case__first_name="boy",
         case__sex=1,
