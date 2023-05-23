@@ -8,14 +8,39 @@
         var datasets = new L.GeoJSON.AJAX("{% url 'uk_shapes' abstraction_level=abstraction_level %}",{
                         style: function (feature) {
                             return {
-                                color: '{{abstraction_level_border_colour}}'
+                                color: '{{abstraction_level_border_colour}}',
+                                weight: 1
                             };
+                        },
+                        onEachFeature: function(feature, layer){
+                            layer.on({
+                                'mouseover': function (e) {
+                                    highlight(e.target, feature);
+                                },'mouseout': function(e){
+                                    dehighlight(e.target);
+                                }});
                         }
-                    }).bindPopup(function (layer) {
-                        return layer.feature.properties.nhser20nm;
                     });
-        // datasets=L.geoJSON(JSON.parse('{{nhsregion_tiles|escapejs}}'), )
+        console.log(datasets);
         datasets.addTo(map);
+
+    }
+
+    function highlight (layer, feature) {
+			layer.setStyle({
+				weight: 3,
+				color: '#e00087'
+			});
+            layer.bindTooltip(feature.properties.nhser22nm).openPopup();
+			if (!L.Browser.ie && !L.Browser.opera) {
+				layer.bringToFront();
+			}
+		}
+    function dehighlight (layer) {
+        layer.setStyle({
+            weight: 1,
+            color: '{{abstraction_level_border_colour}}',
+        })
     }
 
 </script>
