@@ -3,7 +3,7 @@ Tests the FPA model.
 
 Tests:
 
-    - 
+    - [ ] 
 """
 
 # Standard imports
@@ -18,8 +18,7 @@ import pytest
 def test_fpa_valid_creation(
     e12_first_paediatric_assessment_factory,
 ):
-    
     fpa = e12_first_paediatric_assessment_factory()
-    
+
     print(fpa)
     print(f"{fpa.registration}")
