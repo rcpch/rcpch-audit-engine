@@ -160,7 +160,7 @@ def e12Registration_2022():
 @pytest.fixture()
 def e12MultiaxialDiagnosis_2022(e12Registration_2022):
     """
-    Creates a single E12 Multiaxial Diagnosis object instance for tests. Attached to `e12Registration_2022` instance.
+    Returns a single E12 Multiaxial Diagnosis object instance for tests. Attached to `e12Registration_2022` instance - automatically created when registration created.
 
     Episode:
         1) Default:
@@ -168,7 +168,7 @@ def e12MultiaxialDiagnosis_2022(e12Registration_2022):
             - Approximate date confidence
             - Single Episode
             - Epileptic
-            - Description TODO
+            - Description
             - seizure type = Focal Onset
                 - Left-sided, atonic with impaired awareness and temporal EEG findings
     """
