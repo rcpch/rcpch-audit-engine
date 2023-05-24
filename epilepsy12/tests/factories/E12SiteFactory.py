@@ -26,3 +26,4 @@ class E12SiteFactory(factory.django.DjangoModelFactory):
 
     site_is_actively_involved_in_epilepsy_care = True
     site_is_primary_centre_of_epilepsy_care = True
+    site_is_general_paediatric_centre = True
