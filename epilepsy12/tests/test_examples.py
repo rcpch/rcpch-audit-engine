@@ -5,6 +5,31 @@ from django.contrib.auth import get_user_model
 # RCPCH IMPORTS
 from epilepsy12.models import Organisation
 
+@pytest.mark.examples
+@pytest.mark.django_db
+def test_how_to_use_access_edit_audit_form_factories(
+    e12_case_factory
+):
+    
+    # ALWAYS START WITH BUILDING A FRESH CASE as this builds all interconnected relations and dependencies
+    case = e12_case_factory()
+    
+    print(f"{case.registration.firstpaediatricassessment}")
+    print(f"{case.registration.epilepsycontext}")
+    print(f"{case.registration.multiaxialdiagnosis}")
+    print(f"{case.registration.assessment}")
+    print(f"{case.registration.investigations}")
+    print(f"{case.registration.management}")
+    
+    # override something
+    case2 = e12_case_factory(
+        registration__multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status = 'NE',
+        registration__assessment__no_referral_consultant_paediatrician = True # using the flag found in E12AssessmentFactory to override multiple values at once
+    )
+    
+    from epilepsy12.models import Episode
+
+    print(f"Episode after overriding: {Episode.objects.get(multiaxial_diagnosis=case2.registration.multiaxialdiagnosis)}")
 
 @pytest.mark.examples
 @pytest.mark.django_db
