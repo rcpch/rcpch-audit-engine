@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.gis.db import models
 from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
@@ -144,6 +146,9 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     @_history_user.setter
     def _history_user(self, value):
         self.updated_by = value
+    
+    def get_current_date(self):
+        return date.today()
 
     def consultant_paediatrician_wait(self):
         """
