@@ -1,7 +1,8 @@
-# django
-from django.contrib.gis.db import models
+# standard imports
+from datetime import date
 
 # 3rd party
+from django.contrib.gis.db import models
 from simple_history.models import HistoricalRecords
 
 # rcpch
@@ -119,6 +120,9 @@ class Investigations(
             return stringify_time_elapsed(
                 self.eeg_request_date, self.eeg_performed_date
             )
+    
+    def get_current_date(self):
+        return date.today()
 
     # relationships
     registration = models.OneToOneField(
