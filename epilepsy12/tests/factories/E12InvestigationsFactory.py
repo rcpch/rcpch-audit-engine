@@ -1,7 +1,7 @@
 """Factory fn to create new E12 Investigations, related to a created Registration.
 """
 # standard imports
-from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 # third-party imports
 import factory
@@ -17,9 +17,9 @@ class E12InvestigationsFactory(factory.django.DjangoModelFactory):
     This Factory is generated AFTER a Registration is created.
     
     Default:
-        - EEG requested on registration minus 1 year
+        - EEG requested on registration plus 1 month
         - EEG performed on request date + 28 days
-        - MRI requested on registration minus 1 year
+        - MRI requested on registration plus 1 month
         - MRI reported on request date + 28 days
         - ECG + CTHead performed
     Flags:
@@ -36,21 +36,21 @@ class E12InvestigationsFactory(factory.django.DjangoModelFactory):
     # eeg requested is 365 days before registration
     @factory.lazy_attribute
     def eeg_request_date(self): 
-        return self.registration.registration_date - timedelta(days=365)
+        return self.registration.registration_date + relativedelta(months=1)
     # eeg performed is 28 days after requested date
     @factory.lazy_attribute
     def eeg_performed_date(self): 
-        return self.eeg_request_date + timedelta(days=28)
+        return self.eeg_request_date + relativedelta(days=28)
     
     mri_indicated = True
     # mri requested is 365 days before registration
     @factory.lazy_attribute
     def mri_brain_requested_date(self): 
-        return self.registration.registration_date - timedelta(days=365)
+        return self.registration.registration_date + relativedelta(months=1)
     # mri reported is 28 days after requested date
     @factory.lazy_attribute
     def mri_brain_reported_date(self): 
-        return self.mri_brain_requested_date + timedelta(days=28)
+        return self.mri_brain_requested_date + relativedelta(days=28)
     
     twelve_lead_ecg_status = True
     ct_head_scan_status = True
