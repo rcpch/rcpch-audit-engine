@@ -11,6 +11,25 @@ import pytest
 # RCPCH imports
 from epilepsy12.models import Assessment, Registration
 
+"""
+- [ ] Assessment.consultant_paediatrician_referral_date and Assessment.consultant_paediatrician_input_date are both None if Assessment.consultant_paediatrician_referral_made is False
+- [ ] Assessment.consultant_paediatrician_referral_date and Assessment.consultant_paediatrician_input_date cannot be in the future
+- [ ] Assessment.consultant_paediatrician_referral_date cannot be after Assessment.consultant_paediatrician_input_date
+- [ ] Neither Assessment.consultant_paediatrician_referral_date nor Assessment.consultant_paediatrician_input_date can be before Registration.registration_date or Case.date_of_birth
+- [ ] Assessment.paediatric_neurologist_input_date and Assessment.paediatric_neurologist_referral_date are both None if Assessment.paediatric_neurologist_referral_made is False
+- [ ] Assessment.paediatric_neurologist_input_date and Assessment.paediatric_neurologist_referral_date cannot be in the future
+- [ ] Assessment.paediatric_neurologist_input_date cannot be after Assessment.paediatric_neurologist_referral_date
+- [ ] Neither Assessment.paediatric_neurologist_input_date nor Assessment.paediatric_neurologist_referral_date can be before Registration.registration_date or Case.date_of_birth
+- [ ] Assessment.childrens_epilepsy_surgical_service_input_date and Assessment.childrens_epilepsy_surgical_service_referral_date are both None if Assessment.childrens_epilepsy_surgical_service_referral_made is False
+- [ ] Assessment.childrens_epilepsy_surgical_service_input_date and Assessment.childrens_epilepsy_surgical_service_referral_date cannot be in the future
+- [ ] Assessment.childrens_epilepsy_surgical_service_input_date cannot be after Assessment.childrens_epilepsy_surgical_service_referral_date
+- [ ] Neither Assessment.childrens_epilepsy_surgical_service_input_date nor Assessment.childrens_epilepsy_surgical_service_referral_date can be before Registration.registration_date or Case.date_of_birth
+- [ ] Assessment.epilepsy_specialist_nurse_input_date and Assessment.epilepsy_specialist_nurse_referral_date are both None if Assessment.epilepsy_specialist_nurse_referral_made is False
+- [ ] Assessment.epilepsy_specialist_nurse_input_date and Assessment.epilepsy_specialist_nurse_referral_date cannot be in the future
+- [ ] Assessment.epilepsy_specialist_nurse_input_date cannot be after Assessment.epilepsy_specialist_nurse_referral_date
+- [ ] Neither Assessment.epilepsy_specialist_nurse_input_date nor Assessment.epilepsy_specialist_nurse_referral_date can be before Registration.registration_date or Case.date_of_birth
+"""
+
 
 @pytest.fixture
 @pytest.mark.django_db
