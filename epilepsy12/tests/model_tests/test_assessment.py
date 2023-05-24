@@ -73,6 +73,7 @@ def test_validation_referral_date_and_input_date_both_none_when_referral_made_fa
 @patch.object(Assessment, "get_current_date", return_value=date(2023, 10, 1))
 @pytest.mark.django_db
 def test_validation_referral_date_and_input_date_cant_be_future(
+    mocked_get_current_date,
     e12_case_factory,
 ):
     """
