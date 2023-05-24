@@ -17,7 +17,8 @@ from .E12MultiaxialDiagnosisFactory import E12MultiaxialDiagnosisFactory
 from .E12InvestigationsFactory import E12InvestigationsFactory
 from .E12ManagementFactory import E12ManagementFactory
 from .E12AssessmentFactory import E12AssessmentFactory
-
+from .E12FirstPaediatricAssessmentFactory import E12FirstPaediatricAssessmentFactory
+from .E12EpilepsyContextFactory import E12EpilepsyContextFactory
 
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -66,7 +67,14 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         )
 
     # Reverse dependencies
-
+    first_paediatric_assessment = factory.RelatedFactory(
+        E12FirstPaediatricAssessmentFactory,
+        factory_related_name='registration'
+    )
+    epilepsy_context = factory.RelatedFactory(
+        E12EpilepsyContextFactory,
+        factory_related_name='registration'
+    )
     multiaxial_diagnosis = factory.RelatedFactory(
         E12MultiaxialDiagnosisFactory, factory_related_name="registration"
     )

@@ -12,7 +12,6 @@ import factory
 from epilepsy12.models import (
     EpilepsyContext
 )
-from .E12RegistrationFactory import E12RegistrationFactory
 from epilepsy12.constants import OPT_OUT_UNCERTAIN
 
 class E12EpilepsyContextFactory(factory.django.DjangoModelFactory):
@@ -20,7 +19,8 @@ class E12EpilepsyContextFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EpilepsyContext
     
-    registration = factory.SubFactory(E12RegistrationFactory)
+    # when a registration instance created, it will attach to this instance
+    registration = None
     
     previous_febrile_seizure=OPT_OUT_UNCERTAIN[0][0]
     previous_acute_symptomatic_seizure=OPT_OUT_UNCERTAIN[0][0]

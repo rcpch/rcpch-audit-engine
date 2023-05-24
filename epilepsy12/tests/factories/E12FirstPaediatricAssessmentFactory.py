@@ -12,14 +12,15 @@ import factory
 from epilepsy12.models import (
     FirstPaediatricAssessment
 )
-from .E12RegistrationFactory import E12RegistrationFactory
 
 class E12FirstPaediatricAssessmentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = FirstPaediatricAssessment
     
-    registration = factory.SubFactory(E12RegistrationFactory)
+    # when a registration instance created, it will attach to this instance
+    registration = None
+    
     first_paediatric_assessment_in_acute_or_nonacute_setting=True
     has_number_of_episodes_since_the_first_been_documented=True
     general_examination_performed=True
