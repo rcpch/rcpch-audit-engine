@@ -20,13 +20,14 @@ from .E12AssessmentFactory import E12AssessmentFactory
 from .E12FirstPaediatricAssessmentFactory import E12FirstPaediatricAssessmentFactory
 from .E12EpilepsyContextFactory import E12EpilepsyContextFactory
 
+
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Registration
 
     # Once Case instance made, it will attach to this instance
     case = None
-    
+
     # Sets the minimal 'required' fields for a registration to be valid
     registration_date = datetime.date(2023, 1, 1)
     eligibility_criteria_met = True
@@ -68,18 +69,17 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
 
     # Reverse dependencies
     first_paediatric_assessment = factory.RelatedFactory(
-        E12FirstPaediatricAssessmentFactory,
-        factory_related_name='registration'
+        E12FirstPaediatricAssessmentFactory, factory_related_name="registration"
     )
     epilepsy_context = factory.RelatedFactory(
-        E12EpilepsyContextFactory,
-        factory_related_name='registration'
+        E12EpilepsyContextFactory, factory_related_name="registration"
     )
     multiaxial_diagnosis = factory.RelatedFactory(
         E12MultiaxialDiagnosisFactory, factory_related_name="registration"
     )
     assessment = factory.RelatedFactory(
-        E12AssessmentFactory, factory_related_name="registration"
+        E12AssessmentFactory,  # see docstrings for available flags
+        factory_related_name="registration",
     )
     investigations = factory.RelatedFactory(
         E12InvestigationsFactory,  # see docstrings for available flags

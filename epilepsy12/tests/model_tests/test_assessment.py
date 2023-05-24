@@ -9,7 +9,11 @@ import pytest
 # Third party imports
 
 # RCPCH imports
-from epilepsy12.models import Assessment, Registration
+from epilepsy12.models import (
+    Assessment, 
+    Registration,
+    Site,
+    )
 
 """
 - [ ] Assessment.consultant_paediatrician_referral_date and Assessment.consultant_paediatrician_input_date are both None if Assessment.consultant_paediatrician_referral_made is False
@@ -29,6 +33,14 @@ from epilepsy12.models import Assessment, Registration
 - [ ] Assessment.epilepsy_specialist_nurse_input_date cannot be after Assessment.epilepsy_specialist_nurse_referral_date
 - [ ] Neither Assessment.epilepsy_specialist_nurse_input_date nor Assessment.epilepsy_specialist_nurse_referral_date can be before Registration.registration_date or Case.date_of_birth
 """
+
+@pytest.mark.django_db
+def test_working_assessment_factory(e12_case_factory):
+    case = e12_case_factory(registration__assessment__no_referral_paediatric_neurologist=True)
+    
+    print(f"{Site.objects.get(case=case).site_is_paediatric_neurology_centre=}")
+    
+
 
 
 @pytest.fixture
