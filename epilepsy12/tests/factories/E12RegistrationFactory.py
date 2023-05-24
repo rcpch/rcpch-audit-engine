@@ -13,20 +13,22 @@ from epilepsy12.models import (
     KPI,
 )
 from .E12AuditProgressFactory import E12AuditProgressFactory
-from .E12CaseFactory import E12CaseFactory
 from .E12MultiaxialDiagnosisFactory import E12MultiaxialDiagnosisFactory
 from .E12InvestigationsFactory import E12InvestigationsFactory
 from .E12ManagementFactory import E12ManagementFactory
+from .E12AssessmentFactory import E12AssessmentFactory
 
 
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Registration
 
+    # Once Case instance made, it will attach to this instance
+    case = None
+    
     # Sets the minimal 'required' fields for a registration to be valid
     registration_date = datetime.date(2023, 1, 1)
     eligibility_criteria_met = True
-    case = factory.SubFactory(E12CaseFactory)
     audit_progress = factory.SubFactory(E12AuditProgressFactory)
 
     # Getting the KPI organisation requires a more complex operation so we use the .lazy_attribute decorator. Once a Registration is .create()'d, filter Sites using the related Case to find the lead organisation - which is used to generate the kpi model.
@@ -67,6 +69,9 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
 
     multiaxial_diagnosis = factory.RelatedFactory(
         E12MultiaxialDiagnosisFactory, factory_related_name="registration"
+    )
+    assessment = factory.RelatedFactory(
+        E12AssessmentFactory, factory_related_name="registration"
     )
     investigations = factory.RelatedFactory(
         E12InvestigationsFactory,  # see docstrings for available flags

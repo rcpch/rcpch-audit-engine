@@ -10,3 +10,4 @@ from .E12MultiaxialDiagnosisFactory import E12MultiaxialDiagnosisFactory
 from .E12RegistrationFactory import E12RegistrationFactory
 from .E12SiteFactory import E12SiteFactory
 from .E12UserFactory import E12UserFactory
+from .E12AssessmentFactory import E12AssessmentFactory

@@ -8,6 +8,7 @@ import factory
 # rcpch imports
 from epilepsy12.models import Case
 from .E12SiteFactory import E12SiteFactory
+from .E12RegistrationFactory import E12RegistrationFactory
 from epilepsy12.constants import VALID_NHS_NUMS
 
 
@@ -31,3 +32,9 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             return
 
         E12SiteFactory.create(case=self)
+    
+    # reverse dependencies
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
