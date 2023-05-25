@@ -107,6 +107,19 @@ def calculate_kpis(registration_instance):
         and hasattr(registration_instance, "assessment")
         and hasattr(registration_instance, "multiaxialdiagnosis")
     ):
+        # check to see if tertiary referral made and child seen
+        tertiary_input_complete = (
+            registration_instance.assessment.paediatric_neurologist_input_date
+            is not None
+            and registration_instance.assessment.paediatric_neurologist_referral_date
+            is not None
+        ) or (
+            registration_instance.assessment.childrens_epilepsy_surgical_service_referral_date
+            is not None
+            and registration_instance.assessment.childrens_epilepsy_surgical_service_input_date
+            is not None
+        )
+
         # denominator
         if (
             (age_at_first_paediatric_assessment <= 3)
@@ -184,7 +197,10 @@ def calculate_kpis(registration_instance):
                 )
             ):
                 # measure has been met
-                tertiary_input = 1
+                if tertiary_input_complete:
+                    tertiary_input = 1
+                else:
+                    tertiary_input = 0
 
         else:
             # not eligible for this measure
