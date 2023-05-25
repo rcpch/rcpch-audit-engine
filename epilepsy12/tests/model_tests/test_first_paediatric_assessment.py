@@ -12,13 +12,12 @@ Tests:
 import pytest
 
 # RCPCH imports
-
+from epilepsy12.models import FirstPaediatricAssessment
 
 @pytest.mark.django_db
 def test_fpa_valid_creation(
-    e12_first_paediatric_assessment_factory,
+    e12_case_factory,
 ):
-    fpa = e12_first_paediatric_assessment_factory()
+    case = e12_case_factory()
 
-    print(fpa)
-    print(f"{fpa.registration}")
+    assert FirstPaediatricAssessment.objects.filter(registration=case.registration).exists()

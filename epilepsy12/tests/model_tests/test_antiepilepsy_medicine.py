@@ -14,7 +14,7 @@ from epilepsy12.models import (
 
 @pytest.mark.django_db
 def test_antiepilepsy_pregnancy_checks_set_only_when_female_child_bearing_age(
-    e12_registration_factory,
+    e12_case_factory,
 ):
     """Testing the AntiEpilepsy factory sets up correctly.
     
@@ -23,23 +23,23 @@ def test_antiepilepsy_pregnancy_checks_set_only_when_female_child_bearing_age(
         2) aed is sodium valproate
         3) start date of valproate was >= when girl is of child bearing age
     """
-    management_boy = e12_registration_factory(
-        case__first_name="boy",
-        case__sex=1,
-        case__date_of_birth=date(2004, 1, 1),
-    ).management
+    management_boy = e12_case_factory(
+        first_name="boy",
+        sex=1,
+        date_of_birth=date(2004, 1, 1),
+    ).registration.management
 
-    management_girl_childbearing = e12_registration_factory(
-        case__first_name="girl",
-        case__sex=2,
-        case__date_of_birth=date(2004, 1, 1),
-    ).management
+    management_girl_childbearing = e12_case_factory(
+        first_name="girl",
+        sex=2,
+        date_of_birth=date(2004, 1, 1),
+    ).registration.management
 
-    management_girl_NOT_childbearing = e12_registration_factory(
-        case__first_name="girl",
-        case__sex=2,
-        case__date_of_birth=date(2022, 1, 1),
-    ).management
+    management_girl_NOT_childbearing = e12_case_factory(
+        first_name="girl",
+        sex=2,
+        date_of_birth=date(2022, 1, 1),
+    ).registration.management
 
     assert not AntiEpilepsyMedicine.objects.filter(management=management_boy)[
         0

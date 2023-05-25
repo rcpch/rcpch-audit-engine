@@ -34,12 +34,13 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
     mental_health_screen: False
     mental_health_issue_identified: True
     mental_health_issue: AxD
-    
+
     Reverse foreign keys (created automatically on instantiation of this object):
-        - comorbidity 
-        - syndrome 
-        - episode 
+        - comorbidity
+        - syndrome
+        - episode
     """
+
     class Meta:
         model = MultiaxialDiagnosis
 
@@ -48,7 +49,7 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
 
     epilepsy_cause_known = True
     epilepsy_cause_categories = [EPILEPSY_CAUSES[0][0]]  # Genetic
-    
+
     global_developmental_delay_or_learning_difficulties = False
 
     @factory.lazy_attribute

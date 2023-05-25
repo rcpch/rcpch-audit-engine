@@ -18,9 +18,9 @@ from epilepsy12.models import (
 
 @pytest.mark.django_db
 def test_epilepsy_context_valid_creation(
-    e12_epilepsy_context_factory,
+    e12_case_factory,
 ):
     
-    ec = e12_epilepsy_context_factory()
+    case = e12_case_factory()
     
-    assert ec.registration.case
+    assert Case.objects.filter(registration = case.registration).exists()

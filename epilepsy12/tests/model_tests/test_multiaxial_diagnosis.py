@@ -77,11 +77,11 @@ from epilepsy12.constants import (
 
 @pytest.mark.django_db
 def test_working_e12MultiaxialDiagnosis_relations_success(
-    e12MultiaxialDiagnosis_2022,
+    e12_case_factory,
 ):
     """Checks this multiaxialdiagnosis instance has relevant answers attached e.g. via reverse foreign keys."""
 
-    multiaxial_diagnosis = e12MultiaxialDiagnosis_2022
+    multiaxial_diagnosis = e12_case_factory().registration.multiaxialdiagnosis
 
     # check case relation exists
     assert multiaxial_diagnosis.registration.case
@@ -95,10 +95,10 @@ def test_working_e12MultiaxialDiagnosis_relations_success(
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(
-    e12_registration_factory,
+    e12_case_factory,
 ):
     # default multiaxial diagnosis contains 1 episode which is epileptic. Should pass
-    multiaxial_diagnosis = e12_registration_factory().multiaxialdiagnosis
+    multiaxial_diagnosis = e12_case_factory().registration.multiaxialdiagnosis
 
     epilepsy_episodes = (
         Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
@@ -110,8 +110,8 @@ def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(
 
     # creates multiaxial diagnosis where only episode is non epileptic. Assert validation error on save (called automatically when creating subFactories)
     with pytest.raises(ValidationError):
-        e12_registration_factory(
-            multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[
+        e12_case_factory(
+            registration__multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[
                 1
             ][
                 0
@@ -121,18 +121,18 @@ def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_Episode_validation_description_must_be_present_when_DescriptionOfEpisode_True(
-    e12_registration_factory,
+    e12_case_factory,
 ):
     with pytest.raises(ValidationError):
-        e12_registration_factory(
-            multiaxial_diagnosis__episode__has_description_of_the_episode_or_episodes_been_gathered=True,
-            multiaxial_diagnosis__episode__description=None,
+        e12_case_factory(
+            registration__multiaxial_diagnosis__episode__has_description_of_the_episode_or_episodes_been_gathered=True,
+            registration__multiaxial_diagnosis__episode__description=None,
         )
 
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_Episode_validation_description_keywords_correct_for_description(
-    e12_registration_factory,
+    e12_case_factory,
 ):
     KEYWORDS = Keyword.objects.all()
     description = (
@@ -142,9 +142,9 @@ def test_Episode_validation_description_keywords_correct_for_description(
     # create an Episode with the wrong keywords stored, try to save, should raise validation error
     # ALL WRONG
     with pytest.raises(ValidationError):
-        e12_registration_factory(
-            multiaxial_diagnosis__episode__description=description,
-            multiaxial_diagnosis__episode__description_keywords=[
+        e12_case_factory(
+            registration__multiaxial_diagnosis__episode__description=description,
+            registration__multiaxial_diagnosis__episode__description_keywords=[
                 KEYWORDS[3],
                 KEYWORDS[4],
                 KEYWORDS[5],
@@ -152,9 +152,9 @@ def test_Episode_validation_description_keywords_correct_for_description(
         )
     # 1 WRONG
     with pytest.raises(ValidationError):
-        e12_registration_factory(
-            multiaxial_diagnosis__episode__description=description,
-            multiaxial_diagnosis__episode__description_keywords=[
+        e12_case_factory(
+            registration__multiaxial_diagnosis__episode__description=description,
+            registration__multiaxial_diagnosis__episode__description_keywords=[
                 KEYWORDS[0],
                 KEYWORDS[1],
                 KEYWORDS[5],

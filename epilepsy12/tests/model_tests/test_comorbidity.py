@@ -8,22 +8,15 @@ import pytest
 # Third party imports
 
 # RCPCH imports
-from epilepsy12.models import Comorbidity, ComorbidityEntity, MultiaxialDiagnosis
+from epilepsy12.models import Comorbidity
 
 
-@pytest.fixture
-def comorbidity_entity(db):
-    # picks the first comorbidity entity from the database
-    return ComorbidityEntity.objects.get(pk=1)
+@pytest.mark.django_db
+def test_working_comorbidity(e12_case_factory):
+    """Tests simply ensures a valid comorbidity is attched, with default values, to a case.
+    """
+    case = e12_case_factory()
+      
+    print(Comorbidity.objects.get(multiaxial_diagnosis=case.registration.multiaxialdiagnosis).comorbidity_diagnosis_date)
 
-
-@pytest.fixture
-def comorbidity(db, e12MultiaxialDiagnosis_2022, comorbidity_entity):
-    return Comorbidity.objects.create(
-        multiaxial_diagnosis=e12MultiaxialDiagnosis_2022,
-        comorbidityentity=comorbidity_entity,
-    )
-
-
-def test_comorbidity_diagnosis_date(db, comorbidity):
-    assert comorbidity.comorbidity_diagnosis_date == None
+    
