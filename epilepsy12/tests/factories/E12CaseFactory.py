@@ -24,16 +24,14 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     date_of_birth = datetime.date(2021, 9, 2)
     ethnicity = "A"
     locked = False
-
-    @factory.post_generation
-    def organisations(self, create, extracted, **kwargs):
-        if not create:
-            # factory NOT called with .create() method
-            return
-
-        E12SiteFactory.create(case=self)
     
-    # reverse dependencies
+    # once case created, create a Site, which acts as a link table between the Case and Organisation
+    organisations = factory.RelatedFactory(
+        E12SiteFactory,
+        factory_related_name='case'
+    )
+    
+    # reverse dependency
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
         factory_related_name="case",
