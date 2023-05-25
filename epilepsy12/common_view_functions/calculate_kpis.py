@@ -265,7 +265,7 @@ def calculate_kpis(registration_instance):
     # 5. MRI
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under 2 years  at first assessment with a diagnosis of epilepsy at first year))
     mri = None
     if hasattr(registration_instance, "multiaxialdiagnosis") and hasattr(
         registration_instance, "investigations"
@@ -420,10 +420,11 @@ def calculate_kpis(registration_instance):
         # denominator is all children with epilepsy - no denominator
 
         # eligible for this measure
-        comprehensive_care_planning_agreement = 0
         if registration_instance.management.individualised_care_plan_in_place:
             # criteria met
             comprehensive_care_planning_agreement = 1
+        if not registration_instance.management.individualised_care_plan_in_place:
+            comprehensive_care_planning_agreement = 0
 
     # a. patient_held_individualised_epilepsy_document
     # % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
