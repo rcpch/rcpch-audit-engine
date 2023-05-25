@@ -1,6 +1,24 @@
 """
 Tests the Investigations model.
 
+TODO -> refactor Investigations EEG + MRI field names. Currently:
+
+1 eeg_indicated
+2 eeg_request_date
+3 eeg_performed_date
+4 mri_indicated
+5 mri_brain_requested_date
+6 mri_brain_reported_date
+
+Change to:
+
+1 SAME
+2 eeg_requested_date
+3 eeg_reported_date
+4 mri_brain_indicated
+5 SAME
+6 SAME
+
 Tests:
 - [ ] Investigations.eeg_request_date # TODO what should go here?
 = [x] Investigations.eeg_performed_date should be None if Investigations.eeg_indicated is False or None
