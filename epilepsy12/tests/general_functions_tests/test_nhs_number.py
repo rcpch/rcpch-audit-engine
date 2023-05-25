@@ -1,4 +1,4 @@
-"""Tests for the general functions used in E12
+"""Tests for the NHS Number functions used in E12
 """
 
 import pytest
