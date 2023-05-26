@@ -1,5 +1,5 @@
 """
-Measure 2
+Measure 2 `epilepsy_specialist_nurse`
 - [x] Measure 2 passed (registration.kpi.epilepsy_specialist_nurse = 1) are seen in first year of care
 registration_instance.assessment.epilepsy_specialist_nurse_input_date and registration_instance.assessment.epilepsy_specialist_nurse_referral_made are not None
 - [x] Measure 2 failed (registration.assessment.paediatrician_with_expertise_in_epilepsies = 0) if epilepsy_specialist_nurse not seen after referral or not referred
