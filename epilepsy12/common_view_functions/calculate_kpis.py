@@ -409,7 +409,7 @@ def calculate_kpis(registration_instance):
             # not eligible for this measure
             sodium_valproate = 2
 
-    # 9. comprehensive_care_planning_agreement
+    # 9A. comprehensive_care_planning_agreement
     # % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below
@@ -426,7 +426,7 @@ def calculate_kpis(registration_instance):
         if not registration_instance.management.individualised_care_plan_in_place:
             comprehensive_care_planning_agreement = 0
 
-    # a. patient_held_individualised_epilepsy_document
+    # i. patient_held_individualised_epilepsy_document
     # % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
@@ -443,7 +443,7 @@ def calculate_kpis(registration_instance):
             # criteria met
             patient_held_individualised_epilepsy_document = 1
 
-    # b patient_carer_parent_agreement_to_the_care_planning
+    # ii patient_carer_parent_agreement_to_the_care_planning
     # % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -454,7 +454,7 @@ def calculate_kpis(registration_instance):
         ):
             patient_carer_parent_agreement_to_the_care_planning = 1
 
-    # c. care_planning_has_been_updated_when_necessary
+    # iii. care_planning_has_been_updated_when_necessary
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -468,7 +468,7 @@ def calculate_kpis(registration_instance):
             # criteria met
             care_planning_has_been_updated_when_necessary = 1
 
-    # 9b. comprehensive_care_planning_content
+    # 9B. comprehensive_care_planning_content
     # Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
@@ -489,7 +489,7 @@ def calculate_kpis(registration_instance):
             # criteria met
             comprehensive_care_planning_content = 1
 
-    # a. parental_prolonged_seizures_care_plan
+    # i. parental_prolonged_seizures_care_plan
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
     # Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
@@ -510,7 +510,7 @@ def calculate_kpis(registration_instance):
             # not eligible for this measure
             parental_prolonged_seizures_care_plan = 2
 
-    # b. water_safety
+    # ii. water_safety
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -522,7 +522,7 @@ def calculate_kpis(registration_instance):
         ):
             water_safety = 1
 
-    # c. first_aid
+    # iii. first_aid
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -533,7 +533,7 @@ def calculate_kpis(registration_instance):
         if registration_instance.management.individualised_care_plan_include_first_aid:
             first_aid = 1
 
-    # d. general_participation_and_risk
+    # iv. general_participation_and_risk
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -546,7 +546,7 @@ def calculate_kpis(registration_instance):
         ):
             general_participation_and_risk = 1
 
-    # e. service_contact_details
+    # v. service_contact_details
     # Calculation Method
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
@@ -559,7 +559,7 @@ def calculate_kpis(registration_instance):
         ):
             service_contact_details = 1
 
-    # f. sudep
+    # vi. sudep
     # Calculation Method
     # Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
     # Denominator = Number of children diagnosed with epilepsy at first year
