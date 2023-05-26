@@ -81,6 +81,22 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
     )
 
     class Params:
+        reset = (
+            factory.Trait(
+                consultant_paediatrician_referral_made=None,
+                consultant_paediatrician_referral_date=None,
+                consultant_paediatrician_input_date=None,
+                paediatric_neurologist_referral_made=None,
+                paediatric_neurologist_referral_date=None,
+                paediatric_neurologist_input_date=None,
+                childrens_epilepsy_surgical_service_referral_made=None,
+                childrens_epilepsy_surgical_service_referral_date=None,
+                childrens_epilepsy_surgical_service_input_date=None,
+                epilepsy_specialist_nurse_referral_made=None,
+                epilepsy_specialist_nurse_referral_date=None,
+                epilepsy_specialist_nurse_input_date=None,
+            ),
+        )
         no_referral_consultant_paediatrician = factory.Trait(
             consultant_paediatrician_referral_made=False,
             consultant_paediatrician_referral_date=None,

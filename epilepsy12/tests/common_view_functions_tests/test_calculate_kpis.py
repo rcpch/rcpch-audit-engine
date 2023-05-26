@@ -2,19 +2,7 @@
 Tests for the calculate_kpi function.
 
 Tests
-- [ ] return None if child not registered in audit (registration.registration_date is None, or registration_eligibility_criteria_met is None or False, Site.site_is_primary_centre_of_epilepsy_care is None)
-
-Measure 1
-- [ ] Measure 1 passed (registration.kpi.paediatrician_with_expertise_in_epilepsies = 1) are seen within 2 weeks of referral 
-registration_instance.assessment.epilepsy_specialist_nurse_input_date <= (registration_instance.assessment.epilepsy_specialist_nurse_referral_date + relativedelta(days=+14))
-- [ ] Measure 1 failed (registration.assessment.paediatrician_with_expertise_in_epilepsies = 0) if paediatrician seen after two weeks from referral or not referred
-- [ ] Measure 1 None if incomplete (assessment.consultant_paediatrician_referral_date or assessment.consultant_paediatrician_input_date or assessment.consultant_paediatrician_referral_made is None)
-
-Measure 2
-- [ ] Measure 2 passed (registration.kpi.epilepsy_specialist_nurse = 1) are seen in first year of care
-registration_instance.assessment.epilepsy_specialist_nurse_input_date and registration_instance.assessment.epilepsy_specialist_nurse_referral_made are not None
-- [ ] Measure 2 failed (registration.assessment.paediatrician_with_expertise_in_epilepsies = 0) if epilepsy_specialist_nurse not seen after referral or not referred
-- [ ] Measure 2 None if incomplete (assessment.epilepsy_specialist_nurse_referral_made or assessment.epilepsy_specialist_nurse_input_date or assessment.epilepsy_specialist_nurse_referral_date is None)
+- [x] return None if child not registered in audit (registration.registration_date is None, or registration_eligibility_criteria_met is None or False, Site.site_is_primary_centre_of_epilepsy_care is None)
 
 Measure 3
 - [ ] Measure 3 passed (registration.kpi.tertiary_input == 1) if age at first paediatric assessment is <= 3 and seen by neurologist or epilepsy surgery ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
@@ -69,19 +57,48 @@ Measure 9a
 
 # Standard imports
 import pytest
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # Third party imports
 
 # RCPCH imports
 from epilepsy12.common_view_functions import calculate_kpis
+from epilepsy12.models import (
+    Registration,
+    KPI,
+)
 
 
 @pytest.mark.django_db
-def test_calculate_kpi_function(
-    e12_case_factory,
-):
-    """Creates an audit progress with fields filled using default values."""
+def test_child_not_registered_in_audit_returns_none(e12_case_factory):
+    """
+    Test that calculate_kpis() returns None if child is not registered in the audit.
+    """
+
+    # creates an case with all audit values filled with default values
     case = e12_case_factory()
 
-    calculate_kpis(case.registration)
-    
+    # overwrite registration_date and eligibility criteria
+    case.registration.registration_date = None
+    case.registration.eligibility_criteria_met = None
+    case.save()
+
+    registration = Registration.objects.get(case=case)
+
+    assert calculate_kpis(registration) is None
+
+    # repeat with eligibility_criteria_met = False
+    case.registration.registration_date = None
+    case.registration.eligibility_criteria_met = False
+    case.save()
+
+    # get registration for the saved case model
+    registration = Registration.objects.get(case=case)
+
+    assert calculate_kpis(registration) is None
+
+
+
+
+

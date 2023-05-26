@@ -54,6 +54,7 @@ def calculate_kpis(registration_instance):
             and registration_instance.assessment.consultant_paediatrician_referral_date
             is not None
         ):
+            
             if (
                 registration_instance.assessment.consultant_paediatrician_input_date
                 <= (
