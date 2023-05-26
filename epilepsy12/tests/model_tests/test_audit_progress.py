@@ -21,7 +21,7 @@ def test_audit_progress_creation(
     """
     case = e12_case_factory().registration.audit_progress
     
-    print(case.registration.audit_progress)
+    assert case.registration.audit_progress
 
 # @pytest.mark.django_db
 # def test_audit_progress_creation(e12Registration_2022):

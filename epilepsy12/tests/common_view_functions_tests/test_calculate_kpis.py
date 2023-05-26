@@ -48,6 +48,3 @@ def test_calculate_kpi_function(
     
     calculate_kpis(case.registration)
     
-    print(case.registration.kpi)
-    for attr, val in vars(case.registration.kpi).items():
-        print(f"{attr} = {val}")
