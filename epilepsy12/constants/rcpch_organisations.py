@@ -25,7 +25,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "01223 245151",
         "Email": "",
         "Website": "https://www.cuh.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40270",
@@ -49,7 +49,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.airedaletrust.nhs.uk/",
-        "Fax": "01535 655129"
+        "Fax": "01535 655129",
     },
     {
         "OrganisationID": "40195",
@@ -73,7 +73,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.alderhey.nhs.uk",
-        "Fax": "0151 252 5846"
+        "Fax": "0151 252 5846",
     },
     {
         "OrganisationID": "41948",
@@ -97,7 +97,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/our-locations/alnwick-infirmary",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43210",
@@ -121,7 +121,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk/For%20patients%20and%20visitors/amersham-hospital.htm",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40163",
@@ -145,7 +145,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "wuth.patientexperience@nhs.net",
         "Website": "http://www.wuth.nhs.uk",
-        "Fax": "0151 604 7148"
+        "Fax": "0151 604 7148",
     },
     {
         "OrganisationID": "42027",
@@ -169,7 +169,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "asp-tr.patient.advice@nhs.net",
         "Website": "http://www.ashfordstpeters.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "72361",
@@ -193,7 +193,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.royalfree.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40570",
@@ -217,7 +217,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.barnsleyhospital.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40570",
@@ -241,7 +241,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.barnsleyhospital.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -258,14 +258,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRISTOL",
         "County": "AVON",
         "Postcode": "BS5 0AX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.45640792575672",
+        "Longitude": "-2.563680201763284",
         "ParentODSCode": "RVN",
         "ParentName": "AVON AND WILTSHIRE MENTAL HEALTH PARTNERSHIP NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -282,14 +282,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BASILDON",
         "County": "ESSEX",
         "Postcode": "SS16 5NL",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.558185871010345",
+        "Longitude": "0.45187032374537445",
         "ParentODSCode": "RAJ",
         "ParentName": "MID AND SOUTH ESSEX NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41260",
@@ -313,7 +313,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "customercare@hhft.nhs.uk",
         "Website": "http://www.hampshirehospitals.nhs.uk",
-        "Fax": "01256 313098"
+        "Fax": "01256 313098",
     },
     {
         "OrganisationID": "41405",
@@ -337,7 +337,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.dbth.nhs.uk",
-        "Fax": "01909 502246"
+        "Fax": "01909 502246",
     },
     {
         "OrganisationID": "",
@@ -354,14 +354,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PORTSMOUTH",
         "County": "HAMPSHIRE",
         "Postcode": "PO2 0TA",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.822634957956915",
+        "Longitude": "-1.0703087165064853",
         "ParentODSCode": "R1C",
         "ParentName": "SOLENT NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -378,14 +378,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BEDFORD",
         "County": "",
         "Postcode": "MK42 9DJ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.128773757410244",
+        "Longitude": "-0.471222131766747",
         "ParentODSCode": "RC9",
         "ParentName": "BEDFORDSHIRE HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41507",
@@ -409,7 +409,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.bwc.nhs.uk",
-        "Fax": "0121 333 9998"
+        "Fax": "0121 333 9998",
     },
     {
         "OrganisationID": "43192",
@@ -433,7 +433,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "information@cddft.nhs.uk",
         "Website": "http://www.cddft.nhs.uk/",
-        "Fax": "01388 454127"
+        "Fax": "01388 454127",
     },
     {
         "OrganisationID": "43136",
@@ -457,7 +457,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.bfwh.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -474,14 +474,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WALSALL",
         "County": "WEST MIDLANDS",
         "Postcode": "WS3 1LZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.61485987017649",
+        "Longitude": "-1.986635562256734",
         "ParentODSCode": "RYK",
         "ParentName": "DUDLEY INTEGRATED HEALTH AND CARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41957",
@@ -505,7 +505,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/blyth",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -522,14 +522,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRADFORD",
         "County": "WEST YORKSHIRE",
         "Postcode": "BD9 6RJ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.80683265969457",
+        "Longitude": "-1.7966404739876927",
         "ParentODSCode": "RR8",
         "ParentName": "LEEDS TEACHING HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -546,14 +546,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BOLTON",
         "County": "LANCASHIRE",
         "Postcode": "BL2 6NT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.58260174509509",
+        "Longitude": "-2.3841852348486086",
         "ParentODSCode": "RMC",
         "ParentName": "BOLTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39995",
@@ -577,7 +577,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.uhbristol.nhs.uk/your-hospitals/bristol-royal-hospital-for-children.html",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -594,14 +594,14 @@ RCPCH_ORGANISATIONS = [
         "City": "ABERYSTWYTH",
         "County": "DYFED",
         "Postcode": "SY23 1ER",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.41629608119735",
+        "Longitude": "-4.071755772843108",
         "ParentODSCode": "7A2",
         "ParentName": "HYWEL DDA UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "7828770",
@@ -625,7 +625,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.mse.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43211",
@@ -649,7 +649,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk",
-        "Fax": "01280 824966"
+        "Fax": "01280 824966",
     },
     {
         "OrganisationID": "42363",
@@ -673,7 +673,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/buckland",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43223",
@@ -697,7 +697,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contact@elht.nhs.uk",
         "Website": "http://www.elht.nhs.uk",
-        "Fax": "01282 474444"
+        "Fax": "01282 474444",
     },
     {
         "OrganisationID": "",
@@ -714,14 +714,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SOUTHAMPTON",
         "County": "HAMPSHIRE",
         "Postcode": "SO16 6YD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.93125793154169",
+        "Longitude": "-1.433717192863688",
         "ParentODSCode": "RHM",
         "ParentName": "UNIVERSITY HOSPITAL SOUTHAMPTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "78514",
@@ -745,7 +745,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhdb.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42865",
@@ -769,7 +769,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.cht.nhs.uk",
-        "Fax": "01422 380357"
+        "Fax": "01422 380357",
     },
     {
         "OrganisationID": "",
@@ -786,14 +786,14 @@ RCPCH_ORGANISATIONS = [
         "City": "POOLE",
         "County": "DORSET",
         "Postcode": "BH15 1SZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.719050056794515",
+        "Longitude": "-1.9807258428334855",
         "ParentODSCode": "RDY",
         "ParentName": "DORSET HEALTHCARE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "2917652",
@@ -817,7 +817,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "lnwh-tr.trust@nhs.net",
         "Website": "http://www.lnwh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -834,14 +834,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BEDFORD",
         "County": "BEDFORDSHIRE",
         "Postcode": "MK42 7EB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.1095632794134",
+        "Longitude": "-0.511761474096703",
         "ParentODSCode": "RYV",
         "ParentName": "CAMBRIDGESHIRE COMMUNITY SERVICES NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41545",
@@ -865,7 +865,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.chelwest.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41887",
@@ -889,7 +889,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.gloshospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -906,14 +906,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CHEPSTOW",
         "County": "GWENT",
         "Postcode": "NP16 5YX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.63943343225332",
+        "Longitude": "-2.686661402962116",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40583",
@@ -937,7 +937,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "crhft.communications@nhs.net",
         "Website": "http://www.chesterfieldroyal.nhs.uk",
-        "Fax": "01246 512737"
+        "Fax": "01246 512737",
     },
     {
         "OrganisationID": "",
@@ -954,14 +954,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CHESTER LE STREET",
         "County": "COUNTY DURHAM",
         "Postcode": "DH3 3UR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "54.861359849136804",
+        "Longitude": "-1.572211745083105",
         "ParentODSCode": "RXP",
         "ParentName": "COUNTY DURHAM AND DARLINGTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -978,14 +978,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "",
         "Postcode": "SW10 9NH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.48464571866343",
+        "Longitude": "-0.18172355879372384",
         "ParentODSCode": "RQM",
         "ParentName": "CHELSEA AND WESTMINSTER HOSPITAL NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1002,14 +1002,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BIRMINGHAM",
         "County": "WEST MIDLANDS",
         "Postcode": "B9 5ST",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.47799116365538",
+        "Longitude": "-1.8275362317445312",
         "ParentODSCode": "RYW",
         "ParentName": "BIRMINGHAM COMMUNITY HEALTHCARE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1026,14 +1026,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CAMBRIDGE",
         "County": "CAMBRIDGESHIRE",
         "Postcode": "CB2 0QQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.17487593919441",
+        "Longitude": "0.14141622590743344",
         "ParentODSCode": "RYV",
         "ParentName": "CAMBRIDGESHIRE COMMUNITY SERVICES NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1050,14 +1050,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRENTWOOD",
         "County": "ESSEX",
         "Postcode": "CM15 8DR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.62369359002008",
+        "Longitude": "0.31635099703690556",
         "ParentODSCode": "RAT",
         "ParentName": "NORTH EAST LONDON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1074,14 +1074,14 @@ RCPCH_ORGANISATIONS = [
         "City": "HARLOW",
         "County": "ESSEX",
         "Postcode": "CM17 9TG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.767976263497225",
+        "Longitude": "0.13251425290988306",
         "ParentODSCode": "R1L",
         "ParentName": "ESSEX PARTNERSHIP UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1098,14 +1098,14 @@ RCPCH_ORGANISATIONS = [
         "City": "STANLEY",
         "County": "COUNTY DURHAM",
         "Postcode": "DH9 7TG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "54.857744",
+        "Longitude": "-1.736403",
         "ParentODSCode": "RXP",
         "ParentName": "COUNTY DURHAM AND DARLINGTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1122,14 +1122,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BURY ST. EDMUNDS",
         "County": "SUFFOLK",
         "Postcode": "IP33 3ND",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.24063085442167",
+        "Longitude": "0.7084705271013394",
         "ParentODSCode": "RGR",
         "ParentName": "WEST SUFFOLK NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1146,14 +1146,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LLANDUDNO",
         "County": "GWYNEDD",
         "Postcode": "LL30 1YE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.24065712570418",
+        "Longitude": "0.7084597970760184",
         "ParentODSCode": "7A1",
         "ParentName": "BETSI CADWALADR UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1170,14 +1170,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BANGOR",
         "County": "GWYNEDD",
         "Postcode": "LL57 2EE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.22551496089767",
+        "Longitude": "-4.134974832357014",
         "ParentODSCode": "7A1",
         "ParentName": "BETSI CADWALADR UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1194,14 +1194,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PLYMOUTH",
         "County": "DEVON",
         "Postcode": "PL2 2PQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.39051691746257",
+        "Longitude": "-4.163071330781396",
         "ParentODSCode": "RK9",
         "ParentName": "UNIVERSITY HOSPITALS PLYMOUTH NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1218,14 +1218,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CHICHESTER",
         "County": "WEST SUSSEX",
         "Postcode": "PO19 7HH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.84253071425149",
+        "Longitude": "-0.7601499913684482",
         "ParentODSCode": "RYR",
         "ParentName": "UNIVERSITY HOSPITALS SUSSEX NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1242,14 +1242,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "GREATER LONDON",
         "Postcode": "E15 4PT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.536834588132855",
+        "Longitude": "0.006225110524521736",
         "ParentODSCode": "RP4",
         "ParentName": "GREAT ORMOND STREET HOSPITAL FOR CHILDREN NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1266,14 +1266,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WARWICK",
         "County": "WARWICKSHIRE",
         "Postcode": "CV34 5BW",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.2899606215984",
+        "Longitude": "-1.584414018263402",
         "ParentODSCode": "RJC",
         "ParentName": "SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1290,14 +1290,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "GREATER LONDON",
         "Postcode": "E17 3LA",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.588111852487415",
+        "Longitude": "-0.003012560636604331",
         "ParentODSCode": "RP4",
         "ParentName": "GREAT ORMOND STREET HOSPITAL FOR CHILDREN NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1314,14 +1314,14 @@ RCPCH_ORGANISATIONS = [
         "City": "UXBRIDGE",
         "County": "MIDDLESEX",
         "Postcode": "UB8 3NN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.534177763702324",
+        "Longitude": "-0.4578701302698584",
         "ParentODSCode": "RV3",
         "ParentName": "CENTRAL AND NORTH WEST LONDON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1338,14 +1338,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PORT TALBOT",
         "County": "WEST GLAMORGAN",
         "Postcode": "SA12 7BY",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.59865037448691",
+        "Longitude": "-3.802852293530534",
         "ParentODSCode": "7A3",
         "ParentName": "SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1362,14 +1362,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MILTON KEYNES",
         "County": "BUCKINGHAMSHIRE",
         "Postcode": "MK6 5NG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.024944716501295",
+        "Longitude": "-0.736349618753685",
         "ParentODSCode": "RV3",
         "ParentName": "CENTRAL AND NORTH WEST LONDON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1386,14 +1386,14 @@ RCPCH_ORGANISATIONS = [
         "City": "TRURO",
         "County": "CORNWALL",
         "Postcode": "TR1 3XQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.2662166792816",
+        "Longitude": "-5.095523529924103",
         "ParentODSCode": "REF",
         "ParentName": "ROYAL CORNWALL HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1410,14 +1410,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRECON",
         "County": "",
         "Postcode": "LD3 7NS",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.94899731632159",
+        "Longitude": "-3.3848060452712567",
         "ParentODSCode": "7A7",
         "ParentName": "POWYS TEACHING LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1434,14 +1434,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NOTTINGHAM",
         "County": "NOTTINGHAMSHIRE",
         "Postcode": "NG5 1PB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.9905804091911",
+        "Longitude": "-1.1640642028760453",
         "ParentODSCode": "RX1",
         "ParentName": "NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43182",
@@ -1465,7 +1465,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "enquiries@lthtr.nhs.uk",
         "Website": "https://www.lancsteachinghospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43108",
@@ -1489,7 +1489,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.swbh.nhs.uk",
-        "Fax": "0121 507 5636"
+        "Fax": "0121 507 5636",
     },
     {
         "OrganisationID": "40342",
@@ -1513,7 +1513,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@esneft.nhs.uk",
         "Website": "https://www.esneft.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1530,14 +1530,14 @@ RCPCH_ORGANISATIONS = [
         "City": "DERBY",
         "County": "DERBYSHIRE",
         "Postcode": "DE24 8NH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.89510370116093",
+        "Longitude": "-1.4452974605534492",
         "ParentODSCode": "RTG",
         "ParentName": "UNIVERSITY HOSPITALS OF DERBY AND BURTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1554,14 +1554,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "",
         "Postcode": "N15 3TH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.580052959564135",
+        "Longitude": "-0.08932988262221664",
         "ParentODSCode": "RKE",
         "ParentName": "WHITTINGTON HEALTH NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1578,14 +1578,14 @@ RCPCH_ORGANISATIONS = [
         "City": "HUNTINGDON",
         "County": "CAMBRIDGESHIRE",
         "Postcode": "PE29 7HN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.34562706391435",
+        "Longitude": "-0.17570404808129073",
         "ParentODSCode": "RYV",
         "ParentName": "CAMBRIDGESHIRE COMMUNITY SERVICES NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1602,14 +1602,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NORWICH",
         "County": "NORFOLK",
         "Postcode": "NR4 7PA",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.6167141242066",
+        "Longitude": "1.2671810673633923",
         "ParentODSCode": "RY3",
         "ParentName": "NORFOLK COMMUNITY HEALTH AND CARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1626,14 +1626,14 @@ RCPCH_ORGANISATIONS = [
         "City": "EASTBOURNE",
         "County": "",
         "Postcode": "BN21 2UD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.78645763637544",
+        "Longitude": "0.26970748986035503",
         "ParentODSCode": "RXC",
         "ParentName": "EAST SUSSEX HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1650,14 +1650,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WIRRAL",
         "County": "MERSEYSIDE",
         "Postcode": "CH49 5PE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.37066114086599",
+        "Longitude": "-3.095204921241858",
         "ParentODSCode": "RBL",
         "ParentName": "WIRRAL UNIVERSITY TEACHING HOSPITAL NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1674,14 +1674,14 @@ RCPCH_ORGANISATIONS = [
         "City": "STRATFORD-UPON-AVON",
         "County": "WARWICKSHIRE",
         "Postcode": "CV37 6NX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.195127472619795",
+        "Longitude": "-1.7122910053235376",
         "ParentODSCode": "RJC",
         "ParentName": "SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1698,14 +1698,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CREWE",
         "County": "CHESHIRE",
         "Postcode": "CW1 4QJ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.119010495755255",
+        "Longitude": "-2.475808230401211",
         "ParentODSCode": "RBT",
         "ParentName": "MID CHESHIRE HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1722,14 +1722,14 @@ RCPCH_ORGANISATIONS = [
         "City": "DERBY",
         "County": "",
         "Postcode": "DE22 3NE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.91110179327077",
+        "Longitude": "-1.512306403428385",
         "ParentODSCode": "RTG",
         "ParentName": "UNIVERSITY HOSPITALS OF DERBY AND BURTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1746,14 +1746,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BARROW-IN-FURNESS",
         "County": "CUMBRIA",
         "Postcode": "LA14 4LF",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "54.13673411203507",
+        "Longitude": "-3.2083506112939224",
         "ParentODSCode": "RNN",
         "ParentName": "NORTH CUMBRIA INTEGRATED CARE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1770,14 +1770,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BARNSLEY",
         "County": "SOUTH YORKSHIRE",
         "Postcode": "S70 1LP",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.54885593728199",
+        "Longitude": "-1.4800215002356396",
         "ParentODSCode": "RXG",
         "ParentName": "SOUTH WEST YORKSHIRE PARTNERSHIP NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1794,14 +1794,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WALSALL",
         "County": "WEST MIDLANDS",
         "Postcode": "WS2 9PS",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.58303487554701",
+        "Longitude": "-1.9976477770103798",
         "ParentODSCode": "RBK",
         "ParentName": "WALSALL HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1818,14 +1818,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BASILDON",
         "County": "ESSEX",
         "Postcode": "SS14 1EH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.61275615547437",
+        "Longitude": "0.6648505953412928",
         "ParentODSCode": "RAT",
         "ParentName": "NORTH EAST LONDON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1842,14 +1842,14 @@ RCPCH_ORGANISATIONS = [
         "City": "GRAYS",
         "County": "ESSEX",
         "Postcode": "RM16 2PX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.49616178096384",
+        "Longitude": "0.33659109093339895",
         "ParentODSCode": "RAT",
         "ParentName": "NORTH EAST LONDON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1866,14 +1866,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SOUTHSEA",
         "County": "HAMPSHIRE",
         "Postcode": "PO4 8LD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.796657008704145",
+        "Longitude": "-1.0493687455907676",
         "ParentODSCode": "R1C",
         "ParentName": "SOLENT NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1890,14 +1890,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BLACKBURN",
         "County": "LANCASHIRE",
         "Postcode": "BB2 3HH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.736147580420365",
+        "Longitude": "-2.461713564745193",
         "ParentODSCode": "RXR",
         "ParentName": "EAST LANCASHIRE HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1914,14 +1914,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SOUTHAMPTON",
         "County": "HAMPSHIRE",
         "Postcode": "SO16 6HU",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.93151657046671",
+        "Longitude": "-1.4333675030065531",
         "ParentODSCode": "R1C",
         "ParentName": "SOLENT NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -1938,14 +1938,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SOUTHAMPTON",
         "County": "HAMPSHIRE",
         "Postcode": "SO40 7AR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.89113624486605",
+        "Longitude": "-1.5229741072550669",
         "ParentODSCode": "R1C",
         "ParentName": "SOLENT NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43032",
@@ -1969,7 +1969,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.esht.nhs.uk/conquest",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41035",
@@ -1993,7 +1993,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "cochpals@nhs.net",
         "Website": "http://www.coch.nhs.uk",
-        "Fax": "01244 365 292"
+        "Fax": "01244 365 292",
     },
     {
         "OrganisationID": "",
@@ -2010,14 +2010,14 @@ RCPCH_ORGANISATIONS = [
         "City": "DROITWICH",
         "County": "WORCESTERSHIRE",
         "Postcode": "WR9 8QU",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.26794984957385",
+        "Longitude": "-2.1533879740866677",
         "ParentODSCode": "R1A",
         "ParentName": "HEREFORDSHIRE AND WORCESTERSHIRE HEALTH AND CARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2034,14 +2034,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CROYDON",
         "County": "SURREY",
         "Postcode": "CR0 7YD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.38943236801409",
+        "Longitude": "-0.05949026304572937",
         "ParentODSCode": "RJ6",
         "ParentName": "CROYDON HEALTH SERVICES NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40924",
@@ -2065,7 +2065,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.croydonhealthservices.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "10855536",
@@ -2089,7 +2089,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41265",
@@ -2113,7 +2113,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "dgn-tr.enquiries@nhs.net",
         "Website": "http://www.dgt.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43202",
@@ -2137,7 +2137,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "information@cddft.nhs.uk",
         "Website": "http://www.cddft.nhs.uk",
-        "Fax": "01325 743200"
+        "Fax": "01325 743200",
     },
     {
         "OrganisationID": "41066",
@@ -2161,7 +2161,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.plymouthhospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41019",
@@ -2185,7 +2185,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.nlg.nhs.uk/hospitals/grimsby",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2202,14 +2202,14 @@ RCPCH_ORGANISATIONS = [
         "City": "READING",
         "County": "",
         "Postcode": "RG6 6BZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.442447786143",
+        "Longitude": "-0.9354541726665103",
         "ParentODSCode": "RHW",
         "ParentName": "ROYAL BERKSHIRE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41406",
@@ -2233,7 +2233,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.dbth.nhs.uk",
-        "Fax": "01302 320098"
+        "Fax": "01302 320098",
     },
     {
         "OrganisationID": "40130",
@@ -2257,7 +2257,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "headquarters@dchft.nhs.uk",
         "Website": "http://www.dchft.nhs.uk",
-        "Fax": "01305 254155"
+        "Fax": "01305 254155",
     },
     {
         "OrganisationID": "",
@@ -2274,14 +2274,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WESTON-SUPER-MARE",
         "County": "AVON",
         "Postcode": "BS23 3NT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.33946376061602",
+        "Longitude": "-2.9688690485123415",
         "ParentODSCode": "RVN",
         "ParentName": "AVON AND WILTSHIRE MENTAL HEALTH PARTNERSHIP NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "2917654",
@@ -2305,7 +2305,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "lnwh-tr.trust@nhs.net",
         "Website": "https://www.lnwh.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43033",
@@ -2329,7 +2329,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.esht.nhs.uk/eastbournedgh",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2346,14 +2346,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRISTOL",
         "County": "AVON",
         "Postcode": "BS5 6XX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.48515271161083",
+        "Longitude": "-3.1650109188615785",
         "ParentODSCode": "RVJ",
         "ParentName": "NORTH BRISTOL NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2370,14 +2370,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M30 0TU",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.482882456526816",
+        "Longitude": "-2.33845275607912",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2394,14 +2394,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LLANELLI",
         "County": "DYFED",
         "Postcode": "SA15 3SE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.684363752680774",
+        "Longitude": "-4.156748736588136",
         "ParentODSCode": "7A2",
         "ParentName": "HYWEL DDA UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42351",
@@ -2425,7 +2425,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@epsom-sthelier.nhs.uk",
         "Website": "http://www.epsom-sthelier.nhs.uk",
-        "Fax": "01372 735 159"
+        "Fax": "01372 735 159",
     },
     {
         "OrganisationID": "",
@@ -2442,14 +2442,14 @@ RCPCH_ORGANISATIONS = [
         "City": "DEESIDE",
         "County": "CLWYD",
         "Postcode": "CH5 2EP",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.197806016801934",
+        "Longitude": "-3.013333702231281",
         "ParentODSCode": "7A1",
         "ParentName": "BETSI CADWALADR UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41862",
@@ -2473,7 +2473,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.newcastle-hospitals.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42129",
@@ -2497,7 +2497,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.southtees.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40395",
@@ -2521,7 +2521,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.fhft.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42186",
@@ -2545,7 +2545,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "trusthq@mbht.nhs.uk",
         "Website": "http://www.uhmb.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2562,14 +2562,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WASHINGTON",
         "County": "TYNE AND WEAR",
         "Postcode": "NE38 7NQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "54.89882555930676",
+        "Longitude": "-1.5304436726140653",
         "ParentODSCode": "R0B",
         "ParentName": "SOUTH TYNESIDE AND SUNDERLAND NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2586,14 +2586,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NUNEATON",
         "County": "WARWICKSHIRE",
         "Postcode": "CV10 7DJ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.51178977454635",
+        "Longitude": "-1.47510009235745",
         "ParentODSCode": "RLT",
         "ParentName": "GEORGE ELIOT HOSPITAL NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2610,14 +2610,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CARMARTHEN",
         "County": "DYFED",
         "Postcode": "SA31 2AF",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.86750511544308",
+        "Longitude": "-4.287558062189436",
         "ParentODSCode": "7A2",
         "ParentName": "HYWEL DDA UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41889",
@@ -2641,7 +2641,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.gloshospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2658,14 +2658,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WOKING",
         "County": "SURREY",
         "Postcode": "GU21 3LQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.31890703272032",
+        "Longitude": "-0.5911015293992617",
         "ParentODSCode": "RTK",
         "ParentName": "ASHFORD AND ST PETER'S HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "9445753",
@@ -2689,7 +2689,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhb.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2706,14 +2706,14 @@ RCPCH_ORGANISATIONS = [
         "City": "GRANTHAM",
         "County": "LINCOLNSHIRE",
         "Postcode": "NG31 8DG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.92118212034121",
+        "Longitude": "-0.6399615735161382",
         "ParentODSCode": "RWD",
         "ParentName": "UNITED LINCOLNSHIRE HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2730,14 +2730,14 @@ RCPCH_ORGANISATIONS = [
         "City": "GRANTHAM",
         "County": "LINCOLNSHIRE",
         "Postcode": "NG31 8DG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.92118212034121",
+        "Longitude": "-0.6399615735161382",
         "ParentODSCode": "RWD",
         "ParentName": "UNITED LINCOLNSHIRE HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41403",
@@ -2761,7 +2761,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.gosh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2778,14 +2778,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "GREATER LONDON",
         "Postcode": "SE11 4TH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.49240809148386",
+        "Longitude": "-0.10466680536798287",
         "ParentODSCode": "RJ1",
         "ParentName": "GUY'S AND ST THOMAS' NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2802,14 +2802,14 @@ RCPCH_ORGANISATIONS = [
         "City": "RICHMOND",
         "County": "SURREY",
         "Postcode": "TW10 7NF",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.43785081919746",
+        "Longitude": "-0.3146123188645736",
         "ParentODSCode": "RY9",
         "ParentName": "HOUNSLOW AND RICHMOND COMMUNITY HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43802",
@@ -2833,7 +2833,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.imperial.nhs.uk/our-locations/hammersmith-hospital",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40261",
@@ -2857,7 +2857,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "hello@hdft.nhs.uk",
         "Website": "http://www.hdft.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2874,14 +2874,14 @@ RCPCH_ORGANISATIONS = [
         "City": "HOUNSLOW",
         "County": "MIDDLESEX",
         "Postcode": "TW3 3EL",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.46830184092232",
+        "Longitude": "-0.3709422403006183",
         "ParentODSCode": "RY9",
         "ParentName": "HOUNSLOW AND RICHMOND COMMUNITY HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "9445752",
@@ -2905,7 +2905,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhb.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -2922,14 +2922,14 @@ RCPCH_ORGANISATIONS = [
         "City": "ASCOT",
         "County": "",
         "Postcode": "SL5 7GB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.40828363735065",
+        "Longitude": "-0.685306078413111",
         "ParentODSCode": "RDU",
         "ParentName": "FRIMLEY HEALTH NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41122",
@@ -2953,7 +2953,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@wvt.nhs.uk",
         "Website": "http://www.wyevalley.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42721",
@@ -2977,7 +2977,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.enherts-tr.nhs.uk/our-hospitals/hertford-county/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42721",
@@ -3001,7 +3001,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.enherts-tr.nhs.uk/our-hospitals/hertford-county/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41954",
@@ -3025,7 +3025,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/hexham",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40095",
@@ -3049,7 +3049,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.thh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "7353080",
@@ -3073,7 +3073,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.nwangliaft.nhs.uk/our-hospitals/hinchingbrooke-hospital/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41569",
@@ -3097,7 +3097,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.homerton.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41986",
@@ -3121,7 +3121,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@ouh.nhs.uk",
         "Website": "http://www.ouh.nhs.uk/hospitals/horton/default.aspx",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41072",
@@ -3145,7 +3145,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "info@uhcw.nhs.uk",
         "Website": "http://www.uhcw.nhs.uk/",
-        "Fax": "01788 545151"
+        "Fax": "01788 545151",
     },
     {
         "OrganisationID": "42660",
@@ -3169,7 +3169,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.hey.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3186,14 +3186,14 @@ RCPCH_ORGANISATIONS = [
         "City": "ILKESTON",
         "County": "DERBYSHIRE",
         "Postcode": "DE7 8LN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.988319908650226",
+        "Longitude": "-1.3202010304096143",
         "ParentODSCode": "RTG",
         "ParentName": "UNIVERSITY HOSPITALS OF DERBY AND BURTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "68584",
@@ -3217,7 +3217,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@esneft.nhs.uk",
         "Website": "https://www.esneft.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3234,14 +3234,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M44 5LH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.437687672356965",
+        "Longitude": "-2.431705058942659",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40663",
@@ -3265,7 +3265,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@jpaget.nhs.uk",
         "Website": "http://www.jpaget.nhs.uk/",
-        "Fax": "01493 453086"
+        "Fax": "01493 453086",
     },
     {
         "OrganisationID": "41987",
@@ -3289,7 +3289,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@ouh.nhs.uk",
         "Website": "http://www.ouh.nhs.uk/hospitals/jr/default.aspx",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42445",
@@ -3313,7 +3313,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/kentandcanterburyhospital",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41341",
@@ -3337,7 +3337,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "enquiries@kgh.nhs.uk",
         "Website": "http://www.kgh.nhs.uk",
-        "Fax": "01536 493767"
+        "Fax": "01536 493767",
     },
     {
         "OrganisationID": "41042",
@@ -3361,7 +3361,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "kch-tr.palsdh@nhs.net",
         "Website": "http://www.kch.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41053",
@@ -3385,7 +3385,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "sfh-tr.pet@nhs.net",
         "Website": "http://www.sfh-tr.nhs.uk",
-        "Fax": "01623 621770"
+        "Fax": "01623 621770",
     },
     {
         "OrganisationID": "40109",
@@ -3409,7 +3409,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "khft.pals@nhs.net",
         "Website": "http://www.kingstonhospital.nhs.uk/",
-        "Fax": "020 85472182"
+        "Fax": "020 85472182",
     },
     {
         "OrganisationID": "",
@@ -3426,14 +3426,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRISTOL",
         "County": "AVON",
         "Postcode": "BS15 4DA",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.463190232745326",
+        "Longitude": "-2.499945216472451",
         "ParentODSCode": "RVN",
         "ParentName": "AVON AND WILTSHIRE MENTAL HEALTH PARTNERSHIP NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41611",
@@ -3457,7 +3457,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.leedsth.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42680",
@@ -3481,7 +3481,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.leicestershospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40199",
@@ -3505,7 +3505,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.mchft.nhs.uk",
-        "Fax": "01270 587696"
+        "Fax": "01270 587696",
     },
     {
         "OrganisationID": "",
@@ -3522,14 +3522,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LEAMINGTON SPA",
         "County": "WARWICKSHIRE",
         "Postcode": "CV32 7SF",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.303557274248234",
+        "Longitude": "-1.519704461685684",
         "ParentODSCode": "RJC",
         "ParentName": "SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42670",
@@ -3553,7 +3553,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ulh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42670",
@@ -3577,7 +3577,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ulh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42718",
@@ -3601,7 +3601,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.enherts-tr.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42718",
@@ -3625,7 +3625,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.enherts-tr.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40233",
@@ -3649,7 +3649,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@ldh.nhs.uk",
         "Website": "https://www.ldh.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3666,14 +3666,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LYMINGTON",
         "County": "HAMPSHIRE",
         "Postcode": "SO41 8QD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.76950814986551",
+        "Longitude": "-1.5442285268512799",
         "ParentODSCode": "RW1",
         "ParentName": "SOUTHERN HEALTH NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41031",
@@ -3697,7 +3697,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.eastcheshire.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40242",
@@ -3721,7 +3721,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.york.nhs.uk",
-        "Fax": "01653 604521"
+        "Fax": "01653 604521",
     },
     {
         "OrganisationID": "",
@@ -3738,14 +3738,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "",
         "Postcode": "M1 6LT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.47525438212471",
+        "Longitude": "-2.2400255028448073",
         "ParentODSCode": "R0A",
         "ParentName": "MANCHESTER UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40154",
@@ -3769,7 +3769,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@walsallhealthcare.nhs.uk",
         "Website": "http://www.walsallhealthcare.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40330",
@@ -3793,7 +3793,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.mkuh.nhs.uk",
-        "Fax": "01908 669348"
+        "Fax": "01908 669348",
     },
     {
         "OrganisationID": "",
@@ -3810,14 +3810,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MILTON KEYNES",
         "County": "BUCKINGHAMSHIRE",
         "Postcode": "MK6 5LD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.02494542953305",
+        "Longitude": "-0.7362993875660501",
         "ParentODSCode": "RD8",
         "ParentName": "MILTON KEYNES UNIVERSITY HOSPITAL NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3834,14 +3834,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SWINDON",
         "County": "",
         "Postcode": "SN2 2JG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.58372293121609",
+        "Longitude": "-1.8112139471060151",
         "ParentODSCode": "RN3",
         "ParentName": "GREAT WESTERN HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3858,14 +3858,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SWANSEA",
         "County": "WEST GLAMORGAN",
         "Postcode": "SA6 6NL",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.68358816236783",
+        "Longitude": "-3.9342430863145736",
         "ParentODSCode": "7A3",
         "ParentName": "SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3882,14 +3882,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "GREATER LONDON",
         "Postcode": "NW5 2BX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.54647338497589",
+        "Longitude": "-0.13911479241869015",
         "ParentODSCode": "RV3",
         "ParentName": "CENTRAL AND NORTH WEST LONDON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3906,14 +3906,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PLYMOUTH",
         "County": "DEVON",
         "Postcode": "PL4 7QD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.37910560957554",
+        "Longitude": "-4.112683344124941",
         "ParentODSCode": "RK9",
         "ParentName": "UNIVERSITY HOSPITALS PLYMOUTH NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3930,14 +3930,14 @@ RCPCH_ORGANISATIONS = [
         "City": "TAUNTON",
         "County": "",
         "Postcode": "TA1 5DA",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.01144171713463",
+        "Longitude": "-3.121313219854067",
         "ParentODSCode": "RH5",
         "ParentName": "SOMERSET NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3954,14 +3954,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PORT TALBOT",
         "County": "WEST GLAMORGAN",
         "Postcode": "SA12 7BX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.59929960775662",
+        "Longitude": "-3.7997706458406086",
         "ParentODSCode": "7A3",
         "ParentName": "SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -3978,14 +3978,14 @@ RCPCH_ORGANISATIONS = [
         "City": "ABERGAVENNY",
         "County": "",
         "Postcode": "NP7 7EG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.82444440250398",
+        "Longitude": "-3.0326164868528998",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41093",
@@ -4009,7 +4009,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "rwh-tr.pals@nhs.net",
         "Website": "http://www.royalwolverhampton.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4026,14 +4026,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WILLENHALL",
         "County": "WEST MIDLANDS",
         "Postcode": "WV12 5RZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.60933623348631",
+        "Longitude": "-2.039815918790231",
         "ParentODSCode": "RBK",
         "ParentName": "WALSALL HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39967",
@@ -4057,7 +4057,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "nuhpals@bartshealth.nhs.uk",
         "Website": "http://www.bartshealth.nhs.uk",
-        "Fax": "020 7363 8181"
+        "Fax": "020 7363 8181",
     },
     {
         "OrganisationID": "43679",
@@ -4081,7 +4081,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "dchst.patientexperienceteam@nhs.net",
         "Website": "http://www.dchs.nhs.uk/home_redesign/our-services/find_services_by_location/newholmehospital/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4098,14 +4098,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CARDIFF",
         "County": "SOUTH GLAMORGAN",
         "Postcode": "CF14 4XW",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.50821561439174",
+        "Longitude": "-3.187478640298089",
         "ParentODSCode": "7A4",
         "ParentName": "CARDIFF & VALE UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41147",
@@ -4129,7 +4129,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@nnuh.nhs.uk",
         "Website": "http://www.nnuh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4146,14 +4146,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BARNSTAPLE",
         "County": "DEVON",
         "Postcode": "EX31 4JB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.09169453822436",
+        "Longitude": "-4.050650933822214",
         "ParentODSCode": "RH8",
         "ParentName": "ROYAL DEVON UNIVERSITY HEALTHCARE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4170,14 +4170,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M8 5RB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.51753825484743",
+        "Longitude": "-2.227934753662899",
         "ParentODSCode": "R0A",
         "ParentName": "MANCHESTER UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40091",
@@ -4201,7 +4201,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.northmid.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41969",
@@ -4225,7 +4225,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/north-tyneside",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "2917659",
@@ -4249,7 +4249,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "2131250",
@@ -4273,7 +4273,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/emergency/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "2917651",
@@ -4297,7 +4297,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "lnwh-tr.trust@nhs.net",
         "Website": "http://www.lnwh.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43655",
@@ -4321,7 +4321,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.norfolkcommunityhealthandcare.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4338,14 +4338,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LEAMINGTON SPA",
         "County": "",
         "Postcode": "CV32 6RW",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.31102428092342",
+        "Longitude": "-1.539027380726561",
         "ParentODSCode": "RJC",
         "ParentName": "SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42484",
@@ -4369,7 +4369,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "soh-tr.info@nhs.net",
         "Website": "http://www.southportandormskirk.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4386,14 +4386,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRISTOL",
         "County": "AVON",
         "Postcode": "BS14 0BB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.411698943237695",
+        "Longitude": "-2.5924267932069522",
         "ParentODSCode": "RVN",
         "ParentName": "AVON AND WILTSHIRE MENTAL HEALTH PARTNERSHIP NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4410,14 +4410,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "GREATER LONDON",
         "Postcode": "N19 5NF",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.566442088321025",
+        "Longitude": "-0.1388682606380006",
         "ParentODSCode": "RKE",
         "ParentName": "WHITTINGTON HEALTH NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4434,14 +4434,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRISTOL",
         "County": "AVON",
         "Postcode": "BS34 5PE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.53153185971164",
+        "Longitude": "-2.5764474476942887",
         "ParentODSCode": "RVJ",
         "ParentName": "NORTH BRISTOL NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4458,14 +4458,14 @@ RCPCH_ORGANISATIONS = [
         "City": "COVENTRY",
         "County": "WEST MIDLANDS",
         "Postcode": "CV1 4FS",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.414650840431534",
+        "Longitude": "-1.5059966663377762",
         "ParentODSCode": "RYG",
         "ParentName": "COVENTRY AND WARWICKSHIRE PARTNERSHIP NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4482,14 +4482,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SALFORD",
         "County": "GREATER MANCHESTER",
         "Postcode": "M6 5FX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.48857472553247",
+        "Longitude": "-2.284088128527958",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40658",
@@ -4513,7 +4513,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.nwangliaft.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42671",
@@ -4537,7 +4537,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ulh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42671",
@@ -4561,7 +4561,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ulh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43048",
@@ -4585,7 +4585,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.midyorks.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4602,14 +4602,14 @@ RCPCH_ORGANISATIONS = [
         "City": "POOLE",
         "County": "",
         "Postcode": "BH15 2JB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.72147613368994",
+        "Longitude": "-1.9730246133611542",
         "ParentODSCode": "R0D",
         "ParentName": "UNIVERSITY HOSPITALS DORSET NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4626,14 +4626,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MERTHYR TYDFIL",
         "County": "MID GLAMORGAN",
         "Postcode": "CF47 9DT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.7642467133928",
+        "Longitude": "-3.3851091212405837",
         "ParentODSCode": "7A5",
         "ParentName": "CWM TAF MORGANNWG UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4650,14 +4650,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LLANELLI",
         "County": "DYFED",
         "Postcode": "SA14 8QF",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.69187728463355",
+        "Longitude": "-4.136129731794417",
         "ParentODSCode": "7A2",
         "ParentName": "HYWEL DDA UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41556",
@@ -4681,7 +4681,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.pah.nhs.uk/",
-        "Fax": "01279 429371"
+        "Fax": "01279 429371",
     },
     {
         "OrganisationID": "40847",
@@ -4705,7 +4705,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "patientsupportservices@uhs.nhs.uk",
         "Website": "http://www.uhs.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4722,14 +4722,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRIDGEND",
         "County": "MID GLAMORGAN",
         "Postcode": "CF31 1RQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.517616936821376",
+        "Longitude": "-3.571760230503241",
         "ParentODSCode": "7A3",
         "ParentName": "SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "1094756",
@@ -4753,7 +4753,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://pruh.kch.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4770,14 +4770,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NOTTINGHAM",
         "County": "NOTTINGHAMSHIRE",
         "Postcode": "NG7 2UH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.94378634553726",
+        "Longitude": "-1.1841889169193678",
         "ParentODSCode": "RX1",
         "ParentName": "NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -4794,14 +4794,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NOTTINGHAM",
         "County": "NOTTINGHAMSHIRE",
         "Postcode": "NG7 2UH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.94378634553726",
+        "Longitude": "-1.1841889169193678",
         "ParentODSCode": "RX1",
         "ParentName": "NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40868",
@@ -4825,7 +4825,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.porthosp.nhs.uk",
-        "Fax": "023 9286 6413"
+        "Fax": "023 9286 6413",
     },
     {
         "OrganisationID": "43803",
@@ -4849,7 +4849,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.imperial.nhs.uk/our-locations/queen-charlottes-and-chelsea-hospital",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41607",
@@ -4873,7 +4873,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "ghnt.pals.service@nhs.net",
         "Website": "http://www.qegateshead.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "68511",
@@ -4897,7 +4897,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.lewishamandgreenwich.nhs.uk/",
-        "Fax": "020 8836 4590"
+        "Fax": "020 8836 4590",
     },
     {
         "OrganisationID": "42720",
@@ -4921,7 +4921,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.newqeii.info/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42720",
@@ -4945,7 +4945,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.newqeii.info/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42366",
@@ -4969,7 +4969,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/qeqm",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42349",
@@ -4993,7 +4993,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "est-tr.pals@nhs.net",
         "Website": "http://www.epsom-sthelier.nhs.uk",
-        "Fax": "020 8641 4546"
+        "Fax": "020 8641 4546",
     },
     {
         "OrganisationID": "",
@@ -5010,14 +5010,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SIDCUP",
         "County": "KENT",
         "Postcode": "DA14 6LT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.41924154086068",
+        "Longitude": "0.1034220330275305",
         "ParentODSCode": "RN7",
         "ParentName": "DARTFORD AND GRAVESHAM NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5034,14 +5034,14 @@ RCPCH_ORGANISATIONS = [
         "City": "EAST GRINSTEAD",
         "County": "WEST SUSSEX",
         "Postcode": "RH19 3DZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.135209751134006",
+        "Longitude": "-0.0011303249790203587",
         "ParentODSCode": "RWF",
         "ParentName": "MAIDSTONE AND TUNBRIDGE WELLS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40568",
@@ -5065,7 +5065,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.bhrhospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5082,14 +5082,14 @@ RCPCH_ORGANISATIONS = [
         "City": "RIPLEY",
         "County": "DERBYSHIRE",
         "Postcode": "DE5 3HE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.048059214497236",
+        "Longitude": "-1.409870024857542",
         "ParentODSCode": "RTG",
         "ParentName": "UNIVERSITY HOSPITALS OF DERBY AND BURTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5106,14 +5106,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NUNEATON",
         "County": "WARWICKSHIRE",
         "Postcode": "CV11 5TY",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.518697799442705",
+        "Longitude": "-1.466747350783283",
         "ParentODSCode": "RJC",
         "ParentName": "SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5130,14 +5130,14 @@ RCPCH_ORGANISATIONS = [
         "City": "HEREFORD",
         "County": "HEREFORDSHIRE",
         "Postcode": "HR2 7RL",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.04679652818128",
+        "Longitude": "-2.720555916976644",
         "ParentODSCode": "RLQ",
         "ParentName": "WYE VALLEY NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40573",
@@ -5161,7 +5161,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.therotherhamft.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41724",
@@ -5185,7 +5185,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "patient.relations@wwl.nhs.uk",
         "Website": "http://www.wwl.nhs.uk/hospitals/raei.aspx",
-        "Fax": "01942 822042"
+        "Fax": "01942 822042",
     },
     {
         "OrganisationID": "40884",
@@ -5209,7 +5209,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "nhs.choices@royalberkshire.nhs.uk",
         "Website": "http://www.royalberkshire.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43224",
@@ -5233,7 +5233,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contact@elht.nhs.uk",
         "Website": "http://www.elht.nhs.uk",
-        "Fax": "01254 293512"
+        "Fax": "01254 293512",
     },
     {
         "OrganisationID": "41197",
@@ -5257,7 +5257,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.boltonft.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "10955535",
@@ -5281,7 +5281,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40472",
@@ -5305,7 +5305,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "rcht.patientexperience@nhs.net",
         "Website": "http://www.royalcornwall.nhs.uk",
-        "Fax": "01872 252708"
+        "Fax": "01872 252708",
     },
     {
         "OrganisationID": "41982",
@@ -5329,7 +5329,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "uhdb.contactpalsderby@nhs.net",
         "Website": "https://www.uhdb.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5346,14 +5346,14 @@ RCPCH_ORGANISATIONS = [
         "City": "EXETER",
         "County": "DEVON",
         "Postcode": "EX2 5DW",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.71705628305987",
+        "Longitude": "-3.5057143220612685",
         "ParentODSCode": "RK9",
         "ParentName": "UNIVERSITY HOSPITALS PLYMOUTH NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40782",
@@ -5377,7 +5377,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "rde-tr.pals@nhs.net",
         "Website": "http://www.rdehospital.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40073",
@@ -5401,7 +5401,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "rf.pals@nhs.net",
         "Website": "http://www.royalfree.nhs.uk/",
-        "Fax": "020 7830 2468"
+        "Fax": "020 7830 2468",
     },
     {
         "OrganisationID": "",
@@ -5418,14 +5418,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NEWPORT",
         "County": "GWENT",
         "Postcode": "NP20 2UB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.58019390984616",
+        "Longitude": "-2.9959470071754546",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41261",
@@ -5449,7 +5449,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "hampshire.hospitals@hhft.nhs.uk",
         "Website": "http://www.hampshirehospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "8228423",
@@ -5473,7 +5473,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://mft.nhs.uk/rmch/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5490,14 +5490,14 @@ RCPCH_ORGANISATIONS = [
         "City": "OLDHAM",
         "County": "LANCASHIRE",
         "Postcode": "OL1 2JH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.55276952726198",
+        "Longitude": "-2.12276427085255",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43183",
@@ -5521,7 +5521,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "enquiries@lthtr.nhs.uk",
         "Website": "http://www.lancsteachinghospitals.nhs.uk",
-        "Fax": "01772 522162"
+        "Fax": "01772 522162",
     },
     {
         "OrganisationID": "43348",
@@ -5545,7 +5545,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "sath.commsteam@nhs.net",
         "Website": "http://www.sath.nhs.uk/",
-        "Fax": "01743 261006"
+        "Fax": "01743 261006",
     },
     {
         "OrganisationID": "",
@@ -5562,14 +5562,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SOUTHAMPTON",
         "County": "HAMPSHIRE",
         "Postcode": "SO14 0YG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.91243896406982",
+        "Longitude": "-1.395580557527431",
         "ParentODSCode": "RHM",
         "ParentName": "UNIVERSITY HOSPITAL SOUTHAMPTON NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41013",
@@ -5593,7 +5593,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhnm.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39970",
@@ -5617,7 +5617,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.royalsurrey.nhs.uk",
-        "Fax": "01483 537747"
+        "Fax": "01483 537747",
     },
     {
         "OrganisationID": "",
@@ -5634,14 +5634,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BATH",
         "County": "AVON",
         "Postcode": "BA1 3NG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.39191421412843",
+        "Longitude": "-2.3901410048590637",
         "ParentODSCode": "RNZ",
         "ParentName": "SALISBURY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5658,14 +5658,14 @@ RCPCH_ORGANISATIONS = [
         "City": "FOLKESTONE",
         "County": "KENT",
         "Postcode": "CT19 5BN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.08610340124624",
+        "Longitude": "1.1728709210454833",
         "ParentODSCode": "RVV",
         "ParentName": "EAST KENT HOSPITALS UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5682,14 +5682,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WALSALL",
         "County": "WEST MIDLANDS",
         "Postcode": "WS4 1HB",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.608415215290684",
+        "Longitude": "-1.9586749294735848",
         "ParentODSCode": "RBK",
         "ParentName": "WALSALL HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41268",
@@ -5713,7 +5713,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@dgh.nhs.uk",
         "Website": "https://www.dgft.nhs.uk/",
-        "Fax": "01384 244051"
+        "Fax": "01384 244051",
     },
     {
         "OrganisationID": "",
@@ -5730,14 +5730,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SHEFFIELD",
         "County": "SOUTH YORKSHIRE",
         "Postcode": "S10 5DD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.37768457660176",
+        "Longitude": "-1.5127835592201522",
         "ParentODSCode": "RCU",
         "ParentName": "SHEFFIELD CHILDREN'S NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41161",
@@ -5761,7 +5761,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.northerncarealliance.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41354",
@@ -5785,7 +5785,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "sft.pals@nhs.net",
         "Website": "http://www.salisbury.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "9242464",
@@ -5809,7 +5809,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhdb.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5826,14 +5826,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SALFORD",
         "County": "GREATER MANCHESTER",
         "Postcode": "M5 4DG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.47949508450214",
+        "Longitude": "-2.2794789420216426",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43107",
@@ -5857,7 +5857,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.swbh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "864773",
@@ -5881,7 +5881,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.york.nhs.uk",
-        "Fax": "01723 342 581"
+        "Fax": "01723 342 581",
     },
     {
         "OrganisationID": "41021",
@@ -5905,7 +5905,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.nlg.nhs.uk/hospitals/scunthorpe",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40282",
@@ -5929,7 +5929,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "sheffield.childrenshospital@sch.nhs.uk",
         "Website": "http://www.sheffieldchildrens.nhs.uk/",
-        "Fax": "0114 272 3418"
+        "Fax": "0114 272 3418",
     },
     {
         "OrganisationID": "",
@@ -5946,14 +5946,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NOTTINGHAM",
         "County": "NOTTINGHAMSHIRE",
         "Postcode": "NG5 4AD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.98385661535865",
+        "Longitude": "-1.1409483690398214",
         "ParentODSCode": "RK5",
         "ParentName": "SHERWOOD FOREST HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5970,14 +5970,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LONDON",
         "County": "GREATER LONDON",
         "Postcode": "N10 3HU",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.5871549291953",
+        "Longitude": "-0.1487583672793104",
         "ParentODSCode": "RKE",
         "ParentName": "WHITTINGTON HEALTH NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -5994,14 +5994,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SWANSEA",
         "County": "WEST GLAMORGAN",
         "Postcode": "SA2 8QA",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.60947883960302",
+        "Longitude": "-3.9845510304974274",
         "ParentODSCode": "7A3",
         "ParentName": "SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6018,14 +6018,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SKEGNESS",
         "County": "LINCOLNSHIRE",
         "Postcode": "PE25 2BS",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.14513129808872",
+        "Longitude": "0.33316904076485293",
         "ParentODSCode": "RWD",
         "ParentName": "UNITED LINCOLNSHIRE HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "9445754",
@@ -6049,7 +6049,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhb.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40002",
@@ -6073,7 +6073,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.uhbristol.nhs.uk/patients-and-visitors/your-hospitals/south-bristol-community-hospital/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6090,14 +6090,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BRISTOL",
         "County": "AVON",
         "Postcode": "BS16 7FL",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.531696956239784",
+        "Longitude": "-2.5728256133103904",
         "ParentODSCode": "RVJ",
         "ParentName": "NORTH BRISTOL NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40843",
@@ -6121,7 +6121,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "patientsupportservices@uhs.nhs.uk",
         "Website": "http://www.uhs.nhs.uk",
-        "Fax": "023 8120 4715"
+        "Fax": "023 8120 4715",
     },
     {
         "OrganisationID": "40067",
@@ -6145,7 +6145,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.mse.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6162,14 +6162,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BUSHEY",
         "County": "",
         "Postcode": "WD23 1RD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.637390004846814",
+        "Longitude": "-0.3305057868647216",
         "ParentODSCode": "RWG",
         "ParentName": "WEST HERTFORDSHIRE TEACHING HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6186,14 +6186,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CARLISLE",
         "County": "CUMBRIA",
         "Postcode": "CA2 7HE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "54.88822587966728",
+        "Longitude": "-2.972025091691566",
         "ParentODSCode": "RNN",
         "ParentName": "NORTH CUMBRIA INTEGRATED CARE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6210,14 +6210,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NOTTINGHAM",
         "County": "NOTTINGHAMSHIRE",
         "Postcode": "NG3 3GG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.96281834731625",
+        "Longitude": "-1.1361160766496041",
         "ParentODSCode": "RX1",
         "ParentName": "NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40949",
@@ -6241,7 +6241,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@stgeorges.nhs.uk",
         "Website": "http://www.stgeorges.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40169",
@@ -6265,7 +6265,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.sthk.nhs.uk",
-        "Fax": "01744 646301"
+        "Fax": "01744 646301",
     },
     {
         "OrganisationID": "",
@@ -6282,14 +6282,14 @@ RCPCH_ORGANISATIONS = [
         "City": "IPSWICH",
         "County": "",
         "Postcode": "IP3 8LX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.05222911984776",
+        "Longitude": "1.196965668228381",
         "ParentODSCode": "RDE",
         "ParentName": "EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42347",
@@ -6313,7 +6313,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@epsom-sthelier.nhs.uk",
         "Website": "http://www.epsom-sthelier.nhs.uk",
-        "Fax": "020 8641 4546"
+        "Fax": "020 8641 4546",
     },
     {
         "OrganisationID": "41615",
@@ -6337,7 +6337,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.leedsth.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6354,14 +6354,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WALSALL",
         "County": "WEST MIDLANDS",
         "Postcode": "WS9 9LP",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.625493402530005",
+        "Longitude": "-1.9347685780981938",
         "ParentODSCode": "RBK",
         "ParentName": "WALSALL HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41381",
@@ -6385,7 +6385,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.nhft.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "60338",
@@ -6409,7 +6409,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "iownt.pals@nhs.net",
         "Website": "https://www.iow.nhs.uk/our-services/mental-health-services/isle-talk.htm",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43800",
@@ -6433,7 +6433,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.imperial.nhs.uk/our-locations/st-marys-hospital",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39991",
@@ -6457,7 +6457,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.uhbristol.nhs.uk/your-hospitals/st-michaels-hospital.html",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42026",
@@ -6481,7 +6481,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "asp-tr.patient.advice@nhs.net",
         "Website": "http://www.ashfordstpeters.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43869",
@@ -6505,7 +6505,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhsussex.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6522,14 +6522,14 @@ RCPCH_ORGANISATIONS = [
         "City": "STOCKPORT",
         "County": "CHESHIRE",
         "Postcode": "SK3 8DN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.401726817055895",
+        "Longitude": "-2.160042086204846",
         "ParentODSCode": "RWJ",
         "ParentName": "STOCKPORT NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40919",
@@ -6553,7 +6553,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pals@gstt.nhs.uk",
         "Website": "https://www.guysandstthomas.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6570,14 +6570,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NEWPORT",
         "County": "GWENT",
         "Postcode": "NP20 4SZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.58256284027904",
+        "Longitude": "-3.002913490019792",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6594,14 +6594,14 @@ RCPCH_ORGANISATIONS = [
         "City": "STAINES",
         "County": "MIDDLESEX",
         "Postcode": "TW18 1XD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.429085727109076",
+        "Longitude": "-0.5006946625144656",
         "ParentODSCode": "RTK",
         "ParentName": "ASHFORD AND ST PETER'S HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42725",
@@ -6625,7 +6625,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "pcs@stockport.nhs.uk",
         "Website": "http://www.stockport.nhs.uk",
-        "Fax": "0161 419 4679"
+        "Fax": "0161 419 4679",
     },
     {
         "OrganisationID": "43208",
@@ -6649,7 +6649,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk/For%20patients%20and%20visitors/stoke-mandeville-hospital.htm",
-        "Fax": "01296 316640"
+        "Fax": "01296 316640",
     },
     {
         "OrganisationID": "",
@@ -6666,14 +6666,14 @@ RCPCH_ORGANISATIONS = [
         "City": "NOTTINGHAM",
         "County": "NOTTINGHAMSHIRE",
         "Postcode": "NG8 6LN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.97347694794381",
+        "Longitude": "-1.2266910978761432",
         "ParentODSCode": "RX1",
         "ParentName": "NOTTINGHAM UNIVERSITY HOSPITALS NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "10512886",
@@ -6697,7 +6697,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6714,14 +6714,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SWINDON",
         "County": "WILTSHIRE",
         "Postcode": "SN1 1ED",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.563553146767845",
+        "Longitude": "-1.7808641421440663",
         "ParentODSCode": "RN3",
         "ParentName": "GREAT WESTERN HOSPITALS NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6738,14 +6738,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M27 6BP",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.51252327906953",
+        "Longitude": "-2.3414097174362394",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41222",
@@ -6769,7 +6769,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.tamesidehospital.nhs.uk",
-        "Fax": "0161 331 6026"
+        "Fax": "0161 331 6026",
     },
     {
         "OrganisationID": "",
@@ -6786,14 +6786,14 @@ RCPCH_ORGANISATIONS = [
         "City": "SOUTHAMPTON",
         "County": "HAMPSHIRE",
         "Postcode": "SO16 4XE",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "50.92486696906429",
+        "Longitude": "-1.4478521063594827",
         "ParentODSCode": "R1C",
         "ParentName": "SOLENT NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6810,14 +6810,14 @@ RCPCH_ORGANISATIONS = [
         "City": "CWMBRAN",
         "County": "",
         "Postcode": "NP44 8YN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.64835102816606",
+        "Longitude": "-2.9959835016593503",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41247",
@@ -6841,7 +6841,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.gwh.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42131",
@@ -6865,7 +6865,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.southtees.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42686",
@@ -6889,7 +6889,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "mtw-tr.palsoffice@nhs.net",
         "Website": "http://www.mtw.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6906,14 +6906,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PORT TALBOT",
         "County": "WEST GLAMORGAN",
         "Postcode": "SA13 2BN",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.582985138982984",
+        "Longitude": "-3.768102780225508",
         "ParentODSCode": "7A3",
         "ParentName": "SWANSEA BAY UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -6930,14 +6930,14 @@ RCPCH_ORGANISATIONS = [
         "City": "RUGBY",
         "County": "WARWICKSHIRE",
         "Postcode": "CV21 3SR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "52.370419434583766",
+        "Longitude": "-1.252717489422648",
         "ParentODSCode": "RJC",
         "ParentName": "SOUTH WARWICKSHIRE UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43349",
@@ -6961,7 +6961,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "sath.commsteam@nhs.net",
         "Website": "http://www.sath.nhs.uk",
-        "Fax": "01952 243405"
+        "Fax": "01952 243405",
     },
     {
         "OrganisationID": "40289",
@@ -6985,7 +6985,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.qehkl.nhs.uk",
-        "Fax": "01553 613 700"
+        "Fax": "01553 613 700",
     },
     {
         "OrganisationID": "",
@@ -7002,14 +7002,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PONTYCLUN",
         "County": "MID GLAMORGAN",
         "Postcode": "CF72 8XR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.54786257990656",
+        "Longitude": "-3.3914877354776594",
         "ParentODSCode": "7A5",
         "ParentName": "CWM TAF MORGANNWG UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7026,14 +7026,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PONTYCLUN",
         "County": "MID GLAMORGAN",
         "Postcode": "CF72 8XR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.54786932440031",
+        "Longitude": "-3.391734482077124",
         "ParentODSCode": "7A5",
         "ParentName": "CWM TAF MORGANNWG UNIVERSITY LOCAL HEALTH BOARD",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39955",
@@ -7057,7 +7057,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "rlhpals@bartshealth.nhs.uk",
         "Website": "http://www.bartshealth.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41863",
@@ -7081,7 +7081,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.newcastle-hospitals.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42710",
@@ -7105,7 +7105,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "mtw-tr.palsoffice@nhs.net",
         "Website": "http://www.mtw.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41078",
@@ -7129,7 +7129,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.whittington.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40006",
@@ -7153,7 +7153,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "chiefexecutive.sdhct@nhs.net",
         "Website": "http://www.torbayandsouthdevon.nhs.uk/",
-        "Fax": "01803 616334"
+        "Fax": "01803 616334",
     },
     {
         "OrganisationID": "",
@@ -7170,14 +7170,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M41 5SL",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.453839217199565",
+        "Longitude": "-2.3690510967929255",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7194,14 +7194,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "",
         "Postcode": "M32 0TH",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.45898933439508",
+        "Longitude": "-2.2877698025722513",
         "ParentODSCode": "R0A",
         "ParentName": "MANCHESTER UNIVERSITY NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41804",
@@ -7225,7 +7225,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uclh.nhs.uk/our-services/our-hospitals/university-college-hospital",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41070",
@@ -7249,7 +7249,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "info@uhcw.nhs.uk",
         "Website": "http://www.uhcw.nhs.uk",
-        "Fax": "024 76966056 "
+        "Fax": "024 76966056 ",
     },
     {
         "OrganisationID": "40922",
@@ -7273,7 +7273,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.lewishamandgreenwich.nhs.uk",
-        "Fax": "020 8333 3333"
+        "Fax": "020 8333 3333",
     },
     {
         "OrganisationID": "",
@@ -7290,14 +7290,14 @@ RCPCH_ORGANISATIONS = [
         "City": "PENARTH",
         "County": "SOUTH GLAMORGAN",
         "Postcode": "CF64 2XX",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.448919571524335",
+        "Longitude": "-3.2018747900282367",
         "ParentODSCode": "7A4",
         "ParentName": "CARDIFF & VALE UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42476",
@@ -7321,7 +7321,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@nth.nhs.uk",
         "Website": "http://www.nth.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43198",
@@ -7345,7 +7345,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "information@cddft.nhs.uk",
         "Website": "http://www.cddft.nhs.uk/",
-        "Fax": "0191 333 2685"
+        "Fax": "0191 333 2685",
     },
     {
         "OrganisationID": "42477",
@@ -7369,7 +7369,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@nth.nhs.uk",
         "Website": "http://www.nth.nhs.uk",
-        "Fax": "01642 624089"
+        "Fax": "01642 624089",
     },
     {
         "OrganisationID": "64420",
@@ -7393,7 +7393,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.berkshirehealthcare.nhs.uk/our-sites/slough/upton-hospital/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40162",
@@ -7417,7 +7417,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "wuth.patientexperience@nhs.net",
         "Website": "http://www.wuth.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7434,14 +7434,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M28 3EZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.52506063219724",
+        "Longitude": "-2.397698469004914",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "41960",
@@ -7465,7 +7465,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/wansbeck",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42841",
@@ -7489,7 +7489,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "whh.enquiries@nhs.net",
         "Website": "http://www.whh.nhs.uk",
-        "Fax": "01925 662424"
+        "Fax": "01925 662424",
     },
     {
         "OrganisationID": "40975",
@@ -7513,7 +7513,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.swft.nhs.uk",
-        "Fax": "01926 482603"
+        "Fax": "01926 482603",
     },
     {
         "OrganisationID": "42713",
@@ -7537,7 +7537,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "westherts.pals@nhs.net",
         "Website": "https://www.westhertshospitals.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "10855530",
@@ -7561,7 +7561,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "4622618",
@@ -7585,7 +7585,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.chelwest.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40715",
@@ -7609,7 +7609,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.wsh.nhs.uk",
-        "Fax": "01284 701993"
+        "Fax": "01284 701993",
     },
     {
         "OrganisationID": "59909",
@@ -7633,7 +7633,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.southernhealth.nhs.uk/locations/western-community-hospital/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7650,14 +7650,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WESTON-SUPER-MARE",
         "County": "AVON",
         "Postcode": "BS23 4TQ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.32239856900821",
+        "Longitude": "-2.972724858256704",
         "ParentODSCode": "RVJ",
         "ParentName": "NORTH BRISTOL NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "3028092",
@@ -7681,7 +7681,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.fhft.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39964",
@@ -7705,7 +7705,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "wxpals.bartshealth@nhs.net",
         "Website": "http://www.bartshealth.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "40168",
@@ -7729,7 +7729,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.sthk.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42362",
@@ -7753,7 +7753,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/williamharvey",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7770,14 +7770,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M20 2LR",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.42582006024377",
+        "Longitude": "-2.2442890475733615",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7794,14 +7794,14 @@ RCPCH_ORGANISATIONS = [
         "City": "HAVERFORDWEST",
         "County": "DYFED",
         "Postcode": "SA61 2PZ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.81279926221023",
+        "Longitude": "-4.964727234183426",
         "ParentODSCode": "7A2",
         "ParentName": "HYWEL DDA UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "42755",
@@ -7825,7 +7825,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.worcsacute.nhs.uk/our-hospitals/worcestershire-royal-hospital/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7842,14 +7842,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WORKINGTON",
         "County": "CUMBRIA",
         "Postcode": "CA14 2RW",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "54.642892871753546",
+        "Longitude": "-3.5507700187869427",
         "ParentODSCode": "RNN",
         "ParentName": "NORTH CUMBRIA INTEGRATED CARE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43870",
@@ -7873,7 +7873,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "https://www.uhsussex.nhs.uk/",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7890,14 +7890,14 @@ RCPCH_ORGANISATIONS = [
         "City": "LEEDS",
         "County": "WEST YORKSHIRE",
         "Postcode": "LS12 5SG",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.78266025523274",
+        "Longitude": "-1.6002387438514194",
         "ParentODSCode": "RY6",
         "ParentName": "LEEDS COMMUNITY HEALTHCARE NHS TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7914,14 +7914,14 @@ RCPCH_ORGANISATIONS = [
         "City": "WREXHAM",
         "County": "CLWYD",
         "Postcode": "LL13 7TD",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.047169693895974",
+        "Longitude": "-3.008734102325263",
         "ParentODSCode": "7A1",
         "ParentName": "BETSI CADWALADR UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "43209",
@@ -7945,7 +7945,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -7962,14 +7962,14 @@ RCPCH_ORGANISATIONS = [
         "City": "MANCHESTER",
         "County": "GREATER MANCHESTER",
         "Postcode": "M23 9LT",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.38911906358711",
+        "Longitude": "-2.2919031193396626",
         "ParentODSCode": "RM3",
         "ParentName": "NORTHERN CARE ALLIANCE NHS FOUNDATION TRUST",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "39985",
@@ -7993,7 +7993,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "communications@ydh.nhs.uk",
         "Website": "http://www.yeovilhospital.nhs.uk/",
-        "Fax": "01935 426850"
+        "Fax": "01935 426850",
     },
     {
         "OrganisationID": "40238",
@@ -8017,7 +8017,7 @@ RCPCH_ORGANISATIONS = [
         "Phone": "",
         "Email": "",
         "Website": "http://www.york.nhs.uk",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -8034,14 +8034,14 @@ RCPCH_ORGANISATIONS = [
         "City": "RHYL",
         "County": "CLWYD",
         "Postcode": "LL18 5UJ",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.271949025221794",
+        "Longitude": "-3.496429715048846",
         "ParentODSCode": "7A1",
         "ParentName": "BETSI CADWALADR UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -8058,14 +8058,14 @@ RCPCH_ORGANISATIONS = [
         "City": "BANGOR",
         "County": "GWYNEDD",
         "Postcode": "LL57 2PW",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "53.20922110492283",
+        "Longitude": "-4.159410640189676",
         "ParentODSCode": "7A1",
         "ParentName": "BETSI CADWALADR UNIVERSITY LHB",
         "Phone": "",
         "Email": "",
         "Website": "",
-        "Fax": ""
+        "Fax": "",
     },
     {
         "OrganisationID": "",
@@ -8082,10 +8082,10 @@ RCPCH_ORGANISATIONS = [
         "City": "HENGOED",
         "County": "MID GLAMORGAN",
         "Postcode": "CF82 7EP",
-        "Latitude": "",
-        "Longitude": "",
+        "Latitude": "51.63419223712743",
+        "Longitude": "-3.233903238440721",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
-        "Website": ""
-    }
+        "Website": "",
+    },
 ]
