@@ -34,7 +34,7 @@ def seed_organisations(apps, schema_editor):
     NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
     ONSRegionEntity = apps.get_model("epilepsy12", "ONSRegionEntity")
 
-    print("\033[31m", "Adding new organisations...", "\033[31m")
+    print("\033[31m", "Adding new RCPCH organisations...", "\033[31m")
 
     for added, rcpch_organisation in enumerate(RCPCH_ORGANISATIONS):
         # get openuk network code from ods code in constants list
@@ -105,26 +105,18 @@ def seed_organisations(apps, schema_editor):
             )
 
         # Apply longitude and latitude data, if exists
-        if hasattr(rcpch_organisation, "longitude") and hasattr(
-            rcpch_organisation, "latitude"
-        ):
-            if (
-                len(rcpch_organisation["longitude"]) > 0
-                and len(rcpch_organisation["latitude"]) > 1
-            ):
-                latitude = rcpch_organisation["latitude"]
-                longitude = rcpch_organisation["longitude"]
-                new_point = Point(
-                    x=rcpch_organisation["longitude"], y=rcpch_organisation["latitude"]
-                )
-            else:
-                latitude = None
-                longitude = None
-                new_point = None
-        else:
+        new_point = None
+        try:
+            latitude = float(rcpch_organisation["Latitude"])
+        except:
             latitude = None
-            longitude = None
-            new_point = None
+        try:
+            longitude = float(rcpch_organisation["Longitude"])
+        except:
+            latitude = None
+
+        if longitude and latitude:
+            new_point = Point(x=longitude, y=latitude)
 
         # Date-stamps the Organisation information (this data was supplied on 19.04.2023)
         update_date = datetime(year=2023, month=4, day=19)

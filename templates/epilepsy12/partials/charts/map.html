@@ -1,46 +1,116 @@
-{% load leaflet_tags %}
-
-{% leaflet_map "{{abstraction_level}}" callback="our_layers" %}
+<!-- {% load leaflet_tags %} -->
+<div id='{{abstraction_level}}'></div>
 
 <script>
+
+    if ({{abstraction_level}}.id=='icb'){
+        try{
+            load_map(abstraction='icb', hospital_region_name='{{hospital_region_name}}', feature_properties_region_code = 'icb23nm', data={{abstraction_level_data|safe}}, stroke='{{abstraction_level_border_colour}}', latitude={{selected_organisation.Latitude}}, longitude={{selected_organisation.Longitude}});
+        } 
+        catch(error) {
+            console.log(error);
+        }
+    }
+    if ({{abstraction_level}}.id=='nhs_region'){
+        try {
+            load_map(abstraction='nhs_region', hospital_region_name='{{hospital_region_name}}', feature_properties_region_code = 'nhser22nm', data={{abstraction_level_data|safe}}, stroke='{{abstraction_level_border_colour}}', latitude={{selected_organisation.Latitude}}, longitude={{selected_organisation.Longitude}});
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
+    if ({{abstraction_level}}.id=='country'){
+        try{
+            load_map(abstraction='country', hospital_region_name='{{hospital_region_name}}', feature_properties_region_code = 'ctry22nm', data={{abstraction_level_data|safe}}, stroke='{{abstraction_level_border_colour}}', latitude={{selected_organisation.Latitude}}, longitude={{selected_organisation.Longitude}});
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+
+
+function load_map(abstraction, hospital_region_name, feature_properties_region_code, data, stroke, longitude, latitude){
+
+    const region_map = L.map(abstraction);
+
+    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            maxZoom: 12,
+            attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href= "https://carto.com/about-carto/">CARTO</a>'
+        }).addTo(region_map);
     
-    function our_layers(map,options){
-        var datasets = new L.GeoJSON.AJAX("{% url 'uk_shapes' abstraction_level=abstraction_level %}",{
-                        style: function (feature) {
-                            return {
-                                color: '{{abstraction_level_border_colour}}',
-                                weight: 1
-                            };
-                        },
-                        onEachFeature: function(feature, layer){
-                            layer.on({
-                                'mouseover': function (e) {
-                                    highlight(e.target, feature);
-                                },'mouseout': function(e){
-                                    dehighlight(e.target);
-                                }});
+    if (latitude != null && longitude != null){
+        const marker = L.circleMarker([longitude, latitude]).bindTooltip(hospital_region_name, {direction: 'center'}).openTooltip().addTo(region_map);
+        region_map.setView([longitude, latitude], 8)
+    } else {
+        region_map.setView([56, -5.0], 5.25)
+    }
+
+    const datasets = L.geoJSON(data, {
+            style: function (feature, layer) {
+                if(feature.properties[feature_properties_region_code].toUpperCase() == hospital_region_name.toUpperCase()){
+                    return {
+                        color: stroke,
+                        fillColor: stroke,
+                        fillOpacity: 0.5,
+                        weight: 3,
+                    }
+                }
+                return {
+                    color: stroke,
+                    weight: 1,
+                    fillOpacity: 0.2,
+                };
+            },
+            onEachFeature: function(feature, layer){
+                layer.on({
+                    'mouseover': function (e) {
+                        if(feature.properties[feature_properties_region_code].toUpperCase() == hospital_region_name.toUpperCase()){
+                            layer.setStyle({
+                                color: stroke,
+                                fillOpacity: 0.5,
+                                weight: 4
+                            })
+                            layer.bindTooltip(feature.properties[feature_properties_region_code], {direction: 'center'}).openTooltip();
+                        } else {
+                            highlight(e.target, feature.properties[feature_properties_region_code], stroke);
                         }
-                    });
-        console.log(datasets);
-        datasets.addTo(map);
+                    },'mouseout': function(e){
+                        if(feature.properties[feature_properties_region_code].toUpperCase() == hospital_region_name.toUpperCase()){
+                            layer.setStyle({
+                                color:  stroke,
+                                fillColor: stroke,
+                                fillOpacity: 0.5,
+                                weight: 3
+                            })
+                        } else {
+                            dehighlight(e.target, stroke);
+                        }
+                    }});
+            }
+        });
 
-    }
+        datasets.addTo(region_map);
 
-    function highlight (layer, feature) {
-			layer.setStyle({
-				weight: 3,
-				color: '#e00087'
-			});
-            layer.bindTooltip(feature.properties.nhser22nm).openPopup();
-			if (!L.Browser.ie && !L.Browser.opera) {
-				layer.bringToFront();
-			}
-		}
-    function dehighlight (layer) {
-        layer.setStyle({
-            weight: 1,
-            color: '{{abstraction_level_border_colour}}',
-        })
+};
+
+
+function highlight (layer, tooltipText, stroke) {
+    layer.setStyle({
+        weight: 3,
+        color: stroke,
+        fillOpacity: 0.2,
+    });
+    layer.bindTooltip(tooltipText, {direction: 'center'}).openTooltip();
+    if (!L.Browser.ie && !L.Browser.opera) {
+        layer.bringToFront();
     }
+}
+function dehighlight (layer, stroke) {
+    layer.setStyle({
+        weight: 1,
+        color: stroke,
+        fillOpacity: 0.2,
+    })
+}
 
 </script>

@@ -43,25 +43,25 @@ localhealthboardboundaries_mapping = {
 app_config = django_apps.get_app_config("epilepsy12")
 app_path = app_config.path
 
-Countries_December_2022_GB_BFC = os.path.join(
+Countries_December_2022_UK_BUC = os.path.join(
     app_path,
     "shape_files",
-    "Countries_December_2022_GB_BFC",
-    "CTRY_DEC_2022_GB_BFC.shp",
+    "Countries_December_2022_UK_BUC",
+    "CTRY_DEC_2022_UK_BUC.shp",
 )
 
-Integrated_Care_Boards_April_2023_EN = os.path.join(
+Integrated_Care_Boards_April_2023_EN_BSC = os.path.join(
     app_path,
     "shape_files",
-    "Integrated_Care_Boards_April_2023_EN",
-    "ICB_APR_2023_EN_BFC.shp",
+    "Integrated_Care_Boards_April_2023_EN_BSC",
+    "ICB_APR_2023_EN_BSC.shp",
 )
 
-Local_Health_Boards_April_2022_WA_BFC_2022 = os.path.join(
+Local_Health_Boards_April_2022_WA_BUC_2022 = os.path.join(
     app_path,
     "shape_files",
-    "Local_Health_Boards_April_2022_WA_BFC_2022",
-    "LHB_APR_2022_WA_BFC.shp",
+    "Local_Health_Boards_April_2022_WA_BUC_2022",
+    "LHB_APR_2022_WA_BUC.shp",
 )
 
 
@@ -69,7 +69,7 @@ def load(apps, schema_editor, verbose=True):
     CountryBoundaries = apps.get_model("epilepsy12", "CountryBoundaries")
     lm = LayerMapping(
         CountryBoundaries,
-        Countries_December_2022_GB_BFC,
+        Countries_December_2022_UK_BUC,
         countryboundaries_mapping,
         transform=False,
         encoding="utf-8",
@@ -81,7 +81,7 @@ def load(apps, schema_editor, verbose=True):
     )
     lm = LayerMapping(
         IntegratedCareBoardBoundaries,
-        Integrated_Care_Boards_April_2023_EN,
+        Integrated_Care_Boards_April_2023_EN_BSC,
         integratedcareboardboundaries_mapping,
         transform=False,
         encoding="utf-8",
@@ -93,7 +93,7 @@ def load(apps, schema_editor, verbose=True):
     )
     lm = LayerMapping(
         LocalHealthBoardBoundaries,
-        Local_Health_Boards_April_2022_WA_BFC_2022,
+        Local_Health_Boards_April_2022_WA_BUC_2022,
         localhealthboardboundaries_mapping,
         transform=False,
         encoding="utf-8",

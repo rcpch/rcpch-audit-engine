@@ -232,16 +232,16 @@ REST_FRAMEWORK = {
     ],
 }
 
-LEAFLET_CONFIG = {
-    # "SPATIAL_EXTENT": (5.0, 44.0, 7.5, 46),
-    "TILES": "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-    "DEFAULT_CENTER": (54.9182901, -8.0),
-    "DEFAULT_ZOOM": 4,
-    "MIN_ZOOM": 3,
-    "MAX_ZOOM": 12,
-    "DEFAULT_PRECISION": 6,
-    "ATTRIBUTION_PREFIX": "ONS data, Carto, OpenStreetMap",
-}
+# LEAFLET_CONFIG = {
+#     # "SPATIAL_EXTENT": (5.0, 44.0, 7.5, 46),
+#     "TILES": "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+#     "DEFAULT_CENTER": (54.9182901, -8.0),
+#     "DEFAULT_ZOOM": 4,
+#     "MIN_ZOOM": 3,
+#     "MAX_ZOOM": 12,
+#     "DEFAULT_PRECISION": 6,
+#     "ATTRIBUTION_PREFIX": "ONS data, Carto, OpenStreetMap",
+# }
 
 # Optional Logging for Debugging Purposes (esp with DEBUG=False)
 
