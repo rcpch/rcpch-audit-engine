@@ -1931,3 +1931,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 #country{
   height: 500px;
 }
+
+.region_tooltip{
+  border-radius: 0% !important;
+}

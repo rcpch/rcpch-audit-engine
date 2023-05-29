@@ -3,34 +3,42 @@
 
 <script>
 
+    data={{abstraction_level_data|safe}}
+    stroke='{{abstraction_level_border_colour}}'
+    latitude={{selected_organisation.Latitude}}
+    longitude={{selected_organisation.Longitude}}
+    hospital_region_name='{{hospital_region_name}}'
+
     if ({{abstraction_level}}.id=='icb'){
-        try{
-            load_map(abstraction='icb', hospital_region_name='{{hospital_region_name}}', feature_properties_region_code = 'icb23nm', data={{abstraction_level_data|safe}}, stroke='{{abstraction_level_border_colour}}', latitude={{selected_organisation.Latitude}}, longitude={{selected_organisation.Longitude}});
-        } 
-        catch(error) {
-            console.log(error);
-        }
+        feature_properties_region_code = 'icb23nm';
+        load_map(abstraction='icb', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
     if ({{abstraction_level}}.id=='nhs_region'){
-        try {
-            load_map(abstraction='nhs_region', hospital_region_name='{{hospital_region_name}}', feature_properties_region_code = 'nhser22nm', data={{abstraction_level_data|safe}}, stroke='{{abstraction_level_border_colour}}', latitude={{selected_organisation.Latitude}}, longitude={{selected_organisation.Longitude}});
-        }
-        catch(error){
-            console.log(error);
-        }
+        feature_properties_region_code = 'nhser22nm'
+        load_map(abstraction='nhs_region', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
     if ({{abstraction_level}}.id=='country'){
-        try{
-            load_map(abstraction='country', hospital_region_name='{{hospital_region_name}}', feature_properties_region_code = 'ctry22nm', data={{abstraction_level_data|safe}}, stroke='{{abstraction_level_border_colour}}', latitude={{selected_organisation.Latitude}}, longitude={{selected_organisation.Longitude}});
-        }
-        catch(error) {
-            console.log(error);
-        }
+        feature_properties_region_code = 'ctry22nm'
+        load_map(abstraction='country', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
 
 
 function load_map(abstraction, hospital_region_name, feature_properties_region_code, data, stroke, longitude, latitude){
-
+    /*
+    Function initializes a map using abstraction_level ('icb', 'nhs_region', 'country') passed in from selected_organisation.html
+    Any existing maps are first removed to prevent already initialized error.
+    hospital_region_name: name of region/icb/country the organisation ins in
+    feature_properties_region_code: the region code of the region the organisation is in
+    data: the shapes data
+    stroke: the colour for the border and fill
+    longitude: longitude of the organisation
+    latitude: the latitude of the organisation
+    The function creates a map based on Carto basemap, then adds the region shape files as a layer
+    Finally it adds a Marker (circle) of the organisation
+    There are supplementary methods for changing the colour and border width on mouseover of the regions
+    */
+    L.map(abstraction).remove();
+    
     const region_map = L.map(abstraction);
 
     L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -70,7 +78,7 @@ function load_map(abstraction, hospital_region_name, feature_properties_region_c
                                 fillOpacity: 0.5,
                                 weight: 4
                             })
-                            layer.bindTooltip(feature.properties[feature_properties_region_code], {direction: 'center'}).openTooltip();
+                            layer.bindTooltip(feature.properties[feature_properties_region_code], {direction: 'center', className: 'region_tooltip'}).openTooltip();
                         } else {
                             highlight(e.target, feature.properties[feature_properties_region_code], stroke);
                         }
@@ -100,7 +108,7 @@ function highlight (layer, tooltipText, stroke) {
         color: stroke,
         fillOpacity: 0.2,
     });
-    layer.bindTooltip(tooltipText, {direction: 'center'}).openTooltip();
+    layer.bindTooltip(tooltipText, {direction: 'center', className: 'region_tooltip'}).openTooltip();
     if (!L.Browser.ie && !L.Browser.opera) {
         layer.bringToFront();
     }

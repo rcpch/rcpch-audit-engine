@@ -249,7 +249,7 @@
                         <h3 >Integrated Care Board</h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#11a7f2' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
                     </div>
                 </div>
 
@@ -258,7 +258,7 @@
                         <h3 >NHS Region</h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_region' abstraction_level_border_colour='#3366cc' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
                     </div>
                 </div>
                 
@@ -267,7 +267,7 @@
                         <h3 >Country</h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#e00087' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.ons_region.ons_country.Country_ONS_Name %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.ons_region.ons_country.Country_ONS_Name %}
                     </div>
                 </div>
 

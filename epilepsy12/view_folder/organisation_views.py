@@ -191,6 +191,22 @@ def selected_organisation_summary(request):
     POST request from selected_organisation_summary.html on organisation select
     """
 
+    nhsregion_tiles = serialize(
+        "geojson",
+        NHSEnglandRegionBoundaries.objects.all(),
+    )
+    newnhsregion_tiles = json.loads(nhsregion_tiles)
+    newnhsregion_tiles.pop("crs", None)
+    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
+    icb_tiles = serialize("geojson", IntegratedCareBoardBoundaries.objects.all())
+    newicb_tiles = json.loads(icb_tiles)
+    newicb_tiles.pop("crs", None)
+    newicb_tiles = json.dumps(newicb_tiles)
+    country_tiles = serialize("geojson", CountryBoundaries.objects.all())
+    newcountry_tiles = json.loads(country_tiles)
+    newcountry_tiles.pop("crs", None)
+    newcountry_tiles = json.dumps(newcountry_tiles)
+
     selected_organisation = Organisation.objects.get(
         pk=request.POST.get("selected_organisation_summary")
     )
@@ -289,6 +305,9 @@ def selected_organisation_summary(request):
             "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
             "cohort_data": cohort_data,
             "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+            "nhsregion_tiles": newnhsregion_tiles,
+            "icb_tiles": newicb_tiles,
+            "country_tiles": newcountry_tiles,
         },
     )
 
