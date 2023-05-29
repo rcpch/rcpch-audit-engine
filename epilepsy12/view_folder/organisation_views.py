@@ -74,8 +74,6 @@ def organisation_reports(request):
     # or raises a permission error
     selected_organisation = return_selected_organisation(user=request.user)
 
-    selected_organisation = Organisation.objects.get(pk=304)
-
     if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
         lhb_tiles = serialize("geojson", LocalHealthBoardBoundaries.objects.all())
         newlhb_tiles = json.loads(lhb_tiles)
