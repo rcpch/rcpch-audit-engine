@@ -1,8 +1,12 @@
 # Python/Django imports
-from time import time
+
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.serializers import serialize
+from django.http import HttpResponse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
@@ -13,6 +17,10 @@ from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
 from epilepsy12.models import (
     Organisation,
     KPI,
+    NHSEnglandRegionBoundaries,
+    IntegratedCareBoardBoundaries,
+    CountryBoundaries,
+    LocalHealthBoardBoundaries,
 )
 from ..common_view_functions import (
     return_selected_organisation,
@@ -47,10 +55,33 @@ def organisation_reports(request):
     with an organisation. If they somehow gain access, have no organisation affiliation but are not an RCPCH
     member or a superuser, access is denied
     """
+    nhsregion_tiles = serialize(
+        "geojson",
+        NHSEnglandRegionBoundaries.objects.all(),
+    )
+    newnhsregion_tiles = json.loads(nhsregion_tiles)
+    newnhsregion_tiles.pop("crs", None)
+    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
+    icb_tiles = serialize("geojson", IntegratedCareBoardBoundaries.objects.all())
+    newicb_tiles = json.loads(icb_tiles)
+    newicb_tiles.pop("crs", None)
+    newicb_tiles = json.dumps(newicb_tiles)
+    country_tiles = serialize("geojson", CountryBoundaries.objects.all())
+    newcountry_tiles = json.loads(country_tiles)
+    newcountry_tiles.pop("crs", None)
+    newcountry_tiles = json.dumps(newcountry_tiles)
+
+    newlhb_tiles = None
 
     # this function returns the users organisation or the first in list depending on affilation
     # or raises a permission error
     selected_organisation = return_selected_organisation(user=request.user)
+
+    if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+        lhb_tiles = serialize("geojson", LocalHealthBoardBoundaries.objects.all())
+        newlhb_tiles = json.loads(lhb_tiles)
+        newlhb_tiles.pop("crs", None)
+        newlhb_tiles = json.dumps(newlhb_tiles)
 
     template_name = "epilepsy12/organisation.html"
 
@@ -114,47 +145,57 @@ def organisation_reports(request):
     else:
         total_percent_trust = 0
 
-    context = {
-        "user": request.user,
-        "selected_organisation": selected_organisation,
-        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
-        "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
-            selected_organisation=selected_organisation
-        ),
-        "cases_aggregated_by_sex": cases_aggregated_by_sex(
-            selected_organisation=selected_organisation
-        ),
-        "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
-            selected_organisation=selected_organisation
-        ),
-        "percent_completed_organisation": total_percent_organisation,
-        "percent_completed_trust": total_percent_trust,
-        "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
-        "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_trust,
-        "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
-        "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
-        "cohort_data": cohort_data,
-        # 'all_models': all_models,
-        "model_list": (
-            "allregisteredcases",
-            "registration",
-            "firstpaediatricassessment",
-            "epilepsycontext",
-            "multiaxialdiagnosis",
-            "assessment",
-            "investigations",
-            "management",
-            "site",
-            "case",
-            "epilepsy12user",
-            "organisation",
-            "comorbidity",
-            "episode",
-            "syndrome",
-            "keyword",
-        ),
-        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-    }
+    return render(
+        request=request,
+        template_name=template_name,
+        context={
+            "user": request.user,
+            "selected_organisation": selected_organisation,
+            "organisation_list": Organisation.objects.order_by(
+                "OrganisationName"
+            ).all(),
+            "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
+                selected_organisation=selected_organisation
+            ),
+            "cases_aggregated_by_sex": cases_aggregated_by_sex(
+                selected_organisation=selected_organisation
+            ),
+            "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
+                selected_organisation=selected_organisation
+            ),
+            "percent_completed_organisation": total_percent_organisation,
+            "percent_completed_trust": total_percent_trust,
+            "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
+            "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_trust,
+            "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
+            "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
+            "cohort_data": cohort_data,
+            # 'all_models': all_models,
+            "model_list": (
+                "allregisteredcases",
+                "registration",
+                "firstpaediatricassessment",
+                "epilepsycontext",
+                "multiaxialdiagnosis",
+                "assessment",
+                "investigations",
+                "management",
+                "site",
+                "case",
+                "epilepsy12user",
+                "organisation",
+                "comorbidity",
+                "episode",
+                "syndrome",
+                "keyword",
+            ),
+            "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+            "nhsregion_tiles": newnhsregion_tiles,
+            "icb_tiles": newicb_tiles,
+            "country_tiles": newcountry_tiles,
+            "lhb_tiles": newlhb_tiles,
+        },
+    )
 
     return render(request=request, template_name=template_name, context=context)
 
@@ -165,9 +206,33 @@ def selected_organisation_summary(request):
     POST request from selected_organisation_summary.html on organisation select
     """
 
+    nhsregion_tiles = serialize(
+        "geojson",
+        NHSEnglandRegionBoundaries.objects.all(),
+    )
+    newnhsregion_tiles = json.loads(nhsregion_tiles)
+    newnhsregion_tiles.pop("crs", None)
+    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
+    icb_tiles = serialize("geojson", IntegratedCareBoardBoundaries.objects.all())
+    newicb_tiles = json.loads(icb_tiles)
+    newicb_tiles.pop("crs", None)
+    newicb_tiles = json.dumps(newicb_tiles)
+    country_tiles = serialize("geojson", CountryBoundaries.objects.all())
+    newcountry_tiles = json.loads(country_tiles)
+    newcountry_tiles.pop("crs", None)
+    newcountry_tiles = json.dumps(newcountry_tiles)
+
     selected_organisation = Organisation.objects.get(
         pk=request.POST.get("selected_organisation_summary")
     )
+
+    newlhb_tiles = None
+
+    if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+        lhb_tiles = serialize("geojson", LocalHealthBoardBoundaries.objects.all())
+        newlhb_tiles = json.loads(lhb_tiles)
+        newlhb_tiles.pop("crs", None)
+        newlhb_tiles = json.dumps(newlhb_tiles)
 
     # if logged in user is from different trust and not a superuser or rcpch member, deny access
     sanction_user(user=request.user)
@@ -241,34 +306,67 @@ def selected_organisation_summary(request):
     else:
         total_percent_trust = 0
 
-    context = {
-        "user": request.user,
-        "selected_organisation": selected_organisation,
-        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
-        "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
-            selected_organisation=selected_organisation
-        ),
-        "cases_aggregated_by_sex": cases_aggregated_by_sex(
-            selected_organisation=selected_organisation
-        ),
-        "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
-            selected_organisation=selected_organisation
-        ),
-        "percent_completed_organisation": total_percent_organisation,
-        "percent_completed_trust": total_percent_trust,
-        "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
-        "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
-        "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
-        "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
-        "cohort_data": cohort_data,
-        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-    }
+    context={
+            "user": request.user,
+            "selected_organisation": selected_organisation,
+            "organisation_list": Organisation.objects.order_by(
+                "OrganisationName"
+            ).all(),
+            "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
+                selected_organisation=selected_organisation
+            ),
+            "cases_aggregated_by_sex": cases_aggregated_by_sex(
+                selected_organisation=selected_organisation
+            ),
+            "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
+                selected_organisation=selected_organisation
+            ),
+            "percent_completed_organisation": total_percent_organisation,
+            "percent_completed_trust": total_percent_trust,
+            "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
+            "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
+            "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
+            "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
+            "cohort_data": cohort_data,
+            "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+            "nhsregion_tiles": newnhsregion_tiles,
+            "icb_tiles": newicb_tiles,
+            "country_tiles": newcountry_tiles,
+            "lhb_tiles": newlhb_tiles,
+        }
 
     return render(
         request=request,
         template_name="epilepsy12/partials/selected_organisation_summary.html",
         context=context,
     )
+
+
+def uk_shapes(request, abstraction_level):
+    """
+    return region shapes request from maps.html depending on abstraction_level
+    ['icb', 'nhs_region', 'country', 'lhb']
+    """
+    if abstraction_level == "nhs_region":
+        object_to_return = NHSEnglandRegionBoundaries
+    elif abstraction_level == "icb":
+        object_to_return = IntegratedCareBoardBoundaries
+    elif abstraction_level == "country":
+        object_to_return = CountryBoundaries
+    else:
+        raise ValueError(f"Cannot return region shape {abstraction_level}")
+
+    # serialize data to geojson
+    tiles = serialize(
+        "geojson",
+        object_to_return.objects.all(),
+    )
+    # strip the crs element
+    deserialized_tiles = json.loads(tiles)
+    deserialized_tiles.pop("crs", None)
+    # reserialize
+    serialized_tiles = json.dumps(deserialized_tiles)
+    return HttpResponse(serialized_tiles, content_type="application/json")
 
 
 @login_required

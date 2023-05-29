@@ -1920,6 +1920,13 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   padding-top: 20px;
 }
 
+.region_map{
+  height: 500px;
+}
+
+.region_tooltip{
+  border-radius: 0% !important;
+
 .ui.card.clickable_card:hover {
   cursor: pointer;
 }
