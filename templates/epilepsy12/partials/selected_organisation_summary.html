@@ -246,10 +246,18 @@
                                
                 <div class="ui rcpch_light_blue  card">
                     <div class="content">
+                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
+                        <h3 >Local Health Board</h3>
+                        {% else %}
                         <h3 >Integrated Care Board</h3>
+                        {% endif %}
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
+                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% else %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
+                        {% endif %}
                     </div>
                 </div>
 

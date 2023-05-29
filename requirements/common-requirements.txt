@@ -15,5 +15,4 @@ django-semantic-admin
 djangorestframework
 django-simple-history
 django-auto-logout
-django-leaflet
 # RCPCH imports

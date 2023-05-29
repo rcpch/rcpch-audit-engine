@@ -18,6 +18,7 @@ from epilepsy12.models import (
     NHSEnglandRegionBoundaries,
     IntegratedCareBoardBoundaries,
     CountryBoundaries,
+    LocalHealthBoardBoundaries,
 )
 from ..common_view_functions import (
     return_selected_organisation,
@@ -67,9 +68,19 @@ def organisation_reports(request):
     newcountry_tiles.pop("crs", None)
     newcountry_tiles = json.dumps(newcountry_tiles)
 
+    newlhb_tiles = None
+
     # this function returns the users organisation or the first in list depending on affilation
     # or raises a permission error
     selected_organisation = return_selected_organisation(user=request.user)
+
+    selected_organisation = Organisation.objects.get(pk=304)
+
+    if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+        lhb_tiles = serialize("geojson", LocalHealthBoardBoundaries.objects.all())
+        newlhb_tiles = json.loads(lhb_tiles)
+        newlhb_tiles.pop("crs", None)
+        newlhb_tiles = json.dumps(newlhb_tiles)
 
     template_name = "epilepsy12/organisation.html"
 
@@ -181,6 +192,7 @@ def organisation_reports(request):
             "nhsregion_tiles": newnhsregion_tiles,
             "icb_tiles": newicb_tiles,
             "country_tiles": newcountry_tiles,
+            "lhb_tiles": newlhb_tiles,
         },
     )
 
@@ -210,6 +222,14 @@ def selected_organisation_summary(request):
     selected_organisation = Organisation.objects.get(
         pk=request.POST.get("selected_organisation_summary")
     )
+
+    newlhb_tiles = None
+
+    if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+        lhb_tiles = serialize("geojson", LocalHealthBoardBoundaries.objects.all())
+        newlhb_tiles = json.loads(lhb_tiles)
+        newlhb_tiles.pop("crs", None)
+        newlhb_tiles = json.dumps(newlhb_tiles)
 
     # if logged in user is from different trust and not a superuser or rcpch member, deny access
     sanction_user(user=request.user)
@@ -308,6 +328,7 @@ def selected_organisation_summary(request):
             "nhsregion_tiles": newnhsregion_tiles,
             "icb_tiles": newicb_tiles,
             "country_tiles": newcountry_tiles,
+            "lhb_tiles": newlhb_tiles,
         },
     )
 
@@ -315,7 +336,7 @@ def selected_organisation_summary(request):
 def uk_shapes(request, abstraction_level):
     """
     return region shapes request from maps.html depending on abstraction_level
-    ['icb', 'nhs_region', 'country']
+    ['icb', 'nhs_region', 'country', 'lhb']
     """
     if abstraction_level == "nhs_region":
         object_to_return = NHSEnglandRegionBoundaries

@@ -1920,15 +1920,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   padding-top: 20px;
 }
 
-#icb{
-  height: 500px;
-}
-
-#nhs_region{
-  height: 500px;
-}
-
-#country{
+.region_map{
   height: 500px;
 }
 
