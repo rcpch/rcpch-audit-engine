@@ -1,5 +1,7 @@
 # Python/Django imports
+
 import json
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
@@ -36,6 +38,7 @@ from ..general_functions import (
     value_from_key,
     calculate_kpi_average,
 )
+from ..constants import colors
 
 
 @login_required
@@ -194,6 +197,8 @@ def organisation_reports(request):
         },
     )
 
+    return render(request=request, template_name=template_name, context=context)
+
 
 @login_required
 def selected_organisation_summary(request):
@@ -243,6 +248,10 @@ def selected_organisation_summary(request):
             abstraction_level="organisation",
         ).count()
     )
+
+    print(
+        f"{count_of_current_cohort_registered_completed_cases_in_this_organisation} in this organisation"
+    )
     # query to return all completed E12 cases in the current cohort in this organisation trust
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
@@ -275,8 +284,8 @@ def selected_organisation_summary(request):
         total_percent_organisation = (
             round(
                 (
-                    count_of_current_cohort_registered_cases_in_this_organisation
-                    / count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    / count_of_current_cohort_registered_cases_in_this_organisation
                 )
             )
             * 10
@@ -288,8 +297,8 @@ def selected_organisation_summary(request):
         total_percent_trust = (
             round(
                 (
-                    count_of_current_cohort_registered_cases_in_this_organisation
-                    / count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    count_of_current_cohort_registered_completed_cases_in_this_organisation
+                    / count_of_current_cohort_registered_cases_in_this_organisation
                 )
             )
             * 10
@@ -297,10 +306,7 @@ def selected_organisation_summary(request):
     else:
         total_percent_trust = 0
 
-    return render(
-        request=request,
-        template_name="epilepsy12/partials/selected_organisation_summary.html",
-        context={
+    context={
             "user": request.user,
             "selected_organisation": selected_organisation,
             "organisation_list": Organisation.objects.order_by(
@@ -327,7 +333,12 @@ def selected_organisation_summary(request):
             "icb_tiles": newicb_tiles,
             "country_tiles": newcountry_tiles,
             "lhb_tiles": newlhb_tiles,
-        },
+        }
+
+    return render(
+        request=request,
+        template_name="epilepsy12/partials/selected_organisation_summary.html",
+        context=context,
     )
 
 
@@ -455,6 +466,7 @@ def selected_trust_kpis(request, organisation_id):
     trigger_client_event(
         response=response, name="registration_active", params={}
     )  # reloads the form to show the active steps
+
     return response
 
 
@@ -463,7 +475,6 @@ def selected_trust_kpis_open(request, organisation_id):
     Open access endpoint for KPIs table
     """
 
-    #
     organisation = Organisation.objects.get(pk=organisation_id)
     cohort_data = get_current_cohort_data()
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
@@ -720,7 +731,6 @@ def selected_trust_select_kpi(request, organisation_id):
         "national_kpi": national_kpi[kpi_name],
         "total_national_kpi_cases": national_kpi["total_number_of_cases"],
         "open_uk": all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-        # "open_uk_data_colors": [color for color in all_aggregated_kpis_by_open_uk_region_in_current_cohort],
         "open_uk_avg": open_uk_avg,
         "open_uk_title": f"{kpi_value} by OPEN UK Region",
         "open_uk_id": "open_uk_id",
@@ -736,6 +746,11 @@ def selected_trust_select_kpi(request, organisation_id):
         "country_avg": country_avg,
         "country_title": f"{kpi_value} by Country",
         "country_id": "country_id",
+        # ADD COLOR PER ABSTRACTION
+        "icb_color": colors.RCPCH_AQUA_GREEN,
+        "open_uk_color": colors.RCPCH_LIGHT_BLUE,
+        "nhs_region_color": colors.RCPCH_STRONG_BLUE,
+        "country_color": colors.RCPCH_DARK_BLUE,
     }
 
     template_name = "epilepsy12/partials/organisation/metric.html"

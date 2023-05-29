@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     "django_htmx",
     "rest_framework.authtoken",
     "simple_history",
-    "leaflet",
 ]
 
 MIDDLEWARE = [
@@ -187,7 +186,8 @@ TIME_ZONE = "Europe/London"
 
 USE_I18N = True
 
-USE_L10N = True
+# The USE_L10N setting is deprecated. Starting with Django 5.0, localized formatting of data will always be enabled. For example Django will display numbers and dates using the format of the current locale.
+# USE_L10N = True
 
 USE_TZ = True
 
@@ -232,16 +232,32 @@ REST_FRAMEWORK = {
     ],
 }
 
-# LEAFLET_CONFIG = {
-#     # "SPATIAL_EXTENT": (5.0, 44.0, 7.5, 46),
-#     "TILES": "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-#     "DEFAULT_CENTER": (54.9182901, -8.0),
-#     "DEFAULT_ZOOM": 4,
-#     "MIN_ZOOM": 3,
-#     "MAX_ZOOM": 12,
-#     "DEFAULT_PRECISION": 6,
-#     "ATTRIBUTION_PREFIX": "ONS data, Carto, OpenStreetMap",
-# }
+# Optional Logging for Debugging Purposes (esp with DEBUG=False)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {},
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+        }
+    },
+    "loggers": {
+        "epilepsy12": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
 
 # Optional Logging for Debugging Purposes (esp with DEBUG=False)
 
@@ -277,3 +293,4 @@ REST_FRAMEWORK = {
 #         },
 #     }
 # }
+

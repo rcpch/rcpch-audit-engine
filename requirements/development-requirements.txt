@@ -1,14 +1,15 @@
 # load common requirements
 -r common-requirements.txt
 
-# standard imports
+# code linting and formatting
 autopep8
-coverage
 black
-pytest
 
-# third party imports
+# testing and code analysis
+coverage
+pytest-django
+
+# versioning
 bump2version
 
-# RCPCH imports
 

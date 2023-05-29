@@ -1926,4 +1926,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .region_tooltip{
   border-radius: 0% !important;
+
+.ui.card.clickable_card:hover {
+  cursor: pointer;
 }
