@@ -23,6 +23,7 @@ from epilepsy12.tests.factories import (
     E12MultiaxialDiagnosisFactory,
     E12RegistrationFactory,
     E12SiteFactory,
+    E12SyndromeFactory,
     E12UserFactory,
 )
 
@@ -55,6 +56,7 @@ register(E12FirstPaediatricAssessmentFactory)  # => e12_first_paediatric_assessm
 register(E12ManagementFactory)  # => e12_management_factory
 register(E12RegistrationFactory)  # => e12_registration_factory
 register(E12SiteFactory)  # => e12_site_factory
+register(E12SyndromeFactory) # => e12_syndrome_factory
 register(E12UserFactory)  # => e12_user_factory
 register(E12MultiaxialDiagnosisFactory)  # => e12_multiaxial_diagnosis_factory
 

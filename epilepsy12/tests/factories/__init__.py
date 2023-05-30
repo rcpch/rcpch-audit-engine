@@ -11,4 +11,5 @@ from .E12ManagementFactory import E12ManagementFactory
 from .E12MultiaxialDiagnosisFactory import E12MultiaxialDiagnosisFactory
 from .E12RegistrationFactory import E12RegistrationFactory
 from .E12SiteFactory import E12SiteFactory
+from .E12SyndromeFactory import E12SyndromeFactory
 from .E12UserFactory import E12UserFactory
