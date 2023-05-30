@@ -7,10 +7,10 @@ Each test depends on whether child has been referred / seen by a neurologist OR 
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is on 3 or more AEMS (see lines 115-120 for query) and seen by neurologist / epilepsy surgery/both
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is under 4 and has myoclonic epilepsy (lines 128-133) and seen by neurologist / epilepsy surgery/both
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and seen by neurologist / epilepsy surgery/both
-- [ ] Measure 3 failed (registration.kpi.tertiary_input == 0) if age at first paediatric assessment is <= 3 and not seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
-- [ ] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is on 3 or more AEMS (see lines 115-120 for query) and not seen by neurologist / epilepsy surgery/both
-- [ ] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is under 4 and has myoclonic epilepsy (lines 128-133) and not seen by neurologist / epilepsy surgery/both
-- [ ] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and not seen by neurologist / epilepsy surgery/both
+- [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if age at first paediatric assessment is <= 3 and not seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
+- [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is on 3 or more AEMS (see lines 115-120 for query) and not seen by neurologist / epilepsy surgery/both
+- [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is under 4 and has myoclonic epilepsy (lines 128-133) and not seen by neurologist / epilepsy surgery/both
+- [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and not seen by neurologist / epilepsy surgery/both
 - [ ] Measure 3 ineligible (registration.kpi.tertiary_input == 2) if age at first paediatric assessment is > 3 and not not on 3 or more drugs and not eligible for epilepsy surgery and not >4y with myoclonic epilepsy
 Measure 3b
 - [ ] Measure 3b passed (registration.kp.epilepsy_surgery_referral ==1 ) if met criteria for surgery and evidence of referral or being seen (line 224)
@@ -112,9 +112,11 @@ def test_measure_3_age_3yo(
 
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
 
-    assert (
-        kpi_score == expected_kpi_score
-    ), f"Age at FPA is 3yo and seen by neurologist / surgery / both but did not pass measure" if expected_kpi_score==KPI_SCORE['PASS'] else f"Age at FPA is 3yo but not seen by neurologist / surgery and did not fail measure"
+    assert kpi_score == expected_kpi_score, (
+        f"Age at FPA is 3yo and seen by neurologist / surgery / both but did not pass measure"
+        if expected_kpi_score == KPI_SCORE["PASS"]
+        else f"Age at FPA is 3yo but not seen by neurologist / surgery and did not fail measure"
+    )
 
 
 @pytest.mark.parametrize(
@@ -122,7 +124,7 @@ def test_measure_3_age_3yo(
     CASE_PARAM_VALUES,
 )
 @pytest.mark.django_db
-def test_measure_3_should_pass_3AEMs_seen(
+def test_measure_3_3AEMs_seen(
     e12_case_factory,
     PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
     PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
@@ -177,9 +179,11 @@ def test_measure_3_should_pass_3AEMs_seen(
 
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
 
-    assert (
-        kpi_score == expected_kpi_score
-    ), f"On >= 3 AEMS (n={aems_count}) and seen by neurologist / epilepsy surgery/both but did not pass measure" if expected_kpi_score==KPI_SCORE['PASS'] else f"On >= 3 AEMS (n={aems_count}) and not seen by neurologist / surgery and did not fail measure"
+    assert kpi_score == expected_kpi_score, (
+        f"On >= 3 AEMS (n={aems_count}) and seen by neurologist / epilepsy surgery/both but did not pass measure"
+        if expected_kpi_score == KPI_SCORE["PASS"]
+        else f"On >= 3 AEMS (n={aems_count}) and not seen by neurologist / surgery and did not fail measure"
+    )
 
 
 @pytest.mark.parametrize(
@@ -187,7 +191,7 @@ def test_measure_3_should_pass_3AEMs_seen(
     CASE_PARAM_VALUES,
 )
 @pytest.mark.django_db
-def test_measure_3_should_pass_lt_4yo_myoclonic_seen(
+def test_measure_3_lt_4yo_myoclonic_seen(
     e12_case_factory,
     e12_episode_factory,
     PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
@@ -238,9 +242,11 @@ def test_measure_3_should_pass_lt_4yo_myoclonic_seen(
 
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
 
-    assert (
-        kpi_score == expected_kpi_score
-    ), f"Has myoclonic episode (n = {episodes.count()}) and seen by neurologist / epilepsy surgery/both but did not pass measure" if expected_kpi_score==KPI_SCORE['PASS'] else f"Has myoclonic episode (n = {episodes.count()}) and not seen by neurologist / surgery and did not fail measure"
+    assert kpi_score == expected_kpi_score, (
+        f"Has myoclonic episode (n = {episodes.count()}) and seen by neurologist / epilepsy surgery/both but did not pass measure"
+        if expected_kpi_score == KPI_SCORE["PASS"]
+        else f"Has myoclonic episode (n = {episodes.count()}) and not seen by neurologist / surgery and did not fail measure"
+    )
 
 
 @pytest.mark.parametrize(
@@ -248,7 +254,7 @@ def test_measure_3_should_pass_lt_4yo_myoclonic_seen(
     CASE_PARAM_VALUES,
 )
 @pytest.mark.django_db
-def test_measure_3_should_pass_lt_meets_CESS_seen(
+def test_measure_3_lt_meets_CESS_seen(
     e12_case_factory,
     PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
     PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
@@ -276,6 +282,48 @@ def test_measure_3_should_pass_lt_meets_CESS_seen(
 
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
 
-    assert (
-        kpi_score == expected_kpi_score
-    ), f"Met CESS criteria and seen by neurologist / epilepsy surgery/both but did not pass measure" if expected_kpi_score==KPI_SCORE['PASS'] else f"Met CESS criteria and not seen by neurologist / surgery and did not fail measure"
+    assert kpi_score == expected_kpi_score, (
+        f"Met CESS criteria and seen by neurologist / epilepsy surgery/both but did not pass measure"
+        if expected_kpi_score == KPI_SCORE["PASS"]
+        else f"Met CESS criteria and not seen by neurologist / surgery and did not fail measure"
+    )
+
+
+@pytest.mark.parametrize(
+    CASE_PARAM_NAMES,
+    CASE_PARAM_VALUES,
+)
+@pytest.mark.django_db
+def test_measure_3_lt_meets_CESS_seen(
+    e12_case_factory,
+    PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
+    PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+    expected_kpi_score,
+):
+    """
+    *PASSED*
+    1) child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and seen by neurologist / epilepsy surgery/both
+    """
+
+    case = e12_case_factory(
+        registration__assessment__childrens_epilepsy_surgical_service_referral_criteria_met=True,
+        registration__assessment__paediatric_neurologist_referral_date=PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
+        registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
+        registration__assessment__childrens_epilepsy_surgical_service_input_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+    )
+
+    # get registration for the saved case model
+    registration = Registration.objects.get(case=case)
+
+    calculate_kpis(registration_instance=registration)
+
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
+
+    assert kpi_score == expected_kpi_score, (
+        f"Met CESS criteria and seen by neurologist / epilepsy surgery/both but did not pass measure"
+        if expected_kpi_score == KPI_SCORE["PASS"]
+        else f"Met CESS criteria and not seen by neurologist / surgery and did not fail measure"
+    )
