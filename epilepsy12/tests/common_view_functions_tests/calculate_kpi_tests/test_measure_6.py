@@ -1,9 +1,9 @@
 """
 Measure 6 `assessment_of_mental_health_issues` - Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
 
-- [ ] Measure 6 passed (registration.kpi.assessment_of_mental_health_issues == 1) if (age_at_first_paediatric_assessment >= 5) and (registration_instance.multiaxialdiagnosis.mental_health_screen)
-- [ ] Measure 6 failed (registration.kpi.assessment_of_mental_health_issues == 0) if (age_at_first_paediatric_assessment >= 5) and not (registration_instance.multiaxialdiagnosis.mental_health_screen)
-- [ ] Measure 6 ineligible (registration.kpi.assessment_of_mental_health_issues == 2) if (age_at_first_paediatric_assessment < 5)
+- [x] Measure 6 passed (registration.kpi.assessment_of_mental_health_issues == 1) if (age_at_first_paediatric_assessment >= 5) and (registration_instance.multiaxialdiagnosis.mental_health_screen)
+- [x] Measure 6 failed (registration.kpi.assessment_of_mental_health_issues == 0) if (age_at_first_paediatric_assessment >= 5) and not (registration_instance.multiaxialdiagnosis.mental_health_screen)
+- [x] Measure 6 ineligible (registration.kpi.assessment_of_mental_health_issues == 2) if (age_at_first_paediatric_assessment < 5)
 """
 
 from datetime import date
