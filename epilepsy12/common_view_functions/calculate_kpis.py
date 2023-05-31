@@ -440,27 +440,43 @@ def calculate_kpis(registration_instance):
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
 
-    patient_held_individualised_epilepsy_document = 0
+    patient_held_individualised_epilepsy_document = None
     if hasattr(registration_instance, "management"):
         # denominator is all children with epilepsy - no denominator
         if (
             registration_instance.management.individualised_care_plan_in_place
+            is not None
             and registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+            is not None
             and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
+            is not None
         ):
-            # criteria met
-            patient_held_individualised_epilepsy_document = 1
+            if (
+                registration_instance.management.individualised_care_plan_in_place
+                and registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+                and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
+            ):
+                # criteria met
+                patient_held_individualised_epilepsy_document = 1
+            else:
+                patient_held_individualised_epilepsy_document = 0
 
     # ii patient_carer_parent_agreement_to_the_care_planning
     # % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
     # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
     # Denominator = Number of children and young people diagnosed with epilepsy at first year
-    patient_carer_parent_agreement_to_the_care_planning = 0
+    patient_carer_parent_agreement_to_the_care_planning = None
     if hasattr(registration_instance, "management"):
         if (
             registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+            is not None
         ):
-            patient_carer_parent_agreement_to_the_care_planning = 1
+            if (
+                registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
+            ):
+                patient_carer_parent_agreement_to_the_care_planning = 1
+            else:
+                patient_carer_parent_agreement_to_the_care_planning = 0
 
     # iii. care_planning_has_been_updated_when_necessary
     # Calculation Method
