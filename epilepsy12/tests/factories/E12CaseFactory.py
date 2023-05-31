@@ -17,20 +17,18 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
         model = Case
 
     # TODO - once Case.nhs_number has appropriate validation + cleaning, won't need to strip spaces here
-    nhs_number = factory.Sequence(lambda n: VALID_NHS_NUMS[n].replace(" ", ""))
+    # Iterates through available valid NHS nums. Will reset from beginning once end of list is reached.
+    nhs_number = factory.Iterator(VALID_NHS_NUMS, getter=lambda nhs_num: nhs_num.replace(' ',''))
     first_name = "Thomas"
-    surname = factory.Sequence(lambda n: f"Anderson-{n}")  # Anderson-1, Anderson-2, ...
+    surname = "Anderson"
     sex = 1
     date_of_birth = datetime.date(2021, 9, 2)
     ethnicity = "A"
     locked = False
-    
+
     # once case created, create a Site, which acts as a link table between the Case and Organisation
-    organisations = factory.RelatedFactory(
-        E12SiteFactory,
-        factory_related_name='case'
-    )
-    
+    organisations = factory.RelatedFactory(E12SiteFactory, factory_related_name="case")
+
     # reverse dependency
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
