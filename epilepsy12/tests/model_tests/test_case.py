@@ -20,7 +20,7 @@ def test_case_age_calculation(e12_case_factory):
     fixed_testing_date = date(2023, 6, 17)
     e12Case.date_of_birth = date(2018, 5, 11)
 
-    assert e12Case.age(fixed_testing_date) == "5 years, 1 month"
+    assert e12Case.age(fixed_testing_date) == "5 years, 1 month", "Incorrect stringified age"
 
 
 @pytest.mark.django_db
