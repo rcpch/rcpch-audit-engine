@@ -210,6 +210,7 @@ def test_measure_4_mri_syndromes_ineligible(
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
+    # get syndrome for registration
     current_syndromes = Syndrome.objects.get(
         multiaxial_diagnosis=registration.multiaxialdiagnosis
     )

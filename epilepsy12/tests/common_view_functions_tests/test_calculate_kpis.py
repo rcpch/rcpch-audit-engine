@@ -5,13 +5,6 @@ Tests
 - [x] return None if child not registered in audit (registration.registration_date is None, or registration_eligibility_criteria_met is None or False, Site.site_is_primary_centre_of_epilepsy_care is None)
 
 
-
-
-Measure 6
-- [ ] Measure 6 passed (registration.kpi.assessment_of_mental_health_issues == 1) if (age_at_first_paediatric_assessment >= 5) and (registration_instance.multiaxialdiagnosis.mental_health_screen)
-- [ ] Measure 6 failed (registration.kpi.assessment_of_mental_health_issues == 0) if (age_at_first_paediatric_assessment >= 5) and not (registration_instance.multiaxialdiagnosis.mental_health_screen)
-- [ ] Measure 6 ineligible (registration.kpi.assessment_of_mental_health_issues == 2) if (age_at_first_paediatric_assessment < 5)
-
 Measure 7
 - [ ] Measure 7 passed (registration.kpi.mri == 1) if registration_instance.multiaxialdiagnosis.mental_health_issue_identified and registration_instance.management.has_support_for_mental_health_support
 - [ ] Measure 7 failed (registration.kpi.mri == 0) if not registration_instance.multiaxialdiagnosis.mental_health_issue_identified and registration_instance.management.has_support_for_mental_health_support
