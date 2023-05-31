@@ -13,10 +13,10 @@ from epilepsy12.models import Comorbidity
 
 @pytest.mark.django_db
 def test_working_comorbidity(e12_case_factory):
-    """Tests simply ensures a valid comorbidity is attched, with default values, to a case.
+    """Tests simply ensures a valid comorbidity is attached, with default values, to a case.
     """
     case = e12_case_factory()
       
-    print(Comorbidity.objects.get(multiaxial_diagnosis=case.registration.multiaxialdiagnosis).comorbidity_diagnosis_date)
+    assert Comorbidity.objects.filter(multiaxial_diagnosis = case.registration.multiaxialdiagnosis)
 
     
