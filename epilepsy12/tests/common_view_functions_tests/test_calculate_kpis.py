@@ -5,11 +5,6 @@ Tests
 - [x] return None if child not registered in audit (registration.registration_date is None, or registration_eligibility_criteria_met is None or False, Site.site_is_primary_centre_of_epilepsy_care is None)
 
 
-Measure 7
-- [ ] Measure 7 passed (registration.kpi.mri == 1) if registration_instance.multiaxialdiagnosis.mental_health_issue_identified and registration_instance.management.has_support_for_mental_health_support
-- [ ] Measure 7 failed (registration.kpi.mri == 0) if not registration_instance.multiaxialdiagnosis.mental_health_issue_identified and registration_instance.management.has_support_for_mental_health_support
-- [ ] Measure 7 ineligible (registration.kpi.mri == 2) if not registration_instance.multiaxialdiagnosis.mental_health_issue_identified
-
 Measure 8
 - [ ] Measure 8 passed (registration.kpi.sodium_valproate == 1) if sex == 2 and on valproate and age >= 12 (line 378) and has_a_valproate_annual_risk_acknowledgement_form_been_completed
 - [ ] Measure 8 failed (registration.kpi.sodium_valproate == 1) if sex == 2 and on valproate and age >= 12 (line 378) and not has_a_valproate_annual_risk_acknowledgement_form_been_completed
