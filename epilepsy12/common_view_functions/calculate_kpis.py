@@ -54,7 +54,6 @@ def calculate_kpis(registration_instance):
             and registration_instance.assessment.consultant_paediatrician_referral_date
             is not None
         ):
-            
             if (
                 registration_instance.assessment.consultant_paediatrician_input_date
                 <= (
@@ -419,13 +418,21 @@ def calculate_kpis(registration_instance):
     comprehensive_care_planning_agreement = None
     if hasattr(registration_instance, "management"):
         # denominator is all children with epilepsy - no denominator
-
-        # eligible for this measure
-        if registration_instance.management.individualised_care_plan_in_place:
-            # criteria met
-            comprehensive_care_planning_agreement = 1
-        if not registration_instance.management.individualised_care_plan_in_place:
-            comprehensive_care_planning_agreement = 0
+        if (
+            registration_instance.management.individualised_care_plan_in_place
+            is not None
+            and registration_instance.management.care_planning_has_been_updated_when_necessary
+            is not None
+        ):
+            # eligible for this measure
+            if (
+                registration_instance.management.individualised_care_plan_in_place
+                and registration_instance.management.care_planning_has_been_updated_when_necessary
+            ):
+                # criteria met
+                comprehensive_care_planning_agreement = 1
+            else:
+                comprehensive_care_planning_agreement = 0
 
     # i. patient_held_individualised_epilepsy_document
     # % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
