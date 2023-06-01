@@ -2,9 +2,9 @@
 9iii `care_planning_has_been_updated_when_necessary` - Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
 
 PASS:
-- [ ] management.has_individualised_care_plan_been_updated_in_the_last_year = True
+- [x] management.has_individualised_care_plan_been_updated_in_the_last_year = True
 FAIL:
-- [ ] management.has_individualised_care_plan_been_updated_in_the_last_year = False
+- [x] management.has_individualised_care_plan_been_updated_in_the_last_year = False
 """
 # Standard imports
 
