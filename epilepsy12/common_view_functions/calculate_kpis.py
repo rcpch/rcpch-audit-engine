@@ -109,46 +109,46 @@ def score_kpi_1(registration_instance) -> int:
         else:
             return KPI_SCORE["FAIL"]
 
+
 def score_kpi_2(registration_instance) -> int:
     """2. epilepsy_specialist_nurse
-    
+
     % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
-    
+
     Calculation Method
-    
+
     Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
-    
-    Denominator = Number of children and young people [diagnosed with epilepsy] at first year"""
-    
+
+    Denominator = Number of children and young people [diagnosed with epilepsy] at first year
+    """
+
     assessment = registration_instance.assessment
-        
-    # if not filled, incomplete form
-    if assessment.epilepsy_specialist_nurse_referral_made is None:
+
+    # if not all filled, incomplete form
+    if (
+        assessment.epilepsy_specialist_nurse_referral_made is None
+        or assessment.epilepsy_specialist_nurse_referral_date is None
+        or assessment.epilepsy_specialist_nurse_input_date is None
+    ):
         return KPI_SCORE["NOT_SCORED"]
-    
-    
+
     # no nurse referral, fail
-    if not assessment.epilepsy_specialist_nurse_referral_made:
+    if assessment.epilepsy_specialist_nurse_referral_made is False:
         return KPI_SCORE["FAIL"]
 
-    # if input date provided, referral must have also been provided
-    if assessment.epilepsy_specialist_nurse_input_date is not None:
-        
-        # score check
-        has_seen_nurse_before_close_date = (
-            assessment.epilepsy_specialist_nurse_input_date
-            <= registration_instance.registration_close_date
-        ) or (
-            assessment.epilepsy_specialist_nurse_referral_date
-            <= registration_instance.registration_close_date
-        )
+    # score check
+    has_seen_nurse_before_close_date = (
+        assessment.epilepsy_specialist_nurse_input_date
+        <= registration_instance.registration_close_date
+        or assessment.epilepsy_specialist_nurse_referral_date
+        <= registration_instance.registration_close_date
+    )
 
-        if has_seen_nurse_before_close_date:
-            return KPI_SCORE["PASS"]
-        else:
-            return KPI_SCORE["FAIL"]
-    
-    
+    if has_seen_nurse_before_close_date:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
 
 def calculate_kpis(registration_instance):
     """
