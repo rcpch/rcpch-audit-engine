@@ -13,12 +13,11 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 # Third party imports
-from django.contrib.gis.db.models import Q
 
 # RCPCH imports
 from epilepsy12.common_view_functions import calculate_kpis
-from epilepsy12.constants import KPI_SCORE, SYNDROMES
-from epilepsy12.models import KPI, Registration, Syndrome, SyndromeEntity, MultiaxialDiagnosis
+from epilepsy12.constants import KPI_SCORE
+from epilepsy12.models import KPI, Registration, MultiaxialDiagnosis
 
 
 @pytest.mark.parametrize(
@@ -50,8 +49,10 @@ def test_measure_6_screen_mental_health(
         date_of_birth=DATE_OF_BIRTH,
         registration__registration_date=REGISTRATION_DATE,
     )
-    
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(registration=case.registration)
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        registration=case.registration
+    )
     multiaxial_diagnosis.mental_health_screen = mental_health_screen_done
     multiaxial_diagnosis.save()
 
@@ -60,17 +61,22 @@ def test_measure_6_screen_mental_health(
 
     calculate_kpis(registration_instance=registration)
 
-    kpi_score = KPI.objects.get(pk=registration.kpi.pk).assessment_of_mental_health_issues
-    
+    kpi_score = KPI.objects.get(
+        pk=registration.kpi.pk
+    ).assessment_of_mental_health_issues
+
     # get age for AssertionError message
-    age = (relativedelta(case.registration.registration_date,case.date_of_birth).years)
-    
+    age = relativedelta(case.registration.registration_date, case.date_of_birth).years
+
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f"Age >= 5yo ({age}yo) with mental health screen but not passing measure"
+        assertion_message = (
+            f"Age >= 5yo ({age}yo) with mental health screen but not passing measure"
+        )
     elif expected_score == KPI_SCORE["FAIL"]:
-        assertion_message = f"Age >= 5yo ({age}yo) with NO mental health screen but not failing measure"
+        assertion_message = (
+            f"Age >= 5yo ({age}yo) with NO mental health screen but not failing measure"
+        )
     else:
         assertion_message = f"Age < 5yo ({age}yo) should be ineligible for measure"
-    
+
     assert kpi_score == expected_score, assertion_message
-    

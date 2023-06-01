@@ -349,4 +349,3 @@ def test_measure_3_ineligible(
     assert (
         kpi_score == KPI_SCORE["NOT_APPLICABLE"]
     ), f"Child does not meet any criteria but is not scoring as ineligible"
-

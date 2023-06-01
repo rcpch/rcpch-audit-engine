@@ -54,15 +54,18 @@ def test_measure_9A_comprehensive_care_plan(
     calculate_kpis(registration_instance=registration)
 
     # get KPI score
-    kpi_score = KPI.objects.get(pk=registration.kpi.pk).comprehensive_care_planning_agreement
+    kpi_score = KPI.objects.get(
+        pk=registration.kpi.pk
+    ).comprehensive_care_planning_agreement
 
     if expected_score == KPI_SCORE["PASS"]:
         assertion_message = f"Care plan in place, updated in last year, but not passing"
     elif expected_score == KPI_SCORE["FAIL"]:
         if not individualised_care_plan_in_place:
-            assertion_message = f"No individualised_care_plan_in_place but not failing measure"
+            assertion_message = (
+                f"No individualised_care_plan_in_place but not failing measure"
+            )
         else:
             assertion_message = f"has_individualised_care_plan_been_updated_in_the_last_year=False but not failing measure"
-        
 
     assert kpi_score == expected_score, assertion_message

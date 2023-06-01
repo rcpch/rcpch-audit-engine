@@ -27,6 +27,7 @@ from epilepsy12.models import (
 )
 from epilepsy12.constants import KPI_SCORE
 
+
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_measure_2_should_not_score(
@@ -36,20 +37,19 @@ def test_measure_2_should_not_score(
     *NOT_SCORED*
     1)  kpi.epilepsy_specialist_nurse_referral_made = None
     """
-    case = e12_case_factory(
-            registration__assessment__reset = True
-        )
-    
+    case = e12_case_factory(registration__assessment__reset=True)
+
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
     calculate_kpis(registration_instance=registration)
 
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).epilepsy_specialist_nurse
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).epilepsy_specialist_nurse
 
-    assert kpi_score == KPI_SCORE['NOT_SCORED'], f'{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure isn\'t `not scoring`'
+    assert (
+        kpi_score == KPI_SCORE["NOT_SCORED"]
+    ), f"{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure isn't `not scoring`"
+
 
 @pytest.mark.xfail
 @pytest.mark.django_db
@@ -61,19 +61,20 @@ def test_measure_2_should_fail_no_referral(
     1)  kpi.epilepsy_specialist_nurse_referral_made = False
     """
     case = e12_case_factory(
-            registration__assessment__epilepsy_specialist_nurse_referral_made = False
-        )
-    
+        registration__assessment__epilepsy_specialist_nurse_referral_made=False
+    )
+
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
     calculate_kpis(registration_instance=registration)
 
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).epilepsy_specialist_nurse
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).epilepsy_specialist_nurse
 
-    assert kpi_score == KPI_SCORE['FAIL'], f'{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure is not failing'
+    assert (
+        kpi_score == KPI_SCORE["FAIL"]
+    ), f"{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure is not failing"
+
 
 @pytest.mark.xfail
 @pytest.mark.django_db
@@ -89,27 +90,31 @@ def test_measure_2_should_fail_not_seen_before_close_date(
             kpi.epilepsy_specialist_nurse_input_date > registration.registration_close_date
         )
     """
-    REGISTRATION_DATE = date(2023,1,1)
-    AFTER_REGISTRATION_CLOSE_REFERRAL_DATE = REGISTRATION_DATE + relativedelta(years=1, days=5)
-    AFTER_REGISTRATION_CLOSE_INPUT_DATE = AFTER_REGISTRATION_CLOSE_REFERRAL_DATE + relativedelta(days=5)
-    
+    REGISTRATION_DATE = date(2023, 1, 1)
+    AFTER_REGISTRATION_CLOSE_REFERRAL_DATE = REGISTRATION_DATE + relativedelta(
+        years=1, days=5
+    )
+    AFTER_REGISTRATION_CLOSE_INPUT_DATE = (
+        AFTER_REGISTRATION_CLOSE_REFERRAL_DATE + relativedelta(days=5)
+    )
+
     case = e12_case_factory(
-            registration__assessment__epilepsy_specialist_nurse_referral_made = True,
-            registration__registration_date = REGISTRATION_DATE,
-            registration__assessment__epilepsy_specialist_nurse_referral_date = AFTER_REGISTRATION_CLOSE_REFERRAL_DATE,
-            registration__assessment__epilepsy_specialist_nurse_input_date = AFTER_REGISTRATION_CLOSE_INPUT_DATE
-        )
-    
+        registration__assessment__epilepsy_specialist_nurse_referral_made=True,
+        registration__registration_date=REGISTRATION_DATE,
+        registration__assessment__epilepsy_specialist_nurse_referral_date=AFTER_REGISTRATION_CLOSE_REFERRAL_DATE,
+        registration__assessment__epilepsy_specialist_nurse_input_date=AFTER_REGISTRATION_CLOSE_INPUT_DATE,
+    )
+
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
     calculate_kpis(registration_instance=registration)
 
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).epilepsy_specialist_nurse
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).epilepsy_specialist_nurse
 
-    assert kpi_score == KPI_SCORE['FAIL'], f'Seen after close date ({registration.registration_date =}, {registration.registration_close_date =}, {AFTER_REGISTRATION_CLOSE_REFERRAL_DATE = }, {AFTER_REGISTRATION_CLOSE_INPUT_DATE = }) but measure is not failing'
+    assert (
+        kpi_score == KPI_SCORE["FAIL"]
+    ), f"Seen after close date ({registration.registration_date =}, {registration.registration_close_date =}, {AFTER_REGISTRATION_CLOSE_REFERRAL_DATE = }, {AFTER_REGISTRATION_CLOSE_INPUT_DATE = }) but measure is not failing"
 
 
 @pytest.mark.django_db
@@ -124,24 +129,24 @@ def test_measure_2_should_pass_timely_referral(
         AND
         kpi.epilepsy_specialist_nurse_input_date <= registration.registration_close_date
     """
-    REGISTRATION_DATE = date(2023,1,1)
+    REGISTRATION_DATE = date(2023, 1, 1)
     PASSING_REFERRAL_DATE = REGISTRATION_DATE + relativedelta(days=5)
     PASSING_INPUT_DATE = PASSING_REFERRAL_DATE + relativedelta(days=5)
-    
+
     case = e12_case_factory(
-            registration__assessment__epilepsy_specialist_nurse_referral_made = True,
-            registration__registration_date = REGISTRATION_DATE,
-            registration__assessment__epilepsy_specialist_nurse_referral_date = PASSING_REFERRAL_DATE,
-            registration__assessment__epilepsy_specialist_nurse_input_date = PASSING_INPUT_DATE
-        )
-    
+        registration__assessment__epilepsy_specialist_nurse_referral_made=True,
+        registration__registration_date=REGISTRATION_DATE,
+        registration__assessment__epilepsy_specialist_nurse_referral_date=PASSING_REFERRAL_DATE,
+        registration__assessment__epilepsy_specialist_nurse_input_date=PASSING_INPUT_DATE,
+    )
+
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
     calculate_kpis(registration_instance=registration)
 
-    kpi_score = KPI.objects.get(
-        pk=registration.kpi.pk
-    ).epilepsy_specialist_nurse
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).epilepsy_specialist_nurse
 
-    assert kpi_score == KPI_SCORE['PASS'], f'Seen by epilepsy nurse within {PASSING_INPUT_DATE - PASSING_REFERRAL_DATE} but measure is not passing'
+    assert (
+        kpi_score == KPI_SCORE["PASS"]
+    ), f"Seen by epilepsy nurse within {PASSING_INPUT_DATE - PASSING_REFERRAL_DATE} but measure is not passing"
