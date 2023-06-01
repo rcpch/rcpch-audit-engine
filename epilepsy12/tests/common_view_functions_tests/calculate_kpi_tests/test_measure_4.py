@@ -70,4 +70,6 @@ def test_measure_4_ecg_for_convulsive_seizure(
         ), f"Seizure not convulsive, (no ECG) but not being scored as ineligible"
 
     # PASS / FAIL CASES
-    assert kpi_score == EXPECTED_SCORE, f"Seizure convulsive, {'' if KPI_SCORE['PASS'] else 'no'} ECG performed, but not {'pass' if KPI_SCORE['PASS'] else 'fail'}ing measure"
+    assert (
+        kpi_score == EXPECTED_SCORE
+    ), f"Seizure convulsive, {'' if KPI_SCORE['PASS'] else 'no'} ECG performed, but not {'pass' if KPI_SCORE['PASS'] else 'fail'}ing measure"
