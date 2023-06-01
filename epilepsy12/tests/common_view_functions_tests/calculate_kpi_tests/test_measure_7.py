@@ -6,18 +6,16 @@ Measure 7 `mental_health_support` - Number of children and young people diagnose
 - [x] Measure 7 ineligible (registration.kpi.mental_health_support == 2) if not registration_instance.multiaxialdiagnosis.mental_health_issue_identified
 """
 
-from datetime import date
-
 # Standard imports
+from datetime import date
 import pytest
 from dateutil.relativedelta import relativedelta
 
 # Third party imports
-from django.contrib.gis.db.models import Q
 
 # RCPCH imports
 from epilepsy12.common_view_functions import calculate_kpis
-from epilepsy12.constants import KPI_SCORE, SYNDROMES
+from epilepsy12.constants import KPI_SCORE
 from epilepsy12.models import (
     KPI,
     Registration,
@@ -35,7 +33,7 @@ from epilepsy12.models import (
     ],
 )
 @pytest.mark.django_db
-def test_measure_6_mental_health_support(
+def test_measure_7_mental_health_support(
     e12_case_factory,
     mental_health_issue_identified,
     has_support_for_mental_health_support,
