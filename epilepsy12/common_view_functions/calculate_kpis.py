@@ -35,13 +35,13 @@ def check_is_registered(registration_instance) -> bool:
 def score_kpi_1(registration_instance) -> int:
     """
     1. `paediatrician_with_expertise_in_epilepsies`
-    
+
     % of children and young people with epilepsy, with input by a ‘consultant paediatrician with expertise in epilepsies’ within 2 weeks of initial referral
-    
+
     Calculation Method
-    
+
     Numerator = Number of children and young people [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
-    
+
     Denominator = Number of and young people [diagnosed with epilepsy] at first year
     """
     if (
@@ -109,6 +109,46 @@ def score_kpi_1(registration_instance) -> int:
         else:
             return KPI_SCORE["FAIL"]
 
+def score_kpi_2(registration_instance) -> int:
+    """2. epilepsy_specialist_nurse
+    
+    % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
+    
+    Calculation Method
+    
+    Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
+    
+    Denominator = Number of children and young people [diagnosed with epilepsy] at first year"""
+    
+    assessment = registration_instance.assessment
+        
+    # if not filled, incomplete form
+    if assessment.epilepsy_specialist_nurse_referral_made is None:
+        return KPI_SCORE["NOT_SCORED"]
+    
+    
+    # no nurse referral, fail
+    if not assessment.epilepsy_specialist_nurse_referral_made:
+        return KPI_SCORE["FAIL"]
+
+    # if input date provided, referral must have also been provided
+    if assessment.epilepsy_specialist_nurse_input_date is not None:
+        
+        # score check
+        has_seen_nurse_before_close_date = (
+            assessment.epilepsy_specialist_nurse_input_date
+            <= registration_instance.registration_close_date
+        ) or (
+            assessment.epilepsy_specialist_nurse_referral_date
+            <= registration_instance.registration_close_date
+        )
+
+        if has_seen_nurse_before_close_date:
+            return KPI_SCORE["PASS"]
+        else:
+            return KPI_SCORE["FAIL"]
+    
+    
 
 def calculate_kpis(registration_instance):
     """
@@ -133,33 +173,13 @@ def calculate_kpis(registration_instance):
         # In theory it should not be possible to get this far.
         return None
 
-
     paediatrician_with_expertise_in_epilepsies = KPI_SCORE["NOT_SCORED"]
     if hasattr(registration_instance, "assessment"):
         paediatrician_with_expertise_in_epilepsies = score_kpi_1(registration_instance)
 
-
-    # 2. epilepsy_specialist_nurse
-    # % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
-    # Calculation Method
-    # Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
-    # Denominator = Number of children and young people [diagnosed with epilepsy] at first year
-
-    epilepsy_specialist_nurse = None
+    epilepsy_specialist_nurse = KPI_SCORE["NOT_SCORED"]
     if hasattr(registration_instance, "assessment"):
-        if (
-            registration_instance.assessment.epilepsy_specialist_nurse_referral_made
-            and registration_instance.assessment.epilepsy_specialist_nurse_input_date
-            is not None
-        ):
-            if (
-                registration_instance.assessment.epilepsy_specialist_nurse_input_date
-                <= registration_instance.registration_close_date
-            ) or (
-                registration_instance.assessment.epilepsy_specialist_nurse_referral_date
-                <= registration_instance.registration_close_date
-            ):
-                epilepsy_specialist_nurse = 1
+        epilepsy_specialist_nurse = score_kpi_2(registration_instance)
 
     # 3. tertiary_input
     # % of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care

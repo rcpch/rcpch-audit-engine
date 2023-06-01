@@ -28,7 +28,7 @@ from epilepsy12.models import (
 from epilepsy12.constants import KPI_SCORE
 
 
-@pytest.mark.xfail
+
 @pytest.mark.django_db
 def test_measure_2_should_not_score(
     e12_case_factory,
@@ -37,8 +37,8 @@ def test_measure_2_should_not_score(
     *NOT_SCORED*
     1)  kpi.epilepsy_specialist_nurse_referral_made = None
     """
-    case = e12_case_factory(registration__assessment__reset=True)
-
+    case = e12_case_factory(registration__assessment__epilepsy_specialist_nurse_referral_made=None)
+    
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
@@ -51,7 +51,7 @@ def test_measure_2_should_not_score(
     ), f"{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure isn't `not scoring`"
 
 
-@pytest.mark.xfail
+
 @pytest.mark.django_db
 def test_measure_2_should_fail_no_referral(
     e12_case_factory,
@@ -76,7 +76,7 @@ def test_measure_2_should_fail_no_referral(
     ), f"{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure is not failing"
 
 
-@pytest.mark.xfail
+
 @pytest.mark.django_db
 def test_measure_2_should_fail_not_seen_before_close_date(
     e12_case_factory,
