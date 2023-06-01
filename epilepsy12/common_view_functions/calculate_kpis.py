@@ -421,13 +421,13 @@ def calculate_kpis(registration_instance):
         if (
             registration_instance.management.individualised_care_plan_in_place
             is not None
-            and registration_instance.management.care_planning_has_been_updated_when_necessary
+            and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
             is not None
         ):
             # eligible for this measure
             if (
                 registration_instance.management.individualised_care_plan_in_place
-                and registration_instance.management.care_planning_has_been_updated_when_necessary
+                and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
             ):
                 # criteria met
                 comprehensive_care_planning_agreement = 1
