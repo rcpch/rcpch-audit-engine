@@ -4,15 +4,16 @@
 Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
 
 PASS:
-- [ ] management.individualised_care_plan_includes_ehcp = True
+- [x] management.individualised_care_plan_includes_ehcp = True
 FAIL:
-- [ ] management.individualised_care_plan_includes_ehcp = False
+- [x] management.individualised_care_plan_includes_ehcp = False
 INELIGIBLE:
-- [ ] age_at_first_paediatric_assessment >= 5
+- [x] age_at_first_paediatric_assessment >= 5
 """
 # Standard imports
 from datetime import date
 from dateutil.relativedelta import relativedelta
+
 # Third party imports
 import pytest
 
@@ -27,7 +28,7 @@ from epilepsy12.models import KPI, Registration
     [
         (relativedelta(years=5), True, KPI_SCORE["PASS"]),
         (relativedelta(years=5), False, KPI_SCORE["FAIL"]),
-        (relativedelta(years=4, months=11), True, KPI_SCORE["NOT_APPLICABLE"]),
+        (relativedelta(years=4, months=11), False, KPI_SCORE["NOT_APPLICABLE"]),
     ],
 )
 @pytest.mark.django_db
@@ -37,14 +38,13 @@ def test_measure_10_school_individual_healthcare_plan(
     individualised_care_plan_includes_ehcp,
     expected_score,
 ):
-    
-    REGISTRATION_DATE = date(2023,1,1)
+    REGISTRATION_DATE = date(2023, 1, 1)
     DATE_OF_BIRTH = REGISTRATION_DATE - age
 
     # create case
     case = e12_case_factory(
-        date_of_birth = DATE_OF_BIRTH,
-        registration__registration_date = REGISTRATION_DATE,
+        date_of_birth=DATE_OF_BIRTH,
+        registration__registration_date=REGISTRATION_DATE,
         registration__management__individualised_care_plan_includes_ehcp=individualised_care_plan_includes_ehcp,
     )
 
@@ -59,9 +59,13 @@ def test_measure_10_school_individual_healthcare_plan(
     ).school_individual_healthcare_plan
 
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f"individualised_care_plan_includes_ehcp is True but not passing"
+        assertion_message = (
+            f"individualised_care_plan_includes_ehcp is True but not passing"
+        )
     elif expected_score == KPI_SCORE["FAIL"]:
-        assertion_message = f"individualised_care_plan_includes_ehcp is False but not failing"
+        assertion_message = (
+            f"individualised_care_plan_includes_ehcp is False but not failing"
+        )
     else:
         assertion_message = f"age 4y11mo (<5yo) but not scoring as ineligible"
 
