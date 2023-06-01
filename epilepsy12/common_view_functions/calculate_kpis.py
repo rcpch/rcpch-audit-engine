@@ -7,7 +7,107 @@ from django.contrib.gis.db.models import Q, Sum
 
 # E12 imports
 from ..models import *
-from ..constants import ALL_NHS_TRUSTS
+from ..constants import ALL_NHS_TRUSTS, KPI_SCORE
+
+
+def calculate_age_at_first_paediatric_assessment_in_years(registration_instance) -> int:
+    """
+    Helper fn returns age in years as int
+    """
+    age_at_first_paediatric_assessment = relativedelta(
+        registration_instance.registration_date,
+        registration_instance.case.date_of_birth,
+    )
+
+    return age_at_first_paediatric_assessment.years
+
+
+def check_is_registered(registration_instance) -> bool:
+    """
+    Helper fn returns True if registered
+    """
+    return (
+        registration_instance.registration_date is not None
+        and registration_instance.eligibility_criteria_met
+    )
+
+
+def score_kpi_1(registration_instance) -> int:
+    """
+    1. `paediatrician_with_expertise_in_epilepsies`
+    
+    % of children and young people with epilepsy, with input by a ‘consultant paediatrician with expertise in epilepsies’ within 2 weeks of initial referral
+    
+    Calculation Method
+    
+    Numerator = Number of children and young people [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
+    
+    Denominator = Number of and young people [diagnosed with epilepsy] at first year
+    """
+    if (
+        registration_instance.assessment.consultant_paediatrician_referral_made == False
+    ) and (
+        registration_instance.assessment.paediatric_neurologist_referral_made == False
+    ):
+        # never saw a consultant OR neurologist!
+        return KPI_SCORE["FAIL"]
+
+    # check all fields complete for either consultant or neurologist
+    all_consultant_paediatrician_fields_complete = (
+        (registration_instance.assessment.consultant_paediatrician_referral_made)
+        and (
+            registration_instance.assessment.consultant_paediatrician_referral_date
+            is not None
+        )
+        and (
+            registration_instance.assessment.consultant_paediatrician_input_date
+            is not None
+        )
+    )
+    all_paediatric_neurologist_fields_complete = (
+        (registration_instance.assessment.paediatric_neurologist_referral_made)
+        and (
+            registration_instance.assessment.paediatric_neurologist_referral_date
+            is not None
+        )
+        and (
+            registration_instance.assessment.paediatric_neurologist_input_date
+            is not None
+        )
+    )
+
+    # incomplete
+    if (not all_consultant_paediatrician_fields_complete) or (
+        not all_paediatric_neurologist_fields_complete
+    ):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score KPI
+    if all_consultant_paediatrician_fields_complete:
+        passed_metric = (
+            relativedelta(
+                registration_instance.assessment.consultant_paediatrician_input_date,
+                registration_instance.assessment.consultant_paediatrician_referral_date,
+            ).days
+            <= 14
+        )
+        if passed_metric:
+            return KPI_SCORE["PASS"]
+        else:
+            return KPI_SCORE["FAIL"]
+
+    elif all_paediatric_neurologist_fields_complete:
+        passed_metric = (
+            relativedelta(
+                registration_instance.assessment.paediatric_neurologist_input_date,
+                registration_instance.assessment.paediatric_neurologist_referral_date,
+            ).days
+            <= 14
+        )
+        if passed_metric:
+            return KPI_SCORE["PASS"]
+        else:
+            return KPI_SCORE["FAIL"]
 
 
 def calculate_kpis(registration_instance):
@@ -23,55 +123,21 @@ def calculate_kpis(registration_instance):
     """
 
     # important metric for calculations that follow
-    age_at_first_paediatric_assessment = relativedelta(
-        registration_instance.registration_date,
-        registration_instance.case.date_of_birth,
-    ).years
+    age_at_first_paediatric_assessment = (
+        calculate_age_at_first_paediatric_assessment_in_years(registration_instance)
+    )
 
     # child must be registered in the audit for the KPI to be counted
-    is_registered = (
-        registration_instance.registration_date is not None
-        and registration_instance.eligibility_criteria_met
-    ) == True
-
-    if not is_registered:
+    if not check_is_registered(registration_instance):
         # cannot proceed any further if registration incomplete.
         # In theory it should not be possible to get this far.
-        return
+        return None
 
-    # 1. paediatrician_with_expertise_in_epilepsies
-    # % of children and young people with epilepsy, with input by a ‘consultant paediatrician with expertise in epilepsies’ within 2 weeks of initial referral
-    # Calculation Method
-    # Numerator = Number of children and young people [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
-    # Denominator = Number of and young people [diagnosed with epilepsy] at first year
 
-    paediatrician_with_expertise_in_epilepsies = None
+    paediatrician_with_expertise_in_epilepsies = KPI_SCORE["NOT_SCORED"]
     if hasattr(registration_instance, "assessment"):
-        if (
-            registration_instance.assessment.consultant_paediatrician_referral_made
-            and registration_instance.assessment.consultant_paediatrician_input_date
-            is not None
-            and registration_instance.assessment.consultant_paediatrician_referral_date
-            is not None
-        ):
-            if (
-                registration_instance.assessment.consultant_paediatrician_input_date
-                <= (
-                    registration_instance.assessment.consultant_paediatrician_referral_date
-                    + relativedelta(days=+14)
-                )
-            ):
-                paediatrician_with_expertise_in_epilepsies = 1
-        elif (
-            registration_instance.assessment.paediatric_neurologist_referral_made
-            and registration_instance.assessment.paediatric_neurologist_input_date
-            is not None
-        ):
-            if registration_instance.assessment.paediatric_neurologist_input_date <= (
-                registration_instance.assessment.paediatric_neurologist_referral_date
-                + relativedelta(days=+14)
-            ):
-                paediatrician_with_expertise_in_epilepsies = 1
+        paediatrician_with_expertise_in_epilepsies = score_kpi_1(registration_instance)
+
 
     # 2. epilepsy_specialist_nurse
     # % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
