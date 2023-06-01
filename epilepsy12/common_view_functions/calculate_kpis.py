@@ -44,36 +44,25 @@ def score_kpi_1(registration_instance) -> int:
 
     Denominator = Number of and young people [diagnosed with epilepsy] at first year
     """
-    if (
-        registration_instance.assessment.consultant_paediatrician_referral_made == False
-    ) and (
-        registration_instance.assessment.paediatric_neurologist_referral_made == False
+
+    assessment = registration_instance.assessment
+
+    # never saw a consultant OR neurologist!
+    if (assessment.consultant_paediatrician_referral_made == False) and (
+        assessment.paediatric_neurologist_referral_made == False
     ):
-        # never saw a consultant OR neurologist!
         return KPI_SCORE["FAIL"]
 
     # check all fields complete for either consultant or neurologist
     all_consultant_paediatrician_fields_complete = (
-        (registration_instance.assessment.consultant_paediatrician_referral_made)
-        and (
-            registration_instance.assessment.consultant_paediatrician_referral_date
-            is not None
-        )
-        and (
-            registration_instance.assessment.consultant_paediatrician_input_date
-            is not None
-        )
+        (assessment.consultant_paediatrician_referral_made is not None)
+        and (assessment.consultant_paediatrician_referral_date is not None)
+        and (assessment.consultant_paediatrician_input_date is not None)
     )
     all_paediatric_neurologist_fields_complete = (
-        (registration_instance.assessment.paediatric_neurologist_referral_made)
-        and (
-            registration_instance.assessment.paediatric_neurologist_referral_date
-            is not None
-        )
-        and (
-            registration_instance.assessment.paediatric_neurologist_input_date
-            is not None
-        )
+        (assessment.paediatric_neurologist_referral_made is not None)
+        and (assessment.paediatric_neurologist_referral_date is not None)
+        and (assessment.paediatric_neurologist_input_date is not None)
     )
 
     # incomplete
@@ -86,8 +75,8 @@ def score_kpi_1(registration_instance) -> int:
     if all_consultant_paediatrician_fields_complete:
         passed_metric = (
             relativedelta(
-                registration_instance.assessment.consultant_paediatrician_input_date,
-                registration_instance.assessment.consultant_paediatrician_referral_date,
+                assessment.consultant_paediatrician_input_date,
+                assessment.consultant_paediatrician_referral_date,
             ).days
             <= 14
         )
@@ -99,8 +88,8 @@ def score_kpi_1(registration_instance) -> int:
     elif all_paediatric_neurologist_fields_complete:
         passed_metric = (
             relativedelta(
-                registration_instance.assessment.paediatric_neurologist_input_date,
-                registration_instance.assessment.paediatric_neurologist_referral_date,
+                assessment.paediatric_neurologist_input_date,
+                assessment.paediatric_neurologist_referral_date,
             ).days
             <= 14
         )
