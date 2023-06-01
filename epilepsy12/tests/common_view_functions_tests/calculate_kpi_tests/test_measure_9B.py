@@ -47,7 +47,7 @@ Number of children and young people diagnosed with epilepsy at first year
     AND individualised_care_plan_includes_service_contact_details
 
 
-[ ] - 9Bvi. `sudep` - Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
+[x] - 9Bvi. `sudep` - Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
 
 Number of children and young people diagnosed with epilepsy at first year 
     AND individualised_care_plan_parental_prolonged_seizure_care
