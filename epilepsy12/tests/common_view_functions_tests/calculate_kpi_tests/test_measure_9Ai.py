@@ -32,7 +32,7 @@ from epilepsy12.models import KPI, Registration
     ],
 )
 @pytest.mark.django_db
-def test_measure_9i_epilepsy_document(
+def test_measure_9Ai_epilepsy_document(
     e12_case_factory,
     individualised_care_plan_in_place,
     individualised_care_plan_has_parent_carer_child_agreement,

@@ -6,8 +6,8 @@ Number of children and young people diagnosed with epilepsy at first year
     AND 
 with evidence of agreement
 
-- [ ] Measure 9ii passed (registration.kpi.patient_carer_parent_agreement_to_the_care_planning == 1) if registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement == True
-- [ ] Measure 9ii failed (registration.kpi.patient_carer_parent_agreement_to_the_care_planning == 1) if registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement == False
+- [x] Measure 9ii passed (registration.kpi.patient_carer_parent_agreement_to_the_care_planning == 1) if registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement == True
+- [x] Measure 9ii failed (registration.kpi.patient_carer_parent_agreement_to_the_care_planning == 1) if registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement == False
 """
 # Standard imports
 
@@ -28,7 +28,7 @@ from epilepsy12.models import KPI, Registration
     ],
 )
 @pytest.mark.django_db
-def test_measure_9ii_carer_patient_plan(
+def test_measure_9Aii_carer_patient_plan(
     e12_case_factory,
     individualised_care_plan_has_parent_carer_child_agreement,
     expected_score,
