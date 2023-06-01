@@ -29,15 +29,31 @@ from epilepsy12.constants import KPI_SCORE
 
 
 
+@pytest.mark.parametrize(
+    "epilepsy_specialist_nurse_referral_made,epilepsy_specialist_nurse_referral_date,epilepsy_specialist_nurse_input_date, expected_score",
+    [
+        (None, None, None, KPI_SCORE['NOT_SCORED']),
+        (True, None, None, KPI_SCORE['NOT_SCORED']),
+        (True, date(2023,1,1), None, KPI_SCORE['NOT_SCORED']),
+    ]
+)
 @pytest.mark.django_db
 def test_measure_2_should_not_score(
     e12_case_factory,
+    epilepsy_specialist_nurse_referral_made,
+    epilepsy_specialist_nurse_referral_date,
+    epilepsy_specialist_nurse_input_date, 
+    expected_score
 ):
     """
     *NOT_SCORED*
-    1)  kpi.epilepsy_specialist_nurse_referral_made = None
+    1)  ANY epilepsy_nurse field is none
     """
-    case = e12_case_factory(registration__assessment__epilepsy_specialist_nurse_referral_made=None)
+    case = e12_case_factory(
+        registration__assessment__epilepsy_specialist_nurse_referral_made=epilepsy_specialist_nurse_referral_made,
+        registration__assessment__epilepsy_specialist_nurse_referral_date=epilepsy_specialist_nurse_referral_date,
+        registration__assessment__epilepsy_specialist_nurse_input_date=epilepsy_specialist_nurse_input_date
+        )
     
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
@@ -47,7 +63,7 @@ def test_measure_2_should_not_score(
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).epilepsy_specialist_nurse
 
     assert (
-        kpi_score == KPI_SCORE["NOT_SCORED"]
+        kpi_score == expected_score
     ), f"{registration.assessment.epilepsy_specialist_nurse_referral_made = } but measure isn't `not scoring`"
 
 
