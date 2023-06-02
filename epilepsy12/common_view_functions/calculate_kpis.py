@@ -113,6 +113,10 @@ def score_kpi_2(registration_instance) -> int:
 
     assessment = registration_instance.assessment
 
+    # no nurse referral, fail
+    if assessment.epilepsy_specialist_nurse_referral_made is False:
+        return KPI_SCORE["FAIL"]
+    
     # if not all filled, incomplete form
     if (
         assessment.epilepsy_specialist_nurse_referral_made is None
@@ -121,9 +125,6 @@ def score_kpi_2(registration_instance) -> int:
     ):
         return KPI_SCORE["NOT_SCORED"]
 
-    # no nurse referral, fail
-    if assessment.epilepsy_specialist_nurse_referral_made is False:
-        return KPI_SCORE["FAIL"]
 
     # score check
     has_seen_nurse_before_close_date = (
