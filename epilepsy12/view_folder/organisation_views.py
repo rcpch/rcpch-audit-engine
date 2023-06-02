@@ -306,67 +306,38 @@ def selected_organisation_summary(request):
     else:
         total_percent_trust = 0
 
-    context={
-            "user": request.user,
-            "selected_organisation": selected_organisation,
-            "organisation_list": Organisation.objects.order_by(
-                "OrganisationName"
-            ).all(),
-            "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
-                selected_organisation=selected_organisation
-            ),
-            "cases_aggregated_by_sex": cases_aggregated_by_sex(
-                selected_organisation=selected_organisation
-            ),
-            "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
-                selected_organisation=selected_organisation
-            ),
-            "percent_completed_organisation": total_percent_organisation,
-            "percent_completed_trust": total_percent_trust,
-            "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
-            "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
-            "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
-            "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
-            "cohort_data": cohort_data,
-            "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-            "nhsregion_tiles": newnhsregion_tiles,
-            "icb_tiles": newicb_tiles,
-            "country_tiles": newcountry_tiles,
-            "lhb_tiles": newlhb_tiles,
-        }
+    context = {
+        "user": request.user,
+        "selected_organisation": selected_organisation,
+        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
+        "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
+            selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_sex": cases_aggregated_by_sex(
+            selected_organisation=selected_organisation
+        ),
+        "cases_aggregated_by_deprivation": cases_aggregated_by_deprivation_score(
+            selected_organisation=selected_organisation
+        ),
+        "percent_completed_organisation": total_percent_organisation,
+        "percent_completed_trust": total_percent_trust,
+        "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
+        "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
+        "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
+        "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
+        "cohort_data": cohort_data,
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+        "nhsregion_tiles": newnhsregion_tiles,
+        "icb_tiles": newicb_tiles,
+        "country_tiles": newcountry_tiles,
+        "lhb_tiles": newlhb_tiles,
+    }
 
     return render(
         request=request,
         template_name="epilepsy12/partials/selected_organisation_summary.html",
         context=context,
     )
-
-
-def uk_shapes(request, abstraction_level):
-    """
-    return region shapes request from maps.html depending on abstraction_level
-    ['icb', 'nhs_region', 'country', 'lhb']
-    """
-    if abstraction_level == "nhs_region":
-        object_to_return = NHSEnglandRegionBoundaries
-    elif abstraction_level == "icb":
-        object_to_return = IntegratedCareBoardBoundaries
-    elif abstraction_level == "country":
-        object_to_return = CountryBoundaries
-    else:
-        raise ValueError(f"Cannot return region shape {abstraction_level}")
-
-    # serialize data to geojson
-    tiles = serialize(
-        "geojson",
-        object_to_return.objects.all(),
-    )
-    # strip the crs element
-    deserialized_tiles = json.loads(tiles)
-    deserialized_tiles.pop("crs", None)
-    # reserialize
-    serialized_tiles = json.dumps(deserialized_tiles)
-    return HttpResponse(serialized_tiles, content_type="application/json")
 
 
 @login_required
