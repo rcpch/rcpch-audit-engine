@@ -112,28 +112,28 @@ def test_measure_8_sodium_valproate_risk_eligible(
             SEX_TYPE[2][0],
             True,
             False,
-            KPI_SCORE["NOT_APPLICABLE"],
+            KPI_SCORE["INELIGIBLE"],
         ),  # 11y11mo, F, aed given, valproate
         (
             relativedelta(years=12),
             SEX_TYPE[1][0],
             True,
             False,
-            KPI_SCORE["NOT_APPLICABLE"],
+            KPI_SCORE["INELIGIBLE"],
         ),  # 12yo, M, aed given, valproate
         (
             relativedelta(years=12),
             SEX_TYPE[2][0],
             False,
             True,
-            KPI_SCORE["NOT_APPLICABLE"],
+            KPI_SCORE["INELIGIBLE"],
         ),  # 12yo, F, aed NOT given, NO valproate
         (
             relativedelta(years=12),
             SEX_TYPE[2][0],
             True,
             True,
-            KPI_SCORE["NOT_APPLICABLE"],
+            KPI_SCORE["INELIGIBLE"],
         ),  # 12yo, F, aed given, NOT valproate
     ],
 )

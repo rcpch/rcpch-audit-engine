@@ -60,7 +60,7 @@ from epilepsy12.constants import (
             date(2022, 1, 1),
             date(2024, 1, 2),
             True,
-            KPI_SCORE["NOT_APPLICABLE"],
+            KPI_SCORE["INELIGIBLE"],
         ),
     ],
 )
@@ -234,5 +234,5 @@ def test_measure_4_mri_syndromes_ineligible(
         multiaxial_diagnosis=registration.multiaxialdiagnosis
     )
     assert (
-        kpi_score == KPI_SCORE["NOT_APPLICABLE"]
+        kpi_score == KPI_SCORE["INELIGIBLE"]
     ), f"{SYNDROME_TYPE_PRESENT} present, should be ineligible"

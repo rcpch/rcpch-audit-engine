@@ -29,7 +29,7 @@ from epilepsy12.constants import (
     [
         (True, True, KPI_SCORE["PASS"]),
         (True, False, KPI_SCORE["FAIL"]),
-        (False, False, KPI_SCORE["NOT_APPLICABLE"]),
+        (False, False, KPI_SCORE["INELIGIBLE"]),
     ],
 )
 @pytest.mark.django_db
@@ -64,7 +64,7 @@ def test_measure_4_ecg_for_convulsive_seizure(
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).ecg
 
     # INELIGIBLE CASE
-    if EXPECTED_SCORE == KPI_SCORE["NOT_APPLICABLE"]:
+    if EXPECTED_SCORE == KPI_SCORE["INELIGIBLE"]:
         assert (
             kpi_score == EXPECTED_SCORE
         ), f"Seizure not convulsive, (no ECG) but not being scored as ineligible"

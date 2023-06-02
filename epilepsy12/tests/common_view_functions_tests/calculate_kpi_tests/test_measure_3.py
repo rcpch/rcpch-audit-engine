@@ -347,5 +347,5 @@ def test_measure_3_ineligible(
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
 
     assert (
-        kpi_score == KPI_SCORE["NOT_APPLICABLE"]
+        kpi_score == KPI_SCORE["INELIGIBLE"]
     ), f"Child does not meet any criteria but is not scoring as ineligible"

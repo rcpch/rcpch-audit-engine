@@ -28,7 +28,7 @@ from epilepsy12.models import KPI, Registration
     [
         (relativedelta(years=5), True, KPI_SCORE["PASS"]),
         (relativedelta(years=5), False, KPI_SCORE["FAIL"]),
-        (relativedelta(years=4, months=11), False, KPI_SCORE["NOT_APPLICABLE"]),
+        (relativedelta(years=4, months=11), False, KPI_SCORE["INELIGIBLE"]),
     ],
 )
 @pytest.mark.django_db

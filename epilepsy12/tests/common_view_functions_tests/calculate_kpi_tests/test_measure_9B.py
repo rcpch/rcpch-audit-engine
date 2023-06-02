@@ -147,7 +147,7 @@ def test_measure_9B_comprehensive_care_planning_content(
     [
         (True, True, KPI_SCORE["PASS"]),
         (True, False, KPI_SCORE["FAIL"]),
-        (False, False, KPI_SCORE["NOT_APPLICABLE"]),
+        (False, False, KPI_SCORE["INELIGIBLE"]),
     ],
 )
 @pytest.mark.django_db

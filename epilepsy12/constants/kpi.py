@@ -36,5 +36,5 @@ KPI_SCORE = {
     "NOT_SCORED": None,
     "FAIL": 0,
     "PASS": 1,
-    "NOT_APPLICABLE": 2,
+    "INELIGIBLE": 2,
 }

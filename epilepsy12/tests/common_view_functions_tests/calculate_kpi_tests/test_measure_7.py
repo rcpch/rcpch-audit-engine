@@ -29,7 +29,7 @@ from epilepsy12.models import (
     [
         (True, True, KPI_SCORE["PASS"]),
         (True, False, KPI_SCORE["FAIL"]),
-        (False, None, KPI_SCORE["NOT_APPLICABLE"]),
+        (False, None, KPI_SCORE["INELIGIBLE"]),
     ],
 )
 @pytest.mark.django_db
