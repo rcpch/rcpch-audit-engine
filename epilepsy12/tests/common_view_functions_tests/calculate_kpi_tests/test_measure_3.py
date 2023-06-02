@@ -3,11 +3,11 @@ Tests for Measure 3 `tertiary_input.
 
 Each test depends on whether child has been referred / seen by a neurologist OR epilepsy surgery OR both, so first each test parametrizes each of these cases.
 
-- [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if age at first paediatric assessment is <= 3 and seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
+- [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if age at first paediatric assessment is < 3 and seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is on 3 or more AEMS (see lines 115-120 for query) and seen by neurologist / epilepsy surgery/both
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is under 4 and has myoclonic epilepsy (lines 128-133) and seen by neurologist / epilepsy surgery/both
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and seen by neurologist / epilepsy surgery/both
-- [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if age at first paediatric assessment is <= 3 and not seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
+- [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if age at first paediatric assessment is < 3 and not seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
 - [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is on 3 or more AEMS (see lines 115-120 for query) and not seen by neurologist / epilepsy surgery/both
 - [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is under 4 and has myoclonic epilepsy (lines 128-133) and not seen by neurologist / epilepsy surgery/both
 - [x] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and not seen by neurologist / epilepsy surgery/both
@@ -21,7 +21,7 @@ Numerator: "Number of children ([less than 3 years old at first assessment] AND 
 
 ^above in English:
     PASS IF ANY OF:
-        1. (age < 3yo at first assessment) AND (seen by neurologist / epilepsy surgery/both)
+        1. (age <= 3yo at first assessment) AND (seen by neurologist / epilepsy surgery/both)
         2. ((age < 4yo) AND (myoclonic epilepsy)) AND (seen by neurologist / epilepsy surgery/both)
         3. (on >= 3 AEMS) AND (seen by neurologist / epilepsy surgery/both)
         4. (eligible for epilepsy surgery) AND (seen by neurologist / epilepsy surgery/both)
@@ -44,6 +44,7 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     MedicineEntity,
     Episode,
+    Assessment,
 )
 from epilepsy12.constants import (
     KPI_SCORE,
@@ -52,25 +53,13 @@ from epilepsy12.constants import (
 
 # sets up paramtrization constant for running tests against seen neurologist/surgery/both/neither
 
-CASE_PARAM_NAMES = "PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,PAEDIATRIC_NEUROLOGIST_INPUT_DATE, CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE, expected_kpi_score"
+CASE_PARAM_NAMES = "PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE, CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE, expected_kpi_score"
 
 CASE_PARAM_VALUES = [
-    (date(2023, 1, 10), date(2023, 1, 11), None, None, KPI_SCORE["PASS"]),
-    (None, None, date(2023, 1, 10), date(2023, 1, 11), KPI_SCORE["PASS"]),
-    (
-        date(2023, 1, 10),
-        date(2023, 1, 11),
-        date(2023, 1, 10),
-        date(2023, 1, 11),
-        KPI_SCORE["PASS"],
-    ),
-    (
-        None,
-        None,
-        None,
-        None,
-        KPI_SCORE["FAIL"],
-    ),
+    (True, True, KPI_SCORE["PASS"]),
+    (True, False, KPI_SCORE["PASS"]),
+    (False, True, KPI_SCORE["PASS"]),
+    (False, False, KPI_SCORE["FAIL"]),
 ]
 
 
@@ -81,30 +70,28 @@ CASE_PARAM_VALUES = [
 @pytest.mark.django_db
 def test_measure_3_age_3yo(
     e12_case_factory,
-    PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-    PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+    PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     expected_kpi_score,
 ):
     """
     *PASS*
-    1) age at First Paediatric Assessment (FPA) is <= 3 && seen by neurologist / epilepsy surgery/both
+    1) age at First Paediatric Assessment (FPA) is <= 3 && seen by BOTH neurologist / CESS
+    1) age at First Paediatric Assessment (FPA) is <= 3 && seen by ONLY neurologist
+    2) age at First Paediatric Assessment (FPA) is <= 3 && seen by ONLY epilepsy surgery
     *FAIL*
-    1) age at First Paediatric Assessment (FPA) is <= 3 && NOT seen by neurologist / epilepsy surgery/both
+    1) age at First Paediatric Assessment (FPA) is <= 3 && NOT seen by (neurologist OR epilepsy surgery)
     """
+
+    # a child who is exactly 3 at registration_date (=FPA)
     DATE_OF_BIRTH = date(2021, 1, 1)
-    REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(
-        years=3
-    )  # a child who is exactly 3 at registration_date (=FPA)
+    REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(years=3)
 
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
         registration__registration_date=REGISTRATION_DATE,
-        registration__assessment__paediatric_neurologist_referral_date=PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-        registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_referral_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_input_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+        registration__assessment__paediatric_neurologist_referral_made=PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     )
 
     # get registration for the saved case model
@@ -128,17 +115,17 @@ def test_measure_3_age_3yo(
 @pytest.mark.django_db
 def test_measure_3_3AEMs_seen(
     e12_case_factory,
-    PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-    PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+    PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     expected_kpi_score,
 ):
     """
     *PASS*
-    1) child is on 3 or more AEMS and seen by neurologist / epilepsy surgery/both
+    1) child is on 3 or more AEMS && seen by BOTH neurologist / CESS
+    1) child is on 3 or more AEMS && seen by ONLY neurologist
+    2) child is on 3 or more AEMS && seen by ONLY epilepsy surgery
     *FAIL*
-    1) child is on 3 or more AEMS and NOT seen by neurologist / epilepsy surgery/both
+    1) child is on 3 or more AEMS && NOT seen by (neurologist OR epilepsy surgery)
     """
 
     REGISTRATION_DATE = date(
@@ -147,21 +134,14 @@ def test_measure_3_3AEMs_seen(
 
     case = e12_case_factory(
         registration__registration_date=REGISTRATION_DATE,
-        registration__assessment__paediatric_neurologist_referral_date=PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-        registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_referral_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_input_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+        registration__assessment__paediatric_neurologist_referral_made=PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     )
 
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
-    # create total of 3 AEMs related to this registration instance
-    aems = AntiEpilepsyMedicine.objects.filter(
-        management=registration.management,
-        is_rescue_medicine=False,
-        antiepilepsy_medicine_start_date__lt=registration.registration_close_date,
-    )
+    # create total of 3 AEMs related to this registration instance (already has 1 by default so only add 2)
     aems_to_add = MedicineEntity.objects.filter(
         medicine_name__in=["Zonisamide", "Vigabatrin"]
     )
@@ -198,17 +178,17 @@ def test_measure_3_3AEMs_seen(
 def test_measure_3_lt_4yo_myoclonic_seen(
     e12_case_factory,
     e12_episode_factory,
-    PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-    PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+    PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     expected_kpi_score,
 ):
     """
     *PASS*
-    1) child is under 4 and has myoclonic epilepsy and seen by neurologist / epilepsy surgery/both
+    1) child is under 4 and has myoclonic epilepsy && seen by BOTH neurologist / CESS
+    1) child is under 4 and has myoclonic epilepsy && seen by ONLY neurologist
+    2) child is under 4 and has myoclonic epilepsy && seen by ONLY epilepsy surgery
     *FAIL*
-    1) child is under 4 and has myoclonic epilepsy and NOT seen by neurologist / epilepsy surgery/both
+    1) child is under 4 and has myoclonic epilepsy && NOT seen by (neurologist OR epilepsy surgery)
     """
 
     # SET UP CONSTANTS
@@ -221,10 +201,8 @@ def test_measure_3_lt_4yo_myoclonic_seen(
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
         registration__registration_date=REGISTRATION_DATE,
-        registration__assessment__paediatric_neurologist_referral_date=PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-        registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_referral_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_input_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+        registration__assessment__paediatric_neurologist_referral_made=PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     )
 
     # get registration for the saved case model
@@ -262,25 +240,23 @@ def test_measure_3_lt_4yo_myoclonic_seen(
 @pytest.mark.django_db
 def test_measure_3b_meets_CESS_seen(
     e12_case_factory,
-    PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-    PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+    PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+    CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     expected_kpi_score,
 ):
     """
     *PASS*
-    1) child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and seen by neurologist / epilepsy surgery/both
+    1) child is eligible for epilepsy surgery (assessment.childrens_epilepsy_surgical_service_referral_criteria_met) && seen by BOTH neurologist / CESS
+    1) child is eligible for epilepsy surgery (assessment.childrens_epilepsy_surgical_service_referral_criteria_met) && seen by ONLY neurologist
+    2) child is eligible for epilepsy surgery (assessment.childrens_epilepsy_surgical_service_referral_criteria_met) && seen by ONLY epilepsy surgery
     *FAIL*
-    1) child is eligible for epilepsy surgery (registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met) and NOT seen by neurologist / epilepsy surgery/both
+    1) child is eligible for epilepsy surgery (assessment.childrens_epilepsy_surgical_service_referral_criteria_met) && NOT seen by (neurologist OR epilepsy surgery)
     """
 
     case = e12_case_factory(
-        registration__assessment__childrens_epilepsy_surgical_service_referral_criteria_met=True,
-        registration__assessment__paediatric_neurologist_referral_date=PAEDIATRIC_NEUROLOGIST_REFERRAL_DATE,
-        registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_referral_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_DATE,
-        registration__assessment__childrens_epilepsy_surgical_service_input_date=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_INPUT_DATE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_criteria_met = True,
+        registration__assessment__paediatric_neurologist_referral_made = PAEDIATRIC_NEUROLOGIST_REFERRAL_MADE,
+        registration__assessment__childrens_epilepsy_surgical_service_referral_made = CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE
     )
 
     # get registration for the saved case model
@@ -297,7 +273,6 @@ def test_measure_3b_meets_CESS_seen(
     )
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_measure_3_ineligible(
     e12_case_factory,
@@ -305,7 +280,7 @@ def test_measure_3_ineligible(
 ):
     """
     *INELIGIBLE*
-    1) age at first paediatric assessment is > 3
+    1) age at first paediatric assessment is > 3y
         and
         not on 3 or more drugs
         and
@@ -317,8 +292,7 @@ def test_measure_3_ineligible(
     # a child who is exactly 3y1mo at registration_date (=FPA)
     DATE_OF_BIRTH = date(2021, 1, 1)
     REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(
-        years=3,
-        months=1,
+        years=4,
     )
 
     # default N(AEMs) = 1, override not required

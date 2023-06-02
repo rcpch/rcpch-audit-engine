@@ -139,6 +139,67 @@ def score_kpi_2(registration_instance) -> int:
         return KPI_SCORE["FAIL"]
 
 
+def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> int:
+    """3. tertiary_input
+    % of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care
+
+    Calculation Method
+
+    Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
+
+    Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
+    """
+
+    assessment = registration_instance.assessment
+
+    # EVALUATE ELIGIBILITY CRITERIA
+
+    # first gather relevant data
+    aems_count = AntiEpilepsyMedicine.objects.filter(
+        management=registration_instance.management,
+        is_rescue_medicine=False,
+        antiepilepsy_medicine_start_date__lt=registration_instance.registration_close_date,
+    ).count()
+    has_myoclonic_epilepsy_episode = Episode.objects.filter(
+        Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis)
+        & Q(epilepsy_or_nonepilepsy_status="E")
+        & Q(epileptic_generalised_onset="MyC")
+    ).exists()
+
+    # List of True/False assessing if meets any of criteria
+    eligibility_criteria = [
+        (age_at_first_paediatric_assessment <= 3),
+        (age_at_first_paediatric_assessment < 4 and has_myoclonic_epilepsy_episode),
+        (aems_count >= 3),
+        (assessment.childrens_epilepsy_surgical_service_referral_criteria_met), # NOTE: CESS_referral_criteria_met is only one that could be None (rest must be True/False), however, only checking whether it is True or not True here so doesn't matter
+    ]
+
+    # None of eligibility criteria are True -> set ineligible with guard clause
+    if not any(eligibility_criteria):
+        return KPI_SCORE["INELIGIBLE"]
+
+    # Eligible for measure - EVALUATE IF AT LEAST REFERRED FROM NEUROLOGIST OR CESS. Note: if received input, MUST have had referral, so no need to test received input.
+    
+    # first evaluate relevant fields complete
+    tertiary_input_complete = (
+        assessment.paediatric_neurologist_referral_made is not None
+    ) or (assessment.childrens_epilepsy_surgical_service_referral_made is not None)
+
+    if not tertiary_input_complete:
+        return KPI_SCORE["NOT_SCORED"]
+    
+    pass_criteria = [
+        (assessment.paediatric_neurologist_referral_made is True),
+        (assessment.childrens_epilepsy_surgical_service_referral_made is True)
+        ]
+
+    # if referral made to either neurologist or CESS, they pass
+    if any(pass_criteria):
+        return KPI_SCORE['PASS']
+    else:
+        return KPI_SCORE['FAIL']
+
+
 def calculate_kpis(registration_instance):
     """
     Function called on update of every field
@@ -170,116 +231,15 @@ def calculate_kpis(registration_instance):
     if hasattr(registration_instance, "assessment"):
         epilepsy_specialist_nurse = score_kpi_2(registration_instance)
 
-    # 3. tertiary_input
-    # % of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care
-    # Calculation Method
-    # Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
-    # Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
-
     tertiary_input = None
     if (
         hasattr(registration_instance, "management")
         and hasattr(registration_instance, "assessment")
         and hasattr(registration_instance, "multiaxialdiagnosis")
     ):
-        # check to see if tertiary referral made and child seen
-        tertiary_input_complete = (
-            registration_instance.assessment.paediatric_neurologist_input_date
-            is not None
-            and registration_instance.assessment.paediatric_neurologist_referral_date
-            is not None
-        ) or (
-            registration_instance.assessment.childrens_epilepsy_surgical_service_referral_date
-            is not None
-            and registration_instance.assessment.childrens_epilepsy_surgical_service_input_date
-            is not None
+        tertiary_input = score_kpi_3(
+            registration_instance, age_at_first_paediatric_assessment
         )
-
-        # denominator
-        if (
-            (age_at_first_paediatric_assessment <= 3)
-            or (
-                # (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year)
-                AntiEpilepsyMedicine.objects.filter(
-                    management=registration_instance.management,
-                    is_rescue_medicine=False,
-                    antiepilepsy_medicine_start_date__lt=registration_instance.registration_close_date,
-                ).count()
-                >= 3
-            )
-            or (
-                # number of children and young people diagnosed with epilepsy  who met [CESS criteria]
-                registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-            )
-            or (
-                # Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures]
-                age_at_first_paediatric_assessment <= 4
-                and Episode.objects.filter(
-                    Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis)
-                    & Q(epilepsy_or_nonepilepsy_status="E")
-                    & Q(epileptic_generalised_onset="MyC")
-                ).exists()
-            )
-        ):
-            # eligible for this measure
-            tertiary_input = 0
-            if (
-                (
-                    # Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy]
-                    age_at_first_paediatric_assessment
-                    <= 3
-                )
-                or (
-                    # (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year)
-                    AntiEpilepsyMedicine.objects.filter(
-                        management=registration_instance.management,
-                        is_rescue_medicine=False,
-                        antiepilepsy_medicine_start_date__lt=registration_instance.registration_close_date,
-                    ).count()
-                    >= 3
-                )
-                or (
-                    # (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)
-                    age_at_first_paediatric_assessment <= 4
-                    and Episode.objects.filter(
-                        Q(
-                            multiaxial_diagnosis=registration_instance.multiaxialdiagnosis
-                        )
-                        & Q(epilepsy_or_nonepilepsy_status="E")
-                        & Q(epileptic_generalised_onset="MyC")
-                    ).exists()
-                )
-                or (
-                    # (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist]
-                    (
-                        registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-                        == registration_instance.assessment.paediatric_neurologist_referral_made
-                    )
-                    or (
-                        registration_instance.assessment.paediatric_neurologist_input_date
-                        is not None
-                        and registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-                    )
-                )
-                or (
-                    # [evidence of referral or involvement of CESS]
-                    registration_instance.assessment.childrens_epilepsy_surgical_service_referral_made
-                    is not None
-                    or registration_instance.assessment.childrens_epilepsy_surgical_service_referral_date
-                    is not None
-                    or registration_instance.assessment.childrens_epilepsy_surgical_service_input_date
-                    is not None
-                )
-            ):
-                # measure has been met
-                if tertiary_input_complete:
-                    tertiary_input = 1
-                else:
-                    tertiary_input = 0
-
-        else:
-            # not eligible for this measure
-            tertiary_input = 2
 
     # 3b. epilepsy_surgery_referral
 
