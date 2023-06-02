@@ -116,7 +116,7 @@ def score_kpi_2(registration_instance) -> int:
     # no nurse referral, fail
     if assessment.epilepsy_specialist_nurse_referral_made is False:
         return KPI_SCORE["FAIL"]
-    
+
     # if not all filled, incomplete form
     if (
         assessment.epilepsy_specialist_nurse_referral_made is None
@@ -124,7 +124,6 @@ def score_kpi_2(registration_instance) -> int:
         or assessment.epilepsy_specialist_nurse_input_date is None
     ):
         return KPI_SCORE["NOT_SCORED"]
-
 
     # score check
     has_seen_nurse_before_close_date = (
@@ -172,7 +171,9 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
         (age_at_first_paediatric_assessment <= 3),
         (age_at_first_paediatric_assessment < 4 and has_myoclonic_epilepsy_episode),
         (aems_count >= 3),
-        (assessment.childrens_epilepsy_surgical_service_referral_criteria_met), # NOTE: CESS_referral_criteria_met is only one that could be None (rest must be True/False), however, only checking whether it is True or not True here so doesn't matter
+        (
+            assessment.childrens_epilepsy_surgical_service_referral_criteria_met
+        ),  # NOTE: CESS_referral_criteria_met is only one that could be None (rest must be True/False), however, only checking whether it is True or not True here so doesn't matter
     ]
 
     # None of eligibility criteria are True -> set ineligible with guard clause
@@ -180,7 +181,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["INELIGIBLE"]
 
     # Eligible for measure - EVALUATE IF AT LEAST REFERRED FROM NEUROLOGIST OR CESS. NOTE: technically the Assessment model allows a referral_date & input_date filled WITHOUT referral_made, but this is a rare edge case just for API-use. The UI does not allow you to enter either date, if referral_made is False. If the API has an endpoint for this measure, need to ensure referral_made==True, if dates are both valid.
-    
+
     # first evaluate relevant fields complete
     tertiary_input_complete = (
         assessment.paediatric_neurologist_referral_made is not None
@@ -188,17 +189,47 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
 
     if not tertiary_input_complete:
         return KPI_SCORE["NOT_SCORED"]
-    
+
     pass_criteria = [
         (assessment.paediatric_neurologist_referral_made is True),
-        (assessment.childrens_epilepsy_surgical_service_referral_made is True)
-        ]
+        (assessment.childrens_epilepsy_surgical_service_referral_made is True),
+    ]
 
     # if referral made to either neurologist or CESS, they pass
     if any(pass_criteria):
-        return KPI_SCORE['PASS']
+        return KPI_SCORE["PASS"]
     else:
-        return KPI_SCORE['FAIL']
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_4(registration_instance) -> int:
+    """4. ECG
+
+    % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
+
+    Calculation Method
+
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year AND who have [12 lead ECG obtained]
+
+    Denominator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year
+    """
+    epilepsy_context = registration_instance.epilepsycontext
+    investigations = registration_instance.investigations
+
+    # not scored / ineligible guard clauses
+    if (epilepsy_context.were_any_of_the_epileptic_seizures_convulsive is None) or (
+        investigations.twelve_lead_ecg_status is None
+    ):
+        return KPI_SCORE["NOT_SCORED"]
+    if epilepsy_context.were_any_of_the_epileptic_seizures_convulsive is False:
+        return KPI_SCORE["INELIGIBLE"]
+
+    # Convulsive seizure - score ECG status
+
+    if investigations.twelve_lead_ecg_status is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
 
 
 def calculate_kpis(registration_instance):
@@ -273,30 +304,11 @@ def calculate_kpis(registration_instance):
             # not eligible for this measure
             epilepsy_surgery_referral = 2
 
-    # 4. ECG
-    # % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year AND who have [12 lead ECG obtained]
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year
-    ecg = None
+    ecg = KPI_SCORE["NOT_SCORED"]
     if hasattr(registration_instance, "epilepsycontext") and hasattr(
         registration_instance, "investigations"
     ):
-        # denominator
-        if (
-            registration_instance.epilepsycontext.were_any_of_the_epileptic_seizures_convulsive
-        ):
-            # eligible for this measure
-            ecg = 0
-            if (
-                registration_instance.epilepsycontext.were_any_of_the_epileptic_seizures_convulsive
-                and registration_instance.investigations.twelve_lead_ecg_status
-            ):
-                # criteria met
-                ecg = 1
-        else:
-            # not eligible for this measure
-            ecg = 2
+        ecg = score_kpi_4(registration_instance)
 
     # 5. MRI
     # Calculation Method
