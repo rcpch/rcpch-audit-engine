@@ -31,7 +31,6 @@ from epilepsy12.models import (
 from epilepsy12.constants import KPI_SCORE
 
 
-
 @pytest.mark.django_db
 def test_measure_1_should_pass_seen_paediatrician(
     e12_case_factory,
@@ -48,7 +47,6 @@ def test_measure_1_should_pass_seen_paediatrician(
 
     # creates a case with all audit values filled
     case = e12_case_factory(
-        registration__assessment__reset=True,
         registration__assessment__consultant_paediatrician_referral_made=True,
         registration__assessment__consultant_paediatrician_referral_date=REFERRAL_DATE,
         registration__assessment__consultant_paediatrician_input_date=INPUT_DATE,
@@ -86,7 +84,6 @@ def test_measure_1_should_pass_seen_neurologist(
 
     # creates a case with all audit values filled
     case = e12_case_factory(
-        registration__assessment__reset=True,
         registration__assessment__paediatric_neurologist_referral_made=True,
         registration__assessment__paediatric_neurologist_referral_date=REFERRAL_DATE,
         registration__assessment__paediatric_neurologist_input_date=INPUT_DATE,
@@ -105,7 +102,6 @@ def test_measure_1_should_pass_seen_neurologist(
     assert (
         kpi_score == KPI_SCORE["PASS"]
     ), f"Patient saw a Neurologist IN {INPUT_DATE - REFERRAL_DATE} after referral, but did not pass measure"
-
 
 
 @pytest.mark.django_db
@@ -149,8 +145,6 @@ def test_measure_1_should_fail_not_seen_14_days_after_referral(
     assert (
         kpi_score == KPI_SCORE["FAIL"]
     ), f"Patient did not see a Paediatrician/Neurologist within 14 days of referral (seen after {INPUT_DATE - REFERRAL_DATE}), but did not fail measure"
-
-
 
 @pytest.mark.django_db
 def test_measure_1_should_fail_no_doctor_involved(

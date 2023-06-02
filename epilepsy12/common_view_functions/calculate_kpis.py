@@ -66,7 +66,7 @@ def score_kpi_1(registration_instance) -> int:
     )
 
     # incomplete
-    if (not all_consultant_paediatrician_fields_complete) or (
+    if (not all_consultant_paediatrician_fields_complete) and (
         not all_paediatric_neurologist_fields_complete
     ):
         return KPI_SCORE["NOT_SCORED"]
@@ -178,7 +178,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
     if not any(eligibility_criteria):
         return KPI_SCORE["INELIGIBLE"]
 
-    # Eligible for measure - EVALUATE IF AT LEAST REFERRED FROM NEUROLOGIST OR CESS. Note: if received input, MUST have had referral, so no need to test received input.
+    # Eligible for measure - EVALUATE IF AT LEAST REFERRED FROM NEUROLOGIST OR CESS. NOTE: technically the Assessment model allows a referral_date & input_date filled WITHOUT referral_made, but this is a rare edge case just for API-use. The UI does not allow you to enter either date, if referral_made is False. If the API has an endpoint for this measure, need to ensure referral_made==True, if dates are both valid.
     
     # first evaluate relevant fields complete
     tertiary_input_complete = (
