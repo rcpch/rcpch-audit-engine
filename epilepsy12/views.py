@@ -78,7 +78,10 @@ def epilepsy12_login(request):
                         selected_organisation = Organisation.objects.order_by(
                             "OrganisationName"
                         ).first()
-                return redirect("selected_organisation_summary")
+                return redirect(
+                    "selected_organisation_summary",
+                    organisation_id=selected_organisation.pk,
+                )
             else:
                 messages.error(request, "Invalid email or password.")
         else:
