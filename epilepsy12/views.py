@@ -49,6 +49,9 @@ def epilepsy12_login(request):
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
+                selected_organisation = Organisation.objects.get(
+                    OrganisationName=user.organisation_employer
+                )
                 if user.email_confirmed == False:
                     user.email_confirmed = True
                     user.save()
@@ -98,9 +101,14 @@ def index(request):
     except the children and families page which requires an organisation id to filter against. An organisation is chosen
     here at random, but in future might be chosen based on the location of the visitor's ISP.
     """
-    random_organisation = Organisation.objects.order_by("?").first()
+    if request.user.id:
+        organisation = Organisation.objects.get(
+            OrganisationName=request.user.organisation_employer
+        )
+    else:
+        organisation = Organisation.objects.order_by("?").first()
     template_name = "epilepsy12/epilepsy12index.html"
-    context = {"organisation": random_organisation}
+    context = {"organisation": organisation}
     return render(request=request, template_name=template_name, context=context)
 
 
@@ -159,6 +167,7 @@ def open_access(request, organisation_id):
     context = {
         "organisation": organisation,
         "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
     return render(request, template_name, context=context)
 

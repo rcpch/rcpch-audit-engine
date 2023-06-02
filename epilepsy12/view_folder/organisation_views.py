@@ -420,8 +420,8 @@ def view_preference(request, organisation_id, template_name):
     )
 
 
-@login_required
-@user_may_view_this_organisation()
+# @login_required
+# @user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
     POST request from dropdown in selected_organisation_summary.html
@@ -575,6 +575,7 @@ def selected_trust_select_kpi(request, organisation_id):
         "open_uk_color": colors.RCPCH_LIGHT_BLUE,
         "nhs_region_color": colors.RCPCH_STRONG_BLUE,
         "country_color": colors.RCPCH_DARK_BLUE,
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
 
     template_name = "epilepsy12/partials/organisation/metric.html"
