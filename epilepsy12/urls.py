@@ -35,11 +35,6 @@ urlpatterns = [
     path("403", views.redirect_403, name="redirect_403"),
     path("", views.index, name="index"),
     path("database", views.database, name="database"),
-    path(
-        "organisation/",
-        views.organisation_reports,
-        name="organisation_reports",
-    ),
     path("organisation/<int:organisation_id>/cases/", views.case_list, name="cases"),
     path(
         "organisation/<int:organisation_id>/case/<int:case_id>/update",
@@ -93,7 +88,7 @@ urlpatterns = [
         name="log_list",
     ),
     path(
-        "selected_organisation_summary",
+        "organisation/<int:organisation_id>/summary",
         views.selected_organisation_summary,
         name="selected_organisation_summary",
     ),
@@ -163,7 +158,6 @@ urlpatterns = [
         views.edit_epilepsy12_user,
         name="edit_epilepsy12_user",
     ),
-    path("uk_shapes/<str:abstraction_level>", views.uk_shapes, name="uk_shapes"),
 ]
 
 htmx_paths = [

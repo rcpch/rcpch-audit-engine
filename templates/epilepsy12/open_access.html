@@ -9,16 +9,22 @@
     <div class="ui rcpch_info message">
         This represents all the Key Performance Indicators for the selected hospital
     </div>
-    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+    <div class="ui top attached tabular rcpch menu" _="init js $('.menu .item').tab();">
+        <a class="active item" data-tab="first">Overview</a>
+        <a class="item" data-tab="second">Individual Measures</a>
+    </div>
 
     <div 
+        class="ui bottom attached active tab segment" data-tab="first"
         id="organisation_summary"
         hx-trigger="load"
         hx-get="{% url 'selected_trust_kpis_open' organisation_id=organisation.pk %}"
         hx-target="#organisation_summary"
         hx-swap="innerHTML"
     >
-
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="second">
+        {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices selected_organisation=organisation %}
     </div>
 </div>
 {% endblock %}

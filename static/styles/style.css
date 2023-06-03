@@ -1926,7 +1926,27 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .region_tooltip{
   border-radius: 0% !important;
+}
 
 .ui.card.clickable_card:hover {
   cursor: pointer;
 }
+
+.ui.attached.tabular.menu{
+  border-color: var(--rcpch_light_blue);
+}
+
+.ui.attached.tabular.menu  .active.item {
+  border-color: var(--rcpch_light_blue) !important;
+  border-width: 3px;
+}
+
+.ui.bottom.attached.segment {
+  border-color: var(--rcpch_light_blue) !important;
+  border-width: 3px;
+  border-radius: 0;
+}
+
+
+
+
