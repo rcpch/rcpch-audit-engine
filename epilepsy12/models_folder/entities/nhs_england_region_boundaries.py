@@ -10,7 +10,7 @@ class NHSEnglandRegionBoundaries(models.Model):
     long = models.FloatField()
     lat = models.FloatField()
     globalid = models.CharField(max_length=38)
-    geom = models.MultiPolygonField(srid=17700)
+    geom = models.MultiPolygonField(srid=27700)
 
 
 # Auto-generated `LayerMapping` dictionary for NHSEnglandRegionBoundaries model

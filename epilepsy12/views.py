@@ -49,9 +49,13 @@ def epilepsy12_login(request):
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
-                selected_organisation = Organisation.objects.get(
-                    OrganisationName=user.organisation_employer
-                )
+                if user.organisation_employer is not None:
+                    # select the first hospital in the list if no allocated employing hospital
+                    selected_organisation = Organisation.objects.get(
+                        OrganisationName=user.organisation_employer
+                    )
+                else:
+                    selected_organisation = Organisation.objects.first()
                 if user.email_confirmed == False:
                     user.email_confirmed = True
                     user.save()

@@ -11,7 +11,7 @@ class LocalHealthBoardBoundaries(models.Model):
     long = models.FloatField()
     lat = models.FloatField()
     globalid = models.CharField(max_length=38)
-    geom = models.MultiPolygonField(srid=4326)
+    geom = models.MultiPolygonField(srid=27700)
 
     def __str__(self) -> str:
         return self.lhb22nm

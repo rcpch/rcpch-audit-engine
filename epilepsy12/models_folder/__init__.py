@@ -36,6 +36,10 @@ from .audit_progress import AuditProgress
 from .kpi import KPI
 from .visitactivity import VisitActivity
 
+# This stores the results of aggregations of the KPI model for different levels of abstraction
+# There is one one KPIAggregation instance for each organisation, trust/lhb, icb, nhs_region, open_uk region, country and national
+from .kpi_aggregation import KPIAggregation
+
 # These are helper classes to support the functioning of each model. Do not need to be globally available
 from .time_and_user_abstract_base_classes import (
     TimeStampAbstractBaseClass,
