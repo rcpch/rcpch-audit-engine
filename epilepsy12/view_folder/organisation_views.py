@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.serializers import serialize
-from django.http import HttpResponse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
@@ -17,13 +16,8 @@ from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
 from epilepsy12.models import (
     Organisation,
     KPI,
-    NHSEnglandRegionBoundaries,
-    IntegratedCareBoardBoundaries,
-    CountryBoundaries,
-    LocalHealthBoardBoundaries,
 )
 from ..common_view_functions import (
-    return_selected_organisation,
     sanction_user,
     trigger_client_event,
     cases_aggregated_by_sex,
@@ -32,6 +26,7 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     aggregate_all_eligible_kpi_fields,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
+    return_tile_for_region,
 )
 from ..general_functions import (
     get_current_cohort_data,
@@ -53,21 +48,9 @@ def selected_organisation_summary(request, organisation_id):
     Otherwise it returns the organisation.html template
     """
 
-    nhsregion_tiles = serialize(
-        "geojson",
-        NHSEnglandRegionBoundaries.objects.all(),
-    )
-    newnhsregion_tiles = json.loads(nhsregion_tiles)
-    newnhsregion_tiles.pop("crs", None)
-    newnhsregion_tiles = json.dumps(newnhsregion_tiles)
-    icb_tiles = serialize("geojson", IntegratedCareBoardBoundaries.objects.all())
-    newicb_tiles = json.loads(icb_tiles)
-    newicb_tiles.pop("crs", None)
-    newicb_tiles = json.dumps(newicb_tiles)
-    country_tiles = serialize("geojson", CountryBoundaries.objects.all())
-    newcountry_tiles = json.loads(country_tiles)
-    newcountry_tiles.pop("crs", None)
-    newcountry_tiles = json.dumps(newcountry_tiles)
+    nhsregion_tiles = return_tile_for_region("nhs_region")
+    icb_tiles = return_tile_for_region("icb")
+    country_tiles = return_tile_for_region("country")
 
     if request.POST.get("selected_organisation_summary"):
         selected_organisation = Organisation.objects.get(
@@ -79,13 +62,10 @@ def selected_organisation_summary(request, organisation_id):
         selected_organisation = Organisation.objects.get(pk=organisation_id)
         template_name = "epilepsy12/organisation.html"
 
-    newlhb_tiles = None
+    lhb_tiles = None
 
     if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
-        lhb_tiles = serialize("geojson", LocalHealthBoardBoundaries.objects.all())
-        newlhb_tiles = json.loads(lhb_tiles)
-        newlhb_tiles.pop("crs", None)
-        newlhb_tiles = json.dumps(newlhb_tiles)
+        lhb_tiles = return_tile_for_region("lhb")
 
     # if logged in user is from different trust and not a superuser or rcpch member, deny access
     sanction_user(user=request.user)
@@ -180,10 +160,10 @@ def selected_organisation_summary(request, organisation_id):
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "cohort_data": cohort_data,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-        "nhsregion_tiles": newnhsregion_tiles,
-        "icb_tiles": newicb_tiles,
-        "country_tiles": newcountry_tiles,
-        "lhb_tiles": newlhb_tiles,
+        "nhsregion_tiles": nhsregion_tiles,
+        "icb_tiles": icb_tiles,
+        "country_tiles": country_tiles,
+        "lhb_tiles": lhb_tiles,
     }
 
     return render(
