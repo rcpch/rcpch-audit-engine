@@ -1373,7 +1373,7 @@ class Migration(migrations.Migration):
                 (
                     "Geocode_Coordinates",
                     django.contrib.gis.db.models.fields.PointField(
-                        blank=True, default=None, null=True, srid=4326
+                        blank=True, default=None, null=True, srid=27700
                     ),
                 ),
                 (
@@ -2877,7 +2877,7 @@ class Migration(migrations.Migration):
                 (
                     "Geocode_Coordinates",
                     django.contrib.gis.db.models.fields.PointField(
-                        blank=True, default=None, null=True, srid=4326
+                        blank=True, default=None, null=True, srid=27700
                     ),
                 ),
                 (

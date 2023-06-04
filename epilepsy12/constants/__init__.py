@@ -28,3 +28,4 @@ from .country_codes import *
 from .nhs_england_regions import *
 from .uk_ons_region_codes import *
 from .colors import *
+from .abstraction_levels import *

@@ -124,9 +124,9 @@ def cases_aggregated_by_ethnicity(selected_organisation):
 
 def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     """
-    Returns a dictionary of all KPI fields with aggregation for each measure ready to pass
-    into a related model. If an individual measure is passed in, only that measure will be aggregated.
-    It can only be used by a model which has a relationship with registration (but not registration itself)
+    Returns a dictionary of all KPI fields with aggregation for each measure ready to persist in KPIAggregations.
+    It accepts a list of cases filtered by a given level of abstraction (all cases in an organisation, trust, icb etc)
+    If an individual measure is passed in, only that measure will be aggregated.
     Returned fields include sum of all eligible KPI measures (identified as having an individual score of 1 or 0)
     for that registration as well as average score of the same and total number KPIs.
     A KPI score of 2 is excluded as not eligible for that measure.
@@ -217,7 +217,7 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     kpi_measure=None,
 ):
     """
-    Returns aggregated KPIS for given cohort against sublevel of abstraction (eg all NHS England regions)
+    Returns aggregated KPIS for given cohort annotated by sublevel of abstraction (eg kpis in each NHS England region, labelled by region)
     """
 
     if abstraction_level == "organisation":

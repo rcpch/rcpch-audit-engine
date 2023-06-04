@@ -1,11 +1,8 @@
 # Python/Django imports
 
-import json
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-from django.core.serializers import serialize
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
@@ -13,10 +10,7 @@ from django_htmx.http import HttpResponseClientRedirect
 # E12 imports
 from ..decorator import user_may_view_this_organisation
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
-from epilepsy12.models import (
-    Organisation,
-    KPI,
-)
+from epilepsy12.models import Organisation, KPI, KPIAggregation
 from ..common_view_functions import (
     sanction_user,
     trigger_client_event,
@@ -35,6 +29,10 @@ from ..general_functions import (
 )
 from ..constants import colors
 
+from ..tasks import (
+    aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously,
+)
+
 
 @login_required
 @user_may_view_this_organisation()
@@ -52,7 +50,7 @@ def selected_organisation_summary(request, organisation_id):
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
-    if request.POST.get("selected_organisation_summary"):
+    if request.POST.get("selected_organisation_summary") is not None:
         selected_organisation = Organisation.objects.get(
             pk=request.POST.get("selected_organisation_summary")
         )
@@ -79,9 +77,6 @@ def selected_organisation_summary(request, organisation_id):
         ).count()
     )
 
-    print(
-        f"{count_of_current_cohort_registered_completed_cases_in_this_organisation} in this organisation"
-    )
     # query to return all completed E12 cases in the current cohort in this organisation trust
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
@@ -183,58 +178,34 @@ def selected_trust_kpis(request, organisation_id):
     """
 
     organisation = Organisation.objects.get(pk=organisation_id)
-    cohort_data = get_current_cohort_data()
-    organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="organisation",
-    )
-    trust_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="trust",
-    )
-    icb_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="icb",
-    )
-    nhs_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="nhs_region",
-    )
-    open_uk_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="open_uk",
-    )
-    country_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="country",
-    )
-    national_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="national",
+
+    # run the aggregations
+    aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
+        organisation_id=organisation.pk, open_access=False
     )
 
-    # aggregate at each level of abstraction
-    organisation_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
-    trust_kpis = aggregate_all_eligible_kpi_fields(trust_level)
-    icb_kpis = aggregate_all_eligible_kpi_fields(icb_level)
-    nhs_kpis = aggregate_all_eligible_kpi_fields(nhs_level)
-    open_uk_kpis = aggregate_all_eligible_kpi_fields(open_uk_level)
-    country_kpis = aggregate_all_eligible_kpi_fields(country_level)
-    national_kpis = aggregate_all_eligible_kpi_fields(national_level)
+    # get aggregated KPIs for level of abstraction from KPIAggregation
+    organisation_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="organisation"
+    ).get()
+    trust_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="trust"
+    ).get()
+    icb_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="icb"
+    ).get()
+    nhs_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="nhs_region"
+    ).get()
+    open_uk_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="open_uk"
+    ).get()
+    country_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="country"
+    ).get()
+    national_kpis = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="national"
+    ).get()
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
@@ -277,62 +248,32 @@ def selected_trust_kpis_open(request, organisation_id):
     """
 
     organisation = Organisation.objects.get(pk=organisation_id)
-    cohort_data = get_current_cohort_data()
-    organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="organisation",
-    )
-    trust_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="trust",
-    )
-    icb_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="icb",
-    )
-    nhs_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="nhs_region",
-    )
-    open_uk_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="open_uk",
-    )
-    country_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="country",
-    )
-    national_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="national",
-    )
 
-    # aggregate at each level of abstraction
-    organisation_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
-    trust_kpis = aggregate_all_eligible_kpi_fields(trust_level)
-    icb_kpis = aggregate_all_eligible_kpi_fields(icb_level)
-    nhs_kpis = aggregate_all_eligible_kpi_fields(nhs_level)
-    open_uk_kpis = aggregate_all_eligible_kpi_fields(open_uk_level)
-    country_kpis = aggregate_all_eligible_kpi_fields(country_level)
-    national_kpis = aggregate_all_eligible_kpi_fields(national_level)
+    # get aggregated KPIs for level of abstraction from KPIAggregation
+    organisation_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="organisation"
+    ).get()
+    trust_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="trust"
+    ).get()
+    icb_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="icb"
+    ).get()
+    nhs_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="nhs_region"
+    ).get()
+    open_uk_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="open_uk"
+    ).get()
+    country_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="country"
+    ).get()
+    national_kpis = KPIAggregation.filter(
+        organisation=organisation, abstraction_level="national"
+    ).get()
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
-    organisation = Organisation.objects.get(pk=organisation_id)
     kpis = KPI.objects.create(
         organisation=organisation,
         parent_trust=organisation.ParentOrganisation_OrganisationName,
@@ -416,65 +357,31 @@ def selected_trust_select_kpi(request, organisation_id):
 
     organisation = Organisation.objects.get(pk=organisation_id)
     cohort_data = get_current_cohort_data()
-    organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="organisation",
-    )
-    trust_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="trust",
-    )
-    icb_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="icb",
-    )
-    nhs_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="nhs_region",
-    )
-    open_uk_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="open_uk",
-    )
-    country_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="country",
-    )
-    national_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=organisation,
-        cohort=cohort_data["cohort"],
-        case_complete=True,
-        abstraction_level="national",
-    )
 
     # aggregate at each level of abstraction
-    # organisation_level.aggregate(**aggregation_fields)
-    organisation_kpi = aggregate_all_eligible_kpi_fields(organisation_level, kpi_name)
-    # trust_level.aggregate(**aggregation_fields)
-    trust_kpi = aggregate_all_eligible_kpi_fields(trust_level, kpi_name)
-    # icb_level.aggregate(**aggregation_fields)
-    icb_kpi = aggregate_all_eligible_kpi_fields(icb_level, kpi_name)
-    # nhs_level.aggregate(**aggregation_fields)
-    nhs_kpi = aggregate_all_eligible_kpi_fields(nhs_level, kpi_name)
-    # open_uk_level.aggregate(**aggregation_fields)
-    open_uk_kpi = aggregate_all_eligible_kpi_fields(open_uk_level, kpi_name)
-    # country_level.aggregate(**aggregation_fields)
-    country_kpi = aggregate_all_eligible_kpi_fields(country_level, kpi_name)
-    # national_level.aggregate(**aggregation_fields)
-    national_kpi = aggregate_all_eligible_kpi_fields(national_level, kpi_name)
+    organisation_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="organisation"
+    )
+    trust_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="trust"
+    )
+    icb_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="icb"
+    )
+    nhs_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="nhs_region"
+    )
+    open_uk_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="open_uk"
+    )
+    country_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="country"
+    )
+    national_kpi = KPIAggregation.objects.filter(
+        organisation=organisation, abstraction_level="national"
+    )
 
+    # Get kpi totals for this measure annotated by region name
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data["cohort"], abstraction_level="open_uk", kpi_measure=kpi_name
     )
@@ -517,20 +424,24 @@ def selected_trust_select_kpi(request, organisation_id):
         "kpi_name": kpi_name,
         "kpi_value": kpi_value,
         "selected_organisation": organisation,
-        "organisation_kpi": organisation_kpi[kpi_name],
-        "total_organisation_kpi_cases": organisation_kpi["total_number_of_cases"],
-        "trust_kpi": trust_kpi[kpi_name],
-        "total_trust_kpi_cases": trust_kpi["total_number_of_cases"],
-        "icb_kpi": icb_kpi[kpi_name],
-        "total_icb_kpi_cases": icb_kpi["total_number_of_cases"],
-        "nhs_kpi": nhs_kpi[kpi_name],
-        "total_nhs_kpi_cases": nhs_kpi["total_number_of_cases"],
-        "open_uk_kpi": open_uk_kpi[kpi_name],
-        "total_open_uk_kpi_cases": open_uk_kpi["total_number_of_cases"],
-        "country_kpi": country_kpi[kpi_name],
-        "total_country_kpi_cases": country_kpi["total_number_of_cases"],
-        "national_kpi": national_kpi[kpi_name],
-        "total_national_kpi_cases": national_kpi["total_number_of_cases"],
+        "organisation_kpi": getattr(organisation_kpi, kpi_name, None),
+        "total_organisation_kpi_cases": getattr(
+            organisation_kpi, "total_number_of_cases", None
+        ),
+        "trust_kpi": getattr(trust_kpi, kpi_name, None),
+        "total_trust_kpi_cases": getattr(trust_kpi, "total_number_of_cases", None),
+        "icb_kpi": getattr(icb_kpi, kpi_name, None),
+        "total_icb_kpi_cases": getattr(icb_kpi, "total_number_of_cases", None),
+        "nhs_kpi": getattr(nhs_kpi, kpi_name, None),
+        "total_nhs_kpi_cases": getattr(nhs_kpi, "total_number_of_cases", None),
+        "open_uk_kpi": getattr(open_uk_kpi, kpi_name, None),
+        "total_open_uk_kpi_cases": getattr(open_uk_kpi, "total_number_of_cases", None),
+        "country_kpi": getattr(country_kpi, kpi_name, None),
+        "total_country_kpi_cases": getattr(country_kpi, "total_number_of_cases", None),
+        "national_kpi": getattr(national_kpi, kpi_name, None),
+        "total_national_kpi_cases": getattr(
+            national_kpi, "total_number_of_cases", None
+        ),
         "open_uk": all_aggregated_kpis_by_open_uk_region_in_current_cohort,
         "open_uk_avg": open_uk_avg,
         "open_uk_title": f"{kpi_value} by OPEN UK Region",
