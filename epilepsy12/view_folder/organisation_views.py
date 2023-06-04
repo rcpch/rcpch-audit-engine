@@ -67,9 +67,6 @@ def selected_organisation_summary(request, organisation_id):
     if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
         lhb_tiles = return_tile_for_region("lhb")
 
-    # if logged in user is from different trust and not a superuser or rcpch member, deny access
-    sanction_user(user=request.user)
-
     cohort_data = get_current_cohort_data()
 
     # query to return all completed E12 cases in the current cohort in this organisation
