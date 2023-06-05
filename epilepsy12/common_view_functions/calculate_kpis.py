@@ -357,6 +357,86 @@ def score_kpi_6(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["FAIL"]
 
 
+def score_kpi_7(registration_instance) -> int:
+    """7. mental_health_support
+
+    Percentage of children with epilepsy and a mental health problem who have evidence of mental health support
+
+    Calculation Method
+
+    Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue identified AND had evidence of mental health support received
+
+    Denominator= Number of children and young people diagnosed with epilepsy AND had a mental health issue identified
+    """
+
+    multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
+    management = registration_instance.management
+
+    # not scored
+    if multiaxial_diagnosis.mental_health_issue_identified is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # ineligible
+    if multiaxial_diagnosis.mental_health_issue_identified is False:
+        return KPI_SCORE["INELIGIBLE"]
+    
+    # not scored
+    if management.has_support_for_mental_health_support is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.has_support_for_mental_health_support:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> int:
+    """8. Sodium Valproate
+
+    Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
+
+    Calculation Method
+
+    Numerator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate AND annual risk acknowledgement forms completed AND pregnancy prevention programme in place
+
+    Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
+    """
+    # denominator
+    if (
+        age_at_first_paediatric_assessment >= 12 and registration_instance.case.sex == 2
+    ) and (
+        registration_instance.management.has_an_aed_been_given
+        and AntiEpilepsyMedicine.objects.filter(
+            management=registration_instance.management,
+            medicine_entity=MedicineEntity.objects.filter(
+                medicine_name__icontains="valproate"
+            ).first(),
+        ).exists()
+    ):
+        # eligible for this measure
+        sodium_valproate = 0
+        if (
+            age_at_first_paediatric_assessment >= 12
+            and registration_instance.case.sex == 2
+        ) and (
+            registration_instance.management.has_an_aed_been_given
+            and AntiEpilepsyMedicine.objects.filter(
+                management=registration_instance.management,
+                medicine_entity=MedicineEntity.objects.filter(
+                    medicine_name__icontains="valproate"
+                ).first(),
+                is_a_pregnancy_prevention_programme_needed=True,
+                has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
+            ).exists()
+        ):
+            # criteria met
+            sodium_valproate = 1
+    else:
+        # not eligible for this measure
+        sodium_valproate = 2
+
+
 def calculate_kpis(registration_instance):
     """
     Function called on update of every field
@@ -409,72 +489,13 @@ def calculate_kpis(registration_instance):
             registration_instance, age_at_first_paediatric_assessment
         )
 
-    # 7. mental_health_support
-    # Percentage of children with epilepsy and a mental health problem who have evidence of mental health support
-    # Calculation Method
-    # Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue identified AND had evidence of mental health support received
-    # Denominator= Number of children and young people diagnosed with epilepsy AND had a mental health issue identified
-
-    mental_health_support = None
-    if hasattr(registration_instance, "multiaxialdiagnosis") and hasattr(
-        registration_instance, "management"
-    ):
-        # denominator
-        if registration_instance.multiaxialdiagnosis.mental_health_issue_identified:
-            # eligible for this measure
-            mental_health_support = 0
-            if (
-                registration_instance.multiaxialdiagnosis.mental_health_issue_identified
-                and registration_instance.management.has_support_for_mental_health_support
-            ):
-                # criteria met
-                mental_health_support = 1
-        else:
-            # not eligible for this measure
-            mental_health_support = 2
-
-    # 8. Sodium Valproate
-    # Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
-    # Calculation Method
-    # Numerator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate AND annual risk acknowledgement forms completed AND pregnancy prevention programme in place
-    # Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
-    sodium_valproate = None
+    if has_all_attributes(registration_instance, ["multiaxialdiagnosis", "management"]):
+        mental_health_support = score_kpi_7(registration_instance)
 
     if hasattr(registration_instance, "management"):
-        # denominator
-        if (
-            age_at_first_paediatric_assessment >= 12
-            and registration_instance.case.sex == 2
-        ) and (
-            registration_instance.management.has_an_aed_been_given
-            and AntiEpilepsyMedicine.objects.filter(
-                management=registration_instance.management,
-                medicine_entity=MedicineEntity.objects.filter(
-                    medicine_name__icontains="valproate"
-                ).first(),
-            ).exists()
-        ):
-            # eligible for this measure
-            sodium_valproate = 0
-            if (
-                age_at_first_paediatric_assessment >= 12
-                and registration_instance.case.sex == 2
-            ) and (
-                registration_instance.management.has_an_aed_been_given
-                and AntiEpilepsyMedicine.objects.filter(
-                    management=registration_instance.management,
-                    medicine_entity=MedicineEntity.objects.filter(
-                        medicine_name__icontains="valproate"
-                    ).first(),
-                    is_a_pregnancy_prevention_programme_needed=True,
-                    has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
-                ).exists()
-            ):
-                # criteria met
-                sodium_valproate = 1
-        else:
-            # not eligible for this measure
-            sodium_valproate = 2
+        sodium_valproate = score_kpi_8(
+            registration_instance, age_at_first_paediatric_assessment
+        )
 
     # 9A. comprehensive_care_planning_agreement
     # % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
