@@ -8,6 +8,7 @@ from django.contrib.gis.db.models import Q, Sum
 # E12 imports
 from ..models import *
 from ..constants import ALL_NHS_TRUSTS, KPI_SCORE
+from ..general_functions import has_all_attributes
 
 
 def calculate_age_at_first_paediatric_assessment_in_years(registration_instance) -> int:
@@ -255,19 +256,14 @@ def calculate_kpis(registration_instance):
         # In theory it should not be possible to get this far.
         return None
 
-    paediatrician_with_expertise_in_epilepsies = KPI_SCORE["NOT_SCORED"]
     if hasattr(registration_instance, "assessment"):
         paediatrician_with_expertise_in_epilepsies = score_kpi_1(registration_instance)
 
-    epilepsy_specialist_nurse = KPI_SCORE["NOT_SCORED"]
     if hasattr(registration_instance, "assessment"):
         epilepsy_specialist_nurse = score_kpi_2(registration_instance)
 
-    tertiary_input = None
-    if (
-        hasattr(registration_instance, "management")
-        and hasattr(registration_instance, "assessment")
-        and hasattr(registration_instance, "multiaxialdiagnosis")
+    if has_all_attributes(
+        registration_instance, ["management", "assessment", "multiaxialdiagnosis"]
     ):
         tertiary_input = score_kpi_3(
             registration_instance, age_at_first_paediatric_assessment

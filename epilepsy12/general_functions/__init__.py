@@ -18,3 +18,4 @@ from .nhs_number import *
 from .ods_search import *
 from .calculate_kpi_average import *
 from .item_from_choice import *
+from .has_all_attributes import *
