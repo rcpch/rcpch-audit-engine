@@ -105,7 +105,7 @@ def index(request):
     except the children and families page which requires an organisation id to filter against. An organisation is chosen
     here at random, but in future might be chosen based on the location of the visitor's ISP.
     """
-    if request.user.id:
+    if getattr(request.user, "organisation_employer", None) is not None:
         organisation = Organisation.objects.get(
             OrganisationName=request.user.organisation_employer
         )

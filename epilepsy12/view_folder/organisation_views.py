@@ -253,24 +253,24 @@ def selected_trust_kpis_open(request, organisation_id):
     organisation_kpis = KPIAggregation.filter(
         organisation=organisation, abstraction_level="organisation"
     ).get()
-    trust_kpis = KPIAggregation.filter(
+    trust_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="trust"
-    ).get()
-    icb_kpis = KPIAggregation.filter(
+    )
+    icb_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="icb"
-    ).get()
-    nhs_kpis = KPIAggregation.filter(
+    )
+    nhs_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="nhs_region"
-    ).get()
-    open_uk_kpis = KPIAggregation.filter(
+    )
+    open_uk_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="open_uk"
-    ).get()
-    country_kpis = KPIAggregation.filter(
+    )
+    country_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="country"
-    ).get()
-    national_kpis = KPIAggregation.filter(
+    )
+    national_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="national"
-    ).get()
+    )
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
