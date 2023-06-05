@@ -16,14 +16,14 @@ class Migration(migrations.Migration):
             model_name="historicalorganisation",
             name="Geocode_Coordinates",
             field=django.contrib.gis.db.models.fields.PointField(
-                blank=True, default=None, null=True, srid=4326
+                blank=True, default=None, null=True, srid=27700
             ),
         ),
         migrations.AlterField(
             model_name="organisation",
             name="Geocode_Coordinates",
             field=django.contrib.gis.db.models.fields.PointField(
-                blank=True, default=None, null=True, srid=4326
+                blank=True, default=None, null=True, srid=27700
             ),
         ),
         migrations.CreateModel(

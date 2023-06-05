@@ -1,5 +1,5 @@
 # python dependencies
-from random import randint, getrandbits
+from random import randint, getrandbits, choice
 from dateutil.relativedelta import relativedelta
 from datetime import date
 
@@ -51,6 +51,7 @@ from ...constants import (
     NON_EPILEPSY_PAROXYSMS,
     ANTIEPILEPSY_MEDICINES,
     BENZODIAZEPINE_TYPES,
+    SEVERITY,
 )
 from ...general_functions import (
     random_date,
@@ -126,7 +127,8 @@ def create_registrations(verbose=True):
                 case=case, audit_progress=audit_progress, kpi=kpi
             )
         else:
-            if verbose: print(f"{case} is registered already. Skipping")
+            if verbose:
+                print(f"{case} is registered already. Skipping")
             return case.registration
 
 
@@ -139,44 +141,38 @@ def create_epilepsy12_record(registration_instance, verbose=True):
 
     # create random first paediatric assessment
     first_paediatric_assessment = create_first_paediatric_assessment(
-        registration_instance=registration_instance,
-        verbose=verbose
+        registration_instance=registration_instance, verbose=verbose
     )
     test_fields_update_audit_progress(model_instance=first_paediatric_assessment)
 
     # create random EpilepsyContext
     epilepsy_context = create_epilepsy_context(
-        registration_instance=registration_instance,
-        verbose=verbose
+        registration_instance=registration_instance, verbose=verbose
     )
     test_fields_update_audit_progress(model_instance=epilepsy_context)
 
     # create random Multiaxial Diagnosis
     multiaxial_diagnosis = create_multiaxial_diagnosis(
-        registration_instance=registration_instance,
-        verbose=verbose
+        registration_instance=registration_instance, verbose=verbose
     )
     test_fields_update_audit_progress(model_instance=multiaxial_diagnosis)
 
     # create random Assessment
     assessment = create_assessment(
-        registration_instance=registration_instance,
-        verbose=verbose
-        )
+        registration_instance=registration_instance, verbose=verbose
+    )
     test_fields_update_audit_progress(model_instance=assessment)
 
     # create random Investigations
     assessment = create_investigations(
-        registration_instance=registration_instance,
-        verbose=verbose
-        )
+        registration_instance=registration_instance, verbose=verbose
+    )
     test_fields_update_audit_progress(model_instance=assessment)
 
     # create random Management
     management = create_management(
-        registration_instance=registration_instance,
-        verbose=verbose
-        )
+        registration_instance=registration_instance, verbose=verbose
+    )
     test_fields_update_audit_progress(model_instance=management)
 
     # calculate all the kpis
@@ -200,9 +196,10 @@ def create_first_paediatric_assessment(registration_instance, verbose=True):
             registration=registration_instance,
         )
     else:
-        if verbose: print(
-            f"First Paediatric assessment exists for {registration_instance.case}. Skipping..."
-        )
+        if verbose:
+            print(
+                f"First Paediatric assessment exists for {registration_instance.case}. Skipping..."
+            )
         return registration_instance.firstpaediatricassessment
 
 
@@ -212,20 +209,23 @@ def create_epilepsy_context(registration_instance, verbose=True):
     """
     if not hasattr(registration_instance, "epilepsycontext"):
         return EpilepsyContext.objects.create(
-            previous_febrile_seizure=OPT_OUT_UNCERTAIN[randint(0, 2)][0],
-            previous_acute_symptomatic_seizure=OPT_OUT_UNCERTAIN[randint(0, 2)][0],
-            is_there_a_family_history_of_epilepsy=OPT_OUT_UNCERTAIN[randint(0, 2)][0],
-            previous_neonatal_seizures=OPT_OUT_UNCERTAIN[randint(0, 2)][0],
+            previous_febrile_seizure=choice(OPT_OUT_UNCERTAIN)[0],
+            previous_acute_symptomatic_seizure=choice(OPT_OUT_UNCERTAIN)[0],
+            is_there_a_family_history_of_epilepsy=choice(OPT_OUT_UNCERTAIN)[0],
+            previous_neonatal_seizures=choice(OPT_OUT_UNCERTAIN)[0],
             diagnosis_of_epilepsy_withdrawn=bool(getrandbits(1)),
             were_any_of_the_epileptic_seizures_convulsive=bool(getrandbits(1)),
-            experienced_prolonged_generalized_convulsive_seizures=OPT_OUT_UNCERTAIN[
-                randint(0, 2)
-            ][0],
-            experienced_prolonged_focal_seizures=OPT_OUT_UNCERTAIN[randint(0, 2)][0],
+            experienced_prolonged_generalized_convulsive_seizures=choice(
+                OPT_OUT_UNCERTAIN
+            )[0],
+            experienced_prolonged_focal_seizures=choice(OPT_OUT_UNCERTAIN)[0],
             registration=registration_instance,
         )
     else:
-        if verbose: print(f"Epilepsy context exists for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(
+                f"Epilepsy context exists for {registration_instance.case}. Skipping..."
+            )
         return registration_instance.epilepsycontext
 
 
@@ -241,202 +241,180 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
             relevant_impairments_behavioural_educational=bool(getrandbits(1)),
             mental_health_screen=bool(getrandbits(1)),
             mental_health_issue_identified=bool(getrandbits(1)),
+            global_developmental_delay_or_learning_difficulties=bool(getrandbits(1)),
+            autistic_spectrum_disorder=bool(getrandbits(1)),
             registration=registration_instance,
         )
+    else:
+        multiaxial_diagnosis = registration_instance.multiaxial_diagnosis
 
-        if multiaxial_diagnosis.syndrome_present:
-            # create a related syndrome
-            syndrome_entity = SyndromeEntity.objects.filter(
-                syndrome_name=SYNDROMES[randint(0, len(SYNDROMES) - 1)][1]
-            ).get()
-            Syndrome.objects.create(
-                syndrome_diagnosis_date=random_date(
-                    start=registration_instance.registration_date, end=date.today()
-                ),
-                syndrome=syndrome_entity,
-                multiaxial_diagnosis=multiaxial_diagnosis,
+    if multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties:
+        rand_severity = SEVERITY[randint(0, len(SEVERITY) - 1)][0]
+        multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties_severity = (
+            rand_severity
+        )
+
+    if multiaxial_diagnosis.syndrome_present:
+        # create a related syndrome
+        syndrome_entity = SyndromeEntity.objects.filter(
+            syndrome_name=choice(SYNDROMES)[1]
+        ).get()
+        Syndrome.objects.create(
+            syndrome_diagnosis_date=random_date(
+                start=registration_instance.registration_date, end=date.today()
+            ),
+            syndrome=syndrome_entity,
+            multiaxial_diagnosis=multiaxial_diagnosis,
+        )
+
+    if multiaxial_diagnosis.epilepsy_cause_known:
+        ecl = "<< 363235000"
+        epilepsy_causes = fetch_ecl(ecl)
+        random_cause = EpilepsyCauseEntity.objects.filter(
+            conceptId=epilepsy_causes[randint(0, len(epilepsy_causes) - 1)]["conceptId"]
+        ).first()
+
+        multiaxial_diagnosis.epilepsy_cause = random_cause
+        choices = []
+        for item in range(0, randint(1, 3)):
+            chosen_cause = choice(EPILEPSY_CAUSES)
+            choices.append(chosen_cause[0])
+        multiaxial_diagnosis.epilepsy_cause_categories = choices
+
+    if multiaxial_diagnosis.mental_health_issue_identified:
+        multiaxial_diagnosis.mental_health_issue = choice(NEUROPSYCHIATRIC)[0]
+
+    if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
+        # add upto 5 comorbidities
+        for count_item in range(1, randint(2, 5)):
+            comorbidity_choices = (
+                fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
             )
+            random_comorbidities = choice(comorbidity_choices)
 
-        if multiaxial_diagnosis.epilepsy_cause_known:
-            ecl = "<< 363235000"
-            epilepsy_causes = fetch_ecl(ecl)
-            random_cause = EpilepsyCauseEntity.objects.filter(
-                conceptId=epilepsy_causes[randint(0, len(epilepsy_causes) - 1)][
-                    "conceptId"
-                ]
+            random_comorbidity = ComorbidityEntity.objects.filter(
+                conceptId=random_comorbidities["conceptId"]
             ).first()
 
-            multiaxial_diagnosis.epilepsy_cause = random_cause
-            total_cause_choices = len(EPILEPSY_CAUSES)
-            random_number_of_choices = randint(1, total_cause_choices)
-            choices = []
-            for choice in range(0, random_number_of_choices):
-                choices.append(EPILEPSY_CAUSES[randint(0, len(EPILEPSY_CAUSES) - 1)][0])
-            multiaxial_diagnosis.epilepsy_cause_categories = choices
-
-        if multiaxial_diagnosis.mental_health_issue_identified:
-            multiaxial_diagnosis.mental_health_issue = NEUROPSYCHIATRIC[
-                randint(0, len(NEUROPSYCHIATRIC) - 1)
-            ][0]
-
-        if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
-            # add upto 5 comorbidities
-            for count_item in range(1, randint(1, 5)):
-                comorbidity_choices = (
-                    fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set()
+            try:
+                Comorbidity.objects.create(
+                    multiaxial_diagnosis=multiaxial_diagnosis,
+                    comorbidity_diagnosis_date=random_date(
+                        start=registration_instance.registration_date,
+                        end=date.today(),
+                    ),
+                    comorbidityentity=random_comorbidity,
                 )
-                random_comorbidities = comorbidity_choices[
-                    randint(0, len(comorbidity_choices) - 1)
-                ]
-                random_comorbidity = ComorbidityEntity.objects.filter(
-                    conceptId=random_comorbidities["conceptId"]
-                ).first()
-
-                try:
-                    Comorbidity.objects.create(
-                        multiaxial_diagnosis=multiaxial_diagnosis,
-                        comorbidity_diagnosis_date=random_date(
-                            start=registration_instance.registration_date,
-                            end=date.today(),
-                        ),
-                        comorbidityentity=random_comorbidity,
-                    )
-                except Exception as e:
-                    if verbose: print(
+            except Exception as e:
+                if verbose:
+                    print(
                         f"Failed to create Comorbidity with {random_comorbidity}:{e=}"
                     )
 
-                    # create a random number of episodes to a maximum of 5
-        for count_item in range(1, randint(1, 5)):
-            current_cohort_end_date = first_tuesday_in_january(
-                current_cohort_start_date().year + 2
-            ) + relativedelta(days=7)
-            episode = Episode.objects.create(
-                multiaxial_diagnosis=multiaxial_diagnosis,
-                seizure_onset_date=random_date(
-                    start=registration_instance.registration_date
-                    - relativedelta(months=6),
-                    end=date.today(),
-                ),
-                seizure_onset_date_confidence=DATE_ACCURACY[
-                    randint(0, len(DATE_ACCURACY) - 1)
-                ][0],
-                episode_definition=EPISODE_DEFINITION[
-                    randint(0, len(EPISODE_DEFINITION) - 1)
-                ][0],
+                # create a random number of episodes to a maximum of 5
+    for count_item in range(1, randint(2, 5)):
+        episode = Episode.objects.create(
+            multiaxial_diagnosis=multiaxial_diagnosis,
+            seizure_onset_date=random_date(
+                start=registration_instance.registration_date - relativedelta(months=6),
+                end=date.today(),
+            ),
+            seizure_onset_date_confidence=choice(DATE_ACCURACY)[0],
+            episode_definition=choice(EPISODE_DEFINITION)[0],
+        )
+
+        if count_item == 1:
+            # the first episode must be epileptic, subsequent ones are random
+            episode.epilepsy_or_nonepilepsy_status = "E"
+        else:
+            episode.epilepsy_or_nonepilepsy_status = choice(EPILEPSY_DIAGNOSIS_STATUS)[
+                0
+            ]
+
+        episode.has_description_of_the_episode_or_episodes_been_gathered = bool(
+            getrandbits(1)
+        )
+
+        if episode.has_description_of_the_episode_or_episodes_been_gathered:
+            keyword_array = []
+            activity_choices = (
+                "running",
+                "sleeping",
+                "on their way to school",
+                "watching YouTube",
+                "gaming",
             )
+            description_string = f"{registration_instance.case} was "
+            for random_number in range(randint(1, 5)):
+                random_keyword = Keyword.objects.order_by("?").first()
+                keyword_array.append(random_keyword)
 
-            if count_item == 1:
-                # the first episode must be epileptic, subsequent ones are random
-                episode.epilepsy_or_nonepilepsy_status = "E"
-            else:
-                episode.epilepsy_or_nonepilepsy_status = EPILEPSY_DIAGNOSIS_STATUS[
-                    randint(0, len(EPILEPSY_DIAGNOSIS_STATUS) - 1)
-                ][0]
-
-            episode.has_description_of_the_episode_or_episodes_been_gathered = bool(
-                getrandbits(1)
+            description_string += (
+                f"{activity_choices[random_number]} when they developed "
             )
-
-            if episode.has_description_of_the_episode_or_episodes_been_gathered:
-                keyword_array = []
-                activity_choices = (
-                    "running",
-                    "sleeping",
-                    "on their way to school",
-                    "watching YouTube",
-                    "gaming",
-                )
-                description_string = f"{registration_instance.case} was "
-                for random_number in range(randint(1, 5)):
-                    random_keyword = Keyword.objects.order_by("?").first()
-                    keyword_array.append(random_keyword)
-
-                description_string += (
-                    f"{activity_choices[random_number]} when they developed "
-                )
-                for index, semiology_keyword in enumerate(keyword_array):
-                    if index == len(keyword_array) - 1:
-                        description_string += f"and {semiology_keyword}."
-                    else:
-                        description_string += f"{semiology_keyword}, "
-
-                episode.description = description_string
-                episode.description_keywords = keyword_array
-
-            if episode.epilepsy_or_nonepilepsy_status == "E":
-                episode.epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[
-                    randint(0, len(EPILEPSY_SEIZURE_TYPE) - 1)
-                ][0]
-
-                if episode.epileptic_seizure_onset_type == "FO":
-                    laterality = LATERALITY[randint(0, len(LATERALITY) - 1)]
-                    motor_manifestation = FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS[
-                        randint(0, len(FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS) - 1)
-                    ]
-                    nonmotor_manifestation = FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS[
-                        randint(0, len(FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS) - 1)
-                    ]
-                    eeg_manifestations = FOCAL_EPILEPSY_EEG_MANIFESTATIONS[
-                        randint(0, len(FOCAL_EPILEPSY_EEG_MANIFESTATIONS) - 1)
-                    ]
-                    setattr(episode, laterality["name"], True)
-                    setattr(episode, motor_manifestation["name"], True)
-                    setattr(episode, nonmotor_manifestation["name"], True)
-                    setattr(episode, eeg_manifestations["name"], True)
-
-                elif episode.epileptic_seizure_onset_type == "GO":
-                    episode.epileptic_generalised_onset = GENERALISED_SEIZURE_TYPE[
-                        randint(0, len(GENERALISED_SEIZURE_TYPE) - 1)
-                    ][0]
-
-            elif episode.epilepsy_or_nonepilepsy_status == "NE":
-                episode.nonepileptic_seizure_unknown_onset = NON_EPILEPSY_SEIZURE_ONSET[
-                    randint(0, len(NON_EPILEPSY_SEIZURE_ONSET) - 1)
-                ][0]
-                episode.nonepileptic_seizure_type = NON_EPILEPSY_SEIZURE_TYPE[
-                    randint(0, len(NON_EPILEPSY_SEIZURE_TYPE) - 1)
-                ][0]
-
-                if episode.nonepileptic_seizure_type == "BPP":
-                    episode.nonepileptic_seizure_behavioural = (
-                        NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS[
-                            len(NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS) - 1
-                        ][0]
-                    )
-                elif episode.nonepileptic_seizure_type == "MAD":
-                    episode.nonepileptic_seizure_migraine = MIGRAINES[
-                        len(MIGRAINES) - 1
-                    ][0]
-                elif episode.nonepileptic_seizure_type == "ME":
-                    episode.nonepileptic_seizure_miscellaneous = EPIS_MISC[
-                        len(EPIS_MISC) - 1
-                    ][0]
-                elif episode.nonepileptic_seizure_type == "SRC":
-                    episode.nonepileptic_seizure_sleep = (
-                        NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS[
-                            len(NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS) - 1
-                        ][0]
-                    )
-                elif episode.nonepileptic_seizure_type == "SAS":
-                    episode.nonepileptic_seizure_syncope = NON_EPILEPTIC_SYNCOPES[
-                        len(NON_EPILEPTIC_SYNCOPES) - 1
-                    ][0]
-                elif episode.nonepileptic_seizure_type == "PMD":
-                    episode.nonepileptic_seizure_paroxysmal = NON_EPILEPSY_PAROXYSMS[
-                        len(NON_EPILEPSY_PAROXYSMS) - 1
-                    ][0]
+            for index, semiology_keyword in enumerate(keyword_array):
+                if index == len(keyword_array) - 1:
+                    description_string += f"and {semiology_keyword}."
                 else:
-                    pass
+                    description_string += f"{semiology_keyword}, "
 
-            episode.save()
+            episode.description = description_string
+            episode.description_keywords = keyword_array
+
+        if episode.epilepsy_or_nonepilepsy_status == "E":
+            episode.epileptic_seizure_onset_type = choice(EPILEPSY_SEIZURE_TYPE)[0]
+
+            if episode.epileptic_seizure_onset_type == "FO":
+                laterality = choice(LATERALITY)
+                motor_manifestation = choice(FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS)
+                nonmotor_manifestation = choice(FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS)
+                eeg_manifestations = choice(FOCAL_EPILEPSY_EEG_MANIFESTATIONS)
+                setattr(episode, laterality["name"], True)
+                setattr(episode, motor_manifestation["name"], True)
+                setattr(episode, nonmotor_manifestation["name"], True)
+                setattr(episode, eeg_manifestations["name"], True)
+
+            elif episode.epileptic_seizure_onset_type == "GO":
+                episode.epileptic_generalised_onset = GENERALISED_SEIZURE_TYPE[
+                    randint(0, len(GENERALISED_SEIZURE_TYPE) - 1)
+                ][0]
+
+        elif episode.epilepsy_or_nonepilepsy_status == "NE":
+            episode.nonepileptic_seizure_unknown_onset = choice(
+                NON_EPILEPSY_SEIZURE_ONSET
+            )[0]
+            episode.nonepileptic_seizure_type = choice(NON_EPILEPSY_SEIZURE_TYPE)[0]
+
+            if episode.nonepileptic_seizure_type == "BPP":
+                episode.nonepileptic_seizure_behavioural = choice(
+                    NON_EPILEPSY_BEHAVIOURAL_ARREST_SYMPTOMS
+                )[0]
+            elif episode.nonepileptic_seizure_type == "MAD":
+                episode.nonepileptic_seizure_migraine = choice(MIGRAINES)[0]
+            elif episode.nonepileptic_seizure_type == "ME":
+                episode.nonepileptic_seizure_miscellaneous = choice(EPIS_MISC)[0]
+            elif episode.nonepileptic_seizure_type == "SRC":
+                episode.nonepileptic_seizure_sleep = choice(
+                    NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS
+                )[0]
+            elif episode.nonepileptic_seizure_type == "SAS":
+                episode.nonepileptic_seizure_syncope = choice(NON_EPILEPTIC_SYNCOPES)[0]
+            elif episode.nonepileptic_seizure_type == "PMD":
+                episode.nonepileptic_seizure_paroxysmal = choice(
+                    NON_EPILEPSY_PAROXYSMS
+                )[0]
+            else:
+                pass
+
+        episode.save()
 
         multiaxial_diagnosis.save()
         return multiaxial_diagnosis
     else:
-        if verbose: print(
-            f"Multiaxial diagnosis exists for {registration_instance.case}. Skipping..."
-        )
+        if verbose:
+            print(
+                f"Multiaxial diagnosis exists for {registration_instance.case}. Skipping..."
+            )
         return registration_instance.multiaxialdiagnosis
 
 
@@ -504,7 +482,7 @@ def create_assessment(registration_instance, verbose=True):
                     case=registration_instance.case,
                     organisation=random_organisation,
                 ).get()
-                site.site_is_general_paediatric_centre = True
+                site.site_is_paediatric_neurology_centre = True
                 site.save()
             else:
                 Site.objects.create(
@@ -533,7 +511,7 @@ def create_assessment(registration_instance, verbose=True):
                     case=registration_instance.case,
                     organisation=random_organisation,
                 ).get()
-                site.site_is_general_paediatric_centre = True
+                site.site_is_childrens_epilepsy_surgery_centre = True
                 site.save()
             else:
                 Site.objects.create(
@@ -555,7 +533,8 @@ def create_assessment(registration_instance, verbose=True):
         assessment.save()
         return assessment
     else:
-        if verbose: print(f"Assessment exists for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(f"Assessment exists for {registration_instance.case}. Skipping...")
         return registration_instance.assessment
 
 
@@ -589,7 +568,8 @@ def create_investigations(registration_instance, verbose=True):
         investigations.save()
         return investigations
     else:
-        if verbose: print(f"Investigations exist for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(f"Investigations exist for {registration_instance.case}. Skipping...")
         return registration_instance.investigations
 
 
@@ -606,7 +586,7 @@ def create_management(registration_instance, verbose=True):
         )
 
         if management.has_an_aed_been_given:
-            for count_item in range(1, randint(1, 3)):
+            for count_item in range(0, randint(1, 3)):
                 # add a random number of medicines up to a total of 3
                 random_medicine = (
                     MedicineEntity.objects.filter(is_rescue=False).order_by("?").first()
@@ -634,14 +614,19 @@ def create_management(registration_instance, verbose=True):
                             antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed = bool(
                                 getrandbits(1)
                             )
-                            antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed
-                            antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = bool(
-                                getrandbits(1)
-                            )
+                            if (
+                                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_needed
+                            ):
+                                antiepilepsy_medicine.has_a_valproate_annual_risk_acknowledgement_form_been_completed = bool(
+                                    getrandbits(1)
+                                )
+                                antiepilepsy_medicine.is_a_pregnancy_prevention_programme_in_place = bool(
+                                    getrandbits(1)
+                                )
                 antiepilepsy_medicine.save()
 
         if management.has_rescue_medication_been_prescribed:
-            for count_item in range(1, randint(1, 3)):
+            for count_item in range(1, randint(2, 3)):
                 # add a random number of medicines up to a total of 3
                 random_medicine = (
                     MedicineEntity.objects.filter(is_rescue=True).order_by("?").first()
@@ -656,7 +641,8 @@ def create_management(registration_instance, verbose=True):
                     medicine_entity=random_medicine,
                 )
     else:
-        if verbose: print(f"Management exists for {registration_instance.case}. Skipping...")
+        if verbose:
+            print(f"Management exists for {registration_instance.case}. Skipping...")
         return registration_instance.management
 
     if management.individualised_care_plan_in_place:
@@ -684,8 +670,9 @@ def create_management(registration_instance, verbose=True):
         management.has_individualised_care_plan_been_updated_in_the_last_year = bool(
             getrandbits(1)
         )
-        management.has_been_referred_for_mental_health_support = bool(getrandbits(1))
-        management.has_support_for_mental_health_support = bool(getrandbits(1))
+
+    management.has_been_referred_for_mental_health_support = bool(getrandbits(1))
+    management.has_support_for_mental_health_support = bool(getrandbits(1))
 
     management.save()
     return management
