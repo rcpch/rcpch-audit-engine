@@ -506,11 +506,13 @@ def score_kpi_9Ai(registration_instance) -> int:
     else:
         return KPI_SCORE["FAIL"]
 
+
 def score_kpi_9Aii(registration_instance) -> int:
     """ii patient_carer_parent_agreement_to_the_care_planning
     % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
-    Denominator = Number of children and young people diagnosed with epilepsy at first year"""
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
 
     management = registration_instance.management
 
@@ -524,12 +526,14 @@ def score_kpi_9Aii(registration_instance) -> int:
     else:
         return KPI_SCORE["FAIL"]
 
+
 def score_kpi_9Aiii(registration_instance) -> int:
     """iii. care_planning_has_been_updated_when_necessary
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
-    Denominator = Number of children and young people diagnosed with epilepsy at first year"""
-    
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
     management = registration_instance.management
 
     # unscored
@@ -542,13 +546,15 @@ def score_kpi_9Aiii(registration_instance) -> int:
     else:
         return KPI_SCORE["FAIL"]
 
+
 def score_kpi_9B(registration_instance) -> int:
     """9B. comprehensive_care_planning_content
     Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
-    Denominator = Number of children and young people diagnosed with epilepsy at first year"""
-    
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
     management = registration_instance.management
 
     fields_not_filled = [
@@ -557,7 +563,10 @@ def score_kpi_9B(registration_instance) -> int:
         (management.individualised_care_plan_include_first_aid is None),
         (management.individualised_care_plan_addresses_water_safety is None),
         (management.individualised_care_plan_includes_service_contact_details is None),
-        (management.individualised_care_plan_includes_general_participation_risk is None),
+        (
+            management.individualised_care_plan_includes_general_participation_risk
+            is None
+        ),
         (management.individualised_care_plan_addresses_sudep is None),
     ]
 
@@ -572,7 +581,10 @@ def score_kpi_9B(registration_instance) -> int:
         (management.individualised_care_plan_include_first_aid is True),
         (management.individualised_care_plan_addresses_water_safety is True),
         (management.individualised_care_plan_includes_service_contact_details is True),
-        (management.individualised_care_plan_includes_general_participation_risk is True),
+        (
+            management.individualised_care_plan_includes_general_participation_risk
+            is True
+        ),
         (management.individualised_care_plan_addresses_sudep is True),
     ]
 
@@ -580,7 +592,170 @@ def score_kpi_9B(registration_instance) -> int:
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]
-    
+
+
+def score_kpi_9Bi(registration_instance) -> int:
+    """9Bi. parental_prolonged_seizures_care_plan
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
+    Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
+    """
+
+    management = registration_instance.management
+
+    fields_not_filled = [
+        (management.has_rescue_medication_been_prescribed is None),
+        (management.individualised_care_plan_parental_prolonged_seizure_care is None),
+    ]
+
+    # unscored
+    if any(fields_not_filled):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # ineligible
+    if management.has_rescue_medication_been_prescribed is False:
+        return KPI_SCORE["INELIGIBLE"]
+
+    # score kpi
+    if management.individualised_care_plan_parental_prolonged_seizure_care is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_9Bii(registration_instance) -> int:
+    """ii. water_safety
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
+    management = registration_instance.management
+
+    # unscored
+    if management.individualised_care_plan_addresses_water_safety is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.individualised_care_plan_addresses_water_safety is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_9Biii(registration_instance) -> int:
+    """# iii. first_aid
+    # Calculation Method
+    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
+    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
+    management = registration_instance.management
+
+    # unscored
+    if management.individualised_care_plan_include_first_aid is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.individualised_care_plan_include_first_aid is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_9Biv(registration_instance) -> int:
+    """iv. general_participation_and_risk
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
+    management = registration_instance.management
+
+    # unscored
+    if management.individualised_care_plan_includes_general_participation_risk is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.individualised_care_plan_includes_general_participation_risk is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_9Bv(registration_instance) -> int:
+    """v. service_contact_details
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
+    management = registration_instance.management
+
+    # unscored
+    if management.individualised_care_plan_includes_service_contact_details is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.individualised_care_plan_includes_service_contact_details is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_9Bvi(registration_instance) -> int:
+    """vi. sudep
+    Calculation Method
+    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
+    Denominator = Number of children diagnosed with epilepsy at first year"""
+
+    management = registration_instance.management
+
+    fields_not_filled = [
+        (management.individualised_care_plan_parental_prolonged_seizure_care is None),
+        (management.individualised_care_plan_addresses_sudep is None),
+    ]
+
+    # unscored
+    if any(fields_not_filled):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    pass_criteria = [
+        (management.individualised_care_plan_parental_prolonged_seizure_care is True),
+        (management.individualised_care_plan_addresses_sudep is True),
+    ]
+
+    if all(pass_criteria):
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_10(registration_instance, age_at_first_paediatric_assessment) -> int:
+    """10. school_individual_healthcare_plan
+    Percentage of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.
+    Calculation Method
+    Numerator = Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
+    Denominator =Number of children and young people aged 5 years and above diagnosed with epilepsy at first year
+    """
+
+    management = registration_instance.management
+
+    # ineligible
+    if age_at_first_paediatric_assessment < 5:
+        return KPI_SCORE["INELIGIBLE"]
+
+    # unscored
+    if management.individualised_care_plan_includes_ehcp is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.individualised_care_plan_includes_ehcp is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
 
 def calculate_kpis(registration_instance):
     """
@@ -652,131 +827,42 @@ def calculate_kpis(registration_instance):
 
     if hasattr(registration_instance, "management"):
         patient_carer_parent_agreement_to_the_care_planning = score_kpi_9Aii(
-                registration_instance
-            )
-        
+            registration_instance
+        )
+
     if hasattr(registration_instance, "management"):
         care_planning_has_been_updated_when_necessary = score_kpi_9Aiii(
-                registration_instance
-            )
-        
+            registration_instance
+        )
+
+    if hasattr(registration_instance, "management"):
+        comprehensive_care_planning_content = score_kpi_9B(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        parental_prolonged_seizures_care_plan = score_kpi_9Bi(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        water_safety = score_kpi_9Bii(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        first_aid = score_kpi_9Biii(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        general_participation_and_risk = score_kpi_9Biv(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        service_contact_details = score_kpi_9Bv(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        sudep = score_kpi_9Bvi(registration_instance)
+
+    if hasattr(registration_instance, "management"):
+        school_individual_healthcare_plan = score_kpi_10(
+            registration_instance, age_at_first_paediatric_assessment
+        )
 
     
-
-    if hasattr(registration_instance, "management"):
-        comprehensive_care_planning_content = score_kpi_9B(
-                    registration_instance
-                )
-        
-
-    # i. parental_prolonged_seizures_care_plan
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
-
-    parental_prolonged_seizures_care_plan = None
-    if hasattr(registration_instance, "management"):
-        # denominator
-        if registration_instance.management.has_rescue_medication_been_prescribed:
-            # eligible for this measure
-            parental_prolonged_seizures_care_plan = 0
-            if (
-                registration_instance.management.has_rescue_medication_been_prescribed
-                and registration_instance.management.individualised_care_plan_parental_prolonged_seizure_care
-            ):
-                # criteria met
-                parental_prolonged_seizures_care_plan = 1
-        else:
-            # not eligible for this measure
-            parental_prolonged_seizures_care_plan = 2
-
-    # ii. water_safety
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-    water_safety = 0
-    if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.individualised_care_plan_addresses_water_safety
-        ):
-            water_safety = 1
-
-    # iii. first_aid
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-
-    first_aid = 0
-    if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if registration_instance.management.individualised_care_plan_include_first_aid:
-            first_aid = 1
-
-    # iv. general_participation_and_risk
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-
-    general_participation_and_risk = 0
-    if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.individualised_care_plan_includes_general_participation_risk
-        ):
-            general_participation_and_risk = 1
-
-    # v. service_contact_details
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-
-    service_contact_details = 0
-    if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.individualised_care_plan_includes_service_contact_details
-        ):
-            service_contact_details = 1
-
-    # vi. sudep
-    # Calculation Method
-    # Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
-    # Denominator = Number of children diagnosed with epilepsy at first year
-
-    sudep = 0
-    if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.individualised_care_plan_parental_prolonged_seizure_care
-            and registration_instance.management.individualised_care_plan_addresses_sudep
-        ):
-            sudep = 1
-
-    # 10. school_individual_healthcare_plan
-    # Percentage of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.
-    # Calculation Method
-    # Numerator = Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
-    # Denominator =Number of children and young people aged 5 years and above diagnosed with epilepsy at first year
-
-    school_individual_healthcare_plan = None
-    if hasattr(registration_instance, "management"):
-        # denominator
-        if age_at_first_paediatric_assessment >= 5:
-            # eligible for this measure
-            school_individual_healthcare_plan = 0
-            if (age_at_first_paediatric_assessment >= 5) and (
-                registration_instance.management.individualised_care_plan_includes_ehcp
-            ):
-                school_individual_healthcare_plan = 1
-        else:
-            # not eligible for this measure
-            school_individual_healthcare_plan = 2
-
-    """
-    Store the KPIs in AuditProgress
-    """
-
+    # Store the KPIs in AuditProgress
     kpis = {
         "paediatrician_with_expertise_in_epilepsies": paediatrician_with_expertise_in_epilepsies,
         "epilepsy_specialist_nurse": epilepsy_specialist_nurse,
