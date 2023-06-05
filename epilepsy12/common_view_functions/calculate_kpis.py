@@ -271,6 +271,58 @@ def score_kpi_4(registration_instance) -> int:
         return KPI_SCORE["FAIL"]
 
 
+def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> int:
+    """5. MRI
+
+    Calculation Method
+
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
+
+    Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under 2 years  at first assessment with a diagnosis of epilepsy at first year))
+    """
+    multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
+    investigations = registration_instance.investigations
+
+    # not scored
+    if multiaxial_diagnosis.syndrome_present is None:
+        return KPI_SCORE["NOT_SCORED"]
+    
+    # ineligible
+    if age_at_first_paediatric_assessment >= 2:
+        return KPI_SCORE["INELIGIBLE"]
+    ineligible_syndrome_present = Syndrome.objects.filter(
+        Q(multiaxial_diagnosis=multiaxial_diagnosis)
+        &
+        # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
+        Q(
+            syndrome__syndrome_name__in=[
+                "Self-limited epilepsy with centrotemporal spikes",
+                "Juvenile myoclonic epilepsy",
+                "Juvenile absence epilepsy",
+                "Childhood absence epilepsy",
+            ]
+        )
+    ).exists()
+    if ineligible_syndrome_present:
+        return KPI_SCORE["INELIGIBLE"]
+    
+    # not scored
+    mri_dates_are_none = [
+        (investigations.mri_brain_requested_date is None),
+        (investigations.mri_brain_reported_date is None),
+    ]
+    if any(mri_dates_are_none):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # eligible for this measure - score kpi
+    passing_criteria_met = abs((investigations.mri_brain_requested_date - investigations.mri_brain_reported_date).days) <= 42
+    
+    if passing_criteria_met:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
 def calculate_kpis(registration_instance):
     """
     Function called on update of every field
@@ -313,66 +365,10 @@ def calculate_kpis(registration_instance):
     if has_all_attributes(registration_instance, ["epilepsycontext", "investigations"]):
         ecg = score_kpi_4(registration_instance)
 
-    # 5. MRI
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under 2 years  at first assessment with a diagnosis of epilepsy at first year))
-    mri = None
-    if hasattr(registration_instance, "multiaxialdiagnosis") and hasattr(
-        registration_instance, "investigations"
+    if has_all_attributes(
+        registration_instance, ["multiaxialdiagnosis", "investigations"]
     ):
-        # denominator
-        if (
-            registration_instance.multiaxialdiagnosis.syndrome_present
-            and Syndrome.objects.filter(
-                Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis)
-                &
-                # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                ~Q(
-                    syndrome__syndrome_name__in=[
-                        "Self-limited epilepsy with centrotemporal spikes",
-                        "Juvenile myoclonic epilepsy",
-                        "Juvenile absence epilepsy",
-                        "Childhood absence epilepsy",
-                    ]
-                )
-            ).exists()
-            or age_at_first_paediatric_assessment <= 2
-        ) and (
-            registration_instance.investigations.mri_brain_requested_date is not None
-            and registration_instance.investigations.mri_brain_reported_date is not None
-        ):
-            # eligible for this measure
-            mri = 0
-            if (
-                registration_instance.multiaxialdiagnosis.syndrome_present
-                and Syndrome.objects.filter(
-                    Q(multiaxial_diagnosis=registration_instance.multiaxialdiagnosis)
-                    &
-                    # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-                    ~Q(
-                        syndrome__syndrome_name__in=[
-                            "Self-limited epilepsy with centrotemporal spikes",
-                            "Juvenile myoclonic epilepsy",
-                            "Juvenile absence epilepsy",
-                            "Childhood absence epilepsy",
-                        ]
-                    )
-                ).exists()
-                or age_at_first_paediatric_assessment <= 2
-            ) and (
-                registration_instance.investigations.mri_brain_reported_date
-                <= (
-                    registration_instance.investigations.mri_brain_requested_date
-                    + relativedelta(days=42)
-                )
-            ):
-                # criteria met
-                mri = 1
-
-        else:
-            # not eligible for this measure
-            mri = 2
+        mri = score_kpi_5(registration_instance, age_at_first_paediatric_assessment)
 
     # 6. assessment_of_mental_health_issues
     # Calculation Method

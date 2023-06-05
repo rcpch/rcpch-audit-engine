@@ -31,6 +31,7 @@ from epilepsy12.models import (
     KPI,
     Syndrome,
     SyndromeEntity,
+    MultiaxialDiagnosis,
 )
 from epilepsy12.constants import (
     KPI_SCORE,
@@ -38,27 +39,26 @@ from epilepsy12.constants import (
 )
 
 
-@pytest.mark.xfail
 @pytest.mark.parametrize(
     "DATE_OF_BIRTH,REGISTRATION_DATE,TIMELY_MRI,EXPECTED_SCORE",
     [
         (
-            # 2yo, MRI done within 6 weeks of refer
+            # <2yo, MRI done within 6 weeks of refer
             date(2022, 1, 1),
-            date(2024, 1, 1),
+            date(2023, 12, 31),
             True,
             KPI_SCORE["PASS"],
         ),
         (  # 2yo, MRI NOT done within 6 weeks of refer
             date(2022, 1, 1),
-            date(2024, 1, 1),
+            date(2023, 12, 31),
             False,
             KPI_SCORE["FAIL"],
         ),
         (
-            # 2y1day, ineligible
+            # 2yo, ineligible
             date(2022, 1, 1),
-            date(2024, 1, 2),
+            date(2024, 1, 1),
             True,
             KPI_SCORE["INELIGIBLE"],
         ),
@@ -110,7 +110,7 @@ def test_measure_4_mri_under2yo(
         ), f"Not <= 2yo so ineligible for measure, wrong KPI scoring"
 
 
-@pytest.mark.xfail
+
 @pytest.mark.parametrize(
     "TIMELY_MRI,EXPECTED_SCORE",
     [
@@ -141,14 +141,19 @@ def test_measure_4_mri_syndromes_pass_fail(
 
     MRI_REPORTED_DATE = MRI_REQUESTED_DATE + relativedelta(weeks=6)
     if not TIMELY_MRI:
-        MRI_REPORTED_DATE = MRI_REQUESTED_DATE + relativedelta(weeks=6, days=1)
+        MRI_REPORTED_DATE += relativedelta(days=1)
 
     case = e12_case_factory(
         registration__registration_date=REGISTRATION_DATE,
         registration__investigations__mri_brain_requested_date=MRI_REQUESTED_DATE,
         registration__investigations__mri_brain_reported_date=MRI_REPORTED_DATE,
     )
-
+    
+    # set syndrome present to False
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(registration=case.registration)
+    multiaxial_diagnosis.syndrome_present = False
+    multiaxial_diagnosis.save()
+    
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
@@ -157,7 +162,7 @@ def test_measure_4_mri_syndromes_pass_fail(
         Q(multiaxial_diagnosis=registration.multiaxialdiagnosis)
         &
         # ELECTROCLINICAL SYNDROMES: BECTS/JME/JAE/CAE currently not included
-        ~Q(
+        Q(
             syndrome__syndrome_name__in=[
                 "Self-limited epilepsy with centrotemporal spikes",
                 "Juvenile myoclonic epilepsy",
@@ -169,6 +174,8 @@ def test_measure_4_mri_syndromes_pass_fail(
     # remove syndromes to ensure just testing pass/fail
     if relevant_syndromes.exists():
         relevant_syndromes.delete()
+    
+
 
     calculate_kpis(registration_instance=registration)
 
@@ -185,7 +192,7 @@ def test_measure_4_mri_syndromes_pass_fail(
         ), f"None of JME or JAE or CAE or CECTS/Rolandi present, MRI booked > 6 weeks but not failing measure"
 
 
-@pytest.mark.xfail
+
 @pytest.mark.parametrize(
     "SYNDROME_TYPE_PRESENT",
     [
@@ -206,6 +213,11 @@ def test_measure_4_mri_syndromes_ineligible(
     """
 
     case = e12_case_factory()
+    
+    # set syndrome present to True
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(registration=case.registration)
+    multiaxial_diagnosis.syndrome_present = True
+    multiaxial_diagnosis.save()
 
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
