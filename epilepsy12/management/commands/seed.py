@@ -43,12 +43,12 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options["cases"]:
+        if options["mode"] == "cases":
             cases = options["cases"]
             self.stdout.write("seeding with dummy case data...")
             run_dummy_cases_seed(cases=cases)
 
-        if options["mode"] == "seed_registrations":
+        elif options["mode"] == "seed_registrations":
             self.stdout.write(
                 "register cases in audit and complete all fields with random answers..."
             )
