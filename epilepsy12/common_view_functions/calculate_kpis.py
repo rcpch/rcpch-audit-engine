@@ -379,7 +379,7 @@ def score_kpi_7(registration_instance) -> int:
     # ineligible
     if multiaxial_diagnosis.mental_health_issue_identified is False:
         return KPI_SCORE["INELIGIBLE"]
-    
+
     # not scored
     if management.has_support_for_mental_health_support is None:
         return KPI_SCORE["NOT_SCORED"]
@@ -405,28 +405,106 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
     # ineligible - < 12yo or male
     if age_at_first_paediatric_assessment < 12 or registration_instance.case.sex != 2:
         return KPI_SCORE["INELIGIBLE"]
-    
+
     # not scored
     if registration_instance.management.has_an_aed_been_given is None:
         return KPI_SCORE["NOT_SCORED"]
-    
+
     # ineligible
     if not AntiEpilepsyMedicine.objects.filter(
-            management=registration_instance.management,
-            medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate")
-        ).exists():
+        management=registration_instance.management,
+        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+    ).exists():
         return KPI_SCORE["INELIGIBLE"]
-    
+
     # get valproate assigned
     valproate = AntiEpilepsyMedicine.objects.get(
-            management=registration_instance.management,
-            medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"))
-    
-    if valproate.is_a_pregnancy_prevention_programme_needed and valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed:
+        management=registration_instance.management,
+        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+    )
+
+    if (
+        valproate.is_a_pregnancy_prevention_programme_needed
+        and valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
+    ):
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]
-    
+
+
+def score_kpi_9A(registration_instance) -> int:
+    """9A. comprehensive_care_planning_agreement
+
+    % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
+
+    Calculation Method
+
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below
+
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
+    management = registration_instance.management
+
+    fields_not_filled = [
+        (management.individualised_care_plan_in_place is None),
+        (management.has_individualised_care_plan_been_updated_in_the_last_year is None),
+    ]
+
+    # unscored
+    if any(fields_not_filled):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    pass_criteria = [
+        (management.individualised_care_plan_in_place is True),
+        (management.has_individualised_care_plan_been_updated_in_the_last_year is True),
+    ]
+
+    if all(pass_criteria):
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_9Ai(registration_instance) -> int:
+    """i. patient_held_individualised_epilepsy_document
+
+    % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
+
+    Calculation Method
+
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
+
+    Denominator = Number of children and young people diagnosed with epilepsy at first year
+    """
+
+    # not scored
+
+    management = registration_instance.management
+
+    fields_not_filled = [
+        (management.individualised_care_plan_in_place is None),
+        (management.individualised_care_plan_has_parent_carer_child_agreement is None),
+        (management.has_individualised_care_plan_been_updated_in_the_last_year is None),
+    ]
+
+    # unscored
+    if any(fields_not_filled):
+        print(fields_not_filled)
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    pass_criteria = [
+        (management.individualised_care_plan_in_place),
+        (management.individualised_care_plan_has_parent_carer_child_agreement),
+        (management.has_individualised_care_plan_been_updated_in_the_last_year),
+    ]
+
+    if all(pass_criteria):
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
 
 
 def calculate_kpis(registration_instance):
@@ -489,57 +567,13 @@ def calculate_kpis(registration_instance):
             registration_instance, age_at_first_paediatric_assessment
         )
 
-    # 9A. comprehensive_care_planning_agreement
-    # % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-
-    comprehensive_care_planning_agreement = None
     if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.individualised_care_plan_in_place
-            is not None
-            and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
-            is not None
-        ):
-            # eligible for this measure
-            if (
-                registration_instance.management.individualised_care_plan_in_place
-                and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
-            ):
-                # criteria met
-                comprehensive_care_planning_agreement = 1
-            else:
-                comprehensive_care_planning_agreement = 0
+        comprehensive_care_planning_agreement = score_kpi_9A(registration_instance)
 
-    # i. patient_held_individualised_epilepsy_document
-    # % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-
-    patient_held_individualised_epilepsy_document = None
     if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.individualised_care_plan_in_place
-            is not None
-            and registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
-            is not None
-            and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
-            is not None
-        ):
-            if (
-                registration_instance.management.individualised_care_plan_in_place
-                and registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
-                and registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
-            ):
-                # criteria met
-                patient_held_individualised_epilepsy_document = 1
-            else:
-                patient_held_individualised_epilepsy_document = 0
+        patient_held_individualised_epilepsy_document = score_kpi_9Ai(
+            registration_instance
+        )
 
     # ii patient_carer_parent_agreement_to_the_care_planning
     # % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
