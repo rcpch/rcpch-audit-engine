@@ -506,6 +506,41 @@ def score_kpi_9Ai(registration_instance) -> int:
     else:
         return KPI_SCORE["FAIL"]
 
+def score_kpi_9Aii(registration_instance) -> int:
+    """ii patient_carer_parent_agreement_to_the_care_planning
+    % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
+    Denominator = Number of children and young people diagnosed with epilepsy at first year"""
+
+    management = registration_instance.management
+
+    # unscored
+    if management.individualised_care_plan_has_parent_carer_child_agreement is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.individualised_care_plan_has_parent_carer_child_agreement is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+def score_kpi_9Aiii(registration_instance) -> int:
+    """iii. care_planning_has_been_updated_when_necessary
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
+    Denominator = Number of children and young people diagnosed with epilepsy at first year"""
+    
+    management = registration_instance.management
+
+    # unscored
+    if management.has_individualised_care_plan_been_updated_in_the_last_year is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    if management.has_individualised_care_plan_been_updated_in_the_last_year is True:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
 
 def calculate_kpis(registration_instance):
     """
@@ -575,36 +610,18 @@ def calculate_kpis(registration_instance):
             registration_instance
         )
 
-    # ii patient_carer_parent_agreement_to_the_care_planning
-    # % of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-    patient_carer_parent_agreement_to_the_care_planning = None
     if hasattr(registration_instance, "management"):
-        if (
-            registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
-            is not None
-        ):
-            if (
-                registration_instance.management.individualised_care_plan_has_parent_carer_child_agreement
-            ):
-                patient_carer_parent_agreement_to_the_care_planning = 1
-            else:
-                patient_carer_parent_agreement_to_the_care_planning = 0
+        patient_carer_parent_agreement_to_the_care_planning = score_kpi_9Aii(
+                registration_instance
+            )
+        
+    
 
-    # iii. care_planning_has_been_updated_when_necessary
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
-
-    care_planning_has_been_updated_when_necessary = 0
     if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.has_individualised_care_plan_been_updated_in_the_last_year
-        ):
-            # criteria met
-            care_planning_has_been_updated_when_necessary = 1
+        care_planning_has_been_updated_when_necessary = score_kpi_9Aiii(
+                registration_instance
+            )
+        
 
     # 9B. comprehensive_care_planning_content
     # Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
