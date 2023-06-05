@@ -86,8 +86,8 @@ def selected_organisation_summary(request, organisation_id):
             abstraction_level="trust",
         ).count()
     )
-    # query to return all cases registered in the current cohort at this organisation
-    count_of_current_cohort_registered_cases_in_this_organisation = (
+    # query to return all cases (including incomplete) registered in the current cohort at this organisation
+    count_of_all_current_cohort_registered_cases_in_this_organisation = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
             cohort=cohort_data["cohort"],
@@ -95,8 +95,8 @@ def selected_organisation_summary(request, organisation_id):
             abstraction_level="organisation",
         ).count()
     )
-    # query to return all cases registered in the current cohort at this organisation trust
-    count_of_current_cohort_registered_cases_in_this_trust = (
+    # query to return all cases (including incomplete) registered in the current cohort at this organisation trust
+    count_of_all_current_cohort_registered_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
             cohort=cohort_data["cohort"],
@@ -106,30 +106,29 @@ def selected_organisation_summary(request, organisation_id):
     )
 
     if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0:
-        total_percent_organisation = (
-            round(
-                (
-                    count_of_current_cohort_registered_completed_cases_in_this_organisation
-                    / count_of_current_cohort_registered_cases_in_this_organisation
-                )
+        total_percent_organisation = int(
+            (
+                count_of_current_cohort_registered_completed_cases_in_this_organisation
+                / (count_of_all_current_cohort_registered_cases_in_this_organisation)
             )
-            * 10
+            * 100
         )
+
     else:
         total_percent_organisation = 0
 
-    if count_of_current_cohort_registered_completed_cases_in_this_organisation > 0:
-        total_percent_trust = (
-            round(
-                (
-                    count_of_current_cohort_registered_completed_cases_in_this_organisation
-                    / count_of_current_cohort_registered_cases_in_this_organisation
-                )
+    if count_of_current_cohort_registered_completed_cases_in_this_trust > 0:
+        total_percent_trust = int(
+            (
+                count_of_current_cohort_registered_completed_cases_in_this_trust
+                / (count_of_all_current_cohort_registered_cases_in_this_organisation)
+                * 100
             )
-            * 10
         )
     else:
         total_percent_trust = 0
+
+    print(total_percent_trust)
 
     context = {
         "user": request.user,
@@ -146,9 +145,9 @@ def selected_organisation_summary(request, organisation_id):
         ),
         "percent_completed_organisation": total_percent_organisation,
         "percent_completed_trust": total_percent_trust,
-        "count_of_current_cohort_registered_cases_in_this_organisation": count_of_current_cohort_registered_cases_in_this_organisation,
+        "count_of_all_current_cohort_registered_cases_in_this_organisation": count_of_all_current_cohort_registered_cases_in_this_organisation,
         "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
-        "count_of_current_cohort_registered_cases_in_this_trust": count_of_current_cohort_registered_cases_in_this_trust,
+        "count_of_all_current_cohort_registered_cases_in_this_trust": count_of_all_current_cohort_registered_cases_in_this_organisation,
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "cohort_data": cohort_data,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
