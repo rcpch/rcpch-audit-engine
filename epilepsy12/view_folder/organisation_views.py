@@ -249,28 +249,33 @@ def selected_trust_kpis_open(request, organisation_id):
 
     organisation = Organisation.objects.get(pk=organisation_id)
 
+    # run the aggregations TODO This will need ultimately throttling to run only periodically
+    aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
+        organisation_id=organisation.pk, open_access=True
+    )
+
     # get aggregated KPIs for level of abstraction from KPIAggregation
-    organisation_kpis = KPIAggregation.filter(
+    organisation_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="organisation"
     ).get()
     trust_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="trust"
-    )
+    ).get()
     icb_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="icb"
-    )
+    ).get()
     nhs_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="nhs_region"
-    )
+    ).get()
     open_uk_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="open_uk"
-    )
+    ).get()
     country_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="country"
-    )
+    ).get()
     national_kpis = KPIAggregation.objects.filter(
         organisation=organisation, abstraction_level="national"
-    )
+    ).get()
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
