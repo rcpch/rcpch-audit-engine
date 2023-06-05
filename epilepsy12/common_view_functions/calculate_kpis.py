@@ -542,6 +542,46 @@ def score_kpi_9Aiii(registration_instance) -> int:
     else:
         return KPI_SCORE["FAIL"]
 
+def score_kpi_9B(registration_instance) -> int:
+    """9B. comprehensive_care_planning_content
+    Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
+    Denominator = Number of children and young people diagnosed with epilepsy at first year"""
+    
+    management = registration_instance.management
+
+    fields_not_filled = [
+        (management.has_rescue_medication_been_prescribed is None),
+        (management.individualised_care_plan_parental_prolonged_seizure_care is None),
+        (management.individualised_care_plan_include_first_aid is None),
+        (management.individualised_care_plan_addresses_water_safety is None),
+        (management.individualised_care_plan_includes_service_contact_details is None),
+        (management.individualised_care_plan_includes_general_participation_risk is None),
+        (management.individualised_care_plan_addresses_sudep is None),
+    ]
+
+    # unscored
+    if any(fields_not_filled):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score kpi
+    pass_criteria = [
+        (management.has_rescue_medication_been_prescribed is True),
+        (management.individualised_care_plan_parental_prolonged_seizure_care is True),
+        (management.individualised_care_plan_include_first_aid is True),
+        (management.individualised_care_plan_addresses_water_safety is True),
+        (management.individualised_care_plan_includes_service_contact_details is True),
+        (management.individualised_care_plan_includes_general_participation_risk is True),
+        (management.individualised_care_plan_addresses_sudep is True),
+    ]
+
+    if all(pass_criteria):
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+    
+
 def calculate_kpis(registration_instance):
     """
     Function called on update of every field
@@ -615,34 +655,19 @@ def calculate_kpis(registration_instance):
                 registration_instance
             )
         
-    
-
     if hasattr(registration_instance, "management"):
         care_planning_has_been_updated_when_necessary = score_kpi_9Aiii(
                 registration_instance
             )
         
 
-    # 9B. comprehensive_care_planning_content
-    # Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
-    # Denominator = Number of children and young people diagnosed with epilepsy at first year
+    
 
-    comprehensive_care_planning_content = 0
     if hasattr(registration_instance, "management"):
-        # denominator is all children with epilepsy - no denominator
-        if (
-            registration_instance.management.has_rescue_medication_been_prescribed
-            and registration_instance.management.individualised_care_plan_parental_prolonged_seizure_care
-            and registration_instance.management.individualised_care_plan_include_first_aid
-            and registration_instance.management.individualised_care_plan_addresses_water_safety
-            and registration_instance.management.individualised_care_plan_includes_service_contact_details
-            and registration_instance.management.individualised_care_plan_includes_general_participation_risk
-            and registration_instance.management.individualised_care_plan_addresses_sudep
-        ):
-            # criteria met
-            comprehensive_care_planning_content = 1
+        comprehensive_care_planning_content = score_kpi_9B(
+                    registration_instance
+                )
+        
 
     # i. parental_prolonged_seizures_care_plan
     # Calculation Method
