@@ -203,6 +203,44 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["FAIL"]
 
 
+def score_kpi_3b(registration_instance) -> int:
+    """3b. epilepsy_surgery_referral
+
+    % of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral
+    Calculation Method
+
+    Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral or involvement of CESS]
+
+    Denominator = Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
+    """
+
+    assessment = registration_instance.assessment
+
+    # not scored
+    if assessment.childrens_epilepsy_surgical_service_referral_criteria_met is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # ineligible
+    if assessment.childrens_epilepsy_surgical_service_referral_criteria_met is False:
+        return KPI_SCORE["INELIGIBLE"]
+
+    # not scored
+    if (
+        assessment.childrens_epilepsy_surgical_service_referral_made is None
+        and assessment.paediatric_neurologist_referral_made is None
+    ):
+        return KPI_SCORE["NOT_SCORED"]
+
+    # score KPI
+    if (
+        assessment.childrens_epilepsy_surgical_service_referral_made
+        or assessment.paediatric_neurologist_referral_made
+    ):
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
 def score_kpi_4(registration_instance) -> int:
     """4. ECG
 
@@ -269,41 +307,10 @@ def calculate_kpis(registration_instance):
             registration_instance, age_at_first_paediatric_assessment
         )
 
-    # 3b. epilepsy_surgery_referral
-
-    # % of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral
-    # Calculation Method
-    # Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral or involvement of CESS]
-    # Denominator =Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
-    epilepsy_surgery_referral = None
     if hasattr(registration_instance, "assessment"):
-        # denominator
-        if (
-            registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-        ):
-            # eligible for this measure
-            epilepsy_surgery_referral = 0
-            if (
-                registration_instance.assessment.childrens_epilepsy_surgical_service_referral_criteria_met
-                and (
-                    registration_instance.assessment.childrens_epilepsy_surgical_service_referral_made
-                    is not None
-                    or registration_instance.assessment.childrens_epilepsy_surgical_service_referral_date
-                    is not None
-                    or registration_instance.assessment.childrens_epilepsy_surgical_service_input_date
-                    is not None
-                )
-            ):
-                # criteria met
-                epilepsy_surgery_referral = 1
-        else:
-            # not eligible for this measure
-            epilepsy_surgery_referral = 2
+        epilepsy_surgery_referral = score_kpi_3b(registration_instance)
 
-    ecg = KPI_SCORE["NOT_SCORED"]
-    if hasattr(registration_instance, "epilepsycontext") and hasattr(
-        registration_instance, "investigations"
-    ):
+    if has_all_attributes(registration_instance, ["epilepsycontext", "investigations"]):
         ecg = score_kpi_4(registration_instance)
 
     # 5. MRI
