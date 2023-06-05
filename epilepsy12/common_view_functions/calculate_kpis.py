@@ -286,7 +286,7 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     # not scored
     if multiaxial_diagnosis.syndrome_present is None:
         return KPI_SCORE["NOT_SCORED"]
-    
+
     # ineligible
     if age_at_first_paediatric_assessment >= 2:
         return KPI_SCORE["INELIGIBLE"]
@@ -305,7 +305,7 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     ).exists()
     if ineligible_syndrome_present:
         return KPI_SCORE["INELIGIBLE"]
-    
+
     # not scored
     mri_dates_are_none = [
         (investigations.mri_brain_requested_date is None),
@@ -315,9 +315,43 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["NOT_SCORED"]
 
     # eligible for this measure - score kpi
-    passing_criteria_met = abs((investigations.mri_brain_requested_date - investigations.mri_brain_reported_date).days) <= 42
-    
+    passing_criteria_met = (
+        abs(
+            (
+                investigations.mri_brain_requested_date
+                - investigations.mri_brain_reported_date
+            ).days
+        )
+        <= 42
+    )
+
     if passing_criteria_met:
+        return KPI_SCORE["PASS"]
+    else:
+        return KPI_SCORE["FAIL"]
+
+
+def score_kpi_6(registration_instance, age_at_first_paediatric_assessment) -> int:
+    """6. assessment_of_mental_health_issues
+    Calculation Method
+
+    Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
+
+    Denominator = = Number of children and young people over 5 years diagnosed with epilepsy
+    denominator"""
+
+    multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
+
+    # not scored
+    if multiaxial_diagnosis.mental_health_screen is None:
+        return KPI_SCORE["NOT_SCORED"]
+
+    # ineligible
+    if age_at_first_paediatric_assessment < 5:
+        return KPI_SCORE["INELIGIBLE"]
+
+    # score kpi
+    if multiaxial_diagnosis.mental_health_screen:
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]
@@ -370,24 +404,10 @@ def calculate_kpis(registration_instance):
     ):
         mri = score_kpi_5(registration_instance, age_at_first_paediatric_assessment)
 
-    # 6. assessment_of_mental_health_issues
-    # Calculation Method
-    # Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
-    # Denominator = = Number of children and young people over 5 years diagnosed with epilepsy
-    assessment_of_mental_health_issues = None
     if hasattr(registration_instance, "multiaxialdiagnosis"):
-        # denominator
-        if age_at_first_paediatric_assessment >= 5:
-            # eligible for this measure
-            assessment_of_mental_health_issues = 0
-            if (age_at_first_paediatric_assessment >= 5) and (
-                registration_instance.multiaxialdiagnosis.mental_health_screen
-            ):
-                # criteria met
-                assessment_of_mental_health_issues = 1
-        else:
-            # not eligible for this measure
-            assessment_of_mental_health_issues = 2
+        assessment_of_mental_health_issues = score_kpi_6(
+            registration_instance, age_at_first_paediatric_assessment
+        )
 
     # 7. mental_health_support
     # Percentage of children with epilepsy and a mental health problem who have evidence of mental health support
