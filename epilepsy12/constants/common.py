@@ -1,14 +1,14 @@
 # Common selectors
 
 SECTION_STATUS_CHOICES = (
-        (-1, "Not Set"),
-        (0, "Not saved"),
-        (5, "Disabled"),
-        (10, "Complete"),
-        (20, "Incomplete"),
-        (30, "Errors"),
-        (60, "TransferredIn"),
-        (70, "TransferredOut"),
+    (-1, "Not Set"),
+    (0, "Not saved"),
+    (5, "Disabled"),
+    (10, "Complete"),
+    (20, "Incomplete"),
+    (30, "Errors"),
+    (60, "TransferredIn"),
+    (70, "TransferredOut"),
 )
 
 # ASSESSMENT=(
@@ -25,46 +25,34 @@ SECTION_STATUS_CHOICES = (
 #         (10, "10th year of care")
 #     )
 
-OPT_OUT = (
-    ("Y","Yes"),
-    ("N", "No")
-)
+OPT_OUT = (("Y", "Yes"), ("N", "No"))
 
-OPT_OUT_UNCERTAIN = (
-    ("Y","Yes"),
-    ("N", "No"),
-    ("U","Uncertain")
-)
+OPT_OUT_UNCERTAIN = (("Y", "Yes"), ("N", "No"), ("U", "Uncertain"))
 
-CHECKED_STATUS = (
-    (1, "Checked"), 
-    (2,"Unchecked")
-)
+CHECKED_STATUS = ((1, "Checked"), (2, "Unchecked"))
 
-SEX_TYPE=( 
+SEX_TYPE = (
     # This definition has been updated based on NHS standards
     # (cf https://www.datadictionary.nhs.uk/attributes/person_gender_code.html)
     (0, "Not Known"),
     (1, "Male"),
     (2, "Female"),
-    (9, "Not Specified")
+    (9, "Not Specified"),
 )
 
-CHRONICITY=(
-    (1, "Acute"), 
-    (2, "Non-acute"), 
-    (3, "Don't know")
+CHRONICITY = ((1, "Acute"), (2, "Non-acute"), (3, "Don't know"))
+
+DISORDER_SEVERITY = (
+    ("Mil", "Mild"),
+    ("Mod", "Moderate"),
+    ("Sev", "Severe"),
+    ("Pro", "Profound"),
 )
 
-DISORDER_SEVERITY=(
-    ("Mil", "Mild"), 
-    ("Mod", "Moderate"), 
-    ("Sev", "Severe"), 
-    ("Pro", "Profound")
+DATE_ACCURACY = (
+    ("Apx", "Approximate date"),
+    ("Exc", "Exact date"),
+    ("NK", "Not known"),
 )
 
-DATE_ACCURACY=(
-    ("Apx", "Approximate date"), 
-    ("Exc", "Exact date"), 
-    ("NK", "Not known")
-)
+DEPRIVATION_QUINTILES = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (None, 6))
