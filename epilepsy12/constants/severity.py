@@ -1,8 +1,8 @@
-MILD = (1, "Mild")
-MODERATE = (2, "Moderate")
-SEVERE = (3, "Severe")
-PROFOUND = (4, "Profound")
-UNCERTAIN = (5, "Uncertain")
+MILD = ("mild", "Mild")
+MODERATE = ("moderate", "Moderate")
+SEVERE = ("severe", "Severe")
+PROFOUND = ("profound", "Profound")
+UNCERTAIN = ("uncertain", "Uncertain")
 
 SEVERITY = (
     MILD,
