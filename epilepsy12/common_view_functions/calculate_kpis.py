@@ -31,6 +31,7 @@ from .calculate_kpi_functions import (
     check_is_registered,
 )
 from epilepsy12.models import KPI
+from epilepsy12.constants import KPI_SCORE
 
 
 def calculate_kpis(registration_instance):
@@ -44,6 +45,29 @@ def calculate_kpis(registration_instance):
     2 - measure not applicable (eg ECG in nonconvulsive seizure)
     None - measure not scored yet
     """
+    
+    # first set default value 'NOT_SCORED' to all KPIs
+    paediatrician_with_expertise_in_epilepsies = KPI_SCORE["NOT_SCORED"]
+    epilepsy_specialist_nurse = KPI_SCORE["NOT_SCORED"]
+    tertiary_input = KPI_SCORE["NOT_SCORED"]
+    epilepsy_surgery_referral = KPI_SCORE["NOT_SCORED"]
+    ecg = KPI_SCORE["NOT_SCORED"]
+    mri = KPI_SCORE["NOT_SCORED"]
+    assessment_of_mental_health_issues = KPI_SCORE["NOT_SCORED"]
+    mental_health_support = KPI_SCORE["NOT_SCORED"]
+    sodium_valproate = KPI_SCORE["NOT_SCORED"]
+    comprehensive_care_planning_agreement = KPI_SCORE["NOT_SCORED"]
+    patient_held_individualised_epilepsy_document = KPI_SCORE["NOT_SCORED"]
+    patient_carer_parent_agreement_to_the_care_planning = KPI_SCORE["NOT_SCORED"]
+    care_planning_has_been_updated_when_necessary = KPI_SCORE["NOT_SCORED"]
+    comprehensive_care_planning_content = KPI_SCORE["NOT_SCORED"]
+    parental_prolonged_seizures_care_plan = KPI_SCORE["NOT_SCORED"]
+    water_safety = KPI_SCORE["NOT_SCORED"]
+    first_aid = KPI_SCORE["NOT_SCORED"]
+    general_participation_and_risk = KPI_SCORE["NOT_SCORED"]
+    service_contact_details = KPI_SCORE["NOT_SCORED"]
+    sudep = KPI_SCORE["NOT_SCORED"]
+    school_individual_healthcare_plan = KPI_SCORE["NOT_SCORED"]
 
     # important metric for calculations that follow
     age_at_first_paediatric_assessment = (
