@@ -12,13 +12,17 @@ def groups_cases_seeder(django_db_setup, django_db_blocker):
     verbose=False
     """
     with django_db_blocker.unblock():
-        run_dummy_cases_seed(
-            verbose=False # don't print any stdout
-        )
-        run_registrations(
-            verbose=False # don't print any stdout
-        )
-        groups_seeder(
-            run_create_groups=True,
-            verbose=False, # don't print any stdout
-        )
+        # run_dummy_cases_seed(
+        #     verbose=False # don't print any stdout
+        # )
+        # run_registrations(
+        #     verbose=False # don't print any stdout
+        # )
+        # groups_seeder(
+        #     run_create_groups=True,
+        #     verbose=False, # don't print any stdout
+        # )
+        
+        # UNCOMMENT ABOVE IF REQUIRING LOTS OF SEEDED REGISTERED CASES / GROUPS 
+        
+        pass

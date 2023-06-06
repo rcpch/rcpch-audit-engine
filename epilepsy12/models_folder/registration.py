@@ -9,7 +9,7 @@ from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
 from ..constants import CAN_APPROVE_ELIGIBILITY, CAN_REMOVE_APPROVAL_OF_ELIGIBILITY, CAN_REGISTER_CHILD_IN_EPILEPSY12, CAN_UNREGISTER_CHILD_IN_EPILEPSY12, CAN_CONSENT_TO_AUDIT_PARTICIPATION
 from .time_and_user_abstract_base_classes import *
-from ..general_functions import first_tuesday_in_january, cohort_number_from_enrolment_date
+from ..general_functions import nth_tuesday_of_year, cohort_number_from_enrolment_date
 
 
 class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
@@ -44,23 +44,26 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         null=True
     )
 
-    def audit_submission_date_calculation(self):
-        if (self.registration_date):
-            one_year_complete_year = self.registration_date_one_year_on().year
-            second_tuesday_this_year = first_tuesday_in_january(
-                datetime.today().date().year) + relativedelta(days=7)
-            if self.registration_date_one_year_on() <= second_tuesday_this_year:
-                second_tuesday = second_tuesday_this_year
-            else:
-                second_tuesday = first_tuesday_in_january(
-                    one_year_complete_year+1) + relativedelta(days=7)
-            return second_tuesday
-        else:
-            return None
+    def audit_submission_date_calculation(self)->datetime.date:
+        """Returns audit submission date.
+        
+        Defined as registration date + 1 year, and then the first occurring 2nd Tuesday of Jan.
 
-    def registration_date_one_year_on(self):
+        Returns:
+            datetime.date: audit submission date.
+        """
         if (self.registration_date):
-            return self.registration_date+relativedelta(years=1)
+            
+            registration_plus_one_year = self.registration_date + relativedelta(years=1)
+            
+            second_tuesday_next_year = nth_tuesday_of_year(registration_plus_one_year.year, n=2)
+            
+            second_tuesday_two_years = nth_tuesday_of_year(registration_plus_one_year.year+1, n=2)
+            
+            if registration_plus_one_year <= second_tuesday_next_year:
+                return second_tuesday_next_year
+            else:
+                return second_tuesday_two_years
         else:
             return None
 
@@ -88,13 +91,12 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
         return datetime.now().date()
     
     @property
-    def days_remaining_before_submission(self):
+    def days_remaining_before_submission(self)->int:
+        """Returns remaining days between current datetime and submission datetime, minimum value 0.
+        """
         if self.audit_submission_date:
-            today = self.get_current_date()
-            remaining_time = self.audit_submission_date - today
-            if remaining_time.days < 0:
-                return 0
-            return remaining_time.days
+            remaining_dateime = self.audit_submission_date - self.get_current_date()
+            return remaining_dateime.days if remaining_dateime.days > 0 else 0
 
     # relationships
     case = models.OneToOneField(
@@ -128,7 +130,7 @@ class Registration(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpT
 
     def save(self, *args, **kwargs) -> None:
         if self.registration_date is not None:
-            self.registration_close_date = self.registration_date_one_year_on()
+            self.registration_close_date = self.registration_date + relativedelta(years=1)
             self.audit_submission_date = self.audit_submission_date_calculation()
             self.cohort = cohort_number_from_enrolment_date(
                 self.registration_date)

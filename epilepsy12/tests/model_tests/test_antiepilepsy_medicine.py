@@ -1,55 +1,54 @@
-import pytest
+"""Tests for AntieEpilepsyMedicine model
+"""
+# Standard imports
 from datetime import date
-from django.forms import ValidationError
-from epilepsy12.models import AntiEpilepsyMedicine, Management, MedicineEntity, Registration
 
+# Third party imports
+import pytest
 
-@pytest.fixture
-@pytest.mark.django_db
-def registration():
-    """
-    Creates a minimal Registration object instance for the test
-    """
-    return Registration.objects.create()
-
-
-@pytest.fixture
-@pytest.mark.django_db
-def management(registration):
-    """
-    Creates a minimal Management object instance for the test
-    """
-    return Management.objects.create(registration=registration)
-
-
-@pytest.fixture
-@pytest.mark.django_db
-def medicine_entity():
-    """
-    Creates a minimal MedicineEntity object instance for the test
-    """
-    return MedicineEntity.objects.create(medicine_name='Test Medicine')
+# RCPCH imports
+from epilepsy12.models import (
+    AntiEpilepsyMedicine,
+)
 
 
 @pytest.mark.django_db
-def test_length_of_treatment(management, medicine_entity):
-    # Test when both start date and stop date are provided
-    medicine = AntiEpilepsyMedicine.objects.create(
-        management=management,
-        medicine_entity=medicine_entity,
-        antiepilepsy_medicine_start_date=date(2023, 1, 1),
-        antiepilepsy_medicine_stop_date=date(2023, 1, 10)
-    )
-    assert medicine.length_of_treatment == '9 days'
+def test_antiepilepsy_pregnancy_checks_set_only_when_female_child_bearing_age(
+    e12_case_factory,
+):
+    """Testing the AntiEpilepsy factory sets up correctly.
+    
+    Should only set the fields related to pregnancy if:
+        1) case's sex is female
+        2) aed is sodium valproate
+        3) start date of valproate was >= when girl is of child bearing age
+    """
+    management_boy = e12_case_factory(
+        first_name="boy",
+        sex=1,
+        date_of_birth=date(2004, 1, 1),
+    ).registration.management
 
-    # Test when start date and stop date are the same
-    medicine.antiepilepsy_medicine_start_date = date(2023, 2, 1)
-    medicine.antiepilepsy_medicine_stop_date = date(2023, 2, 1)
-    with pytest.raises(Exception):
-        medicine.length_of_treatment
+    management_girl_childbearing = e12_case_factory(
+        first_name="girl",
+        sex=2,
+        date_of_birth=date(2004, 1, 1),
+    ).registration.management
 
-    # Test when stop date is before start date
-    medicine.antiepilepsy_medicine_start_date = date(2023, 3, 1)
-    medicine.antiepilepsy_medicine_stop_date = date(2023, 2, 1)
-    with pytest.raises(ValidationError):
-        medicine.clean()
+    management_girl_NOT_childbearing = e12_case_factory(
+        first_name="girl",
+        sex=2,
+        date_of_birth=date(2022, 1, 1),
+    ).registration.management
+
+    assert not AntiEpilepsyMedicine.objects.filter(management=management_boy)[
+        0
+    ].is_a_pregnancy_prevention_programme_in_place
+
+    assert AntiEpilepsyMedicine.objects.filter(management=management_girl_childbearing)[
+        0
+    ].is_a_pregnancy_prevention_programme_in_place
+
+    assert not AntiEpilepsyMedicine.objects.filter(
+        management=management_girl_NOT_childbearing
+    )[0].is_a_pregnancy_prevention_programme_in_place

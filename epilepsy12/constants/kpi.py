@@ -32,3 +32,9 @@ INDIVIDUAL_KPI_MEASURES = (
          'School individual healthcare plan'),
     )
 )
+KPI_SCORE = {
+    "NOT_SCORED": None,
+    "FAIL": 0,
+    "PASS": 1,
+    "INELIGIBLE": 2,
+}

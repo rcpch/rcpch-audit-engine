@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.gis.db import models
 from simple_history.models import HistoricalRecords
 from .help_text_mixin import HelpTextMixin
@@ -144,6 +146,9 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     @_history_user.setter
     def _history_user(self, value):
         self.updated_by = value
+    
+    def get_current_date(self):
+        return date.today()
 
     def consultant_paediatrician_wait(self):
         """
@@ -158,7 +163,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
                 self.consultant_paediatrician_input_date,
             )
         else:
-            raise ValueError("Both referral and input dates must be provided")
+            return None  # raise ValueError("Both referral and input dates must be provided")
 
     def paediatric_neurologist_wait(self):
         """
@@ -173,7 +178,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
                 self.paediatric_neurologist_input_date,
             )
         else:
-            raise ValueError("Both referral and input dates must be provided")
+            return None  # raise ValueError("Both referral and input dates must be provided")
 
     def childrens_epilepsy_surgery_wait(self):
         """
@@ -188,7 +193,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
                 self.childrens_epilepsy_surgical_service_input_date,
             )
         else:
-            raise ValueError("Both referral and input dates must be provided")
+            return None  # raise ValueError("Both referral and input dates must be provided")
 
     def epilepsy_nurse_specialist_wait(self):
         """
@@ -203,7 +208,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
                 self.epilepsy_specialist_nurse_input_date,
             )
         else:
-            raise ValueError("Both referral and input dates must be provided")
+            return None  # raise ValueError("Both referral and input dates must be provided")
 
     registration = models.OneToOneField(
         "epilepsy12.Registration",

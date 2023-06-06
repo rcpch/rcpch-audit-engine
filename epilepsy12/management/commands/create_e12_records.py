@@ -60,7 +60,7 @@ from ...general_functions import (
     fetch_ecl,
     fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
 )
-from ...common_view_functions import test_fields_update_audit_progress, calculate_kpis
+from ...common_view_functions import update_audit_progress, calculate_kpis
 
 
 def create_registrations(verbose=True):
@@ -137,43 +137,43 @@ def create_epilepsy12_record(registration_instance, verbose=True):
     Creates a full randomised record for a given registration instance.
     """
     # score registration_instance
-    test_fields_update_audit_progress(model_instance=registration_instance)
+    update_audit_progress(model_instance=registration_instance)
 
     # create random first paediatric assessment
     first_paediatric_assessment = create_first_paediatric_assessment(
         registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=first_paediatric_assessment)
+    update_audit_progress(model_instance=first_paediatric_assessment)
 
     # create random EpilepsyContext
     epilepsy_context = create_epilepsy_context(
         registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=epilepsy_context)
+    update_audit_progress(model_instance=epilepsy_context)
 
     # create random Multiaxial Diagnosis
     multiaxial_diagnosis = create_multiaxial_diagnosis(
         registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=multiaxial_diagnosis)
+    update_audit_progress(model_instance=multiaxial_diagnosis)
 
     # create random Assessment
     assessment = create_assessment(
         registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=assessment)
+    update_audit_progress(model_instance=assessment)
 
     # create random Investigations
     assessment = create_investigations(
         registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=assessment)
+    update_audit_progress(model_instance=assessment)
 
     # create random Management
     management = create_management(
         registration_instance=registration_instance, verbose=verbose
     )
-    test_fields_update_audit_progress(model_instance=management)
+    update_audit_progress(model_instance=management)
 
     # calculate all the kpis
     calculate_kpis(registration_instance=registration_instance)

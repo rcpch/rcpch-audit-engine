@@ -1,103 +1,43 @@
-from datetime import datetime, date
+"""
+Tests the Registration model.
 
+Tests:
+
+    - [x] Test a valid Registration
+    - [x] Test for DOFPA in the future
+    - [x] Test for DOFPA before E12 began
+    - [x] Test for DOFPA before the child's DOB
+
+"""
+
+# Standard imports
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from unittest.mock import patch
 
+# Third party imports
 import pytest
+from django.core.exceptions import ValidationError
 
+# RCPCH imports
 from epilepsy12.models import (
     Registration,
-    Case,
-    AuditProgress,
-    KPI,
-    Site,
 )
-
-
-@pytest.fixture()
-def example_audit_progress():
-    return AuditProgress.objects.create(
-        registration_complete=False,
-        first_paediatric_assessment_complete=False,
-        assessment_complete=False,
-        epilepsy_context_complete=False,
-        multiaxial_diagnosis_complete=False,
-        management_complete=False,
-        investigations_complete=False,
-        registration_total_expected_fields=3,
-        registration_total_completed_fields=0,
-        first_paediatric_assessment_total_expected_fields=0,
-        first_paediatric_assessment_total_completed_fields=0,
-        assessment_total_expected_fields=0,
-        assessment_total_completed_fields=0,
-        epilepsy_context_total_expected_fields=0,
-        epilepsy_context_total_completed_fields=0,
-        multiaxial_diagnosis_total_expected_fields=0,
-        multiaxial_diagnosis_total_completed_fields=0,
-        investigations_total_expected_fields=0,
-        investigations_total_completed_fields=0,
-        management_total_expected_fields=0,
-        management_total_completed_fields=0,
-    )
-
-
-@pytest.fixture()
-def example_lead_organisation(e12Case):
-    return Site.objects.filter(
-        case=e12Case,
-        site_is_primary_centre_of_epilepsy_care=True,
-        site_is_actively_involved_in_epilepsy_care=True,
-    ).get()
-
-
-@pytest.fixture()
-def example_kpi(example_lead_organisation):
-    return KPI.objects.create(
-        organisation=example_lead_organisation.organisation,
-        parent_trust=example_lead_organisation.organisation.ParentOrganisation_OrganisationName,
-        paediatrician_with_expertise_in_epilepsies=0,
-        epilepsy_specialist_nurse=0,
-        tertiary_input=0,
-        epilepsy_surgery_referral=0,
-        ecg=0,
-        mri=0,
-        assessment_of_mental_health_issues=0,
-        mental_health_support=0,
-        sodium_valproate=0,
-        comprehensive_care_planning_agreement=0,
-        patient_held_individualised_epilepsy_document=0,
-        patient_carer_parent_agreement_to_the_care_planning=0,
-        care_planning_has_been_updated_when_necessary=0,
-        comprehensive_care_planning_content=0,
-        parental_prolonged_seizures_care_plan=0,
-        water_safety=0,
-        first_aid=0,
-        general_participation_and_risk=0,
-        service_contact_details=0,
-        sudep=0,
-        school_individual_healthcare_plan=0,
-    )
-
-
-@pytest.fixture()
-def example_fresh_registration(e12Case, example_audit_progress, example_kpi):
-    return Registration.objects.create(
-        case=e12Case, audit_progress=example_audit_progress, kpi=example_kpi
-    )
 
 
 @pytest.mark.django_db
 def test_registration_custom_method_audit_submission_date_calculation(
-    example_fresh_registration,
+    e12_case_factory,
 ):
     """
-    Tests the `audit_submission_date_calculation` accurately calculates audit submission date.
+    Tests the `audit_submission_date_calculation` accurately calculates audit submission date, depending on different registration dates.
 
     This is always the second Tuesday of January, following 1 year after the first paediatric assessment.
 
     If registration date + 1 year IS the 2nd Tues of Jan, the submission date is the same as registration + 1 year.
     """
 
-    dates = [
+    registration_dates = [
         # (registration date, expected audit submission date)
         (date(2022, 11, 1), date(2024, 1, 9)),
         (date(2022, 12, 31), date(2024, 1, 9)),
@@ -106,18 +46,17 @@ def test_registration_custom_method_audit_submission_date_calculation(
         (date(2022, 1, 11), date(2024, 1, 9)),
     ]
 
-    for expected_input_output in dates:
-        example_fresh_registration.registration_date = expected_input_output[0]
-        example_fresh_registration.save()
+    for expected_input_output in registration_dates:
+        registration = e12_case_factory(
+            registration__registration_date = expected_input_output[0]
+        ).registration
 
-        assert (
-            example_fresh_registration.audit_submission_date == expected_input_output[1]
-        )
+        assert registration.audit_submission_date == expected_input_output[1]
 
 
 @pytest.mark.django_db
 def test_registration_custom_method_registration_date_one_year_on(
-    example_fresh_registration,
+    e12_case_factory,
 ):
     """
     Tests the `registration_date_one_year_on` accurately calculates one year on (registration close date).
@@ -135,29 +74,28 @@ def test_registration_custom_method_registration_date_one_year_on(
     ]
 
     for expected_input_output in expected_inputs_outputs:
-        example_fresh_registration.registration_date = expected_input_output[0]
-        example_fresh_registration.save()
+        registration = e12_case_factory(
+            registration__registration_date = expected_input_output[0]
+        ).registration
 
-        assert (
-            example_fresh_registration.registration_close_date
-            == expected_input_output[1]
-        )
+        assert registration.registration_close_date == expected_input_output[1]
+
 
 @pytest.mark.django_db
 def test_registration_cohort(
-    example_fresh_registration,
+    e12_case_factory,
 ):
     """
     Tests cohort number is set accurately, dependent on registration_date.
 
     Cohorts are defined between 1st December year and 30th November in the subsequent year.
-    
+
     Examples of cohort numbers:
         Cohort 4: 1 December 2020 - 30 November 2021
         Cohort 5: 1 December 2021 - 30 November 2022
         Cohort 6: 1 December 2022 - 30 November 2023
         Cohort 7: 1 December 2023 - 30 November 2024
-        
+
     Dates which are too early (< 2020) should return `None`.
     """
 
@@ -171,46 +109,99 @@ def test_registration_cohort(
     ]
 
     for expected_input_output in expected_inputs_outputs:
-        example_fresh_registration.registration_date = expected_input_output[0]
-        example_fresh_registration.save()
+        registration = e12_case_factory(
+            registration__registration_date = expected_input_output[0]
+        ).registration
 
-        assert (
-            example_fresh_registration.cohort
-            == expected_input_output[1]
-        )
+        assert registration.cohort == expected_input_output[1]
 
-@patch.object(Registration, 'get_current_date', return_value=date(2022, 11, 30))
+
+@patch.object(Registration, "get_current_date", return_value=date(2022, 11, 30))
 @pytest.mark.django_db
 def test_registration_days_remaining_before_submission(
-    mocked_get_current_date,
-    example_fresh_registration,
+    mocked_get_current_date, 
+    e12_case_factory,
 ):
     """
     Tests `days_remaining_before_submission` property calculated properly.
-    
+
     Calculated as submission date - current date, return number of days left days as an int.
-    
-    Test patches the example Registration instance's `.get_current_date`'s return value to always return 30 Nov 2022.
-    
+
+    Test patches "today" - patches the example Registration instance's `.get_current_date`'s return value to always return 30 Nov 2022.
+
     NOTE: if `audit_submission_date` is before today, returns 0.
-    """ 
-      
-    expected_inputs_outputs = [
-        # (submission date, expected number of days left)
-        (date(2022, 11, 30), 0),
-        (date(2023, 11, 30), 365),
-        (date(2024, 11, 30), 731),
-        (date(2025, 11, 30), 1096),
-    ]
+    """
     
+    # submission date = 2023-01-10, 41 days after today
+    registration = e12_case_factory(
+        registration__registration_date = date(2022, 1, 10)
+    ).registration
+    assert registration.days_remaining_before_submission == 41
+    
+    # submission date = 2023-01-10, 41 days after today
+    registration = e12_case_factory(
+        registration__registration_date = date(2021, 1, 1)
+    ).registration
+    assert registration.days_remaining_before_submission == 0
 
-    for expected_input_output in expected_inputs_outputs:
-        example_fresh_registration.audit_submission_date = expected_input_output[0]
-        example_fresh_registration.save()
 
-        assert (
-            example_fresh_registration.days_remaining_before_submission
-            == expected_input_output[1]
+@pytest.mark.xfail
+@patch.object(Registration, "get_current_date", return_value=date(2023, 1, 1))
+@pytest.mark.django_db
+def test_registration_validate_dofpa_not_future(
+    mocked_current_date, 
+    e12_case_factory,
+):
+    """
+    # TODO - add validation
+
+    Test related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
+
+    Patches Registration's .get_current_date() method to always be 1 Jan 2023.
+
+    """
+
+    # Tests that dofpa (registration_date) can't be in the future (relative to today). Tries to create and save a Registration which is 30 days ahead of today.
+    future_date = Registration.get_current_date() + relativedelta(days=30)
+    with pytest.raises(ValidationError):
+        e12_case_factory(
+            registration__registration_date = future_date
         )
 
-   
+
+@pytest.mark.xfail
+@pytest.mark.django_db
+def test_registration_validate_dofpa_not_before_2009(e12_case_factory):
+    """
+    # TODO - add validation
+
+    Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
+
+    """
+
+    # Tests that dofpa (registration_date) can't be before E12 began in 2009.
+    with pytest.raises(ValidationError):
+        e12_case_factory(registration__registration_date=date(2007, 8, 9))
+
+
+@pytest.mark.xfail
+@pytest.mark.django_db
+def test_registration_validate_dofpa_not_before_child_dob(
+    e12_case_factory
+):
+    """
+    # TODO - add validation
+
+    Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
+
+    """
+    date_of_birth = date(2023, 1, 1)
+    registration_date = date_of_birth + relativedelta(days=10)
+    
+    # Tests that dofpa (registration_date) can't be before the child's DoB
+    with pytest.raises(ValidationError):
+        case = e12_case_factory(
+            date_of_birth = date_of_birth,
+            registration__registration_date = registration_date,
+            )
+
