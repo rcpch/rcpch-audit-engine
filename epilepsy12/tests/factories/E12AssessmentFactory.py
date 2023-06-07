@@ -2,6 +2,7 @@
 """
 # standard imports
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # third-party imports
 import factory
@@ -53,7 +54,7 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
             consultant_paediatrician_referral_date=date(2023, 1, 1),
             consultant_paediatrician_input_date=date(2023, 1, 2),
         )
-        
+
         fail_paediatrician_with_expertise_in_epilepsies = factory.Trait(
             consultant_paediatrician_referral_made=True,
             consultant_paediatrician_referral_date=date(2023, 1, 1),
@@ -63,3 +64,16 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
             paediatric_neurologist_input_date=date(2023, 2, 1),
         )
 
+        pass_epilepsy_specialist_nurse = factory.Trait(
+            epilepsy_specialist_nurse_referral_made=True,
+            epilepsy_specialist_nurse_referral_date=factory.LazyAttribute(
+                lambda o: o.registration.registration_date + relativedelta(days=5)
+            ),
+            epilepsy_specialist_nurse_input_date=factory.LazyAttribute(
+                lambda o: o.epilepsy_specialist_nurse_referral_date + relativedelta(days=5)
+            ),
+        )
+
+        fail_epilepsy_specialist_nurse = factory.Trait(
+            epilepsy_specialist_nurse_referral_made=False,
+        )

@@ -156,11 +156,15 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     # define constants
     ORGANISATION = Organisation.objects.first()
 
-    for _ in range(10):
-        case = e12_case_factory.create(
-            organisations__organisation=ORGANISATION,
-            registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True,
-        )
-        calculate_kpis(case.registration)
-        kpi = KPI.objects.get(pk=case.registration.pk)
-        print(kpi.get_kpis())
+    case = e12_case_factory.create(
+        organisations__organisation=ORGANISATION,
+        registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True,
+        registration__assessment__pass_epilepsy_specialist_nurse=True,
+    )
+
+    calculate_kpis(case.registration)
+
+    kpi = KPI.objects.get(pk=case.registration.pk)
+
+    for attr, val in kpi.get_kpis().items():
+        print(f"{attr}:{val}")
