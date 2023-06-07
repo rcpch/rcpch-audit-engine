@@ -21,6 +21,9 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
     Effect on related Site model:
         - if relevant referral is True ON CREATION, the relevant Site attribute related to that referral will be True e.g. if `consultant_paediatrician_referral_made=True`, then Site.site_is_general_paediatric_centre will be set to True. These Site attributes are FALSE by default.
 
+    Flags:
+        - `pass_paediatrician_with_expertise_in_epilepsies` - if True, sets plausible answers so score passes this KPI
+        - `fail_paediatrician_with_expertise_in_epilepsies` - if True, sets plausible answers so score fails this KPI
     """
 
     class Meta:
@@ -59,3 +62,4 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
             paediatric_neurologist_referral_date=date(2023, 1, 1),
             paediatric_neurologist_input_date=date(2023, 2, 1),
         )
+
