@@ -216,7 +216,10 @@ def test_measure_5_mri_syndromes_ineligible(
 
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
-
+    
+    # ensure starting with no default syndromes
+    Syndrome.objects.filter(multiaxial_diagnosis=registration.multiaxialdiagnosis).delete()
+    
     # save the ineligible syndrome type
     new_syndrome = e12_syndrome_factory(
         multiaxial_diagnosis=registration.multiaxialdiagnosis,
