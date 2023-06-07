@@ -1,6 +1,6 @@
 """Factory fn to create new E12 Cases"""
 # standard imports
-import datetime
+from datetime import date
 
 # third-party imports
 import factory
@@ -40,14 +40,24 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             - FAIL: `registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral`
             - INELIGIBLE: `registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral`
         - KPI 4
-            - PASS: 
+            - PASS:
                 - `registration__epilepsy_context__pass_ecg`
                 - `registration__investigations__pass_ecg`
-            - FAIL: 
+            - FAIL:
                 - `registration__epilepsy_context__fail_ecg`
                 - `registration__investigations__fail_ecg`
-            - INELIGIBLE: 
+            - INELIGIBLE:
                 - `registration__epilepsy_context__ineligible_ecg`
+        - KPI 5
+            - PASS:
+                - `registration__investigations__pass_mri`
+            - FAIL:
+                - `registration__investigations__fail_mri`
+            - INELIGIBLE:
+                - ineligible_mri
+                - registration__ineligible_mri
+                - registration__multiaxial_diagnosis__ineligible_mri
+                - registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri
     """
 
     class Meta:
@@ -61,7 +71,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     first_name = "Thomas"
     surname = "Anderson"
     sex = 1
-    date_of_birth = datetime.date(2021, 9, 2)
+    date_of_birth = date(2021, 9, 2)
     ethnicity = "A"
     locked = False
 
@@ -73,3 +83,6 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
         E12RegistrationFactory,
         factory_related_name="case",
     )
+
+    class Params:
+        ineligible_mri = factory.Trait(date_of_birth=date(2020, 1, 1))
