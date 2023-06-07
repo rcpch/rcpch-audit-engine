@@ -39,6 +39,10 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             - PASS: `pass_tertiary_input_AND_epilepsy_surgery_referral`
             - FAIL: `fail_tertiary_input_AND_epilepsy_surgery_referral`
             - INELIGIBLE: `ineligible_tertiary_input_AND_epilepsy_surgery_referral`
+        - KPI 4
+            - PASS: `pass_tertiary_input_AND_epilepsy_surgery_referral`
+            - FAIL: `fail_tertiary_input_AND_epilepsy_surgery_referral`
+            - INELIGIBLE: `ineligible_tertiary_input_AND_epilepsy_surgery_referral`
     """
 
     class Meta:
