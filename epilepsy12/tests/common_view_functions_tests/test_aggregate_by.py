@@ -15,7 +15,7 @@ from epilepsy12.common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     calculate_kpis,
 )
-from epilepsy12.models import Organisation, Case, KPI
+from epilepsy12.models import Organisation, Case, KPI, Registration
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
 
 
@@ -163,9 +163,11 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral=True,
     )
 
-    calculate_kpis(case.registration)
-
-    kpi = KPI.objects.get(pk=case.registration.pk)
+    registration = Registration.objects.get(case=case)
+    
+    calculate_kpis(registration)
+ 
+    kpi = KPI.objects.get(pk=registration.pk)
 
     for attr, val in kpi.get_kpis().items():
         print(f"{attr}:{val}")
