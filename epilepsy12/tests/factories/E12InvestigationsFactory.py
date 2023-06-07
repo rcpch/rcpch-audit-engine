@@ -23,3 +23,10 @@ class E12InvestigationsFactory(factory.django.DjangoModelFactory):
     # Once Registration instance made, it will attach to this instance
     registration = None
     
+    class Params:
+        pass_ecg = factory.Trait(
+            twelve_lead_ecg_status = True,
+        )
+        fail_ecg = factory.Trait(
+            twelve_lead_ecg_status = False,
+        )

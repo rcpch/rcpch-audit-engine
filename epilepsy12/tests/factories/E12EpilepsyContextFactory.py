@@ -18,4 +18,14 @@ class E12EpilepsyContextFactory(factory.django.DjangoModelFactory):
     
     # when a registration instance created, it will attach to this instance
     registration = None
-    
+
+    class Params:
+        pass_ecg = factory.Trait(
+            were_any_of_the_epileptic_seizures_convulsive = True,
+        )
+        fail_ecg = factory.Trait(
+            pass_ecg = True,
+        )
+        ineligible_ecg = factory.Trait(
+            were_any_of_the_epileptic_seizures_convulsive = False,
+        )

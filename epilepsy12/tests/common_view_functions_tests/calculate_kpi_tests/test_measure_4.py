@@ -1,5 +1,7 @@
 """
-Measure 4 % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
+Measure 4 `ecg`
+
+% of children and young people with convulsive seizures and epilepsy, with an ECG at first year
 
 - [x] Measure 4 passed (registration.kpi.ecg == 1) if ECG performed and seizure convulsive (registration_instance.epilepsycontext.were_any_of_the_epileptic_seizures_convulsive and registration_instance.investigations.twelve_lead_ecg_status)
 - [x] Measure 4 failed (registration.kpi.ecg == 0) if ECG not performed and seizure convulsive (not registration_instance.epilepsycontext.were_any_of_the_epileptic_seizures_convulsive and registration_instance.investigations.twelve_lead_ecg_status)
