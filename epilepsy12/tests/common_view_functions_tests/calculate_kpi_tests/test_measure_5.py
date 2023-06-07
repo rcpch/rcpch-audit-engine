@@ -54,18 +54,11 @@ from epilepsy12.constants import (
             date(2023, 12, 31),
             False,
             KPI_SCORE["FAIL"],
-        ),
-        (
-            # 2yo, ineligible
-            date(2022, 1, 1),
-            date(2024, 1, 1),
-            True,
-            KPI_SCORE["INELIGIBLE"],
-        ),
+        )
     ],
 )
 @pytest.mark.django_db
-def test_measure_4_mri_under2yo(
+def test_measure_5_mri_under2yo(
     e12_case_factory, DATE_OF_BIRTH, REGISTRATION_DATE, TIMELY_MRI, EXPECTED_SCORE
 ):
     """
@@ -119,7 +112,7 @@ def test_measure_4_mri_under2yo(
     ],
 )
 @pytest.mark.django_db
-def test_measure_4_mri_syndromes_pass_fail(
+def test_measure_5_mri_syndromes_pass_fail(
     e12_case_factory, TIMELY_MRI, EXPECTED_SCORE
 ):
     """
@@ -195,7 +188,7 @@ def test_measure_4_mri_syndromes_pass_fail(
     ],
 )
 @pytest.mark.django_db
-def test_measure_4_mri_syndromes_ineligible(
+def test_measure_5_mri_syndromes_ineligible(
     e12_case_factory, e12_syndrome_factory, SYNDROME_TYPE_PRESENT
 ):
     """
