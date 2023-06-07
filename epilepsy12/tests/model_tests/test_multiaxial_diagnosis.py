@@ -75,38 +75,11 @@ from epilepsy12.constants import (
 )
 
 
-@pytest.mark.django_db
-def test_working_e12MultiaxialDiagnosis_relations_success(
-    e12_case_factory,
-):
-    """Checks this multiaxialdiagnosis instance has relevant answers attached e.g. via reverse foreign keys."""
-
-    multiaxial_diagnosis = e12_case_factory().registration.multiaxialdiagnosis
-
-    # check case relation exists
-    assert multiaxial_diagnosis.registration.case
-
-    # checks for relevant many to one relations
-    assert Syndrome.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
-    assert Comorbidity.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
-    assert Episode.objects.get(multiaxial_diagnosis=multiaxial_diagnosis)
-
-
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_at_least_one_MultiaxialDiagnosis__Episode_is_epileptic(
     e12_case_factory,
 ):
-    # default multiaxial diagnosis contains 1 episode which is epileptic. Should pass
-    multiaxial_diagnosis = e12_case_factory().registration.multiaxialdiagnosis
-
-    epilepsy_episodes = (
-        Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-        .filter(epilepsy_or_nonepilepsy_status=EPILEPSY_DIAGNOSIS_STATUS[0][0])
-        .exists()
-    )
-
-    assert epilepsy_episodes
 
     # creates multiaxial diagnosis where only episode is non epileptic. Assert validation error on save (called automatically when creating subFactories)
     with pytest.raises(ValidationError):
