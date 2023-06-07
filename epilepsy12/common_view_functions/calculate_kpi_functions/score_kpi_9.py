@@ -64,7 +64,6 @@ def score_kpi_9Ai(registration_instance) -> int:
 
     # unscored
     if any(fields_not_filled):
-        print(fields_not_filled)
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi
