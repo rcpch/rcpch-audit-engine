@@ -200,6 +200,12 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         # kpi 8
         fail_sodium_valproate = True,
         registration__management__sodium_valproate = 'fail',
+        
+        # kpi 9 (ALL)
+        registration__management__pass_kpi_9=True,
+        
+
+        
     
     )
 

@@ -105,7 +105,13 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 registration__management__sodium_valproate = 'fail',
             - INELIGIBLE:
                 ineligible_sodium_valproate=True,
-
+        - KPI 9
+        > NOTE: as these sub-measures are all related, and flags are applied sequentially, we can only set ALL to pass or ALL to fail.
+            - PASS
+                registration__management__pass_kpi_9=True,
+            - FAIL
+            > NOTE: if fail flag set, parental_prolonged_seizures_care_plan is set to ineligible (due to is_rescue_medicine_prescribed=False)
+                registration__management__fail_kpi_9=True,
                 
     """
 
