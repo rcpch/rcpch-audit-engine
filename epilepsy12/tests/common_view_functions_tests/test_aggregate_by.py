@@ -180,6 +180,10 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
   
         # kpi 6
         ineligible_assessment_of_mental_health_issues = True,
+        
+        # kpi 7
+        registration__multiaxial_diagnosis__pass_mental_health_support = True,
+        registration__management__pass_mental_health_support = True,
     
     )
 
