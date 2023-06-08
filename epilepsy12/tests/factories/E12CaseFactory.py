@@ -1,6 +1,7 @@
 """Factory fn to create new E12 Cases"""
 # standard imports
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # third-party imports
 import factory
@@ -29,16 +30,19 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
         NOTE: ONLY 1 FLAG SHOULD BE SET TRUE PER KPI (i.e. don't set KPI 1 to pass AND fail).
 
     Useful flags:
+        
         - KPI 1
             - PASS: 
                 - `registration__assessment__pass_paediatrician_with_expertise_in_epilepsies`
             - FAIL: 
                 - `registration__assessment__fail_paediatrician_with_expertise_in_epilepsies`
+        
         - KPI 2
             - PASS: 
                 - `registration__assessment__pass_epilepsy_specialist_nurse`
             - FAIL: 
                 - `registration__assessment__fail_epilepsy_specialist_nurse`
+        
         - KPI 3 & 3b
             - PASS: 
                 - `registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral`
@@ -46,6 +50,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 - `registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral`
             - INELIGIBLE: 
                 - `registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral`
+        
         - KPI 4
             - PASS:
                 - `registration__epilepsy_context__pass_ecg`
@@ -55,7 +60,8 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 - `registration__investigations__fail_ecg`
             - INELIGIBLE:
                 - `registration__epilepsy_context__ineligible_ecg`
-        - KPI 5
+        
+        - KPI 5 NOTE: please see caveats defined in KPI 6
             - PASS:
                 - `registration__investigations__pass_mri`
             - FAIL:
@@ -65,10 +71,31 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 - registration__ineligible_mri
                 - registration__multiaxial_diagnosis__ineligible_mri
                 - registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri
+        
+        - KPI 6
+            NOTE: If either PASS/FAIL flags set, KPI5 PASS/FAIL FIELDS CAN NOT BE USED. KPI6 pass/fail fields make child 6yo (age at FPA >= 5 required to be eligible for this measure). Therefore, they automatically become ineligible for KPI 5 (eligibility requires age at FPA < 2). 
+            - PASS: 
+                - `pass_assessment_of_mental_health_issues`
+                - `registration__pass_assessment_of_mental_health_issues`
+                - `registration__multiaxial_diagnosis__pass_assessment_of_mental_health_issues`
+            - FAIL: 
+                - `fail_assessment_of_mental_health_issues`
+                - `registration__fail_assessment_of_mental_health_issues`
+                - `registration__multiaxial_diagnosis__fail_assessment_of_mental_health_issues`
+            - INELIGIBLE:
+                - `ineligible_assessment_of_mental_health_issues`
     """
 
     class Meta:
         model = Case
+        
+    class Params:
+        
+        ineligible_mri = factory.Trait(date_of_birth=date(2017,1,1))
+
+        pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
+        fail_assessment_of_mental_health_issues = factory.Trait(pass_assessment_of_mental_health_issues=True)
+        ineligible_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=False, date_of_birth=date(2022,1,1))
 
     # TODO - once Case.nhs_number has appropriate validation + cleaning, won't need to strip spaces here
     # Iterates through available valid NHS nums. Will reset from beginning once end of list is reached.
@@ -78,7 +105,11 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     first_name = "Thomas"
     surname = "Anderson"
     sex = 1
-    date_of_birth = date(2021, 9, 2)
+    
+    
+    # default date of birth (with no Params flags set) will be 2022,1,1
+    date_of_birth = date(2022,1,1)
+    
     ethnicity = "A"
     locked = False
 
@@ -91,5 +122,4 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
         factory_related_name="case",
     )
 
-    class Params:
-        ineligible_mri = factory.Trait(date_of_birth=date(2020, 1, 1))
+    

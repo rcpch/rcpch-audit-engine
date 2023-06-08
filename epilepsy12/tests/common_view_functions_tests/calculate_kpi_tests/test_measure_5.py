@@ -193,8 +193,8 @@ def test_measure_5_mri_syndromes_ineligible(
 ):
     """
     *INELIGIBLE*
-    1) ONE OF:
-        JME or JAE or CAE or CECTS/Rolandic
+    1)      ONE OF:
+                JME or JAE or CAE or CECTS/Rolandic
         AND
         age_at_first_paediatric_assessment >= 2 (testing using age at fpa = 2y exactly)
     """

@@ -94,3 +94,8 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         ineligible_mri = factory.Trait(
             registration_date = date(2023,1,1)
         )
+        
+        pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
+        fail_assessment_of_mental_health_issues = factory.Trait(
+            pass_assessment_of_mental_health_issues=True
+        )
