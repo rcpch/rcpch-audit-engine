@@ -59,6 +59,13 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
             individualised_care_plan_includes_general_participation_risk=False,
             individualised_care_plan_addresses_sudep=False,
         )
+        
+        pass_school_individual_healthcare_plan = factory.Trait(
+            individualised_care_plan_includes_ehcp = True,
+        )
+        fail_school_individual_healthcare_plan = factory.Trait(
+            individualised_care_plan_includes_ehcp = False,
+        )
 
     # Once Registration instance made, it will attach to this instance
     registration = None

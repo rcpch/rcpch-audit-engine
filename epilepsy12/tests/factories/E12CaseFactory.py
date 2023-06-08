@@ -112,6 +112,19 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             - FAIL
             > NOTE: if fail flag set, parental_prolonged_seizures_care_plan is set to ineligible (due to is_rescue_medicine_prescribed=False)
                 registration__management__fail_kpi_9=True,
+        
+        - KPI 10
+        > NOTE: PASS/FAIL fields set KPI5 to Ineligible. See KPI6 for details. KPI 10 eligibility requires age >= 5.
+            - PASS
+                pass_individualised_care_plan_includes_ehcp = True,
+                registration__management__pass_individualised_care_plan_includes_ehcp=True,
+            - FAIL
+                fail_school_individual_healthcare_plan = True,
+                registration__management__fail_school_individual_healthcare_plan=True,
+            - INELIGIBLE 
+            > NOTE: if ineligible, sets age to 1yo, so eligible for KPI5 but ineligible for KPI6
+                ineligible_individualised_care_plan_includes_ehcp=True,
+                
                 
     """
 
@@ -140,6 +153,18 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
         ineligible_sodium_valproate = factory.Trait(
             ineligible_mri=True
         )
+        
+        pass_school_individual_healthcare_plan = factory.Trait(
+            ineligible_mri=True,
+        )
+        fail_school_individual_healthcare_plan = factory.Trait(
+            pass_school_individual_healthcare_plan=True,
+        )
+        ineligible_school_individual_healthcare_plan = factory.Trait( 
+            ineligible_assessment_of_mental_health_issues = True,
+            date_of_birth=date(2022, 1, 1),
+        )
+        
 
     # TODO - once Case.nhs_number has appropriate validation + cleaning, won't need to strip spaces here
     # Iterates through available valid NHS nums. Will reset from beginning once end of list is reached.
