@@ -78,23 +78,30 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         E12MultiaxialDiagnosisFactory, factory_related_name="registration"
     )
     assessment = factory.RelatedFactory(
-        E12AssessmentFactory,  
+        E12AssessmentFactory,
         factory_related_name="registration",
     )
     investigations = factory.RelatedFactory(
-        E12InvestigationsFactory, 
-        factory_related_name="registration",
-    )
-    management = factory.RelatedFactory(
-        E12ManagementFactory,
+        E12InvestigationsFactory,
         factory_related_name="registration",
     )
 
+    @factory.post_generation
+    def management(self, create, extracted, **kwargs):
+        if not create:
+            return None
+
+        print(f"Creating management with {kwargs=}{extracted=}")
+        sodium_valproate = kwargs.pop('sodium_valproate', None)
+        E12ManagementFactory(
+                registration=self, 
+                antiepilepsymedicine__sodium_valproate=sodium_valproate if sodium_valproate else None,
+                **kwargs,
+            )
+
     class Params:
-        ineligible_mri = factory.Trait(
-            registration_date = date(2023,1,1)
-        )
-        
+        ineligible_mri = factory.Trait(registration_date=date(2023, 1, 1))
+
         pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
         fail_assessment_of_mental_health_issues = factory.Trait(
             pass_assessment_of_mental_health_issues=True
