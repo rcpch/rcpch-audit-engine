@@ -24,7 +24,6 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     if (age_at_first_paediatric_assessment >= 2) and (
         multiaxial_diagnosis.syndrome_present is None
     ):
-        print(f'returning none here {age_at_first_paediatric_assessment=} {multiaxial_diagnosis.syndrome_present=}')
         return KPI_SCORE["NOT_SCORED"]
 
     # define eligibility criteria 1
