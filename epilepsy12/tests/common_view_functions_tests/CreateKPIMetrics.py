@@ -169,6 +169,8 @@ class KPIMetric:
         self.eligible_kpi_3_5 = eligible_kpi_3_5
         self.eligible_kpi_6_8_10 = eligible_kpi_6_8_10
 
+    # Each of these Class properties define the FactoryBoy flags which need to be set inside the e12CaseFactory constructor for that KPI to be a PASS | FAIL | INVALID.
+    
     @property
     def PASS_KPI_1(self):
         return {
@@ -323,7 +325,11 @@ class KPIMetric:
                 f"Incorrect value provided for {kpi}: {value}. Available values are {available_values}"
             )
 
-    def generate_metrics(self, **kwargs: Literal["PASS", "FAIL"]):
+    def generate_metrics(self, **kwargs: Literal["PASS", "FAIL"])->dict:
+        """
+        Generate a dictionary of flags according to KPI metrics.
+        """
+        
         e12_case_factory_constructor_args = {}
 
         # Determine which age-dependent eligible KPI values can be used:
