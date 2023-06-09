@@ -19,13 +19,15 @@ def score_kpi_4(registration_instance) -> int:
     epilepsy_context = registration_instance.epilepsycontext
     investigations = registration_instance.investigations
 
+    # ineligible
+    if epilepsy_context.were_any_of_the_epileptic_seizures_convulsive is False:
+        return KPI_SCORE["INELIGIBLE"]
+    
     # not scored / ineligible guard clauses
     if (epilepsy_context.were_any_of_the_epileptic_seizures_convulsive is None) or (
         investigations.twelve_lead_ecg_status is None
     ):
         return KPI_SCORE["NOT_SCORED"]
-    if epilepsy_context.were_any_of_the_epileptic_seizures_convulsive is False:
-        return KPI_SCORE["INELIGIBLE"]
 
     # Convulsive seizure - score ECG status
 

@@ -16,7 +16,13 @@ from epilepsy12.common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     calculate_kpis,
 )
-from epilepsy12.models import Organisation, Case, KPI, Registration, AntiEpilepsyMedicine
+from epilepsy12.models import (
+    Organisation,
+    Case,
+    KPI,
+    Registration,
+    AntiEpilepsyMedicine,
+)
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
 
 
@@ -61,7 +67,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
 
     # Loop through each ethnicity
     cases_list = []
-    
+
     # Loop through each deprivation quintile
     for deprivation_type in DEPRIVATION_QUINTILES:
         # set an organisation constant
@@ -75,7 +81,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
                 organisations__organisation=ORGANISATION,
             )
             cases_list.append(case)
-    
+
     # single SQL INSERT to save all cases
     Case.objects.bulk_create(cases_list)
 
@@ -104,7 +110,6 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     # Loop through each ethnicity
     cases_list = []
     for ethnicity_type in ETHNICITIES:
-
         # For each ethnicity, build 10 cases, and append to cases_list
         for _ in range(10):
             case = e12_case_factory.build(
@@ -113,7 +118,7 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
                 organisations__organisation=ORGANISATION,
             )
             cases_list.append(case)
-    
+
     # single SQL INSERT to save all cases
     Case.objects.bulk_create(cases_list)
 
@@ -167,53 +172,136 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     # define constants
     ORGANISATION = Organisation.objects.first()
 
+    pass_kpi_1 = {
+        "registration__assessment__pass_paediatrician_with_expertise_in_epilepsies": True,
+    }
+    fail_kpi_1 = {
+        "registration__assessment__fail_paediatrician_with_expertise_in_epilepsies": True
+    }
+
+    pass_kpi_2 = {
+        "registration__assessment__pass_epilepsy_specialist_nurse": True,
+    }
+    fail_kpi_2 = {"registration__assessment__fail_epilepsy_specialist_nurse": True}
+
+    eligible_kpi_3_5_ineligible_6_8_10 = {
+        "eligible_kpi_3_5_ineligible_6_8_10": True,
+    }
+    eligible_kpi_6_8_10_ineligible_3_5 = {
+        "eligible_kpi_6_8_10_ineligible_3_5": True,
+        # extra ineligibility kpi 3
+        "registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral": True,
+        # extra ineligibility kpi5
+        "registration__ineligible_mri": True,
+        "registration__multiaxial_diagnosis__ineligible_mri": True,
+        "registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri": True,
+    }
+
+    pass_kpi_3 = {
+        "registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral": True,
+    }
+    fail_kpi_3 = {
+        "registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral": True,
+    }
+
+    pass_kpi_4 = {
+        "registration__epilepsy_context__pass_ecg": True,
+        "registration__investigations__pass_ecg": True,
+    }
+    fail_kpi_4 = {
+        "registration__epilepsy_context__fail_ecg": True,
+        "registration__investigations__fail_ecg": True,
+    }
+    ineligible_kpi_4 = {
+        "registration__epilepsy_context__ineligible_ecg": True,
+    }
+
+    pass_kpi_5 = {
+        "registration__investigations__pass_mri": True,
+    }
+    fail_kpi_5 = {
+        "registration__investigations__fail_mri": True,
+    }
+
+    pass_kpi_6 = {
+        "pass_assessment_of_mental_health_issues": True,
+        "registration__pass_assessment_of_mental_health_issues": True,
+        "registration__multiaxial_diagnosis__pass_assessment_of_mental_health_issues": True,
+    }
+    fail_kpi_6 = {
+        "fail_assessment_of_mental_health_issues": True,
+        "registration__fail_assessment_of_mental_health_issues": True,
+        "registration__multiaxial_diagnosis__fail_assessment_of_mental_health_issues": True,
+    }
+
+    pass_kpi_7 = {
+        "registration__multiaxial_diagnosis__pass_mental_health_support": True,
+        "registration__management__pass_mental_health_support": True,
+    }
+    fail_kpi_7 = {
+        "registration__multiaxial_diagnosis__fail_mental_health_support": True,
+        "registration__management__fail_mental_health_support": True,
+    }
+    ineligible_kpi_7 = {
+        "registration__multiaxial_diagnosis__ineligible_mental_health_support": True,
+    }
+
+    pass_kpi_8 = {
+        "pass_sodium_valproate": True,
+        "registration__management__sodium_valproate": "pass",
+    }
+    fail_kpi_8 = {
+        "fail_sodium_valproate": True,
+        "registration__management__sodium_valproate": "fail",
+    }
+
+    pass_kpi_9 = {
+        "registration__management__pass_kpi_9": True,
+    }
+    fail_kpi_9 = {
+        "registration__management__fail_kpi_9": True,
+    }
+
+    pass_kpi_10 = {
+        "pass_school_individual_healthcare_plan": True,
+        "registration__management__pass_school_individual_healthcare_plan": True,
+    }
+    fail_kpi_10 = {
+        "fail_school_individual_healthcare_plan": True,
+        "registration__management__fail_school_individual_healthcare_plan": True,
+    }
+
     case = e12_case_factory.create(
         organisations__organisation=ORGANISATION,
+        # """age-dependent eligibility flag"""
+        # **eligible_kpi_3_5_ineligible_6_8_10,
+        **eligible_kpi_6_8_10_ineligible_3_5,
         # kpi 1
-        registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True,
-        
+        **fail_kpi_1,
         # kpi 2
-        registration__assessment__pass_epilepsy_specialist_nurse=True,
-        
+        **fail_kpi_2,
         # kpi 3 & 3b
-        registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral=True,
-        
+        # **pass_kpi_3,
         # kpi 4
-        registration__epilepsy_context__pass_ecg = True,
-        registration__investigations__pass_ecg = True,
-        
+        **ineligible_kpi_4,
         # kpi 5
-        ineligible_mri = True,
-        registration__ineligible_mri = True,
-        registration__multiaxial_diagnosis__ineligible_mri = True,
-        registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri = True,
-  
+        # **pass_kpi_5,
         # kpi 6
-        pass_assessment_of_mental_health_issues=True,
-        registration__pass_assessment_of_mental_health_issues=True,
-        registration__multiaxial_diagnosis__pass_assessment_of_mental_health_issues=True,
-        
+        **fail_kpi_6,
         # kpi 7
-        registration__multiaxial_diagnosis__pass_mental_health_support = True,
-        registration__management__pass_mental_health_support = True,
-        
+        **ineligible_kpi_7,
         # kpi 8
-        fail_sodium_valproate = True,
-        registration__management__sodium_valproate = 'fail',
-        
+        **fail_kpi_8,
         # kpi 9 (ALL)
-        registration__management__pass_kpi_9=True,
-        
+        **fail_kpi_9,
         # kpi 10
-        ineligible_school_individual_healthcare_plan=True,
-        
-    
+        **fail_kpi_10,
     )
 
     registration = Registration.objects.get(case=case)
-    
+
     calculate_kpis(registration)
- 
+
     kpi = KPI.objects.get(pk=registration.pk)
 
     for attr, val in kpi.get_kpis().items():
