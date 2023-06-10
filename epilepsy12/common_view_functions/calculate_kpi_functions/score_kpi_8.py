@@ -6,6 +6,7 @@ from epilepsy12.models import AntiEpilepsyMedicine, MedicineEntity
 # E12 imports
 from epilepsy12.constants import KPI_SCORE
 
+
 def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> int:
     """8. Sodium Valproate
 
@@ -33,10 +34,12 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["INELIGIBLE"]
 
     # get valproate assigned
-    valproate = AntiEpilepsyMedicine.objects.get(
+    valproate = AntiEpilepsyMedicine.objects.filter(
         management=registration_instance.management,
-        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
-    )
+        medicine_entity=MedicineEntity.objects.filter(
+            medicine_name="Sodium valproate"
+        ).first(),
+    ).first()
 
     if (
         valproate.is_a_pregnancy_prevention_programme_needed

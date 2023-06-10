@@ -121,14 +121,12 @@ def selected_organisation_summary(request, organisation_id):
         total_percent_trust = int(
             (
                 count_of_current_cohort_registered_completed_cases_in_this_trust
-                / (count_of_all_current_cohort_registered_cases_in_this_organisation)
+                / (count_of_all_current_cohort_registered_cases_in_this_trust)
                 * 100
             )
         )
     else:
         total_percent_trust = 0
-
-    print(total_percent_trust)
 
     context = {
         "user": request.user,
@@ -147,7 +145,7 @@ def selected_organisation_summary(request, organisation_id):
         "percent_completed_trust": total_percent_trust,
         "count_of_all_current_cohort_registered_cases_in_this_organisation": count_of_all_current_cohort_registered_cases_in_this_organisation,
         "count_of_current_cohort_registered_completed_cases_in_this_organisation": count_of_current_cohort_registered_completed_cases_in_this_organisation,
-        "count_of_all_current_cohort_registered_cases_in_this_trust": count_of_all_current_cohort_registered_cases_in_this_organisation,
+        "count_of_all_current_cohort_registered_cases_in_this_trust": count_of_all_current_cohort_registered_cases_in_this_trust,
         "count_of_current_cohort_registered_completed_cases_in_this_trust": count_of_current_cohort_registered_completed_cases_in_this_trust,
         "cohort_data": cohort_data,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,

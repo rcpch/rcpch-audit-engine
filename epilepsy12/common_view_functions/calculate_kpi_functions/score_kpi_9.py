@@ -5,6 +5,7 @@
 # E12 imports
 from epilepsy12.constants import KPI_SCORE
 
+
 def score_kpi_9A(registration_instance) -> int:
     """9A. comprehensive_care_planning_agreement
 
@@ -64,7 +65,6 @@ def score_kpi_9Ai(registration_instance) -> int:
 
     # unscored
     if any(fields_not_filled):
-        print(fields_not_filled)
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi

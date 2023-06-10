@@ -246,7 +246,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
             registration=registration_instance,
         )
     else:
-        multiaxial_diagnosis = registration_instance.multiaxial_diagnosis
+        multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
 
     if multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties:
         rand_severity = SEVERITY[randint(0, len(SEVERITY) - 1)][0]
