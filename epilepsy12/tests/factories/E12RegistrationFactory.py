@@ -78,11 +78,11 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         E12MultiaxialDiagnosisFactory, factory_related_name="registration"
     )
     assessment = factory.RelatedFactory(
-        E12AssessmentFactory,  # see docstrings for available flags
+        E12AssessmentFactory,  
         factory_related_name="registration",
     )
     investigations = factory.RelatedFactory(
-        E12InvestigationsFactory,  # see docstrings for available flags
+        E12InvestigationsFactory, 
         factory_related_name="registration",
     )
     management = factory.RelatedFactory(

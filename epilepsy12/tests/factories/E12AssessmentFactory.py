@@ -1,6 +1,7 @@
 """Factory fn to create new E12 Assessments, related to a created Registration.
 """
 # standard imports
+from datetime import date
 
 # third-party imports
 import factory
@@ -28,8 +29,6 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
     # Once Registration instance made, it will attach to this instance
     registration = None
 
-
-
     # once assessment filled, will set corresponding Site attributes depending on these values
     @factory.post_generation
     def set_site_attribute(self, create, extracted, **kwargs):
@@ -44,3 +43,19 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
                 site.site_is_childrens_epilepsy_surgery_centre = True
 
             site.save()
+
+    class Params:
+        pass_paediatrician_with_expertise_in_epilepsies = factory.Trait(
+            consultant_paediatrician_referral_made=True,
+            consultant_paediatrician_referral_date=date(2023, 1, 1),
+            consultant_paediatrician_input_date=date(2023, 1, 2),
+        )
+        
+        fail_paediatrician_with_expertise_in_epilepsies = factory.Trait(
+            consultant_paediatrician_referral_made=True,
+            consultant_paediatrician_referral_date=date(2023, 1, 1),
+            consultant_paediatrician_input_date=date(2023, 2, 1),
+            paediatric_neurologist_referral_made=True,
+            paediatric_neurologist_referral_date=date(2023, 1, 1),
+            paediatric_neurologist_input_date=date(2023, 2, 1),
+        )
