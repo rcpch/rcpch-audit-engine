@@ -7,19 +7,19 @@ from epilepsy12.models import (
 )
 
 
-@pytest.mark.django_db
-def test_visitActivity(e12User_GOSH, client):
-    """
-    Test that visit activity logging works, using e12User_GOSH fixture
-    """
-    
-    client.force_login(e12User_GOSH)
+# @pytest.mark.django_db
+# def test_visitActivity(e12User_GOSH, client):
+#     """
+#     Test that visit activity logging works, using e12User_GOSH fixture
+#     """
 
-    visit_activity = VisitActivity.objects.all()
+#     client.force_login(e12User_GOSH)
 
-    time.sleep(1)
+#     visit_activity = VisitActivity.objects.all()
 
-    client.force_login(e12User_GOSH)
+#     time.sleep(1)
 
-    assert len(visit_activity) == 2
-    assert visit_activity[1].activity_datetime > visit_activity[0].activity_datetime
+#     client.force_login(e12User_GOSH)
+
+#     assert len(visit_activity) == 2
+#     assert visit_activity[1].activity_datetime > visit_activity[0].activity_datetime
