@@ -27,6 +27,25 @@ E12UserFactory(
     organisation_employer = ORGANISATION_TEST_USER,
     groups=[GROUP_AUDIT_CENTRE_CLINICIAN],
 )
+
+# Test Cases
+
+## Scope Tests
+
+[] Assert an audit centre clinician can only view patients from own organisation
+[] Assert an Audit Centre Administrator can only view patients from own organisation
+[] Assert an Audit Centre Lead Clinician can only view patients from own Trust
+[] Assert an RCPCH Audit Lead can view all patients
+
+[] Assert an audit centre clinician can only view users from own organisation
+[] Assert an Audit Centre Administrator can only view users from own organisation
+[] Assert an Audit Centre Lead Clinician can only view users from own Trust
+[] Assert an RCPCH Audit Lead can view all users
+
+[] Assert an audit centre clinician can only view patient records from own organisation
+[] Assert an Audit Centre Administrator can only view patient records from own organisation
+[] Assert an Audit Centre Lead Clinician can only view patient records from own Trust
+[] Assert an RCPCH Audit Lead can view all patient records
 """
 
 # python imports
@@ -131,8 +150,6 @@ def test_audit_centre_clinician_cases_list_access(client, e12_user_factory, seed
 
     res_other_org = client.get(reverse('cases', kwargs={'organisation_id':ORGANISATION_OTHER.id}))  
     
-    
-    
-    
+
     assert res_other_org.status_code == 403, f"User from {ORGANISATION_TEST_USER} requesting cases list from {ORGANISATION_OTHER}. Expecting 403 status_code, receiving {res_other_org.status_code}"
     
