@@ -1544,7 +1544,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_comorbidity", raise_exception=True)
+@permission_required("epilepsy12.view_comorbidity", raise_exception=True)
 def edit_comorbidity(request, comorbidity_id):
     """
     POST request from comorbidities.html partial on button click to edit episode
@@ -1740,7 +1740,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_comorbidity", raise_exception=True)
+@permission_required("epilepsy12.view_comorbidity", raise_exception=True)
 def comorbidities(request, multiaxial_diagnosis_id):
     """
     POST request from comorbidity partial to replace it with table

@@ -184,6 +184,16 @@ def test_users_list_view_permissions_success(
     [ ] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
     [ ] Assert an RCPCH Audit Lead can view field - response.status_code == 200
 
+    # Comorbidity
+    for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbidities']
+    [ ] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+    [ ] Assert an RCPCH Audit Lead can view field - response.status_code == 200
+
     # Syndrome
     for each field in fields ['edit_syndrome', 'close_syndrome']
     [ ] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
