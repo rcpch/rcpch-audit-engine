@@ -204,7 +204,8 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         # kpi 9 (ALL)
         registration__management__pass_kpi_9=True,
         
-
+        # kpi 10
+        ineligible_school_individual_healthcare_plan=True,
         
     
     )
