@@ -35,6 +35,31 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
             has_support_for_mental_health_support=False
         )
 
+        pass_kpi_9 = factory.Trait(
+            individualised_care_plan_in_place=True,
+            individualised_care_plan_has_parent_carer_child_agreement=True,
+            has_individualised_care_plan_been_updated_in_the_last_year=True,
+            has_rescue_medication_been_prescribed=True,
+            individualised_care_plan_parental_prolonged_seizure_care=True,
+            individualised_care_plan_include_first_aid=True,
+            individualised_care_plan_addresses_water_safety=True,
+            individualised_care_plan_includes_service_contact_details=True,
+            individualised_care_plan_includes_general_participation_risk=True,
+            individualised_care_plan_addresses_sudep=True,
+        )
+        fail_kpi_9 = factory.Trait(
+            individualised_care_plan_in_place=False,
+            individualised_care_plan_has_parent_carer_child_agreement=False,
+            has_individualised_care_plan_been_updated_in_the_last_year=False,
+            has_rescue_medication_been_prescribed=False,
+            individualised_care_plan_parental_prolonged_seizure_care=False,
+            individualised_care_plan_include_first_aid=False,
+            individualised_care_plan_addresses_water_safety=False,
+            individualised_care_plan_includes_service_contact_details=False,
+            individualised_care_plan_includes_general_participation_risk=False,
+            individualised_care_plan_addresses_sudep=False,
+        )
+
     # Once Registration instance made, it will attach to this instance
     registration = None
 
@@ -47,13 +72,11 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
         print(f"{extracted=}")
         print(f"{kwargs=}")
         if kwargs:
-            
-            if 'sodium_valproate' in kwargs:
+            if "sodium_valproate" in kwargs:
                 # create a related Valproate AEM instance, with pregnancy prevention fields set depending on sodium_valproate flag.
                 self.has_an_aed_been_given = True
-                
-                if kwargs['sodium_valproate'] == 'pass':
 
+                if kwargs["sodium_valproate"] == "pass":
                     E12AntiEpilepsyMedicineFactory(
                         management=self,
                         is_rescue_medicine=False,
@@ -64,7 +87,7 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
                         is_a_pregnancy_prevention_programme_needed=True,
                         has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
                     )
-                elif kwargs['sodium_valproate'] == 'fail':
+                elif kwargs["sodium_valproate"] == "fail":
                     E12AntiEpilepsyMedicineFactory(
                         management=self,
                         is_rescue_medicine=False,
