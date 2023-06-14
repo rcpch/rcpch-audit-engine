@@ -160,6 +160,7 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         organisations__organisation=ORGANISATION,
         registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True,
         registration__assessment__pass_epilepsy_specialist_nurse=True,
+        registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral=True,
     )
 
     calculate_kpis(case.registration)
