@@ -92,7 +92,7 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
             return None
 
         sodium_valproate = kwargs.pop('sodium_valproate', None)
-        print(f"Creating managmenet factory with {kwargs=}")
+
         E12ManagementFactory(
                 registration=self, 
                 antiepilepsymedicine__sodium_valproate=sodium_valproate if sodium_valproate else None,

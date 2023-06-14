@@ -76,8 +76,6 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
         if not create:
             return
 
-        print(f"{extracted=}")
-        print(f"{kwargs=}")
         if kwargs:
             if "sodium_valproate" in kwargs:
                 # create a related Valproate AEM instance, with pregnancy prevention fields set depending on sodium_valproate flag.

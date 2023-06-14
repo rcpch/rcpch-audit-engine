@@ -33,47 +33,44 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
         - KPI 1
             - PASS:
-                - `registration__assessment__pass_paediatrician_with_expertise_in_epilepsies`
+                registration__assessment__pass_paediatrician_with_expertise_in_epilepsies=True
             - FAIL:
-                - `registration__assessment__fail_paediatrician_with_expertise_in_epilepsies`
+                registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True
 
         - KPI 2
             - PASS:
-                - `registration__assessment__pass_epilepsy_specialist_nurse`
+                registration__assessment__pass_epilepsy_specialist_nurse=True
             - FAIL:
-                - `registration__assessment__fail_epilepsy_specialist_nurse`
+                registration__assessment__fail_epilepsy_specialist_nurse=True
 
-        - KPI 3 & 3b
+        - KPI 3 + 5 ELIGIBILITY FLAG
+        > NOTE: Due to eligibility reasons, KPI3+5 eligible only when age is 1y (<2y), KPI 6+8+10 only eligible when age is 12y(>=12y).
+            eligible_kpi_3_5_ineligible_6_8_10=True,
+        
+        - KPI 3 & 3b > NOTE: IF either PASS/FAIL flags set here, eligible_kpi_3_5_ineligible_6_8_10 must be used!
             - PASS:
-                - `registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral`
+                registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral=True,
             - FAIL:
-                - `registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral`
-            - INELIGIBLE:
-                - `registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral`
+                registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral=True,
 
         - KPI 4
             - PASS:
-                - `registration__epilepsy_context__pass_ecg`
-                - `registration__investigations__pass_ecg`
+                registration__epilepsy_context__pass_ecg=True,
+                registration__investigations__pass_ecg=True,
             - FAIL:
-                - `registration__epilepsy_context__fail_ecg`
-                - `registration__investigations__fail_ecg`
+                registration__epilepsy_context__fail_ecg=True,
+                registration__investigations__fail_ecg=True,
             - INELIGIBLE:
-                - `registration__epilepsy_context__ineligible_ecg`
+                registration__epilepsy_context__ineligible_ecg=True,
 
-        - KPI 5 NOTE: please see caveats defined in KPI 6
+        - KPI 5 > NOTE: IF either PASS/FAIL flags set here, eligible_kpi_3_5_ineligible_6_8_10 must be used!
             - PASS:
-                - `registration__investigations__pass_mri`
+                registration__investigations__pass_mri=True,
             - FAIL:
-                - `registration__investigations__fail_mri`
-            - INELIGIBLE:
-                - ineligible_mri
-                - registration__ineligible_mri
-                - registration__multiaxial_diagnosis__ineligible_mri
-                - registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri
+                registration__investigations__fail_mri=True,
 
         - KPI 6
-            NOTE: If either PASS/FAIL flags set, KPI5 PASS/FAIL FIELDS CAN NOT BE USED. KPI6 pass/fail fields make child 6yo (age at FPA >= 5 required to be eligible for this measure). Therefore, they automatically become ineligible for KPI 5 (eligibility requires age at FPA < 2).
+            > NOTE: If either PASS/FAIL flags set here, must use flag eligible_kpi_6_8_10_ineligible_3_5.
             - PASS:
                 pass_assessment_of_mental_health_issues=True,
                 registration__pass_assessment_of_mental_health_issues=True,
@@ -82,29 +79,26 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 fail_assessment_of_mental_health_issues=True,
                 registration__fail_assessment_of_mental_health_issues=True,
                 registration__multiaxial_diagnosis__fail_assessment_of_mental_health_issues=True,
-            - INELIGIBLE:
-                - `ineligible_assessment_of_mental_health_issues`
 
         - KPI 7
             - PASS:
-                - `registration__multiaxial_diagnosis__pass_mental_health_support`
-                - `registration__management__pass_mental_health_support`
+                registration__multiaxial_diagnosis__pass_mental_health_support=True,
+                registration__management__pass_mental_health_support=True,
             - FAIL:
-                - `registration__multiaxial_diagnosis__fail_mental_health_support`
-                - `registration__management__fail_mental_health_support`
+                registration__multiaxial_diagnosis__fail_mental_health_support=True,
+                registration__management__fail_mental_health_support=True,
             - INELIGIBLE:
-                - `registration__multiaxial_diagnosis__ineligible_mental_health_support`
+                registration__multiaxial_diagnosis__ineligible_mental_health_support=True,
         
         - KPI 8 
-            > NOTE: IF ANY OF THESE flags set, KPI5 PASS/FAIL FIELDS CAN NOT BE USED. See KPI 6 NOTE for reason (eligibility for this KPI requires age >= 12). If ineligible, age is set to fail mri, but stay eligible for KPI 6.
+            > NOTE: If either PASS/FAIL flags set here, must use flag eligible_kpi_6_8_10_ineligible_3_5.
             - PASS:
                 pass_sodium_valproate = True,
                 registration__management__sodium_valproate = 'pass',
             - FAIL:
                 fail_sodium_valproate = True,
                 registration__management__sodium_valproate = 'fail',
-            - INELIGIBLE:
-                ineligible_sodium_valproate=True,
+                
         - KPI 9
         > NOTE: as these sub-measures are all related, and flags are applied sequentially, we can only set ALL to pass or ALL to fail.
             - PASS
@@ -114,55 +108,50 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 registration__management__fail_kpi_9=True,
         
         - KPI 10
-        > NOTE: PASS/FAIL fields set KPI5 to Ineligible. See KPI6 for details. KPI 10 eligibility requires age >= 5.
+        > NOTE: NOTE: If either PASS/FAIL flags set here, must use flag eligible_kpi_6_8_10_ineligible_3_5.
             - PASS
-                pass_individualised_care_plan_includes_ehcp = True,
-                registration__management__pass_individualised_care_plan_includes_ehcp=True,
+                pass_school_individual_healthcare_plan = True,
+                registration__management__pass_school_individual_healthcare_plan=True,
             - FAIL
                 fail_school_individual_healthcare_plan = True,
                 registration__management__fail_school_individual_healthcare_plan=True,
-            - INELIGIBLE 
-            > NOTE: if ineligible, sets age to 1yo, so eligible for KPI5 but ineligible for KPI6
-                ineligible_individualised_care_plan_includes_ehcp=True,
-                
-                
+
     """
 
     class Meta:
         model = Case
 
     class Params:
-        ineligible_mri = factory.Trait(date_of_birth=date(2017, 1, 1))
+        
+        # helper eligibility flags to set age
+        eligible_kpi_3_5_ineligible_6_8_10 = factory.Trait(
+            date_of_birth = date(2021, 1, 1) # age = 1y
+        )
+        
+        eligible_kpi_6_8_10_ineligible_3_5= factory.Trait(
+            date_of_birth=date(2011, 1, 1)# age = 12y
+            )
 
-        pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
+        pass_assessment_of_mental_health_issues = factory.Trait(
+            eligible_kpi_6_8_10_ineligible_3_5=True,
+            )
         fail_assessment_of_mental_health_issues = factory.Trait(
             pass_assessment_of_mental_health_issues=True
         )
-        ineligible_assessment_of_mental_health_issues = factory.Trait(
-            ineligible_mri=False, date_of_birth=date(2022, 1, 1)
-        )
 
         pass_sodium_valproate = factory.Trait(
-            ineligible_mri=True,
-            date_of_birth=date(2010, 1, 1),
+            eligible_kpi_6_8_10_ineligible_3_5=True,
             sex=SEX_TYPE[2][0],
         )
         fail_sodium_valproate = factory.Trait(
-           pass_sodium_valproate=True
-        )
-        ineligible_sodium_valproate = factory.Trait(
-            ineligible_mri=True
+           pass_sodium_valproate=True,
         )
         
         pass_school_individual_healthcare_plan = factory.Trait(
-            ineligible_mri=True,
+            eligible_kpi_6_8_10_ineligible_3_5=True,
         )
         fail_school_individual_healthcare_plan = factory.Trait(
             pass_school_individual_healthcare_plan=True,
-        )
-        ineligible_school_individual_healthcare_plan = factory.Trait( 
-            ineligible_assessment_of_mental_health_issues = True,
-            date_of_birth=date(2022, 1, 1),
         )
         
 
