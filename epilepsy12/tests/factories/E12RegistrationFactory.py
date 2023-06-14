@@ -1,7 +1,7 @@
 """Factory fn to create new E12 Registrations"""
 
 # standard imports
-import datetime
+from datetime import date
 
 # third-party imports
 import factory
@@ -29,7 +29,7 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
     case = None
 
     # Sets the minimal 'required' fields for a registration to be valid
-    registration_date = datetime.date(2023, 1, 1)
+    registration_date = date(2023, 1, 1)
     eligibility_criteria_met = True
     audit_progress = factory.SubFactory(E12AuditProgressFactory)
 
@@ -89,3 +89,8 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         E12ManagementFactory,
         factory_related_name="registration",
     )
+
+    class Params:
+        ineligible_mri = factory.Trait(
+            registration_date = date(2023,1,1)
+        )

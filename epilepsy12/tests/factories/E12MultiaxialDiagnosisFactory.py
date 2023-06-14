@@ -29,3 +29,27 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
 
     # Once Registration instance made, it will attach to this instance
     registration = None
+
+    # Reverse dependency
+    # comorbidity = factory.RelatedFactory(
+    #     E12ComorbidityFactory,
+    #     factory_related_name="multiaxial_diagnosis",
+    # )
+    
+    # Reverse dependency
+    syndrome_entity = factory.RelatedFactory(
+        E12SyndromeFactory,
+        factory_related_name="multiaxial_diagnosis",
+    )
+
+    # Reverse dependency
+    episode = factory.RelatedFactory(
+        E12EpisodeFactory,
+        factory_related_name="multiaxial_diagnosis",
+    )
+    
+    class Params:
+        ineligible_mri = factory.Trait(
+            syndrome_present=True,
+        )
+    

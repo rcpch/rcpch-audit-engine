@@ -3,6 +3,7 @@
 
 # python imports
 import pytest
+from datetime import date
 
 # django imports
 
@@ -172,6 +173,10 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         registration__investigations__pass_ecg = True,
         
         # kpi 5
+        ineligible_mri = True,
+        registration__ineligible_mri = True,
+        registration__multiaxial_diagnosis__ineligible_mri=True,
+        registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri=True,
         
     )
 
