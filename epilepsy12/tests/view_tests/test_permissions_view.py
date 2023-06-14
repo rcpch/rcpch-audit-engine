@@ -203,6 +203,34 @@ def test_users_list_view_permissions_success(
     [ ] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
     [ ] Assert an RCPCH Audit Lead can view 'assessment' - response.status_code == 200
 
+    # Investigations
+    [ ] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
+    [ ] Assert an RCPCH Audit Lead can view 'investigations' - response.status_code == 200
+
+    # Management
+    [ ] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == 403
+    [ ] Assert an RCPCH Audit Lead can view 'management' - response.status_code == 200
+
+    # Antiepilepsy Medicine
+    for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medicine']
+    [ ] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+    [ ] Assert an RCPCH Audit Lead can view field - response.status_code == 200
+
     """
 
     # set up constants

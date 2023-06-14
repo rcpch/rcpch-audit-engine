@@ -26,6 +26,7 @@ from ..decorator import user_may_view_this_child
 
 @login_required
 @user_may_view_this_child()
+@permission_required("epilepsy12.view_management", raise_exception=True)
 def management(request, case_id):
     # function called on form load
     # creates a new management object if one does not exist
