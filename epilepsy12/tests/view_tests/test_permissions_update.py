@@ -167,7 +167,41 @@ for field in fields: [
 
 # Management
 for field in fields: [
-    
+    'individualised_care_plan_in_place',
+    'individualised_care_plan_date',
+    'individualised_care_plan_has_parent_carer_child_agreement',
+    'individualised_care_plan_includes_service_contact_details',
+    'individualised_care_plan_include_first_aid',
+    'individualised_care_plan_parental_prolonged_seizure_care',
+    'individualised_care_plan_includes_general_participation_risk',
+    'individualised_care_plan_addresses_water_safety',
+    'individualised_care_plan_addresses_sudep',
+    'individualised_care_plan_includes_ehcp',
+    'has_individualised_care_plan_been_updated_in_the_last_year',
+    'has_been_referred_for_mental_health_support',
+    'has_support_for_mental_health_support',
+]
+[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Clinician can change 'rfield' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+
+# Antiepilepsy Medicine
+for field in fields: [
+    'has_an_aed_been_given',
+    'edit_antiepilepsy_medicine',
+    'medicine_id',
+    'antiepilepsy_medicine_start_date',
+    'antiepilepsy_medicine_add_stop_date',
+    'antiepilepsy_medicine_remove_stop_date',
+    'antiepilepsy_medicine_stop_date',
+    'antiepilepsy_medicine_risk_discussed',
+    'is_a_pregnancy_prevention_programme_in_place',
+    'has_a_valproate_annual_risk_acknowledgement_form_been_completed',
+    'has_rescue_medication_been_prescribed',
 ]
 [ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403

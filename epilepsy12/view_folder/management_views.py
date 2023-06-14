@@ -94,7 +94,7 @@ Fields relating to rescue medication begin here
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_management", raise_exception=True)
+@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def has_an_aed_been_given(request, management_id):
     # HTMX call back from management template
     # POST request on toggle button click
@@ -844,7 +844,7 @@ Fields relating to individual care plans begin here
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
+@permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_in_place(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
