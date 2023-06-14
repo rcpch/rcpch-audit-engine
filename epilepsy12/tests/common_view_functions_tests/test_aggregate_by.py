@@ -24,6 +24,7 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
 )
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
+from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
 
 
 @pytest.mark.django_db
@@ -172,130 +173,26 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     # define constants
     ORGANISATION = Organisation.objects.first()
 
-    pass_kpi_1 = {
-        "registration__assessment__pass_paediatrician_with_expertise_in_epilepsies": True,
-    }
-    fail_kpi_1 = {
-        "registration__assessment__fail_paediatrician_with_expertise_in_epilepsies": True
-    }
-
-    pass_kpi_2 = {
-        "registration__assessment__pass_epilepsy_specialist_nurse": True,
-    }
-    fail_kpi_2 = {"registration__assessment__fail_epilepsy_specialist_nurse": True}
-
-    eligible_kpi_3_5_ineligible_6_8_10 = {
-        "eligible_kpi_3_5_ineligible_6_8_10": True,
-    }
-    eligible_kpi_6_8_10_ineligible_3_5 = {
-        "eligible_kpi_6_8_10_ineligible_3_5": True,
-        # extra ineligibility kpi 3
-        "registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral": True,
-        # extra ineligibility kpi5
-        "registration__ineligible_mri": True,
-        "registration__multiaxial_diagnosis__ineligible_mri": True,
-        "registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri": True,
-    }
-
-    pass_kpi_3 = {
-        "registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral": True,
-    }
-    fail_kpi_3 = {
-        "registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral": True,
-    }
-
-    pass_kpi_4 = {
-        "registration__epilepsy_context__pass_ecg": True,
-        "registration__investigations__pass_ecg": True,
-    }
-    fail_kpi_4 = {
-        "registration__epilepsy_context__fail_ecg": True,
-        "registration__investigations__fail_ecg": True,
-    }
-    ineligible_kpi_4 = {
-        "registration__epilepsy_context__ineligible_ecg": True,
-    }
-
-    pass_kpi_5 = {
-        "registration__investigations__pass_mri": True,
-    }
-    fail_kpi_5 = {
-        "registration__investigations__fail_mri": True,
-    }
-
-    pass_kpi_6 = {
-        "pass_assessment_of_mental_health_issues": True,
-        "registration__pass_assessment_of_mental_health_issues": True,
-        "registration__multiaxial_diagnosis__pass_assessment_of_mental_health_issues": True,
-    }
-    fail_kpi_6 = {
-        "fail_assessment_of_mental_health_issues": True,
-        "registration__fail_assessment_of_mental_health_issues": True,
-        "registration__multiaxial_diagnosis__fail_assessment_of_mental_health_issues": True,
-    }
-
-    pass_kpi_7 = {
-        "registration__multiaxial_diagnosis__pass_mental_health_support": True,
-        "registration__management__pass_mental_health_support": True,
-    }
-    fail_kpi_7 = {
-        "registration__multiaxial_diagnosis__fail_mental_health_support": True,
-        "registration__management__fail_mental_health_support": True,
-    }
-    ineligible_kpi_7 = {
-        "registration__multiaxial_diagnosis__ineligible_mental_health_support": True,
-    }
-
-    pass_kpi_8 = {
-        "pass_sodium_valproate": True,
-        "registration__management__sodium_valproate": "pass",
-    }
-    fail_kpi_8 = {
-        "fail_sodium_valproate": True,
-        "registration__management__sodium_valproate": "fail",
-    }
-
-    pass_kpi_9 = {
-        "registration__management__pass_kpi_9": True,
-    }
-    fail_kpi_9 = {
-        "registration__management__fail_kpi_9": True,
-    }
-
-    pass_kpi_10 = {
-        "pass_school_individual_healthcare_plan": True,
-        "registration__management__pass_school_individual_healthcare_plan": True,
-    }
-    fail_kpi_10 = {
-        "fail_school_individual_healthcare_plan": True,
-        "registration__management__fail_school_individual_healthcare_plan": True,
-    }
-
+    # create a KPI object 
+    kpi_metric_eligible_3_5_object = KPIMetric(eligible_kpi_3_5=True, eligible_kpi_6_8_10=False)
+    
+    # generate answer set for e12_case_factory constructor
+    answers_eligible_3_5 = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1='PASS',
+        kpi_2='PASS',
+        kpi_3='PASS',
+        kpi_4='INELIGIBLE',
+        kpi_5='FAIL',
+        kpi_7='PASS',
+        kpi_9='PASS',
+    )
+    
     case = e12_case_factory.create(
+        
         organisations__organisation=ORGANISATION,
-        # """age-dependent eligibility flag"""
-        # **eligible_kpi_3_5_ineligible_6_8_10,
-        **eligible_kpi_6_8_10_ineligible_3_5,
-        # kpi 1
-        **fail_kpi_1,
-        # kpi 2
-        **fail_kpi_2,
-        # kpi 3 & 3b
-        # **pass_kpi_3,
-        # kpi 4
-        **ineligible_kpi_4,
-        # kpi 5
-        # **pass_kpi_5,
-        # kpi 6
-        **fail_kpi_6,
-        # kpi 7
-        **ineligible_kpi_7,
-        # kpi 8
-        **fail_kpi_8,
-        # kpi 9 (ALL)
-        **fail_kpi_9,
-        # kpi 10
-        **fail_kpi_10,
+        
+        # feed in values for eligible
+        **answers_eligible_3_5,
     )
 
     registration = Registration.objects.get(case=case)
