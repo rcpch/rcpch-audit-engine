@@ -27,8 +27,7 @@ class E12UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Epilepsy12User  # returns the Epilepsy12User object
 
-    email = factory.Sequence(lambda n: f"e12_test_user_{n}@rcpch.com")
-    password = "password"
+    email = factory.Sequence(lambda n: f"e12_test_user_{n}@nhs.net")
     first_name = "Mandel"
     surname = "Brot"
     is_active = True
@@ -44,6 +43,9 @@ class E12UserFactory(factory.django.DjangoModelFactory):
         if not create:
             return
 
+        # hook into post gen hook to set pass
+        self.set_password('pw')
+        
         if extracted:
             for group in extracted:
                 self.groups.add(group)
