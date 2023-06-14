@@ -36,13 +36,18 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             - PASS: `registration__assessment__pass_epilepsy_specialist_nurse`
             - FAIL: `registration__assessment__fail_epilepsy_specialist_nurse`
         - KPI 3 & 3b
-            - PASS: `pass_tertiary_input_AND_epilepsy_surgery_referral`
-            - FAIL: `fail_tertiary_input_AND_epilepsy_surgery_referral`
-            - INELIGIBLE: `ineligible_tertiary_input_AND_epilepsy_surgery_referral`
+            - PASS: `registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral`
+            - FAIL: `registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral`
+            - INELIGIBLE: `registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral`
         - KPI 4
-            - PASS: `pass_tertiary_input_AND_epilepsy_surgery_referral`
-            - FAIL: `fail_tertiary_input_AND_epilepsy_surgery_referral`
-            - INELIGIBLE: `ineligible_tertiary_input_AND_epilepsy_surgery_referral`
+            - PASS: 
+                - `registration__epilepsy_context__pass_ecg`
+                - `registration__investigations__pass_ecg`
+            - FAIL: 
+                - `registration__epilepsy_context__fail_ecg`
+                - `registration__investigations__fail_ecg`
+            - INELIGIBLE: 
+                - `registration__epilepsy_context__ineligible_ecg`
     """
 
     class Meta:

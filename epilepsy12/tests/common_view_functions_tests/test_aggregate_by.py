@@ -158,9 +158,21 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
 
     case = e12_case_factory.create(
         organisations__organisation=ORGANISATION,
+        # kpi 1
         registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True,
+        
+        # kpi 2
         registration__assessment__pass_epilepsy_specialist_nurse=True,
+        
+        # kpi 3 & 3b
         registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral=True,
+        
+        # kpi 4
+        registration__epilepsy_context__pass_ecg = True,
+        registration__investigations__pass_ecg = True,
+        
+        # kpi 5
+        
     )
 
     registration = Registration.objects.get(case=case)
