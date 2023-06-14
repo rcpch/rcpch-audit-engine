@@ -138,6 +138,14 @@ def test_users_list_view_permissions_success(
     [x] Assert an RCPCH Audit Lead can view users inside own Trust - response.status_code == 200
     [x] Assert an RCPCH Audit Lead can view users inside a different Trust - response.status_code == 200
 
+    # Assessment
+    [ ] Assert an Audit Centre Administrator can view assessment inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Administrator cannot view assessment inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Clinician can view assessment inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician cannot view assessment inside a different Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Lead Clinician can view assessment inside own Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Lead Clinician cannot view assessment inside a different Trust - response.status_code == 403
+    [ ] Assert an RCPCH Audit Lead can view assessment - response.status_code == 200
     """
 
     # set up constants
