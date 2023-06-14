@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="ui container">
-        <div class='ui grid'>
-            <div class='twelve wide centered column'>
-                <div class='content'>
-                    <div class='ui icon rcpch_warning message'>
+<div class="ui container">
+    <div class='ui grid'>
+        <div class='twelve wide centered column'>
+            <div class='content'>
+                <div class='ui icon rcpch_warning message'>
                     <i class='exclamation circle icon'></i>
                     <div class='content'>
                         <div class='header'>
-                        403 - Access Denied
+                            403 - Access Denied
                         </div>
-                    You are seeing this message because you are trying to access a record where you don't have the right permissions.
-                    This must be frustrating and we are sorry. Unfortunately the only way this can be resolved is if you contact your local Epilepsy 12 administrator or RCPCH on .....
+                        <p>You are seeing this message because you are trying to access a record where you don't have
+                            the right permissions.</p>
+
+                        <p>This must be frustrating and we are sorry. Unfortunately the only way this can be resolved is
+                            if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
+
+
+
                     </div>
                 </div>
             </div>
@@ -20,4 +26,4 @@
     </div>
 
 
-{% endblock %}
+    {% endblock %}
