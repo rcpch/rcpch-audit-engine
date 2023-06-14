@@ -30,15 +30,22 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
     Useful flags:
         - KPI 1
-            - PASS: `registration__assessment__pass_paediatrician_with_expertise_in_epilepsies`
-            - FAIL: `registration__assessment__fail_paediatrician_with_expertise_in_epilepsies`
+            - PASS: 
+                - `registration__assessment__pass_paediatrician_with_expertise_in_epilepsies`
+            - FAIL: 
+                - `registration__assessment__fail_paediatrician_with_expertise_in_epilepsies`
         - KPI 2
-            - PASS: `registration__assessment__pass_epilepsy_specialist_nurse`
-            - FAIL: `registration__assessment__fail_epilepsy_specialist_nurse`
+            - PASS: 
+                - `registration__assessment__pass_epilepsy_specialist_nurse`
+            - FAIL: 
+                - `registration__assessment__fail_epilepsy_specialist_nurse`
         - KPI 3 & 3b
-            - PASS: `registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral`
-            - FAIL: `registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral`
-            - INELIGIBLE: `registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral`
+            - PASS: 
+                - `registration__assessment__pass_tertiary_input_AND_epilepsy_surgery_referral`
+            - FAIL: 
+                - `registration__assessment__fail_tertiary_input_AND_epilepsy_surgery_referral`
+            - INELIGIBLE: 
+                - `registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral`
         - KPI 4
             - PASS:
                 - `registration__epilepsy_context__pass_ecg`
