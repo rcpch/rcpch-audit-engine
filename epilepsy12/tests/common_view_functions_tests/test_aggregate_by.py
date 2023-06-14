@@ -175,9 +175,12 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         # kpi 5
         ineligible_mri = True,
         registration__ineligible_mri = True,
-        registration__multiaxial_diagnosis__ineligible_mri=True,
-        registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri=True,
-        
+        registration__multiaxial_diagnosis__ineligible_mri = True,
+        registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri = True,
+  
+        # kpi 6
+        ineligible_assessment_of_mental_health_issues = True,
+    
     )
 
     registration = Registration.objects.get(case=case)

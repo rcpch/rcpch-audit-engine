@@ -16,13 +16,14 @@ def score_kpi_6(registration_instance, age_at_first_paediatric_assessment) -> in
 
     multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
 
+    # ineligible
+    if age_at_first_paediatric_assessment < 5:
+        return KPI_SCORE["INELIGIBLE"]
+    
     # not scored
     if multiaxial_diagnosis.mental_health_screen is None:
         return KPI_SCORE["NOT_SCORED"]
 
-    # ineligible
-    if age_at_first_paediatric_assessment < 5:
-        return KPI_SCORE["INELIGIBLE"]
 
     # score kpi
     if multiaxial_diagnosis.mental_health_screen:

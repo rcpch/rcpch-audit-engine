@@ -23,7 +23,6 @@ from epilepsy12.constants import (
 
 
 class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
-
     class Meta:
         model = MultiaxialDiagnosis
 
@@ -35,7 +34,7 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
     #     E12ComorbidityFactory,
     #     factory_related_name="multiaxial_diagnosis",
     # )
-    
+
     # Reverse dependency
     syndrome_entity = factory.RelatedFactory(
         E12SyndromeFactory,
@@ -47,9 +46,15 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
         E12EpisodeFactory,
         factory_related_name="multiaxial_diagnosis",
     )
-    
+
     class Params:
         ineligible_mri = factory.Trait(
             syndrome_present=True,
         )
-    
+
+        pass_assessment_of_mental_health_issues = factory.Trait(
+            mental_health_screen=True
+        )
+        fail_assessment_of_mental_health_issues = factory.Trait(
+             mental_health_screen=False
+        )
