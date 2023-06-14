@@ -17,13 +17,25 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     
     Using FactoryBoy factories, Traits can be set on related factories, directly on creation of this e12_user_factory. To use the useful flags defined below, set the value of the flag to True, to get the required result.
     
-    NOTE: ONLY 1 FLAG SHOULD BE SET PER KPI (i.e. don't set KPI 1 to pass AND fail).
+    Example use:
+    
+        case = e12_case_factory.create(
+            registration__assessment__fail_paediatrician_with_expertise_in_epilepsies=True,
+            
+            registration__assessment__pass_epilepsy_specialist_nurse=True,
+        )
+    
+    NOTE: ONLY 1 FLAG SHOULD BE SET TRUE PER KPI (i.e. don't set KPI 1 to pass AND fail).
+    
+
     
     Useful flags:
         - KPI 1
             - PASS: `pass_paediatrician_with_expertise_in_epilepsies`
             - FAIL: `fail_paediatrician_with_expertise_in_epilepsies`
-    
+        - KPI 2
+            - PASS: `pass_epilepsy_specialist_nurse`
+            - FAIL: `fail_epilepsy_specialist_nurse`
     """
     class Meta:
         model = Case
