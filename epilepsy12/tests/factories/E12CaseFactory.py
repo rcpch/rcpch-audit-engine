@@ -84,6 +84,16 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
                 - `registration__multiaxial_diagnosis__fail_assessment_of_mental_health_issues`
             - INELIGIBLE:
                 - `ineligible_assessment_of_mental_health_issues`
+        
+        - KPI 7
+            - PASS:
+                - `registration__multiaxial_diagnosis__pass_mental_health_support`
+                - `registration__management__pass_mental_health_support`
+            - FAIL:
+                - `registration__multiaxial_diagnosis__fail_mental_health_support`
+                - `registration__management__fail_mental_health_support`
+            - INELIGIBLE:
+                - `registration__multiaxial_diagnosis__ineligible_mental_health_support`
     """
 
     class Meta:
