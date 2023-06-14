@@ -27,15 +27,6 @@ class E12EpisodeFactory(factory.django.DjangoModelFactory):
     
     This E12EpisodeFactory is generated AFTER a E12MaDFactory generated.
     
-    Default:
-        - Seizure onset 7 days before registration date
-        - Approximate date confidence
-        - Single Episode
-        - Epileptic
-        - Description: "the patient was running when they were unresponsive and acalculia"
-        - seizure type = Focal Onset
-            - Left-sided, atonic with impaired awareness and temporal EEG findings
-    
     Flags:
         - `epileptic_seizure_onset_type_generalised`: if True, resets Focal Onset fields, sets Generalised onset with Tonic Clonic
         - `epileptic_seizure_onset_type_unknown`: if True, resets Focal Onset fields, sets to unknown seizure type
@@ -48,46 +39,6 @@ class E12EpisodeFactory(factory.django.DjangoModelFactory):
     
     # Once MultiaxialDiagnosis instance made, it will attach to this instance
     multiaxial_diagnosis = None
-    
-    # Once an Episode is made, set seizure_onset_date as 7 days before registration date
-    @factory.lazy_attribute
-    def seizure_onset_date(self): 
-        return self.multiaxial_diagnosis.registration.registration_date - timedelta(days=7)
-    
-    seizure_onset_date_confidence=DATE_ACCURACY[0][0] # Apx DATE
-    
-    episode_definition=EPISODE_DEFINITION[0][0] # SINGLE EPISODE
-    
-    epilepsy_or_nonepilepsy_status = EPILEPSY_DIAGNOSIS_STATUS[0][0] # FIRST EPISODE MUST BE EPILEPTIC, subsequent can be random
-    
-    has_description_of_the_episode_or_episodes_been_gathered = True 
-    
-    description = factory.Iterator(Keyword.objects.all(), getter=lambda keywrd: f"Patient was running when they developed {keywrd}")
-    description_keywords = factory.Iterator(Keyword.objects.all(), getter=lambda keywrd: [keywrd]) # Episode.description_keywords must be array type
-    
-    epileptic_seizure_onset_type = EPILEPSY_SEIZURE_TYPE[0][0] # 'FO' Focal onset
-    focal_onset_impaired_awareness = True
-    focal_onset_automatisms = None
-    focal_onset_atonic = True
-    focal_onset_clonic = None
-    focal_onset_left = True
-    focal_onset_right = None
-    focal_onset_epileptic_spasms = None
-    focal_onset_hyperkinetic = None
-    focal_onset_myoclonic = None
-    focal_onset_tonic = None
-    focal_onset_autonomic = None
-    focal_onset_behavioural_arrest = None
-    focal_onset_cognitive = None
-    focal_onset_emotional = None
-    focal_onset_sensory = None
-    focal_onset_centrotemporal = None
-    focal_onset_temporal = True
-    focal_onset_frontal = None
-    focal_onset_parietal = None
-    focal_onset_occipital = None
-    focal_onset_gelastic = None
-    focal_onset_focal_to_bilateral_tonic_clonic = None
     
     
     class Params:
