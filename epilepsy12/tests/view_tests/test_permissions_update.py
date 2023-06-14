@@ -69,5 +69,64 @@ for field in fields: [
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
 
+# Multiaxial Diagnosis
+for field in fields: [
+    'epilepsy_cause_known',
+    'epilepsy_cause',
+    'epilepsy_cause_categories',
+    'relevant_impairments_behavioural_educational',
+    'mental_health_screen',
+    'mental_health_issue_identified',
+    'mental_health_issue',
+    'global_developmental_delay_or_learning_difficulties',
+    'global_developmental_delay_or_learning_difficulties_severity',
+    'autistic_spectrum_disorder',
+]
+[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Clinician can change 'rfield' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+
+# Episode
+for field in fields: [
+    seizure_onset_date',
+    seizure_onset_date_confidence',
+    episode_definition',
+    has_description_of_the_episode_or_episodes_been_gathered',
+    edit_description',
+    delete_description_keyword',
+    epilepsy_or_nonepilepsy_status',
+    epileptic_seizure_onset_type',
+    focal_onset_epilepsy_checked_changed',
+    epileptic_generalised_onset',
+    nonepilepsy_generalised_onset',
+    nonepileptic_seizure_type',
+    nonepileptic_seizure_subtype',
+]
+[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Clinician can change 'rfield' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+
+# Comorbidity
+for field in fields: [
+    'edit_comorbidity',
+    'comorbidity_diagnosis_date',
+    'comorbidity_diagnosis',
+]
+[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Clinician can change 'rfield' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+
 
 """
