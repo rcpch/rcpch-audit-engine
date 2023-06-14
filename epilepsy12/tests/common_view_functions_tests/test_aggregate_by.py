@@ -59,18 +59,25 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
     # define constants
     ORGANISATION = Organisation.objects.first()
 
+    # Loop through each ethnicity
+    cases_list = []
+    
     # Loop through each deprivation quintile
     for deprivation_type in DEPRIVATION_QUINTILES:
         # set an organisation constant
         organisation = Organisation.objects.first()
 
-        # For each deprivation, assign 10 cases
+        # For each deprivation, assign 10 cases, add to cases_list
         for _ in range(10):
-            e12_case_factory.create(
+            case = e12_case_factory.build(
                 index_of_multiple_deprivation_quintile=deprivation_type[1],
                 registration=None,  # ensure related audit factories not generated
                 organisations__organisation=ORGANISATION,
             )
+            cases_list.append(case)
+    
+    # single SQL INSERT to save all cases
+    Case.objects.bulk_create(cases_list)
 
     total_count = cases_aggregated_by_deprivation_score(
         selected_organisation=organisation
@@ -95,24 +102,27 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     ORGANISATION = Organisation.objects.first()
 
     # Loop through each ethnicity
+    cases_list = []
     for ethnicity_type in ETHNICITIES:
-        # set an organisation constant
-        organisation = Organisation.objects.first()
 
-        # For each ethnicity, assign 10 cases
+        # For each ethnicity, build 10 cases, and append to cases_list
         for _ in range(10):
-            e12_case_factory.create(
+            case = e12_case_factory.build(
                 ethnicity=ethnicity_type[0],
                 registration=None,  # ensure related audit factories not generated
                 organisations__organisation=ORGANISATION,
             )
+            cases_list.append(case)
+    
+    # single SQL INSERT to save all cases
+    Case.objects.bulk_create(cases_list)
 
     total_count = cases_aggregated_by_ethnicity(
-        selected_organisation=organisation
+        selected_organisation=ORGANISATION
     ).count()
 
     matching_count = (
-        cases_aggregated_by_ethnicity(selected_organisation=organisation)
+        cases_aggregated_by_ethnicity(selected_organisation=ORGANISATION)
         .filter(ethnicities=10)
         .count()
     )
