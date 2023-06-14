@@ -16,7 +16,7 @@ from epilepsy12.common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     calculate_kpis,
 )
-from epilepsy12.models import Organisation, Case, KPI, Registration
+from epilepsy12.models import Organisation, Case, KPI, Registration, AntiEpilepsyMedicine
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
 
 
@@ -189,11 +189,17 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         registration__multiaxial_diagnosis__syndrome_entity__ineligible_mri = True,
   
         # kpi 6
-        ineligible_assessment_of_mental_health_issues = True,
+        pass_assessment_of_mental_health_issues=True,
+        registration__pass_assessment_of_mental_health_issues=True,
+        registration__multiaxial_diagnosis__pass_assessment_of_mental_health_issues=True,
         
         # kpi 7
         registration__multiaxial_diagnosis__pass_mental_health_support = True,
         registration__management__pass_mental_health_support = True,
+        
+        # kpi 8
+        fail_sodium_valproate = True,
+        registration__management__sodium_valproate = 'fail',
     
     )
 
