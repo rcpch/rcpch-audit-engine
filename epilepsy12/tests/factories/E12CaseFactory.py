@@ -13,6 +13,18 @@ from epilepsy12.constants import VALID_NHS_NUMS
 
 
 class E12CaseFactory(factory.django.DjangoModelFactory):
+    """Factory for making E12 Cases, with all associated models (with answers as model-defined defaults, usually None)
+    
+    Using FactoryBoy factories, Traits can be set on related factories, directly on creation of this e12_user_factory. To use the useful flags defined below, set the value of the flag to True, to get the required result.
+    
+    NOTE: ONLY 1 FLAG SHOULD BE SET PER KPI (i.e. don't set KPI 1 to pass AND fail).
+    
+    Useful flags:
+        - KPI 1
+            - PASS: `pass_paediatrician_with_expertise_in_epilepsies`
+            - FAIL: `fail_paediatrician_with_expertise_in_epilepsies`
+    
+    """
     class Meta:
         model = Case
 
