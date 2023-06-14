@@ -68,18 +68,17 @@ def test_measure_8_sodium_valproate_risk_eligible(
         sex=SEX,
         date_of_birth=DATE_OF_BIRTH,
         registration__registration_date=REGISTRATION_DATE,
+        registration__management__has_an_aed_been_given = True
     )
 
     # get management
     management = case.registration.management
 
-    # clean current AEMs
-    aem = AntiEpilepsyMedicine.objects.filter(management=management)
-
-    aem.delete()
+    # clean current AEMs if any are set
+    AntiEpilepsyMedicine.objects.filter(management=management).delete()
 
     # create and save a valproate AEM entry with paramtrized constants
-    new_valproate = AntiEpilepsyMedicine.objects.create(
+    AntiEpilepsyMedicine.objects.create(
         management=management,
         is_rescue_medicine=False,
         medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
@@ -172,9 +171,14 @@ def test_measure_8_sodium_valproate_risk_ineligible(
     aem.delete()
 
     if aed_given:
+        
+        # AED given, update management
+        management.has_an_aed_been_given = True
+        management.save()
+        
         # create and save an AEM entry which ISN'T valproate
         if not_valproate:
-            new_aem = AntiEpilepsyMedicine.objects.create(
+            AntiEpilepsyMedicine.objects.create(
                 management=management,
                 is_rescue_medicine=False,
                 medicine_entity=MedicineEntity.objects.get(medicine_name="Lorazepam"),
@@ -182,7 +186,7 @@ def test_measure_8_sodium_valproate_risk_ineligible(
 
         # create and save a valproate AEM entry. Only case is <12yoF or 12yoM
         else:
-            new_valproate = AntiEpilepsyMedicine.objects.create(
+            AntiEpilepsyMedicine.objects.create(
                 management=management,
                 is_rescue_medicine=False,
                 medicine_entity=MedicineEntity.objects.get(
