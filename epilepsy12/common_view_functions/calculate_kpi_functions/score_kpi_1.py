@@ -49,12 +49,9 @@ def score_kpi_1(registration_instance) -> int:
     # score KPI
     if all_consultant_paediatrician_fields_complete:
         passed_metric = (
-            relativedelta(
-                assessment.consultant_paediatrician_input_date,
-                assessment.consultant_paediatrician_referral_date,
-            ).days
-            <= 14
-        )
+            assessment.consultant_paediatrician_input_date
+            - assessment.consultant_paediatrician_referral_date
+        ).days <= 14
         if passed_metric:
             return KPI_SCORE["PASS"]
         else:
@@ -62,12 +59,9 @@ def score_kpi_1(registration_instance) -> int:
 
     elif all_paediatric_neurologist_fields_complete:
         passed_metric = (
-            relativedelta(
-                assessment.paediatric_neurologist_input_date,
-                assessment.paediatric_neurologist_referral_date,
-            ).days
-            <= 14
-        )
+            assessment.paediatric_neurologist_input_date
+            - assessment.paediatric_neurologist_referral_date
+        ).days <= 14
         if passed_metric:
             return KPI_SCORE["PASS"]
         else:
