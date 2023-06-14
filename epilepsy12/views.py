@@ -536,18 +536,21 @@ def rcpch_403(request, exception):
     # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
     # from django-htmx middleware forces a redirect. Neat.
     if request.htmx:
+        
         redirect = reverse_lazy("redirect_403")
         return HttpResponseClientRedirect(redirect)
     else:
+        
         return render(
-            request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}
+            request, template_name="epilepsy12/error_pages/rcpch_403.html", context={},
+            status=403
         )
 
 
 def redirect_403(request):
     # return the custom 403 template. There is no context to add.
     return render(
-        request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}
+        request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}, status=403
     )
 
 
