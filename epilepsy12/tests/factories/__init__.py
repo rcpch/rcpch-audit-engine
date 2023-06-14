@@ -1,4 +1,4 @@
-from .groups_permissions_cases_seed_fixture import groups_cases_seeder
+from .groups_permissions_cases_seed_fixture import seed_groups_fixture, cases_seeder
 from .E12AntiEpilepsyMedicineFactory import E12AntiEpilepsyMedicineFactory
 from .E12AssessmentFactory import E12AssessmentFactory
 from .E12AuditProgressFactory import E12AuditProgressFactory
