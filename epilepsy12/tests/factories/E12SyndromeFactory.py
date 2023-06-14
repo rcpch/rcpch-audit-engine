@@ -25,6 +25,8 @@ class E12SyndromeFactory(factory.django.DjangoModelFactory):
 
     # Once MultiaxialDiagnosis instance made, it will attach to this instance
     multiaxial_diagnosis = None
+    
+    syndrome = factory.LazyAttribute(lambda _: SyndromeEntity.objects.first())
 
     class Params:
         ineligible_mri = factory.Trait(
