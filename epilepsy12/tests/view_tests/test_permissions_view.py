@@ -108,13 +108,15 @@ for each field in fields ['edit_episode','close_episode']
 
 ## Syndrome
 for each field in fields ['edit_syndrome', 'close_syndrome']
-[ ] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view field - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician can view field inside a different Trust - response.status_code == 403
+
+    [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
 
 ## Comorbidity
 for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbidities']
