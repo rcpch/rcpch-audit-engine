@@ -81,13 +81,17 @@ E12UserFactory(
 [x] Assert an Audit Centre Lead Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
 
 ## Multiaxial Diagnosis
-[ ] Assert an Audit Centre Administrator can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+
+[x] Assert an Audit Centre Administrator can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Lead Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+[x] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' inside own Trust- response.status_code == 200
+[x] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' outside own Trust- response.status_code == 200
+
+
 [ ] Assert an Audit Centre Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+[ ] Assert an Audit Centre Administrator cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' - response.status_code == 200
 
 ## Episode
 for each field in fields ['edit_episode','close_episode']
@@ -633,10 +637,6 @@ def test_epilepsy_context_view_permissions_forbidden(
     """
 
     # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
                 ParentOrganisation_ODSCode="RGT",
@@ -663,4 +663,96 @@ def test_epilepsy_context_view_permissions_forbidden(
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested epilepsy_context page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+@pytest.mark.django_db
+def test_multiaxial_diagnosis_view_permissions_success(
+    client
+):
+    """
+    Assert these users CAN view multiaxial_diagnosis for their own Trust.
+    
+    RCPCH Audit Lead has additional test to assert can view multiaxial_diagnosis outside own Trust.
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f'child_{TEST_USER_ORGANISATION.OrganisationName}'
+    )
+    
+    users = Epilepsy12User.objects.all()
+
+    for test_user in users:
+    
+        client.force_login(test_user)
+
+        # Get response object
+        response = client.get(
+            reverse(
+                "multiaxial_diagnosis",
+                kwargs={"case_id": CASE_FROM_SAME_ORG.id},
+            )
+        )
+
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+        # Additional test: assert different organisation if RCPCH AUDIT LEAD
+        # ADDENBROOKE'S
+        if test_user.role == test_user_rcpch_audit_lead_data.role: 
+            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                ODSCode="RGT01",
+                ParentOrganisation_ODSCode="RGT",
+            )
+            
+            # Request e12 patients list endpoint url different org
+            response = client.get(
+                reverse(
+                    "cases",
+                    kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
+                )
+            )
+
+            assert (
+                response.status_code == 200
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+@pytest.mark.django_db
+def test_multiaxial_diagnosis_view_permissions_forbidden(
+    client
+):
+    """
+    Assert these users CANT view multiaxial_diagnosis for different Trust.
+    """
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                ODSCode="RGT01",
+                ParentOrganisation_ODSCode="RGT",
+            )
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f'child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}'
+    )
+    
+   # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE 
+    users = Epilepsy12User.objects.all().exclude(first_name='RCPCH_AUDIT_LEAD')
+
+    for test_user in users:
+    
+        client.force_login(test_user)
+
+        # Get response object
+        response = client.get(
+            reverse(
+                "multiaxial_diagnosis",
+                kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
+            )
+        )
+
+        assert (
+            response.status_code == 403
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
   
