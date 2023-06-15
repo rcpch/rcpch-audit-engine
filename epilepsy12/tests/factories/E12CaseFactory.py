@@ -1,7 +1,6 @@
 """Factory fn to create new E12 Cases"""
 # standard imports
 from datetime import date
-from dateutil.relativedelta import relativedelta
 
 # third-party imports
 import factory
