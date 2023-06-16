@@ -174,10 +174,10 @@ def groups_seeder(
         {"codename": "change_site", "content_type": siteContentType},
         {"codename": "add_site", "content_type": siteContentType},
         {"codename": "add_epilepsy12user", "content_type": epilepsy12userContentType},
-        {
-            "codename": "change_epilepsy12user",
-            "content_type": epilepsy12userContentType,
-        },
+        # {
+        #     "codename": "change_epilepsy12user",
+        #     "content_type": epilepsy12userContentType,
+        # },
     ]
 
     FULL_ACCESS_PERMISSIONS = [
