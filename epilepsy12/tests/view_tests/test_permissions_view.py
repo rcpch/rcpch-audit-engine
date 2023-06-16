@@ -406,111 +406,6 @@ def test_registration_view_permissions_forbidden(client):
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested registration of Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
-@pytest.mark.django_db
-def test_fpa_view_permissions_forbidden(client):
-    """
-    Assert these users CANT view fpa for different Trust.
-    """
-
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
-    )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    )
-
-    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                "first_paediatric_assessment",
-                kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 403
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested fpa page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
-
-@pytest.mark.django_db
-def test_epilepsy_context_view_permissions_forbidden(client):
-    """
-    Assert these users CANT view epilepsy_context for different Trust.
-    """
-
-    # GOSH
-    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
-    )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    )
-
-    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                "epilepsy_context",
-                kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 403
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested epilepsy_context page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
-
-@pytest.mark.django_db
-def test_multiaxial_diagnosis_view_permissions_forbidden(client):
-    """
-    Assert these users CANT view multiaxial_diagnosis for different Trust.
-    """
-
-    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
-    )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    )
-
-    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                "multiaxial_diagnosis",
-                kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 403
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
-
 @pytest.mark.parametrize("URL", [("edit_episode"), ("close_episode")])
 @pytest.mark.django_db
 def test_episode_view_permissions_success(client, URL):
@@ -936,7 +831,14 @@ def test_assessment_investigations_management_view_permissions_success(client):
 @pytest.mark.django_db
 def test_assessment_investigations_management_view_permissions_forbidden(client):
     """
-    Assert these users CANT view assessment for different Trust.
+    Assert these users CANT view these pages for different Trust.
+    
+        - first_paediatric_assessment
+        - assessment
+        - management
+        - investigations
+        - epilepsy_context
+        - multiaxial_diagnosis
     """
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
@@ -953,7 +855,7 @@ def test_assessment_investigations_management_view_permissions_forbidden(client)
     for test_user in users:
         client.force_login(test_user)
 
-        for url_name in ["assessment", "investigations", "management"]:
+        for url_name in ["assessment", "investigations", "management", "first_paediatric_assessment", "epilepsy_context", "multiaxial_diagnosis"]:
             # Get response object
             response = client.get(
                 reverse(
