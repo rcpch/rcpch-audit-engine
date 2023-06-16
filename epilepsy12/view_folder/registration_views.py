@@ -360,8 +360,8 @@ def update_lead_site(request, registration_id, site_id, update):
     If the update parameter is 'edit'
     this updates updating the current site to a new centre.
 
-    Transfers trigger an email to the new lead centre lead clinician and the rcpch audit lead
-    Edits can only be performed by superusers or the RCPCH audit lead - no emails are sent with this option
+    Transfers trigger an email to the new lead centre lead clinician and the rcpch audit team
+    Edits can only be performed by superusers or the RCPCH audit team - no emails are sent with this option
     so it is reserved for editing lead centres centrally in rare situations.
 
     Redirects to the cases table

@@ -4,17 +4,17 @@
 [] Assert an Audit Centre Administrator CANNOT update users
 [] Assert an audit centre clinician CANNOT update users
 [] Assert an Audit Centre Lead Clinician can only update users inside own Trust
-[] Assert an RCPCH Audit Lead can update users nationally, within any organisations 
+[] Assert RCPCH Audit Team can update users nationally, within any organisations 
 
 [] Assert an Audit Centre Administrator can only update patients within own organisation
 [] Assert an audit centre clinician  can only update patients within own organisation
 [] Assert an Audit Centre Lead Clinician can only update patients within own Trust
-[] Assert an RCPCH Audit Lead can update patients nationally, within any organisations
+[] Assert RCPCH Audit Team can update patients nationally, within any organisations
 
 [] Assert an Audit Centre Administrator CANNOT update patient records
 [] Assert an audit centre clinician can only update patient records within own organisation
 [] Assert an Audit Centre Lead Clinician can only update patient records within own Trust
-[] Assert an RCPCH Audit Lead can update patient records nationally, within any organisations
+[] Assert RCPCH Audit Team can update patient records nationally, within any organisations
 
 # First Paediatric Assessment
 for field in fields: [
@@ -31,7 +31,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Epilepsy Context
 for field in fields: [
@@ -50,7 +50,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Multiaxial Diagnosis
 for field in fields: [
@@ -71,7 +71,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Episode
 for field in fields: [
@@ -95,7 +95,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Comorbidity
 for field in fields: [
@@ -108,7 +108,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Assessment
 for field in fields: [
@@ -142,7 +142,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Investigations
 for field in fields: [
@@ -163,7 +163,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Management
 for field in fields: [
@@ -187,7 +187,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 # Antiepilepsy Medicine
 for field in fields: [
@@ -209,7 +209,7 @@ for field in fields: [
 [ ] Assert an Audit Centre Clinician cannot vchange 'field' inside a different Trust - response.status_code == 403
 [ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
 [ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can change 'field' - response.status_code == 200
+[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
 
 
 """
