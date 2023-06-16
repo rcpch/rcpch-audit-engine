@@ -407,61 +407,6 @@ def test_registration_view_permissions_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_fpa_view_permissions_success(client):
-    """
-    Assert these users CAN view first_paediatric_assessment for their own Trust.
-
-    RCPCH Audit Lead has additional test to assert can view fpa outside own Trust.
-    """
-
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    )
-
-    users = Epilepsy12User.objects.all()
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                "first_paediatric_assessment",
-                kwargs={"case_id": CASE_FROM_SAME_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested First Paediatric Assessment page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-
-            # Request e12 patients list endpoint url different org
-            response = client.get(
-                reverse(
-                    "cases",
-                    kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
-                )
-            )
-
-            assert (
-                response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested First Paediatric Assessment page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-
-@pytest.mark.django_db
 def test_fpa_view_permissions_forbidden(client):
     """
     Assert these users CANT view fpa for different Trust.
@@ -500,61 +445,6 @@ def test_fpa_view_permissions_forbidden(client):
 
 
 @pytest.mark.django_db
-def test_epilepsy_context_view_permissions_success(client):
-    """
-    Assert these users CAN view epilepsy_context for their own Trust.
-
-    RCPCH Audit Lead has additional test to assert can view epilepsy_context outside own Trust.
-    """
-
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    )
-
-    users = Epilepsy12User.objects.all()
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                "epilepsy_context",
-                kwargs={"case_id": CASE_FROM_SAME_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested epilepsy_context page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-
-            # Request e12 patients list endpoint url different org
-            response = client.get(
-                reverse(
-                    "cases",
-                    kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
-                )
-            )
-
-            assert (
-                response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested epilepsy_context page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-
-@pytest.mark.django_db
 def test_epilepsy_context_view_permissions_forbidden(client):
     """
     Assert these users CANT view epilepsy_context for different Trust.
@@ -586,61 +476,6 @@ def test_epilepsy_context_view_permissions_forbidden(client):
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested epilepsy_context page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
-
-@pytest.mark.django_db
-def test_multiaxial_diagnosis_view_permissions_success(client):
-    """
-    Assert these users CAN view multiaxial_diagnosis for their own Trust.
-
-    RCPCH Audit Lead has additional test to assert can view multiaxial_diagnosis outside own Trust.
-    """
-
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    )
-
-    users = Epilepsy12User.objects.all()
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                "multiaxial_diagnosis",
-                kwargs={"case_id": CASE_FROM_SAME_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-
-            # Request e12 patients list endpoint url different org
-            response = client.get(
-                reverse(
-                    "cases",
-                    kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
-                )
-            )
-
-            assert (
-                response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -1035,9 +870,12 @@ def test_assessment_investigations_management_view_permissions_success(client):
     """
     Assert these users CAN view the following pages for their own Trust:
 
+        - first_paediatric_assessment
         - assessment
         - management
         - investigations
+        - epilepsy_context
+        - multiaxial_diagnosis
 
     RCPCH Audit Lead has additional test to assert can view assessment outside own Trust.
     """
@@ -1056,7 +894,7 @@ def test_assessment_investigations_management_view_permissions_success(client):
     for test_user in users:
         client.force_login(test_user)
 
-        for url_name in ["assessment", "investigations", "management"]:
+        for url_name in ["assessment", "investigations", "management", "first_paediatric_assessment", "epilepsy_context", "multiaxial_diagnosis"]:
             # Get response object
             response = client.get(
                 reverse(
@@ -1064,6 +902,8 @@ def test_assessment_investigations_management_view_permissions_success(client):
                     kwargs={"case_id": CASE_FROM_SAME_ORG.id},
                 )
             )
+            
+            print(url_name, response.status_code)
 
             assert (
                 response.status_code == 200
