@@ -138,41 +138,41 @@ for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbiditie
 
 
 ## Assessment
-[ ] Assert an Audit Centre Administrator can view 'assessment' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view 'assessment' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view 'assessment' - response.status_code == 200
+[x] Assert an Audit Centre Administrator can view 'assessment' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Clinician can view 'assessment' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
+[x] Assert an RCPCH Audit Lead can view 'assessment' - response.status_code == 200
 
 ## Investigations
-[ ] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view 'investigations' - response.status_code == 200
+[x] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
+[x] Assert an RCPCH Audit Lead can view 'investigations' - response.status_code == 200
 
 ## Management
-[ ] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view 'management' - response.status_code == 200
+[x] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == 403
+[x] Assert an RCPCH Audit Lead can view 'management' - response.status_code == 200
 
 ## Antiepilepsy Medicine
 for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medicine']
-[ ] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view field - response.status_code == 200
+[x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+[x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+[x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+[x] Assert an RCPCH Audit Lead can view field - response.status_code == 200
 
 """
 
@@ -198,6 +198,8 @@ from epilepsy12.models import (
     Syndrome,
     Comorbidity,
     ComorbidityEntity,
+    AntiEpilepsyMedicine,
+    MedicineEntity,
 )
 
 
@@ -1100,10 +1102,15 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comorbidity page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
+
 @pytest.mark.django_db
-def test_assessment_view_permissions_success(client):
+def test_assessment_investigations_management_view_permissions_success(client):
     """
-    Assert these users CAN view assessment for their own Trust.
+    Assert these users CAN view the following pages for their own Trust:
+
+        - assessment
+        - management
+        - investigations
 
     RCPCH Audit Lead has additional test to assert can view assessment outside own Trust.
     """
@@ -1116,52 +1123,51 @@ def test_assessment_view_permissions_success(client):
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
-    
+
     users = Epilepsy12User.objects.all()
 
     for test_user in users:
         client.force_login(test_user)
 
-        # Get response object
-        response = client.get(
-            reverse(
-                "assessment",
-                kwargs={"case_id": CASE_FROM_SAME_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested assessment page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-            CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-            )
-
-            # Request e12 patients list endpoint url different org
+        for url_name in ["assessment", "investigations", "management"]:
+            # Get response object
             response = client.get(
                 reverse(
-                    "assessment",
-                    kwargs={
-                        "case_id": CASE_FROM_DIFF_ORG.id
-                    },
+                    url_name,
+                    kwargs={"case_id": CASE_FROM_SAME_ORG.id},
                 )
             )
 
             assert (
                 response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested assessment page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+            # Additional test: assert different organisation if RCPCH AUDIT LEAD
+            # ADDENBROOKE'S
+            if test_user.role == test_user_rcpch_audit_lead_data.role:
+                DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                    ODSCode="RGT01",
+                    ParentOrganisation_ODSCode="RGT",
+                )
+                CASE_FROM_DIFF_ORG = Case.objects.get(
+                    first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+                )
+
+                # Request e12 patients list endpoint url different org
+                response = client.get(
+                    reverse(
+                        url_name,
+                        kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
+                    )
+                )
+
+                assert (
+                    response.status_code == 200
+                ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
-def test_assessment_view_permissions_forbidden(client):
+def test_assessment_investigations_management_view_permissions_forbidden(client):
     """
     Assert these users CANT view assessment for different Trust.
     """
@@ -1180,15 +1186,132 @@ def test_assessment_view_permissions_forbidden(client):
     for test_user in users:
         client.force_login(test_user)
 
+        for url_name in ["assessment", "investigations", "management"]:
+            # Get response object
+            response = client.get(
+                reverse(
+                    url_name,
+                    kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
+                )
+            )
+
+            assert (
+                response.status_code == 403
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
+)
+@pytest.mark.django_db
+def test_antiepilepsy_medicine_view_permissions_success(client, URL):
+    """
+    Assert these users CAN view antiepilepsy_medicine for Case from their own Trust.
+
+    RCPCH Audit Lead has additional test to assert can view antiepilepsy_medicines outside own Trust.
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all()
+
+    for test_user in users:
+        antiepilepsy_medicine_SAME_ORG = AntiEpilepsyMedicine.objects.create(
+            management=CASE_FROM_SAME_ORG.registration.management,
+            medicine_entity=MedicineEntity.objects.get(
+                medicine_name="Sodium valproate"
+            ),
+        )
+
+        client.force_login(test_user)
+
         # Get response object
         response = client.get(
             reverse(
-                "assessment",
-                kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
+                URL,
+                kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine_SAME_ORG.id},
             )
         )
 
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page url ({URL}) of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+        # Additional test: assert different organisation if RCPCH AUDIT LEAD
+        # ADDENBROOKE'S
+        if test_user.role == test_user_rcpch_audit_lead_data.role:
+            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                ODSCode="RGT01",
+                ParentOrganisation_ODSCode="RGT",
+            )
+            CASE_FROM_DIFF_ORG = Case.objects.get(
+                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+            )
+
+            antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
+                management=CASE_FROM_DIFF_ORG.registration.management,
+                medicine_entity=MedicineEntity.objects.get(
+                    medicine_name="Sodium valproate"
+                ),
+            )
+
+            # Request e12 patients list endpoint url different org
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "antiepilepsy_medicine_id": antiepilepsy_medicine_DIFF_ORG.id
+                    },
+                )
+            )
+
+            assert (
+                response.status_code == 200
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page ({URL}) of {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
+)
+@pytest.mark.django_db
+def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
+    """
+    Assert these users CANT view antiepilepsy_medicine for Case from different Trust.
+    """
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+    antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
+        management=CASE_FROM_DIFF_ORG.registration.management,
+        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+    )
+
+    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        # Get response object
+        response = client.get(
+            reverse(
+                URL,
+                kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine_DIFF_ORG.id},
+            )
+        )
 
         assert (
             response.status_code == 403
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested assessment page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page ({URL}) of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
