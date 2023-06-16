@@ -215,16 +215,8 @@ def signup(request, *args, **kwargs):
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
                 logged_in_user.is_staff = False
                 logged_in_user.is_rcpch_staff = False
-            elif logged_in_user.role == RCPCH_AUDIT_LEAD:
+            elif logged_in_user.role == RCPCH_AUDIT_TEAM:
                 group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-                logged_in_user.is_staff = False
-                logged_in_user.is_rcpch_staff = True
-            elif logged_in_user.role == RCPCH_AUDIT_ANALYST:
-                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-                logged_in_user.is_staff = False
-                logged_in_user.is_rcpch_staff = True
-            elif logged_in_user.role == RCPCH_AUDIT_ADMINISTRATOR:
-                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
                 logged_in_user.is_staff = False
                 logged_in_user.is_rcpch_staff = True
             elif logged_in_user.role == RCPCH_AUDIT_PATIENT_FAMILY:

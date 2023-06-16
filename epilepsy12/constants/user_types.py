@@ -14,20 +14,14 @@ VIEW_PREFERENCES = (
 AUDIT_CENTRE_LEAD_CLINICIAN = 1
 AUDIT_CENTRE_CLINICIAN = 2
 AUDIT_CENTRE_ADMINISTRATOR = 3
-AUDIT_CENTRE_MANAGER = 8
-RCPCH_AUDIT_LEAD = 4
-RCPCH_AUDIT_ANALYST = 5
-RCPCH_AUDIT_ADMINISTRATOR = 6
+RCPCH_AUDIT_TEAM = 4
 RCPCH_AUDIT_PATIENT_FAMILY = 7
 
 ROLES = (
     (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
     (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
     (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
-    (AUDIT_CENTRE_MANAGER, "Audit Centre Manager"),
-    (RCPCH_AUDIT_LEAD, "RCPCH Audit Lead"),
-    (RCPCH_AUDIT_ANALYST, "RCPCH Audit Analyst"),
-    (RCPCH_AUDIT_ADMINISTRATOR, "RCPCH Audit Administrator"),
+    (RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),
     (RCPCH_AUDIT_PATIENT_FAMILY, "RCPCH Audit Children and Family"),
 )
 
@@ -35,14 +29,9 @@ AUDIT_CENTRE_ROLES = (
     (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
     (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
     (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
-    (AUDIT_CENTRE_MANAGER, "Audit Centre Manager"),
 )
 
-RCPCH_AUDIT_TEAM_ROLES = (
-    (RCPCH_AUDIT_LEAD, "RCPCH Audit Lead"),
-    (RCPCH_AUDIT_ANALYST, "RCPCH Audit Analyst"),
-    (RCPCH_AUDIT_ADMINISTRATOR, "RCPCH Audit Administrator"),
-)
+RCPCH_AUDIT_TEAM_ROLES = ((RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),)
 
 MR = 1
 MRS = 2
@@ -55,12 +44,6 @@ TITLES = ((MR, "Mr"), (MRS, "Mrs"), (MS, "Ms"), (DR, "Dr"), (PROFESSOR, "Profess
 """
 Groups
 """
-# logged in user can view all national data but not logs
-EPILEPSY12_AUDIT_TEAM_VIEW_ONLY = "epilepsy12_audit_team_view_only"
-
-# logged in user can edit but not delete national data. Cannot view or edit logs or permissions.
-EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS = "epilepsy12_audit_team_edit_access"
-
 # logged in user access all areas: can create/update/delete any audit data, logs, epilepsy key words and organisation trusts, groups and permissions
 EPILEPSY12_AUDIT_TEAM_FULL_ACCESS = "epilepsy12_audit_team_full_access"
 
@@ -77,8 +60,6 @@ TRUST_AUDIT_TEAM_FULL_ACCESS = "trust_audit_team_full_access"
 PATIENT_ACCESS = "patient_access"
 
 GROUPS = (
-    EPILEPSY12_AUDIT_TEAM_VIEW_ONLY,
-    EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
     TRUST_AUDIT_TEAM_VIEW_ONLY,
     TRUST_AUDIT_TEAM_EDIT_ACCESS,

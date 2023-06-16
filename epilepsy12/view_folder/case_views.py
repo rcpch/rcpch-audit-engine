@@ -12,12 +12,6 @@ from django.core.paginator import Paginator
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
-    RCPCH_AUDIT_ADMINISTRATOR,
-    RCPCH_AUDIT_ANALYST,
-    RCPCH_AUDIT_LEAD,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    TRUST_AUDIT_TEAM_FULL_ACCESS,
-    TRUST_AUDIT_TEAM_VIEW_ONLY,
 )
 from ..decorator import user_may_view_this_organisation, user_may_view_this_child
 

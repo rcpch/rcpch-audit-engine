@@ -11,25 +11,11 @@ from django.contrib.gis.db.models import UniqueConstraint
 from simple_history.models import HistoricalRecords
 
 # rcpch
+from epilepsy12.common_view_functions.group_for_group import group_for_role
 from epilepsy12.constants.user_types import (
     ROLES,
     TITLES,
-    AUDIT_CENTRE_LEAD_CLINICIAN,
-    TRUST_AUDIT_TEAM_FULL_ACCESS,
-    AUDIT_CENTRE_CLINICIAN,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    AUDIT_CENTRE_ADMINISTRATOR,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    RCPCH_AUDIT_LEAD,
-    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
-    RCPCH_AUDIT_ANALYST,
-    EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS,
-    RCPCH_AUDIT_ADMINISTRATOR,
-    EPILEPSY12_AUDIT_TEAM_VIEW_ONLY,
-    RCPCH_AUDIT_PATIENT_FAMILY,
-    PATIENT_ACCESS,
-    TRUST_AUDIT_TEAM_VIEW_ONLY,
-    AUDIT_CENTRE_MANAGER,
+    # preferences in the view
     VIEW_PREFERENCES,
 )
 
@@ -85,29 +71,9 @@ class Epilepsy12UserManager(BaseUserManager):
         """
         Allocate Groups - the groups already have permissions allocated
         """
-        if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-        elif user.role == AUDIT_CENTRE_CLINICIAN:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-        elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
-        elif user.role == AUDIT_CENTRE_MANAGER:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
-        elif user.role == RCPCH_AUDIT_LEAD:
-            group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-        elif user.role == RCPCH_AUDIT_ANALYST:
-            group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-        elif user.role == RCPCH_AUDIT_ADMINISTRATOR:
-            group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-        elif user.role == RCPCH_AUDIT_PATIENT_FAMILY:
-            group = Group.objects.get(name=PATIENT_ACCESS)
-        else:
-            # no group
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+        group = group_for_role(user.role)
         user.save()
         user.groups.add(group)
-
-        print(f"creating {user} in {user.groups }")
 
         return user
 
@@ -138,40 +104,8 @@ class Epilepsy12UserManager(BaseUserManager):
         Allocate Roles
         """
 
-        self.allocate_group_based_on_role(logged_in_user)
-
-    def allocate_group_based_on_role(self, user):
-        if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-            user.is_staff = False
-            user.is_rcpch_staff = False
-        elif user.role == AUDIT_CENTRE_CLINICIAN:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = False
-            user.is_rcpch_staff = False
-        elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = False
-            user.is_rcpch_staff = False
-        elif user.role == RCPCH_AUDIT_LEAD:
-            group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            user.is_staff = False
-            user.is_rcpch_staff = True
-        elif user.role == RCPCH_AUDIT_ANALYST:
-            group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = False
-            user.is_rcpch_staff = True
-        elif user.role == RCPCH_AUDIT_ADMINISTRATOR:
-            group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
-            user.is_rcpch_staff = True
-        elif user.role == RCPCH_AUDIT_PATIENT_FAMILY:
-            group = Group.objects.get(name=PATIENT_ACCESS)
-            user.is_rcpch_staff = False
-            user.is_staff = False
-        else:
-            # no group
-            group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
-        user.groups.add(group)
+        group = group_for_role(logged_in_user.role)
+        logged_in_user.groups.add(group)
 
 
 class Epilepsy12User(AbstractUser, PermissionsMixin):

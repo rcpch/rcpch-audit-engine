@@ -3,16 +3,17 @@ from typing import Literal
 
 # django imports
 from django.contrib.gis.db.models import Q
+from django.apps import apps
 
 # E12 imports
-from ..models import (
-    Case,
-    Organisation,
-    NHSRegionEntity,
-    OPENUKNetworkEntity,
-    IntegratedCareBoardEntity,
-    ONSCountryEntity,
-)
+# from ..models import (
+#     Case,
+#     Organisation,
+#     NHSRegionEntity,
+#     OPENUKNetworkEntity,
+#     IntegratedCareBoardEntity,
+#     ONSCountryEntity,
+# )
 
 
 def all_registered_cases_for_cohort_and_abstraction_level(
@@ -38,6 +39,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     2. the first paediatric assessment falls within the the dates for that cohort
     3. a lead E12 site has been allocated
     """
+    Case = apps.get_model("epilepsy12", "Case")
 
     if case_complete:
         all_cases_for_cohort = Case.objects.filter(
@@ -134,9 +136,7 @@ def get_all_countries():
     Returns a list of all Countries
 
     """
-    # return Organisation.objects.order_by('CountryONSCode',
-    #                                      'Country').values_list('CountryONSCode',
-    #                                                             'Country').distinct()
+    ONSCountryEntity = apps.get_model("epilepsy12", "ONSCountryEntity")
     return ONSCountryEntity.objects.order_by("Country_ONS_Name")
 
 
@@ -145,9 +145,7 @@ def get_all_nhs_regions():
     Returns a list of all NHS Regions
     [('Y56', 'London'), ('Y58', 'South West'), ('Y59', 'South East'), ('Y60', 'Midlands (Y60)'), ('Y61', 'East of England'), ('Y62', 'North West'), ('Y63', 'North East and Yorkshire'), (None, None)]
     """
-    # return Organisation.objects.order_by('NHSEnglandRegionCode',
-    #                                      'NHSEnglandRegion').values_list('NHSEnglandRegionCode',
-    #                                                                      'NHSEnglandRegion').distinct()
+    NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
     return NHSRegionEntity.objects.filter(year=2019).order_by(
         "NHS_Region", "NHS_Region_Code"
     )
@@ -158,9 +156,7 @@ def get_all_open_uk_regions():
     Returns a list of all OPEN UK Networks
     [('BRPNF', 'Birmingham Regional Paediatric Neurology Forum'), ('CEWT', "Children's Epilepsy Workstream in Trent"), ('EPEN', 'Eastern Paediatric Epilepsy Network'), ('EPIC', "Mersey and North Wales network 'Epilepsy In Childhood' interest group"), ('NTPEN', 'North Thames Paediatric Epilepsy Network'), ('NWEIG', "North West Children and Young People's Epilepsy Interest Group"), ('ORENG', 'Oxford region epilepsy interest group'), ('PENNEC', 'Paediatric Epilepsy Network for the North East and Cumbria'), ('SETPEG', 'South East Thames Paediatric Epilepsy Group'), ('SETPEG', 'SSouth East Thames Paediatric Epilepsy Group'), ('SWEP', 'South Wales Epilepsy Forum'), ('SWIPE', 'South West Interest Group Paediatric Epilepsy'), ('SWTPEG', 'South West Thames Paediatric Epilepsy Group'), ('TEN', 'Trent Epilepsy Network'), ('WPNN', 'Wessex Paediatric Neurosciences Network'), ('YPEN', 'Yorkshire Paediatric Neurology Network'), (None, None)]
     """
-    # return Organisation.objects.order_by('OPENUKNetworkCode',
-    #                                      'OPENUKNetworkName').values_list('OPENUKNetworkCode',
-    #                                                                       'OPENUKNetworkName').distinct()
+    OPENUKNetworkEntity = apps.get_model("epilepsy12", "OPENUKNetworkEntity")
     return OPENUKNetworkEntity.objects.order_by("OPEN_UK_Network_Name", "country")
 
 
@@ -168,9 +164,9 @@ def get_all_icbs():
     """
     Returns a list of all Integrated Care Boards
     """
-    # return Organisation.objects.order_by('ICBODSCode',
-    #                                      'ICBName').values_list('ICBODSCode',
-    #                                                             'ICBName').distinct()
+    IntegratedCareBoardEntity = apps.get_model(
+        "epilepsy12", "IntegratedCareBoardEntity"
+    )
     return IntegratedCareBoardEntity.objects.order_by("ICB_Name")
 
 
@@ -178,6 +174,7 @@ def get_all_trusts():
     """
     Returns a list of all Trusts
     """
+    Organisation = apps.get_model("epilepsy12", "Organisation")
     return (
         Organisation.objects.order_by(
             "ParentOrganisation_OrganisationName", "ParentOrganisation_ODSCode"
@@ -193,6 +190,7 @@ def get_all_organisations():
     """
     Returns a list of all Organisations
     """
+    Organisation = apps.get_model("epilepsy12", "Organisation")
     return (
         Organisation.objects.order_by("OrganisationName", "ODSCode")
         .values_list("OrganisationName", "ODSCode")

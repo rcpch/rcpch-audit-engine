@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from ..models import Organisation
+from django.apps import apps
 
 
 def return_selected_organisation(user):
@@ -9,6 +9,9 @@ def return_selected_organisation(user):
     the first in the list is returned. Otherwise, an error is raised
     Accepts a user object.
     """
+
+    Organisation = apps.get_model("epilepsy12", "Organisation")
+
     if user.organisation_employer is not None:
         # current user is affiliated with an existing organisation - set viewable trust to this
         return Organisation.objects.get(OrganisationName=user.organisation_employer)
