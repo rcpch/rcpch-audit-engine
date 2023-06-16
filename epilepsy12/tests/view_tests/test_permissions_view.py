@@ -1099,3 +1099,96 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comorbidity page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+@pytest.mark.django_db
+def test_assessment_view_permissions_success(client):
+    """
+    Assert these users CAN view assessment for their own Trust.
+
+    RCPCH Audit Lead has additional test to assert can view assessment outside own Trust.
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+    
+    users = Epilepsy12User.objects.all()
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        # Get response object
+        response = client.get(
+            reverse(
+                "assessment",
+                kwargs={"case_id": CASE_FROM_SAME_ORG.id},
+            )
+        )
+
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested assessment page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+        # Additional test: assert different organisation if RCPCH AUDIT LEAD
+        # ADDENBROOKE'S
+        if test_user.role == test_user_rcpch_audit_lead_data.role:
+            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                ODSCode="RGT01",
+                ParentOrganisation_ODSCode="RGT",
+            )
+            CASE_FROM_DIFF_ORG = Case.objects.get(
+                first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+            )
+
+            # Request e12 patients list endpoint url different org
+            response = client.get(
+                reverse(
+                    "assessment",
+                    kwargs={
+                        "case_id": CASE_FROM_DIFF_ORG.id
+                    },
+                )
+            )
+
+            assert (
+                response.status_code == 200
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested assessment page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+@pytest.mark.django_db
+def test_assessment_view_permissions_forbidden(client):
+    """
+    Assert these users CANT view assessment for different Trust.
+    """
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        # Get response object
+        response = client.get(
+            reverse(
+                "assessment",
+                kwargs={"case_id": CASE_FROM_DIFF_ORG.id},
+            )
+        )
+
+
+        assert (
+            response.status_code == 403
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested assessment page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
