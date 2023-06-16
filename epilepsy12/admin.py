@@ -57,6 +57,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 "fields": (
                     "is_active",
                     "is_staff",
+                    "is_rcpch_staff",
                     "is_rcpch_audit_team_member",
                     "is_superuser",
                     "email_confirmed",
@@ -95,6 +96,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "first_name",
                     "surname",
                     "is_staff",
+                    "is_rcpch_staff",
                     "is_active",
                     "is_rcpch_audit_team_member",
                     "role",
@@ -120,6 +122,8 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             form.base_fields["title"].disabled = True
             form.base_fields["email"].disabled = True
             form.base_fields["is_staff"].disabled = True
+            form.base_fields["is_rcpch_staff"].disabled = True
+            form.base_fields["is_rcpch_audit_team_member"].disabled = True
         return form
 
 

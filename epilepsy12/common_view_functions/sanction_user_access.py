@@ -14,7 +14,7 @@ def return_selected_organisation(user):
         return Organisation.objects.get(OrganisationName=user.organisation_employer)
     else:
         # current user is NOT affiliated with an existing organisation
-        if user.is_staff or user.is_superuser:
+        if user.is_rcpch_staff or user.is_superuser or user.is_superuser:
             # current user is a member of the RCPCH audit team and also not affiliated with a organisation
             # therefore set selected organisation to first of organisation on the list
             return Organisation.objects.order_by("OrganisationName").first()
@@ -29,7 +29,7 @@ def sanction_user(user):
         return True
     else:
         # current user is NOT affiliated with an existing organisation
-        if user.is_staff or user.is_superuser:
+        if user.is_rcpch_staff or user.is_superuser or user.is_superuser:
             # current user is a member of the RCPCH audit team and also not affiliated with a organisation
             # therefore set selected organisation to first of organisation on the list
             return True

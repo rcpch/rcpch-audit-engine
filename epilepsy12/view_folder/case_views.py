@@ -253,7 +253,7 @@ def case_list(request, organisation_id):
 
     if (
         request.user.is_rcpch_audit_team_member
-        or request.user.is_staff
+        or request.user.is_rcpch_staff
         or request.user.is_superuser
     ):
         rcpch_choices = (

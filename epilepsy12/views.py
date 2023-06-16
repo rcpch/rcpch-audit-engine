@@ -205,24 +205,37 @@ def signup(request, *args, **kwargs):
             logged_in_user.is_superuser = False
             if logged_in_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-                logged_in_user.is_staff = True
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             elif logged_in_user.role == AUDIT_CENTRE_CLINICIAN:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-                logged_in_user.is_staff = True
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             elif logged_in_user.role == AUDIT_CENTRE_ADMINISTRATOR:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-                logged_in_user.is_staff = True
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             elif logged_in_user.role == RCPCH_AUDIT_LEAD:
                 group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = True
             elif logged_in_user.role == RCPCH_AUDIT_ANALYST:
                 group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = True
             elif logged_in_user.role == RCPCH_AUDIT_ADMINISTRATOR:
                 group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = True
             elif logged_in_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
                 group = Group.objects.get(name=PATIENT_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             else:
                 # no group
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
 
             logged_in_user.save()
             logged_in_user.groups.add(group)
@@ -536,21 +549,24 @@ def rcpch_403(request, exception):
     # the 403 template would be inserted into the target. This way the HttpReponseClientRedirect
     # from django-htmx middleware forces a redirect. Neat.
     if request.htmx:
-        
         redirect = reverse_lazy("redirect_403")
         return HttpResponseClientRedirect(redirect)
     else:
-        
         return render(
-            request, template_name="epilepsy12/error_pages/rcpch_403.html", context={},
-            status=403
+            request,
+            template_name="epilepsy12/error_pages/rcpch_403.html",
+            context={},
+            status=403,
         )
 
 
 def redirect_403(request):
     # return the custom 403 template. There is no context to add.
     return render(
-        request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}, status=403
+        request,
+        template_name="epilepsy12/error_pages/rcpch_403.html",
+        context={},
+        status=403,
     )
 
 
