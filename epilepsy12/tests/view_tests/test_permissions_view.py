@@ -32,147 +32,153 @@ E12UserFactory(
 
 ### E12 Patients 
 
-[x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
     [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
     [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
     [x] Assert an RCPCH Audit Lead can view users inside own Trust - response.status_code == 200
     [x] Assert an RCPCH Audit Lead can view users inside a different Trust - response.status_code == 200
 
-[x] Assert an Audit Centre Administrator can view patients inside own Trust - response.status_code == 200
-[x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view patients within all Trusts - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view patients inside own Trust - response.status_code == 200
+    [x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view patients within all Trusts - response.status_code == 200
 
 
-[x] Assert an Audit Centre Administrator CANNOT view patients outside own Trust - response.status_code == 403
-[x] Assert an audit centre clinician CANNOT view patients outside own Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician CANNOT view patients outside own Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator CANNOT view patients outside own Trust - response.status_code == 403
+    [x] Assert an audit centre clinician CANNOT view patients outside own Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician CANNOT view patients outside own Trust - response.status_code == 403
 
 # E12 Patient Records
 
 ## Registration
 
-[x] Assert an Audit Centre Administrator can view 'register' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician can view 'register' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician can view 'register' inside own Trust - response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'register' inside own Trust - response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'register' outside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'register' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'register' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'register' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'register' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'register' outside own Trust - response.status_code == 200
 
-[x] Assert an Audit Centre Clinician cannot view 'register' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Administrator cannot view 'register' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician cannot view 'register' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'register' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'register' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'register' inside a different Trust - response.status_code == 403
 
 ## First Paediatric Assessment
 
-[x] Assert an Audit Centre Administrator can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'first_paediatric_assessment' inside own Trust- response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'first_paediatric_assessment' outside own Trust- response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'first_paediatric_assessment' inside own Trust- response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'first_paediatric_assessment' outside own Trust- response.status_code == 200
 
-[x] Assert an Audit Centre Administrator cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
 
 ## Epilepsy Context
 
-[x] Assert an Audit Centre Administrator can view 'epilepsy_context' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician can view 'epilepsy_context' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician can view 'epilepsy_context' inside own Trust - response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'epilepsy_context' inside own Trust- response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'epilepsy_context' outside own Trust- response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'epilepsy_context' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'epilepsy_context' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'epilepsy_context' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'epilepsy_context' inside own Trust- response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'epilepsy_context' outside own Trust- response.status_code == 200
 
-[x] Assert an Audit Centre Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Administrator cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
 
 ## Multiaxial Diagnosis
 
-[x] Assert an Audit Centre Administrator can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' inside own Trust- response.status_code == 200
-[x] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' outside own Trust- response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' inside own Trust- response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view 'multiaxial_diagnosis' outside own Trust- response.status_code == 200
 
 
-[x] Assert an Audit Centre Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Administrator cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
 
 ## Episode
 for each field in fields ['edit_episode','close_episode']
 
-    [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code = 200
-    [x] Assert an Audit Centre Administrator can view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician can view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code = 200
+        [x] Assert an RCPCH Audit Lead can view field inside own Trust - response.status_code == 403
+        [x] Assert an RCPCH Audit Lead can view field inside a different Trust - response.status_code == 403
 
-    [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
 
 ## Syndrome
 for each field in fields ['edit_syndrome', 'close_syndrome']
+        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+        [x] Assert an RCPCH Audit Lead can view field inside a own and different Trust - response.status_code == 403
+
+        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+
+## Antiepilepsy Medicine
+for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medicine']
+
     [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
     [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
     [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Administrator can view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician can view field inside a different Trust - response.status_code == 403
-
+    [x] Assert an RCPCH Audit Lead can view inside own and different Trust - response.status_code == 403
+    
     [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
     [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
     [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
 
 ## Comorbidity
 for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbidities']
-    [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Administrator can view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician can view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+        [x] Assert an RCPCH Audit Lead can view field inside a own and different Trust - response.status_code == 403
     
-    [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
 
 
 ## Assessment
-[x] Assert an Audit Centre Administrator can view 'assessment' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Clinician can view 'assessment' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
-[x] Assert an RCPCH Audit Lead can view 'assessment' - response.status_code == 200
+
+    [x] Assert an Audit Centre Administrator can view 'assessment' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'assessment' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view inside own and different Trust - response.status_code == 403
+    
+    [x] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
 
 ## Investigations
-[x] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
-[x] Assert an RCPCH Audit Lead can view 'investigations' - response.status_code == 200
+
+    [x] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view inside own and different Trust - response.status_code == 403
+    
+    [x] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
 
 ## Management
-[x] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == 403
-[x] Assert an RCPCH Audit Lead can view 'management' - response.status_code == 200
-
-## Antiepilepsy Medicine
-for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medicine']
-[x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-[x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-[x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
-[x] Assert an RCPCH Audit Lead can view field - response.status_code == 200
+    
+    [x] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view inside own and different Trust - response.status_code == 403
+    
+    [x] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == 403
 
 """
 
