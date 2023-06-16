@@ -18,22 +18,3 @@ def seed_groups_fixture(django_db_setup, django_db_blocker):
             verbose=False,
         )
 
-
-@pytest.mark.django_db
-@pytest.fixture(scope="session")
-def cases_seeder(django_db_setup, django_db_blocker):
-    """
-    Fixture which runs once per session to seed cases
-    verbose=False
-    """
-    with django_db_blocker.unblock():
-        # run_dummy_cases_seed(
-        #     verbose=False # don't print any stdout
-        # )
-        # run_registrations(
-        #     verbose=False # don't print any stdout
-        # )
-        
-        # UNCOMMENT ABOVE IF REQUIRING LOTS OF SEEDED REGISTERED CASES
-        
-        pass
