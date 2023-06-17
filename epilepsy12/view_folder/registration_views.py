@@ -573,7 +573,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_required
-# @user_may_view_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_registration", raise_exception=True)
 def registration_status(request, registration_id):
     registration = Registration.objects.get(pk=registration_id)
