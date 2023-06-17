@@ -260,7 +260,6 @@ def test_users_and_case_list_views_permissions_success(
 
     for test_user in users:
         # Log in Test User
-        print(test_user)
         client.force_login(test_user)
 
         # Request e12 User/Case list endpoint url of same Trust

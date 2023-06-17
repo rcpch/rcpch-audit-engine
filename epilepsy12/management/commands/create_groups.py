@@ -3,11 +3,13 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from ...constants import GROUPS
 from epilepsy12.constants.user_types import (
+    # group names
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
     PATIENT_ACCESS,
     TRUST_AUDIT_TEAM_EDIT_ACCESS,
     TRUST_AUDIT_TEAM_FULL_ACCESS,
     TRUST_AUDIT_TEAM_VIEW_ONLY,
+    # custom permissions
     CAN_CONSENT_TO_AUDIT_PARTICIPATION,
     CAN_APPROVE_ELIGIBILITY,
     CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
@@ -71,55 +73,90 @@ def groups_seeder(
     auditprogressContentType = ContentType.objects.get_for_model(AuditProgress)
     epilepsy12userContentType = ContentType.objects.get_for_model(Epilepsy12User)
 
+    """
+    Note view permissions include viewing users, but not creating, updating or deleting them
+    View permissions include viewing but NOT updating or deleting case audit records
+
+    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    records of users or children in organisations other than their own
+    """
     VIEW_PERMISSIONS = [
+        # epilepsy12 user
+        {"codename": "view_epilepsy12user", "content_type": epilepsy12userContentType},
+        # case
         {"codename": "view_case", "content_type": caseContentType},
+        # registration
         {"codename": "view_registration", "content_type": registrationContentType},
+        # first paediatric assessment
         {
             "codename": "view_firstpaediatricassessment",
             "content_type": first_paediatric_assessmentContentType,
         },
+        # epilepsy context
         {
             "codename": "view_epilepsycontext",
             "content_type": epilepsy_contextContentType,
         },
+        # multiaxial diagnosis
         {
             "codename": "view_multiaxialdiagnosis",
             "content_type": multiaxial_diagnosisContentType,
         },
+        # episode
         {"codename": "view_episode", "content_type": episodeContentType},
+        # syndrome
         {"codename": "view_syndrome", "content_type": syndromeContentType},
+        # comorbidity
         {"codename": "view_comorbidity", "content_type": comorbidityContentType},
+        # assessment
         {"codename": "view_assessment", "content_type": assessmentContentType},
+        # investigations
         {"codename": "view_investigations", "content_type": investigationsContentType},
+        # management
         {"codename": "view_management", "content_type": managementContentType},
+        # antiepilepsy medicine
         {
             "codename": "view_antiepilepsymedicine",
             "content_type": antiepilepsymedicineContentType,
         },
+        # site
         {"codename": "view_site", "content_type": siteContentType},
+        # organisation
         {"codename": "view_organisation", "content_type": organisationContentType},
+        # keyword
         {"codename": "view_keyword", "content_type": keywordContentType},
+        # audit progress
         {"codename": "view_auditprogress", "content_type": auditprogressContentType},
-        {"codename": "view_epilepsy12user", "content_type": epilepsy12userContentType},
     ]
 
-    EDITOR_PERMISSIONS = [
+    """
+    Administrators have additional privileges in relation to case management
+    Permissions include create, update and view cases, but not delete them
+    """
+    ADMIN_CASE_MANAGEMENT_PERMISSIONS = [
         {"codename": "change_case", "content_type": caseContentType},
         {"codename": "add_case", "content_type": caseContentType},
+    ]
+    """
+    Editors inherit all view permissions
+    Note editor access permissions do not include creating, updating or deleting Epilepsy12Users.
+    Editor access include deleting patients
+    Editor access permissions do include creating, updating or delete patient records
+    
+    Editors can create, update and delete neurology, general paediatric and surgical sites, but 
+    cannot create, update or delete lead epilepsy12 centre allocation, or transfer
+
+    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    records of users or children in organisations other than their own
+    """
+    EDITOR_PERMISSIONS = [
+        # case
+        {"codename": "delete_case", "content_type": caseContentType},
+        # registration
         {"codename": "change_registration", "content_type": registrationContentType},
         {"codename": "add_registration", "content_type": registrationContentType},
-        {
-            "codename": "can_register_child_in_epilepsy12",
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": "can_unregister_child_in_epilepsy12",
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": "can_approve_eligibility",
-            "content_type": registrationContentType,
-        },
+        {"codename": "delete_registration", "content_type": registrationContentType},
+        # first paediatric assessment
         {
             "codename": "change_firstpaediatricassessment",
             "content_type": first_paediatric_assessmentContentType,
@@ -129,17 +166,23 @@ def groups_seeder(
             "content_type": first_paediatric_assessmentContentType,
         },
         {
-            "codename": "view_epilepsycontext",
+            "codename": "delete_firstpaediatricassessment",
+            "content_type": first_paediatric_assessmentContentType,
+        },
+        # epilepsy context
+        {
+            "codename": "change_epilepsycontext",
             "content_type": epilepsy_contextContentType,
         },
         {
-            "codename": "change_epilepsycontext",
+            "codename": "delete_epilepsycontext",
             "content_type": epilepsy_contextContentType,
         },
         {
             "codename": "add_epilepsycontext",
             "content_type": epilepsy_contextContentType,
         },
+        # multiaxial diagnosis
         {
             "codename": "change_multiaxialdiagnosis",
             "content_type": multiaxial_diagnosisContentType,
@@ -148,21 +191,41 @@ def groups_seeder(
             "codename": "add_multiaxialdiagnosis",
             "content_type": multiaxial_diagnosisContentType,
         },
+        {
+            "codename": "delete_multiaxialdiagnosis",
+            "content_type": multiaxial_diagnosisContentType,
+        },
+        # episode
         {"codename": "change_episode", "content_type": episodeContentType},
         {"codename": "add_episode", "content_type": episodeContentType},
+        {"codename": "delete_episode", "content_type": episodeContentType},
+        # syndrome
         {"codename": "change_syndrome", "content_type": syndromeContentType},
         {"codename": "add_syndrome", "content_type": syndromeContentType},
+        {"codename": "delete_syndrome", "content_type": syndromeContentType},
+        # comorbidity
         {"codename": "change_comorbidity", "content_type": comorbidityContentType},
         {"codename": "add_comorbidity", "content_type": comorbidityContentType},
+        {"codename": "delete_comorbidity", "content_type": comorbidityContentType},
+        # assessment
         {"codename": "change_assessment", "content_type": assessmentContentType},
         {"codename": "add_assessment", "content_type": assessmentContentType},
+        {"codename": "delete_assessment", "content_type": assessmentContentType},
+        # investigations
         {
             "codename": "change_investigations",
             "content_type": investigationsContentType,
         },
         {"codename": "add_investigations", "content_type": investigationsContentType},
+        {
+            "codename": "delete_investigations",
+            "content_type": investigationsContentType,
+        },
+        # mnaagement
         {"codename": "change_management", "content_type": managementContentType},
         {"codename": "add_management", "content_type": managementContentType},
+        {"codename": "delete_management", "content_type": managementContentType},
+        # antiepilepsy medicine
         {
             "codename": "change_antiepilepsymedicine",
             "content_type": antiepilepsymedicineContentType,
@@ -171,72 +234,64 @@ def groups_seeder(
             "codename": "add_antiepilepsymedicine",
             "content_type": antiepilepsymedicineContentType,
         },
-        {"codename": "change_site", "content_type": siteContentType},
-        {"codename": "add_site", "content_type": siteContentType},
-        {"codename": "add_epilepsy12user", "content_type": epilepsy12userContentType},
-        # {
-        #     "codename": "change_epilepsy12user",
-        #     "content_type": epilepsy12userContentType,
-        # },
-    ]
-
-    FULL_ACCESS_PERMISSIONS = [
-        {"codename": "delete_case", "content_type": caseContentType},
-        {"codename": "delete_registration", "content_type": registrationContentType},
-        {
-            "codename": "delete_firstpaediatricassessment",
-            "content_type": first_paediatric_assessmentContentType,
-        },
-        {
-            "codename": "delete_epilepsycontext",
-            "content_type": epilepsy_contextContentType,
-        },
-        {
-            "codename": "delete_multiaxialdiagnosis",
-            "content_type": multiaxial_diagnosisContentType,
-        },
-        {"codename": "delete_episode", "content_type": episodeContentType},
-        {"codename": "delete_syndrome", "content_type": syndromeContentType},
-        {"codename": "delete_comorbidity", "content_type": comorbidityContentType},
-        {"codename": "delete_assessment", "content_type": assessmentContentType},
-        {
-            "codename": "delete_investigations",
-            "content_type": investigationsContentType,
-        },
-        {"codename": "delete_management", "content_type": managementContentType},
-        {"codename": "delete_site", "content_type": siteContentType},
         {
             "codename": "delete_antiepilepsymedicine",
             "content_type": antiepilepsymedicineContentType,
         },
-    ]
-
-    EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS = []
-
-    EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS = [
+        # sites
+        {"codename": "change_site", "content_type": siteContentType},
+        {"codename": "add_site", "content_type": siteContentType},
+        {"codename": "delete_site", "content_type": siteContentType},
+        # custom
+        {
+            "codename": "can_register_child_in_epilepsy12",
+            "content_type": registrationContentType,
+        },
         {
             "codename": CAN_APPROVE_ELIGIBILITY[0],
             "content_type": registrationContentType,
         },
+    ]
+
+    """
+    Full access inherit all editor permissions
+    In addition they can
+    - create, change and delete Epilepsy12Users
+    - transfer to another the lead Epilepsy12 centre
+
+    NOTE Additional constraints are applied in view decorators to prevent users accessing 
+    records of users or children in organisations other than their own
+    """
+    FULL_ACCESS_PERMISSIONS = [
+        # epilepsy12 user
+        {"codename": "add_epilepsy12user", "content_type": epilepsy12userContentType},
         {
-            "codename": CAN_REMOVE_APPROVAL_OF_ELIGIBILITY[0],
-            "content_type": registrationContentType,
+            "codename": "change_epilepsy12user",
+            "content_type": epilepsy12userContentType,
         },
         {
-            "codename": CAN_REGISTER_CHILD_IN_EPILEPSY12[0],
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": CAN_UNREGISTER_CHILD_IN_EPILEPSY12[0],
-            "content_type": registrationContentType,
+            "codename": "delete_epilepsy12user",
+            "content_type": epilepsy12userContentType,
         },
         {
             "codename": CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE[0],
             "content_type": siteContentType,
         },
+    ]
+
+    """
+    Epilepsy12 Team inherit all view, edit and full access permissions. In addition they may:
+    - unregister children from Epilepsy12
+    - opt children out of Epilepsy12
+    - allocate, update and delete Epilepsy12 lead site status
+    - create, update and delete the look up lists for Keyword and Organisation
+    
+    NOTE RCPCH team are able to access all users and all children nationally.
+    """
+    EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS = [
         {
-            "codename": CAN_CONSENT_TO_AUDIT_PARTICIPATION[0],
-            "content_type": caseContentType,
+            "codename": "can_unregister_child_in_epilepsy12",
+            "content_type": registrationContentType,
         },
         {
             "codename": CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
@@ -250,22 +305,6 @@ def groups_seeder(
             "codename": CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT[0],
             "content_type": caseContentType,
         },
-    ]
-
-    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS = [
-        {"codename": "change_organisation", "content_type": organisationContentType},
-        {"codename": "add_organisation", "content_type": organisationContentType},
-        {"codename": "delete_organisation", "content_type": organisationContentType},
-        {"codename": "change_keyword", "content_type": keywordContentType},
-        {"codename": "add_keyword", "content_type": keywordContentType},
-        {"codename": "delete_keyword", "content_type": keywordContentType},
-        {"codename": "delete_auditprogress", "content_type": auditprogressContentType},
-        {"codename": "change_auditprogress", "content_type": auditprogressContentType},
-        {"codename": "add_auditprogress", "content_type": auditprogressContentType},
-        {
-            "codename": "delete_epilepsy12user",
-            "content_type": epilepsy12userContentType,
-        },
         {
             "codename": CAN_DELETE_EPILEPSY12_LEAD_CENTRE[0],
             "content_type": siteContentType,
@@ -278,50 +317,12 @@ def groups_seeder(
             "codename": CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE[0],
             "content_type": siteContentType,
         },
-    ]
-
-    TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS = []
-
-    TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS = [
-        {
-            "codename": CAN_APPROVE_ELIGIBILITY[0],
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": CAN_REGISTER_CHILD_IN_EPILEPSY12[0],
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE[0],
-            "content_type": siteContentType,
-        },
-        {
-            "codename": CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
-            "content_type": caseContentType,
-        },
-        {
-            "codename": CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT[0],
-            "content_type": caseContentType,
-        },
-    ]
-
-    TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS = [
-        {
-            "codename": CAN_APPROVE_ELIGIBILITY[0],
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": CAN_REGISTER_CHILD_IN_EPILEPSY12[0],
-            "content_type": registrationContentType,
-        },
-        {
-            "codename": CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING[0],
-            "content_type": caseContentType,
-        },
-        {
-            "codename": CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT[0],
-            "content_type": caseContentType,
-        },
+        {"codename": "change_organisation", "content_type": organisationContentType},
+        {"codename": "add_organisation", "content_type": organisationContentType},
+        {"codename": "delete_organisation", "content_type": organisationContentType},
+        {"codename": "change_keyword", "content_type": keywordContentType},
+        {"codename": "add_keyword", "content_type": keywordContentType},
+        {"codename": "delete_keyword", "content_type": keywordContentType},
     ]
 
     PATIENT_ACCESS_PERMISSIONS = [
@@ -356,46 +357,34 @@ def groups_seeder(
             if group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
                 # custom permissions
                 add_permissions_to_group(
-                    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup
+                    EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS, newGroup
                 )
                 # basic permissions
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                add_permissions_to_group(ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup)
                 add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
                 add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
 
             elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
                 # custom permissions
-                add_permissions_to_group(
-                    TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                )
+
                 # basic permissions
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
 
             elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
                 # custom permissions
-                add_permissions_to_group(
-                    TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                )
-                add_permissions_to_group(
-                    TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup
-                )
+
                 # basic permissions
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                add_permissions_to_group(ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup)
                 add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
 
             elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
                 # custom permissions
-                add_permissions_to_group(
-                    TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                )
-                add_permissions_to_group(
-                    TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup
-                )
-                add_permissions_to_group(
-                    TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup
-                )
+
                 # basic permissions
                 add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                add_permissions_to_group(ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup)
                 add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
                 add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
 
@@ -443,52 +432,43 @@ def groups_seeder(
                 if group == EPILEPSY12_AUDIT_TEAM_FULL_ACCESS:
                     # custom permissions
                     add_permissions_to_group(
-                        EPILEPSY12_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(
-                        EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(
-                        EPILEPSY12_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup
+                        EPILEPSY12_AUDIT_TEAM_ACCESS_PERMISSIONS, newGroup
                     )
                     # basic permissions
                     add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                    add_permissions_to_group(
+                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
+                    )
                     add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
                     add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
 
                 elif group == TRUST_AUDIT_TEAM_VIEW_ONLY:
                     # custom permissions
-                    add_permissions_to_group(
-                        TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                    )
+
                     # basic permissions
                     add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                    add_permissions_to_group(
+                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
+                    )
 
                 elif group == TRUST_AUDIT_TEAM_EDIT_ACCESS:
                     # custom permissions
-                    add_permissions_to_group(
-                        TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(
-                        TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup
-                    )
+
                     # basic permissions
                     add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                    add_permissions_to_group(
+                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
+                    )
                     add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
 
                 elif group == TRUST_AUDIT_TEAM_FULL_ACCESS:
                     # custom permissions
-                    add_permissions_to_group(
-                        TRUST_AUDIT_TEAM_VIEW_ONLY_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(
-                        TRUST_AUDIT_TEAM_EDIT_ACCESS_PERMISSIONS, newGroup
-                    )
-                    add_permissions_to_group(
-                        TRUST_AUDIT_TEAM_FULL_ACCESS_PERMISSIONS, newGroup
-                    )
+
                     # basic permissions
                     add_permissions_to_group(VIEW_PERMISSIONS, newGroup)
+                    add_permissions_to_group(
+                        ADMIN_CASE_MANAGEMENT_PERMISSIONS, newGroup
+                    )
                     add_permissions_to_group(EDITOR_PERMISSIONS, newGroup)
                     add_permissions_to_group(FULL_ACCESS_PERMISSIONS, newGroup)
 
@@ -501,8 +481,10 @@ def groups_seeder(
                 else:
                     if verbose:
                         print("Error: group does not exist!")
-            else:
-                if verbose:
-                    print(f"{group} already exists. Skipping...")
+
+                    else:
+                        if verbose:
+                            print("Error: group does not exist!")
+
         if not verbose:
             print("groups_seeder(verbose=False), no output, groups seeded.")
