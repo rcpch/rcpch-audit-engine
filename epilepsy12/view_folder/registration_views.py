@@ -269,7 +269,7 @@ def edit_lead_site(request, registration_id, site_id):
         "transfer": False,
     }
 
-    template_name = "epilepsy12/partials/registration/lead_site.html"
+    template_name = "epilepsy12/partials/registration/edit_or_transfer_lead_site.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,
@@ -289,7 +289,8 @@ def edit_lead_site(request, registration_id, site_id):
 def transfer_lead_site(request, registration_id, site_id):
     """
     POST request from lead_site.html on click of transfer lead centre button
-    Returns a lead_site partial
+    Does not update model
+    Returns a edit_or_transfer_lead_site partial
     """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -304,9 +305,11 @@ def transfer_lead_site(request, registration_id, site_id):
         "transfer": True,
     }
 
+    template_name = "epilepsy12/partials/registration/edit_or_transfer_lead_site.html"
+
     response = render(
         request=request,
-        template_name="epilepsy12/partials/registration/lead_site.html",
+        template_name=template_name,
         context=context,
     )
 

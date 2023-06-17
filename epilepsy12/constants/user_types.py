@@ -102,6 +102,7 @@ CAN_REGISTER_CHILD_IN_EPILEPSY12 = (
     "can_register_child_in_epilepsy12",
     "Can register child in Epilepsy12. (A cohort number is automatically allocaeted)",
 )
+# TODO #512 unregistering a child in Epilepsy12 is currently not implemented
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = (
     "can_unregister_child_in_epilepsy12",
     "Can unregister a child in Epilepsy. Their record and previously entered data is untouched.",
