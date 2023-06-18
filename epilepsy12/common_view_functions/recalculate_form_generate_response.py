@@ -80,6 +80,7 @@ def update_audit_progress(model_instance):
         raise Exception(error)
 
 
+# --8<-- [start:completed_fields]
 def completed_fields(model_instance):
     """
     Test for all completed fields
@@ -130,6 +131,9 @@ def completed_fields(model_instance):
                     else:
                         counter += 1
     return counter
+
+
+# --8<-- [end:completed_fields]
 
 
 def total_fields_expected(model_instance):
