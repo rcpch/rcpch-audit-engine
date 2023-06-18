@@ -1,0 +1,55 @@
+{% load epilepsy12_template_tags %}
+<form class="ui form" method="post" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' id='consent_result'>
+    <div class="ui rcpch_info message">
+        <h5 class="header">
+            Consent
+        </h5>
+        <ul>
+            <li>I confirm that the information relating to {{case}} is accurate.</li>
+            <li>I consent to the inclusion of {{case}}'s data in Epilepsy12.</li>
+            <li>I understand that I may withdraw my consent at any time.</li>
+        </ul>
+
+        {% if audit_progress.consent_patient_confirmed is True %}
+          {% include 'epilepsy12/partials/registration/is_eligible_label.html' with has_error=False message='I consent to being included in Epilepsy12.' is_positive=True %}
+        {% elif audit_progress.consent_patient_confirmed is False %}
+          {% include 'epilepsy12/partials/registration/is_eligible_label.html' with has_error=False message='I do not consent to being included in Epilepsy12.' is_positive=False %}
+          {% else %}
+          {% if has_error %}
+            {% include 'epilepsy12/partials/registration/is_eligible_label.html' with has_error=True message='An error occured. No answer has been saved.' is_positive=False %}
+          {% else %}
+            <div>
+              <div class="ui buttons">
+                <button 
+                  {% if perms.epilepsy12.can_consent_to_audit_participation %}
+                    class="ui rcpch_primary button"
+                  {% else %}
+                    class="ui rcpch_primary disabled button"
+                  {% endif %}
+                  hx-post="{% url 'consent_confirmation' case_id=case.pk consent_type='consent' %}" 
+                  hx-target='#consent_result'
+                  hx-swap="outerHTML"
+                  hx-trigger="click">I confirm all criteria are present
+                </button>
+                <button 
+                  {% if perms.epilepsy12.can_consent_to_audit_participation %}
+                    class="ui rcpch_dark_blue button"
+                  {% else %}
+                    class="ui rcpch_dark_blue disabled button"
+                  {% endif %}
+                  hx-post="{% url 'consent_confirmation' case_id=case.pk consent_type='denied' %}" 
+                  hx-target='#consent_result'
+                  hx-swap="outerHTML"
+                  hx-trigger="click">I do not consent
+                </button>
+              </div>
+              {% if not perms.epilepsy12.can_consent_to_audit_participation %}
+                <small class='rcpch_warning_label'>Your access level does not allow you to consent to participation in Epilepsy12</small>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+
+    </div>
+
+</form>

@@ -63,6 +63,16 @@ urlpatterns = [
         name="opt_out",
     ),
     path(
+        "case/<int:case_id>/consent",
+        views.consent,
+        name="consent",
+    ),
+    path(
+        "case/<int:case_id>/consent/<str:consent_type>/confirm",
+        views.consent_confirmation,
+        name="consent_confirmation",
+    ),
+    path(
         "organisation/<int:organisation_id>/case/<int:case_id>/submit",
         views.case_submit,
         name="case_submit",
