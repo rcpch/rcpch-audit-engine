@@ -10,13 +10,13 @@ NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_
 
 ### E12 Users 
 
-*   [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
-*   [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
     [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
-*   [x] Assert Clinician who is also an RCPCH Audit Team can view users inside own Trust - response.status_code == 200
-*   [x] Assert Clinician who is also an RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
-*   [ ] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
-*   [ ] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == 200 
+    [x] Assert Clinician who is also an RCPCH Audit Team can view users inside own Trust - response.status_code == 200
+
+    [ ] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
+    [ ] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == 200 
 
 
 ### E12 Patient Records
@@ -176,6 +176,7 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
     test_user_audit_centre_lead_clinician_data,
+    test_user_clinicial_audit_team_data,
     test_user_rcpch_audit_team_data,
 )
 from epilepsy12.models import (
@@ -208,7 +209,7 @@ def test_users_and_case_list_views_permissions_success(
 ):
     """
     Simulating different E12Users with different roles attempting to access the Users / Cases list of their own Trust.
-    
+
     Additionally, tests RCPCH Audit Team can access lists of different Trust.
 
 
@@ -247,8 +248,10 @@ def test_users_and_case_list_views_permissions_success(
             e12_user_list_response.status_code == 200
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
 
-        # Additional test to RCPCH AUDIT TEAM who should be able to view nationally
-        if test_user.role == test_user_rcpch_audit_team_data.role:
+        # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
+        if (test_user.role == test_user_rcpch_audit_team_data.role) or (
+            test_user.role == test_user_clinicial_audit_team_data
+        ):
             # Request e12 user/case list endpoint url diff org
             e12_user_list_response = client.get(
                 reverse(
@@ -287,7 +290,9 @@ def test_users_and_cases_list_view_permissions_forbidden(
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -341,7 +346,10 @@ def test_registration_view_permissions_success(client):
 
         # Additional test: assert different organisation if RCPCH AUDIT TEAM
         # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_team_data.role:
+        # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
+        if (test_user.role == test_user_rcpch_audit_team_data.role) or (
+            test_user.role == test_user_clinicial_audit_team_data
+        ):
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
                 ParentOrganisation_ODSCode="RGT",
@@ -380,7 +388,9 @@ def test_registration_view_permissions_forbidden(client):
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -467,9 +477,10 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                     response.status_code == 200
                 ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
-                # Additional test: assert different organisation if RCPCH AUDIT TEAM
-                # ADDENBROOKE'S
-                if test_user.role == test_user_rcpch_audit_team_data.role:
+                # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
+                if (test_user.role == test_user_rcpch_audit_team_data.role) or (
+                    test_user.role == test_user_clinicial_audit_team_data
+                ):
                     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                         ODSCode="RGT01",
                         ParentOrganisation_ODSCode="RGT",
@@ -543,7 +554,9 @@ def test_episode_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -580,7 +593,9 @@ def test_syndrome_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -620,7 +635,9 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -691,9 +708,10 @@ def test_comborbidity_view_permissions_success(client, URL):
             response.status_code == 200
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comborbidity page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
-        # Additional test: assert different organisation if RCPCH AUDIT TEAM
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_team_data.role:
+        # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
+        if (test_user.role == test_user_rcpch_audit_team_data.role) or (
+            test_user.role == test_user_clinicial_audit_team_data
+        ):
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
                 ParentOrganisation_ODSCode="RGT",
@@ -756,7 +774,9 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
@@ -828,15 +848,15 @@ def test_multiple_views_permissions_success(client):
                     kwargs={"case_id": CASE_FROM_SAME_ORG.id},
                 )
             )
-            print(url_name, response.status_code)
 
             assert (
                 response.status_code == 200
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
-            # Additional test: assert different organisation if RCPCH AUDIT TEAM
-            # ADDENBROOKE'S
-            if test_user.role == test_user_rcpch_audit_team_data.role:
+            # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
+            if (test_user.role == test_user_rcpch_audit_team_data.role) or (
+                test_user.role == test_user_clinicial_audit_team_data
+            ):
                 DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                     ODSCode="RGT01",
                     ParentOrganisation_ODSCode="RGT",
@@ -880,7 +900,9 @@ def test_multiple_views_permissions_forbidden(client):
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+    )
 
     for test_user in users:
         client.force_login(test_user)
