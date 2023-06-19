@@ -144,7 +144,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         default=False
     )
     is_rcpch_staff = models.BooleanField(
-        # reflects if user is an RCPCH employe
+        # reflects if user is an RCPCH employee
         # must be affiliated with an organisation
         default=False
     )

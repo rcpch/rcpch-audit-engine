@@ -14,6 +14,7 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_clinician_data,
     test_user_audit_centre_lead_clinician_data,
     test_user_rcpch_audit_team_data,
+    test_user_clinicial_audit_team_data,
 )
 from epilepsy12.models import (
     Epilepsy12User,
@@ -33,6 +34,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
         test_user_audit_centre_clinician_data,
         test_user_audit_centre_lead_clinician_data,
         test_user_rcpch_audit_team_data,
+        test_user_clinicial_audit_team_data,
     ]
 
     with django_db_blocker.unblock():
@@ -43,23 +45,36 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                 ParentOrganisation_ODSCode="RP4",
             )
 
+            is_active = True
             is_staff = False
             is_rcpch_audit_team_member = False
+            is_rcpch_staff = False
 
             # seed a user of each type at GOSH
             for user in users:
+                
+                first_name=user.role_str
+                
                 # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
                 if user.role == RCPCH_AUDIT_TEAM:
-                    is_staff = True
                     is_rcpch_audit_team_member = True
+                    is_rcpch_staff = True
+                
+                if user.is_clinical_audit_team:
+                    is_rcpch_audit_team_member = True
+                    first_name='CLINICAL_AUDIT_TEAM'
 
                 E12UserFactory(
-                    first_name=user.role_str,
+                    first_name=first_name,
+                    role=user.role,
+                    # Assign flags based on user role
+                    is_active=is_active,
                     is_staff=is_staff,
                     is_rcpch_audit_team_member=is_rcpch_audit_team_member,
-                    role=user.role,
+                    is_rcpch_staff=is_rcpch_staff,
                     organisation_employer=TEST_USER_ORGANISATION,
                     groups=[Group.objects.get(name=user.group_name)],
                 )
         else:
-            print("Test users already seeded. Skipping")
+            print("Test users already seeded. Deleting all current users.")
+            Epilepsy12User.objects.all().delete()
