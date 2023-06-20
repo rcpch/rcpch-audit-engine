@@ -1,8 +1,8 @@
 import pytest
-from django.core.management import call_command
+
+from django.contrib.auth.models import Group
 
 from epilepsy12.management.commands.create_groups import groups_seeder
-from epilepsy12.management.commands.seed import run_dummy_cases_seed, run_registrations
 
 @pytest.mark.django_db
 @pytest.fixture(scope="session")
@@ -13,8 +13,11 @@ def seed_groups_fixture(django_db_setup, django_db_blocker):
     """
     with django_db_blocker.unblock():
 
-        groups_seeder(
-            run_create_groups=True,
-            verbose=False,
-        )
+        if not Group.objects.all().exists():
+            groups_seeder(
+                run_create_groups=True,
+                verbose=False,
+            )
+        else:
+            print('Groups already seeded. Skipping')
 
