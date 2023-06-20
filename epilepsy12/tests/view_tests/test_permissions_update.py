@@ -33,15 +33,15 @@
         'developmental_learning_or_schooling_problems',
         'behavioural_or_emotional_problems'
     ]
-    [] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == 403
-    [] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
-    [] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-    [] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
     
-    [] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == 200
-    [] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
-    [] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
-    [] Assert Clinical Audit Team can change 'field' - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
+    [x] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
+    [x] Assert Clinical Audit Team can change 'field' - response.status_code == 200
 
 # Epilepsy Context
 for field in fields: [
