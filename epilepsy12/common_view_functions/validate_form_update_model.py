@@ -68,11 +68,6 @@ def validate_and_update_model(
         # multiple_choice_multiple_toggle_button
         field_value = request.htmx.trigger_name
 
-    elif page_element == "date_field":
-        field_value = datetime.strptime(
-            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
-        ).date()
-
     elif page_element == "select" or page_element == "snomed_select":
         if request.htmx.trigger_name == "syndrome_name":
             syndrome_entity = SyndromeEntity.objects.get(
@@ -105,6 +100,9 @@ def validate_and_update_model(
         # The later of the two dates CAN be in the future but cannot be earlier than the first if supplied.
         # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
         # This validation step happens in validators.py
+        field_value = datetime.strptime(
+            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
+        ).date()
 
         if is_earliest_date:
             first_date = field_value
