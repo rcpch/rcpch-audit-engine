@@ -2,93 +2,94 @@
 
 ## Create Tests
 
-    [ ] Assert an Audit Centre Lead Clinician can create users inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == 200
-    [ ] Assert Clinical Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == 200
+    [ ] Assert an Audit Centre Lead Clinician can create users inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
 
-    [ ] Assert an Audit Centre Administrator CANNOT create users - response.status_code == 403
-    [ ] Assert an audit centre clinician CANNOT create users - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT create users outside own Trust - response.status_code == 403
-
-
-    [ ] Assert an Audit Centre Administrator can create patients inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Clinician can create patients inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Lead Clinician can create patients inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can create patients nationally, inside own Trust, and outside  - response.status_code == 200
-    [ ] Assert Clinical Audit Team can create patients nationally, inside own Trust, and outside  - response.status_code == 200
-
-    [ ] Assert an Audit Centre Administrator CANNOT create patients outside own Trust - response.status_code == 403
-    [ ] Assert an audit centre clinician CANNOT create patients outside own Trust - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT create patients outside own Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Administrator CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an audit centre clinician CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT create users outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
-    [ ] Assert an Audit Centre Clinician can create patient records inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Lead Clinician can create patient records inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can create patient records nationally, inside own Trust, and outside  - response.status_code == 200
-    [ ] Assert Clinical Audit Team can create patient records nationally, inside own Trust, and outside  - response.status_code == 200
+    [ ] Assert an Audit Centre Administrator can create patients inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Clinician can create patients inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Lead Clinician can create patients inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can create patients nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can create patients nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
 
-    [ ] Assert an Audit Centre Administrator CANNOT create patient records - response.status_code == 403
-    [ ] Assert an audit centre clinician CANNOT create patient records outside own Trust - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT create patient records outside own Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Administrator CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an audit centre clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+
+
+    [ ] Assert an Audit Centre Clinician can create patient records inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Lead Clinician can create patient records inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can create patient records nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can create patient records nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+
+    [ ] Assert an Audit Centre Administrator CANNOT create patient records - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an audit centre clinician CANNOT create patient records outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT create patient records outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
 
 # Episode
 
-    [ ] Assert an Audit Centre Clinician can 'add_episode' inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Lead Clinician can 'add_episode' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_episode' inside own Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_episode' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_episode' inside different Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_episode' inside different Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician can 'add_episode' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Lead Clinician can 'add_episode' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_episode' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_episode' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_episode' inside different Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_episode' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_episode' - response.status_code == 403
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_episode' outside own Trust - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_episode' outside own Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Administrator CANNOT 'add_episode' - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 # Comorbidity
 
-    [ ] Assert an Audit Centre Clinician can 'add_comorbidity' inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Lead Clinician can 'add_comorbidity' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_comorbidity' inside own Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_comorbidity' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_comorbidity' inside different Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_comorbidity' inside different Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Lead Clinician can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_comorbidity' - response.status_code == 403
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Administrator CANNOT 'add_comorbidity' - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 # Syndrome
 
-    [ ] Assert an Audit Centre Clinician can 'add_syndrome' inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Lead Clinician can 'add_syndrome' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_syndrome' inside own Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_syndrome' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_syndrome' inside different Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_syndrome' inside different Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Lead Clinician can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_syndrome' - response.status_code == 403
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Administrator CANNOT 'add_syndrome' - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
 # Antiepilepsy Medicine
 
-    [ ] Assert an Audit Centre Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == 200
-    [ ] Assert an Audit Centre Lead Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == 200
-    [ ] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == 200
-    [ ] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == 200
+    [ ] Assert an Audit Centre Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert an Audit Centre Lead Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
+    [ ] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_antiepilepsy_medicine' - response.status_code == 403
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == 403
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == 403
+    [ ] Assert an Audit Centre Administrator CANNOT 'add_antiepilepsy_medicine' - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 """
 
 # python imports
 import pytest
+from http import HTTPStatus
 
 # django imports
 from django.urls import reverse
@@ -116,13 +117,13 @@ from epilepsy12.forms import (
 
 
 @pytest.mark.django_db
-def test_users_and_case_list_views_permissions_success(
+def test_user_creation_same_org_permissions_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
     seed_cases_fixture,
 ):
-    """ Integration test checking functionality of view and form
+    """ Integration test checking functionality of view and form.
     
     Simulating different E12 users with different roles attempting to create Users inside own trust.
 
@@ -143,7 +144,7 @@ def test_users_and_case_list_views_permissions_success(
         ParentOrganisation_ODSCode="RGT",
     )
     
-    FIRST_NAME_VALUE = 'FIRST_NAME_VALUE'
+    TEMP_CREATED_USER_FIRST_NAME = 'TEMP_CREATED_USER_FIRST_NAME'
 
     users = Epilepsy12User.objects.all().exclude(
         first_name__in=["AUDIT_CENTRE_ADMINISTRATOR", "AUDIT_CENTRE_CLINICIAN"]
@@ -166,7 +167,7 @@ def test_users_and_case_list_views_permissions_success(
         response = client.get(url)
 
         assert (
-            response.status_code == 200
+            response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` of {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
         
         data={
@@ -174,7 +175,7 @@ def test_users_and_case_list_views_permissions_success(
             "email": f"{test_user.first_name}@test.com",
             "role": 1,
             "organisation_employer": TEST_USER_ORGANISATION.id,
-            "first_name": FIRST_NAME_VALUE,
+            "first_name": TEMP_CREATED_USER_FIRST_NAME,
             "surname": "User",
             "is_rcpch_audit_team_member": True,
             "is_rcpch_staff": False,
@@ -185,6 +186,32 @@ def test_users_and_case_list_views_permissions_success(
         
         # This is valid form data, should redirect
         assert response.status_code == 302, f"Valid E12User form data POSTed, expected status_code 302, received {response.status_code}"
-    
         
-    assert Epilepsy12User.objects.filter(first_name=FIRST_NAME_VALUE).count() == 3, f"Logged in as 3 different people and created an e12 user with first_name = {FIRST_NAME_VALUE}. Should be 3 matches in db for this filter."
+    assert Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count() == 3, f"Logged in as 3 different people and created an e12 user with first_name = {TEMP_CREATED_USER_FIRST_NAME}. Should be 3 matches in db for this filter."
+
+@pytest.mark.django_db
+def test_user_creation_same_org_permissions_success(
+    client,
+):
+    """ Integration test checking functionality of view and form.
+    
+    RCPCH Audit Team and Clinical Audit Team roles should be able to create user in different trust.
+    """
+
+    # set up constants
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    
+    TEMP_CREATED_USER_FIRST_NAME = 'TEMP_CREATED_USER_FIRST_NAME'
+
+    users = Epilepsy12User.objects.filter(first_name__in=['RCPCH_AUDIT_TEAM','CLINICAL_AUDIT_TEAM'])
+    
+    if not users:
+        assert False, f"No seeded users in test db. Test cannot run."
+
+    for test_user in users:
+        print(test_user)

@@ -62,7 +62,7 @@ test_user_audit_centre_lead_clinician_data = TestUser(
 
 test_user_clinicial_audit_team_data = TestUser(
     role=AUDIT_CENTRE_LEAD_CLINICIAN,
-    role_str="AUDIT_CENTRE_LEAD_CLINICIAN",
+    role_str="CLINICAL_AUDIT_TEAM",
     is_active=False,
     is_staff=False,
     group_name=TRUST_AUDIT_TEAM_FULL_ACCESS,

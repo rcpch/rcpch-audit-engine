@@ -10,181 +10,182 @@ NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_
 
 ### E12 Users 
 
-    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
-    [x] Assert Clinician who is also an RCPCH Audit Team can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinician who is also an RCPCH Audit Team can view users inside own Trust - response.status_code == HTTPStatus.OK
 
-    [x] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == 200 
+    [x] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == HTTPStatus.OK 
 
 
 ### E12 Patient Records
 
-    [x] Assert an Audit Centre Administrator can view patients inside own Trust - response.status_code == 200
-    [x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view patients within all Trusts - response.status_code == 200
-    [x] Assert Clinical Audit Team can view patients inside a different Trust - response.status_code == 200 
+    [x] Assert an Audit Centre Administrator can view patients inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view patients within all Trusts - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view patients inside a different Trust - response.status_code == HTTPStatus.OK 
 
-    [x] Assert an Audit Centre Administrator CANNOT view patients outside own Trust - response.status_code == 403
-    [x] Assert an audit centre clinician CANNOT view patients outside own Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician CANNOT view patients outside own Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator CANNOT view patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT view patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT view patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
 ## Registration
 
-    [x] Assert an Audit Centre Administrator can view 'register' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'register' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'register' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'register' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'register' outside own Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'register' inside own Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'register' outside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'register' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'register' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'register' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'register' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'register' outside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'register' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'register' outside own Trust - response.status_code == HTTPStatus.OK
 
-    [x] Assert an Audit Centre Clinician cannot view 'register' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Administrator cannot view 'register' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'register' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'register' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot view 'register' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'register' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## First Paediatric Assessment
 
-    [x] Assert an Audit Centre Administrator can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'first_paediatric_assessment' inside own Trust- response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'first_paediatric_assessment' outside own Trust- response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'first_paediatric_assessment' inside own Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'first_paediatric_assessment' outside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'first_paediatric_assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'first_paediatric_assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'first_paediatric_assessment' inside own Trust- response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'first_paediatric_assessment' outside own Trust- response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'first_paediatric_assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'first_paediatric_assessment' outside own Trust - response.status_code == HTTPStatus.OK
 
-    [x] Assert an Audit Centre Administrator cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'first_paediatric_assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Epilepsy Context
 
-    [x] Assert an Audit Centre Administrator can view 'epilepsy_context' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'epilepsy_context' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'epilepsy_context' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'epilepsy_context' inside own Trust- response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'epilepsy_context' outside own Trust- response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'epilepsy_context' inside own Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'epilepsy_context' outside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'epilepsy_context' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'epilepsy_context' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'epilepsy_context' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'epilepsy_context' inside own Trust- response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'epilepsy_context' outside own Trust- response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'epilepsy_context' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'epilepsy_context' outside own Trust - response.status_code == HTTPStatus.OK
 
-    [x] Assert an Audit Centre Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Administrator cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot view 'epilepsy_context' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'epilepsy_context' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Multiaxial Diagnosis
 
-    [x] Assert an Audit Centre Administrator can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'multiaxial_diagnosis' inside own Trust- response.status_code == 200
-    [x] Assert RCPCH Audit Team can view 'multiaxial_diagnosis' outside own Trust- response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'multiaxial_diagnosis' inside own Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view 'multiaxial_diagnosis' outside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'multiaxial_diagnosis' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'multiaxial_diagnosis' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'multiaxial_diagnosis' inside own Trust- response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view 'multiaxial_diagnosis' outside own Trust- response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'multiaxial_diagnosis' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view 'multiaxial_diagnosis' outside own Trust - response.status_code == HTTPStatus.OK
 
 
-    [x] Assert an Audit Centre Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Administrator cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'multiaxial_diagnosis' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Episode
 for each field in fields ['edit_episode','close_episode']
 
-        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
         [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code = 200
-        [x] Assert RCPCH Audit Team can view field inside own Trust - response.status_code == 200
-        [x] Assert RCPCH Audit Team can view field inside a different Trust - response.status_code == 200
-        [x] Assert Clinical Audit Team can view field inside own Trust - response.status_code == 200
-        [x] Assert Clinical Audit Team can view field outside own Trust - response.status_code == 200
+        [x] Assert RCPCH Audit Team can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert RCPCH Audit Team can view field inside a different Trust - response.status_code == HTTPStatus.OK
+        [x] Assert Clinical Audit Team can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert Clinical Audit Team can view field outside own Trust - response.status_code == HTTPStatus.OK
 
-        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Syndrome
 for each field in fields ['edit_syndrome', 'close_syndrome']
-        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-        [x] Assert RCPCH Audit Team can view field inside own and different Trust - response.status_code == 200
-        [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == 200
+        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert RCPCH Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
+        [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
         
 
-        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Antiepilepsy Medicine
 for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medicine']
 
-    [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == 200
-    [x] Assert Clinical Audit Team can view inside own and different Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.OK
     
     
-    [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Comorbidity
 for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbidities']
-        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-        [x] Assert RCPCH Audit Team can view field inside own and different Trust - response.status_code == 403
-        [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == 200
+        [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == HTTPStatus.OK
+        [x] Assert RCPCH Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
     
-        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
+        [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+        [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
 ## Assessment
 
-    [x] Assert an Audit Centre Administrator can view 'assessment' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'assessment' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == 403
-    [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'assessment' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
     
-    [x] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot view 'assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'assessment' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Investigations
 
-    [x] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == 403
-    [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'investigations' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'investigations' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'investigations' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
     
-    [x] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'investigations' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot view 'investigations' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'investigations' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 ## Management
     
-    [x] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == 403
-    [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view 'management' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can view 'management' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can view 'management' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can view inside own and different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert Clinical Audit Team can view field inside own and different Trust - response.status_code == HTTPStatus.OK
     
-    [x] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == 403
-    [x] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator cannot view 'management' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot view 'management' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot view 'management' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 """
 
 # python imports
 import pytest
 from datetime import date
+from http import HTTPStatus
 
 # django imports
 from django.urls import reverse
@@ -261,7 +262,7 @@ def test_users_and_case_list_views_permissions_success(
         )
 
         assert (
-            e12_user_list_response.status_code == 200
+            e12_user_list_response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
 
         # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
@@ -277,7 +278,7 @@ def test_users_and_case_list_views_permissions_success(
             )
 
             assert (
-                e12_user_list_response.status_code == 200
+                e12_user_list_response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
 
 
@@ -322,7 +323,7 @@ def test_users_and_cases_list_view_permissions_forbidden(
         )
 
         assert (
-            e12_user_list_response_different_organisation.status_code == 403
+            e12_user_list_response_different_organisation.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {e12_user_list_response_different_organisation.status_code}"
 
 
@@ -357,7 +358,7 @@ def test_registration_view_permissions_success(client):
         )
 
         assert (
-            response.status_code == 200
+            response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested Registration page of Case in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
         # Additional test: assert different organisation if RCPCH AUDIT TEAM
@@ -380,7 +381,7 @@ def test_registration_view_permissions_success(client):
             )
 
             assert (
-                response.status_code == 200
+                response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested Registration page of Case in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
@@ -420,7 +421,7 @@ def test_registration_view_permissions_forbidden(client):
         )
 
         assert (
-            response.status_code == 403
+            response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested registration of Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
@@ -490,8 +491,8 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                 )
 
                 assert (
-                    response.status_code == 200
-                ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+                    response.status_code == HTTPStatus.OK
+                ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of Case from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
                 # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
                 if (test_user.role == test_user_rcpch_audit_team_data.role) or (
@@ -547,7 +548,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                         )
 
                         assert (
-                            response.status_code == 200
+                            response.status_code == HTTPStatus.OK
                         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of case from {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
@@ -586,7 +587,7 @@ def test_episode_view_permissions_forbidden(client, URL):
         )
 
         assert (
-            response.status_code == 403
+            response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
@@ -625,7 +626,7 @@ def test_syndrome_view_permissions_forbidden(client, URL):
         )
 
         assert (
-            response.status_code == 403
+            response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested syndrome page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
@@ -667,7 +668,7 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
         )
 
         assert (
-            response.status_code == 403
+            response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page ({URL}) of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
@@ -721,7 +722,7 @@ def test_comborbidity_view_permissions_success(client, URL):
             )
 
         assert (
-            response.status_code == 200
+            response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comborbidity page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
         # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
@@ -762,7 +763,7 @@ def test_comborbidity_view_permissions_success(client, URL):
                 )
 
             assert (
-                response.status_code == 200
+                response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comborbidity page of {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
@@ -816,7 +817,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
             )
 
         assert (
-            response.status_code == 403
+            response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comorbidity page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
@@ -866,7 +867,7 @@ def test_multiple_views_permissions_success(client):
             )
 
             assert (
-                response.status_code == 200
+                response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
             # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
@@ -890,7 +891,7 @@ def test_multiple_views_permissions_success(client):
                 )
 
                 assert (
-                    response.status_code == 200
+                    response.status_code == HTTPStatus.OK
                 ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
@@ -940,5 +941,5 @@ def test_multiple_views_permissions_forbidden(client):
             )
 
             assert (
-                response.status_code == 403
+                response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
