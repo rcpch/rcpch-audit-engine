@@ -420,6 +420,7 @@ def create_case(request, organisation_id):
         ("ZZ993VZ", "No fixed abode"),
     )
     form = CaseForm(request.POST or None)
+    
 
     template_name = "epilepsy12/cases/case.html"
 
@@ -443,6 +444,8 @@ def create_case(request, organisation_id):
             messages.error(
                 request=request, message="It was not possible to save the case"
             )
+            print('Invalid data')
+            print(form.errors)
 
     context = {
         "organisation_id": organisation_id,

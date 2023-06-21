@@ -3,11 +3,16 @@ This file houses code to be copied and pasted easily into the Django Python shel
 """
 
 
-
 # Seeds test db users according to role + permissions.
 
 from django.contrib.auth.models import Group
-from epilepsy12.tests.UserDataClasses import test_user_audit_centre_administrator_data,        test_user_audit_centre_clinician_data,        test_user_audit_centre_lead_clinician_data,        test_user_rcpch_audit_team_data,        test_user_clinicial_audit_team_data
+from epilepsy12.tests.UserDataClasses import (
+    test_user_audit_centre_administrator_data,
+    test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
+    test_user_rcpch_audit_team_data,
+    test_user_clinicial_audit_team_data,
+)
 
 from epilepsy12.models import Organisation
 from epilepsy12.tests.factories.E12UserFactory import E12UserFactory
