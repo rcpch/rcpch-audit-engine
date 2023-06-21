@@ -44,44 +44,51 @@
     [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Epilepsy Context
-for field in fields: [
-    'previous_febrile_seizure',
-    'previous_acute_symptomatic_seizure',
-    'is_there_a_family_history_of_epilepsy',
-    'previous_neonatal_seizures',
-    'were_any_of_the_epileptic_seizures_convulsive',
-    'experienced_prolonged_generalized_convulsive_seizures',
-    'experienced_prolonged_focal_seizures',
-    'diagnosis_of_epilepsy_withdrawn',
-]
-[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    for field in fields: [
+        'previous_febrile_seizure',                                 single_choice_multiple_toggle_button
+        'previous_acute_symptomatic_seizure',                       single_choice_multiple_toggle_button
+        'is_there_a_family_history_of_epilepsy',                    toggle_button
+        'previous_neonatal_seizures',                               single_choice_multiple_toggle_button
+        'were_any_of_the_epileptic_seizures_convulsive',            toggle_button
+        'experienced_prolonged_generalized_convulsive_seizures',    single_choice_multiple_toggle_button
+        'experienced_prolonged_focal_seizures',                     single_choice_multiple_toggle_button
+        'diagnosis_of_epilepsy_withdrawn',                          toggle_button
+    ]
+
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    
+    [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+
 
 # Multiaxial Diagnosis
-for field in fields: [
-    'epilepsy_cause_known',
-    'epilepsy_cause',
-    'epilepsy_cause_categories',
-    'relevant_impairments_behavioural_educational',
-    'mental_health_screen',
-    'mental_health_issue_identified',
-    'mental_health_issue',
-    'global_developmental_delay_or_learning_difficulties',
-    'global_developmental_delay_or_learning_difficulties_severity',
-    'autistic_spectrum_disorder',
-]
-[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    for field in fields: [
+        'epilepsy_cause_known',                                         toggle_button
+        'epilepsy_cause',                                               select
+        'epilepsy_cause_categories',                                    multiple_choice_multiple_toggle_button
+        'relevant_impairments_behavioural_educational',                 toggle_button
+        'mental_health_screen',                                         toggle_button
+        'mental_health_issue_identified',                               toggle_button
+        'mental_health_issue',                                          single_choice_multiple_toggle_button
+        'global_developmental_delay_or_learning_difficulties',          toggle_button
+        'global_developmental_delay_or_learning_difficulties_severity', single_choice_multiple_toggle_button
+        'autistic_spectrum_disorder',                                   toggle_button
+    ]
+
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    
+    [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Episode
 for field in fields: [
@@ -268,8 +275,8 @@ def test_users_update_users_forbidden(
     )
 
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
+        email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
-        email='temp_user@temp.com',
         role=test_user_audit_centre_administrator_data.role,
         # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
@@ -352,9 +359,9 @@ def test_users_update_users_success(
     )
 
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
+        email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        email='temp_user@temp.com',
         # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
@@ -633,3 +640,316 @@ def test_users_update_first_paediatric_assessment_success(client, URL):
         assert (
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update first paediatric assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+# Epilepsy Context
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("previous_febrile_seizure"),
+        ("previous_acute_symptomatic_seizure"),
+        ("is_there_a_family_history_of_epilepsy"),
+        ("previous_neonatal_seizures"),
+        ("were_any_of_the_epileptic_seizures_convulsive"),
+        ("experienced_prolonged_generalized_convulsive_seizures"),
+        ("experienced_prolonged_focal_seizures"),
+        ("diagnosis_of_epilepsy_withdrawn"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_first_epilepsy_context_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update epilepsy context in Epilepsy12
+
+    Assert these users cannot change epilepsy context
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "RCPCH_AUDIT_TEAM",
+            "CLINICAL_AUDIT_TEAM",
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        response = client.get(
+            reverse(
+                URL,
+                kwargs={
+                    "epilepsy_context_id": CASE_FROM_DIFFERENT_ORG.registration.epilepsycontext.id,
+                },
+            )
+        )
+
+        assert (
+            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update epilepsy context {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("previous_febrile_seizure"),
+        ("previous_acute_symptomatic_seizure"),
+        ("is_there_a_family_history_of_epilepsy"),
+        ("previous_neonatal_seizures"),
+        ("were_any_of_the_epileptic_seizures_convulsive"),
+        ("experienced_prolonged_generalized_convulsive_seizures"),
+        ("experienced_prolonged_focal_seizures"),
+        ("diagnosis_of_epilepsy_withdrawn"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_epilepsy_context_success(client, URL):
+    """
+    Simulating different E12 Users attempting to update epilepsy context in Epilepsy12
+
+    Assert these users can change epilepsy context
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    single_choice_multiple_toggle_fields = [
+        "previous_febrile_seizure",
+        "previous_acute_symptomatic_seizure",
+        "is_there_a_family_history_of_epilepsy",
+        "previous_neonatal_seizures",
+        "experienced_prolonged_generalized_convulsive_seizures",
+        "experienced_prolonged_focal_seizures",
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL in single_choice_multiple_toggle_fields:
+            # this is single_choice_multiple_toggle_button - select option 1
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "epilepsy_context_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+            )
+        else:
+            # all other options are toggle buttons: select True
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "epilepsy_context_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+            )
+
+        assert (
+            response.status_code == response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+# Multiaxial Diagnosis
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("epilepsy_cause_known"),
+        ("epilepsy_cause"),
+        ("epilepsy_cause_categories"),
+        ("relevant_impairments_behavioural_educational"),
+        ("mental_health_screen"),
+        ("mental_health_issue_identified"),
+        ("mental_health_issue"),
+        ("global_developmental_delay_or_learning_difficulties"),
+        ("global_developmental_delay_or_learning_difficulties_severity"),
+        ("autistic_spectrum_disorder"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
+
+    Assert these users cannot change multiaxial diagnosis
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "RCPCH_AUDIT_TEAM",
+            "CLINICAL_AUDIT_TEAM",
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        response = client.get(
+            reverse(
+                URL,
+                kwargs={
+                    "multiaxial_diagnosis_id": CASE_FROM_DIFFERENT_ORG.registration.multiaxialdiagnosis.id,
+                },
+            )
+        )
+
+        assert (
+            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update multiaxial diagnosis {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("epilepsy_cause_known"),
+        ("epilepsy_cause"),
+        ("epilepsy_cause_categories"),
+        ("relevant_impairments_behavioural_educational"),
+        ("mental_health_screen"),
+        ("mental_health_issue_identified"),
+        ("mental_health_issue"),
+        ("global_developmental_delay_or_learning_difficulties"),
+        ("global_developmental_delay_or_learning_difficulties_severity"),
+        ("autistic_spectrum_disorder"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_multiaxial_diagnosis_success(
+    client, seed_epilepsy_causes_fixture, URL
+):
+    """
+    Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
+
+    Assert these users can change multiaxial diagnosis
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    toggle_fields = [
+        "epilepsy_cause_known",
+        "relevant_impairments_behavioural_educational",
+        "mental_health_screen",
+        "mental_health_issue_identified",
+        "global_developmental_delay_or_learning_difficulties",
+        "autistic_spectrum_disorder",
+    ]
+
+    single_choice_multiple_toggle_button_fields = [
+        "mental_health_issue",
+        "global_developmental_delay_or_learning_difficulties_severity",
+    ]
+
+    select_fields = ["epilepsy_cause"]
+
+    multiple_choice_multiple_toggle_button_fields = ["epilepsy_cause_categories"]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL in toggle_fields:
+            # all other options are toggle buttons: select True
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+            )
+        elif (
+            URL in single_choice_multiple_toggle_button_fields
+            or URL in multiple_choice_multiple_toggle_button_fields
+        ):
+            # this is single_choice_multiple_toggle_button - select option 1
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+            )
+        else:
+            # all other options are selects: select True
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
+            )
+
+        assert (
+            response.status_code == response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
