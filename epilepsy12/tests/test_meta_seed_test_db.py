@@ -15,4 +15,3 @@ def test__seed_test_db(
     assert Case.objects.all().exists()
     assert Epilepsy12User.objects.all().exists()
     assert EpilepsyCauseEntity.objects.all().exists()
-    print(f"{EpilepsyCauseEntity.objects.all().count()=}")
