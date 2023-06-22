@@ -526,13 +526,14 @@ def test_patient_creation_forbidden(
 
 
 @pytest.mark.django_db
-def test_add_episode_comorbidity_syndrome_success(client):
+def test_add_episode_comorbidity_syndrome_aem_success(client):
     """
     Simulating different permitted E12 Roles request.POSTing to the following htmx urls:
 
         - `add_episode`
         - `add_comorbidity`
         - `add_syndrome`
+        - `add_antiepilepsy_medicine`
 
     Additionally, RCPCH_AUDIT_TEAM and CLINICAL_AUDIT_TEAM can add Episode in different Trust.
     """
@@ -563,6 +564,7 @@ def test_add_episode_comorbidity_syndrome_success(client):
         "add_episode",
         "add_comorbidity",
         "add_syndrome",
+        "add_antiepilepsy_medicine",
     ]
 
     users = Epilepsy12User.objects.filter(
@@ -582,12 +584,20 @@ def test_add_episode_comorbidity_syndrome_success(client):
         client.force_login(test_user)
 
         for url in URLS:
+            if url == "add_antiepilepsy_medicine":
+                kwargs = {
+                    "management_id": CASE_FROM_SAME_ORG.registration.management.id,
+                    "is_rescue_medicine": "is_rescue_medicine",
+                }
+            else:
+                kwargs = {
+                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
+                }
+
             response = client.post(
                 reverse(
-                    "add_episode",
-                    kwargs={
-                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
-                    },
+                    url,
+                    kwargs=kwargs,
                 ),
                 headers={"Hx-Request": "true"},
             )
@@ -603,10 +613,8 @@ def test_add_episode_comorbidity_syndrome_success(client):
             ]:
                 response = client.post(
                     reverse(
-                        "add_episode",
-                        kwargs={
-                            "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id
-                        },
+                        url,
+                        kwargs=kwargs,
                     ),
                     headers={"Hx-Request": "true"},
                 )
@@ -620,13 +628,14 @@ def test_add_episode_comorbidity_syndrome_success(client):
     reason="When an administrator tries the `add_episode` endpoint, a PermissionDenied is correctly raised and they hit the `rcpch_403` view, specifically the htmx part. At this point, the HttpResponseClientRedirect object from django-htmx does not return a 403, instead a 200. This is an edge case, and in the UI, the add episode button is disabled."
 )
 @pytest.mark.django_db
-def test_add_episode_comorbidity_syndrome_forbidden(client):
+def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
     """
     Simulating different unauthorized E12 Roles adding Episodes for Case in same Trust.
 
     - `add_episode`
     - `add_comorbidity`
     - `add_syndrome`
+    - `add_antiepilepsy_medicine`
 
     """
     # set up constants
@@ -670,17 +679,28 @@ def test_add_episode_comorbidity_syndrome_forbidden(client):
             "add_episode",
             "add_comorbidity",
             "add_syndrome",
+            "add_antiepilepsy_medicine",
         ]
-        
-        for url in URLS:
 
-            if test_user.first_name == test_user_audit_centre_administrator_data.role_str:
+        for url in URLS:
+            if url == "add_antiepilepsy_medicine":
+                kwargs = {
+                    "management_id": CASE_FROM_SAME_ORG.registration.management.id,
+                    "is_rescue_medicine": "is_rescue_medicine",
+                }
+            else:
+                kwargs = {
+                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
+                }
+
+            if (
+                test_user.first_name
+                == test_user_audit_centre_administrator_data.role_str
+            ):
                 response = client.post(
                     reverse(
                         url,
-                        kwargs={
-                            "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
-                        },
+                        kwargs=kwargs,
                     ),
                     headers={"Hx-Request": "true"},
                 )
@@ -690,9 +710,7 @@ def test_add_episode_comorbidity_syndrome_forbidden(client):
                 response = client.post(
                     reverse(
                         url,
-                        kwargs={
-                            "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id
-                        },
+                        kwargs=kwargs,
                     ),
                     headers={"Hx-Request": "true"},
                 )
@@ -700,5 +718,3 @@ def test_add_episode_comorbidity_syndrome_forbidden(client):
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `{url}` for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.FORBIDDEN}, received {response.status_code}"
-
-
