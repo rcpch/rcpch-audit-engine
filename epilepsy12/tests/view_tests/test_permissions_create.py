@@ -554,12 +554,12 @@ def test_add_episode_success(client):
     SEIZURE_ONSET_DATE = (
         CASE_FROM_SAME_ORG.registration.registration_date - relativedelta(days=7)
     )
-    SEIZURE_ONSET_DATE_CONFIDENCE = 'Apx'
-    EPISODE_DEFINITION='a'
+    SEIZURE_ONSET_DATE_CONFIDENCE = "Apx"
+    EPISODE_DEFINITION = "a"
     HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED = False
-    EPILEPSY_OR_NONEPILEPSY_STATUS='E'
-    EPILEPTIC_SEIZURE_ONSET_TYPE='FO'
-    FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED='LATERALITY'
+    EPILEPSY_OR_NONEPILEPSY_STATUS = "E"
+    EPILEPTIC_SEIZURE_ONSET_TYPE = "FO"
+    FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED = "LATERALITY"
 
     users = Epilepsy12User.objects.filter(
         first_name__in=[
@@ -600,71 +600,70 @@ def test_add_episode_success(client):
             multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
         ).latest("id")
 
+        episode_answers_data = [
+            {
+                "url_name": "seizure_onset_date",
+                "headers": {"Hx-Trigger-Name": "seizure_onset_date"},
+                "data": {"seizure_onset_date": SEIZURE_ONSET_DATE},
+            },
+            {
+                "url_name": "seizure_onset_date_confidence",
+                "headers": {"Hx-Trigger-Name": SEIZURE_ONSET_DATE_CONFIDENCE},
+                "data": {},
+            },
+            {
+                "url_name": "episode_definition",
+                "headers": {"Hx-Trigger-Name": "episode_definition"},
+                "data": {'episode_definition':EPISODE_DEFINITION},
+            },
+            {
+                "url_name": "has_description_of_the_episode_or_episodes_been_gathered",
+                "headers": {"Hx-Trigger-Name": "button-false"},
+                "data": {},
+            },
+            {
+                "url_name": "epilepsy_or_nonepilepsy_status",
+                "headers": {"Hx-Trigger-Name": EPILEPSY_OR_NONEPILEPSY_STATUS},
+                "data": {},
+            },
+            {
+                "url_name": "epileptic_seizure_onset_type",
+                "headers": {"Hx-Trigger-Name": EPILEPTIC_SEIZURE_ONSET_TYPE},
+                "data": {},
+            },
+            {
+                "url_name": "focal_onset_epilepsy_checked_changed",
+                "headers": {
+                    "Hx-Trigger": "focal_onset_left",
+                    "Hx-Trigger-Name": FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED,
+                },
+                "data": {},
+            },
+        ]
+
         # Fill in valid answers
-        client.post(
-            reverse(
-                "seizure_onset_date",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger-Name": "seizure_onset_date", "Hx-Request": "true"},
-            data={"seizure_onset_date": SEIZURE_ONSET_DATE},
-        )
-        client.post(
-            reverse(
-                "seizure_onset_date_confidence",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger-Name": SEIZURE_ONSET_DATE_CONFIDENCE, "Hx-Request": "true"},
-        )
-        client.post(
-            reverse(
-                "episode_definition",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger-Name": "episode_definition", "Hx-Request": "true"},
-            data={'episode_definition':EPISODE_DEFINITION}
-        )
-        client.post(
-            reverse(
-                "has_description_of_the_episode_or_episodes_been_gathered",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger-Name": 'button-false', "Hx-Request": "true"},
-        )
-        client.post(
-            reverse(
-                "epilepsy_or_nonepilepsy_status",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger-Name": EPILEPSY_OR_NONEPILEPSY_STATUS, "Hx-Request": "true"},
-        )
-        client.post(
-            reverse(
-                "epileptic_seizure_onset_type",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger-Name": EPILEPTIC_SEIZURE_ONSET_TYPE, "Hx-Request": "true"},
-        )
-        client.post(
-            reverse(
-                "focal_onset_epilepsy_checked_changed",
-                kwargs={"episode_id": episode.id},
-            ),
-            headers={"Hx-Trigger":'focal_onset_left',"Hx-Trigger-Name": FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED, "Hx-Request": "true"},
-        )
+        for answer in episode_answers_data:
+            response = client.post(
+                reverse(answer["url_name"], kwargs={"episode_id": episode.id}),
+                headers={**answer["headers"], **{"Hx-Request": "true"}},
+                data=answer.get("data"),
+            )
+            assert response.status_code == HTTPStatus.OK, f"{test_user} should be permitted to POST {answer['url_name']}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
         episode = Episode.objects.filter(
             multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
         ).latest("id")
-        
+
         assert episode.seizure_onset_date == SEIZURE_ONSET_DATE
         assert episode.seizure_onset_date_confidence == SEIZURE_ONSET_DATE_CONFIDENCE
         assert episode.episode_definition == EPISODE_DEFINITION
-        assert episode.has_description_of_the_episode_or_episodes_been_gathered == HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED 
+        assert (
+            episode.has_description_of_the_episode_or_episodes_been_gathered
+            == HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED
+        )
         assert episode.epilepsy_or_nonepilepsy_status == EPILEPSY_OR_NONEPILEPSY_STATUS
         assert episode.epileptic_seizure_onset_type == EPILEPTIC_SEIZURE_ONSET_TYPE
         assert episode.focal_onset_left == True
-        
 
         # Reset Episode for next User
         episode.delete()
