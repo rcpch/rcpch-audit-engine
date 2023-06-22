@@ -589,8 +589,10 @@ def test_add_episode_success(client):
             ),
             headers={"Hx-Request": "true"},
         )
-        
-        assert response.status_code == HTTPStatus.OK, f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {TEST_USER_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
+
+        assert (
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {TEST_USER_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
         # Get new episode
         episode = Episode.objects.filter(
@@ -611,7 +613,7 @@ def test_add_episode_success(client):
             {
                 "url_name": "episode_definition",
                 "headers": {"Hx-Trigger-Name": "episode_definition"},
-                "data": {'episode_definition':EPISODE_DEFINITION},
+                "data": {"episode_definition": EPISODE_DEFINITION},
             },
             {
                 "url_name": "has_description_of_the_episode_or_episodes_been_gathered",
@@ -645,16 +647,24 @@ def test_add_episode_success(client):
                 headers={**answer["headers"], **{"Hx-Request": "true"}},
                 data=answer.get("data"),
             )
-            assert response.status_code == HTTPStatus.OK, f"{test_user} from {TEST_USER_ORGANISATION} should be permitted to POST {answer['url_name']} for Case in {TEST_USER_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user} from {TEST_USER_ORGANISATION} should be permitted to POST {answer['url_name']} for Case in {TEST_USER_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
         # Reset Episode for next User
-        episode = Episode.objects.filter(
-            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
-        ).latest("id").delete()
-        
+        episode = (
+            Episode.objects.filter(
+                multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+            )
+            .latest("id")
+            .delete()
+        )
+
         # Additional test for RCPCH_AUDIT_TEAM and CLINICAL_AUDIT_TEAM adding in different Trust
-        if test_user.first_name in [test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]:
-        
+        if test_user.first_name in [
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]:
             response = client.post(
                 reverse(
                     "add_episode",
@@ -664,8 +674,10 @@ def test_add_episode_success(client):
                 ),
                 headers={"Hx-Request": "true"},
             )
-            
-            assert response.status_code == HTTPStatus.OK, f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
+
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
             # Get new episode
             episode = Episode.objects.filter(
@@ -686,7 +698,7 @@ def test_add_episode_success(client):
                 {
                     "url_name": "episode_definition",
                     "headers": {"Hx-Trigger-Name": "episode_definition"},
-                    "data": {'episode_definition':EPISODE_DEFINITION},
+                    "data": {"episode_definition": EPISODE_DEFINITION},
                 },
                 {
                     "url_name": "has_description_of_the_episode_or_episodes_been_gathered",
@@ -720,23 +732,90 @@ def test_add_episode_success(client):
                     headers={**answer["headers"], **{"Hx-Request": "true"}},
                     data=answer.get("data"),
                 )
-                assert response.status_code == HTTPStatus.OK, f"{test_user} from {DIFF_TRUST_DIFF_ORGANISATION} should be permitted to POST {answer['url_name']} for Case in {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
+                assert (
+                    response.status_code == HTTPStatus.OK
+                ), f"{test_user} from {DIFF_TRUST_DIFF_ORGANISATION} should be permitted to POST {answer['url_name']} for Case in {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
             # Reset Episode for next User
-            episode = Episode.objects.filter(
-                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
-            ).latest("id").delete()
+            episode = (
+                Episode.objects.filter(
+                    multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
+                )
+                .latest("id")
+                .delete()
+            )
 
 
-
+# @pytest.mark.xfail(
+#     reason="When an administrator tries the `add_episode` endpoint, they hit the `rcpch_403` view, specifically the htmx part. At this point, the HttpResponseClientRedirect object from django-htmx does not return a 403, instead a 200. This is an edge case, and in the UI, the add episode button is disabled."
+# )
 @pytest.mark.django_db
 def test_add_episode_forbidden(client):
     """
-    Simulating different permitted E12 Roles adding Episodes for Case in same Trust.
-
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_episode' - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    Simulating different unauthorized E12 Roles adding Episodes for Case in same Trust.
 
     """
-    pass
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    # Case from SAME Org
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+    # Case from DIFF Org
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+        ]
+    )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        if test_user.first_name == test_user_audit_centre_administrator_data.role_str:
+            response = client.post(
+                reverse(
+                    "add_episode",
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
+                    },
+                ),
+                headers={"Hx-Request": "true"},
+            )
+
+        # Other users only forbidden from doing action in different Trust
+        else:
+            response = client.post(
+                reverse(
+                    "add_episode",
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id
+                    },
+                ),
+                headers={"Hx-Request": "true"},
+            )
+
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {TEST_USER_ORGANISATION}. Expected {HTTPStatus.FORBIDDEN}, received {response.status_code}"
+
