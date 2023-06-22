@@ -93,6 +93,7 @@
 import pytest
 from http import HTTPStatus
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # django imports
 from django.urls import reverse
@@ -100,6 +101,9 @@ from django.db import transaction
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
+    test_user_audit_centre_administrator_data,
+    test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
     test_user_clinicial_audit_team_data,
     test_user_rcpch_audit_team_data,
 )
@@ -449,6 +453,7 @@ def test_patient_create_success(
             # Remove Case for next user
             Case.objects.filter(first_name=TEST_FIRST_NAME).delete()
 
+
 @pytest.mark.django_db
 def test_patient_creation_forbidden(
     client,
@@ -517,3 +522,164 @@ def test_patient_creation_forbidden(
         assert not Case.objects.filter(
             first_name=TEST_FIRST_NAME
         ).exists(), f"Logged in as {test_user} and attempted to Case at {url}. Unpermitted so Case should not be created."
+
+
+@pytest.mark.django_db
+def test_add_episode_success(client):
+    """
+    Simulating different permitted E12 Roles adding 1 valid Episode.
+
+    Additionally, RCPCH_AUDIT_TEAM and CLINICAL_AUDIT_TEAM can add Episode in different Trust.
+    """
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    # Case from SAME Org
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    TEST_FIRST_NAME = "TEST_FIRST_NAME"
+    SEIZURE_ONSET_DATE = (
+        CASE_FROM_SAME_ORG.registration.registration_date - relativedelta(days=7)
+    )
+    SEIZURE_ONSET_DATE_CONFIDENCE = 'Apx'
+    EPISODE_DEFINITION='a'
+    HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED = False
+    EPILEPSY_OR_NONEPILEPSY_STATUS='E'
+    EPILEPTIC_SEIZURE_ONSET_TYPE='FO'
+    FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED='LATERALITY'
+
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
+        ]
+    )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        client.post(
+            reverse(
+                "add_episode",
+                kwargs={
+                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
+                },
+            ),
+            headers={"Hx-Request": "true"},
+        )
+
+        # Ensure a new episode was added
+        assert (
+            Episode.objects.filter(
+                multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+            ).count()
+            == 2
+        ), f"{test_user} POST requested url='add_episode' but new Episode not added to test db."
+
+        # Get new episode
+        episode = Episode.objects.filter(
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+        ).latest("id")
+
+        # Fill in valid answers
+        client.post(
+            reverse(
+                "seizure_onset_date",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger-Name": "seizure_onset_date", "Hx-Request": "true"},
+            data={"seizure_onset_date": SEIZURE_ONSET_DATE},
+        )
+        client.post(
+            reverse(
+                "seizure_onset_date_confidence",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger-Name": SEIZURE_ONSET_DATE_CONFIDENCE, "Hx-Request": "true"},
+        )
+        client.post(
+            reverse(
+                "episode_definition",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger-Name": "episode_definition", "Hx-Request": "true"},
+            data={'episode_definition':EPISODE_DEFINITION}
+        )
+        client.post(
+            reverse(
+                "has_description_of_the_episode_or_episodes_been_gathered",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger-Name": 'button-false', "Hx-Request": "true"},
+        )
+        client.post(
+            reverse(
+                "epilepsy_or_nonepilepsy_status",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger-Name": EPILEPSY_OR_NONEPILEPSY_STATUS, "Hx-Request": "true"},
+        )
+        client.post(
+            reverse(
+                "epileptic_seizure_onset_type",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger-Name": EPILEPTIC_SEIZURE_ONSET_TYPE, "Hx-Request": "true"},
+        )
+        client.post(
+            reverse(
+                "focal_onset_epilepsy_checked_changed",
+                kwargs={"episode_id": episode.id},
+            ),
+            headers={"Hx-Trigger":'focal_onset_left',"Hx-Trigger-Name": FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED, "Hx-Request": "true"},
+        )
+
+        episode = Episode.objects.filter(
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+        ).latest("id")
+        
+        assert episode.seizure_onset_date == SEIZURE_ONSET_DATE
+        assert episode.seizure_onset_date_confidence == SEIZURE_ONSET_DATE_CONFIDENCE
+        assert episode.episode_definition == EPISODE_DEFINITION
+        assert episode.has_description_of_the_episode_or_episodes_been_gathered == HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED 
+        assert episode.epilepsy_or_nonepilepsy_status == EPILEPSY_OR_NONEPILEPSY_STATUS
+        assert episode.epileptic_seizure_onset_type == EPILEPTIC_SEIZURE_ONSET_TYPE
+        assert episode.focal_onset_left == True
+        
+
+        # Reset Episode for next User
+        episode.delete()
+
+
+@pytest.mark.django_db
+def test_add_episode_forbidden(client):
+    """
+    Simulating different permitted E12 Roles adding Episodes for Case in same Trust.
+
+
+
+    [ ] Assert an Audit Centre Administrator CANNOT 'add_episode' - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+
+    """
+    pass
