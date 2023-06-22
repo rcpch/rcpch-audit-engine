@@ -92,19 +92,19 @@
 
 # Episode
 for field in fields: [
-    seizure_onset_date',
-    seizure_onset_date_confidence',
-    episode_definition',
-    has_description_of_the_episode_or_episodes_been_gathered',
-    edit_description',
-    delete_description_keyword',
-    epilepsy_or_nonepilepsy_status',
-    epileptic_seizure_onset_type',
-    focal_onset_epilepsy_checked_changed',
-    epileptic_generalised_onset',
-    nonepilepsy_generalised_onset',
-    nonepileptic_seizure_type',
-    nonepileptic_seizure_subtype',
+    seizure_onset_date',                                                date_field
+    seizure_onset_date_confidence',                                     single_choice_multiple_toggle_button
+    episode_definition',                                                select
+    has_description_of_the_episode_or_episodes_been_gathered',          toggle_button
+    edit_description',                                                  string - updated in view function
+    delete_description_keyword',                                        Keyword id - updated in view function
+    epilepsy_or_nonepilepsy_status',                                    single_choice_multiple_toggle_button
+    epileptic_seizure_onset_type',                                      single_choice_multiple_toggle_button
+    focal_onset_epilepsy_checked_changed',                              updated in view function
+    epileptic_generalised_onset',                                       single_choice_multiple_toggle_button
+    nonepilepsy_generalised_onset',                                     single_choice_multiple_toggle_button
+    nonepileptic_seizure_type',                                         select
+    nonepileptic_seizure_subtype',                                      select
 ]
 [ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
 [ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -240,13 +240,7 @@ from django.urls import reverse
 from django.contrib.auth.models import Group
 
 # E12 imports
-from epilepsy12.models import (
-    Epilepsy12User,
-    Organisation,
-    Case,
-    MultiaxialDiagnosis,
-    EpilepsyCauseEntity,
-)
+from epilepsy12.models import Epilepsy12User, Organisation, Case, Episode, Keyword
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
@@ -923,14 +917,14 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
 
         if URL in toggle_fields:
             # all other options are toggle buttons: select True
-            response = client.get(
+            response = client.post(
                 reverse(
                     URL,
                     kwargs={
                         "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
                     },
                 ),
-                headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+                Keyword.objects.all().first(),
             )
         elif (
             URL in single_choice_multiple_toggle_button_fields
@@ -948,7 +942,7 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
             )
         else:
             # all other options are selects: select True
-            response = client.get(
+            response = client.post(
                 reverse(
                     URL,
                     kwargs={
@@ -956,6 +950,7 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
                     },
                 ),
                 headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
+                data={"epilepsy_cause": "179"},
             )
 
         assert (
@@ -993,7 +988,7 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
-    
+
     # Fryns macrocephaly
     EPILEPSY_CAUSE_ENTITY = EpilepsyCauseEntity.objects.get(id=179)
 
