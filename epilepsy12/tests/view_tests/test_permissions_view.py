@@ -4,8 +4,6 @@ Tests to ensure permissions work as expected.
 NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_shell_code.py` file.
 
 
-# Test Cases - TODO: UPDATE TESTS TO CHECK FOR Clinical Audit Team
-
 ## View Tests
 
 ### E12 Users 
@@ -308,7 +306,7 @@ def test_users_and_cases_list_view_permissions_forbidden(
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str,test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
@@ -406,7 +404,7 @@ def test_registration_view_permissions_forbidden(client):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
@@ -495,8 +493,8 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                 ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of Case from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
                 # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
-                if (test_user.role == test_user_rcpch_audit_team_data.role) or (
-                    test_user.role == test_user_clinicial_audit_team_data
+                if (test_user.first_name == test_user_rcpch_audit_team_data.role_str) or (
+                    test_user.first_name == test_user_clinicial_audit_team_data.role_str
                 ):
                     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                         ODSCode="RGT01",
@@ -572,7 +570,7 @@ def test_episode_view_permissions_forbidden(client, URL):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
@@ -611,7 +609,7 @@ def test_syndrome_view_permissions_forbidden(client, URL):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
@@ -653,7 +651,7 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
@@ -726,8 +724,8 @@ def test_comborbidity_view_permissions_success(client, URL):
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comborbidity page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
         # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
-        if (test_user.role == test_user_rcpch_audit_team_data.role) or (
-            test_user.role == test_user_clinicial_audit_team_data
+        if (test_user.first_name == test_user_rcpch_audit_team_data.role_str) or (
+            test_user.first_name == test_user_clinicial_audit_team_data.role_str
         ):
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
@@ -792,7 +790,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
@@ -871,8 +869,8 @@ def test_multiple_views_permissions_success(client):
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
             # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
-            if (test_user.role == test_user_rcpch_audit_team_data.role) or (
-                test_user.role == test_user_clinicial_audit_team_data
+            if (test_user.first_name == test_user_rcpch_audit_team_data.role_str) or (
+                test_user.first_name == test_user_clinicial_audit_team_data.role_str
             ):
                 DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                     ODSCode="RGT01",
@@ -918,7 +916,7 @@ def test_multiple_views_permissions_forbidden(client):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
+        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
     )
 
     for test_user in users:
