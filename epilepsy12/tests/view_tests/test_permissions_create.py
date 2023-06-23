@@ -50,55 +50,52 @@
 
 # Comorbidity
 
-    [ ] Assert an Audit Centre Clinician can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert an Audit Centre Lead Clinician can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'add_comorbidity' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'add_comorbidity' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_comorbidity' - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT 'add_comorbidity' - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT 'add_comorbidity' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 # Syndrome
 
-    [ ] Assert an Audit Centre Clinician can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert an Audit Centre Lead Clinician can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'add_syndrome' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'add_syndrome' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_syndrome' - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT 'add_syndrome' - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT 'add_syndrome' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
 # Antiepilepsy Medicine
 
-    [ ] Assert an Audit Centre Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert an Audit Centre Lead Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'add_antiepilepsy_medicine' inside different Trust - response.status_code == HTTPStatus.OK
     
-    [ ] Assert an Audit Centre Administrator CANNOT 'add_antiepilepsy_medicine' - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT 'add_antiepilepsy_medicine' - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 """
 
 # python imports
 import pytest
 from http import HTTPStatus
 from datetime import date
-from dateutil.relativedelta import relativedelta
 
 # django imports
 from django.urls import reverse
-from django.db import transaction
-from django.contrib.auth.models import Group
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
@@ -112,19 +109,8 @@ from epilepsy12.models import (
     Epilepsy12User,
     Organisation,
     Case,
-    Episode,
-    Syndrome,
-    Comorbidity,
-    ComorbidityEntity,
-    AntiEpilepsyMedicine,
-    MedicineEntity,
 )
-from epilepsy12.forms import (
-    Epilepsy12UserAdminCreationForm,
-)
-from epilepsy12.constants import (
-    VALID_NHS_NUMS,
-)
+
 
 
 @pytest.mark.django_db
