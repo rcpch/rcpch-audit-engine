@@ -26,63 +26,68 @@
 
 # Episode
 
-    [] Assert an Audit Centre Lead Clinician can 'remove_episode' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_episode' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_episode' outside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_episode' inside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_episode' outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'remove_episode' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_episode' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_episode' outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_episode' inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_episode' outside own Trust - HTTPStatus.OK
     
-    [] Assert an Audit Centre Administrator CANNOT  'remove_episode' - HTTPStatus.FORBIDDEN
-    [] Assert an audit centre clinician CANNOT  'remove_episode' outside own Trust - HTTPStatus.FORBIDDEN
-    [] Assert an Audit Centre Lead Clinician CANNOT  'remove_episode' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT  'remove_episode' - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT  'remove_episode' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_episode' outside own Trust - HTTPStatus.FORBIDDEN
 
 # Syndrome
 
-    [] Assert an Audit Centre Lead Clinician can 'remove_syndrome' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_syndrome' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_syndrome' outside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_syndrome' inside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_syndrome' outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'remove_syndrome' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_syndrome' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_syndrome' outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_syndrome' inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_syndrome' outside own Trust - HTTPStatus.OK
     
-    [] Assert an Audit Centre Administrator CANNOT  'remove_syndrome' - HTTPStatus.FORBIDDEN
-    [] Assert an audit centre clinician CANNOT  'remove_syndrome' outside own Trust - HTTPStatus.FORBIDDEN
-    [] Assert an Audit Centre Lead Clinician CANNOT  'remove_syndrome' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT  'remove_syndrome' - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT  'remove_syndrome' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_syndrome' outside own Trust - HTTPStatus.FORBIDDEN
 
 # Comorbidity
 
-    [] Assert an Audit Centre Lead Clinician can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_comorbidity' outside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_comorbidity' outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_comorbidity' outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_comorbidity' inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_comorbidity' outside own Trust - HTTPStatus.OK
     
-    [] Assert an Audit Centre Administrator CANNOT  'remove_comorbidity' - HTTPStatus.FORBIDDEN
-    [] Assert an audit centre clinician CANNOT  'remove_comorbidity' outside own Trust - HTTPStatus.FORBIDDEN
-    [] Assert an Audit Centre Lead Clinician CANNOT  'remove_comorbidity' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT  'remove_comorbidity' - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT  'remove_comorbidity' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_comorbidity' outside own Trust - HTTPStatus.FORBIDDEN
     
 
 # Antiepilepsy Medicine
 
-    [] Assert an Audit Centre Lead Clinician can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can 'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can 'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can 'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_antiepilepsy_medicine' inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can 'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.OK
     
-    [] Assert an Audit Centre Administrator CANNOT  'remove_antiepilepsy_medicine' - HTTPStatus.FORBIDDEN
-    [] Assert an audit centre clinician CANNOT  'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.FORBIDDEN
-    [] Assert an Audit Centre Lead Clinician CANNOT  'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT  'remove_antiepilepsy_medicine' - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT  'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT  'remove_antiepilepsy_medicine' outside own Trust - HTTPStatus.FORBIDDEN
 """
 
 # python imports
 import pytest
 from http import HTTPStatus
+from datetime import date
 
 # django imports
 from django.urls import reverse
 
 # E12 Imports
-from epilepsy12.tests.factories import E12UserFactory, E12CaseFactory, E12EpisodeFactory
+from epilepsy12.tests.factories import (
+    E12UserFactory,
+    E12CaseFactory,
+    E12EpisodeFactory,
+)
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
@@ -95,6 +100,11 @@ from epilepsy12.models import (
     Organisation,
     Case,
     Episode,
+    Syndrome,
+    Comorbidity,
+    AntiEpilepsyMedicine,
+    MedicineEntity,
+    ComorbidityEntity,
 )
 from epilepsy12.constants import VALID_NHS_NUMS
 
@@ -444,6 +454,7 @@ def test_patient_delete_forbidden(
             response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
+
 @pytest.mark.django_db
 def test_episode_delete_success(
     client,
@@ -475,33 +486,63 @@ def test_episode_delete_success(
     assert len(users) == len(
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
-    
+
     URLS = [
-        "remove_episode",
-        "remove_comorbidity",
-        "remove_syndrome",
-        "remove_antiepilepsy_medicine",
+        "episode",
+        "comorbidity",
+        "syndrome",
+        "antiepilepsy_medicine",
     ]
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # Create a Case with Episode
         CASE_FROM_SAME_ORG = E12CaseFactory(
-            first_name=f'temp_{TEST_USER_ORGANISATION}',
-            nhs_number=VALID_NHS_NUMS[-1].replace(' ',''),
+            first_name=f"temp_{TEST_USER_ORGANISATION}",
+            nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
             organisations__organisation=TEST_USER_ORGANISATION,
         )
+        # Create objs to search for
         episode = Episode.objects.create(
             episode_definition="a",
             multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
         )
 
+        syndrome = Syndrome.objects.create(
+            syndrome_diagnosis_date=date(
+                2023, 2, 1
+            ),  # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+        )
+
+        comorbidity = Comorbidity.objects.create(
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+            comorbidityentity=ComorbidityEntity.objects.filter(
+                conceptId="1148757008"
+            ).first(),
+        )
+
+        aem = AntiEpilepsyMedicine.objects.create(
+            management=CASE_FROM_SAME_ORG.registration.management,
+            medicine_entity=MedicineEntity.objects.get(
+                medicine_name="Sodium valproate"
+            ),
+        )
+
+        for url in URLS:
+            if url == "episode":
+                OBJ_TO_DEL = episode
+            elif url == "comorbidity":
+                OBJ_TO_DEL = syndrome
+            elif url == "syndrome":
+                OBJ_TO_DEL = comorbidity
+            else:
+                OBJ_TO_DEL = aem
+
         url = reverse(
-            "remove_episode",
-            kwargs={
-                "episode_id":episode.id
-            },
+            f"remove_{url}",
+            kwargs={f"{url}_id": OBJ_TO_DEL.id},
         )
 
         response = client.post(
@@ -511,10 +552,9 @@ def test_episode_delete_success(
         assert (
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
-        
+
         # Reset Case for next User
         CASE_FROM_SAME_ORG.delete()
-
 
         # Additional test for deleting Episode outside of own Trust
         if test_user.first_name in [
@@ -523,29 +563,55 @@ def test_episode_delete_success(
         ]:
             # Create a Case with Episode
             CASE_FROM_DIFF_ORG = E12CaseFactory(
-                first_name=f'temp_{DIFF_TRUST_DIFF_ORGANISATION}',
-                nhs_number=VALID_NHS_NUMS[-1].replace(' ',''),
+                first_name=f"temp_{DIFF_TRUST_DIFF_ORGANISATION}",
+                nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
                 organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
             )
+            # Create objs to search for
             episode = Episode.objects.create(
                 episode_definition="a",
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
             )
 
-            url = reverse(
-                "remove_episode",
-                kwargs={
-                    "episode_id":episode.id
-                },
+            syndrome = Syndrome.objects.create(
+                syndrome_diagnosis_date=date(
+                    2023, 2, 1
+                ),  # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
             )
 
-            response = client.post(
-                url,
+            comorbidity = Comorbidity.objects.create(
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
+                comorbidityentity=ComorbidityEntity.objects.filter(
+                    conceptId="1148757008"
+                ).first(),
+            )
+
+            aem = AntiEpilepsyMedicine.objects.create(
+                management=CASE_FROM_DIFF_ORG.registration.management,
+                medicine_entity=MedicineEntity.objects.get(
+                    medicine_name="Sodium valproate"
+                ),
+            )
+
+            for url in URLS:
+                if url == "episode":
+                    OBJ_TO_DEL = episode
+                elif url == "comorbidity":
+                    OBJ_TO_DEL = syndrome
+                elif url == "syndrome":
+                    OBJ_TO_DEL = comorbidity
+                else:
+                    OBJ_TO_DEL = aem
+
+            url = reverse(
+                f"remove_{url}",
+                kwargs={f"{url}_id": OBJ_TO_DEL.id},
             )
 
             assert (
                 response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}`with DELETE  for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
-            
+
             # Reset Case and Episode
             CASE_FROM_DIFF_ORG.delete()
