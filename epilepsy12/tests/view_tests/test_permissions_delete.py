@@ -1,20 +1,39 @@
 """
 ## Delete Tests
 
-[] Assert an Audit Centre Administrator CANNOT delete users
-[] Assert an audit centre clinician CANNOT delete users
-[] Assert an Audit Centre Lead Clinician can only delete users inside own Trust
-[] Assert RCPCH Audit Team can delete users nationally, within any organisations 
+    [] Assert an Audit Centre Administrator CANNOT delete users - HTTPStatus.FORBIDDEN
+    [] Assert an audit centre clinician CANNOT delete users - HTTPStatus.FORBIDDEN
+    [] Assert an Audit Centre Lead Clinician CANNOT delete users outside own Trust - HTTPStatus.FORBIDDEN
 
-[] Assert an Audit Centre Administrator can only delete patients within own organisation
-[] Assert an audit centre clinician  can only delete patients within own organisation
-[] Assert an Audit Centre Lead Clinician can only delete patients within own Trust
-[] Assert RCPCH Audit Team can delete patients nationally, within any organisations
+    [] Assert an Audit Centre Lead Clinician can delete users inside own Trust - HTTPStatus.OK
+    [] Assert RCPCH Audit Team can delete users inside own Trust - HTTPStatus.OK
+    [] Assert RCPCH Audit Team can delete users outside own Trust - HTTPStatus.OK
+    [] Assert Clinical Audit Team can delete users inside own Trust - HTTPStatus.OK
+    [] Assert Clinical Audit Team can delete users outside own Trust - HTTPStatus.OK
+    
+    
+    
+    [] Assert an Audit Centre Administrator CANNOT delete patients - HTTPStatus.FORBIDDEN
+    [] Assert an audit centre clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
+    [] Assert an Audit Centre Lead Clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
 
-[] Assert an Audit Centre Administrator CANNOT delete patient records
-[] Assert an audit centre clinician can only delete patient records within own organisation
-[] Assert an Audit Centre Lead Clinician can only delete patient records within own Trust
-[] Assert RCPCH Audit Team can delete patient records nationally, within any organisations
+    [] Assert an Audit Centre Lead Clinician can delete patients inside own Trust - HTTPStatus.OK
+    [] Assert RCPCH Audit Team can delete patients inside own Trust - HTTPStatus.OK
+    [] Assert RCPCH Audit Team can delete patients outside own Trust - HTTPStatus.OK
+    [] Assert Clinical Audit Team can delete patients inside own Trust - HTTPStatus.OK
+    [] Assert Clinical Audit Team can delete patients outside own Trust - HTTPStatus.OK
+
+
+
+    [] Assert an Audit Centre Administrator CANNOT delete patient_records - HTTPStatus.FORBIDDEN
+    [] Assert an audit centre clinician CANNOT delete patient_records outside own Trust - HTTPStatus.FORBIDDEN
+    [] Assert an Audit Centre Lead Clinician CANNOT delete patient_records outside own Trust - HTTPStatus.FORBIDDEN
+
+    [] Assert an Audit Centre Lead Clinician can delete patient_records inside own Trust - HTTPStatus.OK
+    [] Assert RCPCH Audit Team can delete patient_records inside own Trust - HTTPStatus.OK
+    [] Assert RCPCH Audit Team can delete patient_records outside own Trust - HTTPStatus.OK
+    [] Assert Clinical Audit Team can delete patient_records inside own Trust - HTTPStatus.OK
+    [] Assert Clinical Audit Team can delete patient_records outside own Trust - HTTPStatus.OK
 
 # Episode
 [ ] Assert an Audit Centre Administrator cannot 'remove_episode' - response.status_code == 403
