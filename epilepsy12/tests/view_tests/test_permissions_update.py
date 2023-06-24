@@ -1378,13 +1378,16 @@ def test_users_update_comorbidity_forbidden(client, URL):
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            test_user_audit_centre_clinician_data.role_str,
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         # Log in Test User
