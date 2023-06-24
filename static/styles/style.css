@@ -583,7 +583,7 @@ div.ui.card > div.content > div.organisation_address_container {
 }
 
 .rcpch_red.icon {
-  color: var(--rcpch_red);
+  color: var(--rcpch_red_light_tint2);
 }
 
 .rcpch_light_blue.icon {
@@ -830,8 +830,8 @@ a.ui.button {
 
 .ui.rcpch_red.label {
   border-radius: 0%;
-  border: 1px solid var(--rcpch_red_dark_tint);
-  color: var(--rcpch_red);
+  border: 1px solid var(--rcpch_red_light_tint2);
+  color: var(--rcpch_red_light_tint2);
   background-color: transparent;
   margin: 5px;
   font-weight: 400;
@@ -976,26 +976,6 @@ a.ui.button {
 .ui.--rcpch_pink_light_tint2.dropdown .item:hover {
   background-color: var(--rcpch_pink_light_tint2);
   color: white;
-}
-
-/* DESSCRIBE */
-
-.ui.rcpch_pink.circular.label {
-  color: white;
-  background-color: var(--rcpch_pink);
-}
-
-.ui.rcpch_light_grey.circular.label {
-  color: white;
-  background-color: var(--rcpch_light_grey);
-}
-
-.ui.rcpch.header {
-  margin-top: 10px;
-}
-
-.ui.rcpch_pink.segment {
-  border-top-color: var(--rcpch_pink);
 }
 
 /* Steps */
@@ -1636,7 +1616,7 @@ a label {
   color: var(--rcpch_dark_red);
   background-color: var(--rcpch_red_light_tint3);
   border-radius: 0%;
-  border-color: var(--rcpch_dark_red);
+  border-color: var(--rcpch_red);
   margin-top: 1em;
 }
 
@@ -1962,6 +1942,24 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   border-radius: 0;
 }
 
+/* DESSCRIBE */
 
+.ui.rcpch_pink.circular.label {
+  color: white;
+  background-color: var(--rcpch_pink);
+  border: transparent;
+  border-radius: 50%;
+}
 
+.ui.rcpch_light_grey.circular.label {
+  color: white;
+  background-color: var(--rcpch_light_grey);
+}
 
+.ui.rcpch.header {
+  margin-top: 10px;
+}
+
+.ui.rcpch_pink.segment {
+  border-top-color: var(--rcpch_pink);
+}
