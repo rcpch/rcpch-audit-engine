@@ -77,3 +77,13 @@ def epilepsy12_date_validator(
     else:
         # no dates supplied
         raise ValueError("At least one date must be supplied!")
+
+
+def not_in_the_future_validator(value):
+    """
+    model level validator to prevent persisting a date in the future
+    """
+    if value <= date.today():
+        return value
+    else:
+        raise ValidationError("Dates cannot be in the future.")

@@ -48,7 +48,7 @@ def test_registration_custom_method_audit_submission_date_calculation(
 
     for expected_input_output in registration_dates:
         registration = e12_case_factory(
-            registration__registration_date = expected_input_output[0]
+            registration__registration_date=expected_input_output[0]
         ).registration
 
         assert registration.audit_submission_date == expected_input_output[1]
@@ -75,7 +75,7 @@ def test_registration_custom_method_registration_date_one_year_on(
 
     for expected_input_output in expected_inputs_outputs:
         registration = e12_case_factory(
-            registration__registration_date = expected_input_output[0]
+            registration__registration_date=expected_input_output[0]
         ).registration
 
         assert registration.registration_close_date == expected_input_output[1]
@@ -110,7 +110,7 @@ def test_registration_cohort(
 
     for expected_input_output in expected_inputs_outputs:
         registration = e12_case_factory(
-            registration__registration_date = expected_input_output[0]
+            registration__registration_date=expected_input_output[0]
         ).registration
 
         assert registration.cohort == expected_input_output[1]
@@ -119,7 +119,7 @@ def test_registration_cohort(
 @patch.object(Registration, "get_current_date", return_value=date(2022, 11, 30))
 @pytest.mark.django_db
 def test_registration_days_remaining_before_submission(
-    mocked_get_current_date, 
+    mocked_get_current_date,
     e12_case_factory,
 ):
     """
@@ -131,16 +131,16 @@ def test_registration_days_remaining_before_submission(
 
     NOTE: if `audit_submission_date` is before today, returns 0.
     """
-    
+
     # submission date = 2023-01-10, 41 days after today
     registration = e12_case_factory(
-        registration__registration_date = date(2022, 1, 10)
+        registration__registration_date=date(2022, 1, 10)
     ).registration
     assert registration.days_remaining_before_submission == 41
-    
+
     # submission date = 2023-01-10, 41 days after today
     registration = e12_case_factory(
-        registration__registration_date = date(2021, 1, 1)
+        registration__registration_date=date(2021, 1, 1)
     ).registration
     assert registration.days_remaining_before_submission == 0
 
@@ -149,7 +149,7 @@ def test_registration_days_remaining_before_submission(
 @patch.object(Registration, "get_current_date", return_value=date(2023, 1, 1))
 @pytest.mark.django_db
 def test_registration_validate_dofpa_not_future(
-    mocked_current_date, 
+    mocked_current_date,
     e12_case_factory,
 ):
     """
@@ -164,9 +164,7 @@ def test_registration_validate_dofpa_not_future(
     # Tests that dofpa (registration_date) can't be in the future (relative to today). Tries to create and save a Registration which is 30 days ahead of today.
     future_date = Registration.get_current_date() + relativedelta(days=30)
     with pytest.raises(ValidationError):
-        e12_case_factory(
-            registration__registration_date = future_date
-        )
+        e12_case_factory(registration__registration_date=future_date)
 
 
 @pytest.mark.xfail
@@ -186,9 +184,7 @@ def test_registration_validate_dofpa_not_before_2009(e12_case_factory):
 
 @pytest.mark.xfail
 @pytest.mark.django_db
-def test_registration_validate_dofpa_not_before_child_dob(
-    e12_case_factory
-):
+def test_registration_validate_dofpa_not_before_child_dob(e12_case_factory):
     """
     # TODO - add validation
 
@@ -197,11 +193,10 @@ def test_registration_validate_dofpa_not_before_child_dob(
     """
     date_of_birth = date(2023, 1, 1)
     registration_date = date_of_birth + relativedelta(days=10)
-    
+
     # Tests that dofpa (registration_date) can't be before the child's DoB
     with pytest.raises(ValidationError):
         case = e12_case_factory(
-            date_of_birth = date_of_birth,
-            registration__registration_date = registration_date,
-            )
-
+            date_of_birth=date_of_birth,
+            registration__registration_date=registration_date,
+        )
