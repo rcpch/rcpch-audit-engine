@@ -242,6 +242,8 @@ from datetime import date
 from django.urls import reverse
 from django.contrib.auth.models import Group
 
+import factory
+
 # E12 imports
 from epilepsy12.models import (
     Epilepsy12User,
@@ -261,7 +263,14 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_clinicial_audit_team_data,
     test_user_rcpch_audit_team_data,
 )
-from epilepsy12.tests.factories import E12UserFactory
+from epilepsy12.tests.factories import (
+    E12UserFactory,
+    E12CaseFactory,
+    E12RegistrationFactory,
+)
+
+from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
+from epilepsy12.general_functions import generate_nhs_number
 
 
 @pytest.mark.django_db
@@ -455,8 +464,21 @@ def test_users_update_cases_forbidden(
         ParentOrganisation_ODSCode="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    # reverse dependency
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.all().exclude(
@@ -563,8 +585,19 @@ def test_users_update_first_paediatric_assessment_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -703,8 +736,19 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [
@@ -858,8 +902,19 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.all().exclude(
@@ -1151,8 +1206,19 @@ def test_users_update_episode_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.all().exclude(
@@ -1394,8 +1460,19 @@ def test_users_update_comorbidity_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     user_first_names_for_test = [

@@ -58,10 +58,9 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
     # TODO - once Case.nhs_number has appropriate validation + cleaning, won't need to strip spaces here
     # Iterates through available valid NHS nums. Will reset from beginning once end of list is reached.
-    # nhs_number = factory.Iterator(
-    #     VALID_NHS_NUMS, getter=lambda nhs_num: nhs_num.replace(" ", "")
-    # )
-    nhs_number = generate_nhs_number()
+    nhs_number = factory.Iterator(
+        VALID_NHS_NUMS, getter=lambda nhs_num: nhs_num.replace(" ", "")
+    )
     first_name = "Thomas"
     surname = "Anderson"
     sex = 1

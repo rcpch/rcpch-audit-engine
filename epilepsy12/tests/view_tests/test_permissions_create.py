@@ -96,6 +96,7 @@ from datetime import date
 
 # django imports
 from django.urls import reverse
+import factory
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
@@ -110,6 +111,15 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
+
+from epilepsy12.tests.factories import (
+    E12UserFactory,
+    E12CaseFactory,
+    E12RegistrationFactory,
+)
+
+from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
+from epilepsy12.general_functions import generate_nhs_number
 
 
 @pytest.mark.django_db
@@ -537,12 +547,19 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
     )
 
     # Case from SAME Org
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    # CASE_FROM_SAME_ORG = Case.objects.get(
+    #     first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
     )
-    # Case from DIFF Org
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    CASE_FROM_SAME_ORG = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
 
     URLS = [
@@ -635,12 +652,34 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
     )
 
     # Case from SAME Org
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    # CASE_FROM_SAME_ORG = Case.objects.get(
+    #     first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_SAME_ORG = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
     )
     # Case from DIFF Org
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     users = Epilepsy12User.objects.filter(
