@@ -203,7 +203,9 @@
         'individualised_care_plan_includes_ehcp',                               toggle_button    
         'has_individualised_care_plan_been_updated_in_the_last_year',           toggle_button                        
         'has_been_referred_for_mental_health_support',                          toggle_button        
-        'has_support_for_mental_health_support',                                toggle_button    
+        'has_support_for_mental_health_support',                                toggle_button
+        'has_an_aed_been_given',                                                toggle_button
+        'has_rescue_medication_been_prescribed',                                toggle_button
     ]
     [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -216,26 +218,26 @@
     [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Antiepilepsy Medicine
-for field in fields: [
-    'has_an_aed_been_given',
-    'edit_antiepilepsy_medicine',
-    'medicine_id',
-    'antiepilepsy_medicine_start_date',
-    'antiepilepsy_medicine_add_stop_date',
-    'antiepilepsy_medicine_remove_stop_date',
-    'antiepilepsy_medicine_stop_date',
-    'antiepilepsy_medicine_risk_discussed',
-    'is_a_pregnancy_prevention_programme_in_place',
-    'has_a_valproate_annual_risk_acknowledgement_form_been_completed',
-    'has_rescue_medication_been_prescribed',
-]
-[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    for field in fields: [
+        'edit_antiepilepsy_medicine',                                           button click (antiepilepsy_medicine_id)
+        'medicine_id',                                                          post on select change handled in view
+        'antiepilepsy_medicine_start_date',                                     date_field
+        'antiepilepsy_medicine_add_stop_date',                                  button click (antiepilepsy_medicine_id)
+        'antiepilepsy_medicine_remove_stop_date',                               button click (antiepilepsy_medicine_id)
+        'antiepilepsy_medicine_stop_date',                                      date_field
+        'antiepilepsy_medicine_risk_discussed',                                 toggle_button
+        'is_a_pregnancy_prevention_programme_in_place',                         toggle_button
+        'has_a_valproate_annual_risk_acknowledgement_form_been_completed',      toggle_button
+    ]
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    
+    [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 
 """
@@ -262,6 +264,8 @@ from epilepsy12.models import (
     MultiaxialDiagnosis,
     ComorbidityEntity,
     Comorbidity,
+    MedicineEntity,
+    AntiEpilepsyMedicine,
 )
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -275,6 +279,7 @@ from epilepsy12.tests.factories import (
     E12CaseFactory,
     E12RegistrationFactory,
     E12SiteFactory,
+    E12AntiEpilepsyMedicineFactory,
 )
 
 from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
@@ -2268,6 +2273,8 @@ def test_users_update_investigations_success(client, URL):
 @pytest.mark.parametrize(
     "URL",
     [
+        "has_an_aed_been_given",
+        "has_rescue_medication_been_prescribed",
         "individualised_care_plan_in_place",
         "individualised_care_plan_date",
         "individualised_care_plan_has_parent_carer_child_agreement",
@@ -2366,6 +2373,8 @@ def test_users_update_management_forbidden(client, URL):
 @pytest.mark.parametrize(
     "URL",
     [
+        "has_an_aed_been_given",
+        "has_rescue_medication_been_prescribed",
         "individualised_care_plan_in_place",
         "individualised_care_plan_date",
         "individualised_care_plan_has_parent_carer_child_agreement",
@@ -2446,3 +2455,235 @@ def test_users_update_management_success(client, URL):
     assert (
         response.status_code == HTTPStatus.OK
     ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Management for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+# Antiepilepsy Medicine
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        "edit_antiepilepsy_medicine",
+        "medicine_id",
+        "antiepilepsy_medicine_start_date",
+        "antiepilepsy_medicine_add_stop_date",
+        "antiepilepsy_medicine_remove_stop_date",
+        "antiepilepsy_medicine_stop_date",
+        "antiepilepsy_medicine_risk_discussed",
+        "is_a_pregnancy_prevention_programme_in_place",
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_antiepilepsymedicine_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update antiepilepsymedicine in Epilepsy12
+
+    Assert these users cannot change antiepilepsymedicine
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+
+    # fields
+    date_fields = [
+        "antiepilepsy_medicine_start_date",
+        "antiepilepsy_medicine_stop_date",
+    ]
+
+    toggle_buttons = [
+        "antiepilepsy_medicine_risk_discussed",
+        "is_a_pregnancy_prevention_programme_in_place",
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+        rescue_antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
+            management=CASE_FROM_DIFFERENT_ORG.registration.management,
+            is_rescue_medicine=True,
+            medicine_entity=MedicineEntity.objects.get(pk=4),  # lorazepam
+        )
+        # antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
+        #     management=CASE_FROM_DIFFERENT_ORG.registration.management,
+        #     is_rescue_medicine=True,
+        #     medicine_entity=MedicineEntity.objects.get(pk=7),  # carbamazepine
+        # )
+        antiepilepsy_medicine = AntiEpilepsyMedicine.objects.filter(
+            management=CASE_FROM_DIFFERENT_ORG.registration.management
+        ).first()
+        if URL in date_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        elif URL in toggle_buttons:
+            # these are all toggle buttons
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+            )
+        else:
+            # these are all button clicks
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine.pk},
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+            )
+
+    assert (
+        response.status_code == HTTPStatus.FORBIDDEN
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update antiepilepsymedicine for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        "edit_antiepilepsy_medicine",
+        "medicine_id",
+        "antiepilepsy_medicine_start_date",
+        "antiepilepsy_medicine_add_stop_date",
+        "antiepilepsy_medicine_remove_stop_date",
+        "antiepilepsy_medicine_stop_date",
+        "antiepilepsy_medicine_risk_discussed",
+        "is_a_pregnancy_prevention_programme_in_place",
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_antiepilepsymedicine_success(client, URL):
+    """
+    Simulating different E12 Users attempting to update antiepilepsymedicine in Epilepsy12
+
+    Assert these users can change antiepilepsymedicine
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
+        ]
+    )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
+
+    # fields
+    date_fields = [
+        "antiepilepsy_medicine_start_date",
+        "antiepilepsy_medicine_stop_date",
+    ]
+
+    toggle_buttons = [
+        "antiepilepsy_medicine_risk_discussed",
+        "is_a_pregnancy_prevention_programme_in_place",
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        # antiepilepsy_medicine = AntiEpilepsyMedicine.objects.filter(
+        #     management=CASE_FROM_SAME_ORG.registration.management
+        # ).first()
+        antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
+            management=CASE_FROM_SAME_ORG.registration.management,
+            is_rescue_medicine=True,
+            medicine_entity=MedicineEntity.objects.get(medicine_name="Carbamazepine"),
+        )  # carbamazepine
+
+        if URL in date_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        elif URL in toggle_buttons:
+            # these are all toggle buttons
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+            )
+        else:
+            # these are all button clicks
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine.pk},
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={"medicine_id": 8},  # Clobazam
+            )
+
+    assert (
+        response.status_code == HTTPStatus.OK
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update AntiepilepsyMedicine for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
