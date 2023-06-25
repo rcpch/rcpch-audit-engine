@@ -328,13 +328,16 @@ def test_users_update_users_forbidden(
         ],
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         # Log in Test User
@@ -477,9 +480,6 @@ def test_users_update_cases_forbidden(
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
     # reverse dependency
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
@@ -494,13 +494,16 @@ def test_users_update_cases_forbidden(
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         # Log in Test User
@@ -542,9 +545,13 @@ def test_users_update_cases_success(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
+    users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+            f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
 
@@ -598,9 +605,6 @@ def test_users_update_first_paediatric_assessment_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
         factory_related_name="case",
@@ -749,9 +753,6 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
         factory_related_name="case",
@@ -915,9 +916,6 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
         factory_related_name="case",
@@ -930,13 +928,12 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
     for test_user in users:
         # Log in Test User
@@ -988,10 +985,13 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
+    users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-            "AUDIT_CENTRE_ADMINISTRATOR",
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
 
@@ -1219,9 +1219,6 @@ def test_users_update_episode_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
         factory_related_name="case",
@@ -1234,13 +1231,16 @@ def test_users_update_episode_forbidden(client, URL):
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     # Create objs to search for
     episode = Episode.objects.create(
@@ -1312,10 +1312,13 @@ def test_users_update_episode_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
+    users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-            "AUDIT_CENTRE_ADMINISTRATOR",
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
 
@@ -1473,9 +1476,6 @@ def test_users_update_comorbidity_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # CASE_FROM_DIFFERENT_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
     registration = factory.RelatedFactory(
         E12RegistrationFactory,
         factory_related_name="case",
