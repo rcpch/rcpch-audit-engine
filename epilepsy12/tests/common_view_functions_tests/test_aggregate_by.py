@@ -45,10 +45,11 @@ def test_cases_aggregated_by_sex_correct_output(e12_case_factory):
                 nhs_number=generate_nhs_number(),
                 sex=sex_type[0],
                 registration=None,  # ensure related audit factories not generated
-                organisations__organisation=ORGANISATION,
+                organisations=ORGANISATION,
             )
 
     total_count = cases_aggregated_by_sex(selected_organisation=organisation).count()
+    print(total_count)
     matching_count = (
         cases_aggregated_by_sex(selected_organisation=organisation)
         .filter(sexes=10)
