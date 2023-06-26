@@ -9,8 +9,8 @@ import factory
 from epilepsy12.models import Case
 from .E12SiteFactory import E12SiteFactory
 from .E12RegistrationFactory import E12RegistrationFactory
-from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
-from epilepsy12.general_functions import generate_nhs_number
+from epilepsy12.constants import SEX_TYPE
+import nhs_number
 
 
 class E12CaseFactory(factory.django.DjangoModelFactory):
@@ -56,11 +56,18 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
             pass_school_individual_healthcare_plan=True,
         )
 
-    # TODO - once Case.nhs_number has appropriate validation + cleaning, won't need to strip spaces here
-    # Iterates through available valid NHS nums. Will reset from beginning once end of list is reached.
-    nhs_number = factory.Iterator(
-        VALID_NHS_NUMS, getter=lambda nhs_num: nhs_num.replace(" ", "")
-    )
+    @factory.lazy_attribute
+    def nhs_number(self):
+        """Returns a unique NHS number which has not been used in the db yet."""
+        not_found_unique_nhs_num = True
+
+        while not_found_unique_nhs_num:
+            candidate_num = nhs_number.generate()[0]
+
+            if not Case.objects.filter(nhs_number=candidate_num).exists():
+                not_found_unique_nhs_num = False
+        return candidate_num
+
     first_name = "Thomas"
     surname = "Anderson"
     sex = 1

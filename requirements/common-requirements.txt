@@ -17,3 +17,4 @@ django-simple-history
 django-auto-logout
 pytest-django
 pytest-factoryboy
+nhs-number
