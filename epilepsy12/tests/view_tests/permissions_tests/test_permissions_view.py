@@ -185,16 +185,17 @@ import pytest
 from datetime import date
 from http import HTTPStatus
 
-# django imports
+# 3rd party imports
 from django.urls import reverse
-
 import factory
 
-# E12 imports
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
-    test_user_clinicial_audit_team_data,
+    test_user_audit_centre_administrator_data,
+    test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
     test_user_rcpch_audit_team_data,
+    test_user_clinicial_audit_team_data,
 )
 from epilepsy12.models import (
     Epilepsy12User,
@@ -209,12 +210,11 @@ from epilepsy12.models import (
 )
 
 from epilepsy12.tests.factories import (
-    E12UserFactory,
     E12CaseFactory,
     E12RegistrationFactory,
 )
 
-from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
+from epilepsy12.constants import  SEX_TYPE
 from epilepsy12.general_functions import generate_nhs_number
 
 
