@@ -187,7 +187,6 @@ from http import HTTPStatus
 
 # 3rd party imports
 from django.urls import reverse
-import factory
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
@@ -207,11 +206,6 @@ from epilepsy12.models import (
     ComorbidityEntity,
     AntiEpilepsyMedicine,
     MedicineEntity,
-)
-
-from epilepsy12.tests.factories import (
-    E12CaseFactory,
-    E12RegistrationFactory,
 )
 
 
