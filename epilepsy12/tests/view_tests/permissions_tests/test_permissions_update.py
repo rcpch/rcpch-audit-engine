@@ -441,7 +441,10 @@ def test_users_update_users_success(
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
-        if test_user.first_name in ["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]:
+        if test_user.first_name in [
+            test_user_rcpch_audit_team_data,
+            test_user_clinicial_audit_team_data,
+        ]:
             response = client.get(
                 reverse(
                     "edit_epilepsy12_user",
@@ -1115,11 +1118,6 @@ def test_users_update_episode_forbidden(client):
     """
 
     # set up constants
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -1512,7 +1510,6 @@ def test_users_update_comorbidity_success(client):
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update comorbidities {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-# NOTE: TOO COMPLEX, SHOULD SIMPLIFY
 @pytest.mark.django_db
 def test_users_update_assessment_forbidden(client):
     """
@@ -1522,11 +1519,6 @@ def test_users_update_assessment_forbidden(client):
     """
 
     # set up constants
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -1707,7 +1699,7 @@ def test_users_update_assessment_forbidden(client):
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment {URL} for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
-# NOTE: TOO COMPLEX, SHOULD SIMPLIFY
+
 @pytest.mark.django_db
 def test_users_update_assessment_success(client):
     """
@@ -1897,15 +1889,13 @@ def test_users_update_assessment_success(client):
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-# Investigations
-
 
 @pytest.mark.django_db
-def test_users_update_assessment_forbidden(client):
+def test_users_update_investigations_forbidden(client):
     """
-    Simulating different E12 Users attempting to update assessment in Epilepsy12
+    Simulating different E12 Users attempting to update investigations in Epilepsy12
 
-    Assert these users cannot change assessment
+    Assert these users cannot change investigations
     """
 
     # set up constants
@@ -2448,7 +2438,7 @@ def test_users_update_antiepilepsymedicine_success(client):
         "is_a_pregnancy_prevention_programme_in_place",
         "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
     ]
-    
+
     URLS = [
         "edit_antiepilepsy_medicine",
         "medicine_id",
@@ -2464,14 +2454,15 @@ def test_users_update_antiepilepsymedicine_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
-        
-        for URL in URLS:
 
+        for URL in URLS:
             # carbamazepine
             antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
                 management=CASE_FROM_SAME_ORG.registration.management,
                 is_rescue_medicine=True,
-                medicine_entity=MedicineEntity.objects.get(medicine_name="Carbamazepine"),
+                medicine_entity=MedicineEntity.objects.get(
+                    medicine_name="Carbamazepine"
+                ),
             )
 
             if URL in date_fields:
