@@ -243,7 +243,6 @@
 """
 # python imports
 import pytest
-import json
 from http import HTTPStatus
 from datetime import date
 
@@ -282,9 +281,6 @@ from epilepsy12.tests.factories import (
     E12AntiEpilepsyMedicineFactory,
 )
 
-from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
-from epilepsy12.general_functions import generate_nhs_number
-
 
 @pytest.mark.django_db
 def test_users_update_users_forbidden(
@@ -313,6 +309,7 @@ def test_users_update_users_forbidden(
         ParentOrganisation_ODSCode="RGT",
     )
 
+    # Seed Test user to be updated
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
@@ -337,7 +334,7 @@ def test_users_update_users_forbidden(
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         # Log in Test User
@@ -355,11 +352,12 @@ def test_users_update_users_forbidden(
 
         assert (
             response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {USER_FROM_DIFFERENT_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {USER_FROM_DIFFERENT_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
+        # These users can't update any users, including same Trust
         if test_user.first_name in [
-            "AUDIT_CENTRE_ADMINISTRATOR",
-            "AUDIT_CENTRE_CLINICIAN",
+            test_user_audit_centre_administrator_data.role_str,
+            test_user_audit_centre_clinician_data.role_str,
         ]:
             response = client.get(
                 reverse(
@@ -373,7 +371,7 @@ def test_users_update_users_forbidden(
 
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -415,13 +413,18 @@ def test_users_update_users_success(
         ],
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "AUDIT_CENTRE_ADMINISTRATOR",
-            "AUDIT_CENTRE_CLINICIAN",
-            USER_FROM_DIFFERENT_ORG.first_name,
-        ]
-    )
+    selected_users = [
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
+
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}"
 
     for test_user in users:
         # Log in Test User
@@ -439,7 +442,7 @@ def test_users_update_users_success(
 
         assert (
             response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
         if test_user.first_name in ["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]:
             response = client.get(
@@ -454,7 +457,7 @@ def test_users_update_users_success(
 
             assert (
                 response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {USER_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {USER_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -480,18 +483,8 @@ def test_users_update_cases_forbidden(
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # reverse dependency
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -503,7 +496,7 @@ def test_users_update_cases_forbidden(
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         # Log in Test User
@@ -514,14 +507,14 @@ def test_users_update_cases_forbidden(
                 "update_case",
                 kwargs={
                     "organisation_id": TEST_USER_ORGANISATION.id,
-                    "case_id": CASE_FROM_DIFFERENT_ORG.id,
+                    "case_id": CASE_FROM_DIFF_ORG.id,
                 },
             )
         )
 
         assert (
             response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -547,11 +540,11 @@ def test_users_update_cases_success(
 
     users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
+            test_user_audit_centre_administrator_data.role_str,
+            test_user_audit_centre_clinician_data.role_str,
+            test_user_audit_centre_lead_clinician_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+            test_user_rcpch_audit_team_data.role_str,
         ]
     )
 
@@ -571,22 +564,11 @@ def test_users_update_cases_success(
 
         assert (
             response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("first_paediatric_assessment_in_acute_or_nonacute_setting"),
-        ("has_number_of_episodes_since_the_first_been_documented"),
-        ("general_examination_performed"),
-        ("neurological_examination_performed"),
-        ("developmental_learning_or_schooling_problems"),
-        ("behavioural_or_emotional_problems"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_first_paediatric_assessment_forbidden(client, URL):
+def test_users_update_first_paediatric_assessment_forbidden(client):
     """
     Simulating different E12 Users attempting to update first paediatric assessment in Epilepsy12
 
@@ -595,26 +577,14 @@ def test_users_update_first_paediatric_assessment_forbidden(client, URL):
 
     # set up constants
     # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -626,24 +596,34 @@ def test_users_update_first_paediatric_assessment_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
+
+    URLS = [
+        "first_paediatric_assessment_in_acute_or_nonacute_setting",
+        "has_number_of_episodes_since_the_first_been_documented",
+        "general_examination_performed",
+        "neurological_examination_performed",
+        "developmental_learning_or_schooling_problems",
+        "behavioural_or_emotional_problems",
+    ]
 
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={
-                    "first_paediatric_assessment_id": CASE_FROM_DIFFERENT_ORG.registration.firstpaediatricassessment.id,
-                },
+        for url in URLS:
+            response = client.get(
+                reverse(
+                    url,
+                    kwargs={
+                        "first_paediatric_assessment_id": CASE_FROM_DIFF_ORG.registration.firstpaediatricassessment.id,
+                    },
+                )
             )
-        )
 
-        assert (
-            response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {url} for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -674,18 +654,17 @@ def test_users_update_first_paediatric_assessment_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         # Log in Test User
@@ -716,7 +695,7 @@ def test_users_update_first_paediatric_assessment_success(client, URL):
 
         assert (
             response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update first paediatric assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update first paediatric assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Epilepsy Context
@@ -753,16 +732,8 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -774,7 +745,7 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         # Log in Test User
@@ -784,14 +755,14 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
             reverse(
                 URL,
                 kwargs={
-                    "epilepsy_context_id": CASE_FROM_DIFFERENT_ORG.registration.epilepsycontext.id,
+                    "epilepsy_context_id": CASE_FROM_DIFF_ORG.registration.epilepsycontext.id,
                 },
             )
         )
 
         assert (
             response.status_code == response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update epilepsy context {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update epilepsy context {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -824,18 +795,17 @@ def test_users_update_epilepsy_context_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     single_choice_multiple_toggle_fields = [
         "previous_febrile_seizure",
@@ -874,8 +844,8 @@ def test_users_update_epilepsy_context_success(client, URL):
             )
 
         assert (
-            response.status_code == response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Multiaxial Diagnosis
@@ -916,16 +886,8 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -935,6 +897,10 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
     ]
     users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
@@ -943,14 +909,14 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
             reverse(
                 URL,
                 kwargs={
-                    "multiaxial_diagnosis_id": CASE_FROM_DIFFERENT_ORG.registration.multiaxialdiagnosis.id,
+                    "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id,
                 },
             )
         )
 
         assert (
-            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update multiaxial diagnosis {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update multiaxial diagnosis {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -985,15 +951,17 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     toggle_fields = [
         "epilepsy_cause_known",
@@ -1081,27 +1049,24 @@ def test_update_multiaxial_diagnosis_cause_success(client):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # Fryns macrocephaly
     EPILEPSY_CAUSE_ENTITY = EpilepsyCauseEntity.objects.get(id=179)
 
-    if not users:
-        assert False, f"Test db contains no users. Check db."
-
     for test_user in users:
         client.force_login(test_user)
-        print(
-            f"ECKnown before: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_known}"
-        )
+
         response_epilepsy_cause_known = client.post(
             reverse(
                 "epilepsy_cause_known",
@@ -1111,9 +1076,6 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             ),
             headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
         )
-        print(
-            f"ECKnown after: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_known}"
-        )
 
         assert (
             MultiaxialDiagnosis.objects.get(
@@ -1122,9 +1084,6 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             is True
         ), f"{test_user} from {test_user.organisation_employer} attempted POST True to epilepsy_cause_known but model did not update."
 
-        print(
-            f"epilepsy_cause_categories before: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_categories}"
-        )
         response_epilepsy_cause_categories = client.post(
             reverse(
                 "epilepsy_cause_categories",
@@ -1135,19 +1094,12 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             headers={"Hx-Trigger-Name": "Gen", "Hx-Request": "true"},
         )
 
-        print(
-            f"epilepsy_cause_categories after: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_categories}"
-        )
-
         assert MultiaxialDiagnosis.objects.get(
             registration=CASE_FROM_SAME_ORG.registration
         ).epilepsy_cause_categories == [
             "Gen"
         ], f"{test_user} from {test_user.organisation_employer} attempted POST `Gen` to epilepsy_cause_categories but model did not update."
 
-        print(
-            f"epilepsy_cause before: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause}"
-        )
         response_epilepsy_cause = client.post(
             reverse(
                 "epilepsy_cause",
@@ -1159,10 +1111,6 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             data={"epilepsy_cause": f"{EPILEPSY_CAUSE_ENTITY.id}"},
         )
 
-        print(
-            f"epilepsy_cause after: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause}"
-        )
-
         assert (
             MultiaxialDiagnosis.objects.get(
                 registration=CASE_FROM_SAME_ORG.registration
@@ -1171,7 +1119,6 @@ def test_update_multiaxial_diagnosis_cause_success(client):
         ), f"{test_user} from {test_user.organisation_employer} attempted POST `epilepsy_cause:{EPILEPSY_CAUSE_ENTITY.id}` but MultiaxialDiagnosis model field did not update."
 
         # Reset answers for next User
-        print("Resetting answers for next user \n\n")
         MultiaxialDiagnosis.objects.filter(
             registration=CASE_FROM_SAME_ORG.registration
         ).update(
@@ -1219,16 +1166,8 @@ def test_users_update_episode_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -1240,12 +1179,12 @@ def test_users_update_episode_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # Create objs to search for
     episode = Episode.objects.create(
         episode_definition="a",
-        multiaxial_diagnosis=CASE_FROM_DIFFERENT_ORG.registration.multiaxialdiagnosis,
+        multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
     )
 
     for test_user in users:
@@ -1273,8 +1212,8 @@ def test_users_update_episode_forbidden(client, URL):
             )
 
         assert (
-            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -1312,15 +1251,17 @@ def test_users_update_episode_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     date_fields = ["seizure_onset_date"]
 
@@ -1442,8 +1383,8 @@ def test_users_update_episode_success(client, URL):
             )
 
         assert (
-            response.status_code == response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 #  Comorbidity
@@ -1476,16 +1417,8 @@ def test_users_update_comorbidity_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -1497,13 +1430,13 @@ def test_users_update_comorbidity_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
         comorbidity, created = Comorbidity.objects.update_or_create(
-            multiaxial_diagnosis=CASE_FROM_DIFFERENT_ORG.registration.multiaxialdiagnosis,
+            multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
             comorbidity_diagnosis_date=date.today(),
             comorbidityentity=ComorbidityEntity.objects.all().first(),
         )
@@ -1539,7 +1472,7 @@ def test_users_update_comorbidity_forbidden(client, URL):
 
         assert (
             response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update comorbidity for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update comorbidity for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -1566,18 +1499,17 @@ def test_users_update_comorbidity_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         # Log in Test User
@@ -1614,7 +1546,7 @@ def test_users_update_comorbidity_success(client, URL):
 
         assert (
             response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update comorbidities for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update comorbidities for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Assessment
@@ -1667,16 +1599,8 @@ def test_users_update_assessment_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -1688,7 +1612,7 @@ def test_users_update_assessment_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
 
@@ -1720,7 +1644,7 @@ def test_users_update_assessment_forbidden(client, URL):
                 reverse(
                     URL,
                     kwargs={
-                        "assessment_id": CASE_FROM_DIFFERENT_ORG.registration.assessment.id,
+                        "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
                     },
                 ),
                 headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
@@ -1730,7 +1654,7 @@ def test_users_update_assessment_forbidden(client, URL):
                 reverse(
                     URL,
                     kwargs={
-                        "assessment_id": CASE_FROM_DIFFERENT_ORG.registration.assessment.id,
+                        "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
                     },
                 ),
                 headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
@@ -1757,7 +1681,7 @@ def test_users_update_assessment_forbidden(client, URL):
             ]:
                 # these all need assessment_id and site_id
                 current_site = E12SiteFactory(
-                    case=CASE_FROM_DIFFERENT_ORG,
+                    case=CASE_FROM_DIFF_ORG,
                     organisation=DIFF_TRUST_DIFF_ORGANISATION,
                 )
                 if URL in [
@@ -1770,7 +1694,7 @@ def test_users_update_assessment_forbidden(client, URL):
                         reverse(
                             URL,
                             kwargs={
-                                "assessment_id": CASE_FROM_DIFFERENT_ORG.registration.assessment.id,
+                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
                                 "site_id": current_site.pk,
                                 "action": "cancel",
                             },
@@ -1781,13 +1705,13 @@ def test_users_update_assessment_forbidden(client, URL):
                     # assert cancel
                     assert (
                         response.status_code == HTTPStatus.FORBIDDEN
-                    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+                    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
                     # assert edit
                     response = client.post(
                         reverse(
                             URL,
                             kwargs={
-                                "assessment_id": CASE_FROM_DIFFERENT_ORG.registration.assessment.id,
+                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
                                 "site_id": current_site.pk,
                                 "action": "edit",
                             },
@@ -1800,7 +1724,7 @@ def test_users_update_assessment_forbidden(client, URL):
                         reverse(
                             URL,
                             kwargs={
-                                "assessment_id": CASE_FROM_DIFFERENT_ORG.registration.assessment.id,
+                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
                                 "site_id": current_site.pk,
                             },
                         ),
@@ -1812,7 +1736,7 @@ def test_users_update_assessment_forbidden(client, URL):
                     reverse(
                         URL,
                         kwargs={
-                            "assessment_id": CASE_FROM_DIFFERENT_ORG.registration.assessment.id,
+                            "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
                         },
                     ),
                     headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
@@ -1821,7 +1745,7 @@ def test_users_update_assessment_forbidden(client, URL):
 
         assert (
             response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -1868,18 +1792,17 @@ def test_users_update_assessment_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
 
@@ -1972,7 +1895,7 @@ def test_users_update_assessment_success(client, URL):
                     # assert cancel
                     assert (
                         response.status_code == HTTPStatus.OK
-                    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+                    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
                     # assert edit
                     response = client.post(
                         reverse(
@@ -2012,7 +1935,7 @@ def test_users_update_assessment_success(client, URL):
 
             assert (
                 response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Investigations
@@ -2053,16 +1976,8 @@ def test_users_update_assessment_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -2074,7 +1989,7 @@ def test_users_update_assessment_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
     date_fields = [
@@ -2100,7 +2015,7 @@ def test_users_update_assessment_forbidden(client, URL):
                 reverse(
                     URL,
                     kwargs={
-                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
                     },
                 ),
                 headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
@@ -2110,7 +2025,7 @@ def test_users_update_assessment_forbidden(client, URL):
                 reverse(
                     URL,
                     kwargs={
-                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
                     },
                 ),
                 headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
@@ -2123,7 +2038,7 @@ def test_users_update_assessment_forbidden(client, URL):
                 reverse(
                     URL,
                     kwargs={
-                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
                         "confirm": "edit",
                     },
                 ),
@@ -2132,13 +2047,13 @@ def test_users_update_assessment_forbidden(client, URL):
             # assert edit
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFFERENT_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
             # assert decline
             response = client.post(
                 reverse(
                     URL,
                     kwargs={
-                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
                         "confirm": "decline",
                     },
                 ),
@@ -2147,7 +2062,7 @@ def test_users_update_assessment_forbidden(client, URL):
 
     assert (
         response.status_code == HTTPStatus.FORBIDDEN
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -2182,18 +2097,17 @@ def test_users_update_investigations_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
     date_fields = [
@@ -2251,7 +2165,7 @@ def test_users_update_investigations_success(client, URL):
             # assert edit
             assert (
                 response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
             # assert decline
             response = client.post(
                 reverse(
@@ -2266,7 +2180,7 @@ def test_users_update_investigations_success(client, URL):
 
     assert (
         response.status_code == HTTPStatus.OK
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Management
@@ -2300,26 +2214,14 @@ def test_users_update_management_forbidden(client, URL):
 
     # set up constants
     # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -2331,12 +2233,10 @@ def test_users_update_management_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
     date_fields = ["individualised_care_plan_date"]
-
-    toggle_buttons = []
 
     for test_user in users:
         # Log in Test User
@@ -2367,7 +2267,7 @@ def test_users_update_management_forbidden(client, URL):
 
     assert (
         response.status_code == HTTPStatus.FORBIDDEN
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update management for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update management for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -2407,23 +2307,20 @@ def test_users_update_management_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
     date_fields = ["individualised_care_plan_date"]
-
-    toggle_buttons = []
 
     for test_user in users:
         # Log in Test User
@@ -2454,7 +2351,7 @@ def test_users_update_management_success(client, URL):
 
     assert (
         response.status_code == HTTPStatus.OK
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Management for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Management for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Antiepilepsy Medicine
@@ -2494,16 +2391,8 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
     user_first_names_for_test = [
@@ -2515,7 +2404,7 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
     date_fields = [
@@ -2537,11 +2426,6 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
             is_rescue_medicine=True,
             medicine_entity=MedicineEntity.objects.get(pk=4),  # lorazepam
         )
-        # antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
-        #     management=CASE_FROM_DIFFERENT_ORG.registration.management,
-        #     is_rescue_medicine=True,
-        #     medicine_entity=MedicineEntity.objects.get(pk=7),  # carbamazepine
-        # )
         antiepilepsy_medicine = AntiEpilepsyMedicine.objects.filter(
             management=CASE_FROM_DIFFERENT_ORG.registration.management
         ).first()
@@ -2579,7 +2463,7 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
 
     assert (
         response.status_code == HTTPStatus.FORBIDDEN
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update antiepilepsymedicine for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update antiepilepsymedicine for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -2613,18 +2497,17 @@ def test_users_update_antiepilepsymedicine_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # fields
     date_fields = [
@@ -2642,14 +2525,12 @@ def test_users_update_antiepilepsymedicine_success(client, URL):
         # Log in Test User
         client.force_login(test_user)
 
-        # antiepilepsy_medicine = AntiEpilepsyMedicine.objects.filter(
-        #     management=CASE_FROM_SAME_ORG.registration.management
-        # ).first()
+        # carbamazepine
         antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
             management=CASE_FROM_SAME_ORG.registration.management,
             is_rescue_medicine=True,
             medicine_entity=MedicineEntity.objects.get(medicine_name="Carbamazepine"),
-        )  # carbamazepine
+        )
 
         if URL in date_fields:
             response = client.post(
@@ -2686,4 +2567,4 @@ def test_users_update_antiepilepsymedicine_success(client, URL):
 
     assert (
         response.status_code == HTTPStatus.OK
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update AntiepilepsyMedicine for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update AntiepilepsyMedicine for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
