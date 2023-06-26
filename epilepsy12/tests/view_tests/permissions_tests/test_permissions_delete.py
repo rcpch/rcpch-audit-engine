@@ -86,7 +86,6 @@ from django.urls import reverse
 from epilepsy12.tests.factories import (
     E12UserFactory,
     E12CaseFactory,
-    E12EpisodeFactory,
 )
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -98,7 +97,6 @@ from epilepsy12.tests.UserDataClasses import (
 from epilepsy12.models import (
     Epilepsy12User,
     Organisation,
-    Case,
     Episode,
     Syndrome,
     Comorbidity,
@@ -106,7 +104,6 @@ from epilepsy12.models import (
     MedicineEntity,
     ComorbidityEntity,
 )
-from epilepsy12.constants import VALID_NHS_NUMS
 
 
 @pytest.mark.django_db
@@ -142,7 +139,7 @@ def test_user_delete_success(
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -229,6 +226,10 @@ def test_user_delete_forbidden(
     ]
     users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
+
     # Seed a temp User for attempt to delete
     temp_user_same_org = E12UserFactory(
         first_name="temp_user",
@@ -247,10 +248,6 @@ def test_user_delete_forbidden(
         organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
         groups=[test_user_audit_centre_administrator_data.group_name],
     )
-
-    assert len(users) == len(
-        user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -318,7 +315,7 @@ def test_patient_delete_success(
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -327,7 +324,6 @@ def test_patient_delete_success(
         temp_pt_same_org = E12CaseFactory(
             first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
             organisations__organisation=TEST_USER_ORGANISATION,
-            nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
         )
 
         url = reverse(
@@ -356,7 +352,6 @@ def test_patient_delete_success(
             temp_pt_diff_org = E12CaseFactory(
                 first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
                 organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
-                nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
             )
 
             url = reverse(
@@ -407,27 +402,25 @@ def test_patient_delete_forbidden(
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     # Seed a temp pt to be deleted
     temp_pt_same_org = E12CaseFactory(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
         organisations__organisation=TEST_USER_ORGANISATION,
-        nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
     )
     # Seed a temp pt to be deleted
     temp_pt_diff_org = E12CaseFactory(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
-        nhs_number=VALID_NHS_NUMS[-2].replace(" ", ""),
     )
 
     for test_user in users:
         client.force_login(test_user)
 
-        if test_user.role in [
-            test_user_audit_centre_clinician_data.role,
-            test_user_audit_centre_lead_clinician_data.role,
+        if test_user.first_name in [
+            test_user_audit_centre_clinician_data.role_str,
+            test_user_audit_centre_lead_clinician_data.role_str,
         ]:
             url = reverse(
                 "update_case",
@@ -485,7 +478,7 @@ def test_episode_delete_success(
 
     assert len(users) == len(
         user_first_names_for_test
-    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
     URLS = [
         "episode",
@@ -500,7 +493,6 @@ def test_episode_delete_success(
         # Create a Case with Episode
         CASE_FROM_SAME_ORG = E12CaseFactory(
             first_name=f"temp_{TEST_USER_ORGANISATION}",
-            nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
             organisations__organisation=TEST_USER_ORGANISATION,
         )
         # Create objs to search for
@@ -564,7 +556,6 @@ def test_episode_delete_success(
             # Create a Case with Episode
             CASE_FROM_DIFF_ORG = E12CaseFactory(
                 first_name=f"temp_{DIFF_TRUST_DIFF_ORGANISATION}",
-                nhs_number=VALID_NHS_NUMS[-1].replace(" ", ""),
                 organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
             )
             # Create objs to search for
