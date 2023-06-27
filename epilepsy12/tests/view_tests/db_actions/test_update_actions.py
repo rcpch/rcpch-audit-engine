@@ -50,7 +50,7 @@
         'previous_febrile_seizure',                                 single_choice_multiple_toggle_button 
         'previous_acute_symptomatic_seizure',                       single_choice_multiple_toggle_button
         'is_there_a_family_history_of_epilepsy',                    single_choice_multiple_toggle_button
-        'previous_neonatal_seizures',                               toggle_button
+        'previous_neonatal_seizures',                               single_choice_multiple_toggle_button
         'were_any_of_the_epileptic_seizures_convulsive',            toggle_button
         'experienced_prolonged_generalized_convulsive_seizures',    single_choice_multiple_toggle_button
         'experienced_prolonged_focal_seizures',                     single_choice_multiple_toggle_button
@@ -443,6 +443,12 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "model": "epilepsycontext",
     },
     {
+        "field_name": "previous_neonatal_seizures",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
         "field_name": "experienced_prolonged_generalized_convulsive_seizures",
         "choices": OPT_OUT_UNCERTAIN,
         "param": "epilepsy_context_id",
@@ -489,6 +495,209 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "choices": GENERALISED_SEIZURE_TYPE,
         "param": "episode_id",
         "model": "episode",
+    },
+)
+
+TOGGLES = (
+    {
+        "field_name": "has_number_of_episodes_since_the_first_been_documented",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "general_examination_performed",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "neurological_examination_performed",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "developmental_learning_or_schooling_problems",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "behavioural_or_emotional_problems",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "were_any_of_the_epileptic_seizures_convulsive",
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "diagnosis_of_epilepsy_withdrawn",
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "epilepsy_cause_known",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "relevant_impairments_behavioural_educational",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "mental_health_screen",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "mental_health_issue_identified",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "global_developmental_delay_or_learning_difficulties",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "autistic_spectrum_disorder",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "has_description_of_the_episode_or_episodes_been_gathered",
+        "param": "episode_id",
+        "model": "episode",
+    },
+    {
+        "field_name": "consultant_paediatrician_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "paediatric_neurologist_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "childrens_epilepsy_surgical_service_referral_criteria_met",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "childrens_epilepsy_surgical_service_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "epilepsy_specialist_nurse_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "eeg_indicated",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "twelve_lead_ecg_status",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "ct_head_scan_status",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "mri_indicated",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "individualised_care_plan_in_place",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_has_parent_carer_child_agreement",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_includes_service_contact_details",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_include_first_aid",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_parental_prolonged_seizure_care",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_includes_general_participation_risk",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_addresses_water_safety",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_addresses_sudep",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_includes_ehcp",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_individualised_care_plan_been_updated_in_the_last_year",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_been_referred_for_mental_health_support",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_support_for_mental_health_support",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_an_aed_been_given",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_rescue_medication_been_prescribed",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "antiepilepsy_medicine_risk_discussed",
+        "param": "antiepilepsy_medicine_id",
+        "model": "antiepilepsymedicine",
+    },
+    {
+        "field_name": "is_a_pregnancy_prevention_programme_in_place",
+        "param": "antiepilepsy_medicine_id",
+        "model": "antiepilepsymedicine",
+    },
+    {
+        "field_name": "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+        "param": "antiepilepsy_medicine_id",
+        "model": "antiepilepsymedicine",
     },
 )
 
@@ -597,6 +806,108 @@ def test_user_updates_single_choice_multiple_toggle_fail(
                 expected_result="dummy data",
                 assert_pass=False,
             )
+
+
+@pytest.mark.django_db
+def test_user_updates_toggles_success(client):
+    """
+    Assert for each toggle selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(TOGGLES):
+        print(url.get("field_name"))
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_toggle_button(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=True,
+            assert_pass=True,
+        )
+
+
+@pytest.mark.django_db
+def test_user_updates_toggles_success(client):
+    """
+    Assert for each toggle selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(TOGGLES):
+        print(url.get("field_name"))
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_toggle_button(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=False,
+            assert_pass=False,
+        )
 
 
 # Test helper methods - there is one for each page_element
@@ -709,6 +1020,15 @@ def get_model_from_model(case, model_name):
         return Comorbidity.objects.filter(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis
         ).first()
+    elif model_name == "antiepilepsymedicine":
+        return AntiEpilepsyMedicine.objects.create(
+            management=case.registration.management,
+            is_rescue_medicine=False,
+            medicine_entity=MedicineEntity.objects.get(
+                medicine_name="Sodium valproate"
+            ),
+        )
+
     else:
         refresh_case = Case.objects.get(pk=case.pk)
         return getattr(refresh_case.registration, model_name, None)
