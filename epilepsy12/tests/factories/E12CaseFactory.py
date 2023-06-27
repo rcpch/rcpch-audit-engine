@@ -9,7 +9,10 @@ import factory
 from epilepsy12.models import Case
 from .E12SiteFactory import E12SiteFactory
 from .E12RegistrationFactory import E12RegistrationFactory
-from epilepsy12.constants import SEX_TYPE
+from epilepsy12.constants import (
+    SEX_TYPE,
+    DEPRIVATION_QUINTILES
+    )
 import nhs_number
 
 
@@ -76,6 +79,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
     date_of_birth = date(2022, 1, 1)
 
     ethnicity = "A"
+    index_of_multiple_deprivation_quintile=DEPRIVATION_QUINTILES.first
     locked = False
 
     # once case created, create a Site, which acts as a link table between the Case and Organisation

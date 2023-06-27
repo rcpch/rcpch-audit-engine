@@ -5,7 +5,16 @@
 import pytest
 from datetime import date
 
-# django imports
+# 3rd party imports
+from django.contrib.gis.db.models import (
+    Count,
+    When,
+    ExpressionWrapper,
+    F,
+    Value,
+    PositiveSmallIntegerField,
+    Case as DJANGO_CASE,
+)
 
 # E12 imports
 from epilepsy12.common_view_functions import (
@@ -24,41 +33,48 @@ from epilepsy12.models import (
 )
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
-from epilepsy12.general_functions.nhs_number import generate_nhs_number
 
 
 @pytest.mark.django_db
-def test_cases_aggregated_by_sex_correct_output(e12_case_factory):
-    """Tests the cases_aggregated_by_sex fn returns correct count."""
+def test_cases_aggregated_by_sex(e12_case_factory):
+    """Tests the cases_aggregated_by_sex fn returns correct count.
+
+    NOTE: There is already 1 seeded Case in the test db. In this test setup, we seed 10 children per SEX_TYPE (n=4).
+
+    Thus expected total count is 10 for each sex, except Male, which is 11.
+    """
 
     # define constants
-    ORGANISATION = Organisation.objects.first()
+    GOSH = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
 
     # Create 10 cases of each available sex type
     for sex_type in SEX_TYPE:
-        # set an organisation constant
-        organisation = Organisation.objects.first()
-
         # For each sex, assign 10 cases
-        for _ in range(10):
-            e12_case_factory.create(
-                nhs_number=generate_nhs_number(),
-                sex=sex_type[0],
-                registration=None,  # ensure related audit factories not generated
-                organisations=ORGANISATION,
-            )
+        e12_case_factory.create_batch(
+            size=10,
+            sex=sex_type[0],
+            registration=None,  # ensure related audit factories not generated
+            organisations__organisation=GOSH,
+        )
 
-    total_count = cases_aggregated_by_sex(selected_organisation=organisation).count()
-    print(total_count)
-    matching_count = (
-        cases_aggregated_by_sex(selected_organisation=organisation)
-        .filter(sexes=10)
-        .count()
-    )
+    cases_queryset = cases_aggregated_by_sex(selected_organisation=GOSH)
 
-    assert (
-        total_count == matching_count
-    ), f"Not returning correct count. {total_count} should equal {matching_count}"
+    expected_counts = {
+        "Female": 10,
+        "Not Known": 10,
+        "Not Specified": 10,
+        "Male": 11,
+    }
+
+    for aggregate in cases_queryset:
+        SEX = aggregate["sex_display"]
+
+        assert (
+            aggregate["sexes"] == expected_counts[SEX]
+        ), f"`cases_aggregated_by_sex` output does not match expected output for {SEX}. Output {aggregate['sexes']} but expected {expected_counts[SEX]}."
 
 
 @pytest.mark.django_db
@@ -66,42 +82,60 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
     """Tests the cases_aggregated_by_deprivation_score fn returns correct count."""
 
     # define constants
-    ORGANISATION = Organisation.objects.first()
-
-    # Loop through each ethnicity
-    cases_list = []
-
-    # Loop through each deprivation quintile
-    for deprivation_type in DEPRIVATION_QUINTILES:
-        # set an organisation constant
-        organisation = Organisation.objects.first()
-
-        # For each deprivation, assign 10 cases, add to cases_list
-        for _ in range(10):
-            case = e12_case_factory.build(
-                nhs_number=generate_nhs_number(),
-                index_of_multiple_deprivation_quintile=deprivation_type[1],
-                registration=None,  # ensure related audit factories not generated
-                organisations__organisation=ORGANISATION,
-            )
-            cases_list.append(case)
-
-    # single SQL INSERT to save all cases
-    Case.objects.bulk_create(cases_list)
-
-    total_count = cases_aggregated_by_deprivation_score(
-        selected_organisation=organisation
-    ).count()
-
-    matching_count = (
-        cases_aggregated_by_deprivation_score(selected_organisation=organisation)
-        .filter(cases_aggregated_by_deprivation=10)
-        .count()
+    GOSH = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
     )
 
-    assert (
-        total_count == matching_count
-    ), f"Not returning correct count. {total_count=} should equal {matching_count=}"
+    # Loop through each deprivation quintile
+    for deprivation_type in DEPRIVATION_QUINTILES.deprivation_quintiles:
+        # For each deprivation, assign 10 cases, add to cases_list
+        e12_case_factory.create_batch(
+            size=10,
+            index_of_multiple_deprivation_quintile=deprivation_type,
+            registration=None,  # ensure related audit factories not generated
+            organisations__organisation=GOSH,
+        )
+
+    expected_counts = [
+        {
+            "index_of_multiple_deprivation_quintile_display": 1,
+            "cases_aggregated_by_deprivation": 10,
+            "index_of_multiple_deprivation_quintile_display_str": "1st quintile",
+        },
+        {
+            "index_of_multiple_deprivation_quintile_display": 2,
+            "cases_aggregated_by_deprivation": 10,
+            "index_of_multiple_deprivation_quintile_display_str": "2nd quintile",
+        },
+        {
+            "index_of_multiple_deprivation_quintile_display": 3,
+            "cases_aggregated_by_deprivation": 10,
+            "index_of_multiple_deprivation_quintile_display_str": "3rd quintile",
+        },
+        {
+            "index_of_multiple_deprivation_quintile_display": 4,
+            "cases_aggregated_by_deprivation": 10,
+            "index_of_multiple_deprivation_quintile_display_str": "4th quintile",
+        },
+        {
+            "index_of_multiple_deprivation_quintile_display": 5,
+            "cases_aggregated_by_deprivation": 10,
+            "index_of_multiple_deprivation_quintile_display_str": "5th quintile",
+        },
+        {
+            "index_of_multiple_deprivation_quintile_display": 6,
+            "cases_aggregated_by_deprivation": 11, # THIS IS 11 AS THERE IS ALREADY 1 SEEDED CASE IN TEST Db WITH THIS IMD
+            "index_of_multiple_deprivation_quintile_display_str": "Not known",
+        },
+    ]
+
+    cases_queryset = cases_aggregated_by_deprivation_score(GOSH)
+
+    for ix, aggregate in enumerate(cases_queryset):
+        
+
+        assert aggregate == expected_counts[ix], f"Expected aggregate count for test_cases_aggregated_by_deprivation_score not matching output."
 
 
 @pytest.mark.django_db
