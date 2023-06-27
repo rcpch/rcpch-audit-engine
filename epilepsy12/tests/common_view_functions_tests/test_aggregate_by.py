@@ -190,34 +190,79 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
 
 
 @pytest.mark.django_db
-def test_aggregate_all_eligible_kpi_fields_correct_count(e12_case_factory):
-    """Tests the aggregate_all_eligible_kpi_fields fn returns correct count of KPIs."""
+def test_aggregate_all_eligible_kpi_fields_correct_fields_present(e12_case_factory):
+    """Tests the aggregate_all_eligible_kpi_fields fn returns all the KPI fields."""
 
     # define constants
-    ORGANISATION = Organisation.objects.first()
+    GOSH = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
     COHORT = 6
+    
+    # create a KPI object
+    kpi_metric_eligible_3_5_object = KPIMetric(
+        eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
+    )
 
-    for _ in range(10):
-        e12_case_factory.create(
-            organisations__organisation=ORGANISATION, nhs_number=generate_nhs_number()
+    # generate answer set dict for e12_case_factory constructor
+    answers_eligible_3_5 = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="PASS",
+        kpi_5="PASS",
+        kpi_7="PASS",
+        kpi_9="PASS",
+    )
+
+    e12_case_factory.create_batch(
+            size=10,
+            organisations__organisation=GOSH,
+            **answers_eligible_3_5,
         )
 
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
-        organisation_instance=ORGANISATION,
+        organisation_instance=GOSH,
         cohort=COHORT,
         case_complete=False,
         abstraction_level="organisation",
     )
 
     aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
+    
 
-    total_count_kpis = -1  # start at -1 to exclude "total_number_of_cases"
-    for key in aggregated_kpis:
-        if "total" in key:
-            total_count_kpis += 1
+    all_kpi_measures = [
+        "paediatrician_with_expertise_in_epilepsies",
+        "epilepsy_specialist_nurse",
+        "tertiary_input",
+        "epilepsy_surgery_referral",
+        "ecg",
+        "mri",
+        "assessment_of_mental_health_issues",
+        "mental_health_support",
+        "sodium_valproate",
+        "comprehensive_care_planning_agreement",
+        "patient_held_individualised_epilepsy_document",
+        "patient_carer_parent_agreement_to_the_care_planning",
+        "care_planning_has_been_updated_when_necessary",
+        "comprehensive_care_planning_content",
+        "parental_prolonged_seizures_care_plan",
+        "water_safety",
+        "first_aid",
+        "general_participation_and_risk",
+        "service_contact_details",
+        "sudep",
+        "school_individual_healthcare_plan",
+    ]
 
-    assert total_count_kpis == 21
-
+    for kpi in all_kpi_measures:
+        
+        assert kpi in aggregated_kpis, f"{kpi} not present in aggregate_all_eligible_kpi_fields output."
+        
+        assert f"{kpi}_average", f"{kpi}_average not present in aggregate_all_eligible_kpi_fields output."
+        
+        assert f"{kpi}_total", f"{kpi}_total not present in aggregate_all_eligible_kpi_fields output."
 
 @pytest.mark.skip(reason="unfinished test")
 @pytest.mark.django_db
