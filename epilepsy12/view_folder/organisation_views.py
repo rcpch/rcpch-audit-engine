@@ -128,11 +128,6 @@ def selected_organisation_summary(request, organisation_id):
     else:
         total_percent_trust = 0
 
-    print(cases_aggregated_by_deprivation_score(
-            selected_organisation=selected_organisation
-        ))
-    
-
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,

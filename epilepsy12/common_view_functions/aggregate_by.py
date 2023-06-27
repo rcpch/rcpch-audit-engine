@@ -93,7 +93,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
     for aggregate in cases_aggregated_by_deprivation:
         quintile = aggregate["index_of_multiple_deprivation_quintile_display"]
 
-        str_map = deprivation_quintile_str_map[quintile]
+        str_map = deprivation_quintile_str_map.get(quintile)
 
         aggregate.update(
             {"index_of_multiple_deprivation_quintile_display_str": str_map}
