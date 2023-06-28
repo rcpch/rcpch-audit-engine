@@ -82,9 +82,9 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
     """Tests the cases_aggregated_by_deprivation_score fn returns correct count."""
 
     # define constants
-    GOSH = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+    CHELWEST = Organisation.objects.get(
+        ODSCode="RQM01",
+        ParentOrganisation_ODSCode="RQM",
     )
 
     # Loop through each deprivation quintile
@@ -94,7 +94,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
             size=10,
             index_of_multiple_deprivation_quintile=deprivation_type,
             registration=None,  # ensure related audit factories not generated
-            organisations__organisation=GOSH,
+            organisations__organisation=CHELWEST,
         )
 
     expected_counts = [
@@ -125,12 +125,12 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
         },
         {
             "index_of_multiple_deprivation_quintile_display": 6,
-            "cases_aggregated_by_deprivation": 11,  # THIS IS 11 AS THERE IS ALREADY 1 SEEDED CASE IN TEST Db WITH THIS IMD
+            "cases_aggregated_by_deprivation": 10, 
             "index_of_multiple_deprivation_quintile_display_str": "Not known",
         },
     ]
 
-    cases_queryset = cases_aggregated_by_deprivation_score(GOSH)
+    cases_queryset = cases_aggregated_by_deprivation_score(CHELWEST)
 
     for ix, aggregate in enumerate(cases_queryset):
         assert (
@@ -199,7 +199,7 @@ def test_aggregate_all_eligible_kpi_fields_correct_fields_present(e12_case_facto
         ParentOrganisation_ODSCode="RP4",
     )
     COHORT = 6
-    
+
     # create a KPI object
     kpi_metric_eligible_3_5_object = KPIMetric(
         eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
@@ -217,10 +217,10 @@ def test_aggregate_all_eligible_kpi_fields_correct_fields_present(e12_case_facto
     )
 
     e12_case_factory.create_batch(
-            size=10,
-            organisations__organisation=GOSH,
-            **answers_eligible_3_5,
-        )
+        size=10,
+        organisations__organisation=GOSH,
+        **answers_eligible_3_5,
+    )
 
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=GOSH,
@@ -230,7 +230,6 @@ def test_aggregate_all_eligible_kpi_fields_correct_fields_present(e12_case_facto
     )
 
     aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
-    
 
     all_kpi_measures = [
         "paediatrician_with_expertise_in_epilepsies",
@@ -257,48 +256,142 @@ def test_aggregate_all_eligible_kpi_fields_correct_fields_present(e12_case_facto
     ]
 
     for kpi in all_kpi_measures:
-        
-        assert kpi in aggregated_kpis, f"{kpi} not present in aggregate_all_eligible_kpi_fields output."
-        
-        assert f"{kpi}_average", f"{kpi}_average not present in aggregate_all_eligible_kpi_fields output."
-        
-        assert f"{kpi}_total", f"{kpi}_total not present in aggregate_all_eligible_kpi_fields output."
+        assert (
+            kpi in aggregated_kpis
+        ), f"{kpi} not present in aggregate_all_eligible_kpi_fields output."
 
-@pytest.mark.skip(reason="unfinished test")
+        assert (
+            f"{kpi}_average"
+        ), f"{kpi}_average not present in aggregate_all_eligible_kpi_fields output."
+
+        assert (
+            f"{kpi}_total"
+        ), f"{kpi}_total not present in aggregate_all_eligible_kpi_fields output."
+
+
 @pytest.mark.django_db
 def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory):
-    """Tests the aggregate_all_eligible_kpi_fields fn returns scoring of KPIs."""
+    """Tests the aggregate_all_eligible_kpi_fields fn returns scoring of KPIs.
+
+    For Cases with known KPI scorings, assert the output is correct.
+
+    NOTE: using a different organisation to Cases already seeded in db.
+
+    METHOD:
+
+        - define EXPECTED_KPI_SCORE_OUTPUT dict
+        - Get 1 KPIMetric Object each for eligible_kpi_3_5=True, eligible_kpi_6_8_10=True
+        - .generate_metrics(), for each kpi:
+                random_choice(['PASS','FAIL','INELIGIBLE']) *THIS IS DIFF FOR EACH KPI*
+                if ('PASS'):
+                    EXPECTED_KPI_SCORE_OUTPUT[kpi]+=1
+                    EXPECTED_KPI_SCORE_OUTPUT[kpi_total]+=1
+                elif ('FAIL'):
+                    EXPECTED_KPI_SCORE_OUTPUT[kpi]+=0
+                    EXPECTED_KPI_SCORE_OUTPUT[kpi_total]+=1
+                else:
+                    pass
+        
+        - feed into 10 E12CaseFactory's
+        - compare output with expected
+    """
 
     # define constants
-    ORGANISATION = Organisation.objects.first()
+    CHELWEST = Organisation.objects.get(
+        ODSCode="RQM01",
+        ParentOrganisation_ODSCode="RQM",
+    )
 
-    # create a KPI object
+    EXPECTED_KPI_SCORE_OUTPUT = {
+        "paediatrician_with_expertise_in_epilepsies": 0,
+        "paediatrician_with_expertise_in_epilepsies_total": 0,
+        "epilepsy_specialist_nurse": 0,
+        "epilepsy_specialist_nurse_total": 0,
+        "tertiary_input": 0,
+        "tertiary_input_total": 0,
+        "epilepsy_surgery_referral": 0,
+        "epilepsy_surgery_referral_total": 0,
+        "ecg": 0,
+        "ecg_total": 0,
+        "mri": 0,
+        "mri_total": 0,
+        "assessment_of_mental_health_issues": 0,
+        "assessment_of_mental_health_issues_total": 0,
+        "mental_health_support": 0,
+        "mental_health_support_total": 0,
+        "sodium_valproate": 0,
+        "sodium_valproate_total": 0,
+        "comprehensive_care_planning_agreement": 0,
+        "comprehensive_care_planning_agreement_total": 0,
+        "patient_held_individualised_epilepsy_document": 0,
+        "patient_held_individualised_epilepsy_document_total": 0,
+        "patient_carer_parent_agreement_to_the_care_planning": 0,
+        "patient_carer_parent_agreement_to_the_care_planning_total": 0,
+        "care_planning_has_been_updated_when_necessary": 0,
+        "care_planning_has_been_updated_when_necessary_total": 0,
+        "comprehensive_care_planning_content": 0,
+        "comprehensive_care_planning_content_total": 0,
+        "parental_prolonged_seizures_care_plan": 0,
+        "parental_prolonged_seizures_care_plan_total": 0,
+        "water_safety": 0,
+        "water_safety_total": 0,
+        "first_aid": 0,
+        "first_aid_total": 0,
+        "general_participation_and_risk": 0,
+        "general_participation_and_risk_total": 0,
+        "service_contact_details": 0,
+        "service_contact_details_total": 0,
+        "sudep": 0,
+        "sudep_total": 0,
+        "school_individual_healthcare_plan": 0,
+        "school_individual_healthcare_plan_total": 0,
+        "total_number_of_cases": 0,
+    }
+
+    # create KPI objects
     kpi_metric_eligible_3_5_object = KPIMetric(
         eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
     )
+    kpi_metric_eligible_6_8_10_object = KPIMetric(
+        eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
+    )
+    
+    collection_kpi_metric_eligible_3_5_objects = []
+    
 
     # generate answer set for e12_case_factory constructor
-    answers_eligible_3_5 = kpi_metric_eligible_3_5_object.generate_metrics(
-        kpi_1="PASS",
-        kpi_2="PASS",
-        kpi_3="PASS",
-        kpi_4="INELIGIBLE",
-        kpi_5="FAIL",
-        kpi_7="PASS",
-        kpi_9="PASS",
-    )
+    # answers_eligible_3_5 = kpi_metric_eligible_3_5_object.generate_metrics(
+    #     kpi_1="PASS",
+    #     kpi_2="PASS",
+    #     kpi_3="PASS",
+    #     kpi_4="PASS",
+    #     kpi_5="PASS",
+    #     kpi_7="PASS",
+    #     kpi_9="PASS",
+    # )
 
-    case = e12_case_factory.create(
-        organisations__organisation=ORGANISATION,
-        # feed in values for eligible
-        **answers_eligible_3_5,
-    )
+    # CHILDREN = e12_case_factory.create_batch(
+    #     size=10,
+    #     organisations__organisation=CHELWEST,
+    #     **answers_eligible_3_5,
+    # )
 
-    registration = Registration.objects.get(case=case)
+    # for CHILD in CHILDREN:
+    #     registration = Registration.objects.get(case=CHILD)
 
-    calculate_kpis(registration)
+    #     calculate_kpis(registration)
 
-    kpi = KPI.objects.get(pk=registration.pk)
+    # kpi = KPI.objects.get(pk=registration.pk)
 
-    for attr, val in kpi.get_kpis().items():
-        print(f"{attr}:{val}")
+    # for attr, val in kpi.get_kpis().items():
+    #     print(f"{attr}:{val}")
+
+    # organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
+    #     organisation_instance=CHELWEST,
+    #     cohort=6,
+    #     case_complete=False,
+    #     abstraction_level="organisation",
+    # )
+
+    # aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
+    # [print(f"{agg}---{val}") for agg, val in aggregated_kpis.items()]
