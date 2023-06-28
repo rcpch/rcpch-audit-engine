@@ -437,7 +437,10 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
                     EXPECTED_KPI_SCORE_OUTPUT[kpi_name] += 1
                     EXPECTED_KPI_SCORE_OUTPUT[f"{kpi_name}_total"] += 1
                 elif outcome == "FAIL":
-                    EXPECTED_KPI_SCORE_OUTPUT[f"{kpi_name}_total"] += 1
+                    
+                    # Extra check for `parental_prolonged_seizures_care_plan` if kpi_9 = False => this sub-metric is set to INELIGIBLE in KPIMetric Class. Therefore, DON'T COUNT THIS in numerator nor denominator
+                    if not kpi_name == 'parental_prolonged_seizures_care_plan':
+                        EXPECTED_KPI_SCORE_OUTPUT[f"{kpi_name}_total"] += 1
 
                 # Updated kpi answers for E12CaseFactory constructor
                 ans_dict.update({kpi:outcome})
@@ -461,7 +464,7 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
 
     
     
-    for _ in range(10):
+    for _ in range(50):
         
         # Create and save child with these KPI answers (ELIGIBLE 3 + 5)
         answers_3_5_eligible, EXPECTED_KPI_SCORE_OUTPUT = get_ans_dict_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT, eligible_3_5_only=True)
@@ -506,6 +509,6 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     
     # [print(agg, val) for agg,val in aggregated_kpis.items()]
 
-    [print(f"{kpi}:{outcome}") for kpi,outcome in assigned_outcomes.items()]
+    print(EXPECTED_KPI_SCORE_OUTPUT)
     
     assert aggregated_kpis == EXPECTED_KPI_SCORE_OUTPUT
