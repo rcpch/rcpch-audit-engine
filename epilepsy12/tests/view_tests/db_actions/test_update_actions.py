@@ -34,23 +34,23 @@
     [x] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to acute (CHRONICITY[0][0]==1)
     [x] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to non-acute (CHRONICITY[0][0]==2)
     [x] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to don't know (CHRONICITY[0][0]==3)
-    [] Assert user can change 'has_number_of_episodes_since_the_first_been_documented' to True
-    [] Assert user can change 'has_number_of_episodes_since_the_first_been_documented' to False
-    [] Assert user can change 'general_examination_performed' to True
-    [] Assert user can change 'general_examination_performed' to False
-    [] Assert user can change 'neurological_examination_performed' to True
-    [] Assert user can change 'neurological_examination_performed' to False
-    [] Assert user can change 'developmental_learning_or_schooling_problems' to True
-    [] Assert user can change 'developmental_learning_or_schooling_problems' to False
-    [] Assert user can change 'behavioural_or_emotional_problems' to True
-    [] Assert user can change 'behavioural_or_emotional_problems' to False
+    [x] Assert user can change 'has_number_of_episodes_since_the_first_been_documented' to True
+    [x] Assert user can change 'has_number_of_episodes_since_the_first_been_documented' to False
+    [x] Assert user can change 'general_examination_performed' to True
+    [x] Assert user can change 'general_examination_performed' to False
+    [x] Assert user can change 'neurological_examination_performed' to True
+    [x] Assert user can change 'neurological_examination_performed' to False
+    [x] Assert user can change 'developmental_learning_or_schooling_problems' to True
+    [x] Assert user can change 'developmental_learning_or_schooling_problems' to False
+    [x] Assert user can change 'behavioural_or_emotional_problems' to True
+    [x] Assert user can change 'behavioural_or_emotional_problems' to False
     
 # Epilepsy Context
     for field in fields: [
         'previous_febrile_seizure',                                 single_choice_multiple_toggle_button 
         'previous_acute_symptomatic_seizure',                       single_choice_multiple_toggle_button
         'is_there_a_family_history_of_epilepsy',                    single_choice_multiple_toggle_button
-        'previous_neonatal_seizures',                               toggle_button
+        'previous_neonatal_seizures',                               single_choice_multiple_toggle_button
         'were_any_of_the_epileptic_seizures_convulsive',            toggle_button
         'experienced_prolonged_generalized_convulsive_seizures',    single_choice_multiple_toggle_button
         'experienced_prolonged_focal_seizures',                     single_choice_multiple_toggle_button
@@ -66,19 +66,19 @@
     [x] Assert user can change 'is_there_a_family_history_of_epilepsy' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
     [x] Assert user can change 'is_there_a_family_history_of_epilepsy' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
     [x] Assert user can change 'is_there_a_family_history_of_epilepsy' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
-    [] Assert user can change 'previous_neonatal_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
-    [] Assert user can change 'previous_neonatal_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
-    [] Assert user can change 'previous_neonatal_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
-    [] Assert user can change 'were_any_of_the_epileptic_seizures_convulsive' to True
-    [] Assert user can change 'were_any_of_the_epileptic_seizures_convulsive' to False
+    [x] Assert user can change 'previous_neonatal_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
+    [x] Assert user can change 'previous_neonatal_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
+    [x] Assert user can change 'previous_neonatal_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
+    [x] Assert user can change 'were_any_of_the_epileptic_seizures_convulsive' to True
+    [x] Assert user can change 'were_any_of_the_epileptic_seizures_convulsive' to False
     [x] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
     [x] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
     [x] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
     [x] Assert user can change 'experienced_prolonged_focal_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
     [x] Assert user can change 'experienced_prolonged_focal_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
     [x] Assert user can change 'experienced_prolonged_focal_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
-    [] Assert user can change 'diagnosis_of_epilepsy_withdrawn' to True
-    [] Assert user can change 'diagnosis_of_epilepsy_withdrawn' to False
+    [x] Assert user can change 'diagnosis_of_epilepsy_withdrawn' to True
+    [x] Assert user can change 'diagnosis_of_epilepsy_withdrawn' to False
 
 
 
@@ -96,26 +96,26 @@
         'autistic_spectrum_disorder',                                   toggle_button
     ]
 
-    [] Assert user can change 'epilepsy_cause_known' to True
-    [] Assert user can change 'epilepsy_cause_known' to False
+    [x] Assert user can change 'epilepsy_cause_known' to True
+    [x] Assert user can change 'epilepsy_cause_known' to False
     [] Assert user can change 'epilepsy_cause' to Aicardi's Syndrome (pk=135)
     [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[0][0]=='Gen' and EPILEPSY_CAUSES[1][0]=='Imm' and and EPILEPSY_CAUSES[5][0]=='Othe'
     [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
-    [] Assert user can change 'relevant_impairments_behavioural_educational' to True
-    [] Assert user can change 'relevant_impairments_behavioural_educational' to False
+    [x] Assert user can change 'relevant_impairments_behavioural_educational' to True
+    [x] Assert user can change 'relevant_impairments_behavioural_educational' to False
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth'] ('Other')
-    [] Assert user can change 'mental_health_screen' to True
-    [] Assert user can change 'mental_health_screen' to False
-    [] Assert user can change 'mental_health_issue_identified' to True
-    [] Assert user can change 'mental_health_issue_identified' to False
-    [] Assert user can change 'autistic_spectrum_disorder' to True
-    [] Assert user can change 'autistic_spectrum_disorder' to False
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties' to True
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties' to False
+    [x] Assert user can change 'mental_health_screen' to True
+    [x] Assert user can change 'mental_health_screen' to False
+    [x] Assert user can change 'mental_health_issue_identified' to True
+    [x] Assert user can change 'mental_health_issue_identified' to False
+    [x] Assert user can change 'autistic_spectrum_disorder' to True
+    [x] Assert user can change 'autistic_spectrum_disorder' to False
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties' to True
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties' to False
     [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[0][0]=='mild'
     [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[1][0]=='moderate'
     [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[2][0]=='severe'
@@ -145,8 +145,8 @@
     [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[0][0]=='a' ('This was a single episode')
     [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[1][0]=='b' ('This was a cluster within 24 hours')
     [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[2][0]=='c' ('These were 2 or more episodes more than 24 hours apart')
-    [] Assert user can change 'has_description_of_the_episode_or_episodes_been_gathered' to True
-    [] Assert user can delete 'gelastic' in 'delete_description_keyword' from ['gelastic', 'left']
+    [x] Assert user can change 'has_description_of_the_episode_or_episodes_been_gathered' to True
+    [x] Assert user can delete 'gelastic' in 'delete_description_keyword' from ['gelastic', 'left']
     [] Assert user can change 'edit_description' to "Jacob fell to the floor and shook the left side of his body."
     [] Assert user can change 'edit_description' to "Jacob fell to the floor and shook the left side of his body."
     [x] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[0][0]=='E' (Epilepsy)
@@ -233,22 +233,22 @@
         'epilepsy_specialist_nurse_referral_date',                              date_field    
         'epilepsy_specialist_nurse_input_date',                                 date_field
     ]
-    [] Assert user can change 'consultant_paediatrician_referral_made' to True
-    [] Assert user can change 'consultant_paediatrician_referral_made' to False
+    [x] Assert user can change 'consultant_paediatrician_referral_made' to True
+    [x] Assert user can change 'consultant_paediatrician_referral_made' to False
     [] Assert user can change 'consultant_paediatrician_referral_date' ..
     [] Assert user can change 'general_paediatric_centre'...
     [] Assert user can change 'edit_general_paediatric_centre' ..
     [] Assert user can change 'update_general_paediatric_centre_pressed'..
-    [] Assert user can change 'paediatric_neurologist_referral_made' to True
-    [] Assert user can change 'paediatric_neurologist_referral_made' to False
+    [x] Assert user can change 'paediatric_neurologist_referral_made' to True
+    [x] Assert user can change 'paediatric_neurologist_referral_made' to False
     [] Assert user can change 'paediatric_neurologist_referral_date' ..
     [] Assert user can change 'paediatric_neurologist_referral_date' ..
     [] Assert user can change 'paediatric_neurologist_input_date' ..
     [] Assert user can change 'paediatric_neurology_centre' ..
     [] Assert user can change 'edit_paediatric_neurology_centre' ..
     [] Assert user can change 'update_paediatric_neurology_centre_pressed'..
-    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_criteria_met' to True
-    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_criteria_met' to False
+    [x] Assert user can change 'childrens_epilepsy_surgical_service_referral_criteria_met' to True
+    [x] Assert user can change 'childrens_epilepsy_surgical_service_referral_criteria_met' to False
     [] Assert user can change 'childrens_epilepsy_surgical_service_referral_made' to True
     [] Assert user can change 'childrens_epilepsy_surgical_service_referral_made' to False
     [] Assert user can change 'childrens_epilepsy_surgical_service_referral_date' ..
@@ -257,8 +257,8 @@
     [] Assert user can change 'edit_epilepsy_surgery_centre'..
     [] Assert user can change 'update_epilepsy_surgery_centre_pressed' ..
     [] Assert user can change 'update_epilepsy_surgery_centre_pressed' ..
-    [] Assert user can change 'epilepsy_specialist_nurse_referral_made' to True
-    [] Assert user can change 'epilepsy_specialist_nurse_referral_made' to False
+    [x] Assert user can change 'epilepsy_specialist_nurse_referral_made' to True
+    [x] Assert user can change 'epilepsy_specialist_nurse_referral_made' to False
     [] Assert user can change 'epilepsy_specialist_nurse_referral_date' ..
     [] Assert user can change 'epilepsy_specialist_nurse_input_date' ..
 
@@ -275,15 +275,15 @@
         'mri_brain_reported_date',                                              date_field
         'mri_brain_declined',                                                   button click (confirm:edit/decline)
     ]
-    [] Assert user can change 'eeg_indicated' to True
-    [] Assert user can change 'eeg_indicated' to False
+    [x] Assert user can change 'eeg_indicated' to True
+    [x] Assert user can change 'eeg_indicated' to False
     [] Assert user can change 'eeg_request_date' ..
     [] Assert user can change 'eeg_performed_date' ..
     [] Assert user can change 'eeg_declined' ..
-    [] Assert user can change 'twelve_lead_ecg_status' to True
-    [] Assert user can change 'twelve_lead_ecg_status' to False
-    [] Assert user can change 'ct_head_scan_status' to True
-    [] Assert user can change 'ct_head_scan_status' to False
+    [x] Assert user can change 'twelve_lead_ecg_status' to True
+    [x] Assert user can change 'twelve_lead_ecg_status' to False
+    [x] Assert user can change 'ct_head_scan_status' to True
+    [x] Assert user can change 'ct_head_scan_status' to False
     [] Assert user can change 'mri_indicated' to True
     [] Assert user can change 'mri_indicated' to False
     [] Assert user can change 'mri_brain_requested_date' ..
@@ -308,35 +308,35 @@
         'has_an_aed_been_given',                                                toggle_button
         'has_rescue_medication_been_prescribed',                                toggle_button
     ]
-    [] Assert user can change 'individualised_care_plan_in_place' to True
-    [] Assert user can change 'individualised_care_plan_in_place' to False
+    [x] Assert user can change 'individualised_care_plan_in_place' to True
+    [x] Assert user can change 'individualised_care_plan_in_place' to False
     [] Assert user can change 'individualised_care_plan_date' ..
-    [] Assert user can change 'individualised_care_plan_has_parent_carer_child_agreement' to True
-    [] Assert user can change 'individualised_care_plan_has_parent_carer_child_agreement' to False
-    [] Assert user can change 'individualised_care_plan_includes_service_contact_details' to True
-    [] Assert user can change 'individualised_care_plan_includes_service_contact_details' to False
-    [] Assert user can change 'individualised_care_plan_include_first_aid' to True
-    [] Assert user can change 'individualised_care_plan_include_first_aid' to False
-    [] Assert user can change 'individualised_care_plan_parental_prolonged_seizure_care' to True
-    [] Assert user can change 'individualised_care_plan_parental_prolonged_seizure_care' to False
-    [] Assert user can change 'individualised_care_plan_includes_general_participation_risk' to True
-    [] Assert user can change 'individualised_care_plan_includes_general_participation_risk' to False
-    [] Assert user can change 'individualised_care_plan_addresses_water_safety' to True
-    [] Assert user can change 'individualised_care_plan_addresses_water_safety' to False
-    [] Assert user can change 'individualised_care_plan_addresses_sudep' to True
-    [] Assert user can change 'individualised_care_plan_addresses_sudep' to False
-    [] Assert user can change 'individualised_care_plan_includes_ehcp' to True
-    [] Assert user can change 'individualised_care_plan_includes_ehcp' to False
-    [] Assert user can change 'has_individualised_care_plan_been_updated_in_the_last_year' to True
-    [] Assert user can change 'has_individualised_care_plan_been_updated_in_the_last_year' to False
-    [] Assert user can change 'has_been_referred_for_mental_health_support' to True
-    [] Assert user can change 'has_been_referred_for_mental_health_support' to False
-    [] Assert user can change 'has_support_for_mental_health_support' to True
-    [] Assert user can change 'has_support_for_mental_health_support' to False
-    [] Assert user can change 'has_an_aed_been_given' to True
-    [] Assert user can change 'has_an_aed_been_given' to False
-    [] Assert user can change 'has_rescue_medication_been_prescribed' to True
-    [] Assert user can change 'has_rescue_medication_been_prescribed' to False
+    [x] Assert user can change 'individualised_care_plan_has_parent_carer_child_agreement' to True
+    [x] Assert user can change 'individualised_care_plan_has_parent_carer_child_agreement' to False
+    [x] Assert user can change 'individualised_care_plan_includes_service_contact_details' to True
+    [x] Assert user can change 'individualised_care_plan_includes_service_contact_details' to False
+    [x] Assert user can change 'individualised_care_plan_include_first_aid' to True
+    [x] Assert user can change 'individualised_care_plan_include_first_aid' to False
+    [x] Assert user can change 'individualised_care_plan_parental_prolonged_seizure_care' to True
+    [x] Assert user can change 'individualised_care_plan_parental_prolonged_seizure_care' to False
+    [x] Assert user can change 'individualised_care_plan_includes_general_participation_risk' to True
+    [x] Assert user can change 'individualised_care_plan_includes_general_participation_risk' to False
+    [x] Assert user can change 'individualised_care_plan_addresses_water_safety' to True
+    [x] Assert user can change 'individualised_care_plan_addresses_water_safety' to False
+    [x] Assert user can change 'individualised_care_plan_addresses_sudep' to True
+    [x] Assert user can change 'individualised_care_plan_addresses_sudep' to False
+    [x] Assert user can change 'individualised_care_plan_includes_ehcp' to True
+    [x] Assert user can change 'individualised_care_plan_includes_ehcp' to False
+    [x] Assert user can change 'has_individualised_care_plan_been_updated_in_the_last_year' to True
+    [x] Assert user can change 'has_individualised_care_plan_been_updated_in_the_last_year' to False
+    [x] Assert user can change 'has_been_referred_for_mental_health_support' to True
+    [x] Assert user can change 'has_been_referred_for_mental_health_support' to False
+    [x] Assert user can change 'has_support_for_mental_health_support' to True
+    [x] Assert user can change 'has_support_for_mental_health_support' to False
+    [x] Assert user can change 'has_an_aed_been_given' to True
+    [x] Assert user can change 'has_an_aed_been_given' to False
+    [x] Assert user can change 'has_rescue_medication_been_prescribed' to True
+    [x] Assert user can change 'has_rescue_medication_been_prescribed' to False
 
 # Antiepilepsy Medicine
     for field in fields: [
@@ -356,12 +356,12 @@
     [] Assert user can change 'antiepilepsy_medicine_add_stop_date' ..
     [] Assert user can change 'antiepilepsy_medicine_remove_stop_date' ..
     [] Assert user can change 'antiepilepsy_medicine_stop_date' ..
-    [] Assert user can change 'antiepilepsy_medicine_risk_discussed' to True
-    [] Assert user can change 'antiepilepsy_medicine_risk_discussed' to False
-    [] Assert user can change 'is_a_pregnancy_prevention_programme_in_place' to True
-    [] Assert user can change 'is_a_pregnancy_prevention_programme_in_place' to False
-    [] Assert user can change 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' to True
-    [] Assert user can change 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' to False
+    [x] Assert user can change 'antiepilepsy_medicine_risk_discussed' to True
+    [x] Assert user can change 'antiepilepsy_medicine_risk_discussed' to False
+    [x] Assert user can change 'is_a_pregnancy_prevention_programme_in_place' to True
+    [x] Assert user can change 'is_a_pregnancy_prevention_programme_in_place' to False
+    [x] Assert user can change 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' to True
+    [x] Assert user can change 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' to False
 
 """
 # Python imports
@@ -443,6 +443,12 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "model": "epilepsycontext",
     },
     {
+        "field_name": "previous_neonatal_seizures",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
         "field_name": "experienced_prolonged_generalized_convulsive_seizures",
         "choices": OPT_OUT_UNCERTAIN,
         "param": "epilepsy_context_id",
@@ -489,6 +495,209 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "choices": GENERALISED_SEIZURE_TYPE,
         "param": "episode_id",
         "model": "episode",
+    },
+)
+
+TOGGLES = (
+    {
+        "field_name": "has_number_of_episodes_since_the_first_been_documented",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "general_examination_performed",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "neurological_examination_performed",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "developmental_learning_or_schooling_problems",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "behavioural_or_emotional_problems",
+        "param": "first_paediatric_assessment_id",
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "were_any_of_the_epileptic_seizures_convulsive",
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "diagnosis_of_epilepsy_withdrawn",
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "epilepsy_cause_known",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "relevant_impairments_behavioural_educational",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "mental_health_screen",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "mental_health_issue_identified",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "global_developmental_delay_or_learning_difficulties",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "autistic_spectrum_disorder",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "has_description_of_the_episode_or_episodes_been_gathered",
+        "param": "episode_id",
+        "model": "episode",
+    },
+    {
+        "field_name": "consultant_paediatrician_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "paediatric_neurologist_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "childrens_epilepsy_surgical_service_referral_criteria_met",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "childrens_epilepsy_surgical_service_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "epilepsy_specialist_nurse_referral_made",
+        "param": "assessment_id",
+        "model": "assessment",
+    },
+    {
+        "field_name": "eeg_indicated",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "twelve_lead_ecg_status",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "ct_head_scan_status",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "mri_indicated",
+        "param": "investigations_id",
+        "model": "investigations",
+    },
+    {
+        "field_name": "individualised_care_plan_in_place",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_has_parent_carer_child_agreement",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_includes_service_contact_details",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_include_first_aid",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_parental_prolonged_seizure_care",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_includes_general_participation_risk",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_addresses_water_safety",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_addresses_sudep",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "individualised_care_plan_includes_ehcp",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_individualised_care_plan_been_updated_in_the_last_year",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_been_referred_for_mental_health_support",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_support_for_mental_health_support",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_an_aed_been_given",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "has_rescue_medication_been_prescribed",
+        "param": "management_id",
+        "model": "management",
+    },
+    {
+        "field_name": "antiepilepsy_medicine_risk_discussed",
+        "param": "antiepilepsy_medicine_id",
+        "model": "antiepilepsymedicine",
+    },
+    {
+        "field_name": "is_a_pregnancy_prevention_programme_in_place",
+        "param": "antiepilepsy_medicine_id",
+        "model": "antiepilepsymedicine",
+    },
+    {
+        "field_name": "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+        "param": "antiepilepsy_medicine_id",
+        "model": "antiepilepsymedicine",
     },
 )
 
@@ -597,6 +806,210 @@ def test_user_updates_single_choice_multiple_toggle_fail(
                 expected_result="dummy data",
                 assert_pass=False,
             )
+
+
+@pytest.mark.django_db
+def test_user_updates_toggles_true_success(client):
+    """
+    Assert for each toggle selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(TOGGLES):
+        print(url.get("field_name"))
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_toggle_button(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=True,
+            assert_pass=True,
+        )
+
+
+@pytest.mark.django_db
+def test_user_updates_toggles_false_success(client):
+    """
+    Assert for each toggle selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(TOGGLES):
+        print(url.get("field_name"))
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_toggle_button(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=False,
+            assert_pass=True,
+        )
+
+
+@pytest.mark.django_db
+def test_user_updates_toggles_true_fail(client):
+    """
+    Assert for each toggle selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(TOGGLES):
+        print(url.get("field_name"))
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_toggle_button(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=False,
+            assert_pass=False,
+        )
+
+
+@pytest.mark.django_db
+def test_user_updates_toggles_false_fail(client):
+    """
+    Assert for each toggle selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(TOGGLES):
+        print(url.get("field_name"))
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_toggle_button(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=True,
+            assert_pass=False,
+        )
 
 
 # Test helper methods - there is one for each page_element
@@ -709,6 +1122,15 @@ def get_model_from_model(case, model_name):
         return Comorbidity.objects.filter(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis
         ).first()
+    elif model_name == "antiepilepsymedicine":
+        return AntiEpilepsyMedicine.objects.create(
+            management=case.registration.management,
+            is_rescue_medicine=False,
+            medicine_entity=MedicineEntity.objects.get(
+                medicine_name="Sodium valproate"
+            ),
+        )
+
     else:
         refresh_case = Case.objects.get(pk=case.pk)
         return getattr(refresh_case.registration, model_name, None)
