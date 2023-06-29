@@ -382,7 +382,6 @@ from epilepsy12.tests.UserDataClasses import (
 from epilepsy12.tests.factories import (
     E12UserFactory,
     E12CaseFactory,
-    E12RegistrationFactory,
     E12SiteFactory,
     E12AntiEpilepsyMedicineFactory,
 )
@@ -414,7 +413,6 @@ from epilepsy12.constants import (
     EPILEPSY_SEIZURE_TYPE,
     GENERALISED_SEIZURE_TYPE,
 )
-from epilepsy12.general_functions import generate_nhs_number
 
 
 SINGLE_CHOICE_MULTIPLE_TOGGLES = (
@@ -714,15 +712,9 @@ def test_user_updates_single_choice_multiple_toggle_success(
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
+
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -767,15 +759,9 @@ def test_user_updates_single_choice_multiple_toggle_fail(
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
+
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -818,15 +804,8 @@ def test_user_updates_toggles_true_success(client):
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -869,15 +848,9 @@ def test_user_updates_toggles_false_success(client):
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
+
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -920,15 +893,9 @@ def test_user_updates_toggles_true_fail(client):
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
+
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -971,15 +938,9 @@ def test_user_updates_toggles_false_fail(client):
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
+
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
