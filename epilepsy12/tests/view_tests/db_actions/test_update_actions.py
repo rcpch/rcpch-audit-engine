@@ -98,7 +98,7 @@
 
     [x] Assert user can change 'epilepsy_cause_known' to True
     [x] Assert user can change 'epilepsy_cause_known' to False
-    [] Assert user can change 'epilepsy_cause' to Aicardi's Syndrome (pk=135)
+    [x] Assert user can change 'epilepsy_cause' to Aicardi's Syndrome (pk=134)
     [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[0][0]=='Gen' and EPILEPSY_CAUSES[1][0]=='Imm' and and EPILEPSY_CAUSES[5][0]=='Othe'
     [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to True
@@ -158,15 +158,15 @@
     [x] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[3][0]=='UC' (Unclassified)
     [] Assert user can change 'focal_onset_epilepsy_checked_changed' to ........
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[0][0]=='AEM' ('Absence with eyelid myoclonia')
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[1][0]=='Ato' ('Atonic')]], tuple[Literal['Aab'], Literal['Atypical absence']], tuple[Literal['Clo'], Literal['Clonic']], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[2][0]=='Aab' ('Atypical absence')]], tuple[Literal['Clo'], Literal['Clonic']], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[3][0]=='Clo' ('Clonic')]], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[4][0]=='EpS' ('Epileptic spasms')]], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[5][0]=='MyC' ('Myoclonic')]], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[6][0]=='MAb' ('Myoclonic absence')]], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[7][0]=='MTC' ('Myoclonic-tonic-clonic')]], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[8][0]=='MAt' ('Myoclonic-atonic')]], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[9][0]=='Ton' ('Tonic')]], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[1][0]=='Ato' ('Atonic')]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[2][0]=='Aab' ('Atypical absence')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[3][0]=='Clo' ('Clonic')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[4][0]=='EpS' ('Epileptic spasms')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[5][0]=='MyC' ('Myoclonic')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[6][0]=='MAb' ('Myoclonic absence')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[7][0]=='MTC' ('Myoclonic-tonic-clonic')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[8][0]=='MAt' ('Myoclonic-atonic')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[9][0]=='Ton' ('Tonic')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[10][0]=='TCl' ('Tonic-clonic')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[11][0]=='TAb' ('Typical absence')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[12][0]=='Oth' ('Other')
@@ -412,6 +412,9 @@ from epilepsy12.constants import (
     EPILEPSY_DIAGNOSIS_STATUS,
     EPILEPSY_SEIZURE_TYPE,
     GENERALISED_SEIZURE_TYPE,
+    EPISODE_DEFINITION,
+    NON_EPILEPSY_SEIZURE_ONSET,
+    NON_EPILEPSY_SEIZURE_TYPE,
 )
 
 
@@ -699,6 +702,33 @@ TOGGLES = (
     },
 )
 
+SELECTS = (
+    {
+        "field_name": "epilepsy_cause",
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+        "choices": None,
+    },
+    {
+        "field_name": "episode_definition",
+        "param": "episode_id",
+        "model": "episode",
+        "choices": EPISODE_DEFINITION,
+    },
+    {
+        "field_name": "nonepileptic_seizure_type",
+        "param": "episode_id",
+        "model": "episode",
+        "choices": NON_EPILEPSY_SEIZURE_ONSET,
+    },
+    {
+        "field_name": "nonepileptic_seizure_subtype",
+        "param": "episode_id",
+        "model": "episode",
+        "choices": NON_EPILEPSY_SEIZURE_TYPE,
+    },
+)
+
 
 @pytest.mark.django_db
 def test_user_updates_single_choice_multiple_toggle_success(
@@ -973,6 +1003,63 @@ def test_user_updates_toggles_false_fail(client):
         )
 
 
+@pytest.mark.django_db
+def test_user_updates_select_success(
+    client,
+):
+    """
+    Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(SELECTS):
+        model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION,
+            model_name=url.get("model"),
+        )
+        if url.get("model") == "multiaxialdiagnosis":
+            data = {"epilepsy_cause": 134}
+
+        client.post(
+            reverse(
+                url.get("field_name"),
+                kwargs={url.get("param"): model.id},
+            ),
+            headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
+            data=data,
+        )
+        updated_model = get_model_from_model(
+            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+        )
+        validate_select(
+            field_name=url.get("field_name"),
+            model_instance=updated_model,
+            expected_result=EpilepsyCauseEntity.objects.get(pk=134),  # Aicardi's sy.
+            assert_pass=True,
+        )
+
+
 # Test helper methods - there is one for each page_element
 def validate_date_assertions(
     field_name: str,
@@ -1071,6 +1158,23 @@ def validate_single_choice_multiple_toggle_button(
             ), f"{field_name} - result stored in model is {field_value}. Result expected: {expected_result} - Expected Fail"
 
 
+def validate_select(field_name: str, model_instance, expected_result, assert_pass=True):
+    """
+    Asserts whether the result stored in the model matches that expected
+    """
+    field_value = getattr(model_instance, field_name, None)
+
+    if field_value is not None:
+        if assert_pass:
+            assert (
+                f"{expected_result}" == f"{field_value}"
+            ), f"{field_name} - result stored in model is {field_value}. Result expected: {expected_result} - Expected PASS"
+        else:
+            assert (
+                f"{expected_result}" != f"{field_value}"
+            ), f"{field_name} - result stored in model is {field_value}. Result expected: {expected_result} - Expected Fail"
+
+
 def get_model_from_model(case, model_name):
     """
     Return model instance related to Case
@@ -1091,7 +1195,10 @@ def get_model_from_model(case, model_name):
                 medicine_name="Sodium valproate"
             ),
         )
-
+    elif model_name == "multiaxialdiagnosis":
+        return MultiaxialDiagnosis.objects.get(
+            pk=case.registration.multiaxialdiagnosis.pk
+        )  # EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
     else:
         refresh_case = Case.objects.get(pk=case.pk)
         return getattr(refresh_case.registration, model_name, None)
