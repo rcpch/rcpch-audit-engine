@@ -37,6 +37,21 @@ For each MODEL:
         8. experienced_prolonged_focal_seizures
     
 - `Assessment`
+
+    completed_fields(MODEL) == 5
+        1. "childrens_epilepsy_surgical_service_referral_criteria_met"
+        2. "consultant_paediatrician_referral_made"
+        3. "paediatric_neurologist_referral_made"
+        4. "childrens_epilepsy_surgical_service_referral_made"
+        5. "epilepsy_specialist_nurse_referral_made"
+
+        if 
+        "consultant_paediatrician_referral_made" == True
+            'consultant_paediatrician_referral_date'
+            'consultant_paediatrician_input_date'
+            number_of_completed_fields_in_related_models = 1
+
+
 - `Investigations`
 - `Management`
     - `AntiepilepsyMedicine`
