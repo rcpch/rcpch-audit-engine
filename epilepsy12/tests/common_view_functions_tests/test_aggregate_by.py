@@ -375,7 +375,7 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
     )
 
-    # generate kpi_metric_eligible_3_5_object answer set for e12_case_factory constructor
+
     def get_ans_dict_update_expected_score_dict(
         EXPECTED_KPI_SCORE_OUTPUT, eligible_3_5_only
     ):
@@ -469,6 +469,12 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
 
         calculate_kpis(registration)
 
+    # Add average keys
+    only_numerators = [kpi for kpi in EXPECTED_KPI_SCORE_OUTPUT.keys() if not (kpi.endswith('_total') or kpi == 'total_number_of_cases')]
+
+    for kpi in only_numerators:
+        EXPECTED_KPI_SCORE_OUTPUT[f"{kpi}_average"] = EXPECTED_KPI_SCORE_OUTPUT[kpi] / EXPECTED_KPI_SCORE_OUTPUT[f"{kpi}_total"]
+    
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=CHELWEST,
         cohort=6,
@@ -477,12 +483,5 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     )
 
     aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
-
-    # REMOVE AVERAGE COUNTS FROM DICT FOR NOW
-    aggregated_kpis = {
-        key: value
-        for key, value in aggregated_kpis.items()
-        if not key.endswith("_average")
-    }
 
     assert aggregated_kpis == EXPECTED_KPI_SCORE_OUTPUT
