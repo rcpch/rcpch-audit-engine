@@ -56,8 +56,11 @@ import random
 from django.urls import reverse
 
 # E12 imports
-from epilepsy12.models import Epilepsy12User, Organisation, Case, Registration
+from epilepsy12.models import Epilepsy12User, Organisation, Case, Registration, FirstPaediatricAssessment
 from epilepsy12.common_view_functions import completed_fields
+from epilepsy12.constants import (
+    CHRONICITY,
+)
 
 
 @pytest.mark.django_db
@@ -108,3 +111,71 @@ def test_completed_fields_registration_random_fields(e12_case_factory, GOSH):
     registration = Registration.objects.get(case=CASE)
 
     assert completed_fields(registration) == EXPECTED_SCORE, f"Randomly completed registration, `completed_fields(registration)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(registration)}"
+    
+
+@pytest.mark.django_db
+def test_completed_fields_first_paediatric_assessment_all_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=first_paediatric_assessment) returns correct counter when all fields have an answer.
+    """
+    
+    
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+
+    first_paediatric_assessment = FirstPaediatricAssessment.objects.get(registration=CASE.registration)
+
+    assert completed_fields(first_paediatric_assessment) == 0, f"Empty first_paediatric_assessment, `completed_fields(first_paediatric_assessment)` should return 0. Instead returned {completed_fields(first_paediatric_assessment)}"
+    
+    fields_and_answers = {
+        'first_paediatric_assessment_in_acute_or_nonacute_setting': CHRONICITY[0][0],
+        'has_number_of_episodes_since_the_first_been_documented':True,
+        'general_examination_performed':True,
+        'neurological_examination_performed':True,
+        'developmental_learning_or_schooling_problems':True,
+        'behavioural_or_emotional_problems':True,
+    }
+    factory_attributes = {f"registration__first_paediatric_assessment__{field}":answer for field,answer in fields_and_answers.items()}
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes
+    )
+
+    first_paediatric_assessment = FirstPaediatricAssessment.objects.get(registration=CASE.registration)
+
+    assert completed_fields(first_paediatric_assessment) == len(fields_and_answers), f"Completed first_paediatric_assessment, `completed_fields(first_paediatric_assessment)` should return {len(fields_and_answers)}. Instead returned {completed_fields(first_paediatric_assessment)}"
+
+@pytest.mark.django_db
+def test_completed_fields_first_paediatric_assessment_random_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=first_paediatric_assessment) returns correct counter when random fields have an answer or None.
+    """
+       
+    fields_and_answers = {
+        'first_paediatric_assessment_in_acute_or_nonacute_setting': random.choice([None,CHRONICITY[0][0]]),
+        'has_number_of_episodes_since_the_first_been_documented':random.choice([None,True]),
+        'general_examination_performed':random.choice([None,True]),
+        'neurological_examination_performed':random.choice([None,True]),
+        'developmental_learning_or_schooling_problems':random.choice([None,True]),
+        'behavioural_or_emotional_problems':random.choice([None,True]),
+    }
+    EXPECTED_SCORE = 0
+    for answer in fields_and_answers.values():
+        if answer is not None:
+            EXPECTED_SCORE += 1
+    
+    factory_attributes = {f"registration__first_paediatric_assessment__{field}":answer for field,answer in fields_and_answers.items()}
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes
+    )
+
+    first_paediatric_assessment = FirstPaediatricAssessment.objects.get(registration=CASE.registration)
+
+    assert completed_fields(first_paediatric_assessment) == EXPECTED_SCORE, f"Randomly completed first_paediatric_assessment, `completed_fields(first_paediatric_assessment)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(first_paediatric_assessment)}. Answers: {fields_and_answers}"
