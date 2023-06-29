@@ -6,13 +6,11 @@ Configures pytest fixtures for epilepsy12 app tests.
 
 # third-party imports
 from pytest_factoryboy import register
+import pytest
 
 
 # rcpch imports
 from epilepsy12.tests.factories import (
-    seed_groups_fixture,
-    seed_users_fixture,
-    seed_cases_fixture,
     E12AntiEpilepsyMedicineFactory,
     E12AssessmentFactory,
     E12CaseFactory,
@@ -27,6 +25,7 @@ from epilepsy12.tests.factories import (
     E12SyndromeFactory,
     E12UserFactory,
 )
+from epilepsy12.models import Organisation, Case
 
 
 # register factories to be used across test directory
@@ -38,12 +37,42 @@ register(E12CaseFactory)  # => e12_case_factory
 register(E12ComorbidityFactory)  # => e12_comborbidity_factory
 register(E12EpilepsyContextFactory)  # => e12_epilepsy_context
 register(E12EpisodeFactory)  # => e12_episode_factory
-register(E12FirstPaediatricAssessmentFactory)  # => e12_first_paediatric_assessment_factory
+register(
+    E12FirstPaediatricAssessmentFactory
+)  # => e12_first_paediatric_assessment_factory
 register(E12ManagementFactory)  # => e12_management_factory
 register(E12MultiaxialDiagnosisFactory)  # => e12_multiaxial_diagnosis_factory
 register(E12RegistrationFactory)  # => e12_registration_factory
 register(E12SiteFactory)  # => e12_site_factory
-register(E12SyndromeFactory) # => e12_syndrome_factory
+register(E12SyndromeFactory)  # => e12_syndrome_factory
 register(E12UserFactory)  # => e12_user_factory
 
 
+@pytest.fixture
+@pytest.mark.django_db
+def GOSH():
+    return Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def CASE_GOSH():
+    return Case.objects.get(first_name=f"child_{GOSH.OrganisationName}")
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def ADDENBROOKES():
+    Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def CASE_ADDENBROOKES():
+    Case.objects.get(first_name=f"child_{ADDENBROOKES.OrganisationName}")

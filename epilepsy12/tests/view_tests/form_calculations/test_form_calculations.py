@@ -49,20 +49,62 @@ For each MODEL:
 
 # python imports
 import pytest
+from datetime import date
+import random
 
 # django imports
 from django.urls import reverse
 
 # E12 imports
-# E12 imports
-from epilepsy12.models import Epilepsy12User, Organisation, Case
+from epilepsy12.models import Epilepsy12User, Organisation, Case, Registration
+from epilepsy12.common_view_functions import completed_fields
 
 
-@pytest.mark.skip(reason="Unfinished test.")
 @pytest.mark.django_db
-def test_completed_fields_success(
-    client,
-):
+def test_completed_fields_registration_all_fields(e12_case_factory, GOSH):
     """
-    Simulating numerator in form calculation from numbers of scored fields in a given model is correct
+    Simulating completed_fields(model_instance=Registration) returns correct counter when all fields have an answer.
     """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__registration_date=None,
+        registration__eligibility_criteria_met=None,
+    )
+
+    registration = Registration.objects.get(case=CASE)
+
+    assert completed_fields(registration) == 0, f"Empty registration, `completed_fields(registration)` should return 0. Instead returned {completed_fields(registration)}"
+
+    registration.registration_date = date(2023, 1, 1)
+    registration.eligibility_criteria_met = True
+    registration.save()
+
+    assert completed_fields(registration) == 2, f"Completed registration, `completed_fields(registration)` should return 2. . Instead returned {completed_fields(registration)}"
+
+@pytest.mark.django_db
+def test_completed_fields_registration_random_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=Registration) returns correct counter when fields randomly have an answer or left None.
+    """
+    EXPECTED_SCORE = 0
+    
+    REGISTRATION_DATE = random.choice([None,date(2023,1,1)])
+    if REGISTRATION_DATE is not None:
+        EXPECTED_SCORE += 1
+    
+    ELIGIBILITY_CRITERIA_MET = random.choice([None, True])
+    if ELIGIBILITY_CRITERIA_MET is not None:
+        EXPECTED_SCORE += 1
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__registration_date=REGISTRATION_DATE,
+        registration__eligibility_criteria_met=ELIGIBILITY_CRITERIA_MET,
+    )
+
+    registration = Registration.objects.get(case=CASE)
+
+    assert completed_fields(registration) == EXPECTED_SCORE, f"Randomly completed registration, `completed_fields(registration)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(registration)}"
