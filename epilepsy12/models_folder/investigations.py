@@ -1,3 +1,5 @@
+# TODO: attribute names inconsistent e.g. eeg_indicatED & eeg_performED_date (past tense) but eeg_request_date (present tense); and mri_indicated but mri_BRAIN_requested_date & mri_BRAIN_reported_date; and perhaps eeg_PERFORMED but mri_BRAIN_REPORTED Should refactor
+
 # standard imports
 from datetime import date
 

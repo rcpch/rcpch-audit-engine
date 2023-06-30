@@ -36,7 +36,7 @@ For each MODEL:
         7. experienced_prolonged_generalized_convulsive_seizures
         8. experienced_prolonged_focal_seizures
     
-- `Assessment`
+- `Assessment` - DONE
 
     EXPECTED_SCORE=completed_fields(MODEL) == 5
         1. "childrens_epilepsy_surgical_service_referral_criteria_met"
@@ -78,7 +78,7 @@ For each MODEL:
             'epilepsy_specialist_nurse_input_date'
             
 
-- `Investigations`
+- `Investigations` - DONE
     
     EXPECTED_SCORE=completed_fields(MODEL) == 4
     'eeg_indicated'
@@ -161,6 +161,7 @@ from epilepsy12.models import (
     FirstPaediatricAssessment,
     EpilepsyContext,
     Assessment,
+    Investigations,
 )
 from epilepsy12.common_view_functions import completed_fields
 from epilepsy12.constants import (
@@ -546,3 +547,139 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
     assert (
         completed_fields(assessment) == EXPECTED_SCORE
     ), f"Randomly completed assessment, `completed_fields(assessment)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(assessment)}. Answers: {factory_attributes}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_investigations_all_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=investigations) returns correct counter when all fields have an answer.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+
+    investigations = Investigations.objects.get(registration=CASE.registration)
+
+    assert (
+        completed_fields(investigations) == 0
+    ), f"Empty investigations, `completed_fields(investigations)` should return 0. Instead returned {completed_fields(investigations)}"
+
+    DATE_1 = date(2023, 1, 1)
+    DATE_2 = date(2023, 1, 2)
+
+    fields_and_answers = {
+        "eeg_indicated": True,
+        "eeg_request_date": DATE_1,
+        "eeg_performed_date": DATE_2,
+        "twelve_lead_ecg_status": True,
+        "ct_head_scan_status": True,
+        "mri_indicated": True,
+        "mri_brain_requested_date": DATE_1,
+        "mri_brain_reported_date": DATE_2,
+    }
+
+    factory_attributes = {
+        f"registration__investigations__{field}": answer
+        for field, answer in fields_and_answers.items()
+    }
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    investigations = Investigations.objects.get(registration=CASE.registration)
+
+    assert completed_fields(investigations) == len(
+        fields_and_answers
+    ), f"Completed investigations, `completed_fields(investigations)` should return {len(fields_and_answers)}. Instead returned {completed_fields(investigations)}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_investigations_random_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=investigations) returns correct counter when random fields have an answer.
+    """
+
+    factory_attributes = {}
+    EXPECTED_SCORE = 0
+    BASE_KEY_NAME = "registration__investigations__"
+
+    # These fields have no dependent date fields
+    SIMPLE_BOOL_FIELDS = [
+        "ct_head_scan_status",
+        "twelve_lead_ecg_status",
+    ]
+    for simple_bool_field in SIMPLE_BOOL_FIELDS:
+        KEY_NAME = BASE_KEY_NAME + simple_bool_field
+
+        ANSWER = random.choice([None, True])
+        factory_attributes.update({KEY_NAME: ANSWER})
+        if ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+    # All other bool fields have dependent date fields
+    BOOL_FIELDS = [
+        "eeg",
+        "mri",
+    ]
+
+    DATE_1 = date(2023, 1, 1)
+    DATE_2 = date(2023, 1, 2)
+    INVESTIGATION_DECLINED = date(
+        year=1915, month=4, day=15
+    )  # Specific date value to signify investigation was declined, set in investigation_views.investigations
+
+    for bool_field in BOOL_FIELDS:
+        KEY_NAME = BASE_KEY_NAME + f"{bool_field}_indicated"
+        ANSWER = random.choice([True])
+        factory_attributes.update({KEY_NAME: ANSWER})
+
+        DATE_1_ANSWER_OPTIONS = [None]
+        DATE_2_ANSWER_OPTIONS = [None]
+
+        if ANSWER is not None:
+            # Opens up 2 date options
+
+            EXPECTED_SCORE += 1
+            DATE_1_ANSWER_OPTIONS += [DATE_1]
+            DATE_2_ANSWER_OPTIONS += [DATE_2, INVESTIGATION_DECLINED]
+
+        REQUEST_KEY_NAME = BASE_KEY_NAME + (
+            f"{bool_field}_request_date"
+            if bool_field == "eeg"
+            else f"{bool_field}_brain_requested_date"
+        )
+        REQUEST_ANSWER = random.choice(DATE_1_ANSWER_OPTIONS)
+        if REQUEST_ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+        REPORTED_KEY_NAME = BASE_KEY_NAME + (
+            f"{bool_field}_performed_date"
+            if bool_field == "eeg"
+            else f"{bool_field}_brain_reported_date"
+        )
+        REPORTED_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
+        if REPORTED_ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+        date_answers = {
+            REQUEST_KEY_NAME: REQUEST_ANSWER,
+            REPORTED_KEY_NAME: REPORTED_ANSWER,
+        }
+        factory_attributes.update(date_answers)
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    investigations = Investigations.objects.get(registration=CASE.registration)
+
+    assert (
+        completed_fields(investigations) == EXPECTED_SCORE
+    ), f"Randomly completed investigations, `completed_fields(investigations)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(investigations)}. Answers: {factory_attributes}"
