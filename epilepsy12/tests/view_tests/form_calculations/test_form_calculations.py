@@ -37,9 +37,106 @@ For each MODEL:
         8. experienced_prolonged_focal_seizures
     
 - `Assessment`
+
+    EXPECTED_SCORE=completed_fields(MODEL) == 5
+        1. "childrens_epilepsy_surgical_service_referral_criteria_met"
+        2. "consultant_paediatrician_referral_made"
+        3. "paediatric_neurologist_referral_made"
+        4. "childrens_epilepsy_surgical_service_referral_made"
+        5. "epilepsy_specialist_nurse_referral_made"
+
+        if "consultant_paediatrician_referral_made" == True
+            EXPECTED_SCORE+=3
+            'general_paediatric_centre'
+            'consultant_paediatrician_referral_date'
+            'consultant_paediatrician_input_date'
+            
+            number_of_completed_fields_in_related_models = 1
+            general_paediatric_centre
+        
+        if "paediatric_neurologist_referral_made" == True
+            EXPECTED_SCORE+=3
+            'paediatric_neurology_centre'
+            'paediatric_neurologist_referral_date'
+            'paediatric_neurologist_input_date'
+            
+            number_of_completed_fields_in_related_models = 1
+            'paediatric_neurology_centre'
+        
+        if "childrens_epilepsy_surgical_service_referral_made" == True
+            EXPECTED_SCORE+=3
+            'epilepsy_surgery_centre'
+            'childrens_epilepsy_surgical_service_referral_date'
+            'childrens_epilepsy_surgical_service_input_date'
+            
+            number_of_completed_fields_in_related_models = 1
+            'epilepsy_surgery_centre'
+        
+        if "epilepsy_specialist_nurse_referral_made" == True
+            EXPECTED_SCORE+=2
+            'epilepsy_specialist_nurse_referral_date'
+            'epilepsy_specialist_nurse_input_date'
+            
+
 - `Investigations`
+    
+    EXPECTED_SCORE=completed_fields(MODEL) == 4
+    'eeg_indicated'
+    'twelve_lead_ecg_status'
+    'ct_head_scan_status'
+    'mri_indicated'
+
+    if 'eeg_indicated' == True:
+        EXPECTED_SCORE+=2
+        'eeg_request_date'
+        'eeg_performed_date'
+    if mri_indicated == True:
+        EXPECTED_SCORE+=2
+        'mri_brain_requested_date'
+        'mri_brain_reported_date'
+
 - `Management`
-    - `AntiepilepsyMedicine`
+    EXPECTED_SCORE = 5
+    'has_an_aed_been_given'
+    'has_rescue_medication_been_prescribed'
+    'individualised_care_plan_in_place'
+    'has_been_referred_for_mental_health_support'
+    'has_support_for_mental_health_support'
+
+    if 'has_rescue_medication_been_prescribed' == True
+        for medicine in AntiepilepsyMedicine.all(is_rescue_medicine=True)
+            number_of_completed_fields_in_related_models += 3
+            is_rescue_medicine
+            antiepilepsy_medicine_start_date
+            antiepilepsy_medicine_risk_discussed
+
+    if 'has_an_aed_been_given' == True
+        for medicine in AntiepilepsyMedicine.all(is_rescue_medicine=False)
+            number_of_completed_fields_in_related_models += 3
+            is_rescue_medicine
+            antiepilepsy_medicine_start_date
+            antiepilepsy_medicine_risk_discussed
+            
+            if case.sex == 2 and age >= 12 and is_a_pregnancy_prevention_programme_needed==True:
+                number_of_completed_fields_in_related_models += 2
+                has_a_valproate_annual_risk_acknowledgement_form_been_completed
+                is_a_pregnancy_prevention_programme_in_place
+
+
+    if 'individualised_care_plan_in_place' == True
+        EXPECTED_SCORE += 10
+        'individualised_care_plan_date'
+        'individualised_care_plan_has_parent_carer_child_agreement'
+        'individualised_care_plan_includes_service_contact_details'
+        'individualised_care_plan_include_first_aid'
+        'individualised_care_plan_parental_prolonged_seizure_care'
+        'individualised_care_plan_includes_general_participation_risk'
+        'individualised_care_plan_addresses_water_safety'
+        'individualised_care_plan_addresses_sudep'
+        'individualised_care_plan_includes_ehcp'
+        'has_individualised_care_plan_been_updated_in_the_last_year'
+
+
 - `MultiaxialDiagnosis`
     - `Episode`
     - `Syndrome`
