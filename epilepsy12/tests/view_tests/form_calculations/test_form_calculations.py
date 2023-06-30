@@ -162,6 +162,7 @@ from epilepsy12.models import (
     EpilepsyContext,
     Assessment,
     Investigations,
+    Management,
 )
 from epilepsy12.common_view_functions import completed_fields
 from epilepsy12.constants import (
@@ -683,3 +684,58 @@ def test_completed_fields_investigations_random_fields(e12_case_factory, GOSH):
     assert (
         completed_fields(investigations) == EXPECTED_SCORE
     ), f"Randomly completed investigations, `completed_fields(investigations)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(investigations)}. Answers: {factory_attributes}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_management_all_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=management) returns correct counter when all fields have an answer.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+
+    management = Management.objects.get(registration=CASE.registration)
+
+    assert (
+        completed_fields(management) == 0
+    ), f"Empty management, `completed_fields(management)` should return 0. Instead returned {completed_fields(management)}"
+
+    DATE_1 = date(2023, 1, 1)
+
+    BOOL_FIELDS = [
+        "has_an_aed_been_given",
+        "has_rescue_medication_been_prescribed",
+        "individualised_care_plan_in_place",
+        "individualised_care_plan_has_parent_carer_child_agreement",
+        "individualised_care_plan_includes_service_contact_details",
+        "individualised_care_plan_include_first_aid",
+        "individualised_care_plan_parental_prolonged_seizure_care",
+        "individualised_care_plan_includes_general_participation_risk",
+        "individualised_care_plan_addresses_water_safety",
+        "individualised_care_plan_addresses_sudep",
+        "individualised_care_plan_includes_ehcp",
+        "has_individualised_care_plan_been_updated_in_the_last_year",
+        "has_been_referred_for_mental_health_support",
+        "has_support_for_mental_health_support",
+    ]
+    DATE_FIELD = "individualised_care_plan_date"
+
+    factory_attributes = {
+        f"registration__management__{field}": True for field in BOOL_FIELDS
+    }
+    factory_attributes.update({f"registration__management__{DATE_FIELD}": DATE_1})
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    management = Management.objects.get(registration=CASE.registration)
+
+    assert completed_fields(management) == len(
+        factory_attributes
+    ), f"Completed management, `completed_fields(management)` should return {len(factory_attributes)}. Instead returned {completed_fields(management)}"
