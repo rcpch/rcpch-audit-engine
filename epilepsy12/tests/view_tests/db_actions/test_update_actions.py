@@ -1002,7 +1002,7 @@ def test_user_updates_toggles_false_fail(client):
             assert_pass=False,
         )
 
-
+@pytest.mark.skip(reason='unfinished test')
 @pytest.mark.django_db
 def test_user_updates_select_success(
     client,
