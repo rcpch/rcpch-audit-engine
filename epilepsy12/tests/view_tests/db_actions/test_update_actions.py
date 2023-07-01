@@ -203,6 +203,8 @@
         remove_syndrome             (syndrome_id)                           button click
         close_syndrome              (syndrome_id)                           button click
         syndrome_present            (multiaxial_diagnosis_id)               button click
+        syndrome_diagnosis_date     (syndrome_id)                           date_field
+        syndrome_name               (syndrome_id)                           select
     ]
     [] Assert user can change  ..
     [] Assert user can change  ..
@@ -399,6 +401,8 @@ from epilepsy12.models import (
     Comorbidity,
     MedicineEntity,
     AntiEpilepsyMedicine,
+    Syndrome,
+    SyndromeEntity,
 )
 
 from epilepsy12.constants import (
@@ -732,6 +736,12 @@ SELECTS = (
         "choices": GENERALISED_SEIZURE_TYPE,
         "param": "episode_id",
         "model": "episode",
+    },
+    {
+        "field_name": "syndrome_name",
+        "choices": None,
+        "param": "syndrome_id",
+        "model": "syndrome",
     },
 )
 
@@ -1074,12 +1084,18 @@ def test_user_updates_select_success(
                     pk=134
                 )  # Aicardi's sy
                 htmx_trigger = "epilepsy_cause"
-            else:
+            elif url.get("field_name") == "comorbidity":
                 data = {"comorbidityentity": 134}
                 expected_result = ComorbidityEntity.objects.get(
                     pk=34
                 )  # specific learning difficulty
                 htmx_trigger = "comorbidityentity"
+            elif url.get("field_name") == "syndrome_name":
+                data = {"syndrome": 35}
+                expected_result = SyndromeEntity.objects.get(
+                    pk=35
+                )  # Self-limited (familial) neonatal epilepsy
+                htmx_trigger = "syndrome"
 
             client.post(
                 reverse(
@@ -1167,12 +1183,18 @@ def test_user_updates_select_fail(
                     pk=135
                 )  # Dysmorphic sialidosis with renal involvement
                 htmx_trigger = "epilepsy_cause"
-            else:
+            elif url.get("field_name") == "comorbidity_diagnosis":
                 data = {"comorbidityentity": 134}
                 expected_result = ComorbidityEntity.objects.get(
                     pk=35
                 )  # Meets criteria for referral to Children's Epilepsy Surgery Service
                 htmx_trigger = "comorbidityentity"
+            elif url.get("field_name") == "syndrome_name":
+                data = {"syndrome": 35}
+                expected_result = SyndromeEntity.objects.get(
+                    pk=34
+                )  # Self-limited (familial) neonatal epilepsy
+                htmx_trigger = "syndrome"
 
             client.post(
                 reverse(
@@ -1324,6 +1346,14 @@ def get_model_from_model(case, model_name):
             ),  # specific learning difficulty
         )
         return comorbidity
+    elif model_name == "syndrome":
+        syndrome, created = Syndrome.objects.get_or_create(
+            multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
+            syndrome=SyndromeEntity.objects.get(
+                pk=35
+            ),  # Self-limited (familial) neonatal epilepsy
+        )
+        return syndrome
     elif model_name == "epilepsycauseentity":
         return EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
     elif model_name == "antiepilepsymedicine":
