@@ -95,7 +95,7 @@ For each MODEL:
         'mri_brain_requested_date'
         'mri_brain_reported_date'
 
-- `Management`
+- `Management` - DONE
     EXPECTED_SCORE = 5
     'has_an_aed_been_given'
     'has_rescue_medication_been_prescribed'
@@ -137,7 +137,7 @@ For each MODEL:
         'has_individualised_care_plan_been_updated_in_the_last_year'
 
 
-- `MultiaxialDiagnosis`
+- `MultiaxialDiagnosis` - DONE
     EXPECTED_SCORE = 7
     'epilepsy_cause_known'
     'relevant_impairments_behavioural_educational'
@@ -154,65 +154,6 @@ For each MODEL:
         EXPECTED_SCORE += 1
         'global_developmental_delay_or_learning_difficulties_severity'
 
-    - `Episode`
-    for episode in Episodes:
-        EXPECTED_SCORE += 5 (if at least one episode is epileptic)
-        'seizure_onset_date'
-        'seizure_onset_date_confidence'
-        'episode_definition'
-        'has_description_of_the_episode_or_episodes_been_gathered'
-        'epilepsy_or_nonepilepsy_status'
-
-        if episode.has_description_of_the_episode_or_episodes_been_gathered:
-            EXPECTED_SCORE += 1
-            description
-        if episode.epilepsy_or_nonepilepsy_status == "E":
-            EXPECTED_SCORE += 1
-
-            if episode.epileptic_seizure_onset_type == "GO":
-                # 'generalised' onset: essential fields
-                # 'epileptic_generalised_onset'
-                EXPECTED_SCORE += 1
-            elif episode.epileptic_seizure_onset_type == "FO":
-                # focal onset
-                # minimum score is laterality
-                EXPECTED_SCORE += 1
-            else:
-                # either unclassified or unknown onset
-                # no further score
-                EXPECTED_SCORE += 0
-        elif episode.epilepsy_or_nonepilepsy_status == "NE":
-            # nonepileptic seizure - essential fields:
-            # nonepileptic_seizure_unknown_onset
-            # nonepileptic_seizure_type
-            # AND ONE of behavioural/migraine/misc/paroxysmal/sleep related/syncope - essential fields:
-            # nonepileptic_seizure_behavioural or
-            # nonepileptic_seizure_migraine or
-            # nonepileptic_seizure_miscellaneous or
-            # nonepileptic_seizure_paroxysmal or
-            # nonepileptic_seizure_sleep
-            # nonepileptic_seizure_syncope
-            
-            if episode.nonepileptic_seizure_type == "Oth":
-                EXPECTED_SCORE += 2
-            else:
-                EXPECTED_SCORE += 3
-        elif episode.epilepsy_or_nonepilepsy_status == "U":
-            # uncertain status
-            EXPECTED_SCORE += 0
-
-    - `Syndrome`
-        for syndrome in Syndromes:
-            EXPECTED_SCORE += 2
-            "syndrome_diagnosis_date"
-            "syndrome__syndrome_name"
-
-    - `Comorbidity`
-        for comorbidity in Comorbidities:
-            EXPECTED_SCORE += 2
-            comorbidity_diagnosis_date"
-            "comorbidity__comorbidityentity__conceptId"
-        
 
     if multiaxial_diagnosis.'epilepsy_cause_known':
         'epilepsy_cause'
