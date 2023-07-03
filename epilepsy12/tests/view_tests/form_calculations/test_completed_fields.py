@@ -240,11 +240,14 @@ from epilepsy12.models import (
     Assessment,
     Investigations,
     Management,
+    MultiaxialDiagnosis,
 )
 from epilepsy12.common_view_functions import completed_fields
 from epilepsy12.constants import (
     CHRONICITY,
     OPT_OUT_UNCERTAIN,
+    SEVERITY,
+    NEUROPSYCHIATRIC,
 )
 
 
@@ -781,8 +784,6 @@ def test_completed_fields_management_all_fields(e12_case_factory, GOSH):
         completed_fields(management) == 0
     ), f"Empty management, `completed_fields(management)` should return 0. Instead returned {completed_fields(management)}"
 
-    DATE_1 = date(2023, 1, 1)
-
     BOOL_FIELDS = [
         "has_an_aed_been_given",
         "has_rescue_medication_been_prescribed",
@@ -799,11 +800,12 @@ def test_completed_fields_management_all_fields(e12_case_factory, GOSH):
         "has_been_referred_for_mental_health_support",
         "has_support_for_mental_health_support",
     ]
-    DATE_FIELD = "individualised_care_plan_date"
 
     factory_attributes = {
         f"registration__management__{field}": True for field in BOOL_FIELDS
     }
+    DATE_1 = date(2023, 1, 1)
+    DATE_FIELD = "individualised_care_plan_date"
     factory_attributes.update({f"registration__management__{DATE_FIELD}": DATE_1})
 
     CASE = e12_case_factory(
@@ -871,3 +873,133 @@ def test_completed_fields_management_random_fields(e12_case_factory, GOSH):
     assert (
         completed_fields(management) == EXPECTED_SCORE
     ), f"Randomly completed management, `completed_fields(management)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(management)}. Answers: {factory_attributes}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_multiaxial_diagnosis_all_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=multiaxial_diagnosis) returns correct counter when all fields have an answer.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        registration=CASE.registration
+    )
+
+    assert (
+        completed_fields(multiaxial_diagnosis) == 0
+    ), f"Empty multiaxial_diagnosis, `completed_fields(multiaxial_diagnosis)` should return 0. Instead returned {completed_fields(multiaxial_diagnosis)}"
+
+    BASE_KEY_NAME = "registration__multiaxial_diagnosis__"
+
+    BOOL_FIELDS = [
+        "syndrome_present",
+        "epilepsy_cause_known",
+        "relevant_impairments_behavioural_educational",
+        "global_developmental_delay_or_learning_difficulties",
+        "autistic_spectrum_disorder",
+        "mental_health_screen",
+        "mental_health_issue_identified",
+    ]
+    factory_attributes = {f"{BASE_KEY_NAME}{field}": True for field in BOOL_FIELDS}
+
+    # ArrayField
+    EPILEPSY_CAUSES_KEY_NAME = BASE_KEY_NAME + "epilepsy_cause_categories"
+    EPILEPSY_CAUSES_ANSWER = ["Gen"]
+    factory_attributes.update({EPILEPSY_CAUSES_KEY_NAME: EPILEPSY_CAUSES_ANSWER})
+
+    # CharFields
+    char_fields_and_answers = {
+        "global_developmental_delay_or_learning_difficulties_severity": SEVERITY[0][0],
+        "mental_health_issue": NEUROPSYCHIATRIC[0][0],
+    }
+    char_fields_factory_attributes = {
+        f"{BASE_KEY_NAME}{field}": answer
+        for field, answer in char_fields_and_answers.items()
+    }
+    factory_attributes.update(char_fields_factory_attributes)
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        registration=CASE.registration
+    )
+
+    assert completed_fields(multiaxial_diagnosis) == len(
+        factory_attributes
+    ), f"Completed multiaxial_diagnosis, `completed_fields(multiaxial_diagnosis)` should return {len(factory_attributes)}. Instead returned {completed_fields(multiaxial_diagnosis)}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_multiaxial_diagnosis_random_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=multiaxial_diagnosis) returns correct counter when random fields have an answer.
+    """
+
+    factory_attributes = {}
+    EXPECTED_SCORE = 0
+    BASE_KEY_NAME = "registration__multiaxial_diagnosis__"
+
+    BASE_KEY_NAME = "registration__multiaxial_diagnosis__"
+
+    BOOL_FIELDS = [
+        "syndrome_present",
+        "epilepsy_cause_known",
+        "relevant_impairments_behavioural_educational",
+        "global_developmental_delay_or_learning_difficulties",
+        "autistic_spectrum_disorder",
+        "mental_health_screen",
+        "mental_health_issue_identified",
+    ]
+    for bool_field in BOOL_FIELDS:
+        KEY_NAME = BASE_KEY_NAME + bool_field
+        ANSWER = random.choice([None, True])
+        factory_attributes.update({KEY_NAME: ANSWER})
+        if ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+    # ArrayField
+    EPILEPSY_CAUSES_KEY_NAME = BASE_KEY_NAME + "epilepsy_cause_categories"
+    EPILEPSY_CAUSES_ANSWER = random.choice([None, ["Gen"]])
+    if EPILEPSY_CAUSES_ANSWER is not None:
+        EXPECTED_SCORE += 1
+    factory_attributes.update({EPILEPSY_CAUSES_KEY_NAME: EPILEPSY_CAUSES_ANSWER})
+
+    # CharFields
+    GLOBAL_DEV_DELAY_KEY_NAME = (
+        BASE_KEY_NAME + "global_developmental_delay_or_learning_difficulties_severity"
+    )
+    GLOBAL_DEV_DELAY_ANSWER = random.choice([None, SEVERITY[0][0]])
+    if GLOBAL_DEV_DELAY_ANSWER is not None:
+        EXPECTED_SCORE += 1
+    factory_attributes.update({GLOBAL_DEV_DELAY_KEY_NAME: GLOBAL_DEV_DELAY_ANSWER})
+
+    MENTAL_HEALTH_ISSUE_KEY_NAME = BASE_KEY_NAME + "mental_health_issue"
+    MENTAL_HEALTH_ISSUE_ANSWER = random.choice([None, NEUROPSYCHIATRIC[0][0]])
+    if MENTAL_HEALTH_ISSUE_ANSWER is not None:
+        EXPECTED_SCORE += 1
+    factory_attributes.update(
+        {MENTAL_HEALTH_ISSUE_KEY_NAME: MENTAL_HEALTH_ISSUE_ANSWER}
+    )
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        registration=CASE.registration
+    )
+
+    assert (
+        completed_fields(multiaxial_diagnosis) == EXPECTED_SCORE
+    ), f"Randomly completed multiaxial_diagnosis, `completed_fields(multiaxial_diagnosis)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(multiaxial_diagnosis)}. Answers: {factory_attributes}"
