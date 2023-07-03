@@ -99,15 +99,15 @@
     [x] Assert user can change 'epilepsy_cause_known' to True
     [x] Assert user can change 'epilepsy_cause_known' to False
     [x] Assert user can change 'epilepsy_cause' to Aicardi's Syndrome (pk=134)
-    [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[0][0]=='Gen' and EPILEPSY_CAUSES[1][0]=='Imm' and and EPILEPSY_CAUSES[5][0]=='Othe'
-    [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
+    [x] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[0][0]=='Gen' and EPILEPSY_CAUSES[1][0]=='Imm' and and EPILEPSY_CAUSES[5][0]=='Othe'
+    [x] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to True
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to False
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth'] ('Other')
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth' ('Other')
     [x] Assert user can change 'mental_health_screen' to True
     [x] Assert user can change 'mental_health_screen' to False
     [x] Assert user can change 'mental_health_issue_identified' to True
@@ -133,7 +133,7 @@
         'epilepsy_or_nonepilepsy_status',                                    single_choice_multiple_toggle_button
         'epileptic_seizure_onset_type',                                      single_choice_multiple_toggle_button
         'focal_onset_epilepsy_checked_changed',                              updated in view function
-        'epileptic_generalised_onset',                                       single_choice_multiple_toggle_button
+        'epileptic_generalised_onset',                                       select
         'nonepilepsy_generalised_onset',                                     multiple_choice_multiple_toggle_button
         'nonepileptic_seizure_type',                                         select
         'nonepileptic_seizure_subtype',                                      select
@@ -142,9 +142,9 @@
     [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[0][0]=='Apx' (Approximate)
     [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[1][0]=='Exc' (Exact)
     [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[2][0]=='NK' (Not Known)
-    [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[0][0]=='a' ('This was a single episode')
-    [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[1][0]=='b' ('This was a cluster within 24 hours')
-    [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[2][0]=='c' ('These were 2 or more episodes more than 24 hours apart')
+    [x] Assert user can change 'episode_definition' to EPISODE_DEFINITION[0][0]=='a' ('This was a single episode')
+    [x] Assert user can change 'episode_definition' to EPISODE_DEFINITION[1][0]=='b' ('This was a cluster within 24 hours')
+    [x] Assert user can change 'episode_definition' to EPISODE_DEFINITION[2][0]=='c' ('These were 2 or more episodes more than 24 hours apart')
     [x] Assert user can change 'has_description_of_the_episode_or_episodes_been_gathered' to True
     [x] Assert user can delete 'gelastic' in 'delete_description_keyword' from ['gelastic', 'left']
     [] Assert user can change 'edit_description' to "Jacob fell to the floor and shook the left side of his body."
@@ -170,17 +170,17 @@
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[10][0]=='TCl' ('Tonic-clonic')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[11][0]=='TAb' ('Typical absence')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[12][0]=='Oth' ('Other')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[0][0]=='BAr' ('Behaviour arrest')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[1][0]=='EpS' ('Epileptic spasms')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[2][0]=='TCl' ('Tonic-clonic')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[3][0]=='Oth' ('Other')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[0][0]=='BPP' ('Behavioral Psychological And Psychiatric Disorders')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[1][0]=='MAD' ('Migraine Associated Disorders')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[2][0]=='ME' ('Miscellaneous Events')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[3][0]=='SRC' ('Sleep Related Conditions')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[4][0]=='SAS' ('Syncope And Anoxic Seizures')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[5][0]=='PMD' ('Paroxysmal Movement Disorders')]], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[6][0]=='Oth' ('Other')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[0][0]=='BAr' ('Behaviour arrest')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[1][0]=='EpS' ('Epileptic spasms')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[2][0]=='TCl' ('Tonic-clonic')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[3][0]=='Oth' ('Other')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[0][0]=='BPP' ('Behavioral Psychological And Psychiatric Disorders')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[1][0]=='MAD' ('Migraine Associated Disorders')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[2][0]=='ME' ('Miscellaneous Events')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[3][0]=='SRC' ('Sleep Related Conditions')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[4][0]=='SAS' ('Syncope And Anoxic Seizures')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[5][0]=='PMD' ('Paroxysmal Movement Disorders')]], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[6][0]=='Oth' ('Other')
 
     
     [] Assert user cannot change 'seizure_onset_date' to before Case.date_of_birth (raise ValidationError)
@@ -194,7 +194,7 @@
         'comorbidity_diagnosis',                                            select
     ]
     [] Assert user can change 'comorbidity_diagnosis_date' ..
-    [] Assert user can change 'comorbidity_diagnosis' ..
+    [x] Assert user can change 'comorbidity_diagnosis' ..
 
 # Syndrome
     for field in fields: [
@@ -203,6 +203,8 @@
         remove_syndrome             (syndrome_id)                           button click
         close_syndrome              (syndrome_id)                           button click
         syndrome_present            (multiaxial_diagnosis_id)               button click
+        syndrome_diagnosis_date     (syndrome_id)                           date_field
+        syndrome_name               (syndrome_id)                           select
     ]
     [] Assert user can change  ..
     [] Assert user can change  ..
@@ -284,8 +286,8 @@
     [x] Assert user can change 'twelve_lead_ecg_status' to False
     [x] Assert user can change 'ct_head_scan_status' to True
     [x] Assert user can change 'ct_head_scan_status' to False
-    [] Assert user can change 'mri_indicated' to True
-    [] Assert user can change 'mri_indicated' to False
+    [x] Assert user can change 'mri_indicated' to True
+    [x] Assert user can change 'mri_indicated' to False
     [] Assert user can change 'mri_brain_requested_date' ..
     [] Assert user can change 'mri_brain_reported_date' ..
     [] Assert user can change 'mri_brain_declined' ..
@@ -399,6 +401,8 @@ from epilepsy12.models import (
     Comorbidity,
     MedicineEntity,
     AntiEpilepsyMedicine,
+    Syndrome,
+    SyndromeEntity,
 )
 
 from epilepsy12.constants import (
@@ -488,12 +492,6 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
     {
         "field_name": "epileptic_seizure_onset_type",
         "choices": EPILEPSY_SEIZURE_TYPE,
-        "param": "episode_id",
-        "model": "episode",
-    },
-    {
-        "field_name": "epileptic_generalised_onset",
-        "choices": GENERALISED_SEIZURE_TYPE,
         "param": "episode_id",
         "model": "episode",
     },
@@ -710,6 +708,12 @@ SELECTS = (
         "choices": None,
     },
     {
+        "field_name": "comorbidity_diagnosis",
+        "param": "comorbidity_id",
+        "model": "comorbidity",
+        "choices": None,
+    },
+    {
         "field_name": "episode_definition",
         "param": "episode_id",
         "model": "episode",
@@ -726,6 +730,18 @@ SELECTS = (
         "param": "episode_id",
         "model": "episode",
         "choices": NON_EPILEPSY_SEIZURE_TYPE,
+    },
+    {
+        "field_name": "epileptic_generalised_onset",
+        "choices": GENERALISED_SEIZURE_TYPE,
+        "param": "episode_id",
+        "model": "episode",
+    },
+    {
+        "field_name": "syndrome_name",
+        "choices": None,
+        "param": "syndrome_id",
+        "model": "syndrome",
     },
 )
 
@@ -891,7 +907,6 @@ def test_user_updates_toggles_false_success(client):
     client.force_login(test_user)
 
     for index, url in enumerate(TOGGLES):
-        print(url.get("field_name"))
         model = get_model_from_model(
             case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
         )
@@ -936,7 +951,6 @@ def test_user_updates_toggles_true_fail(client):
     client.force_login(test_user)
 
     for index, url in enumerate(TOGGLES):
-        print(url.get("field_name"))
         model = get_model_from_model(
             case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
         )
@@ -981,7 +995,6 @@ def test_user_updates_toggles_false_fail(client):
     client.force_login(test_user)
 
     for index, url in enumerate(TOGGLES):
-        print(url.get("field_name"))
         model = get_model_from_model(
             case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
         )
@@ -1002,7 +1015,8 @@ def test_user_updates_toggles_false_fail(client):
             assert_pass=False,
         )
 
-@pytest.mark.skip(reason='unfinished test')
+
+# selects
 @pytest.mark.django_db
 def test_user_updates_select_success(
     client,
@@ -1028,30 +1042,177 @@ def test_user_updates_select_success(
     client.force_login(test_user)
 
     for index, url in enumerate(SELECTS):
-        model = get_model_from_model(
-            case=CASE_FROM_TEST_USER_ORGANISATION,
-            model_name=url.get("model"),
-        )
-        if url.get("model") == "multiaxialdiagnosis":
-            data = {"epilepsy_cause": 134}
+        if url.get("choices") is not None:
+            for choice in url.get("choices"):
+                model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION,
+                    model_name=url.get("model"),
+                )
+                data = {url.get("field_name"): choice}
 
-        client.post(
-            reverse(
-                url.get("field_name"),
-                kwargs={url.get("param"): model.id},
-            ),
-            headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-            data=data,
-        )
-        updated_model = get_model_from_model(
-            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
-        )
-        validate_select(
-            field_name=url.get("field_name"),
-            model_instance=updated_model,
-            expected_result=EpilepsyCauseEntity.objects.get(pk=134),  # Aicardi's sy.
-            assert_pass=True,
-        )
+                client.post(
+                    reverse(
+                        url.get("field_name"),
+                        kwargs={url.get("param"): model.id},
+                    ),
+                    headers={
+                        "Hx-Trigger-Name": choice,
+                        "Hx-Request": "true",
+                    },
+                    data=data,
+                )
+                updated_model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+                )
+                validate_select(
+                    field_name=url.get("field_name"),
+                    model_instance=updated_model,
+                    expected_result=EpilepsyCauseEntity.objects.get(
+                        pk=134
+                    ),  # Aicardi's sy.
+                    assert_pass=True,
+                )
+        else:
+            model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION,
+                model_name=url.get("model"),
+            )
+
+            if url.get("field_name") == "epilepsy_cause":
+                data = {"epilepsy_cause": 134}
+                expected_result = EpilepsyCauseEntity.objects.get(
+                    pk=134
+                )  # Aicardi's sy
+                htmx_trigger = "epilepsy_cause"
+            elif url.get("field_name") == "comorbidity":
+                data = {"comorbidityentity": 134}
+                expected_result = ComorbidityEntity.objects.get(
+                    pk=34
+                )  # specific learning difficulty
+                htmx_trigger = "comorbidityentity"
+            elif url.get("field_name") == "syndrome_name":
+                data = {"syndrome": 35}
+                expected_result = SyndromeEntity.objects.get(
+                    pk=35
+                )  # Self-limited (familial) neonatal epilepsy
+                htmx_trigger = "syndrome"
+
+            client.post(
+                reverse(
+                    url.get("field_name"),
+                    kwargs={url.get("param"): model.id},
+                ),
+                headers={"Hx-Trigger-Name": htmx_trigger, "Hx-Request": "true"},
+                data=data,
+            )
+            updated_model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            validate_select(
+                field_name=url.get("field_name"),
+                model_instance=updated_model,
+                expected_result=expected_result,
+                assert_pass=True,
+            )
+
+
+@pytest.mark.django_db
+def test_user_updates_select_fail(
+    client,
+):
+    """
+    Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(SELECTS):
+        if url.get("choices") is not None:
+            for choice in url.get("choices"):
+                model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION,
+                    model_name=url.get("model"),
+                )
+                data = {url.get("field_name"): choice}
+
+                client.post(
+                    reverse(
+                        url.get("field_name"),
+                        kwargs={url.get("param"): model.id},
+                    ),
+                    headers={
+                        "Hx-Trigger-Name": choice,
+                        "Hx-Request": "true",
+                    },
+                    data=data,
+                )
+                updated_model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+                )
+                validate_select(
+                    field_name=url.get("field_name"),
+                    model_instance=updated_model,
+                    expected_result=EpilepsyCauseEntity.objects.get(
+                        pk=135
+                    ),  # Dysmorphic sialidosis with renal involvement
+                    assert_pass=False,
+                )
+        else:
+            model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION,
+                model_name=url.get("model"),
+            )
+
+            if url.get("field_name") == "epilepsy_cause":
+                data = {"epilepsy_cause": 134}  # Aicardi's sy.
+                expected_result = EpilepsyCauseEntity.objects.get(
+                    pk=135
+                )  # Dysmorphic sialidosis with renal involvement
+                htmx_trigger = "epilepsy_cause"
+            elif url.get("field_name") == "comorbidity_diagnosis":
+                data = {"comorbidityentity": 134}
+                expected_result = ComorbidityEntity.objects.get(
+                    pk=35
+                )  # Meets criteria for referral to Children's Epilepsy Surgery Service
+                htmx_trigger = "comorbidityentity"
+            elif url.get("field_name") == "syndrome_name":
+                data = {"syndrome": 35}
+                expected_result = SyndromeEntity.objects.get(
+                    pk=34
+                )  # Self-limited (familial) neonatal epilepsy
+                htmx_trigger = "syndrome"
+
+            client.post(
+                reverse(
+                    url.get("field_name"),
+                    kwargs={url.get("param"): model.id},
+                ),
+                headers={"Hx-Trigger-Name": htmx_trigger, "Hx-Request": "true"},
+                data=data,
+            )
+            updated_model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            validate_select(
+                field_name=url.get("field_name"),
+                model_instance=updated_model,
+                expected_result=expected_result,
+                assert_pass=False,
+            )
 
 
 # Test helper methods - there is one for each page_element
@@ -1178,9 +1339,23 @@ def get_model_from_model(case, model_name):
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis
         ).first()
     elif model_name == "comorbidity":
-        return Comorbidity.objects.filter(
-            multiaxial_diagnosis=case.registration.multiaxialdiagnosis
-        ).first()
+        comorbidity, created = Comorbidity.objects.get_or_create(
+            multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
+            comorbidityentity=ComorbidityEntity.objects.get(
+                pk=34
+            ),  # specific learning difficulty
+        )
+        return comorbidity
+    elif model_name == "syndrome":
+        syndrome, created = Syndrome.objects.get_or_create(
+            multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
+            syndrome=SyndromeEntity.objects.get(
+                pk=35
+            ),  # Self-limited (familial) neonatal epilepsy
+        )
+        return syndrome
+    elif model_name == "epilepsycauseentity":
+        return EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
     elif model_name == "antiepilepsymedicine":
         return AntiEpilepsyMedicine.objects.create(
             management=case.registration.management,
@@ -1192,7 +1367,7 @@ def get_model_from_model(case, model_name):
     elif model_name == "multiaxialdiagnosis":
         return MultiaxialDiagnosis.objects.get(
             pk=case.registration.multiaxialdiagnosis.pk
-        )  # EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
+        )  #
     else:
         refresh_case = Case.objects.get(pk=case.pk)
         return getattr(refresh_case.registration, model_name, None)
