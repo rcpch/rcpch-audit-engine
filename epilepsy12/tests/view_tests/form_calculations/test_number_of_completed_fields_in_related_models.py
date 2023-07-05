@@ -505,9 +505,10 @@ def test_related_model_fields_count_all_comorbidity_random_answers(
 
 
 @pytest.mark.django_db
-def test_related_model_fields_count_assessment(
-    e12_case_factory, GOSH
-):
+def test_related_model_fields_count_assessment(e12_case_factory, GOSH):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=assessment) returns correct counter when Site fields' answers are filled.
+    """
     CASE = e12_case_factory(
         first_name=f"temp_child_{GOSH.OrganisationName}",
         organisations__organisation=GOSH,
@@ -517,24 +518,28 @@ def test_related_model_fields_count_assessment(
     assert (
         return_value == 0
     ), f"Empty assessment with relevant Site vars False, `number_of_completed_fields_in_related_models(assessment)` should return 0. Instead returned {return_value}"
-    
+
     site = Site.objects.get(case=CASE)
     site.site_is_childrens_epilepsy_surgery_centre = True
     site.site_is_general_paediatric_centre = True
     site.site_is_paediatric_neurology_centre = True
     site.save()
-    
+
     return_value = number_of_completed_fields_in_related_models(assessment)
     expected_value = 3
-    
+
     assert (
         return_value == expected_value
     ), f"Site values all True for `number_of_completed_fields_in_related_models(assessment)`. Expected {expected_value=} but received {return_value=}"
+
 
 @pytest.mark.django_db
 def test_related_model_fields_count_management(
     e12_case_factory, e12_anti_epilepsy_medicine_factory, GOSH
 ):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=management) returns correct counter when AED fields' answers are filled.
+    """
     CASE = e12_case_factory(
         first_name=f"temp_child_{GOSH.OrganisationName}",
         organisations__organisation=GOSH,
@@ -545,17 +550,17 @@ def test_related_model_fields_count_management(
     assert (
         return_value == 0
     ), f"Empty management, `number_of_completed_fields_in_related_models(management)` should return 0. Instead returned {return_value}"
-    
-    management.has_an_aed_been_given = True 
+
+    management.has_an_aed_been_given = True
     management.has_rescue_medication_been_prescribed = True
     management.save()
-    
+
     aed_answers = {
-        "medicine_entity":MedicineEntity.objects.get(medicine_name='Sodium valproate'),
-        "antiepilepsy_medicine_start_date":date(2023,1,1),
-        "antiepilepsy_medicine_risk_discussed":True,
-        "is_a_pregnancy_prevention_programme_in_place":True,
-        "has_a_valproate_annual_risk_acknowledgement_form_been_completed":True,
+        "medicine_entity": MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+        "antiepilepsy_medicine_start_date": date(2023, 1, 1),
+        "antiepilepsy_medicine_risk_discussed": True,
+        "is_a_pregnancy_prevention_programme_in_place": True,
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed": True,
     }
     aed = e12_anti_epilepsy_medicine_factory(
         management=management,
@@ -563,10 +568,9 @@ def test_related_model_fields_count_management(
         **aed_answers,
     )
     rescue_medicine_answers = {
-
-        "medicine_entity":MedicineEntity.objects.get(medicine_name='Levetiracetam'),
-        "antiepilepsy_medicine_start_date":date(2023,1,1),
-        "antiepilepsy_medicine_risk_discussed":True,
+        "medicine_entity": MedicineEntity.objects.get(medicine_name="Levetiracetam"),
+        "antiepilepsy_medicine_start_date": date(2023, 1, 1),
+        "antiepilepsy_medicine_risk_discussed": True,
     }
     rescue_medicine = e12_anti_epilepsy_medicine_factory(
         management=management,
@@ -575,8 +579,31 @@ def test_related_model_fields_count_management(
     )
     return_value = number_of_completed_fields_in_related_models(management)
 
-    expected_value = len(rescue_medicine_answers)+len(aed_answers)
+    expected_value = len(rescue_medicine_answers) + len(aed_answers)
+
+    assert (
+        return_value == expected_value
+    ), f"AED values all filled and valid for `number_of_completed_fields_in_related_models(management)`. Expected {expected_value=} but received {return_value=}"
+
+
+@pytest.mark.django_db
+def test_related_model_fields_count_registration(e12_case_factory, GOSH):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=registration) returns correct counter when Site fields' answers are filled.
+    
+    NOTE: expected_value == 1 as default factory has: 
+        - site_is_primary_centre_of_epilepsy_care=True
+        - site_is_actively_involved_in_epilepsy_care=True
+    """
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+
+    return_value = number_of_completed_fields_in_related_models(CASE.registration)
+
+    expected_value = 1
     
     assert (
         return_value == expected_value
-    ), f"Site values all True for `number_of_completed_fields_in_related_models(management)`. Expected {expected_value=} but received {return_value=}"
+    ), f"Site values all True for `number_of_completed_fields_in_related_models(registration)`. Expected {expected_value=} but received {return_value=}"
