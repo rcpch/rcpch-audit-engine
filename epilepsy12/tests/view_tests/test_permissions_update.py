@@ -274,7 +274,6 @@ def test_users_update_users_forbidden(
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
-        email="temp_user@temp.com",
         role=test_user_audit_centre_administrator_data.role,
         # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
@@ -360,7 +359,6 @@ def test_users_update_users_success(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
         first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
         role=test_user_audit_centre_administrator_data.role,
-        email="temp_user@temp.com",
         # Assign flags based on user role
         is_active=test_user_audit_centre_administrator_data.is_active,
         is_staff=test_user_audit_centre_administrator_data.is_staff,
@@ -701,7 +699,7 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
         )
 
         assert (
-            response.status_code == 403
+            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update epilepsy context {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
@@ -778,5 +776,5 @@ def test_users_update_epilepsy_context_success(client, URL):
             )
 
         assert (
-            response.status_code == 200
+            response.status_code == response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
