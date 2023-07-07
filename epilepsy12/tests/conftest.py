@@ -3,16 +3,17 @@ Configures pytest fixtures for epilepsy12 app tests.
 """
 
 # standard imports
-from datetime import date
 
 # third-party imports
-import pytest
 from pytest_factoryboy import register
+
 
 # rcpch imports
 from epilepsy12.tests.factories import (
     seed_groups_fixture,
     cases_seeder,
+    seed_users_fixture,
+    seed_cases_fixture,
     E12AntiEpilepsyMedicineFactory,
     E12AssessmentFactory,
     E12CaseFactory,
@@ -45,3 +46,5 @@ register(E12RegistrationFactory)  # => e12_registration_factory
 register(E12SiteFactory)  # => e12_site_factory
 register(E12SyndromeFactory) # => e12_syndrome_factory
 register(E12UserFactory)  # => e12_user_factory
+
+
