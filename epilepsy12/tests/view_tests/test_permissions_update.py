@@ -2,13 +2,16 @@
 ## Update Tests
 
 # Epilepsy12Users
-    [ ] Assert an Audit Centre Administrator CANNOT update users
-    [ ] Assert an audit centre clinician CANNOT update users
-    [ ] Assert an Audit Centre Lead Clinician CANNOT update users outside own Trust
+    [x] Assert an Audit Centre Administrator CANNOT update users inside own Trust
+    [x] Assert an Audit Centre Administrator CANNOT update users from outside own Trust 
+    [x] Assert an audit centre clinician CANNOT update users inside own Trust
+    [x] Assert an audit centre clinician CANNOT update users from outside own Trust 
+    [x] Assert an Audit Centre Lead Clinician CANNOT update users outside own Trust
 
-    [ ] Assert an Audit Centre Lead Clinician can update users inside own Trust
-    [ ] Assert RCPCH Audit Team can update users nationally, within any organisations 
-    [ ] Assert Clinical Audit Team can update users nationally, within any organisations 
+    [x] Assert an Audit Centre Lead Clinician can update users inside own Trust
+    [x] Assert RCPCH Audit Team can update users in any trust
+    [x] Assert Clinical Audit Team can update users in own trust
+    [x] Assert Clinical Audit Team can update users in different trusts
 
 # Cases
 [ ] Assert an Audit Centre Administrator CANNOT update patient records
@@ -218,13 +221,13 @@ import pytest
 
 # django imports
 from django.urls import reverse
+from django.contrib.auth.models import Group
 
 # E12 imports
-from epilepsy12.models import (
-    Epilepsy12User,
-    Organisation,
-    Case
-)
+from epilepsy12.models import Epilepsy12User, Organisation
+from epilepsy12.tests.UserDataClasses import test_user_audit_centre_administrator_data
+from epilepsy12.tests.factories.E12UserFactory import E12UserFactory
+
 
 @pytest.mark.django_db
 def test_users_update_users_forbidden(
@@ -238,7 +241,7 @@ def test_users_update_users_forbidden(
 
     Assert these users cannot change Epilepsy12Users
     """
-    
+
     # set up constants
 
     # GOSH
@@ -252,17 +255,141 @@ def test_users_update_users_forbidden(
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    
-    CASE_FROM_SAME_ORG=Case.objects.get(first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}") 
-    
-    users = Epilepsy12User.objects.all().exclude(first_name__in=['RCPCH_AUDIT_TEAM','CLINICAL_AUDIT_TEAM'])
+
+    USER_FROM_DIFFERENT_ORG = E12UserFactory(
+        first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
+        role=test_user_audit_centre_administrator_data.role,
+        # Assign flags based on user role
+        is_active=test_user_audit_centre_administrator_data.is_active,
+        is_staff=test_user_audit_centre_administrator_data.is_staff,
+        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
+        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[
+            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
+        ],
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "RCPCH_AUDIT_TEAM",
+            "CLINICAL_AUDIT_TEAM",
+            f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
 
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        response = client.get(reverse(
-            'opt_out', kwargs={'organisation_id': DIFF_TRUST_DIFF_ORGANISATION.id, 'case_id': CASE_FROM_SAME_ORG.id}
-        ))
+        response = client.get(
+            reverse(
+                "edit_epilepsy12_user",
+                kwargs={
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                    "epilepsy12_user_id": USER_FROM_DIFFERENT_ORG.id,
+                },
+            )
+        )
 
-        assert response.status_code == 403, f"{test_user.first_name} (from {test_user.organisation_employer}) requested opt out for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        assert (
+            response.status_code == 403
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {USER_FROM_DIFFERENT_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+        if test_user.first_name in [
+            "AUDIT_CENTRE_ADMINISTRATOR",
+            "AUDIT_CENTRE_CLINICIAN",
+        ]:
+            response = client.get(
+                reverse(
+                    "edit_epilepsy12_user",
+                    kwargs={
+                        "organisation_id": TEST_USER_ORGANISATION.id,
+                        "epilepsy12_user_id": test_user.id,
+                    },
+                )
+            )
+
+            assert (
+                response.status_code == 403
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.django_db
+def test_users_update_users_success(
+    client,
+):
+    """
+    Simulating different E12 Users attempting to update users in Epilepsy12
+
+    Assert these users are allowed to change Epilepsy12Users
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    USER_FROM_DIFFERENT_ORG = E12UserFactory(
+        first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
+        role=test_user_audit_centre_administrator_data.role,
+        # Assign flags based on user role
+        is_active=test_user_audit_centre_administrator_data.is_active,
+        is_staff=test_user_audit_centre_administrator_data.is_staff,
+        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
+        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
+        organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+        groups=[
+            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
+        ],
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "AUDIT_CENTRE_ADMINISTRATOR",
+            "AUDIT_CENTRE_CLINICIAN",
+            USER_FROM_DIFFERENT_ORG.first_name,
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        response = client.get(
+            reverse(
+                "edit_epilepsy12_user",
+                kwargs={
+                    "organisation_id": TEST_USER_ORGANISATION.id,
+                    "epilepsy12_user_id": test_user.id,
+                },
+            )
+        )
+
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+        if test_user.first_name in ["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]:
+            response = client.get(
+                reverse(
+                    "edit_epilepsy12_user",
+                    kwargs={
+                        "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                        "epilepsy12_user_id": USER_FROM_DIFFERENT_ORG.id,
+                    },
+                )
+            )
+
+            assert (
+                response.status_code == 200
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {USER_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
