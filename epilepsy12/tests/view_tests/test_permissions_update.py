@@ -22,23 +22,26 @@
     [x] Assert an audit centre clinician can update patient records within own organisation
     [x] Assert an Audit Centre Lead Clinician can update patient records within own Trust
     [x] Assert RCPCH Audit Team can update patient records within an organisation
+    [x] Assert Clinical Audit Team can update patient records within an organisation
 
 # First Paediatric Assessment
-for field in fields: [
-    'first_paediatric_assessment_in_acute_or_nonacute_setting',
-    'has_number_of_episodes_since_the_first_been_documented',
-    'general_examination_performed',
-    'neurological_examination_performed',
-    'developmental_learning_or_schooling_problems',
-    'behavioural_or_emotional_problems'
-]
-[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
-[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
+    for field in fields: [
+        'first_paediatric_assessment_in_acute_or_nonacute_setting',
+        'has_number_of_episodes_since_the_first_been_documented',
+        'general_examination_performed',
+        'neurological_examination_performed',
+        'developmental_learning_or_schooling_problems',
+        'behavioural_or_emotional_problems'
+    ]
+    [] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == 403
+    [] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == 403
+    [] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+    [] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == 403
+    
+    [] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == 200
+    [] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == 200
+    [] Assert RCPCH Audit Team can change 'field' - response.status_code == 200
+    [] Assert Clinical Audit Team can change 'field' - response.status_code == 200
 
 # Epilepsy Context
 for field in fields: [
@@ -222,6 +225,7 @@ for field in fields: [
 """
 # python imports
 import pytest
+import json
 
 # django imports
 from django.urls import reverse
@@ -232,7 +236,7 @@ from epilepsy12.models import Epilepsy12User, Organisation, Case
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
 )
-from epilepsy12.tests.factories import E12UserFactory, E12CaseFactory
+from epilepsy12.tests.factories import E12UserFactory
 
 
 @pytest.mark.django_db
@@ -499,3 +503,130 @@ def test_users_update_cases_success(
         assert (
             response.status_code == 200
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("first_paediatric_assessment_in_acute_or_nonacute_setting"),
+        ("has_number_of_episodes_since_the_first_been_documented"),
+        ("general_examination_performed"),
+        ("neurological_examination_performed"),
+        ("developmental_learning_or_schooling_problems"),
+        ("behavioural_or_emotional_problems"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_first_paediatric_assessment_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update first paediatric assessment in Epilepsy12
+
+    Assert these users cannot change first paediatric assessment
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "RCPCH_AUDIT_TEAM",
+            "CLINICAL_AUDIT_TEAM",
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        response = client.get(
+            reverse(
+                URL,
+                kwargs={
+                    "first_paediatric_assessment_id": CASE_FROM_DIFFERENT_ORG.registration.firstpaediatricassessment.id,
+                },
+            )
+        )
+
+        assert (
+            response.status_code == 403
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("first_paediatric_assessment_in_acute_or_nonacute_setting"),
+        ("has_number_of_episodes_since_the_first_been_documented"),
+        ("general_examination_performed"),
+        ("neurological_examination_performed"),
+        ("developmental_learning_or_schooling_problems"),
+        ("behavioural_or_emotional_problems"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_first_paediatric_assessment_success(client, URL):
+    """
+    Simulating different E12 Users attempting to update first paediatric assessment in Epilepsy12
+
+    Assert these users can change first paediatric assessment
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL == "first_paediatric_assessment_in_acute_or_nonacute_setting":
+            # this is single_choice_multiple_toggle_button - select option 1
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "first_paediatric_assessment_id": CASE_FROM_SAME_ORG.registration.firstpaediatricassessment.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+            )
+        else:
+            # all other options are toggle buttons: select True
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "first_paediatric_assessment_id": CASE_FROM_SAME_ORG.registration.firstpaediatricassessment.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+            )
+
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update first paediatric assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"

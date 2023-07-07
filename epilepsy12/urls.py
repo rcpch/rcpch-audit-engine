@@ -678,32 +678,32 @@ htmx_paths = [
     ),
     # initial assessment endpoints
     path(
-        "registration/<int:first_paediatric_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting",
         views.first_paediatric_assessment_in_acute_or_nonacute_setting,
         name="first_paediatric_assessment_in_acute_or_nonacute_setting",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/has_number_of_episodes_since_the_first_been_documented",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/has_number_of_episodes_since_the_first_been_documented",
         views.has_number_of_episodes_since_the_first_been_documented,
         name="has_number_of_episodes_since_the_first_been_documented",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/general_examination_performed",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/general_examination_performed",
         views.general_examination_performed,
         name="general_examination_performed",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/neurological_examination_performed",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/neurological_examination_performed",
         views.neurological_examination_performed,
         name="neurological_examination_performed",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/developmental_learning_or_schooling_problems",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/developmental_learning_or_schooling_problems",
         views.developmental_learning_or_schooling_problems,
         name="developmental_learning_or_schooling_problems",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/behavioural_or_emotional_problems",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/behavioural_or_emotional_problems",
         views.behavioural_or_emotional_problems,
         name="behavioural_or_emotional_problems",
     ),
