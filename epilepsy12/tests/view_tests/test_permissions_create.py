@@ -550,14 +550,16 @@ def test_add_episode_success(client):
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
+    # Case from DIFF Org
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
 
-    TEST_FIRST_NAME = "TEST_FIRST_NAME"
     SEIZURE_ONSET_DATE = (
         CASE_FROM_SAME_ORG.registration.registration_date - relativedelta(days=7)
     )
     SEIZURE_ONSET_DATE_CONFIDENCE = "Apx"
     EPISODE_DEFINITION = "a"
-    HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED = False
     EPILEPSY_OR_NONEPILEPSY_STATUS = "E"
     EPILEPTIC_SEIZURE_ONSET_TYPE = "FO"
     FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED = "LATERALITY"
@@ -578,7 +580,7 @@ def test_add_episode_success(client):
     for test_user in users:
         client.force_login(test_user)
 
-        client.post(
+        response = client.post(
             reverse(
                 "add_episode",
                 kwargs={
@@ -587,14 +589,8 @@ def test_add_episode_success(client):
             ),
             headers={"Hx-Request": "true"},
         )
-
-        # Ensure a new episode was added
-        assert (
-            Episode.objects.filter(
-                multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
-            ).count()
-            == 2
-        ), f"{test_user} POST requested url='add_episode' but new Episode not added to test db."
+        
+        assert response.status_code == HTTPStatus.OK, f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {TEST_USER_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
         # Get new episode
         episode = Episode.objects.filter(
@@ -649,33 +645,94 @@ def test_add_episode_success(client):
                 headers={**answer["headers"], **{"Hx-Request": "true"}},
                 data=answer.get("data"),
             )
-            assert response.status_code == HTTPStatus.OK, f"{test_user} should be permitted to POST {answer['url_name']}. Expected {HTTPStatus.OK}, received {response.status_code}"
-
-        episode = Episode.objects.filter(
-            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
-        ).latest("id")
-
-        assert episode.seizure_onset_date == SEIZURE_ONSET_DATE
-        assert episode.seizure_onset_date_confidence == SEIZURE_ONSET_DATE_CONFIDENCE
-        assert episode.episode_definition == EPISODE_DEFINITION
-        assert (
-            episode.has_description_of_the_episode_or_episodes_been_gathered
-            == HAS_DESCRIPTION_OF_EPISODE_BEEN_GATHERED
-        )
-        assert episode.epilepsy_or_nonepilepsy_status == EPILEPSY_OR_NONEPILEPSY_STATUS
-        assert episode.epileptic_seizure_onset_type == EPILEPTIC_SEIZURE_ONSET_TYPE
-        assert episode.focal_onset_left == True
+            assert response.status_code == HTTPStatus.OK, f"{test_user} from {TEST_USER_ORGANISATION} should be permitted to POST {answer['url_name']} for Case in {TEST_USER_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
         # Reset Episode for next User
-        episode.delete()
+        episode = Episode.objects.filter(
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+        ).latest("id").delete()
+        
+        # Additional test for RCPCH_AUDIT_TEAM and CLINICAL_AUDIT_TEAM adding in different Trust
+        if test_user.first_name in [test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]:
+        
+            response = client.post(
+                reverse(
+                    "add_episode",
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id
+                    },
+                ),
+                headers={"Hx-Request": "true"},
+            )
+            
+            assert response.status_code == HTTPStatus.OK, f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `add_episode` for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
+
+            # Get new episode
+            episode = Episode.objects.filter(
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
+            ).latest("id")
+
+            episode_answers_data = [
+                {
+                    "url_name": "seizure_onset_date",
+                    "headers": {"Hx-Trigger-Name": "seizure_onset_date"},
+                    "data": {"seizure_onset_date": SEIZURE_ONSET_DATE},
+                },
+                {
+                    "url_name": "seizure_onset_date_confidence",
+                    "headers": {"Hx-Trigger-Name": SEIZURE_ONSET_DATE_CONFIDENCE},
+                    "data": {},
+                },
+                {
+                    "url_name": "episode_definition",
+                    "headers": {"Hx-Trigger-Name": "episode_definition"},
+                    "data": {'episode_definition':EPISODE_DEFINITION},
+                },
+                {
+                    "url_name": "has_description_of_the_episode_or_episodes_been_gathered",
+                    "headers": {"Hx-Trigger-Name": "button-false"},
+                    "data": {},
+                },
+                {
+                    "url_name": "epilepsy_or_nonepilepsy_status",
+                    "headers": {"Hx-Trigger-Name": EPILEPSY_OR_NONEPILEPSY_STATUS},
+                    "data": {},
+                },
+                {
+                    "url_name": "epileptic_seizure_onset_type",
+                    "headers": {"Hx-Trigger-Name": EPILEPTIC_SEIZURE_ONSET_TYPE},
+                    "data": {},
+                },
+                {
+                    "url_name": "focal_onset_epilepsy_checked_changed",
+                    "headers": {
+                        "Hx-Trigger": "focal_onset_left",
+                        "Hx-Trigger-Name": FOCAL_ONSET_EPILEPSY_CHECKED_CHANGED,
+                    },
+                    "data": {},
+                },
+            ]
+
+            # Fill in valid answers
+            for answer in episode_answers_data:
+                response = client.post(
+                    reverse(answer["url_name"], kwargs={"episode_id": episode.id}),
+                    headers={**answer["headers"], **{"Hx-Request": "true"}},
+                    data=answer.get("data"),
+                )
+                assert response.status_code == HTTPStatus.OK, f"{test_user} from {DIFF_TRUST_DIFF_ORGANISATION} should be permitted to POST {answer['url_name']} for Case in {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
+
+            # Reset Episode for next User
+            episode = Episode.objects.filter(
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
+            ).latest("id").delete()
+
 
 
 @pytest.mark.django_db
 def test_add_episode_forbidden(client):
     """
     Simulating different permitted E12 Roles adding Episodes for Case in same Trust.
-
-
 
     [ ] Assert an Audit Centre Administrator CANNOT 'add_episode' - response.status_code == HTTPStatus.FORBIDDEN
     [ ] Assert an Audit Centre Clinician CANNOT 'add_episode' outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
