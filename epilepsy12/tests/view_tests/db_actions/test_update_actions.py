@@ -99,15 +99,15 @@
     [x] Assert user can change 'epilepsy_cause_known' to True
     [x] Assert user can change 'epilepsy_cause_known' to False
     [x] Assert user can change 'epilepsy_cause' to Aicardi's Syndrome (pk=134)
-    [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[0][0]=='Gen' and EPILEPSY_CAUSES[1][0]=='Imm' and and EPILEPSY_CAUSES[5][0]=='Othe'
-    [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
+    [x] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[0][0]=='Gen' and EPILEPSY_CAUSES[1][0]=='Imm' and and EPILEPSY_CAUSES[5][0]=='Othe'
+    [x] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to True
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to False
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
     [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth'] ('Other')
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth' ('Other')
     [x] Assert user can change 'mental_health_screen' to True
     [x] Assert user can change 'mental_health_screen' to False
     [x] Assert user can change 'mental_health_issue_identified' to True
@@ -142,9 +142,9 @@
     [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[0][0]=='Apx' (Approximate)
     [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[1][0]=='Exc' (Exact)
     [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[2][0]=='NK' (Not Known)
-    [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[0][0]=='a' ('This was a single episode')
-    [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[1][0]=='b' ('This was a cluster within 24 hours')
-    [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[2][0]=='c' ('These were 2 or more episodes more than 24 hours apart')
+    [x] Assert user can change 'episode_definition' to EPISODE_DEFINITION[0][0]=='a' ('This was a single episode')
+    [x] Assert user can change 'episode_definition' to EPISODE_DEFINITION[1][0]=='b' ('This was a cluster within 24 hours')
+    [x] Assert user can change 'episode_definition' to EPISODE_DEFINITION[2][0]=='c' ('These were 2 or more episodes more than 24 hours apart')
     [x] Assert user can change 'has_description_of_the_episode_or_episodes_been_gathered' to True
     [x] Assert user can delete 'gelastic' in 'delete_description_keyword' from ['gelastic', 'left']
     [] Assert user can change 'edit_description' to "Jacob fell to the floor and shook the left side of his body."
@@ -170,17 +170,17 @@
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[10][0]=='TCl' ('Tonic-clonic')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[11][0]=='TAb' ('Typical absence')
     [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[12][0]=='Oth' ('Other')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[0][0]=='BAr' ('Behaviour arrest')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[1][0]=='EpS' ('Epileptic spasms')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[2][0]=='TCl' ('Tonic-clonic')
-    [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[3][0]=='Oth' ('Other')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[0][0]=='BPP' ('Behavioral Psychological And Psychiatric Disorders')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[1][0]=='MAD' ('Migraine Associated Disorders')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[2][0]=='ME' ('Miscellaneous Events')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[3][0]=='SRC' ('Sleep Related Conditions')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[4][0]=='SAS' ('Syncope And Anoxic Seizures')
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[5][0]=='PMD' ('Paroxysmal Movement Disorders')]], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[6][0]=='Oth' ('Other')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[0][0]=='BAr' ('Behaviour arrest')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[1][0]=='EpS' ('Epileptic spasms')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[2][0]=='TCl' ('Tonic-clonic')
+    [x] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[3][0]=='Oth' ('Other')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[0][0]=='BPP' ('Behavioral Psychological And Psychiatric Disorders')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[1][0]=='MAD' ('Migraine Associated Disorders')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[2][0]=='ME' ('Miscellaneous Events')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[3][0]=='SRC' ('Sleep Related Conditions')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[4][0]=='SAS' ('Syncope And Anoxic Seizures')
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[5][0]=='PMD' ('Paroxysmal Movement Disorders')]], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'nonepileptic_seizure_subtype' to NON_EPILEPSY_SEIZURE_TYPE[6][0]=='Oth' ('Other')
 
     
     [] Assert user cannot change 'seizure_onset_date' to before Case.date_of_birth (raise ValidationError)
@@ -194,7 +194,7 @@
         'comorbidity_diagnosis',                                            select
     ]
     [] Assert user can change 'comorbidity_diagnosis_date' ..
-    [] Assert user can change 'comorbidity_diagnosis' ..
+    [x] Assert user can change 'comorbidity_diagnosis' ..
 
 # Syndrome
     for field in fields: [
@@ -284,8 +284,8 @@
     [x] Assert user can change 'twelve_lead_ecg_status' to False
     [x] Assert user can change 'ct_head_scan_status' to True
     [x] Assert user can change 'ct_head_scan_status' to False
-    [] Assert user can change 'mri_indicated' to True
-    [] Assert user can change 'mri_indicated' to False
+    [x] Assert user can change 'mri_indicated' to True
+    [x] Assert user can change 'mri_indicated' to False
     [] Assert user can change 'mri_brain_requested_date' ..
     [] Assert user can change 'mri_brain_reported_date' ..
     [] Assert user can change 'mri_brain_declined' ..
