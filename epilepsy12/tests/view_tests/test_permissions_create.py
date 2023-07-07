@@ -16,13 +16,12 @@
     [x] Assert an Audit Centre Lead Clinician can create patients inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert RCPCH Audit Team can create patients  inside own Trust - response.status_code == HTTPStatus.OK
     [x] Assert Clinical Audit Team can create patients  inside own Trust  - response.status_code == HTTPStatus.OK
-    
-    [ ] Assert RCPCH Audit Team can create patients  outside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can create patients  outside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can create patients  outside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can create patients  outside own Trust - response.status_code == HTTPStatus.OK
 
-    [ ] Assert an Audit Centre Administrator CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an audit centre clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Lead Clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT create patients outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
     [ ] Assert an Audit Centre Clinician can create patient records inside own Trust - response.status_code == HTTPStatus.OK
@@ -339,7 +338,7 @@ def test_user_creation_forbidden(
 
 
 @pytest.mark.django_db
-def test_patient_create_same_org_success(
+def test_patient_create_success(
     client,
 ):
     """Integration test checking functionality of view and form.
@@ -368,7 +367,7 @@ def test_patient_create_same_org_success(
     if not users:
         assert False, f"No seeded users in test db. Has the test db been seeded?"
 
-    for ix, test_user in enumerate(users):
+    for test_user in users:
         client.force_login(test_user)
 
         url = reverse(
@@ -449,3 +448,72 @@ def test_patient_create_same_org_success(
 
             # Remove Case for next user
             Case.objects.filter(first_name=TEST_FIRST_NAME).delete()
+
+@pytest.mark.django_db
+def test_patient_creation_forbidden(
+    client,
+):
+    """Integration test checking functionality of view and form.
+
+    Simulating unpermitted E12 Users attempting to create patients.
+
+    Additionally, AUDIT_CENTRE_LEAD_CLINICIAN role only NOT ALLOWED to create patient in different trust.
+    """
+
+    # set up constants
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    TEST_FIRST_NAME = "TEST_FIRST_NAME"
+
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            "AUDIT_CENTRE_ADMINISTRATOR",
+            "AUDIT_CENTRE_CLINICIAN",
+            "AUDIT_CENTRE_LEAD_CLINICIAN",
+        ]
+    )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        url = reverse(
+            "create_case",
+            kwargs={
+                "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+            },
+        )
+
+        response = client.get(url)
+
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} status code, received {response.status_code}"
+
+        data = {
+            "first_name": TEST_FIRST_NAME,
+            "surname": "Chandran",
+            "date_of_birth": date(2023, 6, 15),
+            "sex": "1",
+            "nhs_number": "400 0000 012",
+            "postcode": "SW1A 1AA",
+            "ethnicity": "N",
+        }
+
+        response = client.post(url, data=data)
+
+        # This is valid form data but should be forbidden
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"Valid Case form data POSTed by unpermitted {test_user}, expected status_code {HTTPStatus.FORBIDDEN}, received {response.status_code}"
+
+        assert not Case.objects.filter(
+            first_name=TEST_FIRST_NAME
+        ).exists(), f"Logged in as {test_user} and attempted to Case at {url}. Unpermitted so Case should not be created."
