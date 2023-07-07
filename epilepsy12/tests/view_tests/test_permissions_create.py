@@ -609,9 +609,6 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
                 ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to {url} for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.OK}, received {response.status_code}"
 
 
-@pytest.mark.xfail(
-    reason="When an administrator tries the `add_episode` endpoint, a PermissionDenied is correctly raised and they hit the `rcpch_403` view, specifically the htmx part. At this point, the HttpResponseClientRedirect object from django-htmx does not return a 403, instead a 200. This is an edge case, and in the UI, the add episode button is disabled."
-)
 @pytest.mark.django_db
 def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
     """
@@ -677,7 +674,7 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
             # Other users only forbidden from doing action in different Trust
             else:
                 CASE = CASE_FROM_DIFF_ORG
-                
+
             if url == "add_antiepilepsy_medicine":
                 kwargs = {
                     "management_id": CASE.registration.management.id,
@@ -689,12 +686,12 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
                 }
 
             response = client.post(
-                    reverse(
-                        url,
-                        kwargs=kwargs,
-                    ),
-                    headers={"Hx-Request": "true"},
-                )
+                reverse(
+                    url,
+                    kwargs=kwargs,
+                ),
+                headers={"Hx-Request": "true"},
+            )
 
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
