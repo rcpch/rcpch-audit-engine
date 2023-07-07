@@ -117,7 +117,7 @@ from epilepsy12.forms import (
 
 
 @pytest.mark.django_db
-def test_user_creation_same_org_permissions_success(
+def test_user_creation_same_org_success(
     client,
     seed_groups_fixture,
     seed_users_fixture,
@@ -185,12 +185,12 @@ def test_user_creation_same_org_permissions_success(
         response = client.post(url, data=data)
         
         # This is valid form data, should redirect
-        assert response.status_code == 302, f"Valid E12User form data POSTed, expected status_code 302, received {response.status_code}"
+        assert response.status_code == HTTPStatus.FOUND, f"Valid E12User form data POSTed by {test_user}, expected status_code 302, received {response.status_code}"
         
     assert Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count() == 3, f"Logged in as 3 different people and created an e12 user with first_name = {TEMP_CREATED_USER_FIRST_NAME}. Should be 3 matches in db for this filter."
 
 @pytest.mark.django_db
-def test_user_creation_same_org_permissions_success(
+def test_user_creation_diff_org_success(
     client,
 ):
     """ Integration test checking functionality of view and form.
@@ -214,4 +214,32 @@ def test_user_creation_same_org_permissions_success(
         assert False, f"No seeded users in test db. Test cannot run."
 
     for test_user in users:
-        print(test_user)
+        
+        client.force_login(test_user)
+        
+        url = reverse(
+            "create_epilepsy12_user",
+            kwargs={
+                "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                "user_type": "organisation-staff",
+            },
+        )
+        
+        data={
+            'title':1,
+            "email": f"{test_user.first_name}@test.com",
+            "role": 1,
+            "organisation_employer": DIFF_TRUST_DIFF_ORGANISATION.id,
+            "first_name": TEMP_CREATED_USER_FIRST_NAME,
+            "surname": "User",
+            "is_rcpch_audit_team_member": True,
+            "is_rcpch_staff": False,
+            "email_confirmed": True,
+        }
+        
+        response = client.post(url, data=data)
+        
+        # This is valid form data, should redirect
+        assert response.status_code == HTTPStatus.FOUND, f"Valid E12User form data POSTed by {test_user}, expected status_code 302, received {response.status_code}"
+        
+    assert Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count() == 2, f"Logged in as 2 different people and created an e12 user with first_name = {TEMP_CREATED_USER_FIRST_NAME}. Should be 2 matches in db for this filter."
