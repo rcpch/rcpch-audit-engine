@@ -46,6 +46,7 @@ E12UserFactory(
 [] Assert an Audit Centre Administrator can only view patient records from own organisation
 [] Assert an Audit Centre Lead Clinician can only view patient records from own Trust
 [] Assert an RCPCH Audit Lead can view all patient records
+
 """
 
 # python imports
