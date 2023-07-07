@@ -527,7 +527,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                         )
 
                         assert (
-                            response.status_code == 201
+                            response.status_code == 200
                         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of case from {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
@@ -567,7 +567,6 @@ def test_episode_view_permissions_forbidden(client, URL):
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
-
 @pytest.mark.parametrize("URL", [("edit_syndrome"), ("close_syndrome")])
 @pytest.mark.django_db
 def test_syndrome_view_permissions_forbidden(client, URL):
@@ -603,6 +602,45 @@ def test_syndrome_view_permissions_forbidden(client, URL):
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested syndrome page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+@pytest.mark.parametrize(
+    "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
+)
+@pytest.mark.django_db
+def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
+    """
+    Assert these users CANT view antiepilepsy_medicine for Case from different Trust.
+    """
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+    antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
+        management=CASE_FROM_DIFF_ORG.registration.management,
+        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+    )
+
+    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        # Get response object
+        response = client.get(
+            reverse(
+                URL,
+                kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine_DIFF_ORG.id},
+            )
+        )
+
+        assert (
+            response.status_code == 403
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page ({URL}) of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize(
@@ -796,8 +834,6 @@ def test_multiple_views_permissions_success(client):
                 )
             )
 
-            print(url_name, response.status_code)
-
             assert (
                 response.status_code == 200
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of user from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
@@ -873,41 +909,3 @@ def test_multiple_views_permissions_forbidden(client):
                 response.status_code == 403
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
-@pytest.mark.parametrize(
-    "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
-)
-@pytest.mark.django_db
-def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
-    """
-    Assert these users CANT view antiepilepsy_medicine for Case from different Trust.
-    """
-
-    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
-    )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    )
-    antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
-        management=CASE_FROM_DIFF_ORG.registration.management,
-        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
-    )
-
-    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
-
-    for test_user in users:
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine_DIFF_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 403
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page ({URL}) of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
