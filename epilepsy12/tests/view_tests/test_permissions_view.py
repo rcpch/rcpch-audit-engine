@@ -4,27 +4,68 @@ Tests to ensure permissions work as expected.
 NOTE: if you wish to quickly seed test users inside the shell, use this code:
 
 from django.contrib.auth.models import Group
-# E12 imports
+from epilepsy12.tests.UserDataClasses import (
+    test_user_audit_centre_administrator_data,
+    test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
+    test_user_rcpch_audit_team_data,
+    test_user_clinicial_audit_team_data,
+)
+
+from epilepsy12.models import (
+    Epilepsy12User,
+    Organisation,
+)
+from epilepsy12.tests.factories.E12UserFactory import E12UserFactory
 from epilepsy12.constants.user_types import (
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    AUDIT_CENTRE_CLINICIAN,
+    RCPCH_AUDIT_TEAM,
 )
-from epilepsy12.models import Organisation
-from epilepsy12.tests.factories import E12UserFactory
 
-GROUP_AUDIT_CENTRE_CLINICIAN = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-ORGANISATION_TEST_USER = Organisation.objects.get(ODSCode="RP401")
-ORGANISATION_OTHER = Organisation.objects.get(ODSCode="RGT01")
+users = [
+        test_user_audit_centre_administrator_data,
+        test_user_audit_centre_clinician_data,
+        test_user_audit_centre_lead_clinician_data,
+        test_user_rcpch_audit_team_data,
+        test_user_clinicial_audit_team_data,
+    ]
 
-# Create Test User with specified Group
-E12UserFactory(
-    is_staff=False,
-    is_rcpch_audit_team_member=False,
-    is_superuser=False,
-    role=AUDIT_CENTRE_CLINICIAN,
-    organisation_employer = ORGANISATION_TEST_USER,
-    groups=[GROUP_AUDIT_CENTRE_CLINICIAN],
-)
+TEST_USER_ORGANISATION = Organisation.objects.get(
+                ODSCode="RP401",
+                ParentOrganisation_ODSCode="RP4",
+            )
+
+is_active = True
+is_staff = False
+is_rcpch_audit_team_member = False
+is_rcpch_staff = False
+
+# seed a user of each type at GOSH
+for user in users:
+    
+    first_name=user.role_str
+    
+    # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
+    if user.role == RCPCH_AUDIT_TEAM:
+        is_rcpch_audit_team_member = True
+        is_rcpch_staff = True
+    
+    if user.is_clinical_audit_team:
+        is_rcpch_audit_team_member = True
+        first_name='CLINICAL_AUDIT_TEAM'
+
+    E12UserFactory(
+        first_name=first_name,
+        role=user.role,
+        # Assign flags based on user role
+        is_active=is_active,
+        is_staff=is_staff,
+        is_rcpch_audit_team_member=is_rcpch_audit_team_member,
+        is_rcpch_staff=is_rcpch_staff,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[Group.objects.get(name=user.group_name)],
+    ) 
+    
+
 
 # Test Cases - TODO: UPDATE TESTS TO CHECK FOR Clinical Audit Team
 
@@ -211,11 +252,6 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     MedicineEntity,
 )
-
-@pytest.mark.django_db
-def test_1(seed_users_fixture):
-    
-    print(Epilepsy12User.objects.all())
 
 
 @pytest.mark.parametrize(

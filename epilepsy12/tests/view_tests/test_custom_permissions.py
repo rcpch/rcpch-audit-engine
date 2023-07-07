@@ -4,11 +4,13 @@
 TODO #511
 
 Opt out
-[] Assert an Audit Centre Administrator CANNOT let a child opt out of Epilepsy12
-[] Assert an audit centre clinician CANNOT let a child opt out of Epilepsy12
-[] Assert an Audit Centre Lead Clinician can let a child within their own Trust opt out of Epilepsy12
-[] Assert an Audit Centre Lead Clinician cannot let a child outside their own Trust opt out of Epilepsy12
-[] Assert RCPCH Audit Team can let a child opt out of Epilepsy12
+    [] Assert an Audit Centre Administrator CANNOT let a child opt out of Epilepsy12
+    [] Assert an audit centre clinician CANNOT let a child opt out of Epilepsy12
+    [] Assert an Audit Centre Lead Clinician CANNOT let a child outside their own Trust opt out of Epilepsy12
+
+    [] Assert an Audit Centre Lead Clinician can let a child within their own Trust opt out of Epilepsy12
+    [] Assert RCPCH Audit Team can let a child opt out of Epilepsy12
+    [] Assert Clinical Audit Team can let a child opt out of Epilepsy12
 
 Locking
 [] Assert an Audit Centre Administrator CANNOT lock a child from being edited
@@ -41,3 +43,25 @@ can_delete_epilepsy12_lead_centre
 [] Assert RCPCH Audit Team CAN delete_lead_site
 
 """
+# python imports
+import pytest
+
+# django imports
+from django.urls import reverse
+
+# E12 imports
+
+@pytest.mark.skip(reason='Unfinished test. Awaiting E12 advice re custom permissions.')
+@pytest.mark.django_db
+def test_users_opt_out_forbidden(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    seed_cases_fixture,
+):
+    """
+    Simulating different E12 Users attempting to opt children out of Epilepsy12
+
+    Assert these users cannot opt child out of Epilepsy12
+    """
+    pass

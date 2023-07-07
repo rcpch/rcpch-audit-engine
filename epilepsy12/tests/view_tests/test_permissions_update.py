@@ -2,10 +2,13 @@
 ## Update Tests
 
 # Epilepsy12Users
-[ ] Assert an Audit Centre Administrator CANNOT update users
-[ ] Assert an audit centre clinician CANNOT update users
-[ ] Assert an Audit Centre Lead Clinician can only update users inside own Trust
-[ ] Assert RCPCH Audit Team can update users nationally, within any organisations 
+    [ ] Assert an Audit Centre Administrator CANNOT update users
+    [ ] Assert an audit centre clinician CANNOT update users
+    [ ] Assert an Audit Centre Lead Clinician CANNOT update users outside own Trust
+
+    [ ] Assert an Audit Centre Lead Clinician can update users inside own Trust
+    [ ] Assert RCPCH Audit Team can update users nationally, within any organisations 
+    [ ] Assert Clinical Audit Team can update users nationally, within any organisations 
 
 # Cases
 [ ] Assert an Audit Centre Administrator CANNOT update patient records
@@ -210,3 +213,56 @@ for field in fields: [
 
 
 """
+# python imports
+import pytest
+
+# django imports
+from django.urls import reverse
+
+# E12 imports
+from epilepsy12.models import (
+    Epilepsy12User,
+    Organisation,
+    Case
+)
+
+@pytest.mark.django_db
+def test_users_update_users_forbidden(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    seed_cases_fixture,
+):
+    """
+    Simulating different E12 Users attempting to update users in Epilepsy12
+
+    Assert these users cannot change Epilepsy12Users
+    """
+    
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    
+    CASE_FROM_SAME_ORG=Case.objects.get(first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}") 
+    
+    users = Epilepsy12User.objects.all().exclude(first_name__in=['RCPCH_AUDIT_TEAM','CLINICAL_AUDIT_TEAM'])
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        response = client.get(reverse(
+            'opt_out', kwargs={'organisation_id': DIFF_TRUST_DIFF_ORGANISATION.id, 'case_id': CASE_FROM_SAME_ORG.id}
+        ))
+
+        assert response.status_code == 403, f"{test_user.first_name} (from {test_user.organisation_employer}) requested opt out for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
