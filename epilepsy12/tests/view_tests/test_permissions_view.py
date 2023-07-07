@@ -188,6 +188,8 @@ from http import HTTPStatus
 # django imports
 from django.urls import reverse
 
+import factory
+
 # E12 imports
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
@@ -205,6 +207,15 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     MedicineEntity,
 )
+
+from epilepsy12.tests.factories import (
+    E12UserFactory,
+    E12CaseFactory,
+    E12RegistrationFactory,
+)
+
+from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
+from epilepsy12.general_functions import generate_nhs_number
 
 
 @pytest.mark.parametrize(
@@ -306,7 +317,10 @@ def test_users_and_cases_list_view_permissions_forbidden(
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str,test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
@@ -321,7 +335,8 @@ def test_users_and_cases_list_view_permissions_forbidden(
         )
 
         assert (
-            e12_user_list_response_different_organisation.status_code == HTTPStatus.FORBIDDEN
+            e12_user_list_response_different_organisation.status_code
+            == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {e12_user_list_response_different_organisation.status_code}"
 
 
@@ -398,13 +413,27 @@ def test_registration_view_permissions_forbidden(client):
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
@@ -493,15 +522,28 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                 ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of Case from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
                 # Additional test to RCPCH AUDIT TEAM / Clinical Audit Team  who should be able to view nationally
-                if (test_user.first_name == test_user_rcpch_audit_team_data.role_str) or (
+                if (
+                    test_user.first_name == test_user_rcpch_audit_team_data.role_str
+                ) or (
                     test_user.first_name == test_user_clinicial_audit_team_data.role_str
                 ):
                     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                         ODSCode="RGT01",
                         ParentOrganisation_ODSCode="RGT",
                     )
-                    CASE_FROM_DIFF_ORG = Case.objects.get(
-                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+                    # CASE_FROM_DIFF_ORG = Case.objects.get(
+                    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+                    # )
+                    registration = factory.RelatedFactory(
+                        E12RegistrationFactory,
+                        factory_related_name="case",
+                    )
+                    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+                        nhs_number=generate_nhs_number(),
+                        sex=SEX_TYPE[0][0],
+                        registration=registration,  # ensure related audit factories not generated
+                        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
                     )
 
                     # Create objs to search for
@@ -561,16 +603,31 @@ def test_episode_view_permissions_forbidden(client, URL):
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
     )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    )
+
     EPISODE_DIFF_ORG = Episode.objects.get(
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
@@ -600,16 +657,31 @@ def test_syndrome_view_permissions_forbidden(client, URL):
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
     )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    )
+
     syndrome_DIFF_ORG = Syndrome.objects.get(
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
@@ -641,9 +713,21 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
     )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    )
+
     antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
         management=CASE_FROM_DIFF_ORG.registration.management,
         medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
@@ -651,7 +735,10 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
@@ -686,9 +773,21 @@ def test_comborbidity_view_permissions_success(client, URL):
         ODSCode="RP401",
         ParentOrganisation_ODSCode="RP4",
     )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    # CASE_FROM_SAME_ORG = Case.objects.get(
+    #     first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
     )
+    CASE_FROM_SAME_ORG = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
     COMORBIDITY_SAME_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
         comorbidityentity=ComorbidityEntity.objects.filter(
@@ -731,8 +830,19 @@ def test_comborbidity_view_permissions_success(client, URL):
                 ODSCode="RGT01",
                 ParentOrganisation_ODSCode="RGT",
             )
-            CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+            # CASE_FROM_DIFF_ORG = Case.objects.get(
+            #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+            # )
+            registration = factory.RelatedFactory(
+                E12RegistrationFactory,
+                factory_related_name="case",
+            )
+            CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+                nhs_number=generate_nhs_number(),
+                sex=SEX_TYPE[0][0],
+                registration=registration,  # ensure related audit factories not generated
+                organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
             )
 
             comborbidity_DIFF_ORG = Comorbidity.objects.create(
@@ -778,9 +888,21 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
     )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    )
+
     COMORBIDITY_DIFF_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
         comorbidityentity=ComorbidityEntity.objects.filter(
@@ -790,7 +912,10 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
@@ -910,13 +1035,27 @@ def test_multiple_views_permissions_forbidden(client):
         ODSCode="RGT01",
         ParentOrganisation_ODSCode="RGT",
     )
-    CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # CASE_FROM_DIFF_ORG = Case.objects.get(
+    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    # )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     # RCPCH AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
     users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[test_user_rcpch_audit_team_data.role_str, test_user_clinicial_audit_team_data.role_str]
+        first_name__in=[
+            test_user_rcpch_audit_team_data.role_str,
+            test_user_clinicial_audit_team_data.role_str,
+        ]
     )
 
     for test_user in users:
