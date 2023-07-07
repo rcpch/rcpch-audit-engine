@@ -1,8 +1,6 @@
 """
 Tests to ensure permissions work as expected.
 
-
-
 NOTE: if you wish to quickly seed test users inside the shell, use this code:
 
 from django.contrib.auth.models import Group
@@ -30,22 +28,46 @@ E12UserFactory(
 
 # Test Cases
 
-## Scope Tests
+## View Tests
 
-[] Assert an audit centre clinician can only view patients from own organisation
-[] Assert an Audit Centre Administrator can only view patients from own organisation
-[] Assert an Audit Centre Lead Clinician can only view patients from own Trust
-[] Assert an RCPCH Audit Lead can view all patients
+### E12 Users
 
-[] Assert an audit centre clinician can only view users from own organisation
-[] Assert an Audit Centre Administrator can only view users from own organisation
-[] Assert an Audit Centre Lead Clinician can only view users from own Trust
-[] Assert an RCPCH Audit Lead can view all users
+[] Assert an Audit Centre Administrator can view users inside own organisation - response.status_code == 200
+[] Assert an Audit Centre Administrator CANNOT view users outside own organisation - response.status_code == 403
 
-[] Assert an audit centre clinician can only view patient records from own organisation
-[] Assert an Audit Centre Administrator can only view patient records from own organisation
-[] Assert an Audit Centre Lead Clinician can only view patient records from own Trust
-[] Assert an RCPCH Audit Lead can view all patient records
+[] Assert an audit centre clinician can view users inside own organisation - response.status_code == 200
+[] Assert an audit centre clinician CANNOT view users outside own organisation - response.status_code == 403
+
+[] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
+[] Assert an Audit Centre Lead Clinician CANNOT view users outside own Trust - response.status_code == 403
+
+[] Assert an RCPCH Audit Lead can view users within all organisations - response.status_code == 200
+
+### E12 Patients 
+
+[] Assert an Audit Centre Administrator can view patients inside own organisation - response.status_code == 200
+[] Assert an Audit Centre Administrator CANNOT view patients outside own organisation - response.status_code == 403
+
+[] Assert an audit centre clinician can view patients inside own organisation - response.status_code == 200
+[] Assert an audit centre clinician CANNOT view patients outside own organisation - response.status_code == 403
+
+[] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == 200
+[] Assert an Audit Centre Lead Clinician CANNOT view patients outside own Trust - response.status_code == 403
+
+[] Assert an RCPCH Audit Lead can view patients within all organisations - response.status_code == 200
+
+### E12 Patient Records
+
+[] Assert an Audit Centre Administrator can view patient records inside own organisation - response.status_code == 200
+[] Assert an Audit Centre Administrator CANNOT view patient records outside own organisation - response.status_code == 403
+
+[] Assert an audit centre clinician can view patient records inside own organisation - response.status_code == 200
+[] Assert an audit centre clinician CANNOT view patient records outside own organisation - response.status_code == 403
+
+[] Assert an Audit Centre Lead Clinician can view patient records inside own Trust - response.status_code == 200
+[] Assert an Audit Centre Lead Clinician CANNOT view patient records outside own Trust - response.status_code == 403
+
+[] Assert an RCPCH Audit Lead can view patient records within all organisations - response.status_code == 200
 
 """
 
