@@ -18,7 +18,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "email",
         "surname",
         "role",
-        "organisation_employer",
         "is_active",
     )
     list_display = (
@@ -28,7 +27,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "first_name",
         "surname",
         "is_active",
-        "twitter_handle",
         "role",
         "organisation_employer",
         "is_superuser",
@@ -52,7 +50,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             },
         ),
         ("Epilepsy12 Centre", {"fields": ("organisation_employer", "role")}),
-        ("Contacts", {"fields": ("email", "twitter_handle")}),
+        ("Contacts", {"fields": ("email",)}),
         (
             "Permissions",
             {
@@ -67,6 +65,15 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             },
         ),
         (
+            "Access",
+            {
+                "fields": (
+                    "last_login",
+                    "date_joined",
+                )
+            },
+        ),
+        (
             "Group Permissions",
             {
                 "classes": ("collapse",),
@@ -76,7 +83,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 ),
             },
         ),
-        ("Personal", {"fields": ("bio",)}),
     )
     add_fieldsets = (
         (
