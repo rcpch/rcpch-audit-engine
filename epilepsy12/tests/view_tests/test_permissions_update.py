@@ -939,8 +939,9 @@ def test_users_update_multiaxial_diagnosis_success(
                 headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
             )
         else:
+            
             # all other options are selects: select True
-            response = client.get(
+            response = client.post(
                 reverse(
                     URL,
                     kwargs={
@@ -948,8 +949,12 @@ def test_users_update_multiaxial_diagnosis_success(
                     },
                 ),
                 headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
+                data={
+                    'epilepsy_cause':"179"
+                }
             )
 
         assert (
             response.status_code == response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
