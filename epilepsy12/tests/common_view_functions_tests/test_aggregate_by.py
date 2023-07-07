@@ -125,7 +125,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
         },
         {
             "index_of_multiple_deprivation_quintile_display": 6,
-            "cases_aggregated_by_deprivation": 11, # THIS IS 11 AS THERE IS ALREADY 1 SEEDED CASE IN TEST Db WITH THIS IMD
+            "cases_aggregated_by_deprivation": 11,  # THIS IS 11 AS THERE IS ALREADY 1 SEEDED CASE IN TEST Db WITH THIS IMD
             "index_of_multiple_deprivation_quintile_display_str": "Not known",
         },
     ]
@@ -133,9 +133,9 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
     cases_queryset = cases_aggregated_by_deprivation_score(GOSH)
 
     for ix, aggregate in enumerate(cases_queryset):
-        
-
-        assert aggregate == expected_counts[ix], f"Expected aggregate count for test_cases_aggregated_by_deprivation_score not matching output."
+        assert (
+            aggregate == expected_counts[ix]
+        ), f"Expected aggregate count for cases_aggregated_by_deprivation_score not matching output."
 
 
 @pytest.mark.django_db
@@ -143,37 +143,50 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     """Tests the cases_aggregated_by_ethnicity fn returns correct count."""
 
     # define constants
-    ORGANISATION = Organisation.objects.first()
-
-    # Loop through each ethnicity
-    cases_list = []
-    for ethnicity_type in ETHNICITIES:
-        # For each ethnicity, build 10 cases, and append to cases_list
-        for _ in range(10):
-            case = e12_case_factory.build(
-                nhs_number=generate_nhs_number(),
-                ethnicity=ethnicity_type[0],
-                registration=None,  # ensure related audit factories not generated
-                organisations__organisation=ORGANISATION,
-            )
-            cases_list.append(case)
-
-    # single SQL INSERT to save all cases
-    Case.objects.bulk_create(cases_list)
-
-    total_count = cases_aggregated_by_ethnicity(
-        selected_organisation=ORGANISATION
-    ).count()
-
-    matching_count = (
-        cases_aggregated_by_ethnicity(selected_organisation=ORGANISATION)
-        .filter(ethnicities=10)
-        .count()
+    GOSH = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
     )
 
-    assert (
-        total_count == matching_count
-    ), f"Not returning correct count. {total_count=} should equal {matching_count=}"
+    # Loop through each ethnicity
+    for ethnicity_type in ETHNICITIES:
+        # For each deprivation, assign 10 cases, add to cases_list
+        e12_case_factory.create_batch(
+            size=10,
+            ethnicity=ethnicity_type[0],
+            registration=None,  # ensure related audit factories not generated
+            organisations__organisation=GOSH,
+        )
+
+    cases_queryset = cases_aggregated_by_ethnicity(selected_organisation=GOSH)
+
+    expected_counts = [
+        {"ethnicity_display": "Pakistani or British Pakistani", "ethnicities": 10},
+        {"ethnicity_display": "Any other Asian background", "ethnicities": 10},
+        {"ethnicity_display": "Any other Black background", "ethnicities": 10},
+        {"ethnicity_display": "Any other ethnic group", "ethnicities": 10},
+        {"ethnicity_display": "Any other mixed background", "ethnicities": 10},
+        {"ethnicity_display": "Any other White background", "ethnicities": 10},
+        {"ethnicity_display": "Bangladeshi or British Bangladeshi", "ethnicities": 10},
+        {"ethnicity_display": "African", "ethnicities": 10},
+        {"ethnicity_display": "Caribbean", "ethnicities": 10},
+        {"ethnicity_display": "Chinese", "ethnicities": 10},
+        {"ethnicity_display": "Indian or British Indian", "ethnicities": 10},
+        {"ethnicity_display": "Irish", "ethnicities": 10},
+        {"ethnicity_display": "Mixed (White and Asian)", "ethnicities": 10},
+        {"ethnicity_display": "Mixed (White and Black African)", "ethnicities": 10},
+        {"ethnicity_display": "Mixed (White and Black Caribbean)", "ethnicities": 10},
+        {"ethnicity_display": "Not Stated", "ethnicities": 10},
+        {
+            "ethnicity_display": "British, Mixed British",
+            "ethnicities": 11,
+        },  # 11 AS THERE IS ALREADY A SEEDED CASE IN TEST DB
+    ]
+
+    for ix, aggregate in enumerate(cases_queryset):
+        assert (
+            aggregate == expected_counts[ix]
+        ), f"Expected aggregate count for cases_aggregated_by_ethnicity not matching output: {aggregate} should be {expected_counts[ix]}"
 
 
 @pytest.mark.django_db
