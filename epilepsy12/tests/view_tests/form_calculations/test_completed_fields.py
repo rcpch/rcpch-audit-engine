@@ -817,3 +817,57 @@ def test_completed_fields_management_all_fields(e12_case_factory, GOSH):
     assert completed_fields(management) == len(
         factory_attributes
     ), f"Completed management, `completed_fields(management)` should return {len(factory_attributes)}. Instead returned {completed_fields(management)}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_management_random_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=management) returns correct counter when random fields have an answer.
+    """
+
+    factory_attributes = {}
+    EXPECTED_SCORE = 0
+    BASE_KEY_NAME = "registration__management__"
+
+    BOOL_FIELDS = [
+        "has_an_aed_been_given",
+        "has_rescue_medication_been_prescribed",
+        "individualised_care_plan_in_place",
+        "individualised_care_plan_has_parent_carer_child_agreement",
+        "individualised_care_plan_includes_service_contact_details",
+        "individualised_care_plan_include_first_aid",
+        "individualised_care_plan_parental_prolonged_seizure_care",
+        "individualised_care_plan_includes_general_participation_risk",
+        "individualised_care_plan_addresses_water_safety",
+        "individualised_care_plan_addresses_sudep",
+        "individualised_care_plan_includes_ehcp",
+        "has_individualised_care_plan_been_updated_in_the_last_year",
+        "has_been_referred_for_mental_health_support",
+        "has_support_for_mental_health_support",
+    ]
+    for bool_field in BOOL_FIELDS:
+        KEY_NAME = BASE_KEY_NAME + bool_field
+        ANSWER = random.choice([None, True])
+        factory_attributes.update({KEY_NAME: ANSWER})
+        if ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+    DATE_1 = date(2023, 1, 1)
+    DATE_FIELD = "individualised_care_plan_date"
+    DATE_KEY_NAME = BASE_KEY_NAME + DATE_FIELD
+    DATE_ANSWER = random.choice([None, DATE_1])
+    if DATE_ANSWER is not None:
+        EXPECTED_SCORE += 1
+    factory_attributes.update({DATE_KEY_NAME: DATE_ANSWER})
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    management = Management.objects.get(registration=CASE.registration)
+
+    assert (
+        completed_fields(management) == EXPECTED_SCORE
+    ), f"Randomly completed management, `completed_fields(management)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(management)}. Answers: {factory_attributes}"
