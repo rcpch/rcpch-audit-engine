@@ -178,6 +178,7 @@ for each field in fields ['edit_antiepilepsy_medicine', 'close_antiepilepsy_medi
 
 # python imports
 import pytest
+from datetime import date
 
 # django imports
 from django.urls import reverse
@@ -219,8 +220,8 @@ def test_users_and_case_list_views_permissions_success(
     URL,
 ):
     """
-    # Simulating different E12Users with different roles attempting to access the Users / Cases list of their own Trust. 
-    # 
+    # Simulating different E12Users with different roles attempting to access the Users / Cases list of their own Trust.
+    #
     # Additionally, tests RCPCH Audit Leads can access lists of different Trust.
 
 
@@ -273,6 +274,7 @@ def test_users_and_case_list_views_permissions_success(
                 e12_user_list_response.status_code == 200
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
 
+
 @pytest.mark.parametrize(
     "URL",
     [
@@ -281,9 +283,12 @@ def test_users_and_case_list_views_permissions_success(
     ],
 )
 @pytest.mark.django_db
-def test_users_and_cases_list_view_permissions_forbidden(client,URL,):
+def test_users_and_cases_list_view_permissions_forbidden(
+    client,
+    URL,
+):
     """
-    Simulating different E12Users with different roles attempting to access the Users / Cases list of different Trust. 
+    Simulating different E12Users with different roles attempting to access the Users / Cases list of different Trust.
 
     Assert these users CAN'T view the List of a different Trust.
     """
@@ -405,14 +410,16 @@ def test_registration_view_permissions_forbidden(client):
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested registration of Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
-
-@pytest.mark.parametrize("URL", [("edit_episode"), ("close_episode")])
 @pytest.mark.django_db
-def test_episode_view_permissions_success(client, URL):
+def test_episode_syndrome_aem_view_permissions_success(client):
     """
-    Assert these users CAN view episode for Case from their own Trust.
+    Assert these users CAN view following for Case from their own Trust:
+    
+        - episode
+        - syndrome
+        - aem
 
-    RCPCH Audit Lead has additional test to assert can view episodes outside own Trust.
+    RCPCH Audit Lead has additional test to assert can view outside own Trust.
     """
 
     # GOSH
@@ -426,51 +433,102 @@ def test_episode_view_permissions_success(client, URL):
 
     users = Epilepsy12User.objects.all()
 
-    for test_user in users:
-        EPISODE_SAME_ORG = Episode.objects.create(
-            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
-        )
+    # Create objs to search for
+    episode = Episode.objects.create(
+        episode_definition="a",
+        multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+    )
+    syndrome = Syndrome.objects.create(
+        syndrome_diagnosis_date=date(2023,2,1), # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
+        multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+    )
 
+    aem = AntiEpilepsyMedicine.objects.create(
+        management=CASE_FROM_SAME_ORG.registration.management,
+        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+    )
+
+    for test_user in users:
         client.force_login(test_user)
 
-        # Get response object
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={"episode_id": EPISODE_SAME_ORG.id},
-            )
-        )
+        for page in ["episode", "syndrome", "antiepilepsy_medicine"]:
+            # Create the object to search for
+            if page == "episode":
+                OBJ_SAME_ORGANISATION = episode
+            elif page == "syndrome":
+                OBJ_SAME_ORGANISATION = syndrome
+            elif page == "antiepilepsy_medicine":
+                OBJ_SAME_ORGANISATION = aem
 
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested episode page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            for action in ["edit", "close"]:
+                URL = f"{action}_{page}"
 
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-            CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-            )
+                KWARGS = {f"{page}_id": OBJ_SAME_ORGANISATION.id}
 
-            EPISODE_DIFF_ORG = Episode.objects.get(
-                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
-            )
-
-            # Request e12 patients list endpoint url different org
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={"episode_id": EPISODE_DIFF_ORG.id},
+                # Get response object
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs=KWARGS,
+                    )
                 )
-            )
 
-            assert (
-                response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested episode page of {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+                assert (
+                    response.status_code == 200
+                ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+                # Additional test: assert different organisation if RCPCH AUDIT LEAD
+                # ADDENBROOKE'S
+                if test_user.role == test_user_rcpch_audit_lead_data.role:
+
+                    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                        ODSCode="RGT01",
+                        ParentOrganisation_ODSCode="RGT",
+                    )
+                    CASE_FROM_DIFF_ORG = Case.objects.get(
+                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+                    )
+
+                    # Create objs to search for
+                    episode = Episode.objects.create(
+                        episode_definition="a",
+                        multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
+                    )
+                    
+                    syndrome = Syndrome.objects.create(
+                        syndrome_diagnosis_date=date(2023,2,1), # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
+                        multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
+                    )
+                    
+                    aem = AntiEpilepsyMedicine.objects.create(
+                        management=CASE_FROM_DIFF_ORG.registration.management,
+                        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+                    )
+                    
+                    # Create the object to search for
+                    if page == "episode":
+                        OBJ_DIFF_ORGANISATION = episode
+                    elif page == "syndrome":
+                        OBJ_DIFF_ORGANISATION = syndrome
+                    elif page == "antiepilepsy_medicine":
+                        OBJ_DIFF_ORGANISATION = aem
+
+                    for action in ["edit", "close"]:
+                        URL = f"{action}_{page}"
+
+                        KWARGS = {f"{page}_id": OBJ_DIFF_ORGANISATION.id}
+                        
+                        # Get response object
+                        response = client.get(
+                            reverse(
+                                URL,
+                                kwargs=KWARGS,
+                            )
+                        )
+
+                        assert (
+                            response.status_code == 201
+                        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} page of case from {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize("URL", [("edit_episode"), ("close_episode")])
@@ -508,73 +566,6 @@ def test_episode_view_permissions_forbidden(client, URL):
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
-
-@pytest.mark.parametrize("URL", [("edit_syndrome"), ("close_syndrome")])
-@pytest.mark.django_db
-def test_syndrome_view_permissions_success(client, URL):
-    """
-    Assert these users CAN view syndrome for Case from their own Trust.
-
-    RCPCH Audit Lead has additional test to assert can view syndromes outside own Trust.
-    """
-
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    )
-
-    users = Epilepsy12User.objects.all()
-
-    for test_user in users:
-        SYNDROME_SAME_ORG = Syndrome.objects.create(
-            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
-        )
-
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={"syndrome_id": SYNDROME_SAME_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested syndrome page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-            CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-            )
-
-            SYNDROME_DIFF_ORG = Syndrome.objects.get(
-                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
-            )
-
-            # Request e12 patients list endpoint url different org
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={"syndrome_id": SYNDROME_DIFF_ORG.id},
-                )
-            )
-
-            assert (
-                response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested syndrome page of {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
 @pytest.mark.parametrize("URL", [("edit_syndrome"), ("close_syndrome")])
@@ -761,7 +752,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
 
 @pytest.mark.django_db
-def test_assessment_investigations_management_view_permissions_success(client):
+def test_multiple_views_permissions_success(client):
     """
     Assert these users CAN view the following pages for their own Trust:
 
@@ -789,7 +780,14 @@ def test_assessment_investigations_management_view_permissions_success(client):
     for test_user in users:
         client.force_login(test_user)
 
-        for url_name in ["assessment", "investigations", "management", "first_paediatric_assessment", "epilepsy_context", "multiaxial_diagnosis"]:
+        for url_name in [
+            "assessment",
+            "investigations",
+            "management",
+            "first_paediatric_assessment",
+            "epilepsy_context",
+            "multiaxial_diagnosis",
+        ]:
             # Get response object
             response = client.get(
                 reverse(
@@ -797,7 +795,7 @@ def test_assessment_investigations_management_view_permissions_success(client):
                     kwargs={"case_id": CASE_FROM_SAME_ORG.id},
                 )
             )
-            
+
             print(url_name, response.status_code)
 
             assert (
@@ -829,10 +827,10 @@ def test_assessment_investigations_management_view_permissions_success(client):
 
 
 @pytest.mark.django_db
-def test_assessment_investigations_management_view_permissions_forbidden(client):
+def test_multiple_views_permissions_forbidden(client):
     """
     Assert these users CANT view these pages for different Trust.
-    
+
         - first_paediatric_assessment
         - assessment
         - management
@@ -855,7 +853,14 @@ def test_assessment_investigations_management_view_permissions_forbidden(client)
     for test_user in users:
         client.force_login(test_user)
 
-        for url_name in ["assessment", "investigations", "management", "first_paediatric_assessment", "epilepsy_context", "multiaxial_diagnosis"]:
+        for url_name in [
+            "assessment",
+            "investigations",
+            "management",
+            "first_paediatric_assessment",
+            "epilepsy_context",
+            "multiaxial_diagnosis",
+        ]:
             # Get response object
             response = client.get(
                 reverse(
@@ -867,84 +872,6 @@ def test_assessment_investigations_management_view_permissions_forbidden(client)
             assert (
                 response.status_code == 403
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
-
-@pytest.mark.parametrize(
-    "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
-)
-@pytest.mark.django_db
-def test_antiepilepsy_medicine_view_permissions_success(client, URL):
-    """
-    Assert these users CAN view antiepilepsy_medicine for Case from their own Trust.
-
-    RCPCH Audit Lead has additional test to assert can view antiepilepsy_medicines outside own Trust.
-    """
-
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-    CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    )
-
-    users = Epilepsy12User.objects.all()
-
-    for test_user in users:
-        antiepilepsy_medicine_SAME_ORG = AntiEpilepsyMedicine.objects.create(
-            management=CASE_FROM_SAME_ORG.registration.management,
-            medicine_entity=MedicineEntity.objects.get(
-                medicine_name="Sodium valproate"
-            ),
-        )
-
-        client.force_login(test_user)
-
-        # Get response object
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine_SAME_ORG.id},
-            )
-        )
-
-        assert (
-            response.status_code == 200
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page url ({URL}) of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
-        # Additional test: assert different organisation if RCPCH AUDIT LEAD
-        # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
-            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
-            )
-            CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-            )
-
-            antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
-                management=CASE_FROM_DIFF_ORG.registration.management,
-                medicine_entity=MedicineEntity.objects.get(
-                    medicine_name="Sodium valproate"
-                ),
-            )
-
-            # Request e12 patients list endpoint url different org
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "antiepilepsy_medicine_id": antiepilepsy_medicine_DIFF_ORG.id
-                    },
-                )
-            )
-
-            assert (
-                response.status_code == 200
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested antiepilepsy_medicine page ({URL}) of {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
-
 
 @pytest.mark.parametrize(
     "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
