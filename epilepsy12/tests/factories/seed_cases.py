@@ -49,6 +49,8 @@ def seed_cases_fixture(django_db_setup, django_db_blocker):
                     first_name=f"child_{organisation.OrganisationName}",
                     organisations__organisation = organisation,
                 )
+        else:
+            print('Test cases seeded. Skipping')
         
         
 

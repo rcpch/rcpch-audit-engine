@@ -16,6 +16,7 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_rcpch_audit_lead_data,
 )
 from epilepsy12.models import (
+    Epilepsy12User,
     Organisation,
 )
 from .E12UserFactory import E12UserFactory
@@ -37,7 +38,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         
         # Don't repeat seed
-        if not Organisation.objects.filter(ODSCode="RP401").exists():
+        if not Epilepsy12User.objects.exists():
 
             TEST_USER_ORGANISATION = Organisation.objects.get(
                 ODSCode="RP401",
@@ -67,5 +68,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                         )
                     ],
                 )
+        else:
+            print('Test users already seeded. Skipping')
 
 
