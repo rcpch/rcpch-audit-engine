@@ -138,6 +138,7 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     ), f"Not returning correct count. {total_count=} should equal {matching_count=}"
 
 
+@pytest.mark.xfail(reason='unfinished test')
 @pytest.mark.django_db
 def test_aggregate_all_eligible_kpi_fields_correct_count(e12_case_factory):
     """Tests the aggregate_all_eligible_kpi_fields fn returns correct count of KPIs."""
