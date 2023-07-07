@@ -135,11 +135,11 @@ def test_users_list_view_permissions_success(
     """
     # Simulating different E12Users with different roles attempting to access the Users list of their own Trust. Additionally, RCPCH Audit Leads can access all organisations.
 
-    [] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
-    [] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
-    [] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
-    [] Assert an RCPCH Audit Lead can view users inside own Trust - response.status_code == 200
-    [] Assert an RCPCH Audit Lead can view users inside a different Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view users inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view users inside a different Trust - response.status_code == 200
 
     """
 
@@ -223,19 +223,81 @@ def test_users_list_view_permissions_success(
         ), f"{test_user.role} (from {test_user.organisation_employer}) requested user list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response_different_organisation.status_code}"
 
 
-
+@pytest.mark.parametrize(
+    "ROLE, GROUP_NAME",
+    [
+        (
+            test_user_audit_centre_administrator.role,
+            test_user_audit_centre_administrator.group_name,
+        ),
+        (
+            test_user_audit_centre_clinician.role,
+            test_user_audit_centre_clinician.group_name,
+        ),
+        (
+            test_user_audit_centre_lead_clinician.role,
+            test_user_audit_centre_lead_clinician.group_name,
+        ),
+    ],
+)
 @pytest.mark.django_db
 def test_users_list_view_permissions_forbidden(
-    client, e12_user_factory, seed_groups_fixture
+    client, e12_user_factory, seed_groups_fixture, ROLE, GROUP_NAME
 ):
     """
     # E12 Users
 
-    [] Assert an Audit Centre Administrator CANNOT view users outside own organisation - response.status_code == 403
-    [] Assert an audit centre clinician CANNOT view users outside own organisation - response.status_code == 403
-    [] Assert an Audit Centre Lead Clinician CANNOT view users outside own Trust - response.status_code == 403
+    [x] Assert an Audit Centre Administrator CANNOT view users outside own organisation - response.status_code == 403
+    [x] Assert an audit centre clinician CANNOT view users outside own organisation - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician CANNOT view users outside own Trust - response.status_code == 403
     """
-    pass
+    # set up constants
+    
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    is_staff = False
+    is_rcpch_audit_team_member = False
+
+    # Create Test User with specified Group
+    test_user = e12_user_factory(
+        is_staff=is_staff,
+        is_rcpch_audit_team_member=is_rcpch_audit_team_member,
+        role=ROLE,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[Group.objects.get(name=GROUP_NAME)],
+    )
+
+    # Create 2 users in a different trust
+    e12_user_factory.create_batch(
+        2,
+        is_staff=False,
+        is_rcpch_audit_team_member=False,
+        role=AUDIT_CENTRE_CLINICIAN,
+        organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+        groups=[Group.objects.get(name=GROUP_NAME)],
+    )
+
+    # Request e12 user list endpoint url diff org
+    e12_user_list_response_different_organisation = client.get(
+        reverse(
+            "epilepsy12_user_list",
+            kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
+        )
+    )
+
+    assert (
+        e12_user_list_response_different_organisation.status_code == 403
+    ), f"{test_user.role} (from {test_user.organisation_employer}) requested user list of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response_different_organisation.status_code}"
 
 @pytest.mark.django_db
 def test_audit_centre_clinician_cases_list_access(
