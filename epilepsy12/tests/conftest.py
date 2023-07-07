@@ -11,6 +11,9 @@ import pytest
 
 # rcpch imports
 from epilepsy12.tests.factories import (
+    seed_groups_fixture,
+    seed_users_fixture,
+    seed_cases_fixture,
     E12AntiEpilepsyMedicineFactory,
     E12AssessmentFactory,
     E12CaseFactory,
