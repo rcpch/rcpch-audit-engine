@@ -8,17 +8,8 @@ import pytest
 # 3rd Party imports
 
 # E12 Imports
-from epilepsy12.tests.UserDataClasses import (
-    test_user_audit_centre_administrator_data,
-    test_user_audit_centre_clinician_data,
-    test_user_audit_centre_lead_clinician_data,
-    test_user_rcpch_audit_team_data,
-)
 from epilepsy12.models import Organisation, Case
 from .E12CaseFactory import E12CaseFactory
-from epilepsy12.constants.user_types import (
-    RCPCH_AUDIT_TEAM,
-)
 
 
 @pytest.mark.django_db
