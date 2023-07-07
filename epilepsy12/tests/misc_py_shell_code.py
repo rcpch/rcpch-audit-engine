@@ -40,7 +40,16 @@ E12UserFactory(
     is_rcpch_audit_team_member=False,
     is_rcpch_staff=False,
     organisation_employer=TEST_USER_ORGANISATION,
-    groups=[
-        Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
-    ],
+    groups=[test_user_audit_centre_administrator_data.group_name],
+)
+E12UserFactory(
+    first_name=test_user_rcpch_audit_team_data.role_str,
+    role=test_user_rcpch_audit_team_data.role,
+    # Assign flags based on user role
+    is_active=True,
+    is_staff=False,
+    is_rcpch_audit_team_member=False,
+    is_rcpch_staff=False,
+    organisation_employer=TEST_USER_ORGANISATION,
+    groups=[test_user_rcpch_audit_team_data.group_name],
 )

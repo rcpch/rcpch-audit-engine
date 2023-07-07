@@ -237,7 +237,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
+@permission_required("epilepsy12.view_antiepilepsymedicine", raise_exception=True)
 def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
     Call back from onclick of edit button in antiepilepsy_medicine_list partial
