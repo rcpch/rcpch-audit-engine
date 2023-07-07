@@ -1099,6 +1099,99 @@ def test_user_updates_select_success(
             )
 
 
+@pytest.mark.django_db
+def test_user_updates_select_fail(
+    client,
+):
+    """
+    Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(SELECTS):
+        if url.get("choices") is not None:
+            for choice in url.get("choices"):
+                model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION,
+                    model_name=url.get("model"),
+                )
+                data = {url.get("field_name"): choice}
+
+                client.post(
+                    reverse(
+                        url.get("field_name"),
+                        kwargs={url.get("param"): model.id},
+                    ),
+                    headers={
+                        "Hx-Trigger-Name": choice,
+                        "Hx-Request": "true",
+                    },
+                    data=data,
+                )
+                updated_model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+                )
+                validate_select(
+                    field_name=url.get("field_name"),
+                    model_instance=updated_model,
+                    expected_result=EpilepsyCauseEntity.objects.get(
+                        pk=135
+                    ),  # Dysmorphic sialidosis with renal involvement
+                    assert_pass=False,
+                )
+        else:
+            model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION,
+                model_name=url.get("model"),
+            )
+
+            if url.get("field_name") == "epilepsy_cause":
+                data = {"epilepsy_cause": 134}  # Aicardi's sy.
+                expected_result = EpilepsyCauseEntity.objects.get(
+                    pk=135
+                )  # Dysmorphic sialidosis with renal involvement
+                htmx_trigger = "epilepsy_cause"
+            else:
+                data = {"comorbidityentity": 134}
+                expected_result = ComorbidityEntity.objects.get(
+                    pk=35
+                )  # Meets criteria for referral to Children's Epilepsy Surgery Service
+                htmx_trigger = "comorbidityentity"
+
+            client.post(
+                reverse(
+                    url.get("field_name"),
+                    kwargs={url.get("param"): model.id},
+                ),
+                headers={"Hx-Trigger-Name": htmx_trigger, "Hx-Request": "true"},
+                data=data,
+            )
+            updated_model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            validate_select(
+                field_name=url.get("field_name"),
+                model_instance=updated_model,
+                expected_result=expected_result,
+                assert_pass=False,
+            )
+
+
 # Test helper methods - there is one for each page_element
 def validate_date_assertions(
     field_name: str,
