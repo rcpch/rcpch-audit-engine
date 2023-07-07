@@ -24,7 +24,7 @@ For each MODEL:
         5. developmental_learning_or_schooling_problems
         6. behavioural_or_emotional_problems
 
-- `EpilepsyContext`
+- `EpilepsyContext` - DONE
 
     completed_fields(MODEL) == 8
         1. previous_febrile_seizure
@@ -160,6 +160,7 @@ from epilepsy12.models import (
     Registration,
     FirstPaediatricAssessment,
     EpilepsyContext,
+    Assessment,
 )
 from epilepsy12.common_view_functions import completed_fields
 from epilepsy12.constants import (
@@ -374,19 +375,6 @@ def test_completed_fields_epilepsy_context_random_fields(e12_case_factory, GOSH)
     Simulating completed_fields(model_instance=epilepsy_context) returns correct counter when random fields have an answer.
     """
 
-    CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
-        organisations__organisation=GOSH,
-    )
-
-    epilepsy_context = FirstPaediatricAssessment.objects.get(
-        registration=CASE.registration
-    )
-
-    assert (
-        completed_fields(epilepsy_context) == 0
-    ), f"Empty epilepsy_context, `completed_fields(epilepsy_context)` should return 0. Instead returned {completed_fields(epilepsy_context)}"
-
     CHAR_CHOICE_FIELDS = [
         "previous_febrile_seizure",
         "previous_acute_symptomatic_seizure",
@@ -433,3 +421,128 @@ def test_completed_fields_epilepsy_context_random_fields(e12_case_factory, GOSH)
     assert (
         completed_fields(epilepsy_context) == EXPECTED_SCORE
     ), f"Randomly completed epilepsy_context, `completed_fields(epilepsy_context)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(epilepsy_context)}. Answers: {factory_attributes}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_assessment_all_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=assessment) returns correct counter when all fields have an answer.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+
+    assessment = Assessment.objects.get(registration=CASE.registration)
+
+    assert (
+        completed_fields(assessment) == 0
+    ), f"Empty assessment, `completed_fields(assessment)` should return 0. Instead returned {completed_fields(assessment)}"
+
+    fields_and_answers = {
+        "childrens_epilepsy_surgical_service_referral_criteria_met": True,
+        "consultant_paediatrician_referral_made": True,
+        "consultant_paediatrician_referral_date": date(2023, 1, 1),
+        "consultant_paediatrician_input_date": date(2023, 1, 2),
+        "paediatric_neurologist_referral_made": True,
+        "paediatric_neurologist_referral_date": date(2023, 1, 1),
+        "paediatric_neurologist_input_date": date(2023, 1, 2),
+        "childrens_epilepsy_surgical_service_referral_made": True,
+        "childrens_epilepsy_surgical_service_referral_date": date(2023, 1, 1),
+        "childrens_epilepsy_surgical_service_input_date": date(2023, 1, 2),
+        "epilepsy_specialist_nurse_referral_made": True,
+        "epilepsy_specialist_nurse_referral_date": date(2023, 1, 1),
+        "epilepsy_specialist_nurse_input_date": date(2023, 1, 2),
+    }
+
+    factory_attributes = {
+        f"registration__assessment__{field}": answer
+        for field, answer in fields_and_answers.items()
+    }
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    assessment = Assessment.objects.get(registration=CASE.registration)
+
+    assert completed_fields(assessment) == len(
+        fields_and_answers
+    ), f"Completed assessment, `completed_fields(assessment)` should return {len(fields_and_answers)}. Instead returned {completed_fields(assessment)}"
+
+
+@pytest.mark.django_db
+def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
+    """
+    Simulating completed_fields(model_instance=assessment) returns correct counter when random fields have an answer.
+    """
+
+    factory_attributes = {}
+    EXPECTED_SCORE = 0
+    BASE_KEY_NAME = "registration__assessment__"
+
+    # This field has no dependent date fields
+    KEY_NAME = (
+        BASE_KEY_NAME + "childrens_epilepsy_surgical_service_referral_criteria_met"
+    )
+
+    ANSWER = random.choice([None, True])
+    factory_attributes.update({KEY_NAME: ANSWER})
+    if ANSWER is not None:
+        EXPECTED_SCORE += 1
+
+    # All other bool fields have dependent date fields
+    BOOL_FIELDS = [
+        "consultant_paediatrician",
+        "paediatric_neurologist",
+        "childrens_epilepsy_surgical_service",
+        "epilepsy_specialist_nurse",
+    ]
+    DATE_1 = date(2023, 1, 1)
+    DATE_2 = date(2023, 1, 2)
+
+    for bool_field in BOOL_FIELDS:
+        factory_attributes.update({KEY_NAME: ANSWER})
+
+        KEY_NAME = BASE_KEY_NAME + f"{bool_field}_referral_made"
+        ANSWER = random.choice([None, True])
+
+        DATE_1_ANSWER_OPTIONS = [None]
+        DATE_2_ANSWER_OPTIONS = [None]
+
+        if ANSWER is not None:
+            # Opens up 2 date options
+            EXPECTED_SCORE += 1
+            DATE_1_ANSWER_OPTIONS += [DATE_1]
+            DATE_2_ANSWER_OPTIONS += [DATE_2]
+
+        REFERRAL_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_referral_date"
+        REFERRAL_ANSWER = random.choice(DATE_1_ANSWER_OPTIONS)
+        if REFERRAL_ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+        INPUT_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_input_date"
+        INPUT_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
+        if INPUT_ANSWER is not None:
+            EXPECTED_SCORE += 1
+
+        date_answers = {
+            REFERRAL_KEY_NAME: REFERRAL_ANSWER,
+            INPUT_KEY_NAME: INPUT_ANSWER,
+        }
+        factory_attributes.update(date_answers)
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **factory_attributes,
+    )
+
+    assessment = Assessment.objects.get(registration=CASE.registration)
+
+    assert (
+        completed_fields(assessment) == EXPECTED_SCORE
+    ), f"Randomly completed assessment, `completed_fields(assessment)` should return {EXPECTED_SCORE}. Instead returned {completed_fields(assessment)}. Answers: {factory_attributes}"
