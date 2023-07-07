@@ -19,7 +19,7 @@ Locking
 [] Assert RCPCH Audit Team can lock a child from being edited
 [] Assert RCPCH Audit Team can unlock a child from being edited
 
-Locking
+can_consent_to_audit_participation
 [] Assert an Audit Centre Administrator CANNOT consent for a child to be included in Epilepsy12
 [] Assert an audit centre clinician CANNOT consent for a child to be included in Epilepsy12
 [] Assert an Audit Centre Lead Clinician CANNOT consent for a child to be included in Epilepsy12

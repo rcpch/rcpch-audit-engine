@@ -97,10 +97,6 @@ CAN_APPROVE_ELIGIBILITY = (
     "can_approve_eligibility",
     "Can approve eligibility for Epilepsy12.",
 )
-CAN_REMOVE_APPROVAL_OF_ELIGIBILITY = (
-    "can_remove_approval_of_eligibility",
-    "Can remove approval of eligibiltiy for Epilepsy12.",
-)
 
 CAN_REGISTER_CHILD_IN_EPILEPSY12 = (
     "can_register_child_in_epilepsy12",
@@ -141,7 +137,6 @@ PERMISSIONS = (
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_APPROVE_ELIGIBILITY,
-    CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
     CAN_REGISTER_CHILD_IN_EPILEPSY12,
     CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
     CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
