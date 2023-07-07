@@ -23,6 +23,7 @@ class TestUser:
     role: int
     role_str: str
     group_name: str
+    is_clinical_audit_team: bool = False
 
 
 test_user_audit_centre_administrator_data = TestUser(
@@ -43,8 +44,16 @@ test_user_audit_centre_lead_clinician_data = TestUser(
     group_name=TRUST_AUDIT_TEAM_FULL_ACCESS,
 )
 
+test_user_clinicial_audit_team_data = TestUser(
+    role=AUDIT_CENTRE_LEAD_CLINICIAN,
+    role_str="AUDIT_CENTRE_LEAD_CLINICIAN",
+    group_name=TRUST_AUDIT_TEAM_FULL_ACCESS,
+    is_clinical_audit_team=True,
+)
+
 test_user_rcpch_audit_team_data = TestUser(
     role=RCPCH_AUDIT_TEAM,
     role_str="RCPCH_AUDIT_TEAM",
     group_name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
+

@@ -26,24 +26,19 @@ E12UserFactory(
     groups=[GROUP_AUDIT_CENTRE_CLINICIAN],
 )
 
-# Test Cases
+# Test Cases - TODO: UPDATE TESTS TO CHECK FOR Clinical Audit Team
 
 ## View Tests
 
 ### E12 Users 
 
 *   [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
-*   [ ] Assert an Audit Centre Administrator can view users inside own Organisation - response.status_code == 200
-
 *   [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
-*   [ ] Assert an Audit Centre Clinician can view users inside own Organisation - response.status_code == 200
-
     [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
-*   [ ] Assert an Audit Centre Lead Clinician who is a member of the RCPCH Audit Team can view users nationally - response.status_code == 200
-
-*   [x] Assert RCPCH Audit Team can view users inside own Trust - response.status_code == 200
-*   [x] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
-*   [ ] Assert RCPCH Audit Team can view users nationally - response.status_code == 200
+*   [x] Assert Clinician who is also an RCPCH Audit Team can view users inside own Trust - response.status_code == 200
+*   [x] Assert Clinician who is also an RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
+*   [ ] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
+*   [ ] Assert Clinical Audit Team can view users inside a different Trust - response.status_code == 200 
 
 
 ### E12 Patient Records
@@ -217,6 +212,11 @@ from epilepsy12.models import (
     MedicineEntity,
 )
 
+@pytest.mark.django_db
+def test_1(seed_users_fixture):
+    
+    print(Epilepsy12User.objects.all())
+
 
 @pytest.mark.parametrize(
     "URL",
@@ -234,9 +234,9 @@ def test_users_and_case_list_views_permissions_success(
     URL,
 ):
     """
-    # Simulating different E12Users with different roles attempting to access the Users / Cases list of their own Trust.
-    #
-    # Additionally, tests RCPCH Audit Team can access lists of different Trust.
+    Simulating different E12Users with different roles attempting to access the Users / Cases list of their own Trust.
+    
+    Additionally, tests RCPCH Audit Team can access lists of different Trust.
 
 
     NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.

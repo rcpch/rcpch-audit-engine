@@ -184,12 +184,12 @@ def create_first_paediatric_assessment(registration_instance, verbose=True):
     """
     if not hasattr(registration_instance, "firstpaediatricassessment"):
         return FirstPaediatricAssessment.objects.create(
-            first_paediatric_assessment_in_acute_or_nonacute_setting=bool(
-                getrandbits(1)
-            ),
-            has_number_of_episodes_since_the_first_been_documented=choice(CHRONICITY)[
+            first_paediatric_assessment_in_acute_or_nonacute_setting=choice(CHRONICITY)[
                 0
             ],
+            has_number_of_episodes_since_the_first_been_documented=bool(
+                getrandbits(1)
+            ),
             general_examination_performed=bool(getrandbits(1)),
             neurological_examination_performed=bool(getrandbits(1)),
             developmental_learning_or_schooling_problems=bool(getrandbits(1)),

@@ -166,7 +166,7 @@ def test_aggregate_all_eligible_kpi_fields_correct_count(e12_case_factory):
 
     assert total_count_kpis == 21
 
-@pytest.mark.xskip(reason='unfinished test')
+@pytest.mark.skip(reason='unfinished test')
 @pytest.mark.django_db
 def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory):
     """Tests the aggregate_all_eligible_kpi_fields fn returns scoring of KPIs."""
