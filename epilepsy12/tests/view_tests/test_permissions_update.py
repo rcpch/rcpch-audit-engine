@@ -868,7 +868,7 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
 )
 @pytest.mark.django_db
 def test_users_update_multiaxial_diagnosis_success(
-    client, seed_epilepsy_causes_fixture, URL
+    client, URL
 ):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
