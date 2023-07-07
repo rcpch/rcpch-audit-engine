@@ -43,6 +43,9 @@ from epilepsy12.constants import (
     Management_minimum_scorable_fields,
     AntiEpilepsyMedicine_minimum_scorable_fields,
     SEX_TYPE,
+    EPILEPSY_DIAGNOSIS_STATUS,
+    NON_EPILEPSY_SEIZURE_ONSET,
+    NON_EPILEPSY_SEIZURE_TYPE,
 )
 from epilepsy12.tests.view_tests.form_calculations.test_number_of_completed_fields_in_related_models import (
     get_random_answers_update_counter,
@@ -79,7 +82,7 @@ def test_correct_output_scoreable_fields_for_model_class_name():
 
 
 @pytest.mark.django_db
-def test_count_episode_fields(e12_case_factory, GOSH):
+def test_count_episode_fields_epileptic_focal_onset(e12_case_factory, GOSH):
     """
     Tests count_episode_fields with single Episode queryset returns correct expected output, with a completed episode.
     """
@@ -99,6 +102,154 @@ def test_count_episode_fields(e12_case_factory, GOSH):
     assert (
         return_value == 8
     ), f"Single completely filled Focal Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 8. Instead, returned {return_value}"
+
+
+@pytest.mark.django_db
+def test_count_episode_fields_epileptic_generalised_onset(e12_case_factory, GOSH):
+    """
+    Tests count_episode_fields with single Episode queryset returns correct expected output, with a completed episode.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__episode__complete_episode_generalised_onset_seizure=True,
+    )
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    episode_queryset = Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+
+    return_value = count_episode_fields(episode_queryset)
+
+    assert (
+        return_value == 8
+    ), f"Single completely filled Generalised Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 8. Instead, returned {return_value}"
+
+
+@pytest.mark.django_db
+def test_count_episode_fields_epileptic_unclassified_onset(e12_case_factory, GOSH):
+    """
+    Tests count_episode_fields with single Episode queryset returns correct expected output, with a completed episode.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__episode__complete_episode_unclassified_onset_seizure=True,
+    )
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    episode_queryset = Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+
+    return_value = count_episode_fields(episode_queryset)
+
+    assert (
+        return_value == 7
+    ), f"Single completely filled unclassified Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 7. Instead, returned {return_value}"
+
+
+@pytest.mark.django_db
+def test_count_episode_fields_epileptic_unknown_onset(e12_case_factory, GOSH):
+    """
+    Tests count_episode_fields with single Episode queryset returns correct expected output, with a completed episode.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__episode__complete_episode_unknown_onset_seizure=True,
+    )
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    episode_queryset = Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+
+    return_value = count_episode_fields(episode_queryset)
+
+    assert (
+        return_value == 7
+    ), f"Single completely filled unknown Onset Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return 7. Instead, returned {return_value}"
+
+
+@pytest.mark.django_db
+def test_count_episode_fields_nonepileptic(e12_case_factory, GOSH):
+    """
+    Tests count_episode_fields with single non epileptic Episode queryset returns correct expected output, with a completed episode.
+    """
+    expected_value = 11  # 5 for incomplete epileptic episode, ++6 for non epileptic episode base value incomplete fields
+
+    # Either BPP (++3 to expected score) OR Oth (++2 to expected score)
+    seizure_type_answer = random.choice(
+        [NON_EPILEPSY_SEIZURE_TYPE[0][0], NON_EPILEPSY_SEIZURE_TYPE[-1][0]]
+    )
+
+    if seizure_type_answer == NON_EPILEPSY_SEIZURE_TYPE[0][0]:
+        expected_value += 3
+    else:
+        expected_value += 2
+    answer_set = {
+        "registration__multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status": EPILEPSY_DIAGNOSIS_STATUS[
+            1
+        ][
+            0
+        ],
+        "registration__multiaxial_diagnosis__episode__nonepileptic_seizure_unknown_onset": NON_EPILEPSY_SEIZURE_ONSET[
+            0
+        ][
+            0
+        ],
+        "registration__multiaxial_diagnosis__episode__nonepileptic_seizure_type": seizure_type_answer,
+    }
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__episode__common_fields=True,
+        **answer_set,
+    )
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    episode_queryset = Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+
+    return_value = count_episode_fields(episode_queryset)
+
+    assert (
+        return_value == expected_value
+    ), f"Single completely filled non epileptic Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return {expected_value} (as inserted nonepileptic_seizure_type=={seizure_type_answer}). Instead, returned {return_value}"
+
+
+@pytest.mark.django_db
+def test_count_episode_fields_uncertain(e12_case_factory, GOSH):
+    """
+    Tests count_episode_fields with single uncertain epileptic Episode queryset returns correct expected output, with a completed episode.
+    """
+    expected_value = 11  # 5 for incomplete epileptic episode, ++6 for uncertain episode base value incomplete fields
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__episode__common_fields=True,
+        **{
+            "registration__multiaxial_diagnosis__episode__epilepsy_or_nonepilepsy_status": EPILEPSY_DIAGNOSIS_STATUS[
+                2
+            ][
+                0
+            ],
+        },
+    )
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    episode_queryset = Episode.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+
+    return_value = count_episode_fields(episode_queryset)
+
+    assert (
+        return_value == expected_value
+    ), f"Single completely filled uncertain epileptic Episode ({episode_queryset=}) inserted into count_episode_fields() fn. Should return {expected_value}. Instead, returned {return_value}"
 
 
 @pytest.mark.django_db

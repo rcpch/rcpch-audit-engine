@@ -68,30 +68,62 @@ class E12EpisodeFactory(factory.django.DjangoModelFactory):
             focal_onset_focal_to_bilateral_tonic_clonic=None,
         )
 
-        # Set fields for completely filled Focal Onset Epilepsy
-        complete_episode_focal_onset_seizure = factory.Trait(
+        # These values don't affect further answer choices
+        common_fields = factory.Trait(
             **{
                 "seizure_onset_date": date(2023, 1, 1),
                 "seizure_onset_date_confidence": DATE_ACCURACY[0][0],
                 "episode_definition": EPISODE_DEFINITION[0][0],
                 "has_description_of_the_episode_or_episodes_been_gathered": True,
                 "description": "The seizure happened when child was watching TV",
+            }
+        )
+
+        # Set fields for completely filled Focal Onset Epilepsy
+        complete_episode_focal_onset_seizure = factory.Trait(
+            common_fields=True,
+            **{
                 "epilepsy_or_nonepilepsy_status": EPILEPSY_DIAGNOSIS_STATUS[0][0],
                 "epileptic_seizure_onset_type": EPILEPSY_SEIZURE_TYPE[0][0],
                 "focal_onset_left": True,
                 "focal_onset_impaired_awareness": True,  # should not be counted!
             }
         )
+        # Set fields for completely filled Generalised Onset Epilepsy
+        complete_episode_generalised_onset_seizure = factory.Trait(
+            common_fields=True,
+            **{
+                "epilepsy_or_nonepilepsy_status": EPILEPSY_DIAGNOSIS_STATUS[0][0],
+                "epileptic_seizure_onset_type": EPILEPSY_SEIZURE_TYPE[1][0],
+                "epileptic_generalised_onset": GENERALISED_SEIZURE_TYPE[-3][0],
+            }
+        )
+        # Set fields for completely filled Unclassified Onset Epilepsy
+        complete_episode_unclassified_onset_seizure = factory.Trait(
+            common_fields=True,
+            **{
+                "epilepsy_or_nonepilepsy_status": EPILEPSY_DIAGNOSIS_STATUS[0][0],
+                "epileptic_seizure_onset_type": EPILEPSY_SEIZURE_TYPE[3][0],
+            }
+        )
+        # Set fields for completely filled Unclassified Onset Epilepsy
+        complete_episode_unknown_onset_seizure = factory.Trait(
+            common_fields=True,
+            **{
+                "epilepsy_or_nonepilepsy_status": EPILEPSY_DIAGNOSIS_STATUS[0][0],
+                "epileptic_seizure_onset_type": EPILEPSY_SEIZURE_TYPE[2][0],
+            }
+        )
 
         # Set appropriate fields if Generalised onset type
         epileptic_seizure_onset_type_generalised = factory.Trait(
             reset=True,
-            epileptic_seizure_onset_type=EPILEPSY_SEIZURE_TYPE[1][
-                0
-            ],  # 'GO' Generalised onset
-            epileptic_generalised_onset=GENERALISED_SEIZURE_TYPE[-3][
-                0
-            ],  # TCl Tonic-clonic
+            **{
+                # 'GO' Generalised onset
+                "epileptic_seizure_onset_type": EPILEPSY_SEIZURE_TYPE[1][0],
+                # TCl Tonic-clonic
+                "epileptic_generalised_onset": GENERALISED_SEIZURE_TYPE[-3][0],
+            }
         )
 
         # Set appropriate fields if unknown onset type
