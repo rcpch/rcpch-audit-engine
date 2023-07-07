@@ -195,7 +195,7 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
     test_user_audit_centre_lead_clinician_data,
-    test_user_rcpch_audit_lead_data,
+    test_user_rcpch_audit_team_data,
 )
 from epilepsy12.models import (
     Epilepsy12User,
@@ -268,7 +268,7 @@ def test_users_and_case_list_views_permissions_success(
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {URL} list of {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {e12_user_list_response.status_code}"
 
         # Additional test to RCPCH AUDIT LEADs who should be able to view nationally
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
+        if test_user.role == test_user_rcpch_audit_team_data.role:
             # Request e12 user/case list endpoint url diff org
             e12_user_list_response = client.get(
                 reverse(
@@ -290,7 +290,10 @@ def test_users_and_case_list_views_permissions_success(
     ],
 )
 @pytest.mark.django_db
-def test_users_and_cases_list_view_permissions_forbidden(client,URL,):
+def test_users_and_cases_list_view_permissions_forbidden(
+    client,
+    URL,
+):
     """
     Simulating different E12Users with different roles attempting to access the Users / Cases list of different Trust.
 
@@ -304,7 +307,7 @@ def test_users_and_cases_list_view_permissions_forbidden(client,URL,):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -358,7 +361,7 @@ def test_registration_view_permissions_success(client):
 
         # Additional test: assert different organisation if RCPCH AUDIT LEAD
         # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
+        if test_user.role == test_user_rcpch_audit_team_data.role:
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
                 ParentOrganisation_ODSCode="RGT",
@@ -397,7 +400,7 @@ def test_registration_view_permissions_forbidden(client):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -414,11 +417,12 @@ def test_registration_view_permissions_forbidden(client):
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested registration of Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
+
 @pytest.mark.django_db
 def test_episode_syndrome_aem_view_permissions_success(client):
     """
     Assert these users CAN view following for Case from their own Trust:
-    
+
         - episode
         - syndrome
         - aem
@@ -443,8 +447,10 @@ def test_episode_syndrome_aem_view_permissions_success(client):
         multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
     )
     syndrome = Syndrome.objects.create(
-        syndrome_diagnosis_date=date(2023,2,1), # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
-        multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis
+        syndrome_diagnosis_date=date(
+            2023, 2, 1
+        ),  # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
+        multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
     )
 
     aem = AntiEpilepsyMedicine.objects.create(
@@ -483,8 +489,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
 
                 # Additional test: assert different organisation if RCPCH AUDIT LEAD
                 # ADDENBROOKE'S
-                if test_user.role == test_user_rcpch_audit_lead_data.role:
-
+                if test_user.role == test_user_rcpch_audit_team_data.role:
                     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                         ODSCode="RGT01",
                         ParentOrganisation_ODSCode="RGT",
@@ -498,17 +503,21 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                         episode_definition="a",
                         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
                     )
-                    
+
                     syndrome = Syndrome.objects.create(
-                        syndrome_diagnosis_date=date(2023,2,1), # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
-                        multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis
+                        syndrome_diagnosis_date=date(
+                            2023, 2, 1
+                        ),  # arbitrary answer just to ensure at least 1 completed field so not removed inside close_syndrome view
+                        multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
                     )
-                    
+
                     aem = AntiEpilepsyMedicine.objects.create(
                         management=CASE_FROM_DIFF_ORG.registration.management,
-                        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+                        medicine_entity=MedicineEntity.objects.get(
+                            medicine_name="Sodium valproate"
+                        ),
                     )
-                    
+
                     # Create the object to search for
                     if page == "episode":
                         OBJ_DIFF_ORGANISATION = episode
@@ -521,7 +530,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                         URL = f"{action}_{page}"
 
                         KWARGS = {f"{page}_id": OBJ_DIFF_ORGANISATION.id}
-                        
+
                         # Get response object
                         response = client.get(
                             reverse(
@@ -554,7 +563,7 @@ def test_episode_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -570,6 +579,7 @@ def test_episode_view_permissions_forbidden(client, URL):
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
 
 @pytest.mark.parametrize("URL", [("edit_syndrome"), ("close_syndrome")])
 @pytest.mark.django_db
@@ -590,7 +600,7 @@ def test_syndrome_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -606,6 +616,7 @@ def test_syndrome_view_permissions_forbidden(client, URL):
         assert (
             response.status_code == 403
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested syndrome page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
 
 @pytest.mark.parametrize(
     "URL", [("edit_antiepilepsy_medicine"), ("close_antiepilepsy_medicine")]
@@ -629,7 +640,7 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -702,7 +713,7 @@ def test_comborbidity_view_permissions_success(client, URL):
 
         # Additional test: assert different organisation if RCPCH AUDIT LEAD
         # ADDENBROOKE'S
-        if test_user.role == test_user_rcpch_audit_lead_data.role:
+        if test_user.role == test_user_rcpch_audit_team_data.role:
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
                 ParentOrganisation_ODSCode="RGT",
@@ -765,7 +776,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -836,6 +847,7 @@ def test_multiple_views_permissions_success(client):
                     url_name,
                     kwargs={"case_id": CASE_FROM_SAME_ORG.id},
                 )
+            )
             print(url_name, response.status_code)
 
             assert (
@@ -844,7 +856,7 @@ def test_multiple_views_permissions_success(client):
 
             # Additional test: assert different organisation if RCPCH AUDIT LEAD
             # ADDENBROOKE'S
-            if test_user.role == test_user_rcpch_audit_lead_data.role:
+            if test_user.role == test_user_rcpch_audit_team_data.role:
                 DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                     ODSCode="RGT01",
                     ParentOrganisation_ODSCode="RGT",
@@ -888,7 +900,7 @@ def test_multiple_views_permissions_forbidden(client):
     )
 
     # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
-    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_TEAM")
 
     for test_user in users:
         client.force_login(test_user)
@@ -912,4 +924,3 @@ def test_multiple_views_permissions_forbidden(client):
             assert (
                 response.status_code == 403
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested {url_name} page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-
