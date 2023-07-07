@@ -264,7 +264,6 @@ from epilepsy12.models import (
     ComorbidityEntity,
     Comorbidity,
     MedicineEntity,
-    AntiEpilepsyMedicine,
 )
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -275,8 +274,6 @@ from epilepsy12.tests.UserDataClasses import (
 )
 from epilepsy12.tests.factories import (
     E12UserFactory,
-    E12CaseFactory,
-    E12RegistrationFactory,
     E12SiteFactory,
     E12AntiEpilepsyMedicineFactory,
 )
@@ -626,19 +623,8 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update case {url} for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("first_paediatric_assessment_in_acute_or_nonacute_setting"),
-        ("has_number_of_episodes_since_the_first_been_documented"),
-        ("general_examination_performed"),
-        ("neurological_examination_performed"),
-        ("developmental_learning_or_schooling_problems"),
-        ("behavioural_or_emotional_problems"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_first_paediatric_assessment_success(client, URL):
+def test_users_update_first_paediatric_assessment_success(client):
     """
     Simulating different E12 Users attempting to update first paediatric assessment in Epilepsy12
 
@@ -666,54 +652,50 @@ def test_users_update_first_paediatric_assessment_success(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "first_paediatric_assessment_in_acute_or_nonacute_setting",
+        "has_number_of_episodes_since_the_first_been_documented",
+        "general_examination_performed",
+        "neurological_examination_performed",
+        "developmental_learning_or_schooling_problems",
+        "behavioural_or_emotional_problems",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL == "first_paediatric_assessment_in_acute_or_nonacute_setting":
-            # this is single_choice_multiple_toggle_button - select option 1
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "first_paediatric_assessment_id": CASE_FROM_SAME_ORG.registration.firstpaediatricassessment.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
-            )
-        else:
-            # all other options are toggle buttons: select True
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "first_paediatric_assessment_id": CASE_FROM_SAME_ORG.registration.firstpaediatricassessment.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
-            )
+        for URL in URLS:
+            if URL == "first_paediatric_assessment_in_acute_or_nonacute_setting":
+                # this is single_choice_multiple_toggle_button - select option 1
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "first_paediatric_assessment_id": CASE_FROM_SAME_ORG.registration.firstpaediatricassessment.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+                )
+            else:
+                # all other options are toggle buttons: select True
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "first_paediatric_assessment_id": CASE_FROM_SAME_ORG.registration.firstpaediatricassessment.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+                )
 
-        assert (
-            response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update first paediatric assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update first paediatric assessment ({URL}) for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-# Epilepsy Context
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("previous_febrile_seizure"),
-        ("previous_acute_symptomatic_seizure"),
-        ("is_there_a_family_history_of_epilepsy"),
-        ("previous_neonatal_seizures"),
-        ("were_any_of_the_epileptic_seizures_convulsive"),
-        ("experienced_prolonged_generalized_convulsive_seizures"),
-        ("experienced_prolonged_focal_seizures"),
-        ("diagnosis_of_epilepsy_withdrawn"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_first_epilepsy_context_forbidden(client, URL):
+def test_users_update_first_epilepsy_context_forbidden(client):
     """
     Simulating different E12 Users attempting to update epilepsy context in Epilepsy12
 
@@ -721,11 +703,6 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
     """
 
     # set up constants
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -747,39 +724,38 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "previous_febrile_seizure",
+        "previous_acute_symptomatic_seizure",
+        "is_there_a_family_history_of_epilepsy",
+        "previous_neonatal_seizures",
+        "were_any_of_the_epileptic_seizures_convulsive",
+        "experienced_prolonged_generalized_convulsive_seizures",
+        "experienced_prolonged_focal_seizures",
+        "diagnosis_of_epilepsy_withdrawn",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={
-                    "epilepsy_context_id": CASE_FROM_DIFF_ORG.registration.epilepsycontext.id,
-                },
+        for URL in URLS:
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "epilepsy_context_id": CASE_FROM_DIFF_ORG.registration.epilepsycontext.id,
+                    },
+                )
             )
-        )
 
-        assert (
-            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update epilepsy context {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+            assert (
+                response.status_code == response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update epilepsy context {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("previous_febrile_seizure"),
-        ("previous_acute_symptomatic_seizure"),
-        ("is_there_a_family_history_of_epilepsy"),
-        ("previous_neonatal_seizures"),
-        ("were_any_of_the_epileptic_seizures_convulsive"),
-        ("experienced_prolonged_generalized_convulsive_seizures"),
-        ("experienced_prolonged_focal_seizures"),
-        ("diagnosis_of_epilepsy_withdrawn"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_epilepsy_context_success(client, URL):
+def test_users_update_epilepsy_context_success(client):
     """
     Simulating different E12 Users attempting to update epilepsy context in Epilepsy12
 
@@ -807,6 +783,17 @@ def test_users_update_epilepsy_context_success(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "previous_febrile_seizure",
+        "previous_acute_symptomatic_seizure",
+        "is_there_a_family_history_of_epilepsy",
+        "previous_neonatal_seizures",
+        "were_any_of_the_epileptic_seizures_convulsive",
+        "experienced_prolonged_generalized_convulsive_seizures",
+        "experienced_prolonged_focal_seizures",
+        "diagnosis_of_epilepsy_withdrawn",
+    ]
+
     single_choice_multiple_toggle_fields = [
         "previous_febrile_seizure",
         "previous_acute_symptomatic_seizure",
@@ -820,54 +807,37 @@ def test_users_update_epilepsy_context_success(client, URL):
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in single_choice_multiple_toggle_fields:
-            # this is single_choice_multiple_toggle_button - select option 1
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "epilepsy_context_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
-            )
-        else:
-            # all other options are toggle buttons: select True
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "epilepsy_context_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
-            )
+        for URL in URLS:
+            if URL in single_choice_multiple_toggle_fields:
+                # this is single_choice_multiple_toggle_button - select option 1
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "epilepsy_context_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+                )
+            else:
+                # all other options are toggle buttons: select True
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "epilepsy_context_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-false", "Hx-Request": "true"},
+                )
 
-        assert (
-            response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
-
-
-# Multiaxial Diagnosis
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("epilepsy_cause_known"),
-        ("epilepsy_cause"),
-        ("epilepsy_cause_categories"),
-        ("relevant_impairments_behavioural_educational"),
-        ("mental_health_screen"),
-        ("mental_health_issue_identified"),
-        ("mental_health_issue"),
-        ("global_developmental_delay_or_learning_difficulties"),
-        ("global_developmental_delay_or_learning_difficulties_severity"),
-        ("autistic_spectrum_disorder"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
+def test_users_update_first_multiaxial_diagnosis_forbidden(client):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
 
@@ -875,11 +845,6 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
     """
 
     # set up constants
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -901,41 +866,40 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "epilepsy_cause_known",
+        "epilepsy_cause",
+        "epilepsy_cause_categories",
+        "relevant_impairments_behavioural_educational",
+        "mental_health_screen",
+        "mental_health_issue_identified",
+        "mental_health_issue",
+        "global_developmental_delay_or_learning_difficulties",
+        "global_developmental_delay_or_learning_difficulties_severity",
+        "autistic_spectrum_disorder",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        response = client.get(
-            reverse(
-                URL,
-                kwargs={
-                    "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id,
-                },
+        for URL in URLS:
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id,
+                    },
+                )
             )
-        )
 
-        assert (
-            response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update multiaxial diagnosis {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update multiaxial diagnosis {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("epilepsy_cause_known"),
-        ("epilepsy_cause"),
-        ("epilepsy_cause_categories"),
-        ("relevant_impairments_behavioural_educational"),
-        ("mental_health_screen"),
-        ("mental_health_issue_identified"),
-        ("mental_health_issue"),
-        ("global_developmental_delay_or_learning_difficulties"),
-        ("global_developmental_delay_or_learning_difficulties_severity"),
-        ("autistic_spectrum_disorder"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_multiaxial_diagnosis_success(client, URL):
+def test_users_update_multiaxial_diagnosis_success(client):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
 
@@ -963,6 +927,19 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "epilepsy_cause_known",
+        "epilepsy_cause",
+        "epilepsy_cause_categories",
+        "relevant_impairments_behavioural_educational",
+        "mental_health_screen",
+        "mental_health_issue_identified",
+        "mental_health_issue",
+        "global_developmental_delay_or_learning_difficulties",
+        "global_developmental_delay_or_learning_difficulties_severity",
+        "autistic_spectrum_disorder",
+    ]
+
     toggle_fields = [
         "epilepsy_cause_known",
         "relevant_impairments_behavioural_educational",
@@ -985,47 +962,48 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in toggle_fields:
-            # all other options are toggle buttons: select True
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        elif (
-            URL in single_choice_multiple_toggle_button_fields
-            or URL in multiple_choice_multiple_toggle_button_fields
-        ):
-            # this is single_choice_multiple_toggle_button - select option 1
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
-            )
-        else:
-            # all other options are selects: select True
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-                data={"epilepsy_cause": "179"},
-            )
+        for URL in URLS:
+            if URL in toggle_fields:
+                # all other options are toggle buttons: select True
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+            elif (
+                URL in single_choice_multiple_toggle_button_fields
+                or URL in multiple_choice_multiple_toggle_button_fields
+            ):
+                # this is single_choice_multiple_toggle_button - select option 1
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.epilepsycontext.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+                )
+            else:
+                # all other options are selects: select True
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
+                    data={"epilepsy_cause": "179"},
+                )
 
-        assert (
-            response.status_code == response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            assert (
+                response.status_code == response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -1128,26 +1106,8 @@ def test_update_multiaxial_diagnosis_cause_success(client):
         )
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("seizure_onset_date"),
-        ("seizure_onset_date_confidence"),
-        ("episode_definition"),
-        ("has_description_of_the_episode_or_episodes_been_gathered"),
-        ("edit_description"),
-        ("delete_description_keyword"),
-        ("epilepsy_or_nonepilepsy_status"),
-        ("epileptic_seizure_onset_type"),
-        ("focal_onset_epilepsy_checked_changed"),
-        ("epileptic_generalised_onset"),
-        ("nonepilepsy_generalised_onset"),
-        ("nonepileptic_seizure_type"),
-        ("nonepileptic_seizure_subtype"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_episode_forbidden(client, URL):
+def test_users_update_episode_forbidden(client):
     """
     Simulating different E12 Users attempting to update episode in Epilepsy12
 
@@ -1187,55 +1147,54 @@ def test_users_update_episode_forbidden(client, URL):
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
     )
 
+    URLS = [
+        "seizure_onset_date",
+        "seizure_onset_date_confidence",
+        "episode_definition",
+        "has_description_of_the_episode_or_episodes_been_gathered",
+        "edit_description",
+        "delete_description_keyword",
+        "epilepsy_or_nonepilepsy_status",
+        "epileptic_seizure_onset_type",
+        "focal_onset_epilepsy_checked_changed",
+        "epileptic_generalised_onset",
+        "nonepilepsy_generalised_onset",
+        "nonepileptic_seizure_type",
+        "nonepileptic_seizure_subtype",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL == "delete_description_keyword":
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                        "description_keyword_id": Keyword.objects.all().first().id,
-                    },
+        for URL in URLS:
+            if URL == "delete_description_keyword":
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                            "description_keyword_id": Keyword.objects.all().first().id,
+                        },
+                    )
                 )
-            )
-        else:
-            response = client.get(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
+            else:
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    )
                 )
-            )
 
-        assert (
-            response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {URL} for  {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("seizure_onset_date"),
-        ("seizure_onset_date_confidence"),
-        ("episode_definition"),
-        ("has_description_of_the_episode_or_episodes_been_gathered"),
-        ("edit_description"),
-        ("delete_description_keyword"),
-        ("epilepsy_or_nonepilepsy_status"),
-        ("epileptic_seizure_onset_type"),
-        ("focal_onset_epilepsy_checked_changed"),
-        ("epileptic_generalised_onset"),
-        ("nonepilepsy_generalised_onset"),
-        ("nonepileptic_seizure_type"),
-        ("nonepileptic_seizure_subtype"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_episode_success(client, URL):
+def test_users_update_episode_success(client):
     """
     Simulating different E12 Users attempting to update episode in Epilepsy12
 
@@ -1287,118 +1246,125 @@ def test_users_update_episode_success(client, URL):
         multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
     )
 
+    URLS = [
+        "seizure_onset_date",
+        "seizure_onset_date_confidence",
+        "episode_definition",
+        "has_description_of_the_episode_or_episodes_been_gathered",
+        "edit_description",
+        "delete_description_keyword",
+        "epilepsy_or_nonepilepsy_status",
+        "epileptic_seizure_onset_type",
+        "focal_onset_epilepsy_checked_changed",
+        "epileptic_generalised_onset",
+        "nonepilepsy_generalised_onset",
+        "nonepileptic_seizure_type",
+        "nonepileptic_seizure_subtype",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL == "delete_description_keyword":
-            keyword = Keyword.objects.all().first()
-            description_keyword_list = [keyword.keyword]
-            episode.description_keywords = description_keyword_list
-            episode.save()
+        for URL in URLS:
+            if URL == "delete_description_keyword":
+                keyword = Keyword.objects.all().first()
+                description_keyword_list = [keyword.keyword]
+                episode.description_keywords = description_keyword_list
+                episode.save()
 
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                        "description_keyword_id": 0,  # remove first item in list
-                    },
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                            "description_keyword_id": 0,  # remove first item in list
+                        },
+                    )
                 )
-            )
-        elif URL in single_choice_multiple_toggle_button_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
-            )
-        elif URL in toggle_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        elif URL in select_fields:
-            post_body = None
-            if URL == "episode_definition":
-                post_body = "a"
-            elif URL == "nonepileptic_seizure_type":
-                post_body = "MAD"
-            elif URL == "nonepileptic_seizure_subtype":
-                post_body = "c"
+            elif URL in single_choice_multiple_toggle_button_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+                )
+            elif URL in toggle_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+            elif URL in select_fields:
+                post_body = None
+                if URL == "episode_definition":
+                    post_body = "a"
+                elif URL == "nonepileptic_seizure_type":
+                    post_body = "MAD"
+                elif URL == "nonepileptic_seizure_subtype":
+                    post_body = "c"
+                else:
+                    raise ValueError("No select chosen")
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: post_body},
+                )
+            elif URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            elif URL == "edit_description":
+                # remaining values are strings
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "description", "Hx-Request": "true"},
+                    data={"description": "This is a description"},
+                )
             else:
-                raise ValueError("No select chosen")
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: post_body},
-            )
-        elif URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        elif URL == "edit_description":
-            # remaining values are strings
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "description", "Hx-Request": "true"},
-                data={"description": "This is a description"},
-            )
-        else:
-            # this is the choice for focal epilepsy
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "episode_id": episode.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "LATERALITY", "Hx-Request": "true"},
-                data={URL: "focal_onset_left"},
-            )
+                # this is the choice for focal epilepsy
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "episode_id": episode.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "LATERALITY", "Hx-Request": "true"},
+                    data={URL: "focal_onset_left"},
+                )
 
-        assert (
-            response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-#  Comorbidity
-
-
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("comorbidity_diagnosis_date"),
-        ("comorbidity_diagnosis"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_comorbidity_forbidden(client, URL):
+def test_users_update_comorbidity_forbidden(client):
     """
     Simulating different E12 Users attempting to update comorbidity in Epilepsy12
 
@@ -1406,11 +1372,6 @@ def test_users_update_comorbidity_forbidden(client, URL):
     """
 
     # set up constants
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -1432,58 +1393,53 @@ def test_users_update_comorbidity_forbidden(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "comorbidity_diagnosis_date",
+        "comorbidity_diagnosis",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
-        comorbidity, created = Comorbidity.objects.update_or_create(
-            multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-            comorbidity_diagnosis_date=date.today(),
-            comorbidityentity=ComorbidityEntity.objects.all().first(),
-        )
-        comorbidity.save()
 
-        if URL == "comorbidity_diagnosis_date":
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "comorbidity_id": comorbidity.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
+        for URL in URLS:
+            comorbidity, created = Comorbidity.objects.update_or_create(
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
+                comorbidity_diagnosis_date=date.today(),
+                comorbidityentity=ComorbidityEntity.objects.all().first(),
             )
-        elif URL == "comorbidity_diagnosis":
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "comorbidity_id": comorbidity.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: ComorbidityEntity.objects.all().first().id},
-            )
+            comorbidity.save()
 
-        if response.status_code == 200:
-            print(
-                f"{test_user.first_name} change permission: {test_user.has_perm('epilepsy12.change_comorbidity')} view permission: {test_user.has_perm('epilepsy12.view_comorbidity')}"
-            )
+            if URL == "comorbidity_diagnosis_date":
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "comorbidity_id": comorbidity.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            elif URL == "comorbidity_diagnosis":
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "comorbidity_id": comorbidity.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: ComorbidityEntity.objects.all().first().id},
+                )
 
-        assert (
-            response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update comorbidity for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update comorbidity {URL} for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("comorbidity_diagnosis_date"),
-        ("comorbidity_diagnosis"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_comorbidity_success(client, URL):
+def test_users_update_comorbidity_success(client):
     """
     Simulating different E12 Users attempting to update comorbidity in Epilepsy12
 
@@ -1511,76 +1467,54 @@ def test_users_update_comorbidity_success(client, URL):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
+    URLS = [
+        "comorbidity_diagnosis_date",
+        "comorbidity_diagnosis",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
-        comorbidity, created = Comorbidity.objects.update_or_create(
-            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
-            comorbidity_diagnosis_date=date.today(),
-            comorbidityentity=ComorbidityEntity.objects.all().first(),
-        )
-        comorbidity.save()
 
-        if URL == "comorbidity_diagnosis_date":
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "comorbidity_id": comorbidity.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
+        for URL in URLS:
+            comorbidity, created = Comorbidity.objects.update_or_create(
+                multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+                comorbidity_diagnosis_date=date.today(),
+                comorbidityentity=ComorbidityEntity.objects.all().first(),
             )
-        elif URL == "comorbidity_diagnosis":
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "comorbidity_id": comorbidity.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: ComorbidityEntity.objects.all().first().id},
-            )
+            comorbidity.save()
 
-        assert (
-            response.status_code == HTTPStatus.OK
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update comorbidities for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            if URL == "comorbidity_diagnosis_date":
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "comorbidity_id": comorbidity.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            elif URL == "comorbidity_diagnosis":
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "comorbidity_id": comorbidity.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: ComorbidityEntity.objects.all().first().id},
+                )
+
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update comorbidities {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-# Assessment
-
-
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("consultant_paediatrician_referral_made"),
-        ("consultant_paediatrician_referral_date"),
-        ("consultant_paediatrician_input_date"),
-        ("general_paediatric_centre"),
-        ("edit_general_paediatric_centre"),
-        ("update_general_paediatric_centre_pressed"),
-        ("paediatric_neurologist_referral_made"),
-        ("paediatric_neurologist_referral_date"),
-        ("paediatric_neurologist_input_date"),
-        ("paediatric_neurology_centre"),
-        ("edit_paediatric_neurology_centre"),
-        ("update_paediatric_neurology_centre_pressed"),
-        ("childrens_epilepsy_surgical_service_referral_criteria_met"),
-        ("childrens_epilepsy_surgical_service_referral_made"),
-        ("childrens_epilepsy_surgical_service_referral_date"),
-        ("childrens_epilepsy_surgical_service_input_date"),
-        ("epilepsy_surgery_centre"),
-        ("edit_epilepsy_surgery_centre"),
-        ("update_epilepsy_surgery_centre_pressed"),
-        ("epilepsy_specialist_nurse_referral_made"),
-        ("epilepsy_specialist_nurse_referral_date"),
-        ("epilepsy_specialist_nurse_input_date"),
-    ],
-)
+# NOTE: TOO COMPLEX, SHOULD SIMPLIFY
 @pytest.mark.django_db
-def test_users_update_assessment_forbidden(client, URL):
+def test_users_update_assessment_forbidden(client):
     """
     Simulating different E12 Users attempting to update assessment in Epilepsy12
 
@@ -1635,103 +1569,47 @@ def test_users_update_assessment_forbidden(client, URL):
         "epilepsy_specialist_nurse_input_date",
     ]
 
+    URLS = [
+        "consultant_paediatrician_referral_made",
+        "consultant_paediatrician_referral_date",
+        "consultant_paediatrician_input_date",
+        "general_paediatric_centre",
+        "edit_general_paediatric_centre",
+        "update_general_paediatric_centre_pressed",
+        "paediatric_neurologist_referral_made",
+        "paediatric_neurologist_referral_date",
+        "paediatric_neurologist_input_date",
+        "paediatric_neurology_centre",
+        "edit_paediatric_neurology_centre",
+        "update_paediatric_neurology_centre_pressed",
+        "childrens_epilepsy_surgical_service_referral_criteria_met",
+        "childrens_epilepsy_surgical_service_referral_made",
+        "childrens_epilepsy_surgical_service_referral_date",
+        "childrens_epilepsy_surgical_service_input_date",
+        "epilepsy_surgery_centre",
+        "edit_epilepsy_surgery_centre",
+        "update_epilepsy_surgery_centre_pressed",
+        "epilepsy_specialist_nurse_referral_made",
+        "epilepsy_specialist_nurse_referral_date",
+        "epilepsy_specialist_nurse_input_date",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in toggle_buttons:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        elif URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        else:
-            # these are all button clicks
-            # 'general_paediatric_centre',                   button click                       assessment_id
-            # 'edit_general_paediatric_centre',              button click                       assessment_id, site_id
-            # 'update_general_paediatric_centre_pressed',    button click (edit/cancel)         assessment_id, site_id
-            # 'paediatric_neurology_centre',                 button click                       assessment_id
-            # 'edit_paediatric_neurology_centre',            button click                       assessment_id, site_id
-            # 'update_paediatric_neurology_centre_pressed',  button click (edit/cancel)         assessment_id, site_id
-            # 'epilepsy_surgery_centre',                     button click                       assessment_id
-            # 'edit_epilepsy_surgery_centre',                button click                       assessment_id, site_id
-            # 'update_epilepsy_surgery_centre_pressed',      button click (edit/cancel)         assessment_id, site_id
-            if URL in [
-                "edit_general_paediatric_centre",
-                "update_general_paediatric_centre_pressed",
-                "edit_paediatric_neurology_centre",
-                "update_paediatric_neurology_centre_pressed",
-                "edit_epilepsy_surgery_centre",
-                "update_epilepsy_surgery_centre_pressed",
-            ]:
-                # these all need assessment_id and site_id
-                current_site = E12SiteFactory(
-                    case=CASE_FROM_DIFF_ORG,
-                    organisation=DIFF_TRUST_DIFF_ORGANISATION,
+        for URL in URLS:
+            if URL in toggle_buttons:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
                 )
-                if URL in [
-                    "update_general_paediatric_centre_pressed",
-                    "update_paediatric_neurology_centre_pressed",
-                    "update_epilepsy_surgery_centre_pressed",
-                ]:
-                    # these need accept a cancel or an edit param - testing the cancels here
-                    response = client.post(
-                        reverse(
-                            URL,
-                            kwargs={
-                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
-                                "site_id": current_site.pk,
-                                "action": "cancel",
-                            },
-                        ),
-                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                        data={URL: 177},  # new organisation_id northampton general
-                    )
-                    # assert cancel
-                    assert (
-                        response.status_code == HTTPStatus.FORBIDDEN
-                    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
-                    # assert edit
-                    response = client.post(
-                        reverse(
-                            URL,
-                            kwargs={
-                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
-                                "site_id": current_site.pk,
-                                "action": "edit",
-                            },
-                        ),
-                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                        data={URL: 177},  # new organisation_id northampton general
-                    )
-                else:
-                    response = client.post(
-                        reverse(
-                            URL,
-                            kwargs={
-                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
-                                "site_id": current_site.pk,
-                            },
-                        ),
-                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                        data={URL: 177},  # new organisation_id northampton general
-                    )
-            else:
+            elif URL in date_fields:
                 response = client.post(
                     reverse(
                         URL,
@@ -1740,43 +1618,98 @@ def test_users_update_assessment_forbidden(client, URL):
                         },
                     ),
                     headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                    data={URL: 177},  # new organisation_id northampton general
+                    data={URL: date.today()},
                 )
+            else:
+                # these are all button clicks
+                # 'general_paediatric_centre',                   button click                       assessment_id
+                # 'edit_general_paediatric_centre',              button click                       assessment_id, site_id
+                # 'update_general_paediatric_centre_pressed',    button click (edit/cancel)         assessment_id, site_id
+                # 'paediatric_neurology_centre',                 button click                       assessment_id
+                # 'edit_paediatric_neurology_centre',            button click                       assessment_id, site_id
+                # 'update_paediatric_neurology_centre_pressed',  button click (edit/cancel)         assessment_id, site_id
+                # 'epilepsy_surgery_centre',                     button click                       assessment_id
+                # 'edit_epilepsy_surgery_centre',                button click                       assessment_id, site_id
+                # 'update_epilepsy_surgery_centre_pressed',      button click (edit/cancel)         assessment_id, site_id
+                if URL in [
+                    "edit_general_paediatric_centre",
+                    "update_general_paediatric_centre_pressed",
+                    "edit_paediatric_neurology_centre",
+                    "update_paediatric_neurology_centre_pressed",
+                    "edit_epilepsy_surgery_centre",
+                    "update_epilepsy_surgery_centre_pressed",
+                ]:
+                    # these all need assessment_id and site_id
+                    current_site = E12SiteFactory(
+                        case=CASE_FROM_DIFF_ORG,
+                        organisation=DIFF_TRUST_DIFF_ORGANISATION,
+                    )
+                    if URL in [
+                        "update_general_paediatric_centre_pressed",
+                        "update_paediatric_neurology_centre_pressed",
+                        "update_epilepsy_surgery_centre_pressed",
+                    ]:
+                        # these need accept a cancel or an edit param - testing the cancels here
+                        response = client.post(
+                            reverse(
+                                URL,
+                                kwargs={
+                                    "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
+                                    "site_id": current_site.pk,
+                                    "action": "cancel",
+                                },
+                            ),
+                            headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                            data={URL: 177},  # new organisation_id northampton general
+                        )
+                        # assert cancel
+                        assert (
+                            response.status_code == HTTPStatus.FORBIDDEN
+                        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+                        # assert edit
+                        response = client.post(
+                            reverse(
+                                URL,
+                                kwargs={
+                                    "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
+                                    "site_id": current_site.pk,
+                                    "action": "edit",
+                                },
+                            ),
+                            headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                            data={URL: 177},  # new organisation_id northampton general
+                        )
+                    else:
+                        response = client.post(
+                            reverse(
+                                URL,
+                                kwargs={
+                                    "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
+                                    "site_id": current_site.pk,
+                                },
+                            ),
+                            headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                            data={URL: 177},  # new organisation_id northampton general
+                        )
+                else:
+                    response = client.post(
+                        reverse(
+                            URL,
+                            kwargs={
+                                "assessment_id": CASE_FROM_DIFF_ORG.registration.assessment.id,
+                            },
+                        ),
+                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                        data={URL: 177},  # new organisation_id northampton general
+                    )
 
-        assert (
-            response.status_code == HTTPStatus.FORBIDDEN
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment {URL} for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
-
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("consultant_paediatrician_referral_made"),
-        ("consultant_paediatrician_referral_date"),
-        ("consultant_paediatrician_input_date"),
-        ("general_paediatric_centre"),
-        ("edit_general_paediatric_centre"),
-        ("update_general_paediatric_centre_pressed"),
-        ("paediatric_neurologist_referral_made"),
-        ("paediatric_neurologist_referral_date"),
-        ("paediatric_neurologist_input_date"),
-        ("paediatric_neurology_centre"),
-        ("edit_paediatric_neurology_centre"),
-        ("update_paediatric_neurology_centre_pressed"),
-        ("childrens_epilepsy_surgical_service_referral_criteria_met"),
-        ("childrens_epilepsy_surgical_service_referral_made"),
-        ("childrens_epilepsy_surgical_service_referral_date"),
-        ("childrens_epilepsy_surgical_service_input_date"),
-        ("epilepsy_surgery_centre"),
-        ("edit_epilepsy_surgery_centre"),
-        ("update_epilepsy_surgery_centre_pressed"),
-        ("epilepsy_specialist_nurse_referral_made"),
-        ("epilepsy_specialist_nurse_referral_date"),
-        ("epilepsy_specialist_nurse_input_date"),
-    ],
-)
+# NOTE: TOO COMPLEX, SHOULD SIMPLIFY
 @pytest.mark.django_db
-def test_users_update_assessment_success(client, URL):
+def test_users_update_assessment_success(client):
     """
     Simulating different E12 Users attempting to update assessment in Epilepsy12
 
@@ -1825,103 +1758,47 @@ def test_users_update_assessment_success(client, URL):
         "epilepsy_specialist_nurse_input_date",
     ]
 
+    URLS = [
+        "consultant_paediatrician_referral_made",
+        "consultant_paediatrician_referral_date",
+        "consultant_paediatrician_input_date",
+        "general_paediatric_centre",
+        "edit_general_paediatric_centre",
+        "update_general_paediatric_centre_pressed",
+        "paediatric_neurologist_referral_made",
+        "paediatric_neurologist_referral_date",
+        "paediatric_neurologist_input_date",
+        "paediatric_neurology_centre",
+        "edit_paediatric_neurology_centre",
+        "update_paediatric_neurology_centre_pressed",
+        "childrens_epilepsy_surgical_service_referral_criteria_met",
+        "childrens_epilepsy_surgical_service_referral_made",
+        "childrens_epilepsy_surgical_service_referral_date",
+        "childrens_epilepsy_surgical_service_input_date",
+        "epilepsy_surgery_centre",
+        "edit_epilepsy_surgery_centre",
+        "update_epilepsy_surgery_centre_pressed",
+        "epilepsy_specialist_nurse_referral_made",
+        "epilepsy_specialist_nurse_referral_date",
+        "epilepsy_specialist_nurse_input_date",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in toggle_buttons:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        elif URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        else:
-            # these are all button clicks
-            # 'general_paediatric_centre',                   button click                       assessment_id
-            # 'edit_general_paediatric_centre',              button click                       assessment_id, site_id
-            # 'update_general_paediatric_centre_pressed',    button click (edit/cancel)         assessment_id, site_id
-            # 'paediatric_neurology_centre',                 button click                       assessment_id
-            # 'edit_paediatric_neurology_centre',            button click                       assessment_id, site_id
-            # 'update_paediatric_neurology_centre_pressed',  button click (edit/cancel)         assessment_id, site_id
-            # 'epilepsy_surgery_centre',                     button click                       assessment_id
-            # 'edit_epilepsy_surgery_centre',                button click                       assessment_id, site_id
-            # 'update_epilepsy_surgery_centre_pressed',      button click (edit/cancel)         assessment_id, site_id
-            if URL in [
-                "edit_general_paediatric_centre",
-                "update_general_paediatric_centre_pressed",
-                "edit_paediatric_neurology_centre",
-                "update_paediatric_neurology_centre_pressed",
-                "edit_epilepsy_surgery_centre",
-                "update_epilepsy_surgery_centre_pressed",
-            ]:
-                # these all need assessment_id and site_id
-                current_site = E12SiteFactory(
-                    case=CASE_FROM_SAME_ORG,
-                    organisation=TEST_USER_ORGANISATION,
+        for URL in URLS:
+            if URL in toggle_buttons:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
                 )
-                if URL in [
-                    "update_general_paediatric_centre_pressed",
-                    "update_paediatric_neurology_centre_pressed",
-                    "update_epilepsy_surgery_centre_pressed",
-                ]:
-                    # these need accept a cancel or an edit param - testing the cancels here
-                    response = client.post(
-                        reverse(
-                            URL,
-                            kwargs={
-                                "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
-                                "site_id": current_site.pk,
-                                "action": "cancel",
-                            },
-                        ),
-                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                        data={URL: 177},  # new organisation_id northampton general
-                    )
-                    # assert cancel
-                    assert (
-                        response.status_code == HTTPStatus.OK
-                    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
-                    # assert edit
-                    response = client.post(
-                        reverse(
-                            URL,
-                            kwargs={
-                                "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
-                                "site_id": current_site.pk,
-                                "action": "edit",
-                            },
-                        ),
-                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                        data={URL: 177},  # new organisation_id northampton general
-                    )
-                else:
-                    response = client.post(
-                        reverse(
-                            URL,
-                            kwargs={
-                                "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
-                                "site_id": current_site.pk,
-                            },
-                        ),
-                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                        data={URL: 177},  # new organisation_id northampton general
-                    )
-            else:
+            elif URL in date_fields:
                 response = client.post(
                     reverse(
                         URL,
@@ -1930,34 +1807,101 @@ def test_users_update_assessment_success(client, URL):
                         },
                     ),
                     headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                    data={URL: 177},  # new organisation_id northampton general
+                    data={URL: date.today()},
                 )
+            else:
+                # these are all button clicks
+                # 'general_paediatric_centre',                   button click                       assessment_id
+                # 'edit_general_paediatric_centre',              button click                       assessment_id, site_id
+                # 'update_general_paediatric_centre_pressed',    button click (edit/cancel)         assessment_id, site_id
+                # 'paediatric_neurology_centre',                 button click                       assessment_id
+                # 'edit_paediatric_neurology_centre',            button click                       assessment_id, site_id
+                # 'update_paediatric_neurology_centre_pressed',  button click (edit/cancel)         assessment_id, site_id
+                # 'epilepsy_surgery_centre',                     button click                       assessment_id
+                # 'edit_epilepsy_surgery_centre',                button click                       assessment_id, site_id
+                # 'update_epilepsy_surgery_centre_pressed',      button click (edit/cancel)         assessment_id, site_id
+                if URL in [
+                    "edit_general_paediatric_centre",
+                    "update_general_paediatric_centre_pressed",
+                    "edit_paediatric_neurology_centre",
+                    "update_paediatric_neurology_centre_pressed",
+                    "edit_epilepsy_surgery_centre",
+                    "update_epilepsy_surgery_centre_pressed",
+                ]:
+                    # these all need assessment_id and site_id
+                    current_site = E12SiteFactory(
+                        case=CASE_FROM_SAME_ORG,
+                        organisation=TEST_USER_ORGANISATION,
+                    )
+                    if URL in [
+                        "update_general_paediatric_centre_pressed",
+                        "update_paediatric_neurology_centre_pressed",
+                        "update_epilepsy_surgery_centre_pressed",
+                    ]:
+                        # these need accept a cancel or an edit param - testing the cancels here
+                        response = client.post(
+                            reverse(
+                                URL,
+                                kwargs={
+                                    "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
+                                    "site_id": current_site.pk,
+                                    "action": "cancel",
+                                },
+                            ),
+                            headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                            data={URL: 177},  # new organisation_id northampton general
+                        )
+                        # assert cancel
+                        assert (
+                            response.status_code == HTTPStatus.OK
+                        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+                        # assert edit
+                        response = client.post(
+                            reverse(
+                                URL,
+                                kwargs={
+                                    "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
+                                    "site_id": current_site.pk,
+                                    "action": "edit",
+                                },
+                            ),
+                            headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                            data={URL: 177},  # new organisation_id northampton general
+                        )
+                    else:
+                        response = client.post(
+                            reverse(
+                                URL,
+                                kwargs={
+                                    "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
+                                    "site_id": current_site.pk,
+                                },
+                            ),
+                            headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                            data={URL: 177},  # new organisation_id northampton general
+                        )
+                else:
+                    response = client.post(
+                        reverse(
+                            URL,
+                            kwargs={
+                                "assessment_id": CASE_FROM_SAME_ORG.registration.assessment.id,
+                            },
+                        ),
+                        headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                        data={URL: 177},  # new organisation_id northampton general
+                    )
 
             assert (
                 response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 # Investigations
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("eeg_indicated"),
-        ("eeg_request_date"),
-        ("eeg_performed_date"),
-        ("eeg_declined"),
-        ("twelve_lead_ecg_status"),
-        ("ct_head_scan_status"),
-        ("mri_indicated"),
-        ("mri_brain_requested_date"),
-        ("mri_brain_reported_date"),
-        ("mri_brain_declined"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_assessment_forbidden(client, URL):
+def test_users_update_assessment_forbidden(client):
     """
     Simulating different E12 Users attempting to update assessment in Epilepsy12
 
@@ -2006,82 +1950,81 @@ def test_users_update_assessment_forbidden(client, URL):
         "mri_indicated",
     ]
 
+    URLS = [
+        "eeg_indicated",
+        "eeg_request_date",
+        "eeg_performed_date",
+        "eeg_declined",
+        "twelve_lead_ecg_status",
+        "ct_head_scan_status",
+        "mri_indicated",
+        "mri_brain_requested_date",
+        "mri_brain_reported_date",
+        "mri_brain_declined",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in toggle_buttons:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        elif URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        else:
-            # these are all button clicks
-            # these need accept an edit or a decline param - testing the confirm here
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
-                        "confirm": "edit",
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-            )
-            # assert edit
+        for URL in URLS:
+            if URL in toggle_buttons:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+            elif URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            else:
+                # these are all button clicks
+                # these need accept an edit or a decline param - testing the confirm here
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
+                            "confirm": "edit",
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                )
+                # assert edit
+                assert (
+                    response.status_code == HTTPStatus.FORBIDDEN
+                ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+                # assert decline
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
+                            "confirm": "decline",
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                )
+
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
-            # assert decline
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_DIFF_ORG.registration.investigations.id,
-                        "confirm": "decline",
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-            )
-
-    assert (
-        response.status_code == HTTPStatus.FORBIDDEN
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment {URL} for {CASE_FROM_DIFF_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        ("eeg_indicated"),
-        ("eeg_request_date"),
-        ("eeg_performed_date"),
-        ("eeg_declined"),
-        ("twelve_lead_ecg_status"),
-        ("ct_head_scan_status"),
-        ("mri_indicated"),
-        ("mri_brain_requested_date"),
-        ("mri_brain_reported_date"),
-        ("mri_brain_declined"),
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_investigations_success(client, URL):
+def test_users_update_investigations_success(client):
     """
     Simulating different E12 Users attempting to update investigations in Epilepsy12
 
@@ -2124,88 +2067,81 @@ def test_users_update_investigations_success(client, URL):
         "mri_indicated",
     ]
 
+    URLS = [
+        "eeg_indicated",
+        "eeg_request_date",
+        "eeg_performed_date",
+        "eeg_declined",
+        "twelve_lead_ecg_status",
+        "ct_head_scan_status",
+        "mri_indicated",
+        "mri_brain_requested_date",
+        "mri_brain_reported_date",
+        "mri_brain_declined",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in toggle_buttons:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        elif URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        else:
-            # these are all button clicks
-            # these need accept an edit or a decline param - testing the edit here
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
-                        "confirm": "edit",
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-            )
-            # assert edit
+        for URL in URLS:
+            if URL in toggle_buttons:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+            elif URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            else:
+                # these are all button clicks
+                # these need accept an edit or a decline param - testing the edit here
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                            "confirm": "edit",
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                )
+                # assert edit
+                assert (
+                    response.status_code == HTTPStatus.OK
+                ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+                # assert decline
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                            "confirm": "decline",
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                )
+
             assert (
                 response.status_code == HTTPStatus.OK
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
-            # assert decline
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
-                        "confirm": "decline",
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-            )
-
-    assert (
-        response.status_code == HTTPStatus.OK
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-# Management
-@pytest.mark.parametrize(
-    "URL",
-    [
-        "has_an_aed_been_given",
-        "has_rescue_medication_been_prescribed",
-        "individualised_care_plan_in_place",
-        "individualised_care_plan_date",
-        "individualised_care_plan_has_parent_carer_child_agreement",
-        "individualised_care_plan_includes_service_contact_details",
-        "individualised_care_plan_include_first_aid",
-        "individualised_care_plan_parental_prolonged_seizure_care",
-        "individualised_care_plan_includes_general_participation_risk",
-        "individualised_care_plan_addresses_water_safety",
-        "individualised_care_plan_addresses_sudep",
-        "individualised_care_plan_includes_ehcp",
-        "has_individualised_care_plan_been_updated_in_the_last_year",
-        "has_been_referred_for_mental_health_support",
-        "has_support_for_mental_health_support",
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_management_forbidden(client, URL):
+def test_users_update_management_forbidden(client):
     """
     Simulating different E12 Users attempting to update management in Epilepsy12
 
@@ -2213,7 +2149,6 @@ def test_users_update_management_forbidden(client, URL):
     """
 
     # set up constants
-    # GOSH
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -2238,41 +2173,7 @@ def test_users_update_management_forbidden(client, URL):
     # fields
     date_fields = ["individualised_care_plan_date"]
 
-    for test_user in users:
-        # Log in Test User
-        client.force_login(test_user)
-
-        if URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "management_id": CASE_FROM_DIFFERENT_ORG.registration.management.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        else:
-            # these are all toggle buttons
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "management_id": CASE_FROM_DIFFERENT_ORG.registration.management.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-
-    assert (
-        response.status_code == HTTPStatus.FORBIDDEN
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update management for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
-
-
-@pytest.mark.parametrize(
-    "URL",
-    [
+    URLS = [
         "has_an_aed_been_given",
         "has_rescue_medication_been_prescribed",
         "individualised_care_plan_in_place",
@@ -2288,10 +2189,43 @@ def test_users_update_management_forbidden(client, URL):
         "has_individualised_care_plan_been_updated_in_the_last_year",
         "has_been_referred_for_mental_health_support",
         "has_support_for_mental_health_support",
-    ],
-)
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        for URL in URLS:
+            if URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "management_id": CASE_FROM_DIFFERENT_ORG.registration.management.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            else:
+                # these are all toggle buttons
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "management_id": CASE_FROM_DIFFERENT_ORG.registration.management.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update management {URL} for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+
+
 @pytest.mark.django_db
-def test_users_update_management_success(client, URL):
+def test_users_update_management_success(client):
     """
     Simulating different E12 Users attempting to update management in Epilepsy12
 
@@ -2322,57 +2256,59 @@ def test_users_update_management_success(client, URL):
     # fields
     date_fields = ["individualised_care_plan_date"]
 
+    URLS = [
+        "has_an_aed_been_given",
+        "has_rescue_medication_been_prescribed",
+        "individualised_care_plan_in_place",
+        "individualised_care_plan_date",
+        "individualised_care_plan_has_parent_carer_child_agreement",
+        "individualised_care_plan_includes_service_contact_details",
+        "individualised_care_plan_include_first_aid",
+        "individualised_care_plan_parental_prolonged_seizure_care",
+        "individualised_care_plan_includes_general_participation_risk",
+        "individualised_care_plan_addresses_water_safety",
+        "individualised_care_plan_addresses_sudep",
+        "individualised_care_plan_includes_ehcp",
+        "has_individualised_care_plan_been_updated_in_the_last_year",
+        "has_been_referred_for_mental_health_support",
+        "has_support_for_mental_health_support",
+    ]
+
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
 
-        if URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "management_id": CASE_FROM_SAME_ORG.registration.management.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        else:
-            # these are all toggle buttons
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "management_id": CASE_FROM_SAME_ORG.registration.management.id,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
+        for URL in URLS:
+            if URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "management_id": CASE_FROM_SAME_ORG.registration.management.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            else:
+                # these are all toggle buttons
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "management_id": CASE_FROM_SAME_ORG.registration.management.id,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
 
-    assert (
-        response.status_code == HTTPStatus.OK
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Management for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
-
-
-# Antiepilepsy Medicine
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Management {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-@pytest.mark.parametrize(
-    "URL",
-    [
-        "edit_antiepilepsy_medicine",
-        "medicine_id",
-        "antiepilepsy_medicine_start_date",
-        "antiepilepsy_medicine_add_stop_date",
-        "antiepilepsy_medicine_remove_stop_date",
-        "antiepilepsy_medicine_stop_date",
-        "antiepilepsy_medicine_risk_discussed",
-        "is_a_pregnancy_prevention_programme_in_place",
-        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
-    ],
-)
 @pytest.mark.django_db
-def test_users_update_antiepilepsymedicine_forbidden(client, URL):
+def test_users_update_antiepilepsymedicine_forbidden(client):
     """
     Simulating different E12 Users attempting to update antiepilepsymedicine in Epilepsy12
 
@@ -2380,11 +2316,6 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
     """
 
     # set up constants
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -2418,57 +2349,7 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
         "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
     ]
 
-    for test_user in users:
-        # Log in Test User
-        client.force_login(test_user)
-        rescue_antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
-            management=CASE_FROM_DIFFERENT_ORG.registration.management,
-            is_rescue_medicine=True,
-            medicine_entity=MedicineEntity.objects.get(pk=4),  # lorazepam
-        )
-        antiepilepsy_medicine = AntiEpilepsyMedicine.objects.filter(
-            management=CASE_FROM_DIFFERENT_ORG.registration.management
-        ).first()
-        if URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        elif URL in toggle_buttons:
-            # these are all toggle buttons
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        else:
-            # these are all button clicks
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine.pk},
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-            )
-
-    assert (
-        response.status_code == HTTPStatus.FORBIDDEN
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update antiepilepsymedicine for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
-
-
-@pytest.mark.parametrize(
-    "URL",
-    [
+    URLS = [
         "edit_antiepilepsy_medicine",
         "medicine_id",
         "antiepilepsy_medicine_start_date",
@@ -2478,10 +2359,57 @@ def test_users_update_antiepilepsymedicine_forbidden(client, URL):
         "antiepilepsy_medicine_risk_discussed",
         "is_a_pregnancy_prevention_programme_in_place",
         "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
-    ],
-)
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        for URL in URLS:
+            antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
+                management=CASE_FROM_DIFFERENT_ORG.registration.management,
+                is_rescue_medicine=True,
+                medicine_entity=MedicineEntity.objects.get(pk=4),  # lorazepam
+            )
+            if URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            elif URL in toggle_buttons:
+                # these are all toggle buttons
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+            else:
+                # these are all button clicks
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine.pk},
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                )
+
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update antiepilepsymedicine {URL} for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+
+
 @pytest.mark.django_db
-def test_users_update_antiepilepsymedicine_success(client, URL):
+def test_users_update_antiepilepsymedicine_success(client):
     """
     Simulating different E12 Users attempting to update antiepilepsymedicine in Epilepsy12
 
@@ -2520,51 +2448,65 @@ def test_users_update_antiepilepsymedicine_success(client, URL):
         "is_a_pregnancy_prevention_programme_in_place",
         "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
     ]
+    
+    URLS = [
+        "edit_antiepilepsy_medicine",
+        "medicine_id",
+        "antiepilepsy_medicine_start_date",
+        "antiepilepsy_medicine_add_stop_date",
+        "antiepilepsy_medicine_remove_stop_date",
+        "antiepilepsy_medicine_stop_date",
+        "antiepilepsy_medicine_risk_discussed",
+        "is_a_pregnancy_prevention_programme_in_place",
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed",
+    ]
 
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+        
+        for URL in URLS:
 
-        # carbamazepine
-        antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
-            management=CASE_FROM_SAME_ORG.registration.management,
-            is_rescue_medicine=True,
-            medicine_entity=MedicineEntity.objects.get(medicine_name="Carbamazepine"),
-        )
-
-        if URL in date_fields:
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={URL: date.today()},
-            )
-        elif URL in toggle_buttons:
-            # these are all toggle buttons
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={
-                        "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
-                    },
-                ),
-                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
-            )
-        else:
-            # these are all button clicks
-            response = client.post(
-                reverse(
-                    URL,
-                    kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine.pk},
-                ),
-                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
-                data={"medicine_id": 8},  # Clobazam
+            # carbamazepine
+            antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
+                management=CASE_FROM_SAME_ORG.registration.management,
+                is_rescue_medicine=True,
+                medicine_entity=MedicineEntity.objects.get(medicine_name="Carbamazepine"),
             )
 
-    assert (
-        response.status_code == HTTPStatus.OK
-    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update AntiepilepsyMedicine for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            if URL in date_fields:
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={URL: date.today()},
+                )
+            elif URL in toggle_buttons:
+                # these are all toggle buttons
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "antiepilepsy_medicine_id": antiepilepsy_medicine.pk,
+                        },
+                    ),
+                    headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+                )
+            else:
+                # these are all button clicks
+                response = client.post(
+                    reverse(
+                        URL,
+                        kwargs={"antiepilepsy_medicine_id": antiepilepsy_medicine.pk},
+                    ),
+                    headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                    data={"medicine_id": 8},  # Clobazam
+                )
+
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update AntiepilepsyMedicine {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
