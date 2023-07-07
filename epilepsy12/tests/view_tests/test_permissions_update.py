@@ -91,28 +91,30 @@
     [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Episode
-for field in fields: [
-    seizure_onset_date',                                                date_field
-    seizure_onset_date_confidence',                                     single_choice_multiple_toggle_button
-    episode_definition',                                                select
-    has_description_of_the_episode_or_episodes_been_gathered',          toggle_button
-    edit_description',                                                  string - updated in view function
-    delete_description_keyword',                                        Keyword id - updated in view function
-    epilepsy_or_nonepilepsy_status',                                    single_choice_multiple_toggle_button
-    epileptic_seizure_onset_type',                                      single_choice_multiple_toggle_button
-    focal_onset_epilepsy_checked_changed',                              updated in view function
-    epileptic_generalised_onset',                                       single_choice_multiple_toggle_button
-    nonepilepsy_generalised_onset',                                     single_choice_multiple_toggle_button
-    nonepileptic_seizure_type',                                         select
-    nonepileptic_seizure_subtype',                                      select
-]
-[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    for field in fields: [
+        seizure_onset_date',                                                date_field
+        seizure_onset_date_confidence',                                     single_choice_multiple_toggle_button
+        episode_definition',                                                select
+        has_description_of_the_episode_or_episodes_been_gathered',          toggle_button
+        edit_description',                                                  string - updated in view function
+        delete_description_keyword',                                        Keyword id - updated in view function
+        epilepsy_or_nonepilepsy_status',                                    single_choice_multiple_toggle_button
+        epileptic_seizure_onset_type',                                      single_choice_multiple_toggle_button
+        focal_onset_epilepsy_checked_changed',                              updated in view function
+        epileptic_generalised_onset',                                       single_choice_multiple_toggle_button
+        nonepilepsy_generalised_onset',                                     single_choice_multiple_toggle_button
+        nonepileptic_seizure_type',                                         select
+        nonepileptic_seizure_subtype',                                      select
+    ]
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    
+    [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Comorbidity
 for field in fields: [
