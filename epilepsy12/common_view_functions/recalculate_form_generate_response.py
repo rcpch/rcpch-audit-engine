@@ -1,5 +1,7 @@
 from dateutil import relativedelta
 from datetime import date
+
+# 3rd Party Imports
 from django_htmx.http import trigger_client_event
 from django.shortcuts import render
 from psycopg2 import DatabaseError
@@ -10,7 +12,21 @@ from epilepsy12.models_folder.comorbidity import Comorbidity
 from epilepsy12.models_folder.antiepilepsy_medicine import AntiEpilepsyMedicine
 from epilepsy12.models_folder.epilepsy12_site import Site
 
+# E12 imports
 from .calculate_kpis import calculate_kpis
+from epilepsy12.constants import (
+    Registration_minimum_scorable_fields,
+    EpilepsyContext_minimum_scorable_fields,
+    FirstPaediatricAssessment_minimum_scorable_fields,
+    MultiaxialDiagnosis_minimum_scorable_fields,
+    Episode_minimum_scorable_fields,
+    Syndrome_minimum_scorable_fields,
+    Comorbidity_minimum_scorable_fields,
+    Assessment_minimum_scorable_fields,
+    Investigations_minimum_scorable_fields,
+    Management_minimum_scorable_fields,
+    AntiEpilepsyMedicine_minimum_scorable_fields,
+)
 
 
 def recalculate_form_generate_response(
@@ -54,9 +70,9 @@ def update_audit_progress(model_instance):
     )
 
     all_completed_fields = completed_fields(model_instance)
-    all_expected_fields = total_fields_expected(model_instance)
-
     all_completed_fields += number_of_completed_fields_in_related_models(model_instance)
+
+    all_expected_fields = total_fields_expected(model_instance)
 
     update_fields = {
         f"{verbose_name_underscored}_total_expected_fields": all_expected_fields,
@@ -235,6 +251,7 @@ def total_fields_expected(model_instance):
             medicines = AntiEpilepsyMedicine.objects.filter(
                 management=model_instance, is_rescue_medicine=False
             ).all()
+
             if medicines.count() > 0:
                 for medicine in medicines:
                     # essential fields are:
@@ -431,101 +448,44 @@ def scoreable_fields_for_model_class_name(model_class_name):
     Returns the minimum number of scoreable fields based on the model instance at the time
     """
 
-    if model_class_name == "EpilepsyContext":
-        # Essential fields
-        return len(
-            [
-                "previous_febrile_seizure",
-                "previous_acute_symptomatic_seizure",
-                "is_there_a_family_history_of_epilepsy",
-                "previous_neonatal_seizures",
-                "diagnosis_of_epilepsy_withdrawn",
-                "were_any_of_the_epileptic_seizures_convulsive",
-                "experienced_prolonged_generalized_convulsive_seizures",
-                "experienced_prolonged_focal_seizures",
-            ]
-        )
-    elif model_class_name == "FirstPaediatricAssessment":
-        return len(
-            [
-                "first_paediatric_assessment_in_acute_or_nonacute_setting",
-                "has_number_of_episodes_since_the_first_been_documented",
-                "general_examination_performed",
-                "neurological_examination_performed",
-                "developmental_learning_or_schooling_problems",
-                "behavioural_or_emotional_problems",
-            ]
-        )
-    elif model_class_name == "MultiaxialDiagnosis":
+    if model_class_name == EpilepsyContext_minimum_scorable_fields.model_name:
+        return len(EpilepsyContext_minimum_scorable_fields.all_fields)
+
+    elif (
+        model_class_name == FirstPaediatricAssessment_minimum_scorable_fields.model_name
+    ):
+        return len(FirstPaediatricAssessment_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == MultiaxialDiagnosis_minimum_scorable_fields.model_name:
         # minimum fields in multiaxial_diagnosis include:
         # at least one episode that is epileptic fully completed
-        return len(
-            [
-                "syndrome_present",
-                "epilepsy_cause_known",
-                "relevant_impairments_behavioural_educational",
-                "autistic_spectrum_disorder",
-                "global_developmental_delay_or_learning_difficulties",
-                "mental_health_screen",
-                "mental_health_issue_identified",
-            ]
-        )
-    elif model_class_name == "Episode":
+        return len(MultiaxialDiagnosis_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Episode_minimum_scorable_fields.model_name:
         # returns minimum number of fields that could be scored for an epileptic episode
-        return len(
-            [
-                "seizure_onset_date",
-                "seizure_onset_date_confidence",
-                "episode_definition",
-                "has_description_of_the_episode_or_episodes_been_gathered",
-                "epilepsy_or_nonepilepsy_status",
-            ]
-        )
-    elif model_class_name == "Syndrome":
-        return len(["syndrome_diagnosis_date", "syndrome__syndrome_name"])
-    elif model_class_name == "Comorbidity":
-        return len(
-            ["comorbidity_diagnosis_date", "comorbidity__comorbidityentity__conceptId"]
-        )
-    elif model_class_name == "Assessment":
-        return len(
-            [
-                "childrens_epilepsy_surgical_service_referral_criteria_met",
-                "consultant_paediatrician_referral_made",
-                "paediatric_neurologist_referral_made",
-                "childrens_epilepsy_surgical_service_referral_made",
-                "epilepsy_specialist_nurse_referral_made",
-            ]
-        )
-    elif model_class_name == "Investigations":
-        return len(
-            [
-                "eeg_indicated",
-                "twelve_lead_ecg_status",
-                "ct_head_scan_status",
-                "mri_indicated",
-            ]
-        )
-    elif model_class_name == "Management":
-        return len(
-            [
-                "has_an_aed_been_given",
-                "has_rescue_medication_been_prescribed",
-                "individualised_care_plan_in_place",
-                "has_been_referred_for_mental_health_support",
-                "has_support_for_mental_health_support",
-            ]
-        )
-    elif model_class_name == "AntiEpilepsyMedicine":
-        return len(
-            [
-                "medicine_name",
-                "antiepilepsy_medicine_start_date",
-                "antiepilepsy_medicine_risk_discussed",
-            ]
-        )
-    elif model_class_name == "Registration":
-        return len(["registration_date", "eligibility_criteria_met"])
+        return len(Episode_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Syndrome_minimum_scorable_fields.model_name:
+        return len(Syndrome_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Comorbidity_minimum_scorable_fields.model_name:
+        return len(Comorbidity_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Assessment_minimum_scorable_fields.model_name:
+        return len(Assessment_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Investigations_minimum_scorable_fields.model_name:
+        return len(Investigations_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Management_minimum_scorable_fields.model_name:
+        return len(Management_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == AntiEpilepsyMedicine_minimum_scorable_fields.model_name:
+        return len(AntiEpilepsyMedicine_minimum_scorable_fields.all_fields)
+
+    elif model_class_name == Registration_minimum_scorable_fields.model_name:
+        return len(Registration_minimum_scorable_fields.all_fields)
+
     else:
         raise ValueError(
             f"Form scoring error: {model_class_name} does not exist to calculate minimum number of scoreable fields."
@@ -652,6 +612,7 @@ def number_of_completed_fields_in_related_models(model_instance):
         comorbidities = Comorbidity.objects.filter(
             multiaxial_diagnosis=model_instance
         ).all()
+
         if episodes.count() > 0:
             for episode in episodes:
                 calculated_score = completed_fields(episode)
@@ -667,10 +628,12 @@ def number_of_completed_fields_in_related_models(model_instance):
                 cumulative_score += completed_fields(comorbidity)
     elif model_instance.__class__.__name__ == "Assessment":
         # also need to count associated records in Site
+
         sites = Site.objects.filter(
             case=model_instance.registration.case,
             site_is_actively_involved_in_epilepsy_care=True,
         ).all()
+
         if sites:
             for site in sites:
                 if site.site_is_childrens_epilepsy_surgery_centre:

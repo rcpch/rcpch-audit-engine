@@ -6,6 +6,9 @@ from dataclasses import dataclass
 
 @dataclass
 class MinimumScorableFieldsForModel:
+    """
+    Used for `scoreable_fields_for_model_class_name`
+    """
     model_name: str
     all_fields: list
 
