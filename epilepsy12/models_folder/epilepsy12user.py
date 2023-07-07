@@ -53,9 +53,9 @@ class Epilepsy12UserManager(BaseUserManager):
             raise ValueError(_("You must provide an email address"))
 
         if not extra_fields.get("organisation_employer") and not extra_fields.get(
-            "is_staff"
+            "is_rcpch_staff"
         ):
-            # Non-RCPCH staff (is_staff) are not affiliated with a organisation
+            # Non-RCPCH staff (is_rcpch_staff) are not affiliated with a organisation
             raise ValueError(
                 _("You must provide the name of your main organisation trust.")
             )
@@ -120,6 +120,7 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
+        extra_fields.setdefault("is_rcpch_staff", True)
         extra_fields.setdefault("email_confirmed", True)
         # National level preference
         extra_fields.setdefault("view_preference", 2)
@@ -142,23 +143,31 @@ class Epilepsy12UserManager(BaseUserManager):
     def allocate_group_based_on_role(self, user):
         if user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-            user.is_staff = True
+            user.is_staff = False
+            user.is_rcpch_staff = False
         elif user.role == AUDIT_CENTRE_CLINICIAN:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = True
+            user.is_staff = False
+            user.is_rcpch_staff = False
         elif user.role == AUDIT_CENTRE_ADMINISTRATOR:
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = True
+            user.is_staff = False
+            user.is_rcpch_staff = False
         elif user.role == RCPCH_AUDIT_LEAD:
             group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            user.is_staff = True
+            user.is_staff = False
+            user.is_rcpch_staff = True
         elif user.role == RCPCH_AUDIT_ANALYST:
             group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            user.is_staff = True
+            user.is_staff = False
+            user.is_rcpch_staff = True
         elif user.role == RCPCH_AUDIT_ADMINISTRATOR:
             group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+            user.is_rcpch_staff = True
         elif user.role == RCPCH_AUDIT_PATIENT_FAMILY:
             group = Group.objects.get(name=PATIENT_ACCESS)
+            user.is_rcpch_staff = False
+            user.is_staff = False
         else:
             # no group
             group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
@@ -195,12 +204,13 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     )
     is_superuser = models.BooleanField(default=False)
     is_rcpch_audit_team_member = models.BooleanField(
-        # reflects is a member of the RCPCH audit team. If is_clinician is true, user is also a clinician and therefore must
+        # reflects is a member of the RCPCH audit team. If is_rcpch_audit_team_member is True and
+        # is_rcpch_staff is False, user is also a clinician/organisation admin and therefore must
         # may be affiliated with a organisation trust
         default=False
     )
-    is_clinician = models.BooleanField(
-        # reflects is a clinician
+    is_rcpch_staff = models.BooleanField(
+        # reflects if user is an RCPCH employe
         # must be affiliated with an organisation
         default=False
     )

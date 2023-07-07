@@ -252,6 +252,7 @@ def test_users_and_case_list_views_permissions_success(
 
     for test_user in users:
         # Log in Test User
+        print(test_user)
         client.force_login(test_user)
 
         # Request e12 User/Case list endpoint url of same Trust
@@ -289,10 +290,7 @@ def test_users_and_case_list_views_permissions_success(
     ],
 )
 @pytest.mark.django_db
-def test_users_and_cases_list_view_permissions_forbidden(
-    client,
-    URL,
-):
+def test_users_and_cases_list_view_permissions_forbidden(client,URL,):
     """
     Simulating different E12Users with different roles attempting to access the Users / Cases list of different Trust.
 
@@ -838,7 +836,7 @@ def test_multiple_views_permissions_success(client):
                     url_name,
                     kwargs={"case_id": CASE_FROM_SAME_ORG.id},
                 )
-            )
+            print(url_name, response.status_code)
 
             assert (
                 response.status_code == 200

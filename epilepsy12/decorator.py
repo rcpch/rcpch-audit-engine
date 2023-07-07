@@ -69,7 +69,7 @@ def editor_access_for_this_child(*outer_args, **outer_kwargs):
             else:
                 if (
                     request.user.is_rcpch_audit_team_member
-                    or request.user.is_staff
+                    or request.user.is_rcpch_staff
                     or request.user.is_superuser
                 ):
                     # user is an editor member of the RCPCH audit team
@@ -205,7 +205,7 @@ def user_may_view_this_organisation():
                 if (user.is_active and user.email_confirmed) or user.is_superuser:
                     if (
                         user.is_rcpch_audit_team_member
-                        or user.is_staff
+                        or user.is_rcpch_staff
                         or user.is_superuser
                     ):
                         # RCPCH staff or E12 RCPCH staff can see all children across the UK
@@ -316,7 +316,8 @@ def user_may_view_this_child():
                 if (
                     organisation.exists()
                     or user.is_rcpch_audit_team_member
-                    or user.is_staff
+                    or user.is_rcpch_staff
+                    or user.is_superuser
                 ):
                     return view(request, *args, **kwargs)
                 else:
