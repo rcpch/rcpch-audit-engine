@@ -41,6 +41,7 @@ from epilepsy12.constants import (
     Management_minimum_scorable_fields,
     AntiEpilepsyMedicine_minimum_scorable_fields,
 )
+from epilepsy12.tests.view_tests.form_calculations.test_number_of_completed_fields_in_related_models import get_random_answers_update_counter
 
 
 def test_correct_output_scoreable_fields_for_model_class_name():
@@ -123,7 +124,7 @@ def test_total_fields_expected_multiaxial_diagnosis_syndrome_fields(
     e12_case_factory, GOSH, e12_syndrome_factory
 ):
     """
-    Tests total_fields_expected(multiaxial_diagnosis) returns correct expected output, with a completed Syndrome. Each syndrome registered has 2 fields.
+    Tests total_fields_expected(multiaxial_diagnosis) returns correct expected output, with 3 completed Syndromes. Each syndrome registered has 2 fields.
 
     """
 
@@ -160,4 +161,71 @@ def test_total_fields_expected_multiaxial_diagnosis_syndrome_fields(
     return_value = total_fields_expected(multiaxial_diagnosis)
     
     assert return_value == expected_value, f"total_fields_expected(multiaxial_diagnosis) with {'3 syndromes registered' if ADD_SYNDROMES else 'syndrome_present==True but no syndromes entered'} expects return value of {expected_value} but received {return_value}"
+
+@pytest.mark.django_db
+def test_total_fields_expected_multiaxial_diagnosis_general_fields(
+    e12_case_factory, GOSH
+):
+    """
+    Tests total_fields_expected(multiaxial_diagnosis) returns correct expected output, with all general fields all True.
+
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        registration__multiaxial_diagnosis__epilepsy_cause_known = True, # +2
+        registration__multiaxial_diagnosis__relevant_impairments_behavioural_educational=True, # +2
+        registration__multiaxial_diagnosis__mental_health_issue_identified = True, # +1
+        registration__multiaxial_diagnosis__global_developmental_delay_or_learning_difficulties = True, # +1
+    )
+
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+    # Initial value because Multiaxial diagnosis fields minimum == 7; ++ no episodes == 5; ++ general_fields all true == 6;
+    expected_value = 23
         
+    return_value = total_fields_expected(multiaxial_diagnosis)
+    
+    assert return_value == expected_value, f"total_fields_expected(multiaxial_diagnosis) with general fields all True. Expected {expected_value} but got {return_value}"
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_assessment(
+    e12_case_factory, GOSH
+):
+    """
+    Tests total_fields_expected(assessment) returns correct expected output, with all general fields all True.
+    """
+
+    answer_set={}
+    expected_value=5 # minimum value when no fields complete
+    fields = [
+        'consultant_paediatrician_referral_made',
+        'paediatric_neurologist_referral_made',
+        'childrens_epilepsy_surgical_service_referral_made',
+        'epilepsy_specialist_nurse_referral_made',
+    ]
+    for field in fields:
+        answer = random.choice([None,True])
+        
+        BASE_KEY_NAME = 'registration__assessment__'
+        answer_set.update({f"{BASE_KEY_NAME}{field}":answer})
+        
+        if answer is not None:
+            if field == 'epilepsy_specialist_nurse_referral_made':
+                expected_value += 2
+            else:
+                expected_value += 3
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+        **answer_set,
+    )
+    
+    assessment = CASE.registration.assessment
+        
+    return_value = total_fields_expected(assessment)
+    
+    assert return_value == expected_value, f"total_fields_expected(assessment) expected {expected_value} but got {return_value}. Used answers: {answer_set}"
