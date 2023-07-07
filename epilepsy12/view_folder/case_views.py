@@ -420,7 +420,6 @@ def create_case(request, organisation_id):
         ("ZZ993VZ", "No fixed abode"),
     )
     form = CaseForm(request.POST or None)
-    
 
     template_name = "epilepsy12/cases/case.html"
 
@@ -444,7 +443,7 @@ def create_case(request, organisation_id):
             messages.error(
                 request=request, message="It was not possible to save the case"
             )
-            print('Invalid data')
+            print("Invalid data")
             print(form.errors)
 
     context = {
@@ -482,9 +481,12 @@ def update_case(request, organisation_id, case_id):
 
     if request.method == "POST":
         if ("delete") in request.POST:
+            if not request.user.has_perm("epilepsy12.delete_case"):
+                raise PermissionDenied()
             messages.success(request, f"You successfully deleted {case}'s details")
             case.delete()
             return redirect("cases", organisation_id=organisation_id)
+
         form = CaseForm(request.POST, instance=case)
         if form.is_valid():
             obj = form.save()
