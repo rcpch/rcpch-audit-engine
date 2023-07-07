@@ -85,6 +85,7 @@ from epilepsy12.models import (
     Management,
     MultiaxialDiagnosis,
     Episode,
+    SyndromeEntity,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     number_of_completed_fields_in_related_models,
@@ -324,3 +325,87 @@ def test_related_model_fields_count_all_episode_random_answers(
             # Reset for next seizure type
             episode.delete()
 
+
+@pytest.mark.django_db
+def test_related_model_fields_count_all_syndrome_fully_completed(
+    e12_case_factory, e12_syndrome_factory, GOSH
+):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=multiaxialdiagnosis) returns correct counter when all syndrome fields have an answer.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+    return_value = number_of_completed_fields_in_related_models(multiaxial_diagnosis)
+    assert (
+        return_value == 0
+    ), f"Empty syndrome, `number_of_completed_fields_in_related_models(multiaxial_diagnosis)` should return 0. Instead returned {return_value}"
+
+    factory_attributes = {
+        "syndrome_diagnosis_date": date(2023, 1, 1),
+        "syndrome": SyndromeEntity.objects.get(syndrome_name="Rasmussen syndrome"),
+    }
+
+    syndrome = e12_syndrome_factory(
+        multiaxial_diagnosis=multiaxial_diagnosis, **factory_attributes
+    )
+
+    return_value = number_of_completed_fields_in_related_models(multiaxial_diagnosis)
+
+    expected_value = len(factory_attributes)
+
+    assert (
+        return_value == expected_value
+    ), f"Fully completed Syndrome run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted Episode answer fields were: {factory_attributes}"
+
+
+@pytest.mark.django_db
+def test_related_model_fields_count_all_syndrome_random_answers(
+    e12_case_factory, e12_syndrome_factory, GOSH
+):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=multiaxialdiagnosis) returns correct counter when syndrome fields' answers are randomly either valid value or None.
+    """
+
+    counter = 0
+
+    factory_attributes_list = []
+    SYNDROME_NAMES = SyndromeEntity.objects.all()[:5]
+    for i in range(5):
+        inital_answer = {
+            "syndrome_diagnosis_date": date(2023, 1, 1),
+            "syndrome": SYNDROME_NAMES[i],
+        }
+        # Get random answer set for fields
+        ANSWER_SET, expected_value = get_random_answers_update_counter(
+            answer_set=inital_answer, counter=counter
+        )
+        factory_attributes_list.append((ANSWER_SET, expected_value))
+
+    # Create 5 randomly filled syndromes - ensures covers various different scenarios.
+    for factory_attributes, expected_value in factory_attributes_list:
+        # Need a case to make an syndrome
+        CASE = e12_case_factory(
+            first_name=f"temp_child_{GOSH.OrganisationName}",
+            organisations__organisation=GOSH,
+        )
+        multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+        syndrome = e12_syndrome_factory(
+            multiaxial_diagnosis=multiaxial_diagnosis,
+            **factory_attributes,
+        )
+
+        return_value = number_of_completed_fields_in_related_models(
+            multiaxial_diagnosis
+        )
+
+        assert (
+            return_value == expected_value
+        ), f"Randomly completed syndromes run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted syndrome answer fields: {factory_attributes}"
+
+        # Reset for next seizure type
+        syndrome.delete()
