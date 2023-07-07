@@ -1,15 +1,22 @@
-from django.utils import timezone
+# python imports
 from datetime import datetime
+
+# django imports
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
+from django.core.paginator import Paginator
+
+# third party imports
+from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
+
+# RCPCH imports
 from epilepsy12.forms import CaseForm
 from epilepsy12.models import Organisation, Site, Case
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
@@ -335,9 +342,19 @@ def case_submit(request, organisation_id, case_id):
     """
     POST request callback from submit button in case_list partial.
     Disables further editing of case information. Case considered submitted
+    There is a specific permission both for locking and unlocking which is tested in this function
     """
     case = Case.objects.get(pk=case_id)
-    case.locked = not case.locked
+    if case.locked is True and request.user.has_perm(
+        "epilepsy12.can_unlock_child_case_data_from_editing"
+    ):
+        case.locked = False
+    elif case.locked is False and request.user.has_perm(
+        "epilepsy12.can_lock_child_case_data_from_editing"
+    ):
+        case.locked = True
+    else:
+        raise PermissionDenied()
     case.save()
 
     return HttpResponseClientRedirect(
