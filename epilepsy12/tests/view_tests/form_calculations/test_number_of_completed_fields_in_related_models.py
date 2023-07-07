@@ -86,6 +86,7 @@ from epilepsy12.models import (
     MultiaxialDiagnosis,
     Episode,
     SyndromeEntity,
+    ComorbidityEntity,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     number_of_completed_fields_in_related_models,
@@ -359,7 +360,7 @@ def test_related_model_fields_count_all_syndrome_fully_completed(
 
     assert (
         return_value == expected_value
-    ), f"Fully completed Syndrome run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted Episode answer fields were: {factory_attributes}"
+    ), f"Fully completed Syndrome run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted answer fields were: {factory_attributes}"
 
 
 @pytest.mark.django_db
@@ -374,6 +375,7 @@ def test_related_model_fields_count_all_syndrome_random_answers(
 
     factory_attributes_list = []
     SYNDROME_NAMES = SyndromeEntity.objects.all()[:5]
+    # Create 5 randomly filled syndromes - ensures covers various different scenarios.
     for i in range(5):
         inital_answer = {
             "syndrome_diagnosis_date": date(2023, 1, 1),
@@ -385,7 +387,6 @@ def test_related_model_fields_count_all_syndrome_random_answers(
         )
         factory_attributes_list.append((ANSWER_SET, expected_value))
 
-    # Create 5 randomly filled syndromes - ensures covers various different scenarios.
     for factory_attributes, expected_value in factory_attributes_list:
         # Need a case to make an syndrome
         CASE = e12_case_factory(
@@ -405,7 +406,96 @@ def test_related_model_fields_count_all_syndrome_random_answers(
 
         assert (
             return_value == expected_value
-        ), f"Randomly completed syndromes run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted syndrome answer fields: {factory_attributes}"
+        ), f"Randomly completed syndromes run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted answer fields: {factory_attributes}"
 
         # Reset for next seizure type
         syndrome.delete()
+
+
+@pytest.mark.django_db
+def test_related_model_fields_count_all_comorbidity_fully_completed(
+    e12_case_factory, e12_comorbidity_factory, GOSH
+):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=multiaxialdiagnosis) returns correct counter when all comorbidity fields have an answer.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        organisations__organisation=GOSH,
+    )
+    multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+    return_value = number_of_completed_fields_in_related_models(multiaxial_diagnosis)
+    assert (
+        return_value == 0
+    ), f"Empty comorbidity, `number_of_completed_fields_in_related_models(multiaxial_diagnosis)` should return 0. Instead returned {return_value}"
+
+    factory_attributes = {
+        "comorbidity_diagnosis_date": date(2023, 1, 1),
+        "comorbidityentity": ComorbidityEntity.objects.first(),
+    }
+
+    comorbidity = e12_comorbidity_factory(
+        multiaxial_diagnosis=multiaxial_diagnosis, **factory_attributes
+    )
+
+    return_value = number_of_completed_fields_in_related_models(multiaxial_diagnosis)
+
+    expected_value = len(factory_attributes)
+
+    assert (
+        return_value == expected_value
+    ), f"Fully completed comorbidity run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted answer fields were: {factory_attributes}"
+
+
+@pytest.mark.django_db
+def test_related_model_fields_count_all_comorbidity_random_answers(
+    e12_case_factory, e12_comorbidity_factory, GOSH
+):
+    """
+    Simulating number_of_completed_fields_in_related_models(model_instance=multiaxialdiagnosis) returns correct counter when comorbidity fields' answers are randomly either valid value or None.
+    """
+
+    counter = 0
+
+    factory_attributes_list = []
+    COMORBIDITY_NAMES = ComorbidityEntity.objects.all()[:5]
+    # Create 5 randomly filled comorbiditys - ensures covers various different scenarios.
+    for i in range(len(COMORBIDITY_NAMES)):
+        # Comorbidity.comorbidityentity CANNOT be None, so only have diagnosis date's random answer options include None
+        inital_answer = {
+            "comorbidity_diagnosis_date": date(2023, 1, 1),
+        }
+        # Get random answer set for fields
+        ANSWER_SET, expected_value = get_random_answers_update_counter(
+            answer_set=inital_answer, counter=counter
+        )
+        ANSWER_SET.update({"comorbidityentity": COMORBIDITY_NAMES[i]})
+        expected_value += 1
+
+        factory_attributes_list.append((ANSWER_SET, expected_value))
+
+    for factory_attributes, expected_value in factory_attributes_list:
+        # Need a case to make an comorbidity
+        CASE = e12_case_factory(
+            first_name=f"temp_child_{GOSH.OrganisationName}",
+            organisations__organisation=GOSH,
+        )
+        multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
+
+        comorbidity = e12_comorbidity_factory(
+            multiaxial_diagnosis=multiaxial_diagnosis,
+            **factory_attributes,
+        )
+
+        return_value = number_of_completed_fields_in_related_models(
+            multiaxial_diagnosis
+        )
+
+        assert (
+            return_value
+            == expected_value  # Have to add 1 as comorbidityentity is always set, but outside the helper fn to updated expected_value
+        ), f"Randomly completed comorbiditys run through `number_of_completed_fields_in_related_models(multiaxial_diagnosis)`. Expected {expected_value=} but received {return_value=}. Inserted answer fields: {factory_attributes}"
+
+        # Reset for next seizure type
+        comorbidity.delete()
