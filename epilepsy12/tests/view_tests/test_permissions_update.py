@@ -132,30 +132,30 @@
     [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Assessment
-for field in fields: [
-    'consultant_paediatrician_referral_made',                               toggle_button
-    'consultant_paediatrician_referral_date',                               date_field
-    'consultant_paediatrician_input_date',                                  date_field
-    'general_paediatric_centre',                                            button click
-    'edit_general_paediatric_centre',                                       button click
-    'update_general_paediatric_centre_pressed',                             button click (edit/cancel)
-    'paediatric_neurologist_referral_made',                                 toggle_button
-    'paediatric_neurologist_referral_date',                                 date_field
-    'paediatric_neurologist_input_date',                                    date_field
-    'paediatric_neurology_centre',                                          button click
-    'edit_paediatric_neurology_centre',                                     button click    
-    'update_paediatric_neurology_centre_pressed',                           button click (edit/cancel)
-    'childrens_epilepsy_surgical_service_referral_criteria_met',            toggle_button                
-    'childrens_epilepsy_surgical_service_referral_made',                    toggle_button        
-    'childrens_epilepsy_surgical_service_referral_date',                    date_field    
-    'childrens_epilepsy_surgical_service_input_date',                       date_field
-    'epilepsy_surgery_centre',                                              button click
-    'edit_epilepsy_surgery_centre',                                         button click
-    'update_epilepsy_surgery_centre_pressed',                               button click (edit/cancel)            
-    'epilepsy_specialist_nurse_referral_made',                              toggle_button
-    'epilepsy_specialist_nurse_referral_date',                              date_field    
-    'epilepsy_specialist_nurse_input_date',                                 date_field
-]
+    for field in fields: [
+        'consultant_paediatrician_referral_made',                               toggle_button
+        'consultant_paediatrician_referral_date',                               date_field
+        'consultant_paediatrician_input_date',                                  date_field
+        'general_paediatric_centre',                                            button click
+        'edit_general_paediatric_centre',                                       button click
+        'update_general_paediatric_centre_pressed',                             button click (action:edit/cancel)
+        'paediatric_neurologist_referral_made',                                 toggle_button
+        'paediatric_neurologist_referral_date',                                 date_field
+        'paediatric_neurologist_input_date',                                    date_field
+        'paediatric_neurology_centre',                                          button click
+        'edit_paediatric_neurology_centre',                                     button click    
+        'update_paediatric_neurology_centre_pressed',                           button click (action:edit/cancel)
+        'childrens_epilepsy_surgical_service_referral_criteria_met',            toggle_button                
+        'childrens_epilepsy_surgical_service_referral_made',                    toggle_button        
+        'childrens_epilepsy_surgical_service_referral_date',                    date_field    
+        'childrens_epilepsy_surgical_service_input_date',                       date_field
+        'epilepsy_surgery_centre',                                              button click
+        'edit_epilepsy_surgery_centre',                                         button click
+        'update_epilepsy_surgery_centre_pressed',                               button click (action:edit/cancel)            
+        'epilepsy_specialist_nurse_referral_made',                              toggle_button
+        'epilepsy_specialist_nurse_referral_date',                              date_field    
+        'epilepsy_specialist_nurse_input_date',                                 date_field
+    ]
     [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
     [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
@@ -167,25 +167,27 @@ for field in fields: [
     [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Investigations
-for field in fields: [
-    'eeg_indicated',
-    'eeg_request_date',
-    'eeg_performed_date',
-    'eeg_declined',
-    'twelve_lead_ecg_status',
-    'ct_head_scan_status',
-    'mri_indicated',
-    'mri_brain_requested_date',
-    'mri_brain_reported_date',
-    'mri_brain_declined',
-]
-[ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
-[ ] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
-[ ] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    for field in fields: [
+        'eeg_indicated',                                                        toggle_button
+        'eeg_request_date',                                                     date_field
+        'eeg_performed_date',                                                   date_field    
+        'eeg_declined',                                                         button click (confirm:edit/decline)
+        'twelve_lead_ecg_status',                                               toggle_button        
+        'ct_head_scan_status',                                                  toggle_button    
+        'mri_indicated',                                                        toggle_button
+        'mri_brain_requested_date',                                             date_field
+        'mri_brain_reported_date',                                              date_field
+        'mri_brain_declined',                                                   button click (confirm:edit/decline)
+    ]
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
+    
+    [x] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can change 'field' - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Management
 for field in fields: [
@@ -2004,3 +2006,260 @@ def test_users_update_assessment_success(client, URL):
             assert (
                 response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+# Investigations
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("eeg_indicated"),
+        ("eeg_request_date"),
+        ("eeg_performed_date"),
+        ("eeg_declined"),
+        ("twelve_lead_ecg_status"),
+        ("ct_head_scan_status"),
+        ("mri_indicated"),
+        ("mri_brain_requested_date"),
+        ("mri_brain_reported_date"),
+        ("mri_brain_declined"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_assessment_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update assessment in Epilepsy12
+
+    Assert these users cannot change assessment
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_DIFFERENT_ORG = E12CaseFactory.create(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+
+    # fields
+    date_fields = [
+        "eeg_request_date",
+        "eeg_performed_date",
+        "mri_brain_requested_date",
+        "mri_brain_reported_date",
+    ]
+
+    toggle_buttons = [
+        "eeg_indicated",
+        "twelve_lead_ecg_status",
+        "ct_head_scan_status",
+        "mri_indicated",
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL in toggle_buttons:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+            )
+        elif URL in date_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        else:
+            # these are all button clicks
+            # these need accept an edit or a decline param - testing the confirm here
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                        "confirm": "edit",
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+            )
+            # assert edit
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFFERENT_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+            # assert decline
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_DIFFERENT_ORG.registration.investigations.id,
+                        "confirm": "decline",
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+            )
+
+    assert (
+        response.status_code == HTTPStatus.FORBIDDEN
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("eeg_indicated"),
+        ("eeg_request_date"),
+        ("eeg_performed_date"),
+        ("eeg_declined"),
+        ("twelve_lead_ecg_status"),
+        ("ct_head_scan_status"),
+        ("mri_indicated"),
+        ("mri_brain_requested_date"),
+        ("mri_brain_reported_date"),
+        ("mri_brain_declined"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_investigations_success(client, URL):
+    """
+    Simulating different E12 Users attempting to update investigations in Epilepsy12
+
+    Assert these users can change investigations
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
+        ]
+    )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
+
+    # fields
+    date_fields = [
+        "eeg_request_date",
+        "eeg_performed_date",
+        "mri_brain_requested_date",
+        "mri_brain_reported_date",
+    ]
+
+    toggle_buttons = [
+        "eeg_indicated",
+        "twelve_lead_ecg_status",
+        "ct_head_scan_status",
+        "mri_indicated",
+    ]
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL in toggle_buttons:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+            )
+        elif URL in date_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        else:
+            # these are all button clicks
+            # these need accept an edit or a decline param - testing the edit here
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                        "confirm": "edit",
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+            )
+            # assert edit
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+            # assert decline
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "investigations_id": CASE_FROM_SAME_ORG.registration.investigations.id,
+                        "confirm": "decline",
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+            )
+
+    assert (
+        response.status_code == HTTPStatus.OK
+    ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+# Management
