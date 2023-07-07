@@ -18,6 +18,7 @@ from ..constants import (
 )
 from .time_and_user_abstract_base_classes import *
 from ..general_functions import nth_tuesday_of_year, cohort_number_from_enrolment_date
+from ..validators import not_in_the_future_validator
 
 
 class Registration(
@@ -34,6 +35,7 @@ class Registration(
         },
         null=True,
         default=None,
+        validators=[not_in_the_future_validator],
     )
 
     registration_close_date = models.DateField(
