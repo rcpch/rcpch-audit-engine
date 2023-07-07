@@ -117,10 +117,10 @@
     [x] Assert Clinical Audit Team can change 'field' - response.status_code == HTTPStatus.OK
 
 # Comorbidity
-for field in fields: [
-    'comorbidity_diagnosis_date',
-    'comorbidity_diagnosis',
-]
+    for field in fields: [
+        'comorbidity_diagnosis_date',                                       date_field
+        'comorbidity_diagnosis',                                            select
+    ]
 [ ] Assert an Audit Centre Administrator can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
 [ ] Assert an Audit Centre Administrator cannot change 'field' inside a different Trust - response.status_code == HTTPStatus.FORBIDDEN
 [ ] Assert an Audit Centre Clinician can change 'field' inside own Trust - response.status_code == HTTPStatus.OK
@@ -251,6 +251,8 @@ from epilepsy12.models import (
     Keyword,
     EpilepsyCauseEntity,
     MultiaxialDiagnosis,
+    ComorbidityEntity,
+    Comorbidity,
 )
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -1340,3 +1342,157 @@ def test_users_update_episode_success(client, URL):
         assert (
             response.status_code == response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+#  Comorbidity
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("comorbidity_diagnosis_date"),
+        ("comorbidity_diagnosis"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_comorbidity_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update comorbidity in Epilepsy12
+
+    Assert these users cannot change comorbidity
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "RCPCH_AUDIT_TEAM",
+            "CLINICAL_AUDIT_TEAM",
+            test_user_audit_centre_clinician_data.role_str,
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+        comorbidity, created = Comorbidity.objects.update_or_create(
+            multiaxial_diagnosis=CASE_FROM_DIFFERENT_ORG.registration.multiaxialdiagnosis,
+            comorbidity_diagnosis_date=date.today(),
+            comorbidityentity=ComorbidityEntity.objects.all().first(),
+        )
+        comorbidity.save()
+
+        if URL == "comorbidity_diagnosis_date":
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "comorbidity_id": comorbidity.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        elif URL == "comorbidity_diagnosis":
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "comorbidity_id": comorbidity.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: ComorbidityEntity.objects.all().first().id},
+            )
+
+        if response.status_code == 200:
+            print(
+                f"{test_user.first_name} change permission: {test_user.has_perm('epilepsy12.change_comorbidity')} view permission: {test_user.has_perm('epilepsy12.view_comorbidity')}"
+            )
+
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update comorbidity for {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("comorbidity_diagnosis_date"),
+        ("comorbidity_diagnosis"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_comorbidity_success(client, URL):
+    """
+    Simulating different E12 Users attempting to update comorbidity in Epilepsy12
+
+    Assert these users can change comorbidity
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+            test_user_audit_centre_administrator_data.role_str,
+        ]
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+        comorbidity, created = Comorbidity.objects.update_or_create(
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+            comorbidity_diagnosis_date=date.today(),
+            comorbidityentity=ComorbidityEntity.objects.all().first(),
+        )
+        comorbidity.save()
+
+        if URL == "comorbidity_diagnosis_date":
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "comorbidity_id": comorbidity.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        elif URL == "comorbidity_diagnosis":
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "comorbidity_id": comorbidity.pk,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: ComorbidityEntity.objects.all().first().id},
+            )
+
+        assert (
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update comorbidities for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
