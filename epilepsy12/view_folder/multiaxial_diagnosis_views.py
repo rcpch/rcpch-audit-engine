@@ -246,7 +246,7 @@ def add_episode(request, multiaxial_diagnosis_id):
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_episode", raise_exception=True)
+@permission_required("epilepsy12.view_episode", raise_exception=True)
 def edit_episode(request, episode_id):
     """
     HTMX post request from episodes.html partial on button click to add new episode
