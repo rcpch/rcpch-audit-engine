@@ -73,7 +73,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                     is_rcpch_audit_team_member=is_rcpch_audit_team_member,
                     is_rcpch_staff=is_rcpch_staff,
                     organisation_employer=TEST_USER_ORGANISATION,
-                    groups=[Group.objects.get(name=user.group_name)],
+                    groups=[user.group_name],
                 )
         else:
             print("Test users already seeded. Skipping")

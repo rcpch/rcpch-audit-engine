@@ -98,6 +98,7 @@ from dateutil.relativedelta import relativedelta
 # django imports
 from django.urls import reverse
 from django.db import transaction
+from django.contrib.auth.models import Group
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (

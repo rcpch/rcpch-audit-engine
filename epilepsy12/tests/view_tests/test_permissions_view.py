@@ -446,7 +446,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all()
+    users = Epilepsy12User.objects.all().exclude()
 
     # Create objs to search for
     episode = Episode.objects.create(
