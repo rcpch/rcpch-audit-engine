@@ -188,21 +188,25 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
         unique=True,
         error_messages={"unique": _("This email address is already in use.")},
     )
-    bio = models.CharField(
-        help_text=_("Share something about yourself."),
-        max_length=500,
-        blank=True,
-        null=True,
-    )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(
-        # reflects if user is an RCPCH member of staff. This means they are not affiliated with a organisation trust
+        # reflects if user has access to admin
         default=False
     )
     is_superuser = models.BooleanField(default=False)
     is_rcpch_audit_team_member = models.BooleanField(
-        # reflects is a member of the RCPCH audit team. If is_staff is false, user is also a clinician and therefore must
-        # be affiliated with a organisation trust
+        # reflects is a member of the RCPCH audit team. If is_clinician is true, user is also a clinician and therefore must
+        # may be affiliated with a organisation trust
+        default=False
+    )
+    is_clinician = models.BooleanField(
+        # reflects is a clinician
+        # must be affiliated with an organisation
+        default=False
+    )
+    is_patient_or_carer = models.BooleanField(
+        # reflects is a patient or carer
+        # must be affiliated with an organisation
         default=False
     )
     view_preference = models.SmallIntegerField(
@@ -213,8 +217,6 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(default=timezone.now)
     role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
-    twitter_handle = models.CharField(max_length=255, null=True, blank=True)
-
     email_confirmed = models.BooleanField(default=False)
 
     history = HistoricalRecords()
