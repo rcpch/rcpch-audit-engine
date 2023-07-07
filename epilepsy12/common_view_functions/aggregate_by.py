@@ -56,30 +56,33 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
     # aggregate queries on trust level cases
     Case = apps.get_model("epilepsy12", "Case")
 
-    deprivation_quintiles = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (None, 6))
-
-    imd_long_list = [
-        When(index_of_multiple_deprivation_quintile=k, then=Value(v))
-        for k, v in deprivation_quintiles
-    ]
+    cases_in_selected_organisation = Case.objects.filter(
+        organisations__OrganisationName__contains=selected_organisation
+    )
 
     cases_aggregated_by_deprivation = (
-        Case.objects.filter(
-            organisations__OrganisationName__contains=selected_organisation
-        )
+        # Filter just Cases in selected org
+        cases_in_selected_organisation
+        # Get list of IMD quintiles
         .values("index_of_multiple_deprivation_quintile")
+        # Converting 'None' to 6 in a new index_of_multiple_deprivation_quintile_display "column"
         .annotate(
             index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
-                *imd_long_list, output_field=PositiveSmallIntegerField()
+                When(index_of_multiple_deprivation_quintile=None, then=Value(6)),
+                default="index_of_multiple_deprivation_quintile",
+                output_field=PositiveSmallIntegerField(),
             )
         )
+        # Keeps only the new column
         .values("index_of_multiple_deprivation_quintile_display")
+        # Value count the new column
         .annotate(
             cases_aggregated_by_deprivation=Count(
-                "index_of_multiple_deprivation_quintile"
-            )
+                "index_of_multiple_deprivation_quintile_display"
+            ),
         )
-        .order_by("index_of_multiple_deprivation_quintile")
+        .order_by('index_of_multiple_deprivation_quintile_display')
+        
     )
     
     deprivation_quintile_str_map = {
@@ -90,6 +93,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         5: "5th quintile",
         6: "Not known",
     }
+
     for aggregate in cases_aggregated_by_deprivation:
         quintile = aggregate["index_of_multiple_deprivation_quintile_display"]
 
@@ -98,7 +102,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         aggregate.update(
             {"index_of_multiple_deprivation_quintile_display_str": str_map}
         )
-
+ 
     return cases_aggregated_by_deprivation
 
 

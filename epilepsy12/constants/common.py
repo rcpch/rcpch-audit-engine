@@ -1,3 +1,6 @@
+from dataclasses import dataclass, fields
+from typing import Optional
+
 # Common selectors
 
 SECTION_STATUS_CHOICES = (
@@ -55,4 +58,30 @@ DATE_ACCURACY = (
     ("NK", "Not known"),
 )
 
-DEPRIVATION_QUINTILES = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (None, 6))
+@dataclass
+class DEPRIVATION_QUINTILES_DATACLASS:
+    first: int= 1
+    second: int=2
+    third: int=3
+    fourth: int=4
+    fifth: int=5
+    not_known: Optional[int] = None
+
+    @property
+    def deprivation_quintile_names(self):
+        
+        return [field.name for field in fields(self)]
+    
+    @property
+    def deprivation_quintiles(self):
+        
+        return [getattr(self, field.name) for field in fields(self)]
+    
+    def deprivation_quintiles_int_display_map(self, deprivation_quintile):
+        
+        if deprivation_quintile is None:
+            return 6
+        
+        return deprivation_quintile
+
+DEPRIVATION_QUINTILES = DEPRIVATION_QUINTILES_DATACLASS()
