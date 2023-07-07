@@ -3,18 +3,10 @@
 
 # python imports
 import pytest
-from datetime import date
+import random
 
 # 3rd party imports
-from django.contrib.gis.db.models import (
-    Count,
-    When,
-    ExpressionWrapper,
-    F,
-    Value,
-    PositiveSmallIntegerField,
-    Case as DJANGO_CASE,
-)
+
 
 # E12 imports
 from epilepsy12.common_view_functions import (
@@ -31,7 +23,12 @@ from epilepsy12.models import (
     KPI,
     Registration,
 )
-from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
+from epilepsy12.constants import (
+    SEX_TYPE,
+    DEPRIVATION_QUINTILES,
+    ETHNICITIES,
+    KPI_SCORE,
+)
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
 
 
@@ -125,7 +122,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
         },
         {
             "index_of_multiple_deprivation_quintile_display": 6,
-            "cases_aggregated_by_deprivation": 10, 
+            "cases_aggregated_by_deprivation": 10,
             "index_of_multiple_deprivation_quintile_display_str": "Not known",
         },
     ]
@@ -291,7 +288,7 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
                     EXPECTED_KPI_SCORE_OUTPUT[kpi_total]+=1
                 else:
                     pass
-        
+
         - feed into 10 E12CaseFactory's
         - compare output with expected
     """
@@ -301,6 +298,55 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         ODSCode="RQM01",
         ParentOrganisation_ODSCode="RQM",
     )
+
+    KPI_NAMES = [
+        "paediatrician_with_expertise_in_epilepsies",
+        "epilepsy_specialist_nurse",
+        "tertiary_input",
+        "epilepsy_surgery_referral",
+        "ecg",
+        "mri",
+        "assessment_of_mental_health_issues",
+        "mental_health_support",
+        "sodium_valproate",
+        "comprehensive_care_planning_agreement",
+        "patient_held_individualised_epilepsy_document",
+        "patient_carer_parent_agreement_to_the_care_planning",
+        "care_planning_has_been_updated_when_necessary",
+        "comprehensive_care_planning_content",
+        "parental_prolonged_seizures_care_plan",
+        "water_safety",
+        "first_aid",
+        "general_participation_and_risk",
+        "service_contact_details",
+        "sudep",
+        "school_individual_healthcare_plan",
+    ]
+
+    KPI_MAP = {
+        "kpi_1": ["paediatrician_with_expertise_in_epilepsies"],
+        "kpi_2": ["epilepsy_specialist_nurse"],
+        "kpi_3": ["tertiary_input", "epilepsy_surgery_referral"],
+        "kpi_4": ["ecg"],
+        "kpi_5": ["mri"],
+        "kpi_6": ["assessment_of_mental_health_issues"],
+        "kpi_7": ["mental_health_support"],
+        "kpi_8": ["sodium_valproate"],
+        "kpi_9": [
+            "comprehensive_care_planning_agreement",
+            "patient_held_individualised_epilepsy_document",
+            "patient_carer_parent_agreement_to_the_care_planning",
+            "care_planning_has_been_updated_when_necessary",
+            "comprehensive_care_planning_content",
+            "parental_prolonged_seizures_care_plan",
+            "water_safety",
+            "first_aid",
+            "general_participation_and_risk",
+            "service_contact_details",
+            "sudep",
+        ],
+        "kpi_10": ["school_individual_healthcare_plan"],
+    }
 
     EXPECTED_KPI_SCORE_OUTPUT = {
         "paediatrician_with_expertise_in_epilepsies": 0,
@@ -348,50 +394,91 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         "total_number_of_cases": 0,
     }
 
-    # create KPI objects
     kpi_metric_eligible_3_5_object = KPIMetric(
         eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
     )
-    kpi_metric_eligible_6_8_10_object = KPIMetric(
-        eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
+    
+    # Temp varaiable for debugging - shows answers insert into case constructors
+    assigned_outcomes = {}
+
+    # generate kpi_metric_eligible_3_5_object answer set for e12_case_factory constructor
+    def get_ans_dict_eligible_3_5_only_and_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT):
+        ans_dict = {}
+        for kpi_num in range(1, 11):
+            
+            if kpi_num in [6, 8, 10]:
+                # The kpi_metric_eligible_3_5_object automatically sets these to ineligible
+                continue
+            
+            OUTCOME_CHOICES = ['PASS','FAIL']
+            
+            
+            if kpi_num in [4, 7]:
+                OUTCOME_CHOICES += ["INELIGIBLE"]
+
+            outcome = random.choice(OUTCOME_CHOICES)
+            
+            kpi = f"kpi_{kpi_num}"
+            kpi_names = KPI_MAP[kpi]
+            
+            
+            for kpi_name in kpi_names:
+                
+                # Update expected answer
+                if outcome == "PASS":
+                    EXPECTED_KPI_SCORE_OUTPUT[kpi_name] += 1
+                    EXPECTED_KPI_SCORE_OUTPUT[f"{kpi_name}_total"] += 1
+                elif outcome == "FAIL":
+                    EXPECTED_KPI_SCORE_OUTPUT[f"{kpi_name}_total"] += 1
+
+                # Updated kpi answers for E12CaseFactory constructor
+                ans_dict.update({kpi:outcome})
+                
+                # TEMP VAR FOR DEBUGGING _ SHOWS ANSWERS ASSIGNED
+                temp_name = f"{kpi}-{kpi_name}"
+                
+                if assigned_outcomes.get(temp_name):
+                    assigned_outcomes[temp_name] += [outcome]
+                else:
+                    assigned_outcomes[temp_name] = [outcome]
+                    
+                
+       
+        return kpi_metric_eligible_3_5_object.generate_metrics(
+        **ans_dict
+        ), EXPECTED_KPI_SCORE_OUTPUT
+
+    
+    
+    for _ in range(10):
+        answers, EXPECTED_KPI_SCORE_OUTPUT = get_ans_dict_eligible_3_5_only_and_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT)
+        
+        # Create and save child with these KPI answers
+        CHILD = e12_case_factory(
+            organisations__organisation=CHELWEST,
+            **answers
+        )
+        EXPECTED_KPI_SCORE_OUTPUT['total_number_of_cases'] += 1
+
+        registration = Registration.objects.get(case=CHILD)
+
+        calculate_kpis(registration)
+
+    organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
+        organisation_instance=CHELWEST,
+        cohort=6,
+        case_complete=False,
+        abstraction_level="organisation",
     )
+
+    aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
     
-    collection_kpi_metric_eligible_3_5_objects = []
     
+    # REMOVE AVERAGE COUNTS FROM DICT FOR NOW
+    aggregated_kpis = {key: value for key, value in aggregated_kpis.items() if not key.endswith("_average")}
+    
+    # [print(agg, val) for agg,val in aggregated_kpis.items()]
 
-    # generate answer set for e12_case_factory constructor
-    # answers_eligible_3_5 = kpi_metric_eligible_3_5_object.generate_metrics(
-    #     kpi_1="PASS",
-    #     kpi_2="PASS",
-    #     kpi_3="PASS",
-    #     kpi_4="PASS",
-    #     kpi_5="PASS",
-    #     kpi_7="PASS",
-    #     kpi_9="PASS",
-    # )
-
-    # CHILDREN = e12_case_factory.create_batch(
-    #     size=10,
-    #     organisations__organisation=CHELWEST,
-    #     **answers_eligible_3_5,
-    # )
-
-    # for CHILD in CHILDREN:
-    #     registration = Registration.objects.get(case=CHILD)
-
-    #     calculate_kpis(registration)
-
-    # kpi = KPI.objects.get(pk=registration.pk)
-
-    # for attr, val in kpi.get_kpis().items():
-    #     print(f"{attr}:{val}")
-
-    # organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
-    #     organisation_instance=CHELWEST,
-    #     cohort=6,
-    #     case_complete=False,
-    #     abstraction_level="organisation",
-    # )
-
-    # aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
-    # [print(f"{agg}---{val}") for agg, val in aggregated_kpis.items()]
+    [print(f"{kpi}:{outcome}") for kpi,outcome in assigned_outcomes.items()]
+    
+    assert aggregated_kpis == EXPECTED_KPI_SCORE_OUTPUT
