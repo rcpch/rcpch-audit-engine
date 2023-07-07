@@ -240,9 +240,19 @@ from django.urls import reverse
 from django.contrib.auth.models import Group
 
 # E12 imports
-from epilepsy12.models import Epilepsy12User, Organisation, Case
+from epilepsy12.models import (
+    Epilepsy12User,
+    Organisation,
+    Case,
+    MultiaxialDiagnosis,
+    EpilepsyCauseEntity,
+)
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
+    test_user_audit_centre_clinician_data,
+    test_user_audit_centre_lead_clinician_data,
+    test_user_clinicial_audit_team_data,
+    test_user_rcpch_audit_team_data,
 )
 from epilepsy12.tests.factories import E12UserFactory
 
@@ -867,9 +877,7 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
     ],
 )
 @pytest.mark.django_db
-def test_users_update_multiaxial_diagnosis_success(
-    client, URL
-):
+def test_users_update_multiaxial_diagnosis_success(client, URL):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
 
@@ -939,9 +947,8 @@ def test_users_update_multiaxial_diagnosis_success(
                 headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
             )
         else:
-            
             # all other options are selects: select True
-            response = client.post(
+            response = client.get(
                 reverse(
                     URL,
                     kwargs={
@@ -949,12 +956,129 @@ def test_users_update_multiaxial_diagnosis_success(
                     },
                 ),
                 headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-                data={
-                    'epilepsy_cause':"179"
-                }
             )
 
         assert (
             response.status_code == response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update epilepsy context for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
 
+
+@pytest.mark.django_db
+def test_update_multiaxial_diagnosis_cause_success(client):
+    """
+    Assert different E12 Users can update Cause section of multiaxial diagnosis.
+
+    Endpoint url names:
+
+        'epilepsy_cause_known',
+        'epilepsy_cause_categories',
+        'epilepsy_cause'
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.filter(
+        first_name__in=[
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
+        ]
+    )
+    
+    # Fryns macrocephaly
+    EPILEPSY_CAUSE_ENTITY = EpilepsyCauseEntity.objects.get(id=179)
+
+    if not users:
+        assert False, f"Test db contains no users. Check db."
+
+    for test_user in users:
+        client.force_login(test_user)
+        print(
+            f"ECKnown before: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_known}"
+        )
+        response_epilepsy_cause_known = client.post(
+            reverse(
+                "epilepsy_cause_known",
+                kwargs={
+                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                },
+            ),
+            headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+        )
+        print(
+            f"ECKnown after: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_known}"
+        )
+
+        assert (
+            MultiaxialDiagnosis.objects.get(
+                registration=CASE_FROM_SAME_ORG.registration
+            ).epilepsy_cause_known
+            is True
+        ), f"{test_user} from {test_user.organisation_employer} attempted POST True to epilepsy_cause_known but model did not update."
+
+        print(
+            f"epilepsy_cause_categories before: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_categories}"
+        )
+        response_epilepsy_cause_categories = client.post(
+            reverse(
+                "epilepsy_cause_categories",
+                kwargs={
+                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                },
+            ),
+            headers={"Hx-Trigger-Name": "Gen", "Hx-Request": "true"},
+        )
+
+        print(
+            f"epilepsy_cause_categories after: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause_categories}"
+        )
+
+        assert MultiaxialDiagnosis.objects.get(
+            registration=CASE_FROM_SAME_ORG.registration
+        ).epilepsy_cause_categories == [
+            "Gen"
+        ], f"{test_user} from {test_user.organisation_employer} attempted POST `Gen` to epilepsy_cause_categories but model did not update."
+
+        print(
+            f"epilepsy_cause before: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause}"
+        )
+        response_epilepsy_cause = client.post(
+            reverse(
+                "epilepsy_cause",
+                kwargs={
+                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
+                },
+            ),
+            headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
+            data={"epilepsy_cause": f"{EPILEPSY_CAUSE_ENTITY.id}"},
+        )
+
+        print(
+            f"epilepsy_cause after: {MultiaxialDiagnosis.objects.get(registration=CASE_FROM_SAME_ORG.registration).epilepsy_cause}"
+        )
+
+        assert (
+            MultiaxialDiagnosis.objects.get(
+                registration=CASE_FROM_SAME_ORG.registration
+            ).epilepsy_cause
+            == EPILEPSY_CAUSE_ENTITY
+        ), f"{test_user} from {test_user.organisation_employer} attempted POST `epilepsy_cause:{EPILEPSY_CAUSE_ENTITY.id}` but MultiaxialDiagnosis model field did not update."
+
+        # Reset answers for next User
+        print("Resetting answers for next user \n\n")
+        MultiaxialDiagnosis.objects.filter(
+            registration=CASE_FROM_SAME_ORG.registration
+        ).update(
+            epilepsy_cause_known=None,
+            epilepsy_cause_categories=[],
+            epilepsy_cause=None,
+        )
