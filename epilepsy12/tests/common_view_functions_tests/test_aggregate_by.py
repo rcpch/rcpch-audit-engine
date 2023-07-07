@@ -21,7 +21,6 @@ from epilepsy12.models import (
     Case,
     KPI,
     Registration,
-    AntiEpilepsyMedicine,
 )
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
