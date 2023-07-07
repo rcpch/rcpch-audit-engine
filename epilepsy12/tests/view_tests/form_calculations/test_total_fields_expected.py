@@ -14,6 +14,7 @@ Additionally, these 5 use `scoreable_fields_for_model_class_name` += some extra 
 # Python imports
 import pytest
 from datetime import date
+from dateutil.relativedelta import relativedelta
 import random
 
 # Django imports
@@ -22,6 +23,7 @@ import random
 from epilepsy12.models import (
     Episode,
     SyndromeEntity,
+    MedicineEntity,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     scoreable_fields_for_model_class_name,
@@ -40,6 +42,7 @@ from epilepsy12.constants import (
     Investigations_minimum_scorable_fields,
     Management_minimum_scorable_fields,
     AntiEpilepsyMedicine_minimum_scorable_fields,
+    SEX_TYPE,
 )
 from epilepsy12.tests.view_tests.form_calculations.test_number_of_completed_fields_in_related_models import (
     get_random_answers_update_counter,
@@ -243,7 +246,7 @@ def test_total_fields_expected_assessment(e12_case_factory, GOSH):
 @pytest.mark.django_db
 def test_total_fields_expected_investigations(e12_case_factory, GOSH):
     """
-    Tests total_fields_expected(investigations) returns correct expected output, with all general fields all True.
+    Tests total_fields_expected(investigations) returns correct expected output, with all  fields all True.
     """
 
     answer_set = {}
@@ -275,10 +278,11 @@ def test_total_fields_expected_investigations(e12_case_factory, GOSH):
         return_value == expected_value
     ), f"total_fields_expected(investigations) expected {expected_value} but got {return_value}. Used answers: {answer_set}"
 
+
 @pytest.mark.django_db
 def test_total_fields_expected_registration(e12_case_factory, GOSH):
     """
-    Tests total_fields_expected(registration) returns correct expected output, with all general fields all True.
+    Tests total_fields_expected(registration) returns correct expected output, with all  fields all True.
     """
 
     answer_set = {}
@@ -296,3 +300,58 @@ def test_total_fields_expected_registration(e12_case_factory, GOSH):
     assert (
         return_value == expected_value
     ), f"total_fields_expected(registration) expected {expected_value} but got {return_value}. Used answers: {answer_set}"
+
+
+@pytest.mark.django_db
+def test_total_fields_expected_management(
+    e12_case_factory, e12_anti_epilepsy_medicine_factory, GOSH
+):
+    """
+    Tests total_fields_expected(management) returns correct expected output, with all fields all True.
+    """
+
+    CASE = e12_case_factory(
+        first_name=f"temp_child_{GOSH.OrganisationName}",
+        date_of_birth=date.today()
+        - relativedelta(years=13),  # to test sodium valproate
+        organisations__organisation=GOSH,
+        sex=SEX_TYPE[2][0],
+        registration__management__has_an_aed_been_given=True,
+        registration__management__has_rescue_medication_been_prescribed=True,
+    )
+
+    management = CASE.registration.management
+
+    # score +3 for medicine present, +2 as valproate in childbearing female
+    aed_answers = {
+        "medicine_entity": MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+        "antiepilepsy_medicine_start_date": date(2023, 1, 1),
+        "antiepilepsy_medicine_risk_discussed": True,
+        "is_a_pregnancy_prevention_programme_needed": True,
+        "is_a_pregnancy_prevention_programme_in_place": True,
+        "has_a_valproate_annual_risk_acknowledgement_form_been_completed": True,
+    }
+    aed = e12_anti_epilepsy_medicine_factory(
+        management=management,
+        is_rescue_medicine=False,
+        **aed_answers,
+    )
+
+    # score +3 for medicine present
+    rescue_medicine_answers = {
+        "medicine_entity": MedicineEntity.objects.get(medicine_name="Levetiracetam"),
+        "antiepilepsy_medicine_start_date": date(2023, 1, 1),
+        "antiepilepsy_medicine_risk_discussed": True,
+    }
+    rescue_medicine = e12_anti_epilepsy_medicine_factory(
+        management=management,
+        is_rescue_medicine=True,
+        **rescue_medicine_answers,
+    )
+
+    expected_value = 13  # minimum = 5; ++3 for Keppra; ++5 for valproate
+    return_value = total_fields_expected(management)
+
+    assert (
+        return_value == expected_value
+    ), f"total_fields_expected(management) expected {expected_value} but got {return_value}. 13yo girl registered with Valproate AED and Keppra as rescue"
