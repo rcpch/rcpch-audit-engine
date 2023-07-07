@@ -193,7 +193,19 @@
         'comorbidity_diagnosis_date',                                       date_field
         'comorbidity_diagnosis',                                            select
     ]
-    [] Assert user can change
+    [] Assert user can change 'comorbidity_diagnosis_date' ..
+    [] Assert user can change 'comorbidity_diagnosis' ..
+
+# Syndrome
+    for field in fields: [
+        add_syndrome                (multiaxial_diagnosis_id)               button click
+        edit_syndrome               (syndrome_id)                           button click
+        remove_syndrome             (syndrome_id)                           button click
+        close_syndrome              (syndrome_id)                           button click
+        syndrome_present            (multiaxial_diagnosis_id)               button click
+    ]
+    [] Assert user can change  ..
+    [] Assert user can change  ..
     
 
 # Assessment
@@ -221,7 +233,34 @@
         'epilepsy_specialist_nurse_referral_date',                              date_field    
         'epilepsy_specialist_nurse_input_date',                                 date_field
     ]
-    [] Assert user can change
+    [] Assert user can change 'consultant_paediatrician_referral_made' to True
+    [] Assert user can change 'consultant_paediatrician_referral_made' to False
+    [] Assert user can change 'consultant_paediatrician_referral_date' ..
+    [] Assert user can change 'general_paediatric_centre'...
+    [] Assert user can change 'edit_general_paediatric_centre' ..
+    [] Assert user can change 'update_general_paediatric_centre_pressed'..
+    [] Assert user can change 'paediatric_neurologist_referral_made' to True
+    [] Assert user can change 'paediatric_neurologist_referral_made' to False
+    [] Assert user can change 'paediatric_neurologist_referral_date' ..
+    [] Assert user can change 'paediatric_neurologist_referral_date' ..
+    [] Assert user can change 'paediatric_neurologist_input_date' ..
+    [] Assert user can change 'paediatric_neurology_centre' ..
+    [] Assert user can change 'edit_paediatric_neurology_centre' ..
+    [] Assert user can change 'update_paediatric_neurology_centre_pressed'..
+    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_criteria_met' to True
+    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_criteria_met' to False
+    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_made' to True
+    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_made' to False
+    [] Assert user can change 'childrens_epilepsy_surgical_service_referral_date' ..
+    [] Assert user can change 'childrens_epilepsy_surgical_service_input_date' ..
+    [] Assert user can change 'epilepsy_surgery_centre' ..
+    [] Assert user can change 'edit_epilepsy_surgery_centre'..
+    [] Assert user can change 'update_epilepsy_surgery_centre_pressed' ..
+    [] Assert user can change 'update_epilepsy_surgery_centre_pressed' ..
+    [] Assert user can change 'epilepsy_specialist_nurse_referral_made' to True
+    [] Assert user can change 'epilepsy_specialist_nurse_referral_made' to False
+    [] Assert user can change 'epilepsy_specialist_nurse_referral_date' ..
+    [] Assert user can change 'epilepsy_specialist_nurse_input_date' ..
 
 # Investigations
     for field in fields: [
@@ -236,7 +275,20 @@
         'mri_brain_reported_date',                                              date_field
         'mri_brain_declined',                                                   button click (confirm:edit/decline)
     ]
-    [] Assert user can change
+    [] Assert user can change 'eeg_indicated' to True
+    [] Assert user can change 'eeg_indicated' to False
+    [] Assert user can change 'eeg_request_date' ..
+    [] Assert user can change 'eeg_performed_date' ..
+    [] Assert user can change 'eeg_declined' ..
+    [] Assert user can change 'twelve_lead_ecg_status' to True
+    [] Assert user can change 'twelve_lead_ecg_status' to False
+    [] Assert user can change 'ct_head_scan_status' to True
+    [] Assert user can change 'ct_head_scan_status' to False
+    [] Assert user can change 'mri_indicated' to True
+    [] Assert user can change 'mri_indicated' to False
+    [] Assert user can change 'mri_brain_requested_date' ..
+    [] Assert user can change 'mri_brain_reported_date' ..
+    [] Assert user can change 'mri_brain_declined' ..
 
 # Management
     for field in fields: [
@@ -256,7 +308,35 @@
         'has_an_aed_been_given',                                                toggle_button
         'has_rescue_medication_been_prescribed',                                toggle_button
     ]
-    [] Assert user can change
+    [] Assert user can change 'individualised_care_plan_in_place' to True
+    [] Assert user can change 'individualised_care_plan_in_place' to False
+    [] Assert user can change 'individualised_care_plan_date' ..
+    [] Assert user can change 'individualised_care_plan_has_parent_carer_child_agreement' to True
+    [] Assert user can change 'individualised_care_plan_has_parent_carer_child_agreement' to False
+    [] Assert user can change 'individualised_care_plan_includes_service_contact_details' to True
+    [] Assert user can change 'individualised_care_plan_includes_service_contact_details' to False
+    [] Assert user can change 'individualised_care_plan_include_first_aid' to True
+    [] Assert user can change 'individualised_care_plan_include_first_aid' to False
+    [] Assert user can change 'individualised_care_plan_parental_prolonged_seizure_care' to True
+    [] Assert user can change 'individualised_care_plan_parental_prolonged_seizure_care' to False
+    [] Assert user can change 'individualised_care_plan_includes_general_participation_risk' to True
+    [] Assert user can change 'individualised_care_plan_includes_general_participation_risk' to False
+    [] Assert user can change 'individualised_care_plan_addresses_water_safety' to True
+    [] Assert user can change 'individualised_care_plan_addresses_water_safety' to False
+    [] Assert user can change 'individualised_care_plan_addresses_sudep' to True
+    [] Assert user can change 'individualised_care_plan_addresses_sudep' to False
+    [] Assert user can change 'individualised_care_plan_includes_ehcp' to True
+    [] Assert user can change 'individualised_care_plan_includes_ehcp' to False
+    [] Assert user can change 'has_individualised_care_plan_been_updated_in_the_last_year' to True
+    [] Assert user can change 'has_individualised_care_plan_been_updated_in_the_last_year' to False
+    [] Assert user can change 'has_been_referred_for_mental_health_support' to True
+    [] Assert user can change 'has_been_referred_for_mental_health_support' to False
+    [] Assert user can change 'has_support_for_mental_health_support' to True
+    [] Assert user can change 'has_support_for_mental_health_support' to False
+    [] Assert user can change 'has_an_aed_been_given' to True
+    [] Assert user can change 'has_an_aed_been_given' to False
+    [] Assert user can change 'has_rescue_medication_been_prescribed' to True
+    [] Assert user can change 'has_rescue_medication_been_prescribed' to False
 
 # Antiepilepsy Medicine
     for field in fields: [
@@ -270,8 +350,18 @@
         'is_a_pregnancy_prevention_programme_in_place',                         toggle_button
         'has_a_valproate_annual_risk_acknowledgement_form_been_completed',      toggle_button
     ]
-    [] Assert user can change
-
+    [] Assert user can change 'edit_antiepilepsy_medicine' ..
+    [] Assert user can change 'medicine_id' ..
+    [] Assert user can change 'antiepilepsy_medicine_start_date' ..
+    [] Assert user can change 'antiepilepsy_medicine_add_stop_date' ..
+    [] Assert user can change 'antiepilepsy_medicine_remove_stop_date' ..
+    [] Assert user can change 'antiepilepsy_medicine_stop_date' ..
+    [] Assert user can change 'antiepilepsy_medicine_risk_discussed' to True
+    [] Assert user can change 'antiepilepsy_medicine_risk_discussed' to False
+    [] Assert user can change 'is_a_pregnancy_prevention_programme_in_place' to True
+    [] Assert user can change 'is_a_pregnancy_prevention_programme_in_place' to False
+    [] Assert user can change 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' to True
+    [] Assert user can change 'has_a_valproate_annual_risk_acknowledgement_form_been_completed' to False
 
 """
 # Python imports
