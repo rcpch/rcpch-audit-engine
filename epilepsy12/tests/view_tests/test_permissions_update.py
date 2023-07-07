@@ -851,7 +851,6 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update multiaxial diagnosis {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
 
 
-@pytest.mark.xfail()  # all these pass the the epilepsy_cause fails as the EpilepsyCauseEntity table has not been seeded
 @pytest.mark.parametrize(
     "URL",
     [
@@ -868,7 +867,9 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client, URL):
     ],
 )
 @pytest.mark.django_db
-def test_users_update_multiaxial_diagnosis_success(client, URL):
+def test_users_update_multiaxial_diagnosis_success(
+    client, seed_epilepsy_causes_fixture, URL
+):
     """
     Simulating different E12 Users attempting to update multiaxial diagnosis in Epilepsy12
 
