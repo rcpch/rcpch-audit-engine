@@ -2,13 +2,13 @@
 
 ## Create Tests
 
-    [ ] Assert an Audit Centre Lead Clinician can create users inside own Trust - response.status_code == HTTPStatus.OK
-    [ ] Assert RCPCH Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
-    [ ] Assert Clinical Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can create users inside own Trust - response.status_code == HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
+    [x] Assert Clinical Audit Team can create users nationally, inside own Trust, and outside  - response.status_code == HTTPStatus.OK
 
-    [ ] Assert an Audit Centre Administrator CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an audit centre clinician CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
-    [ ] Assert an Audit Centre Lead Clinician CANNOT create users outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
+    [] Assert an Audit Centre Administrator CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
+    [] Assert an audit centre clinician CANNOT create users - response.status_code == HTTPStatus.FORBIDDEN
+    [] Assert an Audit Centre Lead Clinician CANNOT create users outside own Trust - response.status_code == HTTPStatus.FORBIDDEN
 
 
     [ ] Assert an Audit Centre Administrator can create patients inside own Trust - response.status_code == HTTPStatus.OK
@@ -151,7 +151,7 @@ def test_user_creation_same_org_success(
     )
     
     if not users:
-        assert False, f"No seeded users in test db. Test cannot run."
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
 
     for test_user in users:
         client.force_login(test_user)
@@ -211,7 +211,7 @@ def test_user_creation_diff_org_success(
     users = Epilepsy12User.objects.filter(first_name__in=['RCPCH_AUDIT_TEAM','CLINICAL_AUDIT_TEAM'])
     
     if not users:
-        assert False, f"No seeded users in test db. Test cannot run."
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
 
     for test_user in users:
         
@@ -243,3 +243,75 @@ def test_user_creation_diff_org_success(
         assert response.status_code == HTTPStatus.FOUND, f"Valid E12User form data POSTed by {test_user}, expected status_code 302, received {response.status_code}"
         
     assert Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count() == 2, f"Logged in as 2 different people and created an e12 user with first_name = {TEMP_CREATED_USER_FIRST_NAME}. Should be 2 matches in db for this filter."
+
+@pytest.mark.django_db
+def test_user_creation_forbidden(
+    client,
+):
+    """Integration test checking functionality of view and form.
+    
+    Simulating unpermitted E12 users attempting to create Users inside own trust.
+
+    Additionally, AUDIT_CENTRE_LEAD_CLINICIAN role CANNOT create user in different trust.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    
+    TEMP_CREATED_USER_FIRST_NAME = 'TEMP_CREATED_USER_FIRST_NAME'
+
+    users = Epilepsy12User.objects.filter(first_name__in=[
+        'AUDIT_CENTRE_ADMINISTRATOR',
+        'AUDIT_CENTRE_CLINICIAN',
+        'AUDIT_CENTRE_LEAD_CLINICIAN'
+    ])
+    
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        url = reverse(
+            "create_epilepsy12_user",
+            kwargs={
+                "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                "user_type": "organisation-staff",
+            },
+        )
+
+        response = client.get(url)
+
+        assert (
+            response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` of {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+        
+        data={
+            'title':1,
+            "email": f"{test_user.first_name}@test.com",
+            "role": 1,
+            "organisation_employer": DIFF_TRUST_DIFF_ORGANISATION.id,
+            "first_name": TEMP_CREATED_USER_FIRST_NAME,
+            "surname": "User",
+            "is_rcpch_audit_team_member": True,
+            "is_rcpch_staff": False,
+            "email_confirmed": True,
+        }
+        
+        response = client.post(url, data=data)
+        
+        # This is valid form data, should redirect
+        assert response.status_code == HTTPStatus.FORBIDDEN, f"Unpermitted E12User {test_user} attempted to create an E12User. expected status_code {HTTPStatus.FORBIDDEN}, received {response.status_code}"
+        
+    assert Epilepsy12User.objects.filter(first_name=TEMP_CREATED_USER_FIRST_NAME).count() == 0, f"Logged in as 3 different unpermitted Users and attempted to create an e12 user with first_name = {TEMP_CREATED_USER_FIRST_NAME}. Should be 0 matches in db for this filter."

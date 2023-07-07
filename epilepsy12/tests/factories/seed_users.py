@@ -76,4 +76,4 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                     groups=[Group.objects.get(name=user.group_name)],
                 )
         else:
-            print("Test users already seeded. Deleting all current users.")
+            print("Test users already seeded. Skipping")
