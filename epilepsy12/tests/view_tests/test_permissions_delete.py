@@ -13,15 +13,15 @@
     
     
 
-    [] Assert an Audit Centre Lead Clinician can delete patients inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can delete patients inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can delete patients outside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can delete patients inside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can delete patients outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can delete patients inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can delete patients inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can delete patients outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can delete patients inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can delete patients outside own Trust - HTTPStatus.OK
     
-    [] Assert an Audit Centre Administrator CANNOT delete patients - HTTPStatus.FORBIDDEN
-    [] Assert an audit centre clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
-    [] Assert an Audit Centre Lead Clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT delete patients - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT delete patients outside own Trust - HTTPStatus.FORBIDDEN
 
 
 # Episode
@@ -82,7 +82,7 @@ from http import HTTPStatus
 from django.urls import reverse
 
 # E12 Imports
-from epilepsy12.tests.factories import E12UserFactory, E12CaseFactory
+from epilepsy12.tests.factories import E12UserFactory, E12CaseFactory, E12EpisodeFactory
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
@@ -94,6 +94,7 @@ from epilepsy12.models import (
     Epilepsy12User,
     Organisation,
     Case,
+    Episode,
 )
 from epilepsy12.constants import VALID_NHS_NUMS
 
@@ -442,3 +443,109 @@ def test_patient_delete_forbidden(
         assert (
             response.status_code == HTTPStatus.FORBIDDEN
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+
+@pytest.mark.django_db
+def test_episode_delete_success(
+    client,
+):
+    """Simulating different E12 users with different roles attempting to delete Episode inside own trust.
+
+    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to delete Episode in different trust.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    
+    URLS = [
+        "remove_episode",
+        "remove_comorbidity",
+        "remove_syndrome",
+        "remove_antiepilepsy_medicine",
+    ]
+
+    for test_user in users:
+        client.force_login(test_user)
+        
+        # Create a Case with Episode
+        CASE_FROM_SAME_ORG = E12CaseFactory(
+            first_name=f'temp_{TEST_USER_ORGANISATION}',
+            nhs_number=VALID_NHS_NUMS[-1].replace(' ',''),
+            organisations__organisation=TEST_USER_ORGANISATION,
+        )
+        episode = Episode.objects.create(
+            episode_definition="a",
+            multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+        )
+
+        url = reverse(
+            "remove_episode",
+            kwargs={
+                "episode_id":episode.id
+            },
+        )
+
+        response = client.post(
+            url,
+        )
+
+        assert (
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+        
+        # Reset Case for next User
+        CASE_FROM_SAME_ORG.delete()
+
+
+        # Additional test for deleting Episode outside of own Trust
+        if test_user.first_name in [
+            test_user_clinicial_audit_team_data.role_str,
+            test_user_rcpch_audit_team_data.role_str,
+        ]:
+            # Create a Case with Episode
+            CASE_FROM_DIFF_ORG = E12CaseFactory(
+                first_name=f'temp_{DIFF_TRUST_DIFF_ORGANISATION}',
+                nhs_number=VALID_NHS_NUMS[-1].replace(' ',''),
+                organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+            )
+            episode = Episode.objects.create(
+                episode_definition="a",
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
+            )
+
+            url = reverse(
+                "remove_episode",
+                kwargs={
+                    "episode_id":episode.id
+                },
+            )
+
+            response = client.post(
+                url,
+            )
+
+            assert (
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}`with DELETE  for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
+            
+            # Reset Case and Episode
+            CASE_FROM_DIFF_ORG.delete()
