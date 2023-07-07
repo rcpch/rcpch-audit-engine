@@ -154,7 +154,7 @@ def completed_fields(model_instance):
 
 def total_fields_expected(model_instance):
     """
-    returns as expected fields for a given model instance, based on user selections
+    Returns as expected fields for a given model instance, based on user selections.
     """
 
     model_class_name = model_instance.__class__.__name__
@@ -162,6 +162,7 @@ def total_fields_expected(model_instance):
     cumulative_score = scoreable_fields_for_model_class_name(
         model_class_name=model_class_name
     )
+
 
     if model_instance.__class__.__name__ == "MultiaxialDiagnosis":
         # count episodes - note
@@ -320,7 +321,7 @@ def total_fields_expected(model_instance):
 
     return cumulative_score
 
-
+# TODO: should replace with dataclass constant
 def avoid_fields(model_instance):
     """
     When looping through fields and counting them as complete/incomplete, these fields depending on the model
@@ -491,7 +492,7 @@ def scoreable_fields_for_model_class_name(model_class_name):
             f"Form scoring error: {model_class_name} does not exist to calculate minimum number of scoreable fields."
         )
 
-
+# TODO: need to come back and write more tests with multiple cases for this as fn does multiple things. So far, have 1 test case: a fully completed Focal Onset seizure `test_count_episode_fields`
 def count_episode_fields(all_episodes):
     """
     loops through each episode associated with a multiaxial diagnosis and add up expected number of fields
