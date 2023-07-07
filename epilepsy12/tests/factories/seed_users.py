@@ -77,4 +77,3 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
                 )
         else:
             print("Test users already seeded. Deleting all current users.")
-            Epilepsy12User.objects.all().delete()

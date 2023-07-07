@@ -86,3 +86,105 @@
     [ ] Assert an Audit Centre Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == 403
     [ ] Assert an Audit Centre Lead Clinician CANNOT 'add_antiepilepsy_medicine' outside own Trust - response.status_code == 403
 """
+
+# python imports
+import pytest
+
+# django imports
+from django.urls import reverse
+from django.db import transaction
+
+# E12 Imports
+from epilepsy12.tests.UserDataClasses import (
+    test_user_clinicial_audit_team_data,
+    test_user_rcpch_audit_team_data,
+)
+from epilepsy12.models import (
+    Epilepsy12User,
+    Organisation,
+    Case,
+    Episode,
+    Syndrome,
+    Comorbidity,
+    ComorbidityEntity,
+    AntiEpilepsyMedicine,
+    MedicineEntity,
+)
+from epilepsy12.forms import (
+    Epilepsy12UserAdminCreationForm,
+)
+
+
+@pytest.mark.django_db
+def test_users_and_case_list_views_permissions_success(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    seed_cases_fixture,
+):
+    """ Integration test checking functionality of view and form
+    
+    Simulating different E12 users with different roles attempting to create Users inside own trust.
+
+    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to create user in different trust.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    
+    FIRST_NAME_VALUE = 'FIRST_NAME_VALUE'
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=["AUDIT_CENTRE_ADMINISTRATOR", "AUDIT_CENTRE_CLINICIAN"]
+    )
+    
+    if not users:
+        assert False, f"No seeded users in test db. Test cannot run."
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        url = reverse(
+            "create_epilepsy12_user",
+            kwargs={
+                "organisation_id": TEST_USER_ORGANISATION.id,
+                "user_type": "organisation-staff",
+            },
+        )
+
+        response = client.get(url)
+
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` of {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
+        
+        data={
+            'title':1,
+            "email": f"{test_user.first_name}@test.com",
+            "role": 1,
+            "organisation_employer": TEST_USER_ORGANISATION.id,
+            "first_name": FIRST_NAME_VALUE,
+            "surname": "User",
+            "is_rcpch_audit_team_member": True,
+            "is_rcpch_staff": False,
+            "email_confirmed": True,
+        }
+        
+        response = client.post(url, data=data)
+        
+        # This is valid form data, should redirect
+        assert response.status_code == 302, f"Valid E12User form data POSTed, expected status_code 302, received {response.status_code}"
+    
+        
+    assert Epilepsy12User.objects.filter(first_name=FIRST_NAME_VALUE).count() == 3, f"Logged in as 3 different people and created an e12 user with first_name = {FIRST_NAME_VALUE}. Should be 3 matches in db for this filter."
