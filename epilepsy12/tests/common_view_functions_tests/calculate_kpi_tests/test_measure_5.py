@@ -1,5 +1,7 @@
 """
-Measure 5 Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
+Measure 5 `mri`
+
+Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
 
 =
 
@@ -54,18 +56,11 @@ from epilepsy12.constants import (
             date(2023, 12, 31),
             False,
             KPI_SCORE["FAIL"],
-        ),
-        (
-            # 2yo, ineligible
-            date(2022, 1, 1),
-            date(2024, 1, 1),
-            True,
-            KPI_SCORE["INELIGIBLE"],
-        ),
+        )
     ],
 )
 @pytest.mark.django_db
-def test_measure_4_mri_under2yo(
+def test_measure_5_mri_under2yo(
     e12_case_factory, DATE_OF_BIRTH, REGISTRATION_DATE, TIMELY_MRI, EXPECTED_SCORE
 ):
     """
@@ -73,8 +68,6 @@ def test_measure_4_mri_under2yo(
     1) MRI done in 6 weeks post-referral and are under 2y@FPA
     *FAIL*
     1) MRI NOT done in 6 weeks post-referral and are under 2y@FPA
-    *INELIGIBLE*
-    1) over 2y@FPA
     """
     MRI_REQUESTED_DATE = REGISTRATION_DATE + relativedelta(days=1)
 
@@ -104,11 +97,6 @@ def test_measure_4_mri_under2yo(
         assert (
             kpi_score == EXPECTED_SCORE
         ), f"MRI booked > 6 weeks but not failing measure"
-    else:
-        assert (
-            kpi_score == EXPECTED_SCORE
-        ), f"Not <= 2yo so ineligible for measure, wrong KPI scoring"
-
 
 
 @pytest.mark.parametrize(
@@ -126,7 +114,7 @@ def test_measure_4_mri_under2yo(
     ],
 )
 @pytest.mark.django_db
-def test_measure_4_mri_syndromes_pass_fail(
+def test_measure_5_mri_syndromes_pass_fail(
     e12_case_factory, TIMELY_MRI, EXPECTED_SCORE
 ):
     """
@@ -148,12 +136,14 @@ def test_measure_4_mri_syndromes_pass_fail(
         registration__investigations__mri_brain_requested_date=MRI_REQUESTED_DATE,
         registration__investigations__mri_brain_reported_date=MRI_REPORTED_DATE,
     )
-    
+
     # set syndrome present to False
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(registration=case.registration)
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        registration=case.registration
+    )
     multiaxial_diagnosis.syndrome_present = False
     multiaxial_diagnosis.save()
-    
+
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
 
@@ -174,8 +164,6 @@ def test_measure_4_mri_syndromes_pass_fail(
     # remove syndromes to ensure just testing pass/fail
     if relevant_syndromes.exists():
         relevant_syndromes.delete()
-    
-
 
     calculate_kpis(registration_instance=registration)
 
@@ -192,7 +180,6 @@ def test_measure_4_mri_syndromes_pass_fail(
         ), f"None of JME or JAE or CAE or CECTS/Rolandi present, MRI booked > 6 weeks but not failing measure"
 
 
-
 @pytest.mark.parametrize(
     "SYNDROME_TYPE_PRESENT",
     [
@@ -203,33 +190,38 @@ def test_measure_4_mri_syndromes_pass_fail(
     ],
 )
 @pytest.mark.django_db
-def test_measure_4_mri_syndromes_ineligible(
+def test_measure_5_mri_syndromes_ineligible(
     e12_case_factory, e12_syndrome_factory, SYNDROME_TYPE_PRESENT
 ):
     """
     *INELIGIBLE*
-    1) ONE OF:
-        JME or JAE or CAE or CECTS/Rolandic
+    1)      ONE OF:
+                JME or JAE or CAE or CECTS/Rolandic
+        AND
+        age_at_first_paediatric_assessment >= 2 (testing using age at fpa = 2y exactly)
     """
 
-    case = e12_case_factory()
-    
+    REGISTRATION_DATE = date(2023, 1, 1)
+    DATE_OF_BIRTH = REGISTRATION_DATE - relativedelta(years=2)
+
+    case = e12_case_factory(
+        date_of_birth=DATE_OF_BIRTH,
+        registration__registration_date=REGISTRATION_DATE,
+    )
+
     # set syndrome present to True
-    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(registration=case.registration)
+    multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+        registration=case.registration
+    )
     multiaxial_diagnosis.syndrome_present = True
     multiaxial_diagnosis.save()
 
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
-
-    # get syndrome for registration
-    current_syndromes = Syndrome.objects.get(
-        multiaxial_diagnosis=registration.multiaxialdiagnosis
-    )
-
-    # clean existing syndromes
-    current_syndromes.delete()
-
+    
+    # ensure starting with no default syndromes
+    Syndrome.objects.filter(multiaxial_diagnosis=registration.multiaxialdiagnosis).delete()
+    
     # save the ineligible syndrome type
     new_syndrome = e12_syndrome_factory(
         multiaxial_diagnosis=registration.multiaxialdiagnosis,

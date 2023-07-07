@@ -35,7 +35,6 @@ from epilepsy12.models import (
 - [x] Neither Assessment.epilepsy_specialist_nurse_input_date nor Assessment.epilepsy_specialist_nurse_referral_date can be before Registration.registration_date or Case.date_of_birth
 """
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_validation_referral_date_and_input_date_both_none_when_referral_made_false(
     e12_case_factory,

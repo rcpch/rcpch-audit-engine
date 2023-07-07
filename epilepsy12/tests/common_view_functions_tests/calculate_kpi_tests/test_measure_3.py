@@ -44,7 +44,6 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     MedicineEntity,
     Episode,
-    Assessment,
 )
 from epilepsy12.constants import (
     KPI_SCORE,
@@ -264,7 +263,7 @@ def test_measure_3b_meets_CESS_seen(
 
     calculate_kpis(registration_instance=registration)
 
-    kpi_score = KPI.objects.get(pk=registration.kpi.pk).tertiary_input
+    kpi_score = KPI.objects.get(pk=registration.kpi.pk).epilepsy_surgery_referral
 
     assert kpi_score == expected_kpi_score, (
         f"Met CESS criteria and seen by neurologist / epilepsy surgery/both but did not pass measure"

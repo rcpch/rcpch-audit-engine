@@ -1,5 +1,5 @@
 """
-9iii `school_individual_healthcare_plan` - Percentage of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.
+10 `school_individual_healthcare_plan` - Percentage of children and young people with epilepsy aged 5 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.
 
 Number of children and young people aged 5 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
 
