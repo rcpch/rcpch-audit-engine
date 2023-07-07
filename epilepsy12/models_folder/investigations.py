@@ -19,7 +19,7 @@ class Investigations(
     eeg_indicated = models.BooleanField(
         help_text={
             "label": "Has a first EEG been requested?",
-            "reference": "All children with Epilepsy should have an EEG",
+            "reference": "If a diagnosis of epilepsy is suspected, a routine EEG should be carried out to support the diagnosis. CYP undergoing initial investigations for epilepsy should have tests within 4 weeks of being requested.",
         },
         default=None,
         null=True,
