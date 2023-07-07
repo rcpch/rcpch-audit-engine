@@ -9,7 +9,7 @@ Test Measure 2 - % of children and young people with epilepsy, with input by epi
 
 Number of children and young people [diagnosed with epilepsy]
 AND
-who had [input from or referral to an Epilepsy Specialist Nurse] by first year
+who had [referral AND input to an Epilepsy Specialist Nurse] by first year
 """
 
 # Standard imports
