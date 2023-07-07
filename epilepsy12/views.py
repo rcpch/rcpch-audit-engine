@@ -542,7 +542,7 @@ def rcpch_403(request, exception):
     # from django-htmx middleware forces a redirect. Neat.
     if request.htmx:
         redirect = reverse_lazy("redirect_403")
-        return HttpResponseClientRedirect(redirect)
+        return HttpResponseClientRedirect(redirect, status=403)
     else:
         return render(
             request,

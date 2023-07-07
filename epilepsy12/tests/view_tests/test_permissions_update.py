@@ -567,13 +567,16 @@ def test_users_update_first_paediatric_assessment_forbidden(client, URL):
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         # Log in Test User
@@ -621,11 +624,18 @@ def test_users_update_first_paediatric_assessment_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
+    users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
 
     for test_user in users:
         # Log in Test User
@@ -697,13 +707,16 @@ def test_users_update_first_epilepsy_context_forbidden(client, URL):
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=[
-            "RCPCH_AUDIT_TEAM",
-            "CLINICAL_AUDIT_TEAM",
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-        ]
-    )
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         # Log in Test User
@@ -753,11 +766,18 @@ def test_users_update_epilepsy_context_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
+    users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
 
     single_choice_multiple_toggle_fields = [
         "previous_febrile_seizure",
@@ -1456,12 +1476,18 @@ def test_users_update_comorbidity_success(client, URL):
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.all().exclude(
+    users = Epilepsy12User.objects.filter(
         first_name__in=[
-            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
-            test_user_audit_centre_administrator_data.role_str,
+            # f"{test_user_audit_centre_administrator_data.role_str}",
+            f"{test_user_audit_centre_clinician_data.role_str}",
+            f"{test_user_audit_centre_lead_clinician_data.role_str}",
+            f"{test_user_clinicial_audit_team_data.role_str}",
+            f"{test_user_rcpch_audit_team_data.role_str}",
         ]
     )
+
+    if not users:
+        assert False, f"No seeded users in test db. Has the test db been seeded?"
 
     for test_user in users:
         # Log in Test User
