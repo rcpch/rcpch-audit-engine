@@ -25,8 +25,9 @@ from epilepsy12.models import (
 )
 from epilepsy12.constants import SEX_TYPE, DEPRIVATION_QUINTILES, ETHNICITIES
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
+from epilepsy12.general_functions.nhs_number import generate_nhs_number
 
-@pytest.mark.xfail(reason='Case Factory breaks when having seeded Cases (used for permissions tests) due to how the nhs_number iterator works')
+
 @pytest.mark.django_db
 def test_cases_aggregated_by_sex_correct_output(e12_case_factory):
     """Tests the cases_aggregated_by_sex fn returns correct count."""
@@ -42,6 +43,7 @@ def test_cases_aggregated_by_sex_correct_output(e12_case_factory):
         # For each sex, assign 10 cases
         for _ in range(10):
             e12_case_factory.create(
+                nhs_number=generate_nhs_number(),
                 sex=sex_type[0],
                 registration=None,  # ensure related audit factories not generated
                 organisations__organisation=ORGANISATION,
@@ -58,7 +60,7 @@ def test_cases_aggregated_by_sex_correct_output(e12_case_factory):
         total_count == matching_count
     ), f"Not returning correct count. {total_count} should equal {matching_count}"
 
-@pytest.mark.xfail(reason='Case Factory breaks when having seeded Cases (used for permissions tests) due to how the nhs_number iterator works')
+
 @pytest.mark.django_db
 def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factory):
     """Tests the cases_aggregated_by_deprivation_score fn returns correct count."""
@@ -77,6 +79,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
         # For each deprivation, assign 10 cases, add to cases_list
         for _ in range(10):
             case = e12_case_factory.build(
+                nhs_number=generate_nhs_number(),
                 index_of_multiple_deprivation_quintile=deprivation_type[1],
                 registration=None,  # ensure related audit factories not generated
                 organisations__organisation=ORGANISATION,
@@ -100,7 +103,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
         total_count == matching_count
     ), f"Not returning correct count. {total_count=} should equal {matching_count=}"
 
-@pytest.mark.xfail(reason='Case Factory breaks when having seeded Cases (used for permissions tests) due to how the nhs_number iterator works')
+
 @pytest.mark.django_db
 def test_cases_aggregated_by_ethnicity(e12_case_factory):
     """Tests the cases_aggregated_by_ethnicity fn returns correct count."""
@@ -114,6 +117,7 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
         # For each ethnicity, build 10 cases, and append to cases_list
         for _ in range(10):
             case = e12_case_factory.build(
+                nhs_number=generate_nhs_number(),
                 ethnicity=ethnicity_type[0],
                 registration=None,  # ensure related audit factories not generated
                 organisations__organisation=ORGANISATION,
@@ -138,7 +142,6 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
     ), f"Not returning correct count. {total_count=} should equal {matching_count=}"
 
 
-
 @pytest.mark.django_db
 def test_aggregate_all_eligible_kpi_fields_correct_count(e12_case_factory):
     """Tests the aggregate_all_eligible_kpi_fields fn returns correct count of KPIs."""
@@ -148,7 +151,9 @@ def test_aggregate_all_eligible_kpi_fields_correct_count(e12_case_factory):
     COHORT = 6
 
     for _ in range(10):
-        e12_case_factory.create(organisations__organisation=ORGANISATION)
+        e12_case_factory.create(
+            organisations__organisation=ORGANISATION, nhs_number=generate_nhs_number()
+        )
 
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=ORGANISATION,
@@ -166,7 +171,8 @@ def test_aggregate_all_eligible_kpi_fields_correct_count(e12_case_factory):
 
     assert total_count_kpis == 21
 
-@pytest.mark.skip(reason='unfinished test')
+
+@pytest.mark.skip(reason="unfinished test")
 @pytest.mark.django_db
 def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory):
     """Tests the aggregate_all_eligible_kpi_fields fn returns scoring of KPIs."""
@@ -174,24 +180,24 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     # define constants
     ORGANISATION = Organisation.objects.first()
 
-    # create a KPI object 
-    kpi_metric_eligible_3_5_object = KPIMetric(eligible_kpi_3_5=True, eligible_kpi_6_8_10=False)
-    
+    # create a KPI object
+    kpi_metric_eligible_3_5_object = KPIMetric(
+        eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
+    )
+
     # generate answer set for e12_case_factory constructor
     answers_eligible_3_5 = kpi_metric_eligible_3_5_object.generate_metrics(
-        kpi_1='PASS',
-        kpi_2='PASS',
-        kpi_3='PASS',
-        kpi_4='INELIGIBLE',
-        kpi_5='FAIL',
-        kpi_7='PASS',
-        kpi_9='PASS',
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="INELIGIBLE",
+        kpi_5="FAIL",
+        kpi_7="PASS",
+        kpi_9="PASS",
     )
-    
+
     case = e12_case_factory.create(
-        
         organisations__organisation=ORGANISATION,
-        
         # feed in values for eligible
         **answers_eligible_3_5,
     )
