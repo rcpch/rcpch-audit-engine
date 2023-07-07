@@ -116,7 +116,6 @@ for field in fields: [
 
 # Comorbidity
 for field in fields: [
-    'edit_comorbidity',
     'comorbidity_diagnosis_date',
     'comorbidity_diagnosis',
 ]
