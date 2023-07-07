@@ -746,9 +746,9 @@ def test_add_episode_success(client):
             )
 
 
-# @pytest.mark.xfail(
-#     reason="When an administrator tries the `add_episode` endpoint, they hit the `rcpch_403` view, specifically the htmx part. At this point, the HttpResponseClientRedirect object from django-htmx does not return a 403, instead a 200. This is an edge case, and in the UI, the add episode button is disabled."
-# )
+@pytest.mark.xfail(
+    reason="When an administrator tries the `add_episode` endpoint, a PermissionDenied is correctly raised and they hit the `rcpch_403` view, specifically the htmx part. At this point, the HttpResponseClientRedirect object from django-htmx does not return a 403, instead a 200. This is an edge case, and in the UI, the add episode button is disabled."
+)
 @pytest.mark.django_db
 def test_add_episode_forbidden(client):
     """
