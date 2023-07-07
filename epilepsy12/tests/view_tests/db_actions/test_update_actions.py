@@ -710,6 +710,12 @@ SELECTS = (
         "choices": None,
     },
     {
+        "field_name": "comorbidity_diagnosis",
+        "param": "comorbidity_id",
+        "model": "comorbidity",
+        "choices": None,
+    },
+    {
         "field_name": "episode_definition",
         "param": "episode_id",
         "model": "episode",
@@ -891,7 +897,6 @@ def test_user_updates_toggles_false_success(client):
     client.force_login(test_user)
 
     for index, url in enumerate(TOGGLES):
-        print(url.get("field_name"))
         model = get_model_from_model(
             case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
         )
@@ -936,7 +941,6 @@ def test_user_updates_toggles_true_fail(client):
     client.force_login(test_user)
 
     for index, url in enumerate(TOGGLES):
-        print(url.get("field_name"))
         model = get_model_from_model(
             case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
         )
@@ -981,7 +985,6 @@ def test_user_updates_toggles_false_fail(client):
     client.force_login(test_user)
 
     for index, url in enumerate(TOGGLES):
-        print(url.get("field_name"))
         model = get_model_from_model(
             case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
         )
@@ -1028,30 +1031,72 @@ def test_user_updates_select_success(
     client.force_login(test_user)
 
     for index, url in enumerate(SELECTS):
-        model = get_model_from_model(
-            case=CASE_FROM_TEST_USER_ORGANISATION,
-            model_name=url.get("model"),
-        )
-        if url.get("model") == "multiaxialdiagnosis":
-            data = {"epilepsy_cause": 134}
+        if url.get("choices") is not None:
+            for choice in url.get("choices"):
+                model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION,
+                    model_name=url.get("model"),
+                )
+                data = {url.get("field_name"): choice}
 
-        client.post(
-            reverse(
-                url.get("field_name"),
-                kwargs={url.get("param"): model.id},
-            ),
-            headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-            data=data,
-        )
-        updated_model = get_model_from_model(
-            case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
-        )
-        validate_select(
-            field_name=url.get("field_name"),
-            model_instance=updated_model,
-            expected_result=EpilepsyCauseEntity.objects.get(pk=134),  # Aicardi's sy.
-            assert_pass=True,
-        )
+                client.post(
+                    reverse(
+                        url.get("field_name"),
+                        kwargs={url.get("param"): model.id},
+                    ),
+                    headers={
+                        "Hx-Trigger-Name": choice,
+                        "Hx-Request": "true",
+                    },
+                    data=data,
+                )
+                updated_model = get_model_from_model(
+                    case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+                )
+                validate_select(
+                    field_name=url.get("field_name"),
+                    model_instance=updated_model,
+                    expected_result=EpilepsyCauseEntity.objects.get(
+                        pk=134
+                    ),  # Aicardi's sy.
+                    assert_pass=True,
+                )
+        else:
+            model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION,
+                model_name=url.get("model"),
+            )
+
+            if url.get("field_name") == "epilepsy_cause":
+                data = {"epilepsy_cause": 134}
+                expected_result = EpilepsyCauseEntity.objects.get(
+                    pk=134
+                )  # Aicardi's sy
+                htmx_trigger = "epilepsy_cause"
+            else:
+                data = {"comorbidityentity": 134}
+                expected_result = ComorbidityEntity.objects.get(
+                    pk=34
+                )  # specific learning difficulty
+                htmx_trigger = "comorbidityentity"
+
+            client.post(
+                reverse(
+                    url.get("field_name"),
+                    kwargs={url.get("param"): model.id},
+                ),
+                headers={"Hx-Trigger-Name": htmx_trigger, "Hx-Request": "true"},
+                data=data,
+            )
+            updated_model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            validate_select(
+                field_name=url.get("field_name"),
+                model_instance=updated_model,
+                expected_result=expected_result,
+                assert_pass=True,
+            )
 
 
 # Test helper methods - there is one for each page_element
@@ -1178,9 +1223,15 @@ def get_model_from_model(case, model_name):
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis
         ).first()
     elif model_name == "comorbidity":
-        return Comorbidity.objects.filter(
-            multiaxial_diagnosis=case.registration.multiaxialdiagnosis
-        ).first()
+        comorbidity, created = Comorbidity.objects.get_or_create(
+            multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
+            comorbidityentity=ComorbidityEntity.objects.get(
+                pk=34
+            ),  # specific learning difficulty
+        )
+        return comorbidity
+    elif model_name == "epilepsycauseentity":
+        return EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
     elif model_name == "antiepilepsymedicine":
         return AntiEpilepsyMedicine.objects.create(
             management=case.registration.management,
@@ -1192,7 +1243,7 @@ def get_model_from_model(case, model_name):
     elif model_name == "multiaxialdiagnosis":
         return MultiaxialDiagnosis.objects.get(
             pk=case.registration.multiaxialdiagnosis.pk
-        )  # EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
+        )  #
     else:
         refresh_case = Case.objects.get(pk=case.pk)
         return getattr(refresh_case.registration, model_name, None)
