@@ -579,13 +579,17 @@ def confirm_eligible(request, registration_id):
     to True and replace the button with the is_eligible partial, a label confirming
     eligibility. The button will not be shown again.
     """
-    context = {"has_error": False, "message": "Eligibility Criteria Confirmed."}
+    context = {
+        "has_error": False,
+        "message": "Eligibility Criteria Confirmed.",
+        "is_positive": True,
+    }
     try:
         Registration.objects.update_or_create(
             pk=registration_id, defaults={"eligibility_criteria_met": True}
         )
     except Exception as error:
-        context = {"has_error": True, "message": error}
+        context = {"has_error": True, "message": error, "is_positive": False}
 
     registration = Registration.objects.filter(pk=registration_id).get()
 
