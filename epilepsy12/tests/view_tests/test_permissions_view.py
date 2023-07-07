@@ -1,70 +1,7 @@
 """
 Tests to ensure permissions work as expected.
 
-NOTE: if you wish to quickly seed test users inside the shell, use this code:
-
-from django.contrib.auth.models import Group
-from epilepsy12.tests.UserDataClasses import (
-    test_user_audit_centre_administrator_data,
-    test_user_audit_centre_clinician_data,
-    test_user_audit_centre_lead_clinician_data,
-    test_user_rcpch_audit_team_data,
-    test_user_clinicial_audit_team_data,
-)
-
-from epilepsy12.models import (
-    Epilepsy12User,
-    Organisation,
-)
-from epilepsy12.tests.factories.E12UserFactory import E12UserFactory
-from epilepsy12.constants.user_types import (
-    RCPCH_AUDIT_TEAM,
-)
-
-users = [
-        test_user_audit_centre_administrator_data,
-        test_user_audit_centre_clinician_data,
-        test_user_audit_centre_lead_clinician_data,
-        test_user_rcpch_audit_team_data,
-        test_user_clinicial_audit_team_data,
-    ]
-
-TEST_USER_ORGANISATION = Organisation.objects.get(
-                ODSCode="RP401",
-                ParentOrganisation_ODSCode="RP4",
-            )
-
-is_active = True
-is_staff = False
-is_rcpch_audit_team_member = False
-is_rcpch_staff = False
-
-# seed a user of each type at GOSH
-for user in users:
-    
-    first_name=user.role_str
-    
-    # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
-    if user.role == RCPCH_AUDIT_TEAM:
-        is_rcpch_audit_team_member = True
-        is_rcpch_staff = True
-    
-    if user.is_clinical_audit_team:
-        is_rcpch_audit_team_member = True
-        first_name='CLINICAL_AUDIT_TEAM'
-
-    E12UserFactory(
-        first_name=first_name,
-        role=user.role,
-        # Assign flags based on user role
-        is_active=is_active,
-        is_staff=is_staff,
-        is_rcpch_audit_team_member=is_rcpch_audit_team_member,
-        is_rcpch_staff=is_rcpch_staff,
-        organisation_employer=TEST_USER_ORGANISATION,
-        groups=[Group.objects.get(name=user.group_name)],
-    ) 
-    
+NOTE: if you wish to quickly seed test users inside the shell, see the `misc_py_shell_code.py` file.
 
 
 # Test Cases - TODO: UPDATE TESTS TO CHECK FOR Clinical Audit Team
