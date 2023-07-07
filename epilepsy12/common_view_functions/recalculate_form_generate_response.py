@@ -163,7 +163,6 @@ def total_fields_expected(model_instance):
         model_class_name=model_class_name
     )
 
-
     if model_instance.__class__.__name__ == "MultiaxialDiagnosis":
         # count episodes - note
         # at least one episode must be epileptic
@@ -321,6 +320,7 @@ def total_fields_expected(model_instance):
 
     return cumulative_score
 
+
 # TODO: should replace with dataclass constant
 def avoid_fields(model_instance):
     """
@@ -330,79 +330,55 @@ def avoid_fields(model_instance):
     # verbose_name_underscored = model_instance._meta.verbose_name.lower().replace(' ', '_')
     model_class_name = model_instance.__class__.__name__
 
+    META_VARIABLES = [
+        "id",
+        "updated_at",
+        "updated_by",
+        "created_at",
+        "created_by",
+    ]
+
     if model_class_name in [
         "FirstPaediatricAssessment",
         "EpilepsyContext",
         "Assessment",
         "Investigations",
     ]:
-        return [
-            "id",
-            "registration",
-            "updated_at",
-            "updated_by",
-            "created_at",
-            "created_by",
-        ]
+        return META_VARIABLES + ["registration"]
+
     elif model_class_name == "MultiaxialDiagnosis":
-        return [
-            "id",
+        return META_VARIABLES + [
             "registration",
             "multiaxial_diagnosis",
             "episode",
             "syndrome",
             "comorbidity",
-            "created_by",
-            "created_at",
-            "updated_by",
-            "updated_at",
         ]
+
     elif model_class_name == "Management":
-        return [
-            "id",
-            "registration",
-            "antiepilepsymedicine",
-            "created_by",
-            "created_at",
-            "updated_by",
-            "updated_at",
-        ]
+        return META_VARIABLES + ["registration", "antiepilepsymedicine"]
+
     elif model_class_name in ["Syndrome", "Comorbidity", "ComorbidityEntity"]:
-        return [
-            "id",
-            "multiaxial_diagnosis",
-            "created_by",
-            "created_at",
-            "updated_by",
-            "updated_at",
-        ]
+        return META_VARIABLES + ["multiaxial_diagnosis"]
+
     elif model_class_name == "Episode":
-        return [
-            "id",
+        return META_VARIABLES + [
             "multiaxial_diagnosis",
             "description_keywords",
-            "created_by",
-            "created_at",
-            "updated_by",
-            "updated_at",
             "expected_score",
             "calculated_score",
         ]
+
     elif model_class_name == "AntiEpilepsyMedicine":
-        return [
-            "id",
+        return META_VARIABLES + [
             "management",
             "is_rescue_medicine",
-            "created_by",
-            "created_at",
-            "updated_by",
-            "updated_at",
             "antiepilepsy_medicine_stop_date",
             "is_a_pregnancy_prevention_programme_needed",
         ]
+
     elif model_class_name == "Registration":
-        return [
-            "id",
+        return META_VARIABLES + [
             "management",
             "assessment",
             "investigations",
@@ -416,12 +392,9 @@ def avoid_fields(model_instance):
             "cohort",
             "case",
             "audit_progress",
-            "created_by",
-            "created_at",
-            "updated_by",
-            "updated_at",
             "kpi",
         ]
+
     elif model_class_name == "MedicineEntity":
         return [
             "id",
@@ -438,6 +411,7 @@ def avoid_fields(model_instance):
             "is_rescue",
             "history",
         ]
+
     else:
         raise ValueError(
             f"Form scoring error: {model_class_name} not found to return fields to avoid in form calculation."
@@ -491,6 +465,7 @@ def scoreable_fields_for_model_class_name(model_class_name):
         raise ValueError(
             f"Form scoring error: {model_class_name} does not exist to calculate minimum number of scoreable fields."
         )
+
 
 # TODO: need to come back and write more tests with multiple cases for this as fn does multiple things. So far, have 1 test case: a fully completed Focal Onset seizure `test_count_episode_fields`
 def count_episode_fields(all_episodes):
