@@ -1,15 +1,15 @@
 """
 ## Delete Tests
 
-    [] Assert an Audit Centre Lead Clinician can delete users inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can delete users inside own Trust - HTTPStatus.OK
-    [] Assert RCPCH Audit Team can delete users outside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can delete users inside own Trust - HTTPStatus.OK
-    [] Assert Clinical Audit Team can delete users outside own Trust - HTTPStatus.OK
+    [x] Assert an Audit Centre Lead Clinician can delete users inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can delete users inside own Trust - HTTPStatus.OK
+    [x] Assert RCPCH Audit Team can delete users outside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can delete users inside own Trust - HTTPStatus.OK
+    [x] Assert Clinical Audit Team can delete users outside own Trust - HTTPStatus.OK
 
-    [] Assert an Audit Centre Administrator CANNOT delete users - HTTPStatus.FORBIDDEN
-    [] Assert an audit centre clinician CANNOT delete users - HTTPStatus.FORBIDDEN
-    [] Assert an Audit Centre Lead Clinician CANNOT delete users outside own Trust - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Administrator CANNOT delete users - HTTPStatus.FORBIDDEN
+    [x] Assert an audit centre clinician CANNOT delete users - HTTPStatus.FORBIDDEN
+    [x] Assert an Audit Centre Lead Clinician CANNOT delete users outside own Trust - HTTPStatus.FORBIDDEN
     
     
 
@@ -97,7 +97,6 @@ from epilepsy12.models import (
 )
 
 
-
 @pytest.mark.django_db
 def test_user_delete_success(
     client,
@@ -123,28 +122,28 @@ def test_user_delete_success(
     )
 
     user_first_names_for_test = [
-            test_user_audit_centre_lead_clinician_data.role_str,
-            test_user_rcpch_audit_team_data.role_str ,
-            test_user_clinicial_audit_team_data.role_str,
-        ]
-    users = Epilepsy12User.objects.filter(
-        first_name__in=user_first_names_for_test
-    )
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
 
-    assert len(users) == len(user_first_names_for_test), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
 
     for test_user in users:
         client.force_login(test_user)
-        
+
         # Seed a temp User to be deleted
         temp_user_same_org = E12UserFactory(
-                    first_name='temp_user',
-                    email=f'temp_{test_user.first_name}@temp.com',
-                    role=test_user.role,
-                    is_active=1,
-                    organisation_employer=TEST_USER_ORGANISATION,
-                    groups=[test_user_audit_centre_administrator_data.group_name],
-                )
+            first_name="temp_user",
+            email=f"temp_{test_user.first_name}@temp.com",
+            role=test_user.role,
+            is_active=1,
+            organisation_employer=TEST_USER_ORGANISATION,
+            groups=[test_user_audit_centre_administrator_data.group_name],
+        )
 
         url = reverse(
             "delete_epilepsy12_user",
@@ -159,19 +158,21 @@ def test_user_delete_success(
         assert (
             response.status_code == HTTPStatus.OK
         ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
-        
+
         # Additional test for deleting users outside of own Trust
-        if test_user.first_name in [test_user_clinicial_audit_team_data.role_str, test_user_rcpch_audit_team_data.role_str]:
-            
+        if test_user.first_name in [
+            test_user_clinicial_audit_team_data.role_str,
+            test_user_rcpch_audit_team_data.role_str,
+        ]:
             # Seed a temp User to be deleted
             temp_user_same_org = E12UserFactory(
-                        first_name='temp_user',
-                        email=f'temp_{test_user.first_name}@temp.com',
-                        role=test_user.role,
-                        is_active=1,
-                        organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
-                        groups=[test_user_audit_centre_administrator_data.group_name],
-                    )
+                first_name="temp_user",
+                email=f"temp_{test_user.first_name}@temp.com",
+                role=test_user.role,
+                is_active=1,
+                organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+                groups=[test_user_audit_centre_administrator_data.group_name],
+            )
 
             url = reverse(
                 "delete_epilepsy12_user",
@@ -186,3 +187,92 @@ def test_user_delete_success(
             assert (
                 response.status_code == HTTPStatus.OK
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected 200 response status code, received {response.status_code}"
+
+
+@pytest.mark.django_db
+def test_user_delete_forbidden(
+    client,
+):
+    """Simulating different E12 users with different roles attempting to delete Patients inside own trust.
+
+    Additionally, Audit Centre Lead Clinician role CANNOT delete user in different trust.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    # Seed a temp User for attempt to delete
+    temp_user_same_org = E12UserFactory(
+        first_name="temp_user",
+        email=f"temp_user_same_org@temp.com",
+        role=test_user_audit_centre_administrator_data.role,
+        is_active=1,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[test_user_audit_centre_administrator_data.group_name],
+    )
+    # Seed a temp User to be deleted
+    temp_user_same_org = E12UserFactory(
+        first_name="temp_user",
+        email=f"temp_user_diff_org@temp.com",
+        role=test_user_audit_centre_administrator_data.role,
+        is_active=1,
+        organisation_employer=DIFF_TRUST_DIFF_ORGANISATION,
+        groups=[test_user_audit_centre_administrator_data.group_name],
+    )
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}"
+
+    for test_user in users:
+        client.force_login(test_user)
+        
+        if test_user.first_name in [
+            test_user_audit_centre_lead_clinician_data.role_str,
+        ]:
+            url = reverse(
+                "delete_epilepsy12_user",
+                kwargs={
+                    "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                    "epilepsy12_user_id": temp_user_same_org.id,
+                },
+            )
+
+            response = client.get(url)
+
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+            
+        else:
+            url = reverse(
+                "delete_epilepsy12_user",
+                kwargs={
+                    "organisation_id": TEST_USER_ORGANISATION.id,
+                    "epilepsy12_user_id": temp_user_same_org.id,
+                },
+            )
+
+            response = client.get(url)
+
+            assert (
+                response.status_code == HTTPStatus.FORBIDDEN
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` for User from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+
+            
