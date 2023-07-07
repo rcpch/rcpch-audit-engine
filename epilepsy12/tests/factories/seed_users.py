@@ -35,34 +35,37 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
     ]
     
     with django_db_blocker.unblock():
+        
+        # Don't repeat seed
+        if not Organisation.objects.filter(ODSCode="RP401").exists():
 
-        TEST_USER_ORGANISATION = Organisation.objects.get(
-            ODSCode="RP401",
-            ParentOrganisation_ODSCode="RP4",
-        )
-    
-        is_staff = False
-        is_rcpch_audit_team_member=False 
-
-        # seed a user of each type at GOSH
-        for user in users:
-            
-            # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
-            if user.role == RCPCH_AUDIT_LEAD:
-                is_staff = True
-                is_rcpch_audit_team_member=True 
-            
-            E12UserFactory(
-                first_name=user.role_str,
-                is_staff=is_staff,
-                is_rcpch_audit_team_member=is_rcpch_audit_team_member,
-                role=user.role,
-                organisation_employer=TEST_USER_ORGANISATION,
-                groups=[
-                    Group.objects.get(
-                        name=user.group_name
-                    )
-                ],
+            TEST_USER_ORGANISATION = Organisation.objects.get(
+                ODSCode="RP401",
+                ParentOrganisation_ODSCode="RP4",
             )
+        
+            is_staff = False
+            is_rcpch_audit_team_member=False 
+
+            # seed a user of each type at GOSH
+            for user in users:
+                
+                # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
+                if user.role == RCPCH_AUDIT_LEAD:
+                    is_staff = True
+                    is_rcpch_audit_team_member=True 
+                
+                E12UserFactory(
+                    first_name=user.role_str,
+                    is_staff=is_staff,
+                    is_rcpch_audit_team_member=is_rcpch_audit_team_member,
+                    role=user.role,
+                    organisation_employer=TEST_USER_ORGANISATION,
+                    groups=[
+                        Group.objects.get(
+                            name=user.group_name
+                        )
+                    ],
+                )
 
 

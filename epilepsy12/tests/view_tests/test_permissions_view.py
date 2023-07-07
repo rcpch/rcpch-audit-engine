@@ -126,13 +126,15 @@ for each field in fields ['edit_syndrome', 'close_syndrome']
 
 ## Comorbidity
 for each field in fields ['edit_comorbidity', 'close_comorbidity', 'comorbidities']
-[ ] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
-[ ] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
-[ ] Assert an RCPCH Audit Lead can view field - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view field inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view field inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view field inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Administrator can view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician can view field inside a different Trust - response.status_code == 403
+    
+    [x] Assert an Audit Centre Administrator cannot view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Clinician cannot view field inside a different Trust - response.status_code == 403
+    [x] Assert an Audit Centre Lead Clinician cannot view field inside a different Trust - response.status_code == 403
 
 
 ## Assessment
@@ -188,7 +190,15 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_lead_clinician_data,
     test_user_rcpch_audit_lead_data,
 )
-from epilepsy12.models import Epilepsy12User, Organisation, Case, Episode, Syndrome
+from epilepsy12.models import (
+    Epilepsy12User,
+    Organisation,
+    Case,
+    Episode,
+    Syndrome,
+    Comorbidity,
+    ComorbidityEntity,
+)
 
 
 @pytest.mark.django_db
@@ -794,7 +804,7 @@ def test_episode_view_permissions_success(client, URL):
             # Request e12 patients list endpoint url different org
             response = client.get(
                 reverse(
-                    "edit_episode",
+                    URL,
                     kwargs={"episode_id": EPISODE_DIFF_ORG.id},
                 )
             )
@@ -898,7 +908,7 @@ def test_syndrome_view_permissions_success(client, URL):
             # Request e12 patients list endpoint url different org
             response = client.get(
                 reverse(
-                    "edit_syndrome",
+                    URL,
                     kwargs={"syndrome_id": SYNDROME_DIFF_ORG.id},
                 )
             )
@@ -942,4 +952,150 @@ def test_syndrome_view_permissions_forbidden(client, URL):
 
         assert (
             response.status_code == 403
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested multiaxial_diagnosis page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested syndrome page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL", [("edit_comorbidity"), ("close_comorbidity"), ("comorbidities")]
+)
+@pytest.mark.django_db
+def test_comborbidity_view_permissions_success(client, URL):
+    """
+    Assert these users CAN view comorbidities for Case from their own Trust.
+
+    RCPCH Audit Lead has additional test to assert can view comborbiditys outside own Trust.
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+    COMORBIDITY_SAME_ORG = Comorbidity.objects.create(
+        multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+        comorbidityentity=ComorbidityEntity.objects.filter(
+            conceptId="1148757008"
+        ).first(),
+    )
+
+    users = Epilepsy12User.objects.all()
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        # Get response object
+        if URL == "comorbidities":
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
+                    },
+                )
+            )
+        else:
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={"comorbidity_id": COMORBIDITY_SAME_ORG.id},
+                )
+            )
+
+        assert (
+            response.status_code == 200
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comborbidity page of user from {CASE_FROM_SAME_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+        # Additional test: assert different organisation if RCPCH AUDIT LEAD
+        # ADDENBROOKE'S
+        if test_user.role == test_user_rcpch_audit_lead_data.role:
+            DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+                ODSCode="RGT01",
+                ParentOrganisation_ODSCode="RGT",
+            )
+            CASE_FROM_DIFF_ORG = Case.objects.get(
+                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+            )
+
+            comborbidity_DIFF_ORG = Comorbidity.objects.create(
+                multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
+                comorbidityentity=ComorbidityEntity.objects.filter(
+                    conceptId="1148757008"
+                ).first(),
+            )
+
+            # Request e12 patients list endpoint url different org
+            if URL == "comorbidities":
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={
+                            "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id
+                        },
+                    )
+                )
+            else:
+                response = client.get(
+                    reverse(
+                        URL,
+                        kwargs={"comorbidity_id": comborbidity_DIFF_ORG.id},
+                    )
+                )
+
+            assert (
+                response.status_code == 200
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comborbidity page of {CASE_FROM_DIFF_ORG.organisations.all()}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL", [("edit_comorbidity"), ("close_comorbidity"), ("comorbidities")]
+)
+@pytest.mark.django_db
+def test_comborbidity_view_permissions_forbidden(client, URL):
+    """
+    Assert these users CANT view comborbidity for Case from different Trust.
+    """
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+    COMORBIDITY_DIFF_ORG = Comorbidity.objects.create(
+        multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
+        comorbidityentity=ComorbidityEntity.objects.filter(
+            conceptId="1148757008"
+        ).first(),
+    )
+
+    # RCPCH AUDIT LEADS HAVE FULL ACCESS SO EXCLUDE
+    users = Epilepsy12User.objects.all().exclude(first_name="RCPCH_AUDIT_LEAD")
+
+    for test_user in users:
+        client.force_login(test_user)
+
+        # Get response object
+        if URL == "comorbidities":
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "multiaxial_diagnosis_id": CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis.id
+                    },
+                )
+            )
+        else:
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={"comorbidity_id": COMORBIDITY_DIFF_ORG.id},
+                )
+            )
+
+        assert (
+            response.status_code == 403
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested comorbidity page of case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
