@@ -41,9 +41,7 @@ def cases_aggregated_by_sex(selected_organisation):
     sex_long_list = [When(sex=k, then=Value(v)) for k, v in SEX_TYPE]
 
     cases_aggregated_by_sex = (
-        Case.objects.filter(
-            organisations__OrganisationName__contains=selected_organisation
-        )
+        Case.objects.filter(organisations=selected_organisation)
         .values("sex")
         .annotate(sex_display=DJANGO_CASE(*sex_long_list, output_field=CharField()))
         .values("sex_display")

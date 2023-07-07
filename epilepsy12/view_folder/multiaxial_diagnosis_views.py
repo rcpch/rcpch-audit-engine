@@ -1433,10 +1433,9 @@ def epilepsy_cause_categories(request, multiaxial_diagnosis_id):
         multiaxial_diagnosis.save()
 
     else:
-        print(
+        raise ValueError(
             f"category is {epilepsy_cause_category}. This is an error that needs handling"
         )
-        # TODO handle this error
 
     context = {
         "epilepsy_cause_selection": EPILEPSY_CAUSES,

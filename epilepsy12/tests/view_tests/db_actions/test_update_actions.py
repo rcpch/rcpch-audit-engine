@@ -31,9 +31,9 @@
         'developmental_learning_or_schooling_problems',             toggle_button
         'behavioural_or_emotional_problems'                         toggle_button
     ]
-    [] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to acute (CHRONICITY[0][0]==1)
-    [] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to non-acute (CHRONICITY[0][0]==2)
-    [] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to don't know (CHRONICITY[0][0]==3)
+    [x] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to acute (CHRONICITY[0][0]==1)
+    [x] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to non-acute (CHRONICITY[0][0]==2)
+    [x] Assert user can change 'first_paediatric_assessment_in_acute_or_nonacute_setting' to don't know (CHRONICITY[0][0]==3)
     [] Assert user can change 'has_number_of_episodes_since_the_first_been_documented' to True
     [] Assert user can change 'has_number_of_episodes_since_the_first_been_documented' to False
     [] Assert user can change 'general_examination_performed' to True
@@ -57,26 +57,26 @@
         'diagnosis_of_epilepsy_withdrawn',                          toggle_button
     ]
 
-    [] Assert user can change 'previous_febrile_seizure' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
-    [] Assert user can change 'previous_febrile_seizure' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
-    [] Assert user can change 'previous_febrile_seizure' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
-    [] Assert user can change 'previous_acute_symptomatic_seizure' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
-    [] Assert user can change 'previous_acute_symptomatic_seizure' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
-    [] Assert user can change 'previous_acute_symptomatic_seizure' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
-    [] Assert user can change 'is_there_a_family_history_of_epilepsy' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
-    [] Assert user can change 'is_there_a_family_history_of_epilepsy' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
-    [] Assert user can change 'is_there_a_family_history_of_epilepsy' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
+    [x] Assert user can change 'previous_febrile_seizure' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
+    [x] Assert user can change 'previous_febrile_seizure' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
+    [x] Assert user can change 'previous_febrile_seizure' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
+    [x] Assert user can change 'previous_acute_symptomatic_seizure' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
+    [x] Assert user can change 'previous_acute_symptomatic_seizure' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
+    [x] Assert user can change 'previous_acute_symptomatic_seizure' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
+    [x] Assert user can change 'is_there_a_family_history_of_epilepsy' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
+    [x] Assert user can change 'is_there_a_family_history_of_epilepsy' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
+    [x] Assert user can change 'is_there_a_family_history_of_epilepsy' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
     [] Assert user can change 'previous_neonatal_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
     [] Assert user can change 'previous_neonatal_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
     [] Assert user can change 'previous_neonatal_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
     [] Assert user can change 'were_any_of_the_epileptic_seizures_convulsive' to True
     [] Assert user can change 'were_any_of_the_epileptic_seizures_convulsive' to False
-    [] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
-    [] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
-    [] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
-    [] Assert user can change 'experienced_prolonged_focal_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
-    [] Assert user can change 'experienced_prolonged_focal_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
-    [] Assert user can change 'experienced_prolonged_focal_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
+    [x] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
+    [x] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
+    [x] Assert user can change 'experienced_prolonged_generalized_convulsive_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
+    [x] Assert user can change 'experienced_prolonged_focal_seizures' to Yes (OPT_OUT_UNCERTAIN[0][0] == 'Y')
+    [x] Assert user can change 'experienced_prolonged_focal_seizures' to No (OPT_OUT_UNCERTAIN[1][0] == 'N')
+    [x] Assert user can change 'experienced_prolonged_focal_seizures' to Uncertain (OPT_OUT_UNCERTAIN[2][0] == 'U')
     [] Assert user can change 'diagnosis_of_epilepsy_withdrawn' to True
     [] Assert user can change 'diagnosis_of_epilepsy_withdrawn' to False
 
@@ -103,6 +103,11 @@
     [] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
     [] Assert user can change 'relevant_impairments_behavioural_educational' to True
     [] Assert user can change 'relevant_impairments_behavioural_educational' to False
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
+    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth'] ('Other')
     [] Assert user can change 'mental_health_screen' to True
     [] Assert user can change 'mental_health_screen' to False
     [] Assert user can change 'mental_health_issue_identified' to True
@@ -111,11 +116,11 @@
     [] Assert user can change 'autistic_spectrum_disorder' to False
     [] Assert user can change 'global_developmental_delay_or_learning_difficulties' to True
     [] Assert user can change 'global_developmental_delay_or_learning_difficulties' to False
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[0][0]=='mild'
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[1][0]=='moderate'
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[2][0]=='severe'
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[3][0]=='profound'
-    [] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[4][0]=='uncertain'
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[0][0]=='mild'
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[1][0]=='moderate'
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[2][0]=='severe'
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[3][0]=='profound'
+    [x] Assert user can change 'global_developmental_delay_or_learning_difficulties_severity' to SEVERITY[4][0]=='uncertain'
 
 # Episode
     for field in fields: [
@@ -129,14 +134,14 @@
         'epileptic_seizure_onset_type',                                      single_choice_multiple_toggle_button
         'focal_onset_epilepsy_checked_changed',                              updated in view function
         'epileptic_generalised_onset',                                       single_choice_multiple_toggle_button
-        'nonepilepsy_generalised_onset',                                     single_choice_multiple_toggle_button
+        'nonepilepsy_generalised_onset',                                     multiple_choice_multiple_toggle_button
         'nonepileptic_seizure_type',                                         select
         'nonepileptic_seizure_subtype',                                      select
     ]
     [] Assert user can change 'seizure_onset_date' to today
-    [] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[0][0]=='Apx' (Approximate)
-    [] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[1][0]=='Exc' (Exact)
-    [] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[2][0]=='NK' (Not Known)
+    [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[0][0]=='Apx' (Approximate)
+    [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[1][0]=='Exc' (Exact)
+    [x] Assert user can change 'seizure_onset_date_confidence' to DATE_ACCURACY[2][0]=='NK' (Not Known)
     [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[0][0]=='a' ('This was a single episode')
     [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[1][0]=='b' ('This was a cluster within 24 hours')
     [] Assert user can change 'episode_definition' to EPISODE_DEFINITION[2][0]=='c' ('These were 2 or more episodes more than 24 hours apart')
@@ -144,27 +149,27 @@
     [] Assert user can delete 'gelastic' in 'delete_description_keyword' from ['gelastic', 'left']
     [] Assert user can change 'edit_description' to "Jacob fell to the floor and shook the left side of his body."
     [] Assert user can change 'edit_description' to "Jacob fell to the floor and shook the left side of his body."
-    [] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[0][0]=='E' (Epilepsy)
-    [] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[1][0]=='NE' (Epilepsy)
-    [] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[2][0]=='U' (Uncertain)
-    [] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[0][0]=='FO' (Focal Onset)
-    [] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[1][0]=='GO' (Generalised Onset)
-    [] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[2][0]=='UO' (Unknown Onset)
-    [] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[3][0]=='UC' (Unclassified)
+    [x] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[0][0]=='E' (Epilepsy)
+    [x] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[1][0]=='NE' (Epilepsy)
+    [x] Assert user can change 'epilepsy_or_nonepilepsy_status' to EPILEPSY_DIAGNOSIS_STATUS[2][0]=='U' (Uncertain)
+    [x] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[0][0]=='FO' (Focal Onset)
+    [x] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[1][0]=='GO' (Generalised Onset)
+    [x] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[2][0]=='UO' (Unknown Onset)
+    [x] Assert user can change 'epileptic_seizure_onset_type' to EPILEPSY_SEIZURE_TYPE[3][0]=='UC' (Unclassified)
     [] Assert user can change 'focal_onset_epilepsy_checked_changed' to ........
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[0][0]=='AEM' ('Absence with eyelid myoclonia')
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[1][0]=='Ato' ('Atonic')]], tuple[Literal['Aab'], Literal['Atypical absence']], tuple[Literal['Clo'], Literal['Clonic']], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[2][0]=='Aab' ('Atypical absence')]], tuple[Literal['Clo'], Literal['Clonic']], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[3][0]=='Clo' ('Clonic')]], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[4][0]=='EpS' ('Epileptic spasms')]], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[5][0]=='MyC' ('Myoclonic')]], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[6][0]=='MAb' ('Myoclonic absence')]], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[7][0]=='MTC' ('Myoclonic-tonic-clonic')]], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[8][0]=='MAt' ('Myoclonic-atonic')]], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[9][0]=='Ton' ('Tonic')]], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[10][0]=='TCl' ('Tonic-clonic')
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[11][0]=='TAb' ('Typical absence')
-    [] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[12][0]=='Oth' ('Other')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[0][0]=='AEM' ('Absence with eyelid myoclonia')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[1][0]=='Ato' ('Atonic')]], tuple[Literal['Aab'], Literal['Atypical absence']], tuple[Literal['Clo'], Literal['Clonic']], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[2][0]=='Aab' ('Atypical absence')]], tuple[Literal['Clo'], Literal['Clonic']], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[3][0]=='Clo' ('Clonic')]], tuple[Literal['EpS'], Literal['Epileptic spasms']], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[4][0]=='EpS' ('Epileptic spasms')]], tuple[Literal['MyC'], Literal['Myoclonic']], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[5][0]=='MyC' ('Myoclonic')]], tuple[Literal['MAb'], Literal['Myoclonic absence']], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[6][0]=='MAb' ('Myoclonic absence')]], tuple[Literal['MTC'], Literal['Myoclonic-tonic-clonic']], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[7][0]=='MTC' ('Myoclonic-tonic-clonic')]], tuple[Literal['MAt'], Literal['Myoclonic-atonic']], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[8][0]=='MAt' ('Myoclonic-atonic')]], tuple[Literal['Ton'], Literal['Tonic']], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[9][0]=='Ton' ('Tonic')]], tuple[Literal['TCl'], Literal['Tonic-clonic']], tuple[Literal['TAb'], Literal['Typical absence']], tuple[Literal['Oth'], Literal['Other']]]
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[10][0]=='TCl' ('Tonic-clonic')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[11][0]=='TAb' ('Typical absence')
+    [x] Assert user can change 'epileptic_generalised_onset' to GENERALISED_SEIZURE_TYPE[12][0]=='Oth' ('Other')
     [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[0][0]=='BAr' ('Behaviour arrest')
     [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[1][0]=='EpS' ('Epileptic spasms')
     [] Assert user can change 'nonepileptic_seizure_type' to NON_EPILEPSY_SEIZURE_ONSET[2][0]=='TCl' ('Tonic-clonic')
@@ -274,6 +279,7 @@ from datetime import date
 
 # Django imports
 from django.urls import reverse
+from django.apps import apps
 
 # third party imports
 import pytest
@@ -306,15 +312,104 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
 )
 
-from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE, CHRONICITY
+from epilepsy12.constants import (
+    SEX_TYPE,
+    CHRONICITY,
+    OPT_OUT_UNCERTAIN,
+    SEVERITY,
+    EPILEPSY_CAUSES,
+    NEUROPSYCHIATRIC,
+    DATE_ACCURACY,
+    EPILEPSY_DIAGNOSIS_STATUS,
+    EPILEPSY_SEIZURE_TYPE,
+    GENERALISED_SEIZURE_TYPE,
+)
 from epilepsy12.general_functions import generate_nhs_number
 
 
-@pytest.mark.skip(reason="Unfinished test. Very much still a work in progress.")
+SINGLE_CHOICE_MULTIPLE_TOGGLES = (
+    {
+        "field_name": "first_paediatric_assessment_in_acute_or_nonacute_setting",
+        "param": "first_paediatric_assessment_id",
+        "choices": CHRONICITY,
+        "model": "firstpaediatricassessment",
+    },
+    {
+        "field_name": "previous_febrile_seizure",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "previous_acute_symptomatic_seizure",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "is_there_a_family_history_of_epilepsy",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "experienced_prolonged_generalized_convulsive_seizures",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "experienced_prolonged_focal_seizures",
+        "choices": OPT_OUT_UNCERTAIN,
+        "param": "epilepsy_context_id",
+        "model": "epilepsycontext",
+    },
+    {
+        "field_name": "mental_health_issue",
+        "choices": NEUROPSYCHIATRIC,
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "global_developmental_delay_or_learning_difficulties_severity",
+        "choices": SEVERITY,
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+    {
+        "field_name": "seizure_onset_date_confidence",
+        "choices": DATE_ACCURACY,
+        "param": "episode_id",
+        "model": "episode",
+    },
+    {
+        "field_name": "epilepsy_or_nonepilepsy_status",
+        "choices": EPILEPSY_DIAGNOSIS_STATUS,
+        "param": "episode_id",
+        "model": "episode",
+    },
+    {
+        "field_name": "epileptic_seizure_onset_type",
+        "choices": EPILEPSY_SEIZURE_TYPE,
+        "param": "episode_id",
+        "model": "episode",
+    },
+    {
+        "field_name": "epileptic_generalised_onset",
+        "choices": GENERALISED_SEIZURE_TYPE,
+        "param": "episode_id",
+        "model": "episode",
+    },
+)
+
+
 @pytest.mark.django_db
-def test_user_updates_first_paediatric_assessment_in_acute_or_nonacute_setting_success(
+def test_user_updates_single_choice_multiple_toggle_success(
     client, seed_groups_fixture, seed_users_fixture, seed_cases_fixture
 ):
+    """
+    Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
+    """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
@@ -338,22 +433,80 @@ def test_user_updates_first_paediatric_assessment_in_acute_or_nonacute_setting_s
 
     client.force_login(test_user)
 
-    for index, item in enumerate(CHRONICITY):
-        client.post(
-            reverse(
-                "first_paediatric_assessment_in_acute_or_nonacute_setting",
-                kwargs={
-                    "first_paediatric_assessment_id": CASE_FROM_TEST_USER_ORGANISATION.registration.firstpaediatricassessment.id,
-                },
-            ),
-            headers={"Hx-Trigger-Name": item[0], "Hx-Request": "true"},
-        )
-        validate_single_choice_multiple_toggle_button(
-            field_name="first_paediatric_assessment_in_acute_or_nonacute_setting",
-            model_instance=CASE_FROM_TEST_USER_ORGANISATION.registration.firstpaediatricassessment,
-            expected_result=item[0],
-            assert_pass=True,
-        )
+    for index, url in enumerate(SINGLE_CHOICE_MULTIPLE_TOGGLES):
+        for item in enumerate(url.get("choices")):
+            model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            client.post(
+                reverse(
+                    url.get("field_name"),
+                    kwargs={url.get("param"): model.id},
+                ),
+                headers={"Hx-Trigger-Name": item[0], "Hx-Request": "true"},
+            )
+            updated_model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            validate_single_choice_multiple_toggle_button(
+                field_name=url.get("field_name"),
+                model_instance=updated_model,
+                expected_result=item[0],
+                assert_pass=True,
+            )
+
+
+@pytest.mark.django_db
+def test_user_updates_single_choice_multiple_toggle_fail(
+    client, seed_groups_fixture, seed_users_fixture, seed_cases_fixture
+):
+    """
+    Assert for each single_choice_multiple_toggle choice selection, value stored in model is correct selection value
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    registration = factory.RelatedFactory(
+        E12RegistrationFactory,
+        factory_related_name="case",
+    )
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        nhs_number=generate_nhs_number(),
+        sex=SEX_TYPE[0][0],
+        registration=registration,  # ensure related audit factories not generated
+        organisations__organisation=TEST_USER_ORGANISATION,
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    for index, url in enumerate(SINGLE_CHOICE_MULTIPLE_TOGGLES):
+        for item in enumerate(url.get("choices")):
+            model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            client.post(
+                reverse(
+                    url.get("field_name"),
+                    kwargs={url.get("param"): model.id},
+                ),
+                headers={"Hx-Trigger-Name": item[0], "Hx-Request": "true"},
+            )
+            updated_model = get_model_from_model(
+                case=CASE_FROM_TEST_USER_ORGANISATION, model_name=url.get("model")
+            )
+            validate_single_choice_multiple_toggle_button(
+                field_name=url.get("field_name"),
+                model_instance=updated_model,
+                expected_result="dummy data",
+                assert_pass=False,
+            )
 
 
 # Test helper methods - there is one for each page_element
@@ -446,9 +599,26 @@ def validate_single_choice_multiple_toggle_button(
     if field_value is not None:
         if assert_pass:
             assert (
-                expected_result == field_value
+                f"{expected_result}" == f"{field_value}"
             ), f"{field_name} - result stored in model is {field_value}. Result expected: {expected_result} - Expected PASS"
         else:
             assert (
-                expected_result != field_value
+                f"{expected_result}" != f"{field_value}"
             ), f"{field_name} - result stored in model is {field_value}. Result expected: {expected_result} - Expected Fail"
+
+
+def get_model_from_model(case, model_name):
+    """
+    Return model instance related to Case
+    """
+    if model_name == "episode":
+        return Episode.objects.filter(
+            multiaxial_diagnosis=case.registration.multiaxialdiagnosis
+        ).first()
+    elif model_name == "comorbidity":
+        return Comorbidity.objects.filter(
+            multiaxial_diagnosis=case.registration.multiaxialdiagnosis
+        ).first()
+    else:
+        refresh_case = Case.objects.get(pk=case.pk)
+        return getattr(refresh_case.registration, model_name, None)
