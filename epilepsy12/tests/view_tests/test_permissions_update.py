@@ -234,13 +234,22 @@ for field in fields: [
 import pytest
 import json
 from http import HTTPStatus
+from datetime import date
 
 # django imports
 from django.urls import reverse
 from django.contrib.auth.models import Group
 
 # E12 imports
-from epilepsy12.models import Epilepsy12User, Organisation, Case, Episode, Keyword
+from epilepsy12.models import (
+    Epilepsy12User,
+    Organisation,
+    Case,
+    Episode,
+    Keyword,
+    EpilepsyCauseEntity,
+    MultiaxialDiagnosis,
+)
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
     test_user_audit_centre_clinician_data,
@@ -890,6 +899,7 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
     users = Epilepsy12User.objects.all().exclude(
         first_name__in=[
             f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+            "AUDIT_CENTRE_ADMINISTRATOR",
         ]
     )
 
@@ -907,7 +917,7 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
         "global_developmental_delay_or_learning_difficulties_severity",
     ]
 
-    select_fields = ["epilepsy_cause"]
+    # select_fields = ["epilepsy_cause"] tested in separate function
 
     multiple_choice_multiple_toggle_button_fields = ["epilepsy_cause_categories"]
 
@@ -924,7 +934,7 @@ def test_users_update_multiaxial_diagnosis_success(client, URL):
                         "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id,
                     },
                 ),
-                Keyword.objects.all().first(),
+                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
             )
         elif (
             URL in single_choice_multiple_toggle_button_fields
@@ -1077,3 +1087,254 @@ def test_update_multiaxial_diagnosis_cause_success(client):
             epilepsy_cause_categories=[],
             epilepsy_cause=None,
         )
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("seizure_onset_date"),
+        ("seizure_onset_date_confidence"),
+        ("episode_definition"),
+        ("has_description_of_the_episode_or_episodes_been_gathered"),
+        ("edit_description"),
+        ("delete_description_keyword"),
+        ("epilepsy_or_nonepilepsy_status"),
+        ("epileptic_seizure_onset_type"),
+        ("focal_onset_epilepsy_checked_changed"),
+        ("epileptic_generalised_onset"),
+        ("nonepilepsy_generalised_onset"),
+        ("nonepileptic_seizure_type"),
+        ("nonepileptic_seizure_subtype"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_episode_forbidden(client, URL):
+    """
+    Simulating different E12 Users attempting to update episode in Epilepsy12
+
+    Assert these users cannot change episode
+    """
+
+    # set up constants
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ODSCode="RGT01",
+        ParentOrganisation_ODSCode="RGT",
+    )
+
+    CASE_FROM_DIFFERENT_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            "RCPCH_AUDIT_TEAM",
+            "CLINICAL_AUDIT_TEAM",
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+        ]
+    )
+
+    # Create objs to search for
+    episode = Episode.objects.create(
+        episode_definition="a",
+        multiaxial_diagnosis=CASE_FROM_DIFFERENT_ORG.registration.multiaxialdiagnosis,
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL == "delete_description_keyword":
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                        "description_keyword_id": Keyword.objects.all().first().id,
+                    },
+                )
+            )
+        else:
+            response = client.get(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                )
+            )
+
+        assert (
+            response.status_code == response.status_code == HTTPStatus.FORBIDDEN
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_DIFFERENT_ORG} in {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 403 response status code, received {response.status_code}"
+
+
+@pytest.mark.parametrize(
+    "URL",
+    [
+        ("seizure_onset_date"),
+        ("seizure_onset_date_confidence"),
+        ("episode_definition"),
+        ("has_description_of_the_episode_or_episodes_been_gathered"),
+        ("edit_description"),
+        ("delete_description_keyword"),
+        ("epilepsy_or_nonepilepsy_status"),
+        ("epileptic_seizure_onset_type"),
+        ("focal_onset_epilepsy_checked_changed"),
+        ("epileptic_generalised_onset"),
+        ("nonepilepsy_generalised_onset"),
+        ("nonepileptic_seizure_type"),
+        ("nonepileptic_seizure_subtype"),
+    ],
+)
+@pytest.mark.django_db
+def test_users_update_episode_success(client, URL):
+    """
+    Simulating different E12 Users attempting to update episode in Epilepsy12
+
+    Assert these users can change episode
+    """
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+    )
+
+    users = Epilepsy12User.objects.all().exclude(
+        first_name__in=[
+            f"{TEST_USER_ORGANISATION}_ADMINISTRATOR",
+            "AUDIT_CENTRE_ADMINISTRATOR",
+        ]
+    )
+
+    date_fields = ["seizure_onset_date"]
+
+    toggle_fields = ["has_description_of_the_episode_or_episodes_been_gathered"]
+
+    single_choice_multiple_toggle_button_fields = [
+        "seizure_onset_date_confidence",
+        "epilepsy_or_nonepilepsy_status",
+        "epileptic_seizure_onset_type",
+        "epileptic_generalised_onset",
+        "nonepilepsy_generalised_onset",
+    ]
+
+    select_fields = [
+        "episode_definition",
+        "nonepileptic_seizure_type",
+        "nonepileptic_seizure_subtype",
+    ]
+
+    # Create objs to search for
+    episode = Episode.objects.create(
+        episode_definition="a",
+        multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
+    )
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        if URL == "delete_description_keyword":
+            keyword = Keyword.objects.all().first()
+            description_keyword_list = [keyword.keyword]
+            episode.description_keywords = description_keyword_list
+            episode.save()
+
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                        "description_keyword_id": 0,  # remove first item in list
+                    },
+                )
+            )
+        elif URL in single_choice_multiple_toggle_button_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "1", "Hx-Request": "true"},
+            )
+        elif URL in toggle_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "button-true", "Hx-Request": "true"},
+            )
+        elif URL in select_fields:
+            post_body = None
+            if URL == "episode_definition":
+                post_body = "a"
+            elif URL == "nonepileptic_seizure_type":
+                post_body = "MAD"
+            elif URL == "nonepileptic_seizure_subtype":
+                post_body = "c"
+            else:
+                raise ValueError("No select chosen")
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: post_body},
+            )
+        elif URL in date_fields:
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": URL, "Hx-Request": "true"},
+                data={URL: date.today()},
+            )
+        elif URL == "edit_description":
+            # remaining values are strings
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "description", "Hx-Request": "true"},
+                data={"description": "This is a description"},
+            )
+        else:
+            # this is the choice for focal epilepsy
+            response = client.post(
+                reverse(
+                    URL,
+                    kwargs={
+                        "episode_id": episode.id,
+                    },
+                ),
+                headers={"Hx-Trigger-Name": "LATERALITY", "Hx-Request": "true"},
+                data={URL: "focal_onset_left"},
+            )
+
+        assert (
+            response.status_code == response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update episode {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected 200 response status code, received {response.status_code}"
