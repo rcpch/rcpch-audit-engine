@@ -296,7 +296,7 @@ def test_related_model_fields_count_all_episode_random_answers(
             )
 
             # DON'T COUNT OTHER RADIO BUTTONS FOR FOCAL ONSET, regardless of answer
-            if  SEIZURE_TYPE.get("focal_onset_impaired_awareness") is not None:
+            if SEIZURE_TYPE.get("focal_onset_impaired_awareness") is not None:
                 expected_value -= 1
 
             factory_attributes = {**COMMON_FIELDS, **SEIZURE_TYPE}
@@ -323,4 +323,3 @@ def test_related_model_fields_count_all_episode_random_answers(
 
             # Reset for next seizure type
             episode.delete()
-
