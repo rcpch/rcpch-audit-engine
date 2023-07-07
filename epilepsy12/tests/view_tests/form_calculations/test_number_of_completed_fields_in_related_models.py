@@ -70,21 +70,9 @@ from datetime import date
 import random
 
 # django imports
-from django.urls import reverse
 
 # E12 imports
 from epilepsy12.models import (
-    Epilepsy12User,
-    Organisation,
-    Case,
-    Registration,
-    FirstPaediatricAssessment,
-    EpilepsyContext,
-    Assessment,
-    Investigations,
-    Management,
-    MultiaxialDiagnosis,
-    Episode,
     SyndromeEntity,
     ComorbidityEntity,
     Site,
@@ -92,13 +80,8 @@ from epilepsy12.models import (
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     number_of_completed_fields_in_related_models,
-    completed_fields,
 )
 from epilepsy12.constants import (
-    CHRONICITY,
-    OPT_OUT_UNCERTAIN,
-    SEVERITY,
-    NEUROPSYCHIATRIC,
     EPILEPSY_DIAGNOSIS_STATUS,
     EPILEPSY_SEIZURE_TYPE,
     GENERALISED_SEIZURE_TYPE,
