@@ -16,7 +16,7 @@ from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
 
 # RCPCH imports
 from epilepsy12.forms import CaseForm
-from epilepsy12.models import Organisation, Site, Case
+from epilepsy12.models import Organisation, Site, Case, AuditProgress
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
@@ -596,3 +596,95 @@ def opt_out(request, organisation_id, case_id):
     return HttpResponseClientRedirect(
         reverse("cases", kwargs={"organisation_id": organisation_id})
     )
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_consent_to_audit_participation", raise_exception=True
+)
+def consent(request, case_id):
+    case = Case.objects.get(pk=case_id)
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=case,
+    ).get()
+    organisation_id = site.organisation.pk
+
+    context = {
+        "case": case,
+        "case_id": case.pk,
+        "active_template": "consent",
+        "audit_progress": case.registration.audit_progress,
+        "organisation_id": organisation_id,
+    }
+
+    template = "epilepsy12/consent.html"
+
+    response = render(request=request, template_name=template, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response, name="registration_active", params={}
+    )  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_consent_to_audit_participation", raise_exception=True
+)
+def consent_confirmation(request, case_id, consent_type):
+    """
+    POST request on click of confirm button in patient_confirmation.html template
+    params: consent_type is one of 'consent', 'denied'
+    """
+    case = Case.objects.get(pk=case_id)
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=case,
+    ).get()
+    organisation_id = site.organisation.pk
+    has_error = False
+
+    if consent_type == "consent":
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+            consent_patient_confirmed=True
+        )
+        case = Case.objects.get(pk=case_id)
+    elif consent_type == "denied":
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+            consent_patient_confirmed=False
+        )
+        case = Case.objects.get(pk=case_id)
+    else:
+        # an error occurred
+        has_error = True
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+            consent_patient_confirmed=None
+        )
+        case = Case.objects.get(pk=case_id)
+
+    context = {
+        "case": case,
+        "case_id": case.pk,
+        "active_template": "consent",
+        "audit_progress": case.registration.audit_progress,
+        "organisation_id": organisation_id,
+        "has_error": has_error,
+    }
+
+    template = "epilepsy12/forms/consent_form.html"
+
+    response = render(request=request, template_name=template, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response, name="registration_active", params={}
+    )  # reloads the form to show the active steps
+
+    return response

@@ -28,7 +28,7 @@ class Organisation(models.Model):
     Latitude = FloatField(max_length=100, null=True, blank=True, default=None)
     Longitude = FloatField(null=True, blank=True, default=None)
     Postcode = CharField(max_length=10, null=True, blank=True, default=None)
-    Geocode_Coordinates = PointField(null=True, blank=True, default=None)
+    Geocode_Coordinates = PointField(null=True, blank=True, default=None, srid=27700)
     ParentOrganisation_ODSCode = CharField(
         max_length=100, null=True, blank=True, default=None
     )

@@ -49,9 +49,8 @@ from ...constants import (
     NON_EPILEPSY_SLEEP_RELATED_SYMPTOMS,
     NON_EPILEPTIC_SYNCOPES,
     NON_EPILEPSY_PAROXYSMS,
-    ANTIEPILEPSY_MEDICINES,
-    BENZODIAZEPINE_TYPES,
     SEVERITY,
+    CHRONICITY,
 )
 from ...general_functions import (
     random_date,
@@ -188,7 +187,9 @@ def create_first_paediatric_assessment(registration_instance, verbose=True):
             first_paediatric_assessment_in_acute_or_nonacute_setting=bool(
                 getrandbits(1)
             ),
-            has_number_of_episodes_since_the_first_been_documented=bool(getrandbits(1)),
+            has_number_of_episodes_since_the_first_been_documented=choice(CHRONICITY)[
+                0
+            ],
             general_examination_performed=bool(getrandbits(1)),
             neurological_examination_performed=bool(getrandbits(1)),
             developmental_learning_or_schooling_problems=bool(getrandbits(1)),
