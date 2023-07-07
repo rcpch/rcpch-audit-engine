@@ -32,6 +32,12 @@ E12UserFactory(
 
 ### E12 Patients 
 
+[x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
+    [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view users inside own Trust - response.status_code == 200
+    [x] Assert an RCPCH Audit Lead can view users inside a different Trust - response.status_code == 200
+
 [x] Assert an Audit Centre Administrator can view patients inside own Trust - response.status_code == 200
 [x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == 200
 [x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == 200
@@ -186,16 +192,17 @@ from epilepsy12.models import Epilepsy12User, Organisation, Case, Episode, Syndr
 
 
 @pytest.mark.django_db
-def test_users_list_view_permissions_success(client):
+def test_users_list_view_permissions_success(
+    client,
+    seed_groups_fixture,
+    seed_users_fixture,
+    seed_cases_fixture,
+):
     """
     # Simulating different E12Users with different roles attempting to access the Users list of their own Trust. Additionally, RCPCH Audit Leads can access all organisations.
 
-    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
-    [x] Assert an RCPCH Audit Lead can view users inside own Trust - response.status_code == 200
-    [x] Assert an RCPCH Audit Lead can view users inside a different Trust - response.status_code == 200
 
+    NOTE: the `seed_groups_fixture, `seed_users_fixture`, `seed_cases_fixture` fixtures are scoped to the session, they just need to be used once to seed the db across further tests.
     """
 
     # set up constants
