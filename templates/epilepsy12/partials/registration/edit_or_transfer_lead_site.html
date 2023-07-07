@@ -1,23 +1,24 @@
 <h5>Primary Centre for Epilepsy12</h5>
 <label>Current Secondary NHS Trust/Health Board</label>
-{% if edit  %} 
-    <div class="field" id="edit_lead_centre" >
-        
-            {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="edit" as hx_post %}
-            {% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk as hx_cancel %}
-            {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="outerHTML" hx_name="edit_lead_site" test_positive=site.organisation.pk label="Update Secondary Care NHS Trust Centre" hx_default_text="Search organisations..." data_position="top left" enabled=perms.epilepsy12.can_edit_epilepsy12_lead_centre hx_cancel=hx_cancel hx_confirm="Please confirm that you wish to allocate to this organisation." %}
-        
-    </div>
 
-    
-{% elif transfer %}
-    
-    <div class="field" id="transfer_lead_centre" >
+    {% if edit  %} 
+        <div class="field" id="edit_lead_centre" >
+            
+                {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="edit" as hx_post %}
+                {% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk as hx_cancel %}
+                {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="outerHTML" hx_name="edit_lead_site" test_positive=site.organisation.pk label="Update Secondary Care NHS Trust Centre" hx_default_text="Search organisations..." data_position="top left" enabled=perms.epilepsy12.can_edit_epilepsy12_lead_centre hx_cancel=hx_cancel hx_confirm="Please confirm that you wish to allocate to this organisation." %}
+            
+        </div>
 
-            {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="transfer" as hx_post %}
-            {% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk as hx_cancel %}
-            {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="transfer_lead_site" test_positive=site.organisation.pk label="Transfer Secondary Care NHS Trust Centre" hx_default_text="Search organisations..." data_position="top left" enabled=perms.epilepsy12.can_transfer_epilepsy12_lead_centre hx_confirm="Please confirm that you wish to allocate to this organisation." %}
         
-    </div>
+    {% elif transfer %}
+        
+        <div class="field" id="transfer_lead_centre" >
 
-{% endif %}
+                {% url 'update_lead_site' registration_id=registration.pk site_id=site.pk update="transfer" as hx_post %}
+                {% url 'cancel_lead_site' registration_id=registration.pk site_id=site.pk as hx_cancel %}
+                {% include 'epilepsy12/partials/page_elements/organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#lead_site" hx_trigger="click" hx_swap="innerHTML" hx_name="transfer_lead_site" test_positive=site.organisation.pk label="Transfer Secondary Care NHS Trust Centre" hx_default_text="Search organisations..." data_position="top left" enabled=perms.epilepsy12.can_transfer_epilepsy12_lead_centre hx_confirm="Please confirm that you wish to allocate to this organisation." %}
+            
+        </div>
+
+    {% endif %}
