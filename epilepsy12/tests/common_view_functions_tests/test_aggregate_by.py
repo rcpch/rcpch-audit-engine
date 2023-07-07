@@ -397,18 +397,26 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     kpi_metric_eligible_3_5_object = KPIMetric(
         eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
     )
+    kpi_metric_eligible_6_8_10_object = KPIMetric(
+        eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
+    )
     
     # Temp varaiable for debugging - shows answers insert into case constructors
     assigned_outcomes = {}
 
     # generate kpi_metric_eligible_3_5_object answer set for e12_case_factory constructor
-    def get_ans_dict_eligible_3_5_only_and_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT):
+    def get_ans_dict_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT, eligible_3_5_only):
         ans_dict = {}
         for kpi_num in range(1, 11):
             
-            if kpi_num in [6, 8, 10]:
+            if eligible_3_5_only:
                 # The kpi_metric_eligible_3_5_object automatically sets these to ineligible
-                continue
+                if kpi_num in [6, 8, 10]:
+                    continue
+            else:
+                # The kpi_metric_eligible_6_8_10_object automatically sets these to ineligible
+                if kpi_num in [3,5]:
+                    continue
             
             OUTCOME_CHOICES = ['PASS','FAIL']
             
@@ -442,27 +450,46 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
                 else:
                     assigned_outcomes[temp_name] = [outcome]
                     
-                
-       
-        return kpi_metric_eligible_3_5_object.generate_metrics(
-        **ans_dict
-        ), EXPECTED_KPI_SCORE_OUTPUT
+        
+        kpi_metric_object = kpi_metric_eligible_3_5_object if eligible_3_5_only else kpi_metric_eligible_6_8_10_object        
+        
+        ans_dict_return = kpi_metric_object.generate_metrics(
+            **ans_dict
+            )
+        
+        return ans_dict_return, EXPECTED_KPI_SCORE_OUTPUT
 
     
     
     for _ in range(10):
-        answers, EXPECTED_KPI_SCORE_OUTPUT = get_ans_dict_eligible_3_5_only_and_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT)
         
-        # Create and save child with these KPI answers
+        # Create and save child with these KPI answers (ELIGIBLE 3 + 5)
+        answers_3_5_eligible, EXPECTED_KPI_SCORE_OUTPUT = get_ans_dict_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT, eligible_3_5_only=True)
+        
         CHILD = e12_case_factory(
             organisations__organisation=CHELWEST,
-            **answers
+            **answers_3_5_eligible
         )
         EXPECTED_KPI_SCORE_OUTPUT['total_number_of_cases'] += 1
 
         registration = Registration.objects.get(case=CHILD)
 
         calculate_kpis(registration)
+        
+        # Create and save child with these KPI answers (ELIGIBLE 6 + 8 + 10)
+        answers_6_8_10_eligible, EXPECTED_KPI_SCORE_OUTPUT = get_ans_dict_update_expected_score_dict(EXPECTED_KPI_SCORE_OUTPUT, eligible_3_5_only=False)
+        
+        CHILD = e12_case_factory(
+            organisations__organisation=CHELWEST,
+            **answers_6_8_10_eligible
+        )
+        EXPECTED_KPI_SCORE_OUTPUT['total_number_of_cases'] += 1
+
+        registration = Registration.objects.get(case=CHILD)
+
+        calculate_kpis(registration)
+        
+        
 
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=CHELWEST,
