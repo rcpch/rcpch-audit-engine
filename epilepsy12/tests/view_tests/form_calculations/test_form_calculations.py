@@ -571,6 +571,7 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
     ANSWER = random.choice([None, True])
     factory_attributes.update({KEY_NAME: ANSWER})
     if ANSWER is not None:
+        print(f"Adding 1 because {KEY_NAME} is not None")
         EXPECTED_SCORE += 1
 
     # All other bool fields have dependent date fields
@@ -584,10 +585,9 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
     DATE_2 = date(2023, 1, 2)
 
     for bool_field in BOOL_FIELDS:
-        factory_attributes.update({KEY_NAME: ANSWER})
-
         KEY_NAME = BASE_KEY_NAME + f"{bool_field}_referral_made"
         ANSWER = random.choice([None, True])
+        factory_attributes.update({KEY_NAME: ANSWER})
 
         DATE_1_ANSWER_OPTIONS = [None]
         DATE_2_ANSWER_OPTIONS = [None]
@@ -595,6 +595,7 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
         if ANSWER is not None:
             # Opens up 2 date options
             EXPECTED_SCORE += 1
+
             DATE_1_ANSWER_OPTIONS += [DATE_1]
             DATE_2_ANSWER_OPTIONS += [DATE_2]
 
