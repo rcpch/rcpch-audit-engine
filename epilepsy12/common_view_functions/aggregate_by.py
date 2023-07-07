@@ -1,6 +1,7 @@
 from typing import Literal
 
 # Django imports
+from django.apps import apps
 from django.contrib.gis.db.models import (
     Q,
     F,
@@ -16,7 +17,8 @@ from django.contrib.gis.db.models import (
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
-from ..models import Case
+
+# from ..models import Case
 from .report_queries import (
     get_all_organisations,
     get_all_trusts,
@@ -33,6 +35,8 @@ Reporting
 
 def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
+
+    Case = apps.get_model("epilepsy12", "Case")
 
     sex_long_list = [When(sex=k, then=Value(v)) for k, v in SEX_TYPE]
 
@@ -52,6 +56,7 @@ def cases_aggregated_by_sex(selected_organisation):
 
 def cases_aggregated_by_deprivation_score(selected_organisation):
     # aggregate queries on trust level cases
+    Case = apps.get_model("epilepsy12", "Case")
 
     deprivation_quintiles = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (None, 6))
 
@@ -101,6 +106,8 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
 
 def cases_aggregated_by_ethnicity(selected_organisation):
     # aggregate queries on trust level cases
+
+    Case = apps.get_model("epilepsy12", "Case")
 
     ethnicity_long_list = [When(ethnicity=k, then=Value(v)) for k, v in ETHNICITIES]
 
@@ -219,6 +226,7 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     """
     Returns aggregated KPIS for given cohort annotated by sublevel of abstraction (eg kpis in each NHS England region, labelled by region)
     """
+    Case = apps.get_model("epilepsy12", "Case")
 
     if abstraction_level == "organisation":
         abstraction_sublevels = get_all_organisations()

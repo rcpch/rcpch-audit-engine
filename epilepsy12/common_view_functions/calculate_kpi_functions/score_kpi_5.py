@@ -2,9 +2,10 @@
 
 # django imports
 from django.contrib.gis.db.models import Q
+from django.apps import apps
 
 # E12 imports
-from epilepsy12.models import Syndrome
+# from epilepsy12.models import Syndrome
 from epilepsy12.constants import KPI_SCORE
 
 
@@ -19,6 +20,8 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     """
     multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
     investigations = registration_instance.investigations
+
+    Syndrome = apps.get_model("epilepsy12", "Syndrome")
 
     # not scored
     if (age_at_first_paediatric_assessment >= 2) and (
