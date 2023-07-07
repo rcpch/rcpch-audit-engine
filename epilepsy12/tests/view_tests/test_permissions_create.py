@@ -112,7 +112,6 @@ from epilepsy12.models import (
 )
 
 
-
 @pytest.mark.django_db
 def test_user_create_same_org_success(
     client,
@@ -669,31 +668,27 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
         ]
 
         for url in URLS:
-            if url == "add_antiepilepsy_medicine":
-                kwargs = {
-                    "management_id": CASE_FROM_SAME_ORG.registration.management.id,
-                    "is_rescue_medicine": "is_rescue_medicine",
-                }
-            else:
-                kwargs = {
-                    "multiaxial_diagnosis_id": CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis.id
-                }
-
             if (
                 test_user.first_name
                 == test_user_audit_centre_administrator_data.role_str
             ):
-                response = client.post(
-                    reverse(
-                        url,
-                        kwargs=kwargs,
-                    ),
-                    headers={"Hx-Request": "true"},
-                )
+                CASE = CASE_FROM_SAME_ORG
 
             # Other users only forbidden from doing action in different Trust
             else:
-                response = client.post(
+                CASE = CASE_FROM_DIFF_ORG
+                
+            if url == "add_antiepilepsy_medicine":
+                kwargs = {
+                    "management_id": CASE.registration.management.id,
+                    "is_rescue_medicine": "is_rescue_medicine",
+                }
+            else:
+                kwargs = {
+                    "multiaxial_diagnosis_id": CASE.registration.multiaxialdiagnosis.id
+                }
+
+            response = client.post(
                     reverse(
                         url,
                         kwargs=kwargs,
@@ -703,4 +698,4 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
 
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
-            ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `{url}` for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Expected {HTTPStatus.FORBIDDEN}, received {response.status_code}"
+            ), f"{test_user} from {test_user.organisation_employer} with perms {test_user.groups.all()} request.POSTed to `{url}` for Case from {CASE.organisations.all()}. Expected {HTTPStatus.FORBIDDEN}, received {response.status_code}"
