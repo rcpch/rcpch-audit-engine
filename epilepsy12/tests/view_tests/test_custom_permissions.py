@@ -34,4 +34,10 @@ can_register_child_in_epilepsy12
 [] Assert an Audit Centre Lead Clinician CANNOT register a child outside their own Trust in Epilepsy12
 [] Assert an RCPCH Audit Lead CAN register a child within any Trust in Epilepsy12
 
+can_delete_epilepsy12_lead_centre
+[] Assert an Audit Centre Administrator CANNOT 'delete_lead_site'
+[] Assert an audit centre clinician CANNOT delete_lead_site
+[] Assert an Audit Centre Lead Clinician CANNOT delete_lead_site
+[] Assert an RCPCH Audit Lead CAN delete_lead_site
+
 """
