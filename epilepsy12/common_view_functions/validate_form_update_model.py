@@ -1,10 +1,17 @@
+# python imports
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+
+# django imports
 from django.utils import timezone
-from ..models import *
+from django.apps import apps
+
+# third party imports
+from psycopg2 import DatabaseError
+
+# RCPCH imports
 from ..general_functions import current_cohort_start_date, first_tuesday_in_january
 from ..validators import epilepsy12_date_validator
-from psycopg2 import DatabaseError
 
 
 def validate_and_update_model(
@@ -35,6 +42,13 @@ def validate_and_update_model(
     It is important that this function is called early on in the view function and that an updated instance of
     the model AFTER UPDATE is put in the context that is passed back to the template.
     """
+
+    # initialize models
+    SyndromeEntity = apps.get_model("epilepsy12", "SyndromeEntity")
+    EpilepsyCauseEntity = apps.get_model("epilepsy12", "EpilepsyCauseEntity")
+    MedicineEntity = apps.get_model("epilepsy12", "MedicineEntity")
+    Registration = apps.get_model("epilepsy12", "Registration")
+
     if page_element == "toggle_button":
         # toggle button
         # the trigger_name of the element here corresponds to whether true or false has been selected
@@ -53,11 +67,6 @@ def validate_and_update_model(
     ):
         # multiple_choice_multiple_toggle_button
         field_value = request.htmx.trigger_name
-
-    elif page_element == "date_field":
-        field_value = datetime.strptime(
-            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
-        ).date()
 
     elif page_element == "select" or page_element == "snomed_select":
         if request.htmx.trigger_name == "syndrome_name":
@@ -91,6 +100,9 @@ def validate_and_update_model(
         # The later of the two dates CAN be in the future but cannot be earlier than the first if supplied.
         # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
         # This validation step happens in validators.py
+        field_value = datetime.strptime(
+            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
+        ).date()
 
         if is_earliest_date:
             first_date = field_value

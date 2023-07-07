@@ -2,6 +2,7 @@
 
 # django imports
 from django.contrib.gis.db.models import Sum
+from django.apps import apps
 
 # E12 imports
 from ..general_functions import has_all_attributes
@@ -30,7 +31,8 @@ from .calculate_kpi_functions import (
     calculate_age_at_first_paediatric_assessment_in_years,
     check_is_registered,
 )
-from epilepsy12.models import KPI
+
+# from epilepsy12.models import KPI
 from epilepsy12.constants import KPI_SCORE
 
 
@@ -45,7 +47,9 @@ def calculate_kpis(registration_instance):
     2 - measure not applicable (eg ECG in nonconvulsive seizure)
     None - measure not scored yet
     """
-    
+
+    KPI = apps.get_model("epilepsy12", "KPI")
+
     # first set default value 'NOT_SCORED' to all KPIs
     paediatrician_with_expertise_in_epilepsies = KPI_SCORE["NOT_SCORED"]
     epilepsy_specialist_nurse = KPI_SCORE["NOT_SCORED"]

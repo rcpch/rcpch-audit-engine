@@ -1,23 +1,24 @@
-from django.utils import timezone
+# python imports
 from datetime import datetime
+
+# django imports
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
-from epilepsy12.forms import CaseForm
-from epilepsy12.models import Organisation, Site, Case
-from django.contrib import messages
 from django.core.paginator import Paginator
+
+# third party imports
 from django_htmx.http import trigger_client_event, HttpResponseClientRedirect
+
+# RCPCH imports
+from epilepsy12.forms import CaseForm
+from epilepsy12.models import Organisation, Site, Case, AuditProgress
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
-    RCPCH_AUDIT_ADMINISTRATOR,
-    RCPCH_AUDIT_ANALYST,
-    RCPCH_AUDIT_LEAD,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    TRUST_AUDIT_TEAM_FULL_ACCESS,
-    TRUST_AUDIT_TEAM_VIEW_ONLY,
 )
 from ..decorator import user_may_view_this_organisation, user_may_view_this_child
 
@@ -253,7 +254,7 @@ def case_list(request, organisation_id):
 
     if (
         request.user.is_rcpch_audit_team_member
-        or request.user.is_staff
+        or request.user.is_rcpch_staff
         or request.user.is_superuser
     ):
         rcpch_choices = (
@@ -341,9 +342,19 @@ def case_submit(request, organisation_id, case_id):
     """
     POST request callback from submit button in case_list partial.
     Disables further editing of case information. Case considered submitted
+    There is a specific permission both for locking and unlocking which is tested in this function
     """
     case = Case.objects.get(pk=case_id)
-    case.locked = not case.locked
+    if case.locked is True and request.user.has_perm(
+        "epilepsy12.can_unlock_child_case_data_from_editing"
+    ):
+        case.locked = False
+    elif case.locked is False and request.user.has_perm(
+        "epilepsy12.can_lock_child_case_data_from_editing"
+    ):
+        case.locked = True
+    else:
+        raise PermissionDenied()
     case.save()
 
     return HttpResponseClientRedirect(
@@ -432,6 +443,8 @@ def create_case(request, organisation_id):
             messages.error(
                 request=request, message="It was not possible to save the case"
             )
+            print("Invalid data")
+            print(form.errors)
 
     context = {
         "organisation_id": organisation_id,
@@ -468,9 +481,12 @@ def update_case(request, organisation_id, case_id):
 
     if request.method == "POST":
         if ("delete") in request.POST:
+            if not request.user.has_perm("epilepsy12.delete_case"):
+                raise PermissionDenied()
             messages.success(request, f"You successfully deleted {case}'s details")
             case.delete()
             return redirect("cases", organisation_id=organisation_id)
+
         form = CaseForm(request.POST, instance=case)
         if form.is_valid():
             obj = form.save()
@@ -585,3 +601,95 @@ def opt_out(request, organisation_id, case_id):
     return HttpResponseClientRedirect(
         reverse("cases", kwargs={"organisation_id": organisation_id})
     )
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_consent_to_audit_participation", raise_exception=True
+)
+def consent(request, case_id):
+    case = Case.objects.get(pk=case_id)
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=case,
+    ).get()
+    organisation_id = site.organisation.pk
+
+    context = {
+        "case": case,
+        "case_id": case.pk,
+        "active_template": "consent",
+        "audit_progress": case.registration.audit_progress,
+        "organisation_id": organisation_id,
+    }
+
+    template = "epilepsy12/consent.html"
+
+    response = render(request=request, template_name=template, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response, name="registration_active", params={}
+    )  # reloads the form to show the active steps
+
+    return response
+
+
+@login_required
+@user_may_view_this_child()
+@permission_required(
+    "epilepsy12.can_consent_to_audit_participation", raise_exception=True
+)
+def consent_confirmation(request, case_id, consent_type):
+    """
+    POST request on click of confirm button in patient_confirmation.html template
+    params: consent_type is one of 'consent', 'denied'
+    """
+    case = Case.objects.get(pk=case_id)
+    site = Site.objects.filter(
+        site_is_actively_involved_in_epilepsy_care=True,
+        site_is_primary_centre_of_epilepsy_care=True,
+        case=case,
+    ).get()
+    organisation_id = site.organisation.pk
+    has_error = False
+
+    if consent_type == "consent":
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+            consent_patient_confirmed=True
+        )
+        case = Case.objects.get(pk=case_id)
+    elif consent_type == "denied":
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+            consent_patient_confirmed=False
+        )
+        case = Case.objects.get(pk=case_id)
+    else:
+        # an error occurred
+        has_error = True
+        AuditProgress.objects.filter(pk=case.registration.audit_progress.pk).update(
+            consent_patient_confirmed=None
+        )
+        case = Case.objects.get(pk=case_id)
+
+    context = {
+        "case": case,
+        "case_id": case.pk,
+        "active_template": "consent",
+        "audit_progress": case.registration.audit_progress,
+        "organisation_id": organisation_id,
+        "has_error": has_error,
+    }
+
+    template = "epilepsy12/forms/consent_form.html"
+
+    response = render(request=request, template_name=template, context=context)
+
+    # trigger a GET request from the steps template
+    trigger_client_event(
+        response=response, name="registration_active", params={}
+    )  # reloads the form to show the active steps
+
+    return response

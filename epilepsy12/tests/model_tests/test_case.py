@@ -15,10 +15,11 @@ from datetime import date
 def test_case_age_calculation(e12_case_factory):
     # Test that the age function works as expected
     
-    e12Case = e12_case_factory()
+    e12Case = e12_case_factory(
+        date_of_birth = date(2018, 5, 11)
+    )
     
     fixed_testing_date = date(2023, 6, 17)
-    e12Case.date_of_birth = date(2018, 5, 11)
 
     assert e12Case.age(fixed_testing_date) == "5 years, 1 month", "Incorrect stringified age"
 
@@ -33,8 +34,8 @@ def test_case_organisation_assignment(e12_case_factory):
 @pytest.mark.django_db
 def test_case_save_unknown_postcode(e12_case_factory):
     # Tests that the save method works as expected using one of the 'unknown' postcodes
-    e12Case = e12_case_factory()
-    e12Case.postcode = "ZZ99 3CZ"
+    e12Case = e12_case_factory(index_of_multiple_deprivation_quintile=None)
+    e12Case.postcode="ZZ99 3CZ"
     e12Case.save()
     assert e12Case.index_of_multiple_deprivation_quintile is None
 

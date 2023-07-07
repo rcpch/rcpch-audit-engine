@@ -2,10 +2,11 @@
 
 # django imports
 from django.contrib.gis.db.models import Q
+from django.apps import apps
 
 # E12 imports
 from epilepsy12.constants import KPI_SCORE
-from epilepsy12.models import AntiEpilepsyMedicine, Episode
+
 
 def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> int:
     """3. tertiary_input
@@ -19,6 +20,9 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
     """
 
     assessment = registration_instance.assessment
+
+    AntiEpilepsyMedicine = apps.get_model("epilepsy12", "AntiEpilepsyMedicine")
+    Episode = apps.get_model("epilepsy12", "Episode")
 
     # EVALUATE ELIGIBILITY CRITERIA
 
@@ -68,6 +72,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]
+
 
 def score_kpi_3b(registration_instance) -> int:
     """3b. epilepsy_surgery_referral

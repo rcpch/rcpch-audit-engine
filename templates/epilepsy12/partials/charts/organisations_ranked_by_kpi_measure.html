@@ -34,6 +34,9 @@
   var rcpch_grey = '#4d4d4d';
   var rcpch_dark_grey = '#808080';
 
+  var lightColorBars = ['#00BDAA', '#11A7F2']
+  var datalabelTextColor = lightColorBars.includes('{{abstraction_color}}') ? rcpch_black : 'white'
+
   var myChart = new Chart(document.getElementById('{{data_id}}'), {
     type: 'bar',
     data: {
@@ -92,7 +95,7 @@
             font: {
                 weight: 'bold'
             },
-            color: colors,
+            color: datalabelTextColor,
             display: 'auto',
         }
       },

@@ -30,7 +30,6 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     Each case is unique
     """
 
-    # _id = models.ObjectIdField() #TODO #488
     locked = models.BooleanField(
         """
         This determines if the case is locked from editing

@@ -1,6 +1,7 @@
 from typing import Literal
 
 # Django imports
+from django.apps import apps
 from django.contrib.gis.db.models import (
     Q,
     F,
@@ -16,7 +17,8 @@ from django.contrib.gis.db.models import (
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE
-from ..models import Case
+
+# from ..models import Case
 from .report_queries import (
     get_all_organisations,
     get_all_trusts,
@@ -34,12 +36,12 @@ Reporting
 def cases_aggregated_by_sex(selected_organisation):
     # aggregate queries on trust level cases
 
+    Case = apps.get_model("epilepsy12", "Case")
+
     sex_long_list = [When(sex=k, then=Value(v)) for k, v in SEX_TYPE]
 
     cases_aggregated_by_sex = (
-        Case.objects.filter(
-            organisations__OrganisationName__contains=selected_organisation
-        )
+        Case.objects.filter(organisations=selected_organisation)
         .values("sex")
         .annotate(sex_display=DJANGO_CASE(*sex_long_list, output_field=CharField()))
         .values("sex_display")
@@ -52,34 +54,37 @@ def cases_aggregated_by_sex(selected_organisation):
 
 def cases_aggregated_by_deprivation_score(selected_organisation):
     # aggregate queries on trust level cases
+    Case = apps.get_model("epilepsy12", "Case")
 
-    deprivation_quintiles = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (None, 6))
-
-    imd_long_list = [
-        When(index_of_multiple_deprivation_quintile=k, then=Value(v))
-        for k, v in deprivation_quintiles
-    ]
-
-    cases_aggregated_by_deprivation = (
-        Case.objects.filter(
-            organisations__OrganisationName__contains=selected_organisation
-        )
-        .values("index_of_multiple_deprivation_quintile")
-        .annotate(
-            index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
-                *imd_long_list, output_field=PositiveSmallIntegerField()
-            )
-        )
-        .values("index_of_multiple_deprivation_quintile_display")
-        .annotate(
-            cases_aggregated_by_deprivation=Count(
-                "index_of_multiple_deprivation_quintile"
-            )
-        )
-        .order_by("index_of_multiple_deprivation_quintile")
+    cases_in_selected_organisation = Case.objects.filter(
+        organisations__OrganisationName__contains=selected_organisation
     )
 
-    # map quintile num to string repr
+    cases_aggregated_by_deprivation = (
+        # Filter just Cases in selected org
+        cases_in_selected_organisation
+        # Get list of IMD quintiles
+        .values("index_of_multiple_deprivation_quintile")
+        # Converting 'None' to 6 in a new index_of_multiple_deprivation_quintile_display "column"
+        .annotate(
+            index_of_multiple_deprivation_quintile_display=DJANGO_CASE(
+                When(index_of_multiple_deprivation_quintile=None, then=Value(6)),
+                default="index_of_multiple_deprivation_quintile",
+                output_field=PositiveSmallIntegerField(),
+            )
+        )
+        # Keeps only the new column
+        .values("index_of_multiple_deprivation_quintile_display")
+        # Value count the new column
+        .annotate(
+            cases_aggregated_by_deprivation=Count(
+                "index_of_multiple_deprivation_quintile_display"
+            ),
+        )
+        .order_by('index_of_multiple_deprivation_quintile_display')
+        
+    )
+    
     deprivation_quintile_str_map = {
         1: "1st quintile",
         2: "2nd quintile",
@@ -89,18 +94,22 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
         6: "Not known",
     }
 
-    for index, q in enumerate(cases_aggregated_by_deprivation):
-        q[
-            "index_of_multiple_deprivation_quintile_display"
-        ] = deprivation_quintile_str_map.get(
-            q.get("index_of_multiple_deprivation_quintile_display")
-        )
+    for aggregate in cases_aggregated_by_deprivation:
+        quintile = aggregate["index_of_multiple_deprivation_quintile_display"]
 
+        str_map = deprivation_quintile_str_map.get(quintile)
+
+        aggregate.update(
+            {"index_of_multiple_deprivation_quintile_display_str": str_map}
+        )
+ 
     return cases_aggregated_by_deprivation
 
 
 def cases_aggregated_by_ethnicity(selected_organisation):
     # aggregate queries on trust level cases
+
+    Case = apps.get_model("epilepsy12", "Case")
 
     ethnicity_long_list = [When(ethnicity=k, then=Value(v)) for k, v in ETHNICITIES]
 
@@ -219,6 +228,7 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     """
     Returns aggregated KPIS for given cohort annotated by sublevel of abstraction (eg kpis in each NHS England region, labelled by region)
     """
+    Case = apps.get_model("epilepsy12", "Case")
 
     if abstraction_level == "organisation":
         abstraction_sublevels = get_all_organisations()

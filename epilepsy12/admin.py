@@ -18,7 +18,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "email",
         "surname",
         "role",
-        "organisation_employer",
         "is_active",
     )
     list_display = (
@@ -28,7 +27,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
         "first_name",
         "surname",
         "is_active",
-        "twitter_handle",
         "role",
         "organisation_employer",
         "is_superuser",
@@ -52,17 +50,27 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             },
         ),
         ("Epilepsy12 Centre", {"fields": ("organisation_employer", "role")}),
-        ("Contacts", {"fields": ("email", "twitter_handle")}),
+        ("Contacts", {"fields": ("email",)}),
         (
             "Permissions",
             {
                 "fields": (
                     "is_active",
                     "is_staff",
+                    "is_rcpch_staff",
                     "is_rcpch_audit_team_member",
                     "is_superuser",
                     "email_confirmed",
                     "view_preference",
+                )
+            },
+        ),
+        (
+            "Access",
+            {
+                "fields": (
+                    "last_login",
+                    "date_joined",
                 )
             },
         ),
@@ -76,7 +84,6 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 ),
             },
         ),
-        ("Personal", {"fields": ("bio",)}),
     )
     add_fieldsets = (
         (
@@ -89,6 +96,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                     "first_name",
                     "surname",
                     "is_staff",
+                    "is_rcpch_staff",
                     "is_active",
                     "is_rcpch_audit_team_member",
                     "role",
@@ -114,6 +122,8 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
             form.base_fields["title"].disabled = True
             form.base_fields["email"].disabled = True
             form.base_fields["is_staff"].disabled = True
+            form.base_fields["is_rcpch_staff"].disabled = True
+            form.base_fields["is_rcpch_audit_team_member"].disabled = True
         return form
 
 

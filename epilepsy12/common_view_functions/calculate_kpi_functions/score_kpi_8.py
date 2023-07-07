@@ -1,13 +1,16 @@
 # python imports
 
 # django imports
-from epilepsy12.models import AntiEpilepsyMedicine, MedicineEntity
+from django.apps import apps
 
 # E12 imports
 from epilepsy12.constants import KPI_SCORE
 
 
 def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> int:
+    AntiEpilepsyMedicine = apps.get_model("epilepsy12", "AntiEpilepsyMedicine")
+    MedicineEntity = apps.get_model("epilepsy12", "MedicineEntity")
+
     """8. Sodium Valproate
 
     Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed

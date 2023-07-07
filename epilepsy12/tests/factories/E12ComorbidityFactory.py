@@ -9,11 +9,8 @@ import factory
 # rcpch imports
 from epilepsy12.models import (
     Comorbidity,
-    ComorbidityEntity,
 )
-from epilepsy12.general_functions import (
-    fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
-)
+
 
 class E12ComorbidityFactory(factory.django.DjangoModelFactory):
     """Dependency factory for creating a minimum viable E12MaDFactory.
