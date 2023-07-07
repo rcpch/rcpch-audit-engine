@@ -30,25 +30,33 @@ E12UserFactory(
 
 ## View Tests
 
-### E12 Patients 
+### E12 Users 
 
-    [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
-    [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
+*   [x] Assert an Audit Centre Administrator can view users inside own Trust - response.status_code == 200
+*   [ ] Assert an Audit Centre Administrator can view users inside own Organisation - response.status_code == 200
+
+*   [x] Assert an Audit Centre Clinician can view users inside own Trust - response.status_code == 200
+*   [ ] Assert an Audit Centre Clinician can view users inside own Organisation - response.status_code == 200
+
     [x] Assert an Audit Centre Lead Clinician can view users inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view users inside own Trust - response.status_code == 200
-    [x] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
+*   [ ] Assert an Audit Centre Lead Clinician who is a member of the RCPCH Audit Team can view users nationally - response.status_code == 200
+
+*   [x] Assert RCPCH Audit Team can view users inside own Trust - response.status_code == 200
+*   [x] Assert RCPCH Audit Team can view users inside a different Trust - response.status_code == 200
+*   [ ] Assert RCPCH Audit Team can view users nationally - response.status_code == 200
+
+
+### E12 Patient Records
 
     [x] Assert an Audit Centre Administrator can view patients inside own Trust - response.status_code == 200
     [x] Assert an audit centre clinician can view patients inside own Trust - response.status_code == 200
     [x] Assert an Audit Centre Lead Clinician can view patients inside own Trust - response.status_code == 200
     [x] Assert RCPCH Audit Team can view patients within all Trusts - response.status_code == 200
 
-
     [x] Assert an Audit Centre Administrator CANNOT view patients outside own Trust - response.status_code == 403
     [x] Assert an audit centre clinician CANNOT view patients outside own Trust - response.status_code == 403
     [x] Assert an Audit Centre Lead Clinician CANNOT view patients outside own Trust - response.status_code == 403
 
-# E12 Patient Records
 
 ## Registration
 
