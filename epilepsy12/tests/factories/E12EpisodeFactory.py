@@ -1,7 +1,7 @@
 """Factory fn to create new E12 Episodes, related to a Multiaxial Diagnosis.
 """
 # standard imports
-from datetime import timedelta
+from datetime import date
 
 # third-party imports
 import factory
@@ -9,7 +9,6 @@ import factory
 # rcpch imports
 from epilepsy12.models import (
     Episode,
-    Keyword,
 )
 from epilepsy12.constants import (
     DATE_ACCURACY,
