@@ -96,7 +96,6 @@ from datetime import date
 
 # django imports
 from django.urls import reverse
-import factory
 
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
@@ -112,15 +111,6 @@ from epilepsy12.models import (
     Case,
 )
 
-from epilepsy12.tests.factories import (
-    E12UserFactory,
-    E12CaseFactory,
-    E12RegistrationFactory,
-)
-
-from epilepsy12.constants import VALID_NHS_NUMS, SEX_TYPE
-from epilepsy12.general_functions import generate_nhs_number
-
 
 @pytest.mark.django_db
 def test_user_create_same_org_success(
@@ -132,8 +122,6 @@ def test_user_create_same_org_success(
     """Integration test checking functionality of view and form.
 
     Simulating different E12 users with different roles attempting to create Users inside own trust.
-
-    Additionally, RCPCH Audit Team and Clinical Audit Team roles should be able to create user in different trust.
     """
 
     # set up constants
@@ -146,12 +134,18 @@ def test_user_create_same_org_success(
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
 
-    users = Epilepsy12User.objects.all().exclude(
-        first_name__in=["AUDIT_CENTRE_ADMINISTRATOR", "AUDIT_CENTRE_CLINICIAN"]
-    )
+    selected_users = [
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -214,12 +208,17 @@ def test_user_create_diff_org_success(
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=["RCPCH_AUDIT_TEAM", "CLINICAL_AUDIT_TEAM"]
-    )
+    selected_users = [
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -270,12 +269,6 @@ def test_user_creation_forbidden(
 
     # set up constants
 
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
@@ -284,16 +277,17 @@ def test_user_creation_forbidden(
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            "AUDIT_CENTRE_ADMINISTRATOR",
-            "AUDIT_CENTRE_CLINICIAN",
-            "AUDIT_CENTRE_LEAD_CLINICIAN",
-        ]
-    )
+    selected_users = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+    ]
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -362,10 +356,20 @@ def test_patient_create_success(
 
     TEST_FIRST_NAME = "TEST_FIRST_NAME"
 
-    users = Epilepsy12User.objects.all()
+    selected_users = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -398,7 +402,7 @@ def test_patient_create_success(
         # This is valid form data, should redirect
         assert (
             response.status_code == HTTPStatus.FOUND
-        ), f"Valid Case form data POSTed by {test_user}, expected status_code 302, received {response.status_code}"
+        ), f"Valid Case form data POSTed by {test_user}, expected status_code {HTTPStatus.FOUND}, received {response.status_code}"
 
         assert Case.objects.filter(
             first_name=TEST_FIRST_NAME
@@ -471,16 +475,18 @@ def test_patient_creation_forbidden(
 
     TEST_FIRST_NAME = "TEST_FIRST_NAME"
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            "AUDIT_CENTRE_ADMINISTRATOR",
-            "AUDIT_CENTRE_CLINICIAN",
-            "AUDIT_CENTRE_LEAD_CLINICIAN",
-        ]
-    )
+    selected_users = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -546,20 +552,8 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # Case from SAME Org
-    # CASE_FROM_SAME_ORG = Case.objects.get(
-    #     first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    # )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_SAME_ORG = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=TEST_USER_ORGANISATION,
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
     URLS = [
@@ -569,18 +563,19 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
         "add_antiepilepsy_medicine",
     ]
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            # f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-            f"{test_user_clinicial_audit_team_data.role_str}",
-            f"{test_user_rcpch_audit_team_data.role_str}",
-        ]
-    )
+    selected_users = [
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+        test_user_rcpch_audit_team_data.role_str,
+        test_user_clinicial_audit_team_data.role_str,
+    ]
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
@@ -629,7 +624,7 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 @pytest.mark.django_db
 def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
     """
-    Simulating different unauthorized E12 Roles adding Episodes for Case in same Trust.
+    Simulating different unauthorized E12 Roles adding Episodes for Case in same / diff Trust.
 
     - `add_episode`
     - `add_comorbidity`
@@ -651,47 +646,26 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
         ParentOrganisation_ODSCode="RGT",
     )
 
-    # Case from SAME Org
-    # CASE_FROM_SAME_ORG = Case.objects.get(
-    #     first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
-    # )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_SAME_ORG = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=TEST_USER_ORGANISATION,
-    )
-    # Case from DIFF Org
-    # CASE_FROM_DIFF_ORG = Case.objects.get(
-    #     first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
-    # )
-    registration = factory.RelatedFactory(
-        E12RegistrationFactory,
-        factory_related_name="case",
-    )
-    CASE_FROM_DIFF_ORG = E12CaseFactory.create(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
-        nhs_number=generate_nhs_number(),
-        sex=SEX_TYPE[0][0],
-        registration=registration,  # ensure related audit factories not generated
-        organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
+    CASE_FROM_SAME_ORG = Case.objects.get(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
     )
 
-    users = Epilepsy12User.objects.filter(
-        first_name__in=[
-            f"{test_user_audit_centre_administrator_data.role_str}",
-            f"{test_user_audit_centre_clinician_data.role_str}",
-            f"{test_user_audit_centre_lead_clinician_data.role_str}",
-        ]
+    CASE_FROM_DIFF_ORG = Case.objects.get(
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
     )
 
-    if not users:
-        assert False, f"No seeded users in test db. Has the test db been seeded?"
+    selected_users = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+
+    users = Epilepsy12User.objects.filter(first_name__in=selected_users)
+
+    if len(users) != len(selected_users):
+        assert (
+            False
+        ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
         client.force_login(test_user)
