@@ -43,6 +43,13 @@ TITLES = ((MR, "Mr"), (MRS, "Mrs"), (MS, "Ms"), (DR, "Dr"), (PROFESSOR, "Profess
 
 """
 Groups
+These map to the roles
+Role                                Group
+Audit Centre Lead Clinician         trust_audit_team_view_only
+Audit Centre Clinician              trust_audit_team_edit_access
+Audit Centre Administrator          trust_audit_team_full_access
+RCPCH Audit Team                    epilepsy12_audit_team_full_access
+RCPCH Audit Children and Family     patient_access
 """
 # logged in user access all areas: can create/update/delete any audit data, logs, epilepsy key words and organisation trusts, groups and permissions
 EPILEPSY12_AUDIT_TEAM_FULL_ACCESS = "epilepsy12_audit_team_full_access"
@@ -66,6 +73,10 @@ GROUPS = (
     TRUST_AUDIT_TEAM_FULL_ACCESS,
     PATIENT_ACCESS,
 )
+
+"""
+Custom permissions
+"""
 
 # Case
 CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING = (
