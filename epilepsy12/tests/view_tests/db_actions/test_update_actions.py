@@ -133,7 +133,7 @@
         'epilepsy_or_nonepilepsy_status',                                    single_choice_multiple_toggle_button
         'epileptic_seizure_onset_type',                                      single_choice_multiple_toggle_button
         'focal_onset_epilepsy_checked_changed',                              updated in view function
-        'epileptic_generalised_onset',                                       single_choice_multiple_toggle_button
+        'epileptic_generalised_onset',                                       select
         'nonepilepsy_generalised_onset',                                     multiple_choice_multiple_toggle_button
         'nonepileptic_seizure_type',                                         select
         'nonepileptic_seizure_subtype',                                      select
@@ -491,12 +491,6 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "param": "episode_id",
         "model": "episode",
     },
-    {
-        "field_name": "epileptic_generalised_onset",
-        "choices": GENERALISED_SEIZURE_TYPE,
-        "param": "episode_id",
-        "model": "episode",
-    },
 )
 
 TOGGLES = (
@@ -732,6 +726,12 @@ SELECTS = (
         "param": "episode_id",
         "model": "episode",
         "choices": NON_EPILEPSY_SEIZURE_TYPE,
+    },
+    {
+        "field_name": "epileptic_generalised_onset",
+        "choices": GENERALISED_SEIZURE_TYPE,
+        "param": "episode_id",
+        "model": "episode",
     },
 )
 
