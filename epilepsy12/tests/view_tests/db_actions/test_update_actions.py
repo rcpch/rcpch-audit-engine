@@ -368,6 +368,7 @@
 """
 # Python imports
 from datetime import date
+from dateutil import relativedelta
 
 # Django imports
 from django.urls import reverse
@@ -1015,7 +1016,8 @@ def test_user_updates_toggles_false_fail(client):
             assert_pass=False,
         )
 
-@pytest.mark.skip(reason='unfinished test')
+
+@pytest.mark.skip(reason="unfinished test")
 @pytest.mark.django_db
 def test_user_updates_select_success(
     client,
@@ -1212,6 +1214,92 @@ def test_user_updates_select_fail(
                 expected_result=expected_result,
                 assert_pass=False,
             )
+
+
+@pytest.mark.django_db
+def test_user_updates_registation_date_not_over_24_years_PASS(
+    client,
+):
+    """
+    Assert date of first paediatric assessment cannot be after 24th birthday
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        organisations__organisation=TEST_USER_ORGANISATION,
+        date_of_birth=date(year=2000, month=3, day=2),
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    client.post(
+        reverse(
+            "registration_date",
+            kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
+        ),
+        headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
+        data={"registration_date": date(year=2024, month=2, day=2)},
+    )
+
+    assert (
+        relativedelta.relativedelta(
+            CASE_FROM_TEST_USER_ORGANISATION.registration.registration_date,
+            CASE_FROM_TEST_USER_ORGANISATION.date_of_birth,
+        ).years
+        < 24
+    ), f"{CASE_FROM_TEST_USER_ORGANISATION} is not over 24 years. Expected Pass."
+
+
+@pytest.mark.skip(reason="Unfinished test. Test needs further work.")
+def test_user_updates_registation_date_not_over_24_years_FAIL(
+    client,
+):
+    """
+    Assert date of first paediatric assessment cannot be after 24th birthday
+    """
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ODSCode="RP401",
+        ParentOrganisation_ODSCode="RP4",
+    )
+
+    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
+        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        organisations__organisation=TEST_USER_ORGANISATION,
+        date_of_birth=date(year=2000, month=1, day=2),
+    )
+
+    test_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+
+    client.force_login(test_user)
+
+    client.post(
+        reverse(
+            "registration_date",
+            kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
+        ),
+        headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
+        data={"registration_date": date(year=2024, month=2, day=2)},
+    )
+
+    assert (
+        relativedelta.relativedelta(
+            CASE_FROM_TEST_USER_ORGANISATION.registration.registration_date,
+            CASE_FROM_TEST_USER_ORGANISATION.date_of_birth,
+        ).years
+        >= 24
+    ), f"{CASE_FROM_TEST_USER_ORGANISATION} is over 24 years. Expected Fail."
 
 
 # Test helper methods - there is one for each page_element

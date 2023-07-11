@@ -130,6 +130,9 @@ def validate_and_update_model(
     if field_name == "registration_date":
         # registration_date cannot be before date of birth
         registration = Registration.objects.get(pk=model_id)
+        if relativedelta(field_value, registration.case.date_of_birth).years >= 24:
+            errors = f"To be included in Epilepsy12, {registration.case} cannot be over 24y at first paediatric assessment."
+            raise ValueError(errors)
         if field_value < registration.case.date_of_birth:
             errors = f"The date you chose ({field_value.strftime('%d %B %Y')}) cannot not be before {registration.case}'s date of birth."
             raise ValueError(errors)
