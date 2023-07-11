@@ -45,7 +45,7 @@ jobs:
 
       # Run Pytests
       - name: Pytest Suite
-        run: pytest -s
+        run: pytest
         
       - name: collect static files
         run: python manage.py collectstatic --noinput
