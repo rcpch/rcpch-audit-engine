@@ -57,13 +57,15 @@ jobs:
         env:
           DJANGO_CSRF_TRUSTED_ORIGINS: https://localhost,https://0.0.0.0
           E12_POSTGRES_DB_HOST: 127.0.0.1
-          E12_POSTGRES_DB_NAME: "github_actions"
-          E12_POSTGRES_DB_PASSWORD: "postgis"
+          E12_POSTGRES_DB_NAME: github_actions
+          E12_POSTGRES_DB_PASSWORD: postgis
           E12_POSTGRES_DB_PORT: 5432
-          E12_POSTGRES_DB_USER: "postgis"
+          E12_POSTGRES_DB_USER: postgis
           POSTCODES_IO_API_URL: https://api.postcodes.io
           RCPCH_CENSUS_PLATFORM_TOKEN: ${{ secrets.RCPCH_CENSUS_PLATFORM_TOKEN }}
           RCPCH_CENSUS_PLATFORM_URL: https://api.rcpch.ac.uk/deprivation/v1
-          RCPCH_HERMES_SERVER_URL: http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed 
-      - name: Pytest Suite
-        run: pytest
+          RCPCH_HERMES_SERVER_URL: http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
+      - name: print settings for debugging  purposes
+        run: python manage.py diffsettings --all
+        # - name: Pytest Suite
+        # run: pytest
