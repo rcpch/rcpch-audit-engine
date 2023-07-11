@@ -15,15 +15,15 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     services:
-      postgres:
+      postgis:
         image: postgis/postgis:15-3.3
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgis
+          POSTGRES_PASSWORD: postgis
           POSTGRES_DB: github_actions
         ports:
           - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
+        # needed because the postgis container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
@@ -55,11 +55,15 @@ jobs:
       - name: Run migrations
         run: python manage.py migrate
         env:
-          E12_POSTGRES_DB_NAME: github_actions
-          E12_POSTGRES_DB_USER: postgres
-          E12_POSTGRES_DB_PASSWORD: postgres
-          E12_POSTGRES_DB_HOST: 127.0.0.1
-          E12_POSTGRES_DB_PORT: 5432
           DJANGO_CSRF_TRUSTED_ORIGINS: https://localhost,https://0.0.0.0
+          E12_POSTGRES_DB_HOST: 127.0.0.1
+          E12_POSTGRES_DB_NAME: github_actions
+          E12_POSTGRES_DB_PASSWORD: postgis
+          E12_POSTGRES_DB_PORT: 5432
+          E12_POSTGRES_DB_USER: postgis
+          POSTCODES_IO_API_URL: https://api.postcodes.io
+          RCPCH_CENSUS_PLATFORM_TOKEN: ${{ secrets.RCPCH_CENSUS_PLATFORM_TOKEN }}
+          RCPCH_CENSUS_PLATFORM_URL: https://api.rcpch.ac.uk/deprivation/v1
+          RCPCH_HERMES_SERVER_URL: http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed 
       - name: Pytest Suite
         run: pytest
