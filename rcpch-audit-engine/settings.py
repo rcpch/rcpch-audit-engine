@@ -126,11 +126,6 @@ WSGI_APPLICATION = "rcpch-audit-engine.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
@@ -139,11 +134,21 @@ DATABASES = {
         "PASSWORD": os.environ.get("E12_POSTGRES_DB_PASSWORD"),
         "HOST": os.environ.get("E12_POSTGRES_DB_HOST"),
         "PORT": os.environ.get("E12_POSTGRES_DB_PORT"),
-        "TEST": {
-            "NAME": "e12TestDb",
-        },
     }
 }
+
+# TO SET UP TESTDB DURING GITHUB ACTIONS WORKFLOW
+if os.environ.get('GITHUB_WORKFLOW'):
+    DATABASES = {
+        'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'github_actions',
+           'USER': 'postgres',
+           'PASSWORD': 'postgres',
+           'HOST': '127.0.0.1',
+           'PORT': '5432',
+        }
+    }
 
 
 # Password validation
