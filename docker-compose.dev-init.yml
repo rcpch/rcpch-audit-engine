@@ -51,7 +51,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
 
-  # db container - runs postgres
+  # db container - runs postgis
   db:
     image: postgis/postgis:15-3.3
     volumes:
