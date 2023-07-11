@@ -71,5 +71,6 @@ jobs:
    
       - name: print settings for debugging  purposes
         run: python manage.py diffsettings --all
-        # - name: Pytest Suite
-        # run: pytest
+      
+      - name: Pytest Suite
+        run: pytest
