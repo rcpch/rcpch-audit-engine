@@ -104,7 +104,9 @@ def multiaxial_diagnosis(request, case_id):
         multiaxial_diagnosis=multiaxial_diagnosis, epilepsy_or_nonepilepsy_status="E"
     ).exists()
 
-    syndromes = Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).all()
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis
+    ).order_by("-syndrome_diagnosis_date")
 
     comorbidities = Comorbidity.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis
@@ -1148,11 +1150,18 @@ def add_syndrome(request, multiaxial_diagnosis_id):
         syndrome=None,
     )
 
-    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+    # create list of syndromesentities, removing already selected items, excluding current
+    all_selected_syndromes = (
+        Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+        .exclude(pk=syndrome.pk)
+        .values_list("syndrome", flat=True)
+    )
+    syndrome_selection = SyndromeEntity.objects.exclude(
+        pk__in=all_selected_syndromes
+    ).order_by("syndrome_name")
 
     context = {
         "syndrome": syndrome,
-        # sorted(SYNDROMES, key=itemgetter(1)),
         "syndrome_selection": syndrome_selection,
     }
 
@@ -1177,11 +1186,19 @@ def edit_syndrome(request, syndrome_id):
 
     keywords = Keyword.objects.all()
 
-    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+    # create list of syndromesentities, removing already selected items, excluding current
+    multiaxial_diagnosis = syndrome.multiaxial_diagnosis
+    all_selected_syndromes = (
+        Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+        .exclude(pk=syndrome_id)
+        .values_list("syndrome", flat=True)
+    )
+    syndrome_selection = SyndromeEntity.objects.exclude(
+        pk__in=all_selected_syndromes
+    ).order_by("syndrome_name")
 
     context = {
         "syndrome": syndrome,
-        # sorted(SYNDROMES, key=itemgetter(1)),
         "syndrome_selection": syndrome_selection,
         "seizure_onset_date_confidence_selection": DATE_ACCURACY,
         "episode_definition_selection": EPISODE_DEFINITION,
@@ -1232,7 +1249,7 @@ def remove_syndrome(request, syndrome_id):
     Syndrome.objects.get(pk=syndrome_id).delete()
     syndromes = Syndrome.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis
-    ).order_by("syndrome_diagnosis_date")
+    ).order_by("-syndrome_diagnosis_date")
 
     context = {"multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
 
@@ -1263,7 +1280,7 @@ def close_syndrome(request, syndrome_id):
 
     syndromes = Syndrome.objects.filter(
         multiaxial_diagnosis=multiaxial_diagnosis
-    ).order_by("syndrome_diagnosis_date")
+    ).order_by("-syndrome_diagnosis_date")
 
     context = {"multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
 
@@ -1302,7 +1319,9 @@ def syndrome_present(request, multiaxial_diagnosis_id):
         print("Some mistake happened")
         # TODO need to handle this
 
-    syndromes = Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis).all()
+    syndromes = Syndrome.objects.filter(
+        multiaxial_diagnosis=multiaxial_diagnosis
+    ).order_by("-syndrome_diagnosis_date")
 
     context = {"multiaxial_diagnosis": multiaxial_diagnosis, "syndromes": syndromes}
 
