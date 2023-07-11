@@ -42,6 +42,10 @@ jobs:
       # python dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      # Run Pytests
+      - name: Pytest Suite
+        run: pytest -s
         
       - name: collect static files
         run: python manage.py collectstatic --noinput
