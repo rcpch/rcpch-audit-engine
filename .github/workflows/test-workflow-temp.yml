@@ -10,7 +10,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    # This 'env' refers to environment variables
+    # this 'env' refers to environment variables
     env:
         DJANGO_CSRF_TRUSTED_ORIGINS: https://localhost,https://0.0.0.0
         E12_POSTGRES_DB_HOST: 127.0.0.1
@@ -65,12 +65,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # run migrations and tests
+      # run migrations
       - name: Run migrations
         run: python manage.py migrate
-   
+    
+      - name: collect static files
+        run: python manage.py collectstatic --noinput
+
+      # Run Pytest Suite
       - name: print settings for debugging  purposes
         run: python manage.py diffsettings --all
       
       - name: Pytest Suite
-        run: pytest
+        run: pytest -rP
