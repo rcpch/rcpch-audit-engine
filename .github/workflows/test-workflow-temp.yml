@@ -20,7 +20,7 @@ jobs:
         env:
           POSTGRES_USER: postgis
           POSTGRES_PASSWORD: postgis
-          POSTGRES_DB: github_actions
+          POSTGRES_DB: test_db
         ports:
           - 5432:5432
         # needed because the postgis container does not provide a healthcheck
@@ -57,7 +57,7 @@ jobs:
         env:
           DJANGO_CSRF_TRUSTED_ORIGINS: https://localhost,https://0.0.0.0
           E12_POSTGRES_DB_HOST: 127.0.0.1
-          E12_POSTGRES_DB_NAME: github_actions
+          E12_POSTGRES_DB_NAME: db
           E12_POSTGRES_DB_PASSWORD: postgis
           E12_POSTGRES_DB_PORT: 5432
           E12_POSTGRES_DB_USER: postgis
