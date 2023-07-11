@@ -5,10 +5,6 @@ from operator import itemgetter
 from django.contrib.gis.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
-from epilepsy12.constants.medications import (
-    ANTIEPILEPSY_MEDICINES,
-    BENZODIAZEPINE_TYPES,
-)
 from epilepsy12.models import (
     Management,
     Registration,
@@ -46,7 +42,7 @@ def management(request, case_id):
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False
-    ).all()
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -79,15 +75,6 @@ def management(request, case_id):
 
 
 """
-HTMX fields
-There is a function/hx route for each field in the form
-Each one is protected by @login_required
-@user_may_view_this_child()
-Each one updates the record.
-
-
-
-
 Fields relating to rescue medication begin here
 """
 
@@ -126,7 +113,7 @@ def has_an_aed_been_given(request, management_id):
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False
-    )
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
         "management": management,
@@ -215,7 +202,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=is_rescue_medicine
-    ).all()
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
         "medicines": antiepilepsy_medicines,
@@ -302,7 +289,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=antiepilepsy_medicine.management,
         is_rescue_medicine=is_rescue_medicine,
-    )
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
         "medicines": antiepilepsy_medicines,
