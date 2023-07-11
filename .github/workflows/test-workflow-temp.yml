@@ -16,7 +16,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgis/postgis:15-3.3
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -51,7 +51,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Run Pytests
+      # run migrations and tests
       - name: Run migrations
         run: python manage.py migrate
         env:
