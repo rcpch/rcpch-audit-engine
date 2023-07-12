@@ -38,7 +38,7 @@
                 
                 <div class="inline field">
                     <label class='toggle_button_label'>Time to Review</label>
-                    <input class="ui input" type="text" value="{{assessment.childrens_epilepsy_surgery_wait}}" disabled/>
+                    <input class="ui input" type="text" value="{% wait_days_and_weeks assessment.childrens_epilepsy_surgery_wait %}" disabled/>
                 </div>
 
                 {% if error_message %}

@@ -35,6 +35,7 @@ from epilepsy12.models import (
 - [x] Neither Assessment.epilepsy_specialist_nurse_input_date nor Assessment.epilepsy_specialist_nurse_referral_date can be before Registration.registration_date or Case.date_of_birth
 """
 
+
 @pytest.mark.django_db
 def test_validation_referral_date_and_input_date_both_none_when_referral_made_false(
     e12_case_factory,
@@ -111,8 +112,6 @@ def test_validation_referral_date_and_input_date_cant_be_future(
         ).registration.assessment
 
 
-    
-
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_validation_consultant_paediatrician_input_date_cant_be_after_referral_date(
@@ -123,7 +122,7 @@ def test_validation_consultant_paediatrician_input_date_cant_be_after_referral_d
     - Tests Assessment.paediatric_neurologist_referral_date cannot be after Assessment.paediatric_neurologist_input_date.
     - Tests Assessment.childrens_epilepsy_surgical_service_input_date cannot be after Assessment.childrens_epilepsy_surgical_service_referral_date.
     - Tests Assessment.epilepsy_specialist_nurse_input_date cannot be after Assessment.epilepsy_specialist_nurse_referral_date.
-    
+
     """
 
     referral_date = date(2023, 1, 1)
@@ -151,15 +150,13 @@ def test_validation_consultant_paediatrician_input_date_cant_be_after_referral_d
         ).registration.assessment
 
 
-    
-
 @pytest.mark.xfail
 @pytest.mark.django_db
 def test_validation_consultant_paediatrician_referral_date_nor_input_date_before_registration_date_or_dob(
     e12_case_factory,
 ):
     """
-    Tests 
+    Tests
     - neither Assessment.consultant_paediatrician_referral_date nor Assessment.consultant_paediatrician_input_date can be before Registration.registration_date or Case.date_of_birth
     - neither Assessment.paediatric_neurologist_referral_date nor Assessment.paediatric_neurologist_input_date can be before Registration.registration_date or Case.date_of_birth
     - neither Assessment.childrens_epilepsy_surgical_service_referral_date nor Assessment.childrens_epilepsy_surgical_service_input_date can be before Registration.registration_date or Case.date_of_birth
@@ -204,6 +201,7 @@ def test_validation_consultant_paediatrician_referral_date_nor_input_date_before
             registration__assessment__epilepsy_specialist_nurse_input_date=input_date,
         ).registration.assessment
 
+
 # The following tests check if the calculated wait times for each service are correct.
 # They all use the same function (epilepsy12.general_functions.time_elapsed.stringify_time_elapsed)
 # behind the scenes, so the tests are designed to cover the range of cases handled by the logic in that function.
@@ -238,7 +236,7 @@ def test_consultant_paediatrician_wait_days(e12_case_factory):
     ).registration.assessment
 
     # Check if the calculated wait time for the consultant paediatrician is correct
-    assert assessment.consultant_paediatrician_wait() == "2 days"
+    assert assessment.consultant_paediatrician_wait() == 2
 
 
 @pytest.mark.django_db
@@ -255,7 +253,7 @@ def test_consultant_paediatrician_wait_weeks(e12_case_factory):
     ).registration.assessment
 
     # Check if the calculated wait time for the consultant paediatrician is correct
-    assert assessment.consultant_paediatrician_wait() == "2 weeks"
+    assert assessment.consultant_paediatrician_wait() == 14
 
 
 @pytest.mark.django_db
@@ -272,7 +270,7 @@ def test_paediatric_neurologist_wait_months(e12_case_factory):
     ).registration.assessment
 
     # Check if the calculated wait time for the paediatric neurologist is correct
-    assert assessment.paediatric_neurologist_wait() == "4 months"
+    assert assessment.paediatric_neurologist_wait() == 120
 
 
 @pytest.mark.django_db
@@ -289,7 +287,7 @@ def test_childrens_epilepsy_surgery_wait_years(e12_case_factory):
     ).registration.assessment
 
     # Check if the calculated wait time for the children's epilepsy surgery service is correct
-    assert assessment.childrens_epilepsy_surgery_wait() == "2 years, 2 months"
+    assert assessment.childrens_epilepsy_surgery_wait() == 790
 
 
 @pytest.mark.django_db
@@ -306,4 +304,4 @@ def test_epilepsy_nurse_specialist_wait_same_day(e12_case_factory):
     ).registration.assessment
 
     # Check if the calculated wait time for the epilepsy nurse specialist is correct
-    assert assessment.epilepsy_nurse_specialist_wait() == "Same day"
+    assert assessment.epilepsy_nurse_specialist_wait() == 0

@@ -2,6 +2,7 @@
 
 # standard imports
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # 3rd party
 from django.contrib.gis.db import models
@@ -110,19 +111,15 @@ class Investigations(
         Calculated field. Returns time elapsed between date EEG requested and performed as a string.
         """
         if self.mri_brain_reported_date and self.mri_brain_requested_date:
-            return stringify_time_elapsed(
-                self.mri_brain_requested_date, self.mri_brain_reported_date
-            )
+            return (self.mri_brain_reported_date - self.mri_brain_requested_date).days
 
     def eeg_wait(self):
         """
         Calculated field. Returns time elapsed between date EEG requested and performed as a string.
         """
         if self.eeg_performed_date and self.eeg_request_date:
-            return stringify_time_elapsed(
-                self.eeg_request_date, self.eeg_performed_date
-            )
-    
+            return (self.eeg_performed_date - self.eeg_request_date).days
+
     def get_current_date(self):
         return date.today()
 
