@@ -35,7 +35,7 @@ jobs:
       RCPCH_CENSUS_PLATFORM_URL: https://api.rcpch.ac.uk/deprivation/v1
       RCPCH_HERMES_SERVER_URL: http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
 
-      # Sets up a Postgis container for the test db
+    # Sets up a Postgis container for the test db
     services:
       postgis:
         image: postgis/postgis:15-3.3
