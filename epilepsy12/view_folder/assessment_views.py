@@ -1510,7 +1510,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
 
 
 @login_required
-@permission_required("epilepsy12.change_assessment", raise_exception=True)
+@permission_required("epilepsy12.view_assessment", raise_exception=True)
 @user_may_view_this_child()
 def assessment(request, case_id):
     case = Case.objects.get(pk=case_id)

@@ -1,5 +1,4 @@
-
-
+{% load epilepsy12_template_tags %}
 
 <div class="ui segment">
 
@@ -18,7 +17,7 @@
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>
-                <input class="ui input" type="text" value="{{assessment.epilepsy_nurse_specialist_wait}}" disabled/>
+                <input class="ui input" type="text" value="{% wait_days_and_weeks assessment.epilepsy_nurse_specialist_wait %}" disabled/>
             </div>
 
             {% if error_message %}

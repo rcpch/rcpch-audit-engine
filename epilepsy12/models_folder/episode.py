@@ -256,7 +256,7 @@ class Episode(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMi
     )
 
     # nonepileptic seizure onset
-
+    # TODO: is this the correct name for field? Should it be 'nonepileptic_seizure_onset' 
     nonepileptic_seizure_unknown_onset = models.CharField(
         help_text={
             'label': 'How best describes the onset of the nonepileptic episode(s)?',

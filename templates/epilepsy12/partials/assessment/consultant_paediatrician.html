@@ -24,7 +24,7 @@
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>
-                <input class="ui input" type="text" value="{{assessment.consultant_paediatrician_wait}}" disabled/>
+                <input class="ui input" type="text" value="{% wait_days_and_weeks assessment.consultant_paediatrician_wait %}" disabled/>
             </div>
 
             {% if active_general_paediatric_site %}

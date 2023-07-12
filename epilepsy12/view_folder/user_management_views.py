@@ -70,7 +70,7 @@ def epilepsy12_user_list(request, organisation_id):
             # the basic filter filters users based on the selected organisation view
             # the filter_term_Q filters based on what the user has put in the search box
             if (
-                request.user.is_staff
+                request.user.is_rcpch_staff
                 or request.user.is_rcpch_audit_team_member
                 or request.user.is_superuser
             ):
@@ -123,7 +123,7 @@ def epilepsy12_user_list(request, organisation_id):
             raise Exception("No View Preference supplied")
 
         if (
-            request.user.is_staff
+            request.user.is_rcpch_staff
             or request.user.is_rcpch_audit_team_member
             or request.user.is_superuser
         ):
@@ -217,7 +217,7 @@ def epilepsy12_user_list(request, organisation_id):
 
     if (
         request.user.is_rcpch_audit_team_member
-        or request.user.is_staff
+        or request.user.is_rcpch_staff
         or request.user.is_superuser
     ):
         rcpch_choices = (
@@ -254,7 +254,7 @@ def epilepsy12_user_list(request, organisation_id):
 
 @login_required
 @user_may_view_this_organisation()
-@permission_required("epilepsy12.add_epilepsy12user")
+@permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
 def create_epilepsy12_user(request, organisation_id, user_type):
     """
     Creates an epilepsy12 user. It is called from epilepsy12 list of users
@@ -328,7 +328,7 @@ def create_epilepsy12_user(request, organisation_id, user_type):
 
 @login_required
 @user_may_view_this_organisation()
-@permission_required("epilepsy12.change_epilepsy12user")
+@permission_required("epilepsy12.change_epilepsy12user", raise_exception=True)
 def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     """
     Django model form to edit/update Epilepsy12user
@@ -338,7 +338,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     epilepsy12_user_to_edit = get_object_or_404(Epilepsy12User, pk=epilepsy12_user_id)
     can_edit = False
     if (
-        request.user.is_staff
+        request.user.is_rcpch_staff
         or request.user.organisation_employer == organisation
         or request.user.is_rcpch_audit_team_member
     ):
@@ -422,7 +422,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
     template_name = "registration/admin_create_user.html"
 
-    if epilepsy12_user_to_edit.is_staff:
+    if epilepsy12_user_to_edit.is_rcpch_staff:
         admin_title = "Edit RCPCH Epilepsy12 staff member"
         user_type = "rcpch-staff"
     else:
@@ -443,7 +443,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
 @login_required
 @user_may_view_this_organisation()
-@permission_required("epilepsy12.delete_epilepsy12user")
+@permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
 def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     try:
         Epilepsy12User.objects.get(pk=epilepsy12_user_id).delete()

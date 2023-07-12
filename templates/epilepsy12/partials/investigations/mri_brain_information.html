@@ -53,7 +53,7 @@
                 {% if investigations.mri_brain_requested_date and investigations.mri_brain_reported_date %}
                     <div class="field">
                         <label>Time to MRI Brain</label>
-                        <input class="ui input" disabled value='{{investigations.mri_wait}}'>
+                        <input class="ui input" disabled value='{% wait_days_and_weeks investigations.mri_wait %}'>
                     </div>
                 {% endif %}
 

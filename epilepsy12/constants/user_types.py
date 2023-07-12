@@ -14,20 +14,14 @@ VIEW_PREFERENCES = (
 AUDIT_CENTRE_LEAD_CLINICIAN = 1
 AUDIT_CENTRE_CLINICIAN = 2
 AUDIT_CENTRE_ADMINISTRATOR = 3
-AUDIT_CENTRE_MANAGER = 8
-RCPCH_AUDIT_LEAD = 4
-RCPCH_AUDIT_ANALYST = 5
-RCPCH_AUDIT_ADMINISTRATOR = 6
+RCPCH_AUDIT_TEAM = 4
 RCPCH_AUDIT_PATIENT_FAMILY = 7
 
 ROLES = (
     (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
     (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
     (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
-    (AUDIT_CENTRE_MANAGER, "Audit Centre Manager"),
-    (RCPCH_AUDIT_LEAD, "RCPCH Audit Lead"),
-    (RCPCH_AUDIT_ANALYST, "RCPCH Audit Analyst"),
-    (RCPCH_AUDIT_ADMINISTRATOR, "RCPCH Audit Administrator"),
+    (RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),
     (RCPCH_AUDIT_PATIENT_FAMILY, "RCPCH Audit Children and Family"),
 )
 
@@ -35,14 +29,9 @@ AUDIT_CENTRE_ROLES = (
     (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
     (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
     (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
-    (AUDIT_CENTRE_MANAGER, "Audit Centre Manager"),
 )
 
-RCPCH_AUDIT_TEAM_ROLES = (
-    (RCPCH_AUDIT_LEAD, "RCPCH Audit Lead"),
-    (RCPCH_AUDIT_ANALYST, "RCPCH Audit Analyst"),
-    (RCPCH_AUDIT_ADMINISTRATOR, "RCPCH Audit Administrator"),
-)
+RCPCH_AUDIT_TEAM_ROLES = ((RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),)
 
 MR = 1
 MRS = 2
@@ -54,13 +43,14 @@ TITLES = ((MR, "Mr"), (MRS, "Mrs"), (MS, "Ms"), (DR, "Dr"), (PROFESSOR, "Profess
 
 """
 Groups
+These map to the roles
+Role                                Group
+Audit Centre Lead Clinician         trust_audit_team_view_only
+Audit Centre Clinician              trust_audit_team_edit_access
+Audit Centre Administrator          trust_audit_team_full_access
+RCPCH Audit Team                    epilepsy12_audit_team_full_access
+RCPCH Audit Children and Family     patient_access
 """
-# logged in user can view all national data but not logs
-EPILEPSY12_AUDIT_TEAM_VIEW_ONLY = "epilepsy12_audit_team_view_only"
-
-# logged in user can edit but not delete national data. Cannot view or edit logs or permissions.
-EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS = "epilepsy12_audit_team_edit_access"
-
 # logged in user access all areas: can create/update/delete any audit data, logs, epilepsy key words and organisation trusts, groups and permissions
 EPILEPSY12_AUDIT_TEAM_FULL_ACCESS = "epilepsy12_audit_team_full_access"
 
@@ -77,14 +67,16 @@ TRUST_AUDIT_TEAM_FULL_ACCESS = "trust_audit_team_full_access"
 PATIENT_ACCESS = "patient_access"
 
 GROUPS = (
-    EPILEPSY12_AUDIT_TEAM_VIEW_ONLY,
-    EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
     TRUST_AUDIT_TEAM_VIEW_ONLY,
     TRUST_AUDIT_TEAM_EDIT_ACCESS,
     TRUST_AUDIT_TEAM_FULL_ACCESS,
     PATIENT_ACCESS,
 )
+
+"""
+Custom permissions
+"""
 
 # Case
 CAN_LOCK_CHILD_CASE_DATA_FROM_EDITING = (
@@ -105,15 +97,12 @@ CAN_APPROVE_ELIGIBILITY = (
     "can_approve_eligibility",
     "Can approve eligibility for Epilepsy12.",
 )
-CAN_REMOVE_APPROVAL_OF_ELIGIBILITY = (
-    "can_remove_approval_of_eligibility",
-    "Can remove approval of eligibiltiy for Epilepsy12.",
-)
 
 CAN_REGISTER_CHILD_IN_EPILEPSY12 = (
     "can_register_child_in_epilepsy12",
     "Can register child in Epilepsy12. (A cohort number is automatically allocaeted)",
 )
+# TODO #512 unregistering a child in Epilepsy12 is currently not implemented
 CAN_UNREGISTER_CHILD_IN_EPILEPSY12 = (
     "can_unregister_child_in_epilepsy12",
     "Can unregister a child in Epilepsy. Their record and previously entered data is untouched.",
@@ -149,7 +138,6 @@ PERMISSIONS = (
     CAN_UNLOCK_CHILD_CASE_DATA_FROM_EDITING,
     CAN_OPT_OUT_CHILD_FROM_INCLUSION_IN_AUDIT,
     CAN_APPROVE_ELIGIBILITY,
-    CAN_REMOVE_APPROVAL_OF_ELIGIBILITY,
     CAN_REGISTER_CHILD_IN_EPILEPSY12,
     CAN_UNREGISTER_CHILD_IN_EPILEPSY12,
     CAN_EDIT_EPILEPSY12_LEAD_CENTRE,

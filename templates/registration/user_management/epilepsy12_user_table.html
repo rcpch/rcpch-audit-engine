@@ -192,7 +192,7 @@
                         _="init js $('#{{epilepsy12_user.id}}_rcpch_audit_team_member_icon').popup(); end"
                     >
                 {% endif %}
-                {% if epilepsy12_user.is_staff %}
+                {% if epilepsy12_user.is_rcpch_staff %}
                     <img 
                         src="{% static 'images/rcpch-logo.jpg' %}" 
                         class="ui avatar image rcpch_member_image"

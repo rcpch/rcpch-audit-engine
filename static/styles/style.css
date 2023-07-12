@@ -582,6 +582,10 @@ div.ui.card > div.content > div.organisation_address_container {
   color: var(--rcpch_pink);
 }
 
+.rcpch_red.icon {
+  color: var(--rcpch_red_light_tint2);
+}
+
 .rcpch_light_blue.icon {
   color: var(--rcpch_light_blue);
 }
@@ -798,13 +802,6 @@ a.ui.button {
 
 /* eligible label */
 
-#eligible_label {
-  border-radius: 0%;
-  border: 1px solid rgba(224, 0, 135, 0.3);
-  color: var(--rcpch_pink);
-  background: transparent;
-  font-weight: 400;
-}
 
 /* spinner */
 
@@ -821,6 +818,24 @@ a.ui.button {
 }
 
 /* description labels */
+
+.ui.rcpch_pink.label {
+  border-radius: 0%;
+  border: 1px solid rgba(224, 0, 135, 0.3);
+  color: var(--rcpch_pink);
+  background-color: transparent;
+  margin: 5px;
+  font-weight: 400;
+}
+
+.ui.rcpch_red.label {
+  border-radius: 0%;
+  border: 1px solid var(--rcpch_red_light_tint2);
+  color: var(--rcpch_red_light_tint2);
+  background-color: transparent;
+  margin: 5px;
+  font-weight: 400;
+}
 
 .ui.rcpch_light_blue.label {
   border-radius: 0% !important;
@@ -961,26 +976,6 @@ a.ui.button {
 .ui.--rcpch_pink_light_tint2.dropdown .item:hover {
   background-color: var(--rcpch_pink_light_tint2);
   color: white;
-}
-
-/* DESSCRIBE */
-
-.ui.rcpch_pink.circular.label {
-  color: white;
-  background-color: var(--rcpch_pink);
-}
-
-.ui.rcpch_light_grey.circular.label {
-  color: white;
-  background-color: var(--rcpch_light_grey);
-}
-
-.ui.rcpch.header {
-  margin-top: 10px;
-}
-
-.ui.rcpch_pink.segment {
-  border-top-color: var(--rcpch_pink);
 }
 
 /* Steps */
@@ -1621,7 +1616,7 @@ a label {
   color: var(--rcpch_dark_red);
   background-color: var(--rcpch_red_light_tint3);
   border-radius: 0%;
-  border-color: var(--rcpch_dark_red);
+  border-color: var(--rcpch_red);
   margin-top: 1em;
 }
 
@@ -1918,4 +1913,53 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .padded_field {
   padding-top: 20px;
+}
+
+.region_map{
+  height: 500px;
+}
+
+.region_tooltip{
+  border-radius: 0% !important;
+}
+
+.ui.card.clickable_card:hover {
+  cursor: pointer;
+}
+
+.ui.attached.tabular.menu{
+  border-color: var(--rcpch_light_blue);
+}
+
+.ui.attached.tabular.menu  .active.item {
+  border-color: var(--rcpch_light_blue) !important;
+  border-width: 3px;
+}
+
+.ui.bottom.attached.segment {
+  border-color: var(--rcpch_light_blue) !important;
+  border-width: 3px;
+  border-radius: 0;
+}
+
+/* DESSCRIBE */
+
+.ui.rcpch_pink.circular.label {
+  color: white;
+  background-color: var(--rcpch_pink);
+  border: transparent;
+  border-radius: 50%;
+}
+
+.ui.rcpch_light_grey.circular.label {
+  color: white;
+  background-color: var(--rcpch_light_grey);
+}
+
+.ui.rcpch.header {
+  margin-top: 10px;
+}
+
+.ui.rcpch_pink.segment {
+  border-top-color: var(--rcpch_pink);
 }

@@ -9,9 +9,12 @@ from django.db import migrations
 from django.utils import timezone
 
 # RCPCH imports
-from ..constants import (RCPCH_ORGANISATIONS,
-                         OPEN_UK_NETWORKS,
-                         INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES, WELSH_REGIONS)
+from ..constants import (
+    RCPCH_ORGANISATIONS,
+    OPEN_UK_NETWORKS,
+    INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES,
+    WELSH_REGIONS,
+)
 from ..general_functions import ons_region_for_postcode
 
 
@@ -26,30 +29,38 @@ def seed_organisations(apps, schema_editor):
     Organisation = apps.get_model("epilepsy12", "Organisation")
     OPENUKNetworkEntity = apps.get_model("epilepsy12", "OPENUKNetworkEntity")
     IntegratedCareBoardEntity = apps.get_model(
-        "epilepsy12", "IntegratedCareBoardEntity")
+        "epilepsy12", "IntegratedCareBoardEntity"
+    )
     NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
     ONSRegionEntity = apps.get_model("epilepsy12", "ONSRegionEntity")
 
-    print('\033[31m', "Adding new organisations...", '\033[31m')
+    print("\033[31m", "Adding new RCPCH organisations...", "\033[31m")
 
     for added, rcpch_organisation in enumerate(RCPCH_ORGANISATIONS):
-
         # get openuk network code from ods code in constants list
         # this gets openuk network object from table
         open_uk_code = next(
-            item for item in OPEN_UK_NETWORKS if item["ods trust code"] == rcpch_organisation["ParentODSCode"])
+            item
+            for item in OPEN_UK_NETWORKS
+            if item["ods trust code"] == rcpch_organisation["ParentODSCode"]
+        )
         open_uk_network = OPENUKNetworkEntity.objects.get(
-            OPEN_UK_Network_Code=open_uk_code["OPEN UK Network Code"])
+            OPEN_UK_Network_Code=open_uk_code["OPEN UK Network Code"]
+        )
 
         # For England, assign NHS England Region Code, ONS Region Code and ICB Code to Organisation
         # For other nations, this is not possible due to different NHS organisational units
-        if open_uk_code['country'] == 'England':
+        if open_uk_code["country"] == "England":
             # get icb from icb list in constants
             # then get icb object from table
             icb_code = next(
-                item for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES if item["ODS Trust Code"] == rcpch_organisation["ParentODSCode"])
+                item
+                for item in INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES
+                if item["ODS Trust Code"] == rcpch_organisation["ParentODSCode"]
+            )
             integrated_care_board = IntegratedCareBoardEntity.objects.get(
-                ODS_ICB_Code=icb_code["ODS ICB Code"])
+                ODS_ICB_Code=icb_code["ODS ICB Code"]
+            )
 
             # get nhs england region from icb list in constants
             # then get NHSRegion object from table
@@ -57,86 +68,88 @@ def seed_organisations(apps, schema_editor):
                 NHS_Region_Code=icb_code["NHS England Region Code"]
             )
 
-            if rcpch_organisation['ParentODSCode'] == "RXP":
+            if rcpch_organisation["ParentODSCode"] == "RXP":
                 # postcodes io error - postcodes not found: hacky work around
                 ons_region_name = "North East"
-            elif rcpch_organisation['ParentODSCode'] == "RN3":
+            elif rcpch_organisation["ParentODSCode"] == "RN3":
                 ons_region_name = "South West"
-            elif rcpch_organisation['ParentODSCode'] == "RM3":
+            elif rcpch_organisation["ParentODSCode"] == "RM3":
                 ons_region_name = "North West"
+            elif rcpch_organisation["ParentODSCode"] == "R1C":
+                ons_region_name = "South West"
             else:
                 ons_region_name = ons_region_for_postcode(
-                    rcpch_organisation['Postcode'])
+                    rcpch_organisation["Postcode"]
+                )
             ons_region = ONSRegionEntity.objects.filter(
-                Region_ONS_Name=ons_region_name).get()
+                Region_ONS_Name=ons_region_name
+            ).get()
 
         # For Wales, assign Health Board, ODS Code, and ONS Region to Organisation
-        elif open_uk_code['country'] == 'Wales':
+        elif open_uk_code["country"] == "Wales":
             #
             health_board = next(
-                item for item in WELSH_REGIONS if item['ODS_Code'] == rcpch_organisation["ParentODSCode"]
+                item
+                for item in WELSH_REGIONS
+                if item["ODS_Code"] == rcpch_organisation["ParentODSCode"]
             )
             integrated_care_board = None
             nhs_region = NHSRegionEntity.objects.get(
-                NHS_Region_Code=health_board["ODS_Code"])
-            ons_region = ONSRegionEntity.objects.filter(
-                Region_ONS_Name="Wales").get()
+                NHS_Region_Code=health_board["ODS_Code"]
+            )
+            ons_region = ONSRegionEntity.objects.filter(Region_ONS_Name="Wales").get()
 
         else:
             raise Exception(
-                f"{open_uk_code['ods trust code']} is not allocated to a country.")
+                f"{open_uk_code['ods trust code']} is not allocated to a country."
+            )
 
         # Apply longitude and latitude data, if exists
-        if hasattr(rcpch_organisation, "longitude") and hasattr(rcpch_organisation, 'latitude'):
-            if len(rcpch_organisation["longitude"]) > 0 and len(rcpch_organisation['latitude']) > 1:
-                latitude = rcpch_organisation['latitude']
-                longitude = rcpch_organisation['longitude']
-                new_point = Point(
-                    x=rcpch_organisation["longitude"], y=rcpch_organisation['latitude'])
-            else:
-                latitude = None
-                longitude = None
-                new_point = None
-        else:
+        new_point = None
+        try:
+            latitude = float(rcpch_organisation["Latitude"])
+        except:
             latitude = None
-            longitude = None
-            new_point = None
+        try:
+            longitude = float(rcpch_organisation["Longitude"])
+        except:
+            latitude = None
+
+        if longitude and latitude:
+            new_point = Point(x=longitude, y=latitude)
 
         # Date-stamps the Organisation information (this data was supplied on 19.04.2023)
         update_date = datetime(year=2023, month=4, day=19)
-        timezone_aware_update_date = timezone.make_aware(
-            update_date, timezone.utc)
+        timezone_aware_update_date = timezone.make_aware(update_date, timezone.utc)
 
         # Create Organisation instances
         try:
             Organisation.objects.create(
-                ODSCode=rcpch_organisation['OrganisationCode'],
-                OrganisationName=rcpch_organisation['OrganisationName'],
-                Website=rcpch_organisation['Website'],
-                Address1=rcpch_organisation['Address1'],
-                Address2=rcpch_organisation['Address2'],
-                Address3=rcpch_organisation['Address3'],
-                City=rcpch_organisation['City'],
-                County=rcpch_organisation['County'],
+                ODSCode=rcpch_organisation["OrganisationCode"],
+                OrganisationName=rcpch_organisation["OrganisationName"],
+                Website=rcpch_organisation["Website"],
+                Address1=rcpch_organisation["Address1"],
+                Address2=rcpch_organisation["Address2"],
+                Address3=rcpch_organisation["Address3"],
+                City=rcpch_organisation["City"],
+                County=rcpch_organisation["County"],
                 Latitude=latitude,
                 Longitude=longitude,
-                Postcode=rcpch_organisation['Postcode'],
+                Postcode=rcpch_organisation["Postcode"],
                 Geocode_Coordinates=new_point,
-                ParentOrganisation_ODSCode=rcpch_organisation['ParentODSCode'],
-                ParentOrganisation_OrganisationName=rcpch_organisation['ParentName'],
+                ParentOrganisation_ODSCode=rcpch_organisation["ParentODSCode"],
+                ParentOrganisation_OrganisationName=rcpch_organisation["ParentName"],
                 LastUpdatedDate=timezone_aware_update_date,
                 openuk_network=open_uk_network,
                 integrated_care_board=integrated_care_board,
                 nhs_region=nhs_region,
-                ons_region=ons_region
+                ons_region=ons_region,
             ).save()
-            print(
-                f"{added+1}: {rcpch_organisation['OrganisationName']}")
+            print(f"{added+1}: {rcpch_organisation['OrganisationName']}")
         except Exception as error:
-            print(
-                f"Unable to save {rcpch_organisation['OrganisationName']}: {error}")
+            print(f"Unable to save {rcpch_organisation['OrganisationName']}: {error}")
 
-    print('All organisations added.')
+    print("All organisations added.")
 
 
 class Migration(migrations.Migration):

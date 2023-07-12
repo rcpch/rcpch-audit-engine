@@ -69,6 +69,14 @@ class Epilepsy12UserCreationForm(UserCreationForm):
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
     )
 
+    is_rcpch_staff = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
+    )
+
+    is_child_or_carer = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
+    )
+
     class Meta:
         model = Epilepsy12User
         fields = (
@@ -79,6 +87,7 @@ class Epilepsy12UserCreationForm(UserCreationForm):
             "surname",
             "is_rcpch_audit_team_member",
             "is_staff",
+            "is_rcpch_staff",
             "is_active",
             "email_confirmed",
         )
@@ -98,6 +107,7 @@ class Epilepsy12UserChangeForm(UserChangeForm):
             "surname",
             "is_rcpch_audit_team_member",
             "is_staff",
+            "is_rcpch_staff",
             "is_active",
             "email_confirmed",
         )
@@ -183,6 +193,18 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
         required=False,
     )
 
+    is_rcpch_staff = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
+        initial=False,
+        required=False,
+    )
+
+    is_child_or_carer = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
+        initial=False,
+        required=False,
+    )
+
     is_staff = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
         initial=False,
@@ -205,6 +227,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
             "first_name",
             "surname",
             "is_staff",
+            "is_rcpch_staff",
             "is_rcpch_audit_team_member",
             "is_superuser",
             "email_confirmed",
@@ -247,6 +270,15 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
             self.cleaned_data["view_preference"] = 0
         return data
 
+    def clean_is_rcpch_staff(self):
+        """
+        if is_rcpch_staff is positive, set view_preference to organisation_view
+        """
+        data = self.cleaned_data["is_rcpch_staff"]
+        if data:
+            self.cleaned_data["view_preference"] = 0
+        return data
+
     def clean_organisation_employer(self):
         data = self.cleaned_data["organisation_employer"]
         return data
@@ -256,7 +288,8 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
         if self.rcpch_organisation == "rcpch-staff":
             # RCPCH staff are not affiliated with any organisation
-            cleaned_data["is_staff"] = True
+            cleaned_data["is_staff"] = False
+            cleaned_data["is_rcpch_staff"] = True
             cleaned_data["organisation_employer"] = None
             cleaned_data["is_rcpch_audit_team_member"] = True
             cleaned_data["view_preference"] = 0

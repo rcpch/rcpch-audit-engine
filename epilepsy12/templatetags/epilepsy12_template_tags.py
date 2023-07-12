@@ -1,4 +1,5 @@
 import re
+import math
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -126,6 +127,21 @@ def matches_model_field(field_name, model):
             return True
         else:
             return False
+
+
+@register.simple_tag
+def wait_days_and_weeks(day_number):
+    if day_number is None:
+        return ""
+    if day_number < 7:
+        return f"{day_number} days"
+    else:
+        weeks = math.floor(day_number / 7)
+        remaining_days = day_number - (weeks * 7)
+        if remaining_days > 0:
+            return f"{weeks} weeks, {remaining_days} days"
+        else:
+            return f"{weeks} weeks"
 
 
 @register.filter

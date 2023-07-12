@@ -8,44 +8,36 @@ from ..general_functions import is_valid_postcode, validate_nhs_number
 
 
 class CaseForm(forms.ModelForm):
-    unknown_postcode = forms.CharField(
-        required=False
-    )
+    unknown_postcode = forms.CharField(required=False)
 
     first_name = forms.CharField(
         help_text="Enter the first name.",
         widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "First name"
-            }
+            attrs={"class": "form-control", "placeholder": "First name"}
         ),
-        required=True
+        required=True,
     )
     surname = forms.CharField(
         help_text="Enter the surname.",
         widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Surname"
-            }
+            attrs={"class": "form-control", "placeholder": "Surname"}
         ),
-        required=True
+        required=True,
     )
     date_of_birth = forms.DateField(
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
                 "placeholder": "Date of Birth",
-                "type": "date"
+                "type": "date",
             }
         ),
-        required=True
+        required=True,
     )
     sex = forms.ChoiceField(
         choices=SEX_TYPE,
-        widget=forms.Select(attrs={'class': 'ui rcpch dropdown'}),
-        required=True
+        widget=forms.Select(attrs={"class": "ui rcpch dropdown"}),
+        required=True,
     )
     nhs_number = forms.CharField(
         help_text="Enter the NHS Number. This is 10 digits long.",
@@ -54,10 +46,10 @@ class CaseForm(forms.ModelForm):
                 "class": "form-control",
                 "placeholder": "NHS Number",
                 "type": "text",
-                "data-mask": "000 000 0000"
+                "data-mask": "000 000 0000",
             }
         ),
-        required=True
+        required=True,
     )
     postcode = forms.CharField(
         help_text="Enter the postcode.",
@@ -68,50 +60,50 @@ class CaseForm(forms.ModelForm):
                 "type": "text",
             }
         ),
-        required=True
+        required=True,
     )
     ethnicity = forms.ChoiceField(
         choices=ETHNICITIES,
-        widget=forms.Select(
-            attrs={
-                'class': 'ui rcpch dropdown'
-            }
-        ),
-        required=True
+        widget=forms.Select(attrs={"class": "ui rcpch dropdown"}),
+        required=True,
     )
-    locked_at = forms.DateTimeField(
-        help_text="Time record locked.",
-        required=False
-    )
-    locked_by = forms.CharField(
-        help_text="User who locked the record",
-        required=False
-    )
+    locked_at = forms.DateTimeField(help_text="Time record locked.", required=False)
+    locked_by = forms.CharField(help_text="User who locked the record", required=False)
 
     def __init__(self, *args, **kwargs) -> None:
         super(CaseForm, self).__init__(*args, **kwargs)
-        self.fields['ethnicity'].widget.attrs.update({
-            'class': 'ui rcpch dropdown'
-        })
+        self.fields["ethnicity"].widget.attrs.update({"class": "ui rcpch dropdown"})
 
         self.existing_nhs_number = self.instance.nhs_number
 
     class Meta:
         model = Case
         fields = [
-            'first_name', 'surname', 'date_of_birth', 'sex', 'nhs_number', 'postcode', 'ethnicity', 'unknown_postcode'
+            "first_name",
+            "surname",
+            "date_of_birth",
+            "sex",
+            "nhs_number",
+            "postcode",
+            "ethnicity",
+            "unknown_postcode",
         ]
 
     def clean_postcode(self):
         # remove spaces
-        postcode = str(self.cleaned_data['postcode']).replace(' ', '')
-        if is_valid_postcode(postcode=postcode):
+        postcode = str(self.cleaned_data["postcode"]).replace(" ", "")
+        try:
+            validated_postcode = is_valid_postcode(postcode=postcode)
+        except ValueError as error:
+            raise ValidationError(f"Could not validate postcode: {error}")
+
+        if validated_postcode:
             return postcode
         else:
-            raise ValidationError('Invalid postcode')
+            raise ValidationError("Invalid postcode")
 
     def clean_date_of_birth(self):
-        date_of_birth = self.cleaned_data['date_of_birth']
+        date_of_birth = self.cleaned_data["date_of_birth"]
         today = date.today()
         if date_of_birth > today:
             raise ValidationError("Date of birth cannot be in the future.")
@@ -120,8 +112,8 @@ class CaseForm(forms.ModelForm):
 
     def clean_nhs_number(self):
         # remove spaces
-        nhs_number = self.cleaned_data['nhs_number']
-        formatted_number = int(str(nhs_number).replace(' ', ''))
+        nhs_number = self.cleaned_data["nhs_number"]
+        formatted_number = int(str(nhs_number).replace(" ", ""))
 
         # ensure NHS number is unique in the database
         if self.existing_nhs_number is not None:
@@ -129,15 +121,15 @@ class CaseForm(forms.ModelForm):
             if formatted_number != int(self.existing_nhs_number):
                 # the new number does not match the one stored
                 if Case.objects.filter(nhs_number=formatted_number).exists():
-                    raise ValidationError('NHS Number already taken!')
+                    raise ValidationError("NHS Number already taken!")
         else:
             # this is a new form - check this number is unique in the database
             if Case.objects.filter(nhs_number=formatted_number).exists():
-                raise ValidationError('NHS Number already taken!')
+                raise ValidationError("NHS Number already taken!")
 
         # check NHS number is valid
         validity = validate_nhs_number(formatted_number)
-        if validity['valid']:
+        if validity["valid"]:
             return formatted_number
         else:
-            raise ValidationError(validity['message'])
+            raise ValidationError(validity["message"])

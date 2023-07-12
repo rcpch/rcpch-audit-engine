@@ -1,9 +1,17 @@
-from datetime import datetime, date
+# python imports
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
+
+# django imports
 from django.utils import timezone
-from ..models import *
-from ..general_functions import current_cohort_start_date, first_tuesday_in_january
+from django.apps import apps
+
+# third party imports
 from psycopg2 import DatabaseError
+
+# RCPCH imports
+from ..general_functions import current_cohort_start_date, first_tuesday_in_january
+from ..validators import epilepsy12_date_validator
 
 
 def validate_and_update_model(
@@ -26,7 +34,7 @@ def validate_and_update_model(
     page_element: string one of 'date_field', 'toggle_button', 'multiple_choice_single_toggle_button', 'multiple_choic_multiple_toggle_button', 'select', 'snomed_select', 'organisation_select'
     comparison_date_field_name: string corresponding to field name for date in model
     is_earliest_date: boolean
-    first_paediatric_assessment_date: date - used to validate
+    earliest_allowable_date: date - used to validate
 
     It replaces the decorator @update_model as decorators can only redirect the request,
     they cannot pass parameters to the function they wrap. This means that errors raised in updating the model
@@ -34,6 +42,13 @@ def validate_and_update_model(
     It is important that this function is called early on in the view function and that an updated instance of
     the model AFTER UPDATE is put in the context that is passed back to the template.
     """
+
+    # initialize models
+    SyndromeEntity = apps.get_model("epilepsy12", "SyndromeEntity")
+    EpilepsyCauseEntity = apps.get_model("epilepsy12", "EpilepsyCauseEntity")
+    MedicineEntity = apps.get_model("epilepsy12", "MedicineEntity")
+    Registration = apps.get_model("epilepsy12", "Registration")
+
     if page_element == "toggle_button":
         # toggle button
         # the trigger_name of the element here corresponds to whether true or false has been selected
@@ -52,11 +67,6 @@ def validate_and_update_model(
     ):
         # multiple_choice_multiple_toggle_button
         field_value = request.htmx.trigger_name
-
-    elif page_element == "date_field":
-        field_value = datetime.strptime(
-            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
-        ).date()
 
     elif page_element == "select" or page_element == "snomed_select":
         if request.htmx.trigger_name == "syndrome_name":
@@ -89,57 +99,28 @@ def validate_and_update_model(
         # The earlier of the two dates cannot be in the future and cannot be later than the second if supplied.
         # The later of the two dates CAN be in the future but cannot be earlier than the first if supplied.
         # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
-        date_valid = None
-        date_error = ""
+        # This validation step happens in validators.py
+        field_value = datetime.strptime(
+            request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
+        ).date()
 
-        if earliest_allowable_date:
-            if field_value < earliest_allowable_date:
-                # dates cannot be before the earliest allowable date (usually the first paediatric assessment or the cohort start date)
-                date_error = f"The date you chose ({field_value}) cannot not be before {earliest_allowable_date}."
-                date_valid = False
-
-        if comparison_date_field_name and date_valid is None:
-            instance = model.objects.get(pk=model_id)
-            comparison_date = getattr(instance, comparison_date_field_name)
-            if is_earliest_date:
-                if comparison_date:
-                    date_valid = (
-                        field_value <= comparison_date and field_value <= date.today()
-                    )
-                    if field_value > comparison_date:
-                        date_error = f"The date you chose ({field_value}) cannot be after {comparison_date}."
-                    if field_value > date.today():
-                        date_error = f"You cannot choose a date in the future."
-                else:
-                    date_valid = field_value <= date.today()
-                    if not date_valid:
-                        date_error = f"The date you chose ({field_value}) cannot be in the future."
-
-            else:
-                if comparison_date:
-                    date_valid = (
-                        field_value >= comparison_date and field_value <= date.today()
-                    )
-                    if field_value < comparison_date:
-                        date_error = f"The date you chose ({field_value}) cannot be before {comparison_date}."
-                    if field_value > date.today():
-                        date_error = (
-                            f"The date you chose ({field_value}) is in the future."
-                        )
-                    print(f"{field_value} and {comparison_date}")
-                else:
-                    # no other date supplied yet
-                    date_valid = True
-
-        elif field_value > date.today():
-            # dates cannot be in the future unless they are the second of 2 dates
-            date_error = f"The date you chose ({field_value}) cannot be in the future."
-            date_valid = False
-
-        if date_valid:
-            pass
+        if is_earliest_date:
+            first_date = field_value
+            second_date = None
+            if comparison_date_field_name:
+                instance = model.objects.get(pk=model_id)
+                second_date = getattr(instance, comparison_date_field_name)
         else:
-            raise ValueError(date_error)
+            second_date = field_value
+            first_date = None
+            if comparison_date_field_name:
+                instance = model.objects.get(pk=model_id)
+                first_date = getattr(instance, comparison_date_field_name)
+        epilepsy12_date_validator(
+            first_date=first_date,
+            second_date=second_date,
+            earliest_allowable_date=earliest_allowable_date,
+        )
 
     # update the model
 
@@ -149,8 +130,10 @@ def validate_and_update_model(
     if field_name == "registration_date":
         # registration_date cannot be before date of birth
         registration = Registration.objects.get(pk=model_id)
+        if relativedelta(field_value, registration.case.date_of_birth).years >= 24:
+            errors = f"To be included in Epilepsy12, {registration.case} cannot be over 24y at first paediatric assessment."
+            raise ValueError(errors)
         if field_value < registration.case.date_of_birth:
-            date_valid = False
             errors = f"The date you chose ({field_value.strftime('%d %B %Y')}) cannot not be before {registration.case}'s date of birth."
             raise ValueError(errors)
 
@@ -159,11 +142,9 @@ def validate_and_update_model(
             current_cohort_start_date().year + 2
         ) + relativedelta(days=7)
         if field_value < current_cohort_start_date():
-            date_valid = False
             errors = f'The date you entered cannot be before the current cohort start date ({current_cohort_start_date().strftime("%d %B %Y")})'
             raise ValueError(errors)
         elif field_value > current_cohort_end_date:
-            date_valid = False
             errors = f'The date you entered cannot be after the current cohort end date ({current_cohort_end_date.strftime("%d %B %Y")})'
             raise ValueError(errors)
 

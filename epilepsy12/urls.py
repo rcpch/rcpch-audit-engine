@@ -35,11 +35,6 @@ urlpatterns = [
     path("403", views.redirect_403, name="redirect_403"),
     path("", views.index, name="index"),
     path("database", views.database, name="database"),
-    path(
-        "organisation/",
-        views.organisation_reports,
-        name="organisation_reports",
-    ),
     path("organisation/<int:organisation_id>/cases/", views.case_list, name="cases"),
     path(
         "organisation/<int:organisation_id>/case/<int:case_id>/update",
@@ -68,6 +63,16 @@ urlpatterns = [
         name="opt_out",
     ),
     path(
+        "case/<int:case_id>/consent",
+        views.consent,
+        name="consent",
+    ),
+    path(
+        "case/<int:case_id>/consent/<str:consent_type>/confirm",
+        views.consent_confirmation,
+        name="consent_confirmation",
+    ),
+    path(
         "organisation/<int:organisation_id>/case/<int:case_id>/submit",
         views.case_submit,
         name="case_submit",
@@ -93,7 +98,7 @@ urlpatterns = [
         name="log_list",
     ),
     path(
-        "selected_organisation_summary",
+        "organisation/<int:organisation_id>/summary",
         views.selected_organisation_summary,
         name="selected_organisation_summary",
     ),
@@ -673,32 +678,32 @@ htmx_paths = [
     ),
     # initial assessment endpoints
     path(
-        "registration/<int:first_paediatric_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/first_paediatric_assessment_in_acute_or_nonacute_setting",
         views.first_paediatric_assessment_in_acute_or_nonacute_setting,
         name="first_paediatric_assessment_in_acute_or_nonacute_setting",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/has_number_of_episodes_since_the_first_been_documented",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/has_number_of_episodes_since_the_first_been_documented",
         views.has_number_of_episodes_since_the_first_been_documented,
         name="has_number_of_episodes_since_the_first_been_documented",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/general_examination_performed",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/general_examination_performed",
         views.general_examination_performed,
         name="general_examination_performed",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/neurological_examination_performed",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/neurological_examination_performed",
         views.neurological_examination_performed,
         name="neurological_examination_performed",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/developmental_learning_or_schooling_problems",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/developmental_learning_or_schooling_problems",
         views.developmental_learning_or_schooling_problems,
         name="developmental_learning_or_schooling_problems",
     ),
     path(
-        "registration/<int:first_paediatric_assessment_id>/behavioural_or_emotional_problems",
+        "first_paediatric_assessment/<int:first_paediatric_assessment_id>/behavioural_or_emotional_problems",
         views.behavioural_or_emotional_problems,
         name="behavioural_or_emotional_problems",
     ),

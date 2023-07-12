@@ -80,27 +80,27 @@
 
   {% if case and perms.epilepsy.can_opt_out_child_from_inclusion_in_audit %}
 
-  <div class="field">
-    <div class="ui icon rcpch_info message">
-      <i class="ui exclamation circle icon"></i>
-      <p>
-        Children, young people and their families can opt out of Epilepsy12 at any
-        time. Should {{case}} or their family choose to do so, all records
-        relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
-      </p>
-      <button
-        hx-post="{% url 'opt_out' organisation_id case.pk %}"
-        hx-trigger="click"
-        class="ui rcpch_danger button"
-        _="on htmx:confirm(issueRequest)
-                halt the event
-                call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' })
-                if result.isConfirmed issueRequest()"
-      >
-        Opt out of Epilepsy12
-      </button>
+    <div class="field">
+      <div class="ui icon rcpch_info message">
+        <i class="ui exclamation circle icon"></i>
+        <p>
+          Children, young people and their families can opt out of Epilepsy12 at any
+          time. Should {{case}} or their family choose to do so, all records
+          relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
+        </p>
+        <button
+          hx-post="{% url 'opt_out' organisation_id case.pk %}"
+          hx-trigger="click"
+          class="ui rcpch_danger button"
+          _="on htmx:confirm(issueRequest)
+                  halt the event
+                  call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' })
+                  if result.isConfirmed issueRequest()"
+        >
+          Opt out of Epilepsy12
+        </button>
+      </div>
     </div>
-  </div>
 
   {% else %}
 

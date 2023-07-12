@@ -53,7 +53,7 @@
                 {% if investigations.eeg_request_date and investigations.eeg_performed_date %}
                     <div class="field">
                         <label>Time to EEG</label>
-                        <input class="ui input" disabled value='{{investigations.eeg_wait}}'>
+                        <input class="ui input" disabled value='{% wait_days_and_weeks investigations.eeg_wait %}'>
                     </div>
                 {% endif %}
 

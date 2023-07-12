@@ -5,10 +5,6 @@ from operator import itemgetter
 from django.contrib.gis.db.models import Q
 from django.contrib.auth.decorators import login_required, permission_required
 
-from epilepsy12.constants.medications import (
-    ANTIEPILEPSY_MEDICINES,
-    BENZODIAZEPINE_TYPES,
-)
 from epilepsy12.models import (
     Management,
     Registration,
@@ -26,6 +22,7 @@ from ..decorator import user_may_view_this_child
 
 @login_required
 @user_may_view_this_child()
+@permission_required("epilepsy12.view_management", raise_exception=True)
 def management(request, case_id):
     # function called on form load
     # creates a new management object if one does not exist
@@ -45,7 +42,7 @@ def management(request, case_id):
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False
-    ).all()
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -78,22 +75,13 @@ def management(request, case_id):
 
 
 """
-HTMX fields
-There is a function/hx route for each field in the form
-Each one is protected by @login_required
-@user_may_view_this_child()
-Each one updates the record.
-
-
-
-
 Fields relating to rescue medication begin here
 """
 
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_management", raise_exception=True)
+@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def has_an_aed_been_given(request, management_id):
     # HTMX call back from management template
     # POST request on toggle button click
@@ -125,7 +113,7 @@ def has_an_aed_been_given(request, management_id):
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=False
-    )
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
         "management": management,
@@ -172,10 +160,24 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
         medicine_entity=None,
     )
 
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine.pk)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
+    )
+
     context = {
-        "choices": MedicineEntity.objects.filter(is_rescue=is_rescue).order_by(
-            "medicine_name"
-        ),
+        "choices": choices,
         "antiepilepsy_medicine": antiepilepsy_medicine,
         "management_id": management_id,
         "is_rescue_medicine": is_rescue,
@@ -214,7 +216,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=management, is_rescue_medicine=is_rescue_medicine
-    ).all()
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
         "medicines": antiepilepsy_medicines,
@@ -236,7 +238,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
+@permission_required("epilepsy12.view_antiepilepsymedicine", raise_exception=True)
 def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     """
     Call back from onclick of edit button in antiepilepsy_medicine_list partial
@@ -247,9 +249,21 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
-    ).order_by("medicine_name")
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
+    )
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -301,7 +315,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     antiepilepsy_medicines = AntiEpilepsyMedicine.objects.filter(
         management=antiepilepsy_medicine.management,
         is_rescue_medicine=is_rescue_medicine,
-    )
+    ).order_by("-antiepilepsy_medicine_start_date")
 
     context = {
         "medicines": antiepilepsy_medicines,
@@ -334,9 +348,21 @@ def medicine_id(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
-    ).order_by("medicine_name")
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
+    )
 
     # get id of medicine entity
     medicine_id = request.POST.get("medicine_id")
@@ -450,9 +476,21 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
-    ).order_by("medicine_name")
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
+    )
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
         show_end_date = True
@@ -493,9 +531,21 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
-    ).order_by("medicine_name")
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
+    )
 
     context = {
         "choices": choices,
@@ -535,9 +585,21 @@ def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
     antiepilepsy_medicine.antiepilepsy_medicine_stop_date = None
     antiepilepsy_medicine.save()
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
-    ).order_by("medicine_name")
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
+    )
 
     context = {
         "choices": choices,
@@ -589,8 +651,20 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
     )
 
     context = {
@@ -637,8 +711,20 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
     )
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
@@ -690,8 +776,20 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
     )
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
@@ -745,8 +843,20 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(
         pk=antiepilepsy_medicine_id
     )
 
-    choices = MedicineEntity.objects.filter(
-        is_rescue=antiepilepsy_medicine.is_rescue_medicine
+    # get all medicines excluding those already selected, and excluding this medicine
+    management = antiepilepsy_medicine.management
+    all_selected_antiepilepsymedicines = (
+        AntiEpilepsyMedicine.objects.filter(management=management)
+        .exclude(pk=antiepilepsy_medicine_id)
+        .values_list("medicine_entity", flat=True)
+    )
+
+    choices = (
+        MedicineEntity.objects.filter(
+            is_rescue=antiepilepsy_medicine.is_rescue_medicine
+        )
+        .exclude(pk__in=all_selected_antiepilepsymedicines)
+        .order_by("medicine_name")
     )
 
     if antiepilepsy_medicine.antiepilepsy_medicine_stop_date:
@@ -843,7 +953,7 @@ Fields relating to individual care plans begin here
 
 @login_required
 @user_may_view_this_child()
-@permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
+@permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_in_place(request, management_id):
     """
     This is an HTMX callback from the individualised_care_plan partial template
@@ -920,6 +1030,8 @@ def individualised_care_plan_date(request, management_id):
             field_name="individualised_care_plan_date",
             page_element="date_field",
             earliest_allowable_date=management.registration.registration_date,
+            comparison_date_field_name=None,
+            is_earliest_date=None,
         )
     except ValueError as error:
         error_message = error

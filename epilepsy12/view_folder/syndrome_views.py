@@ -2,7 +2,6 @@ from operator import itemgetter
 from django.contrib.auth.decorators import login_required, permission_required
 
 from ..models import Syndrome, SyndromeEntity
-from epilepsy12.constants.syndromes import SYNDROMES
 from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
@@ -34,10 +33,18 @@ def syndrome_diagnosis_date(request, syndrome_id):
 
     syndrome = Syndrome.objects.get(pk=syndrome_id)
 
-    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+    # create list of syndromesentities, removing already selected items, excluding current
+    multiaxial_diagnosis = syndrome.multiaxial_diagnosis
+    all_selected_syndromes = (
+        Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+        .exclude(pk=syndrome_id)
+        .values_list("syndrome", flat=True)
+    )
+    syndrome_selection = SyndromeEntity.objects.exclude(
+        pk__in=all_selected_syndromes
+    ).order_by("syndrome_name")
 
     context = {
-        # sorted(SYNDROMES, key=itemgetter(1)),
         "syndrome_selection": syndrome_selection,
         "syndrome": syndrome,
     }
@@ -75,10 +82,18 @@ def syndrome_name(request, syndrome_id):
 
     syndrome = Syndrome.objects.get(pk=syndrome_id)
 
-    syndrome_selection = SyndromeEntity.objects.all().order_by("syndrome_name")
+    # create list of syndromesentities, removing already selected items, excluding current
+    multiaxial_diagnosis = syndrome.multiaxial_diagnosis
+    all_selected_syndromes = (
+        Syndrome.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
+        .exclude(pk=syndrome_id)
+        .values_list("syndrome", flat=True)
+    )
+    syndrome_selection = SyndromeEntity.objects.exclude(
+        pk__in=all_selected_syndromes
+    ).order_by("syndrome_name")
 
     context = {
-        # sorted(SYNDROMES, key=itemgetter(1)),
         "syndrome_selection": syndrome_selection,
         "syndrome": syndrome,
     }
