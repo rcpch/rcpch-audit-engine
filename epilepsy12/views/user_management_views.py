@@ -1,9 +1,11 @@
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate
 from django.urls import reverse
 from django.contrib.gis.db.models import Q
 from django.core.paginator import Paginator
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.mail import send_mail, BadHeaderError
@@ -13,13 +15,176 @@ from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.html import strip_tags
 
+# 3rd party
 from django_htmx.http import HttpResponseClientRedirect
-from ..models import Epilepsy12User, Organisation
+
+# epilepsy12
+from ..models import Epilepsy12User, Organisation, VisitActivity
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
 from ..decorator import user_may_view_this_organisation
-from ..constants import RCPCH_AUDIT_TEAM_ROLES, AUDIT_CENTRE_ROLES
+from ..constants import (
+    RCPCH_AUDIT_TEAM_ROLES,
+    AUDIT_CENTRE_ROLES,
+    AUDIT_CENTRE_LEAD_CLINICIAN,
+    TRUST_AUDIT_TEAM_FULL_ACCESS,
+    AUDIT_CENTRE_CLINICIAN,
+    TRUST_AUDIT_TEAM_EDIT_ACCESS,
+    AUDIT_CENTRE_ADMINISTRATOR,
+    TRUST_AUDIT_TEAM_EDIT_ACCESS,
+    RCPCH_AUDIT_TEAM,
+    EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
+    RCPCH_AUDIT_PATIENT_FAMILY,
+    PATIENT_ACCESS,
+    TRUST_AUDIT_TEAM_VIEW_ONLY,
+)
+from epilepsy12.forms_folder.epilepsy12_user_form import (
+    Epilepsy12UserCreationForm,
+    Epilepsy12LoginForm,
+)
+
+
+def signup(request, *args, **kwargs):
+    """
+    Part of the registration process. Signing up for a new account, returns empty form as a GET request
+    or validates the form, creates an account and allocates a group if part of a POST request. It is not possible
+    to create a superuser account through this route.
+    """
+    user = request.user
+    if user.is_authenticated:
+        return HttpResponse(f"{user} is already logged in!")
+
+    if request.method == "POST":
+        form = Epilepsy12UserCreationForm(request.POST)
+        if form.is_valid():
+            logged_in_user = form.save()
+            logged_in_user.is_active = True
+            """
+            Allocate Roles
+            """
+            logged_in_user.is_superuser = False
+            if logged_in_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
+            elif logged_in_user.role == AUDIT_CENTRE_CLINICIAN:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
+            elif logged_in_user.role == AUDIT_CENTRE_ADMINISTRATOR:
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
+            elif logged_in_user.role == RCPCH_AUDIT_TEAM:
+                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = True
+            elif logged_in_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
+                group = Group.objects.get(name=PATIENT_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
+            else:
+                # no group
+                group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
+
+            logged_in_user.save()
+            logged_in_user.groups.add(group)
+            login(
+                request,
+                logged_in_user,
+                backend="django.contrib.auth.backends.ModelBackend",
+            )
+            messages.success(request, "Sign up successful.")
+            if user.organisation_employer is not None:
+                # current user is affiliated with an existing organisation - set viewable trust to this
+                selected_organisation = Organisation.objects.get(
+                    OrganisationName=request.user.organisation_employer
+                )
+            else:
+                # current user is a member of the RCPCH audit team and also not affiliated with a organisation
+                # therefore set selected organisation to first of organisation on the list
+                selected_organisation = Organisation.objects.order_by(
+                    "OrganisationName"
+                ).first()
+            return redirect("organisation_reports")
+        for msg in form.error_messages:
+            messages.error(
+                request, f"Registration Unsuccessful: {form.error_messages[msg]}"
+            )
+
+    form = Epilepsy12UserCreationForm()
+    return render(
+        request=request,
+        template_name="registration/signup.html",
+        context={"form": form},
+    )
+
+
+def epilepsy12_login(request):
+    """
+    Callback from the login form
+    """
+    if request.method == "POST":
+        form = Epilepsy12LoginForm(request, data=request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            print(email)
+            user = authenticate(request, username=email, password=password)
+
+            if user is not None:
+                if user.organisation_employer is not None:
+                    # select the first hospital in the list if no allocated employing hospital
+                    selected_organisation = Organisation.objects.get(
+                        OrganisationName=user.organisation_employer
+                    )
+                else:
+                    selected_organisation = Organisation.objects.first()
+                if user.email_confirmed == False:
+                    user.email_confirmed = True
+                    user.save()
+                login(request, user)
+                last_logged_in = VisitActivity.objects.filter(
+                    activity=1, epilepsy12user=user
+                ).order_by("-activity_datetime")[:2]
+                if last_logged_in.count() > 1:
+                    messages.info(
+                        request,
+                        f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}",
+                    )
+                else:
+                    messages.info(
+                        request,
+                        f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
+                    )
+
+                    if request.user.organisation_employer is not None:
+                        # current user is affiliated with an existing organisation - set viewable trust to this
+                        selected_organisation = Organisation.objects.get(
+                            OrganisationName=request.user.organisation_employer
+                        )
+                    else:
+                        # current user is a member of the RCPCH audit team and also not affiliated with a organisation
+                        # therefore set selected organisation to first of organisation on the list
+                        selected_organisation = Organisation.objects.order_by(
+                            "OrganisationName"
+                        ).first()
+                return redirect(
+                    "selected_organisation_summary",
+                    organisation_id=selected_organisation.pk,
+                )
+            else:
+                messages.error(request, "Invalid email or password.")
+        else:
+            messages.error(request, "Invalid email or password.")
+    form = Epilepsy12LoginForm()
+    return render(
+        request=request, template_name="registration/login.html", context={"form": form}
+    )
 
 
 @user_may_view_this_organisation()
@@ -466,3 +631,43 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
     success_url = reverse_lazy("index")
+
+
+@login_required
+def logs(request, organisation_id, epilepsy12_user_id):
+    """
+    returns logs for given organisation
+    """
+    organisation = Organisation.objects.get(pk=organisation_id)
+    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+
+    activities = VisitActivity.objects.filter(epilepsy12user=epilepsy12_user).all()
+
+    template_name = "epilepsy12/logs.html"
+    context = {
+        "epilepsy12_user": epilepsy12_user,
+        "organisation": organisation,
+        "activities": activities,
+    }
+
+    return render(request=request, template_name=template_name, context=context)
+
+
+@login_required
+def log_list(request, organisation_id, epilepsy12_user_id):
+    """
+    GET request to return log table
+    """
+    organisation = Organisation.objects.get(pk=organisation_id)
+    epilepsy12_user = Epilepsy12User.objects.get(pk=epilepsy12_user_id)
+
+    activities = VisitActivity.objects.filter(epilepsy12user=epilepsy12_user).all()
+
+    template_name = "epilepsy12/logs.html"
+    context = {
+        "epilepsy12_user": epilepsy12_user,
+        "organisation": organisation,
+        "activities": activities,
+    }
+
+    return render(request=request, template_name=template_name, context=context)

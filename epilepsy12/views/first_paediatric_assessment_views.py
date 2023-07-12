@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponse
 from epilepsy12.constants import *
 from ..common_view_functions import (
     validate_and_update_model,
@@ -11,7 +12,7 @@ from ..decorator import user_may_view_this_child
 @login_required
 @permission_required("epilepsy12.view_firstpaediatricassessment", raise_exception=True)
 @user_may_view_this_child()
-def first_paediatric_assessment(request, case_id):
+def first_paediatric_assessment(request, case_id) -> HttpResponse:
     registration = Registration.objects.get(case=case_id)
 
     if FirstPaediatricAssessment.objects.filter(registration=registration).exists():
