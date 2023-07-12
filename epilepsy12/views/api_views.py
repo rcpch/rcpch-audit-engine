@@ -12,26 +12,6 @@ from rest_framework import permissions, viewsets
 # # third party
 from epilepsy12.serializers import *
 
-# from epilepsy12.models_folder.epilepsy12user import Epilepsy12User
-# from epilepsy12.models_folder.case import Case
-# from epilepsy12.models_folder.registration import Registration
-# from epilepsy12.models_folder.first_paediatric_assessment import (
-#     FirstPaediatricAssessment,
-# )
-# from epilepsy12.models_folder.epilepsy_context import EpilepsyContext
-# from epilepsy12.models_folder.multiaxial_diagnosis import MultiaxialDiagnosis
-# from epilepsy12.models_folder.episode import Episode
-# from epilepsy12.models_folder.syndrome import Syndrome
-# from epilepsy12.models_folder.assessment import Assessment
-# from epilepsy12.models_folder.investigations import Investigations
-# from epilepsy12.models_folder.management import Management
-# from epilepsy12.models_folder.comorbidity import Comorbidity
-# from epilepsy12.models_folder.antiepilepsy_medicine import AntiEpilepsyMedicine
-# from epilepsy12.models_folder.audit_progress import AuditProgress
-# from epilepsy12.models_folder.epilepsy12_site import Site
-# from epilepsy12.models_folder.entities.organisation import Organisation
-# from epilepsy12.models_folder.semiology_keyword import Keyword
-
 
 class Epilepsy12UserViewSet(viewsets.ModelViewSet):
     """
