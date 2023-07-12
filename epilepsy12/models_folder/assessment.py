@@ -1,4 +1,5 @@
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 from django.contrib.gis.db import models
 from simple_history.models import HistoricalRecords
@@ -146,7 +147,7 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
     @_history_user.setter
     def _history_user(self, value):
         self.updated_by = value
-    
+
     def get_current_date(self):
         return date.today()
 
@@ -158,12 +159,12 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
             self.consultant_paediatrician_referral_date
             and self.consultant_paediatrician_input_date
         ):
-            return stringify_time_elapsed(
-                self.consultant_paediatrician_referral_date,
-                self.consultant_paediatrician_input_date,
-            )
+            return (
+                self.consultant_paediatrician_input_date
+                - self.consultant_paediatrician_referral_date
+            ).days
         else:
-            return None  # raise ValueError("Both referral and input dates must be provided")
+            return None
 
     def paediatric_neurologist_wait(self):
         """
@@ -173,12 +174,12 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
             self.paediatric_neurologist_referral_date
             and self.paediatric_neurologist_input_date
         ):
-            return stringify_time_elapsed(
-                self.paediatric_neurologist_referral_date,
-                self.paediatric_neurologist_input_date,
-            )
+            return (
+                self.paediatric_neurologist_input_date
+                - self.paediatric_neurologist_referral_date
+            ).days
         else:
-            return None  # raise ValueError("Both referral and input dates must be provided")
+            return None
 
     def childrens_epilepsy_surgery_wait(self):
         """
@@ -188,12 +189,12 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
             self.childrens_epilepsy_surgical_service_referral_date
             and self.childrens_epilepsy_surgical_service_input_date
         ):
-            return stringify_time_elapsed(
-                self.childrens_epilepsy_surgical_service_referral_date,
-                self.childrens_epilepsy_surgical_service_input_date,
-            )
+            return (
+                self.childrens_epilepsy_surgical_service_input_date
+                - self.childrens_epilepsy_surgical_service_referral_date
+            ).days
         else:
-            return None  # raise ValueError("Both referral and input dates must be provided")
+            return None
 
     def epilepsy_nurse_specialist_wait(self):
         """
@@ -203,10 +204,10 @@ class Assessment(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTex
             self.epilepsy_specialist_nurse_referral_date
             and self.epilepsy_specialist_nurse_input_date
         ):
-            return stringify_time_elapsed(
-                self.epilepsy_specialist_nurse_referral_date,
-                self.epilepsy_specialist_nurse_input_date,
-            )
+            return (
+                self.epilepsy_specialist_nurse_input_date
+                - self.epilepsy_specialist_nurse_referral_date
+            ).days
         else:
             return None  # raise ValueError("Both referral and input dates must be provided")
 

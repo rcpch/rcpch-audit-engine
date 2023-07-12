@@ -1,5 +1,6 @@
 # python
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # django
 from django.contrib.gis.db import models
@@ -123,6 +124,16 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
     @_history_user.setter
     def _history_user(self, value):
         self.updated_by = value
+
+    def age_days(self, today_date=date.today()):
+        """
+        Returns the age of the patient in years, months and days
+        This is a calculated field
+        Date of birth is required
+        Today's date is optional and defaults to date.today()
+        """
+        # return stringify_time_elapsed(self.date_of_birth, today_date)
+        return (today_date - self.date_of_birth).days
 
     def age(self, today_date=date.today()):
         """
