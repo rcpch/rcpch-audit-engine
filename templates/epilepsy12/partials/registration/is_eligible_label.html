@@ -1,5 +1,18 @@
+<!-- 
+    This partial is a label presented on click of a one way button.
+    It is used when confirming the child has epilepsy in the registration form.
+    It is also used when a child/parent confirms consent to participate in the audit.
+    params:
+    has_error: boolean - presented if an error has occurred
+    message: string - either an error or the value of the label
+    is_positive: boolean - if a pink tick and pink border is required.
+ -->
 {% if has_error %}
     <div class="ui label"><i class="red exclamation triangle icon"></i></i>{{message}}</div>
 {% else %}
-    <div class="ui rcpch_pink label" id='eligible_label'><i class="check rcpch_pink circle outline icon"></i>{{message}}</div>
+    {% if is_positive %}
+        <div class="ui rcpch_pink label"><i class="check rcpch_pink circle outline icon"></i>{{message}}</div>
+    {% else %}
+        <div class="ui rcpch_red label"><i class="exclamation circle rcpch_red icon"></i>{{message}}</div>
+    {% endif %}
 {% endif %}

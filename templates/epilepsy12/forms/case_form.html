@@ -78,62 +78,73 @@
     {% endif %}
   </div>
 
-  {% if case %}
+  {% if case and perms.epilepsy.can_opt_out_child_from_inclusion_in_audit %}
 
-  <div class="ui icon rcpch_info message">
-    <i class="ui exclamation circle icon"></i>
-    <p>
-      Children, young people and their families can opt out of Epilepsy12 at any
-      time. Should {{case}} or their family choose to do so, all records
-      relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
-    </p>
-    <button
-      hx-post="{% url 'opt_out' organisation_id case.pk %}"
-      hx-trigger="click"
-      class="ui rcpch_danger button"
-      _="on htmx:confirm(issueRequest) 
-              halt the event 
-              call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' }) 
-              if result.isConfirmed issueRequest()"
-    >
-      Opt out of Epilepsy12
-    </button>
-  </div>
+    <div class="field">
+      <div class="ui icon rcpch_info message">
+        <i class="ui exclamation circle icon"></i>
+        <p>
+          Children, young people and their families can opt out of Epilepsy12 at any
+          time. Should {{case}} or their family choose to do so, all records
+          relating to {{case}}'s epilepsy care will be removed from RCPCH servers.
+        </p>
+        <button
+          hx-post="{% url 'opt_out' organisation_id case.pk %}"
+          hx-trigger="click"
+          class="ui rcpch_danger button"
+          _="on htmx:confirm(issueRequest)
+                  halt the event
+                  call Swal.fire({ title: 'Confirmation Required', text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.', icon: 'warning', iconColor: '#e00087', showCancelButton: true, confirmButtonColor: '#11a7f2', cancelButtonColor: '#e60700', confirmButtonText: 'Remove {{case}} from Epilepsy12' })
+                  if result.isConfirmed issueRequest()"
+        >
+          Opt out of Epilepsy12
+        </button>
+      </div>
+    </div>
 
   {% else %}
 
-  <div class="ui rcpch_info icon message">
-    <i class="ui exclamation circle icon"></i>
-    <div class="content">
-      <div class="header">Organisation</div>
-      <p>
-        <b
-          >{{organisation.OrganisationName}}({{organisation.ParentOrganisation_OrganisationName}})</b
-        >
-        will be allocated automatically as the lead Epilepsy12 centre on saving
-        this child's information.
-      </p>
+  <div class="field">
+    <div class="ui rcpch_info icon message">
+      <i class="ui exclamation circle icon"></i>
+      <div class="content">
+        <div class="header">Organisation</div>
+        <p>
+          <b
+            >{{organisation.OrganisationName}}({{organisation.ParentOrganisation_OrganisationName}})</b
+          >
+          will be allocated automatically as the lead Epilepsy12 centre on saving
+          this child's information.
+        </p>
+      </div>
     </div>
   </div>
 
-  {% endif %} {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
-  <button type="submit" class="ui rcpch_primary button" name="update">
-    Save
-  </button>
-  {% endif %} {% if perms.epilepsy12.delete_case %}
-  <input
-    type="submit"
-    class="ui rcpch_danger button"
-    name="delete"
-    value="Delete"
-    form="create_case_form"
-  />
+  {% endif %} 
+  
+  <div class="three fields">
+    <div class="eight wide field case_create_buttons_wrapper">
+      <a href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button"
+        >Cancel</a
+      >
+      {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
+        <button type="submit" class="ui rcpch_primary button" name="update">
+          Save
+        </button>
     
-  {% endif %}
-
-  <a href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button"
-    >Cancel</a
-  >
+      {% endif %} 
+      {% if perms.epilepsy12.delete_case %}
+      <input
+        type="submit"
+        class="ui rcpch_danger button"
+        name="delete"
+        value="Delete"
+        form="create_case_form"
+      />
+      
+      {% endif %}
+    </div>
+  </div>
 
 </form>
 

@@ -15,15 +15,71 @@
         <div class="three fields">
             
             {% url 'eeg_request_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}   
-            
-            {% url 'eeg_performed_date' investigations_id=investigations.pk as hx_post %}
-            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' error_messages=error_messages enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.eeg_request_date label=investigations.get_eeg_request_date_help_label_text reference=investigations.get_eeg_request_date_help_reference_text data_position="top left" input_date_field_name='eeg_request_date' enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
 
-            <div class="field">
-                <label>Time to EEG</label>
-                <input class="ui input" disabled value='{{investigations.eeg_wait}}'>
-            </div>
+            {% if eeg_declined %}
+                <div class="field">
+                    <label>{{investigations.get_eeg_performed_date_help_label_text}}
+                        <span 
+                            id="eeg_declined"
+                            data-title="Reference"
+                            data-content="EEG could not be performed."
+                            data-position="top left"
+                            data-variation="basic"
+                            _="init js $('#eeg_declined').popup(); end"
+                        >
+                            <i class="rcpch question circle icon"></i>
+                        </span>
+                    </label>
+                    <div class="ui rcpch_primary disabled fluid padded_form button">DECLINED</div>
+                </div>
+                <div class="padded_field field">
+                    {% url 'eeg_declined' investigations_id=investigations.pk confirm='edit' as hx_post %}
+                    <div 
+                        class="ui rcpch_primary fluid padded_form button"
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                        name="edit_eeg_declined"
+                        hx-post="{{hx_post}}"
+                        hx-trigger="click"
+                        hx-target="#eeg_information"
+                    >Edit date</div>
+                </div>
+
+            {% else %}
+
+                {% url 'eeg_performed_date' investigations_id=investigations.pk as hx_post %}
+                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_target="#eeg_information" hx_trigger="change delay:1s" hx_swap="innerHTML" date_value=investigations.eeg_performed_date label=investigations.get_eeg_performed_date_help_label_text reference=investigations.get_eeg_performed_date_help_reference_text data_position="top left" input_date_field_name='eeg_performed_date' enabled=perms.epilepsy12.change_investigations has_permission=perms.epilepsy12.change_investigations %}
+            
+                {% if investigations.eeg_request_date and investigations.eeg_performed_date %}
+                    <div class="field">
+                        <label>Time to EEG</label>
+                        <input class="ui input" disabled value='{% wait_days_and_weeks investigations.eeg_wait %}'>
+                    </div>
+                {% endif %}
+
+                {% if investigations.eeg_performed_date is None %}
+
+                    {% comment %}
+                    Only show the EEG declined button if the eeg_performed date has neither been declined already
+                    nor has already been set
+                    {% endcomment %}
+                
+                    <div class="padded field">
+                        {% url 'eeg_declined' investigations_id=investigations.pk confirm='decline' as hx_post %}
+                        <div 
+                            class="ui rcpch_primary button"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                            name="eeg_request_date"
+                            hx-post="{{hx_post}}"
+                            hx-trigger="click"
+                            hx-target="#eeg_information"
+                        >EEG declined</div>
+                    </div>
+                
+                {% endif %}
+
+            {% endif %}
+
    
         </div>
         

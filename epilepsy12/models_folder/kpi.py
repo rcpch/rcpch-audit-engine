@@ -55,7 +55,7 @@ class KPI(models.Model, HelpTextMixin):
             9f. Service contact details
                 Percentage of children and young people with epilepsy with evidence of being given service contact details.
 
-    10. School Individual Healthcare Plan - % of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment..              
+    10. School Individual Healthcare Plan - % of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment..
 
     """
 
@@ -68,11 +68,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     paediatrician_with_expertise_in_epilepsies = models.IntegerField(
         help_text={
-            'label': '1. Paediatrician with expertise in epilepsies',
-            'reference': "Percentage of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral"
+            "label": "1. Paediatrician with expertise in epilepsies",
+            "reference": "Percentage of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -84,11 +84,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     epilepsy_specialist_nurse = models.IntegerField(
         help_text={
-            'label': '2. Epilepsy Specialist Nurse',
-            'reference': "Percentage of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care."
+            "label": "2. Epilepsy Specialist Nurse",
+            "reference": "Percentage of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -100,11 +100,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     tertiary_input = models.IntegerField(
         help_text={
-            'label': '3. Tertiary input',
-            'reference': "Percentage of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care."
+            "label": "3. Tertiary input",
+            "reference": "Percentage of children and young people meeting defined criteria for paediatric neurology referral, with input of tertiary care and/or CESS referral within the first year of care.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -116,11 +116,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     epilepsy_surgery_referral = models.IntegerField(
         help_text={
-            'label': '3b. Epilepsy surgery referral',
-            'reference': "Percentage of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral."
+            "label": "3b. Epilepsy surgery referral",
+            "reference": "Percentage of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -132,12 +132,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     ecg = models.IntegerField(
         help_text={
-            'label': '4. ECG',
-            'reference': "Percentage of children and young people with convulsive seizures and epilepsy, with an ECG at first year."
+            "label": "4. ECG",
+            "reference": "Percentage of children and young people with convulsive seizures and epilepsy, with an ECG at first year.",
         },
-
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -149,12 +148,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     mri = models.IntegerField(
         help_text={
-            'label': '5. MRI',
-            'reference': "Percentage of children and young people with defined indications for an MRI, who had timely MRI within 6 weeks of request"
+            "label": "5. MRI",
+            "reference": "Percentage of children and young people with defined indications for an MRI, who had timely MRI within 6 weeks of request",
         },
-
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -166,11 +164,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     assessment_of_mental_health_issues = models.IntegerField(
         help_text={
-            'label': '6. Assessment of mental health issues',
-            'reference': "Percentage of children and young people with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure."
+            "label": "6. Assessment of mental health issues",
+            "reference": "Percentage of children and young people with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -181,13 +179,12 @@ class KPI(models.Model, HelpTextMixin):
     Denominator= Number of children and young people diagnosed with epilepsy AND had a mental health issue identified
     """
     mental_health_support = models.IntegerField(
-
         help_text={
-            'label': '7. Mental health support',
-            'reference': "Percentage of children and young people with epilepsy and a mental health problem who have evidence of mental health support"
+            "label": "7. Mental health support",
+            "reference": "Percentage of children and young people with epilepsy and a mental health problem who have evidence of mental health support",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -199,11 +196,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     sodium_valproate = models.IntegerField(
         help_text={
-            'label': '8. Sodium Valproate',
-            'reference': "Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed"
+            "label": "8. Sodium Valproate",
+            "reference": "Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -215,32 +212,31 @@ class KPI(models.Model, HelpTextMixin):
     """
     comprehensive_care_planning_agreement = models.IntegerField(
         help_text={
-            'label': '9A. Comprehensive care planning agreement',
-            'reference': "Percentage of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary."
+            "label": "9A. Comprehensive care planning agreement",
+            "reference": "Percentage of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9a. Percentage of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information.
+    9i. Percentage of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information.
     
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     patient_held_individualised_epilepsy_document = models.IntegerField(
-
         help_text={
-            'label': '9a. Patient-held individualised epilepsy document/copy of clinic letter that includes care planning information',
-            'reference': "Percentage of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information."
+            "label": "i. Patient-held individualised epilepsy document/copy of clinic letter that includes care planning information",
+            "reference": "Percentage of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9b. Percentage of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate.
+    9ii. Percentage of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate.
     
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
@@ -248,15 +244,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     patient_carer_parent_agreement_to_the_care_planning = models.IntegerField(
         help_text={
-            'label': '9b. Patient/carer/parent agreement to the care planning',
-            'reference': "Percentage of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate."
+            "label": "ii. Patient/carer/parent agreement to the care planning",
+            "reference": "Percentage of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9c. Percentage of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary.
+    9iii. Percentage of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary.
     
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
@@ -264,11 +260,11 @@ class KPI(models.Model, HelpTextMixin):
     """
     care_planning_has_been_updated_when_necessary = models.IntegerField(
         help_text={
-            'label': '9c. Care planning has been updated when necessary',
-            'reference': "Percentage of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary."
+            "label": "iii. Care planning has been updated when necessary",
+            "reference": "Percentage of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -280,15 +276,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     comprehensive_care_planning_content = models.IntegerField(
         help_text={
-            'label': '9B. Comprehensive care planning content',
-            'reference': "Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning (items a - f)."
+            "label": "9B. Comprehensive care planning content",
+            "reference": "Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning (items a - f).",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9a. Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.
+    9i. Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.
     
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan 
@@ -296,15 +292,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     parental_prolonged_seizures_care_plan = models.IntegerField(
         help_text={
-            'label': '9a. Parental prolonged seizures care plan',
-            'reference': "Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan."
+            "label": "i. Parental prolonged seizures care plan",
+            "reference": "Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9b. Water Safety
+    9ii. Water Safety
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding water safety.
 
@@ -314,15 +310,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     water_safety = models.IntegerField(
         help_text={
-            'label': '9b. Water safety',
-            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding water safety."
+            "label": "ii. Water safety",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding water safety.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """    
-    9c. First Aid
+    9iii. First Aid
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.
 
@@ -332,15 +328,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     first_aid = models.IntegerField(
         help_text={
-            'label': '9c. First aid',
-            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding first aid."
+            "label": "iii. First aid",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9d. General participation and risk
+    9iv. General participation and risk
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.
     
@@ -350,15 +346,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     general_participation_and_risk = models.IntegerField(
         help_text={
-            'label': '9d. General participation and risk',
-            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk."
+            "label": "iv. General participation and risk",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
-    9e. SUDEP
+    9v. SUDEP
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
 
@@ -368,15 +364,15 @@ class KPI(models.Model, HelpTextMixin):
     """
     sudep = models.IntegerField(
         help_text={
-            'label': '9e. Sudden unexplained death in epilepsy',
-            'reference': "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan."
+            "label": "v. Sudden unexpected death in epilepsy",
+            "reference": "Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP (Sudden unexpected death in epilepsy) and evidence of a prolonged seizures care plan.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """    
-    9f. Service contact details
+    9vi. Service contact details
 
     Percentage of children and young people with epilepsy with evidence of being given service contact details.
 
@@ -387,11 +383,11 @@ class KPI(models.Model, HelpTextMixin):
 
     service_contact_details = models.IntegerField(
         help_text={
-            'label': '9f. Service contact details',
-            'reference': "Percentage of children and young people with epilepsy with evidence of being given service contact details."
+            "label": "vi. Service contact details",
+            "reference": "Percentage of children and young people with epilepsy with evidence of being given service contact details.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     """
@@ -405,25 +401,52 @@ class KPI(models.Model, HelpTextMixin):
     """
     school_individual_healthcare_plan = models.IntegerField(
         help_text={
-            'label': '10. School individualised health care plan',
-            'reference': "Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment."
+            "label": "10. School individualised health care plan",
+            "reference": "Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.",
         },
         default=None,
-        null=True
+        null=True,
     )
 
     organisation = models.ForeignKey(
-        "epilepsy12.Organisation",
-        on_delete=models.CASCADE
+        "epilepsy12.Organisation", on_delete=models.CASCADE
     )
 
-    parent_trust = models.CharField(
-        max_length=250
-    )
+    parent_trust = models.CharField(max_length=250)
+    
+    def get_kpis(self):
+        """
+        Returns dictionary of KPI attributes with related scores.
+        """
+        kpis = {
+            "paediatrician_with_expertise_in_epilepsies" : self.paediatrician_with_expertise_in_epilepsies,
+            "epilepsy_specialist_nurse" : self.epilepsy_specialist_nurse,
+            "tertiary_input" : self.tertiary_input,
+            "epilepsy_surgery_referral" : self.epilepsy_surgery_referral,
+            "ecg" : self.ecg,
+            "mri" : self.mri,
+            "assessment_of_mental_health_issues" : self.assessment_of_mental_health_issues,
+            "mental_health_support" : self.mental_health_support,
+            "sodium_valproate" : self.sodium_valproate,
+            "comprehensive_care_planning_agreement" : self.comprehensive_care_planning_agreement,
+            "patient_held_individualised_epilepsy_document" : self.patient_held_individualised_epilepsy_document,
+            "patient_carer_parent_agreement_to_the_care_planning" : self.patient_carer_parent_agreement_to_the_care_planning,
+            "care_planning_has_been_updated_when_necessary" : self.care_planning_has_been_updated_when_necessary,
+            "comprehensive_care_planning_content" : self.comprehensive_care_planning_content,
+            "parental_prolonged_seizures_care_plan" : self.parental_prolonged_seizures_care_plan,
+            "water_safety" : self.water_safety,
+            "first_aid" : self.first_aid,
+            "general_participation_and_risk" : self.general_participation_and_risk,
+            "sudep" : self.sudep,
+            "service_contact_details" : self.service_contact_details,
+            "school_individual_healthcare_plan" : self.school_individual_healthcare_plan,
+        }
+        
+        return kpis
 
     class Meta:
         verbose_name = _("KPI ")
         verbose_name_plural = _("KPIs")
 
     def __str__(self):
-        return f'KPI for child in {self.organisation.OrganisationName}({self.parent_trust})'
+        return f"KPI for child in {self.organisation.OrganisationName}({self.parent_trust})"

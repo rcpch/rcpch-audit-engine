@@ -49,7 +49,7 @@ def fetch_snomed(sctid, syntax):
 
 
 def snomed_search(search_term):
-    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}\&constraint=<64572001'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}&constraint=<64572001'
 
     response = requests.get(search_url)
 
@@ -118,7 +118,7 @@ def search_ecl(search, ecl):
 
 
 def search_all_epilepsy(search):
-    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}\&constraint=<<84757009&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}&constraint=<<84757009&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -132,7 +132,7 @@ def search_all_epilepsy(search):
 
 
 def search_all_hereditary_epilepsy(search):
-    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}\&constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search}&constraint=(<< 84757009 AND << 363235000 )&offset=0&limit=1000'
 
     response = requests.get(search_url)
 
@@ -152,7 +152,7 @@ def snomed_search_congenital_neurology(search_term):
     # 363235000 |Hereditary disorder of nervous system (disorder)| +
 
     # 39367000 |Inflammatory disease of the central nervous system (disorder)|
-    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}\&constraint=<84757009'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}&constraint=<84757009'
 
     response = requests.get(search_url)
 
@@ -166,7 +166,7 @@ def snomed_search_congenital_neurology(search_term):
 
 
 def snomed_medicine_search(search_term):
-    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}\&constraint=<373873005'
+    search_url = f'{settings.RCPCH_HERMES_SERVER_URL}/search?s={search_term}&constraint=<373873005'
 
     response = requests.get(search_url)
 

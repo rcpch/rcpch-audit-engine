@@ -2,7 +2,7 @@
 <div hx-target='#case_table' hx-get="{% url 'cases' organisation_id=organisation.pk %}" hx-trigger='case_list from:body'
   hx-swap='innerHTML' name='case_table'>
   {% if case_list.end_index > 0 %}
-  <table class="ui rcpch table cases_table">
+  <table class="ui rcpch purple table cases_table">
     <thead>
       <tr>
         <th class="two wide">
@@ -117,21 +117,21 @@
           <td>{% if case.registration.days_remaining_before_submission is not None %}{{ case.registration.days_remaining_before_submission }}{% endif %}</td>
           <td class='two wide'>
             <div class='ui buttons'>
-              <button data-tooltip='Edit child details.' class="ui rcpch_primary icon button" tabindexed="0" {% if case.locked %}disabled{% endif %}><a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
+              <button data-tooltip='Edit child details.' class="ui rcpch_purple icon button" tabindexed="0" {% if case.locked or not perms.epilepsy12.change_case %}disabled{% endif %}><a href="{% url 'update_case' organisation_id=organisation_id case_id=case.id%}" {% if case.locked %}disabled{% endif %}><i
                 class="edit outline icon"></i></a></button>
               {% comment %}
-              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked %}disabled{% endif %}><a href="{% url 'delete_case' organisation_id=organisation_id case_id=case.id%}"><i
+              <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked or not perms.epilepsy12.delete_case %}disabled{% endif %}><a href="{% url 'delete_case' organisation_id=organisation_id case_id=case.id%}"><i
                 class="trash alternate outline icon"></i></a></button>
               {% endcomment %}
               {% if case.registration.registration_date %}
                 {% if case.locked %}
-                <button data-tooltip='Complete audit details.'class="ui rcpch_positive button" tabindexed="2" 
+                <button data-tooltip='Complete audit details.'class="ui rcpch_dark_purple button" tabindexed="2" 
                 disabled
                 onclick="location.href='{% url 'register'  case.id %}'">Audit</button>
                 {% else %}
                 <button 
                   data-tooltip='Complete audit details.'
-                  class="ui rcpch_positive button" 
+                  class="ui rcpch_dark_purple button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register'  case.id %}'"
                   >Audit</button>
@@ -141,7 +141,7 @@
                 {% if case.locked %}
 
                 <button 
-                  class="ui rcpch_positive button" 
+                  class="ui rcpch_dark_purple button" 
                   tabindexed="2" disabled
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
                 >Audit</button>
@@ -149,7 +149,7 @@
                 {% else %}
 
                 <button 
-                  class="ui rcpch_positive button" 
+                  class="ui rcpch_dark_purple button" 
                   tabindexed="2"
                   onclick="location.href='{% url 'register' case_id=case.id %}'"
                 >Audit</button>
@@ -180,7 +180,7 @@
                 hx-post="{{hx_post}}"
                 hx_trigger='click' 
                 hx-target="#case_table"
-                {% if case.registration.days_remaining_before_submission == 0 %}
+                {% if case.registration.days_remaining_before_submission == 0 or case.locked and not perms.epilepsy12.can_unlock_child_case_data_from_editing or not case.locked and not perms.epilepsy12.can_lock_child_case_data_from_editing  %}
                   disabled
                 {% else %}
                     {% if case.locked %}

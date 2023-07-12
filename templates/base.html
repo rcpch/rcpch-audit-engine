@@ -16,7 +16,12 @@
   <link rel="stylesheet" href="{% static 'styles/semantic.min.css' %}" type="text/css" />
   <link rel="icon" href="/favicon.ico'" />
   <link rel="stylesheet" href="{% static 'styles/style.css' %}" />
-  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
 </head>
 
 <body id="root">
@@ -48,7 +53,12 @@
     <div class="ui rcpch_warning message">This site is currently under development.</div>
   </div>
   <div class='ui fluid container footer_container'>{% include 'epilepsy12/footer.html' %}</div>
-  <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
+  
+  <!-- ADDS AUTO LOGOUT REDIRECT TO LOGIN PAGE SCRIPT -->
+  {{ redirect_to_login_immediately }}
+</body>
+
+<script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
   <script src="{% static 'js/jquery.min.js' %}"></script>
   <script src="{% static 'htmx_1.8.4/htmx.min.js' %}"></script>
   <script src="{% static 'hyperscript_0.9.8/hyperscript.min.js' %}"></script>
@@ -59,10 +69,9 @@
   <script src="{% static 'jquery_mask/jquery.mask.min.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.2.1/chartjs-plugin-annotation.min.js" integrity="sha512-qF3T5CaMgSRNrxzu69V3ZrYGnrbRMIqrkE+OrE01DDsYDNo8R1VrtYL8pk+fqhKxUBXQ2z+yV/irk+AbbHtBAg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
-  <!-- ADDS AUTO LOGOUT REDIRECT TO LOGIN PAGE SCRIPT -->
-  {{ redirect_to_login_immediately }}
-  
+  <!-- <script type="text/javascript" src="{% static 'leaflet.ajax.js'%}"></script> -->
   <script>
     // $('#id_nhs_number').mask('0000 000 000');
     $('.message .close').on('click', function () {
@@ -109,8 +118,28 @@
     })
     */
     $('.ui.dropdown').dropdown();
+    
+    
 
   </script>
-</body>
-
+  
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

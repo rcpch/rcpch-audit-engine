@@ -67,8 +67,8 @@
           
           </div>
           
-          {% if not user.is_staff or user.is_superuser %}
-            <div class='field'>
+          {% if form.organisation_employer.value %}
+            <div class='field' id="organisation_employer">
               <label for="{{form.organisation_employer.id_for_label}}">Employer</label>
               {{ form.organisation_employer }}
               {% if form.organisation_employer.errors %}
@@ -76,11 +76,12 @@
               {% endif %}
             </div>
           {% endif %}
+          
 
-          <div class='three fields'>
+          <div class='two fields'>
 
-            {% if user.is_staff or user.is_superuser%}
-              <div class='six wide field'>
+            {% if user_type == 'organisation-staff' %}
+              <div class='eight wide field'>
                 <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
                   {{ form.is_rcpch_audit_team_member }}
@@ -91,20 +92,8 @@
               </div>
             {% endif %}
             
-            {% if user.is_staff or user.is_superuser%}
-              <div class='five wide field'>
-                <label for="{{form.is_staff.id_for_label}}">RCPCH Staff</label>
-                <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
-                  {{ form.is_staff }}
-                </div>
-                {% if form.is_staff.errors %}
-                  <div class="ui pointing red basic label">{{form.is_staff.errors}}</div>
-                {% endif %}
-              </div>
-            {% endif %}
-            
             {% if user.is_superuser %}
-              <div class='five wide field'>
+              <div class='eight wide field'>
                 <label for="{{form.is_superuser.id_for_label}}">Superuser</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
                   {{ form.is_superuser }}
@@ -117,73 +106,71 @@
 
           </div>
 
-          <input 
-            class="ui rcpch_primary button" 
-            type="submit" 
-            value="{{admin_title}}" 
-            name='edit'/>
-
-          {% if not form.email_confirmed.value %}
-
-            <button 
-              type="submit" 
-              {% if perms.epilepsy12.change_epilepsy12user %}
-                class="ui rcpch_primary icon button"
+          <div class="eight wide field case_create_buttons_wrapper">
+            <input
+              class="ui rcpch_primary button"
+              type="submit"
+              value="{{admin_title}}"
+              name='edit'/>
+            {% if not form.email_confirmed.value and admin_title != "Add RCPCH Epilepsy12 staff member" and admin_title != 'Add Epilepsy12 User' %}
+              <button
+                type="submit"
+                {% if perms.epilepsy12.change_epilepsy12user %}
+                  class="ui rcpch_primary icon button"
+                  {% else %}
+                  class="ui rcpch_primary disabled icon button"
+                {% endif %}
+                name="resend"
+                value="resend"
+              >
+                Resend Email
+              </button>
+            {% endif %}
+            {{form.email_confirmed.as_hidden}}
+            {% if admin_title != 'Add Epilepsy12 User' and admin_title != "Add RCPCH Epilepsy12 staff member" %}
+              <input
+                type="submit"
+                {% if perms.epilepsy12.delete_epilepsy12user %}
+                  class="ui rcpch_danger button"
                 {% else %}
-                class="ui rcpch_primary disabled icon button"
-              {% endif %}
-              name="resend"
-              value="resend"
-            >
-              Resend Email
-            </button>
-
-          {% endif %}
-
-          {% if admin_title != 'Add Epilepsy12 User' %}
-
-            <input 
-              type="submit" 
-              {% if perms.epilepsy12.delete_epilepsy12user %}
-                class="ui rcpch_danger button"
-              {% else %}
-                class="ui rcpch_danger disabled button"
-              {% endif %}
-              name="delete"
-              id="delete"
-              value="Delete"
-                _= "on click
-                halt the event
-                call Swal.fire({ 
-                  title: 'Confirmation Required', 
-                  text: 'This will irreversibly remove user and related dated from Epilepsy12.', 
-                  icon: 'warning', 
-                  iconColor: '#e00087', 
-                  showCancelButton: true, 
-                  confirmButtonColor: '#11a7f2', 
-                  cancelButtonColor: '#e60700', 
-                  confirmButtonText: 'Remove user from Epilepsy12' 
-                })
-                if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %}
-                {
-                  method: 'post',
-                  headers: {
-                    'X-CSRFToken': {{csrf_token}},
-                    'Accept': 'network/json',
-                    'Content-Type': 'network/json',
+                  class="ui rcpch_danger disabled button"
+                {% endif %}
+                name="delete"
+                id="delete"
+                value="Delete"
+                  _= "on click
+                  halt the event
+                  call Swal.fire({
+                    title: 'Confirmation Required',
+                    text: 'This will irreversibly remove user and related dated from Epilepsy12.',
+                    icon: 'warning',
+                    iconColor: '#e00087',
+                    showCancelButton: true,
+                    confirmButtonColor: '#11a7f2',
+                    cancelButtonColor: '#e60700',
+                    confirmButtonText: 'Remove user from Epilepsy12'
+                  })
+                  if result.isConfirmed then fetch {% url 'edit_epilepsy12_user' organisation_id user.pk %}
+                  {
+                    method: 'post',
+                    headers: {
+                      'X-CSRFToken': {{csrf_token}},
+                      'Accept': 'network/json',
+                      'Content-Type': 'network/json',
+                    }
                   }
-                }
-                end
-                " 
-            />
-          
-          {% endif %}
-          
-          <a 
-            class="ui rcpch_negative button"
-            name="cancel"
-            href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}"
-          >Cancel</a>
+                  end
+                  "
+              />
+            
+            {% endif %}
+            
+            <a
+              class="ui rcpch_negative button"
+              name="cancel"
+              href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}"
+            >Cancel</a>
+          </div>
 
         </form>
       </div>

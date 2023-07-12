@@ -36,6 +36,8 @@ services:
     # ensures that docker compose always displays log output
     tty: true
     stdin_open: true
+    env_file:
+      - .env # env file with the token for RCPCH Census Platform, not committed to Git
   
   # db container - runs postgres
   db:

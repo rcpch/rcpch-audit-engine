@@ -1,5 +1,4 @@
-
-
+{% load epilepsy12_template_tags %}
 
 <div class="ui segment">
 
@@ -8,7 +7,7 @@
 
     {% if assessment.epilepsy_specialist_nurse_referral_made %}
 
-        <div class="ui rcpch_lightest_blue message">
+        <div class="ui rcpch_important message">
 
             {% url 'epilepsy_specialist_nurse_referral_date' assessment_id=assessment.pk as hx_post %}
             {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#epilepsy_specialist_nurse" hx_trigger="change delay:1s" label=assessment.get_epilepsy_specialist_nurse_referral_date_help_label_text reference=assessment.get_epilepsy_specialist_nurse_referral_date_help_reference_text date_value=assessment.epilepsy_specialist_nurse_referral_date data_position='top left' input_date_field_name="epilepsy_specialist_nurse_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
@@ -18,7 +17,7 @@
 
             <div class="inline field">
                 <label class='toggle_button_label'>Time to Review</label>
-                <input class="ui input" type="text" value="{{assessment.epilepsy_nurse_specialist_wait}}" disabled/>
+                <input class="ui input" type="text" value="{% wait_days_and_weeks assessment.epilepsy_nurse_specialist_wait %}" disabled/>
             </div>
 
             {% if error_message %}

@@ -1,8 +1,20 @@
 {% load epilepsy12_template_tags %}
 <div class="rcpch_padded">
-  <canvas id="{{data_id}}"></canvas>
+  <canvas id="{{data_id}}" {% if data_id == 'icb_id' %} height="400" {% else %} height="auto" {% endif %} width="auto"></canvas>
 </div>
 <script>
+  
+  // Register the ChartDataLabels plugin to all charts:
+  Chart.register(ChartDataLabels);
+
+  var kpi_data = [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}];
+  var colors = [{% for val in data %}'{% kpi_for_kpi_name val kpi_name color=True %}',{% endfor %}];
+  var kpi_labels = [{% for item in data %}'{% formatlabel item.region|escapejs %}',{% empty %}"Empty",{% endfor %}];
+
+  var kpi_data_mapped = kpi_data.map(function(data_val) {
+    return data_val === -1 ? null : data_val;
+  });
+
   /* secondary colours */
   var rcpch_red='#e60700';
   var rcpch_light_red='#ffe7e6';
@@ -14,31 +26,28 @@
   var rcpch_aqua_green='#00dbaa';
   var rcpch_purple='#7159aa';
   var rcpch_dark_blue='#0d0d58';
-  var rcpch_strong_green='#66cc33';
+  var rcpch_strong_green='#66cc33'; 
   var rcpch_dark_red='#9a0500';
   var rcpch_pink='#e00087';
   var rcpch_pink_transparent='rgba(224, 0, 134, 0.45)';
+  var rcpch_black = '#000000';
+  var rcpch_grey = '#4d4d4d';
+  var rcpch_dark_grey = '#808080';
+
+  var lightColorBars = ['#00BDAA', '#11A7F2']
+  var datalabelTextColor = lightColorBars.includes('{{abstraction_color}}') ? rcpch_black : 'white'
+
   var myChart = new Chart(document.getElementById('{{data_id}}'), {
     type: 'bar',
     data: {
-      labels: [{% for item in data %}'{% formatlabel item.region|escapejs %}',{% empty %}"Empty",{% endfor %}],
+      labels: kpi_labels,
       datasets: [
         {
           label: '% achieving measure',
-          data: [{% for val in data %}{% kpi_for_kpi_name val kpi_name %},{% endfor %}],
+          data: kpi_data_mapped,
           borderWidth: 1,
-          backgroundColor: [
-              rcpch_orange,
-              rcpch_light_orange,
-              rcpch_yellow,
-              rcpch_gold,
-              rcpch_vivid_green,
-              rcpch_aqua_green,
-              rcpch_purple,
-              rcpch_dark_blue,
-              rcpch_strong_green,
-              rcpch_dark_red
-          ]
+          backgroundColor: ['{{ abstraction_color }}'],
+          maxBarThickness: 25,
         },
       ]
     },
@@ -47,7 +56,8 @@
       plugins: {
         title: {
           text: '{{data_title}}',
-          display: true
+          display: true,
+          parseHTML: true
         },
         legend: {
           onClick: null,
@@ -64,7 +74,7 @@
               type: 'line',
               xMin:{{avg_pct}},
               xMax:{{avg_pct}},
-              borderColor: rcpch_pink,
+              borderColor: rcpch_pink_transparent,
               borderWidth: 5,
               label: {
                     content: 'hello',
@@ -73,24 +83,32 @@
                     // yOffset: 10,
                 },
             },
-            label1: {
-              type: 'label',
-              xValue: {{avg_pct}}+10,
-              backgroundColor: rcpch_pink_transparent,
-              content: ['Average: {{avg_pct}}%'],
-              font: {
-                size: 12
-              }
-            }
           }
-    }
+        },
+        datalabels: {
+            anchor: 'center',
+            clamp: true,
+            align: 'end',
+            formatter: function(value) {
+              return value != null ? Math.round(value) + ' %' : 'No data';
+            },
+            font: {
+                weight: 'bold'
+            },
+            color: datalabelTextColor,
+            display: 'auto',
+        }
       },
       scales: {
         y: {
           beginAtZero: true,
           grid: {
             display: false,
-          }
+          },
+          ticks: {
+            autoSkip: false,
+            color: colors,
+          },
         },
         x:
           {
@@ -105,4 +123,9 @@
       }
     }
   });
+
+  // UPDATE CHART TITLE WITH AVG
+  var chrt_title = myChart.options.plugins.title.text
+  myChart.options.plugins.title.text = `${chrt_title} - Average {{avg_pct}}%`
+
 </script>

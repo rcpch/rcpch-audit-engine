@@ -8,9 +8,9 @@ class NHSRegionEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     year = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        verbose_name = 'NHS Region Name'
-        verbose_name_plural = 'NHS Region Names'
-        ordering = ('NHS_Region',)
+        verbose_name = "NHS Region Name"
+        verbose_name_plural = "NHS Region Names"
+        ordering = ("NHS_Region",)
 
     def __str__(self) -> str:
         return self.NHS_Region

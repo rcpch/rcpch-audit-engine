@@ -1,7 +1,7 @@
 
 
 {% url 'view_preference' organisation_id=organisation.pk template_name=template_name as hx_post %}
-{% if request.user.is_rcpch_audit_team_member %}
+{% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
 
     {% include 'epilepsy12/partials/page_elements/rcpch_multiple_toggle.html' with choices=rcpch_choices hx_post=hx_post hx_target=hx_target hx_trigger="click" hx_swap="innerHTML" test_positive=test_positive label="" data_position="top left" enabled=True %}
     {% if request.user.view_preference == 0 %}

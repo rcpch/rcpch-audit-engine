@@ -1,0 +1,9 @@
+<div class="ui rcpch_info message">
+{% url 'global_developmental_delay_or_learning_difficulties' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+{% include 'epilepsy12/partials/page_elements/toggle_button.html' with hx_post=hx_post hx_target='#global_developmental_delay_or_learning_difficulties_section' hx_trigger='click' hx_swap='innerHTML' test_positive=multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties tooltip_id='global_developmental_delay_or_learning_difficulties_tooltip' label=multiaxial_diagnosis.get_global_developmental_delay_or_learning_difficulties_help_label_text reference=multiaxial_diagnosis.get_global_developmental_delay_or_learning_difficulties_help_reference_text data_position='top left' enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
+
+{% if multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties %}
+    {% url 'global_developmental_delay_or_learning_difficulties_severity' multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
+    {% include 'epilepsy12/partials/page_elements/single_choice_multiple_toggle_button.html' with hx_post=hx_post hx_target="#global_developmental_delay_or_learning_difficulties_section" hx_trigger="click" hx_swap="innerHTML" choices=global_developmental_delay_or_learning_difficulties_severity_choices test_positive=multiaxial_diagnosis.global_developmental_delay_or_learning_difficulties_severity tooltip_id='global_developmental_delay_or_learning_difficulties_severity_tooltip' label=multiaxial_diagnosis.get_global_developmental_delay_or_learning_difficulties_severity_help_label_text reference=multiaxial_diagnosis.get_global_developmental_delay_or_learning_difficulties_severity_help_reference_text hx_default_text='Select severity' hx_name='global_developmental_delay_or_learning_difficulties_severity' data_position="top left" enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
+{% endif %}
+</div>

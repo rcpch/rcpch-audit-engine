@@ -2,7 +2,11 @@
 {% load epilepsy12_template_tags %}
 
 <div class="ui text menu signin">
-  {% if user.is_superuser %}<div class="git_hash">Most recent GitHub branch commit hash: BRANCH(<b>{{GIT_BRANCH}}</b>) - COMMIT(<b>{{GIT_HASH}}</b>)</div>{% endif %}
+  {% if user.is_superuser %}<div class="admin-data">
+      ADMIN DATA - branch: <a href="https://github.com/rcpch/rcpch-audit-engine/tree/{{active_git_branch}}" target="_blank">{{ active_git_branch }}</a>,
+      commit: <a href="https://github.com/rcpch/rcpch-audit-engine/commit/{{latest_git_commit}}" target="_blank">{{ latest_git_commit | truncatechars:7 }}</a>,
+      current user: {{ user.email }}</div>
+  {% endif %}
     <div class="right menu">
       {% if user.is_authenticated %}
         <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
@@ -31,18 +35,12 @@
           </a>
         {% if user.is_authenticated %}
 
-          {% if not request.user|has_group:"patient_access"  %}
-            <a {% if request.resolver_match.url_name|is_in:"organisation_reports,epilepsy12_user_list,cases,register,first_paediatric_assessment,multiaxial_description,multiaxial_diagnosis,epilepsy_context,assessment,investigations,management,create_comorbidity,update_comorbidity" %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
-            id="link"
-            href="{% url 'organisation_reports' %}">
-            Clinician access
-            </a>
-          {%endif%}
-
           {% if request.user|has_group:"patient_access" %}
             <a {% if request.resolver_match.url_name|is_in:'patient' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
             id="link"
-            href='https://www.rcpch.ac.uk/resources/patient-parent-guide-epilepsy12-audit'>
+            <!-- href='https://www.rcpch.ac.uk/resources/patient-parent-guide-epilepsy12-audit' -->
+            href="{% url 'open_access' %}"
+            >
             Patient access
             </a>
           {% endif %}
@@ -50,7 +48,7 @@
           <a {% if request.resolver_match.url_name|is_in:'docs' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
           id="link"
           href="{% url 'docs' %}">
-          Documentation
+          Guidance
           </a>
           
           {% if user.is_superuser %}

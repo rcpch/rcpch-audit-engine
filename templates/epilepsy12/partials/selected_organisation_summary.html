@@ -3,11 +3,15 @@
 {% csrf_token %} 
 
 <div class="ui grid container selected_organisation_container">
+
+        <div class="right aligned sixteen wide unpadded fluid column">
+            <div class="ui rcpch_light_blue label">Organisation View</div>
+        </div>
     
-        {% if request.user.is_rcpch_audit_team_member %}
+        {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
             <div class='sixteen wide column'>
                 <div class="field" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-                    {% url 'selected_organisation_summary' as hx_post %}
+                    {% url 'selected_organisation_summary' organisation_id=selected_organisation.pk as hx_post %}
                     {% include 'epilepsy12/partials/page_elements/rcpch_organisations_select.html' with organisation_list=organisation_list hx_post=hx_post hx_target="#rcpch_organisation_select" hx_trigger="change" hx_swap="innerHTML" hx_name="selected_organisation_summary" test_positive=selected_organisation.pk label="Select a organisation trust to view" hx_default_text="Search general paediatric organisations..." data_position="top left" %}
                 </div>
             </div>
@@ -128,7 +132,7 @@
                                 <div class="column">
                                     
                                     <div class="four wide stackable column">
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_organisation numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Organisation" pie_size='med' %}
+                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_organisation numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_all_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Organisation" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
                                             <p><small>{{selected_organisation.OrganisationName}}</small></p>
                                         </div>
@@ -137,9 +141,9 @@
                                 </div>
                                 <div class="column">
                                     <div class="four wide stackable column">
-                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Trust" pie_size='med' %}
+                                        {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_trust denominator=count_of_all_current_cohort_registered_cases_in_this_trust title="Completed Patient Records - Trust" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
-                                            <p><small>{{selected_organisation.ParentName}}</small></p>
+                                            <p><small>{{selected_organisation.ParentOrganisation_OrganisationName}}</small></p>
                                         </div>
                                     </div>
                                     
@@ -235,7 +239,48 @@
 
             </div>
     
-        </div>    
+        </div>
+        
+        <div class="sixteen wide right fluid column">
+            <div class="ui three stackable cards">
+                               
+                <div class="ui rcpch_light_blue  card">
+                    <div class="content">
+                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
+                        <h3 >Local Health Board</h3>
+                        {% else %}
+                        <h3 >Integrated Care Board</h3>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% else %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="ui rcpch_light_blue  card">
+                    <div class="content">
+                        <h3 >NHS Region</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                    </div>
+                </div>
+                
+                <div class="ui rcpch_light_blue  card">
+                    <div class="content">
+                        <h3 >Country</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.ons_region.ons_country.Country_ONS_Name %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
         <div class='sixteen wide right fluid column'>
 
