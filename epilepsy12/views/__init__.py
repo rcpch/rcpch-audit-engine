@@ -9,3 +9,7 @@ from .management_views import *
 from .syndrome_views import *
 from .user_management_views import *
 from .organisation_views import *
+from .route_views import *
+from .redirects import *
+from .htmx_globals import *
+from .api_views import *

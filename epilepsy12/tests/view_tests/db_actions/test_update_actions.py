@@ -1217,22 +1217,24 @@ def test_user_updates_select_fail(
 
 
 @pytest.mark.django_db
-def test_user_updates_registation_date_not_over_24_years_PASS(
-    client,
+def test_age_at_registration_cannot_be_gt_24yo(
+    client, GOSH
 ):
     """
     Assert date of first paediatric assessment cannot be after 24th birthday
     """
+    
+    REGISTRATION_DATE = date(2023,1,1)
+    DATE_OF_BIRTH = REGISTRATION_DATE - relativedelta.relativedelta(years=24)
+    
     # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
+    TEST_USER_ORGANISATION = GOSH
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
         organisations__organisation=TEST_USER_ORGANISATION,
-        date_of_birth=date(year=2000, month=3, day=2),
+        date_of_birth=DATE_OF_BIRTH,
+        registration__registration_date = None,
     )
 
     test_user = Epilepsy12User.objects.get(
@@ -1241,65 +1243,23 @@ def test_user_updates_registation_date_not_over_24_years_PASS(
 
     client.force_login(test_user)
 
-    client.post(
-        reverse(
-            "registration_date",
-            kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
-        ),
-        headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
-        data={"registration_date": date(year=2024, month=2, day=2)},
-    )
 
-    assert (
-        relativedelta.relativedelta(
-            CASE_FROM_TEST_USER_ORGANISATION.registration.registration_date,
-            CASE_FROM_TEST_USER_ORGANISATION.date_of_birth,
-        ).years
-        < 24
-    ), f"{CASE_FROM_TEST_USER_ORGANISATION} is not over 24 years. Expected Pass."
+    response = client.post(
+            reverse(
+                "registration_date",
+                kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
+            ),
+            headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
+            data={"registration_date": REGISTRATION_DATE},
+        )
+    
+    err_msg = response.context['error_message']
+    
+    assert isinstance(err_msg,ValueError)
+    assert str(err_msg) == 'To be included in Epilepsy12, child_GREAT ORMOND STREET HOSPITAL CENTRAL LONDON SITE Anderson cannot be over 24y at first paediatric assessment.'
 
-
-@pytest.mark.skip(reason="Unfinished test. Test needs further work.")
-def test_user_updates_registation_date_not_over_24_years_FAIL(
-    client,
-):
-    """
-    Assert date of first paediatric assessment cannot be after 24th birthday
-    """
-    # GOSH
-    TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
-    )
-
-    CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
-        organisations__organisation=TEST_USER_ORGANISATION,
-        date_of_birth=date(year=2000, month=1, day=2),
-    )
-
-    test_user = Epilepsy12User.objects.get(
-        first_name=test_user_rcpch_audit_team_data.role_str
-    )
-
-    client.force_login(test_user)
-
-    client.post(
-        reverse(
-            "registration_date",
-            kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
-        ),
-        headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
-        data={"registration_date": date(year=2024, month=2, day=2)},
-    )
-
-    assert (
-        relativedelta.relativedelta(
-            CASE_FROM_TEST_USER_ORGANISATION.registration.registration_date,
-            CASE_FROM_TEST_USER_ORGANISATION.date_of_birth,
-        ).years
-        >= 24
-    ), f"{CASE_FROM_TEST_USER_ORGANISATION} is over 24 years. Expected Fail."
+    
+    
 
 
 # Test helper methods - there is one for each page_element
