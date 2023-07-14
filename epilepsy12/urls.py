@@ -12,7 +12,7 @@ router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
 router.register(r"registration", viewset=RegistrationViewSet)
 router.register(r"case", viewset=CaseViewSet)
 router.register(
-    r"first_paediatric_assessments", viewset=FirstPaediatricAssessmentViewSet
+    r"first_paediatric_assessment", viewset=FirstPaediatricAssessmentViewSet
 )
 router.register(r"epilepsycontext", viewset=EpilepsyContextViewSet)
 router.register(r"multiaxialdiagnosis", viewset=MultiaxialDiagnosisViewSet)

@@ -1,7 +1,6 @@
 from datetime import datetime
 from django.contrib.auth.models import Group
 from rest_framework import serializers
-from rest_framework.views import APIView
 from .models import *
 
 # AuditProgress model here not included as only relevant to the Epilepsy12 app
@@ -33,7 +32,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["url", "name"]
 
 
-class CaseSerializer(serializers.HyperlinkedModelSerializer):
+class CaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Case
         fields = [
@@ -79,7 +78,6 @@ class RegistrationSerializer(serializers.HyperlinkedModelSerializer):
     eligibility_criteria_met = serializers.BooleanField(
         required=True, validators=[is_true]
     )
-    child_name = serializers.CharField(source="case", required=False)
 
     class Meta:
         model = Registration
@@ -94,8 +92,13 @@ class RegistrationSerializer(serializers.HyperlinkedModelSerializer):
             "registration_close_date",
             "cohort",
             "eligibility_criteria_met",
-            "child_name",
+            "case",
         ]
+
+    def update(self, instance, validated_data):
+        print("I am called")
+        print(validated_data)
+        return super().update(instance, validated_data)
 
 
 class AuditProgressSerializer(serializers.HyperlinkedModelSerializer):
@@ -141,15 +144,15 @@ class CaseSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FirstPaediatricAssessmentSerializer(serializers.ModelSerializer):
-    child_name = serializers.CharField(source="registration.case", required=False)
+    case = serializers.CharField(source="registration.case", required=False)
+    nhs_number = serializers.CharField(
+        source="registration.case.nhs_number", required=True
+    )
 
     class Meta:
         model = FirstPaediatricAssessment
         registration = serializers.PrimaryKeyRelatedField(
             queryset=Registration.objects.all()
-        )
-        audit_progress = serializers.PrimaryKeyRelatedField(
-            queryset=AuditProgress.objects.all()
         )
         fields = [
             "id",
@@ -159,8 +162,40 @@ class FirstPaediatricAssessmentSerializer(serializers.ModelSerializer):
             "neurological_examination_performed",
             "developmental_learning_or_schooling_problems",
             "behavioural_or_emotional_problems",
-            "child_name",
+            "case",
+            "nhs_number",
         ]
+
+    def update(self, instance, validated_data):
+        nhs_number = validated_data["registration"]["case"]["nhs_number"]
+        if Case.objects.filter(nhs_number=nhs_number).exists:
+            case = Case.objects.get(nhs_number=nhs_number)
+            first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
+                registration=case.registration
+            )
+            instance.first_paediatric_assessment_in_acute_or_nonacute_setting = (
+                validated_data[
+                    "first_paediatric_assessment_in_acute_or_nonacute_setting"
+                ]
+            )
+            instance.has_number_of_episodes_since_the_first_been_documented = (
+                validated_data["has_number_of_episodes_since_the_first_been_documented"]
+            )
+            instance.general_examination_performed = validated_data[
+                "general_examination_performed"
+            ]
+            instance.neurological_examination_performed = validated_data[
+                "neurological_examination_performed"
+            ]
+            instance.developmental_learning_or_schooling_problems = validated_data[
+                "developmental_learning_or_schooling_problems"
+            ]
+            instance.behavioural_or_emotional_problems = validated_data[
+                "behavioural_or_emotional_problems"
+            ]
+            return instance
+        else:
+            raise serializers.ValidationError(f"{nhs_number} does not exist.")
 
 
 class MultiaxialDiagnosisSerializer(serializers.HyperlinkedModelSerializer):
@@ -358,32 +393,80 @@ class SiteSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class OrganisationSerializer(serializers.HyperlinkedModelSerializer):
+class OrganisationCaseSerializer(serializers.HyperlinkedModelSerializer):
+    cases = CaseSerializer(many=True, read_only=True)
+
     class Meta:
         model = Organisation
         fields = [
-            "OrganisationID",
-            "OrganisationCode",
-            "OrganisationType",
-            "SubType",
-            "Sector",
-            "OrganisationStatus",
-            "IsPimsManaged",
+            "ODSCode",
             "OrganisationName",
+            "Website",
             "Address1",
             "Address2",
             "Address3",
             "City",
             "County",
-            "Postcode",
             "Latitude",
             "Longitude",
-            "ParentODSCode",
-            "ParentName",
-            "Phone",
-            "Email",
+            "Postcode",
+            "Geocode_Coordinates",
+            "ParentOrganisation_ODSCode",
+            "ParentOrganisation_OrganisationName",
+            "LastUpdatedDate",
+            "cases",
+        ]
+
+
+class OrganisationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Organisation
+        fields = [
+            "ODSCode",
+            "OrganisationName",
             "Website",
-            "Fax",
+            "Address1",
+            "Address2",
+            "Address3",
+            "City",
+            "County",
+            "Latitude",
+            "Longitude",
+            "Postcode",
+            "Geocode_Coordinates",
+            "ParentOrganisation_ODSCode",
+            "ParentOrganisation_OrganisationName",
+            "LastUpdatedDate",
+        ]
+
+
+class KeyPerformanceIndicatorSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = KPI
+        fields = [
+            "paediatrician_with_expertise_in_epilepsies",
+            "epilepsy_specialist_nurse",
+            "tertiary_input",
+            "epilepsy_surgery_referral",
+            "ecg",
+            "mri",
+            "assessment_of_mental_health_issues",
+            "mental_health_support",
+            "sodium_valproate",
+            "comprehensive_care_planning_agreement",
+            "patient_held_individualised_epilepsy_document",
+            "patient_carer_parent_agreement_to_the_care_planning",
+            "care_planning_has_been_updated_when_necessary",
+            "comprehensive_care_planning_content",
+            "parental_prolonged_seizures_care_plan",
+            "water_safety",
+            "first_aid",
+            "general_participation_and_risk",
+            "sudep",
+            "service_contact_details",
+            "school_individual_healthcare_plan",
+            "organisation",
+            "parent_trust",
         ]
 
 
