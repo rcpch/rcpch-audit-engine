@@ -316,7 +316,9 @@ class FirstPaediatricAssessmentViewSet(ModelViewSet):
         case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
         if hasattr(case, "registration"):
             if hasattr(case.registration, "firstpaediatricassessment"):
-                instance = case.registration.firstpaediatricassessment
+                instance = FirstPaediatricAssessment.objects.get(
+                    pk=case.registration.firstpaediatricassessment.pk
+                )
                 serializer = FirstPaediatricAssessmentSerializer(
                     instance=instance, data=request.data
                 )

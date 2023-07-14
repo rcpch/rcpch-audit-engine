@@ -167,35 +167,35 @@ class FirstPaediatricAssessmentSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        nhs_number = validated_data["registration"]["case"]["nhs_number"]
-        if Case.objects.filter(nhs_number=nhs_number).exists:
-            case = Case.objects.get(nhs_number=nhs_number)
-            first_paediatric_assessment = FirstPaediatricAssessment.objects.get(
-                registration=case.registration
+        instance.first_paediatric_assessment_in_acute_or_nonacute_setting = (
+            validated_data.get(
+                "first_paediatric_assessment_in_acute_or_nonacute_setting",
+                instance.first_paediatric_assessment_in_acute_or_nonacute_setting,
             )
-            instance.first_paediatric_assessment_in_acute_or_nonacute_setting = (
-                validated_data[
-                    "first_paediatric_assessment_in_acute_or_nonacute_setting"
-                ]
+        )
+        instance.has_number_of_episodes_since_the_first_been_documented = (
+            validated_data.get(
+                "has_number_of_episodes_since_the_first_been_documented",
+                instance.has_number_of_episodes_since_the_first_been_documented,
             )
-            instance.has_number_of_episodes_since_the_first_been_documented = (
-                validated_data["has_number_of_episodes_since_the_first_been_documented"]
-            )
-            instance.general_examination_performed = validated_data[
-                "general_examination_performed"
-            ]
-            instance.neurological_examination_performed = validated_data[
-                "neurological_examination_performed"
-            ]
-            instance.developmental_learning_or_schooling_problems = validated_data[
-                "developmental_learning_or_schooling_problems"
-            ]
-            instance.behavioural_or_emotional_problems = validated_data[
-                "behavioural_or_emotional_problems"
-            ]
-            return instance
-        else:
-            raise serializers.ValidationError(f"{nhs_number} does not exist.")
+        )
+        instance.general_examination_performed = validated_data.get(
+            "general_examination_performed", instance.general_examination_performed
+        )
+        instance.neurological_examination_performed = validated_data.get(
+            "neurological_examination_performed",
+            instance.neurological_examination_performed,
+        )
+        instance.developmental_learning_or_schooling_problems = validated_data.get(
+            "developmental_learning_or_schooling_problems",
+            instance.developmental_learning_or_schooling_problems,
+        )
+        instance.behavioural_or_emotional_problems = validated_data.get(
+            "behavioural_or_emotional_problems",
+            instance.behavioural_or_emotional_problems,
+        )
+        instance.save()
+        return instance
 
 
 class MultiaxialDiagnosisSerializer(serializers.HyperlinkedModelSerializer):
