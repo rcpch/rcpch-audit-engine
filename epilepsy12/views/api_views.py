@@ -16,7 +16,7 @@ from epilepsy12.serializers import *
 from epilepsy12.permissions import CanAccessOrganisation
 
 
-class Epilepsy12UserViewSet(viewsets.ModelViewSet):
+class Epilepsy12UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows users to be viewed.
     """
@@ -40,7 +40,7 @@ class CaseViewSet(viewsets.ModelViewSet):
         methods=["post"],
         permission_classes=[permissions.IsAuthenticated, CanAccessOrganisation],
     )
-    def add_case_to_organisation(self, request):
+    def create_case_in_organisation(self, request):
         # params
         nhs_number = request.POST.get("nhs_number")
         odsCode = request.POST.get("ODSCode")
@@ -125,7 +125,7 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         methods=["post"],
         permission_classes=[permissions.IsAuthenticated, CanAccessOrganisation],
     )
-    def register_case(self, request):
+    def register_case_in_E12(self, request):
         """
         Create an active registration in the audit.
         Essential parameters:
@@ -288,6 +288,9 @@ class FirstPaediatricAssessmentViewSet(ModelViewSet):
     lookup_field = "nhs_number"
 
     def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve first paediatric assessment fields by NHS number
+        """
         case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
         if hasattr(case, "registration"):
             if hasattr(case.registration, "firstpaediatricassessment"):
@@ -311,6 +314,7 @@ class FirstPaediatricAssessmentViewSet(ModelViewSet):
     )
     def update_by_nhs_number(self, request, nhs_number=None):
         """
+        Updates the first paediatric assessment fields.
         Accepts an NHS number, and first paediatric assessment form fields
         """
         case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
