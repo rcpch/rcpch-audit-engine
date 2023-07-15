@@ -2,18 +2,21 @@
 # Django Rest Framework Viewsets
 # """
 # # python
-
 # # django rest framework
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework import permissions, viewsets
+from rest_framework import mixins
 from django.shortcuts import get_object_or_404
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # # third party
+from django_filters.rest_framework import DjangoFilterBackend
 from epilepsy12.serializers import *
 from epilepsy12.permissions import CanAccessOrganisation
+from epilepsy12.common_view_functions import calculate_kpis
 
 
 class Epilepsy12UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -26,7 +29,7 @@ class Epilepsy12UserViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
 
 
-class CaseViewSet(viewsets.ModelViewSet):
+class CaseViewSet(GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     """
     API endpoint that allows users to be viewed.
     """
@@ -34,6 +37,11 @@ class CaseViewSet(viewsets.ModelViewSet):
     queryset = Case.objects.all().order_by("-surname")
     serializer_class = CaseSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    filterset_fields = ["nhs_number", "surname"]
+    search_fields = ["=nhs_number", "^surname"]
+    ordering = ["surname"]
+    lookup_field = "ods_code"
 
     @action(
         detail=False,
@@ -111,7 +119,9 @@ class CaseViewSet(viewsets.ModelViewSet):
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class RegistrationViewSet(viewsets.ModelViewSet):
+class RegistrationViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows registrations in Epilepsy12 to be viewed.
     """
@@ -273,7 +283,9 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FirstPaediatricAssessmentViewSet(ModelViewSet):
+class FirstPaediatricAssessmentViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows details relating to the first paediatric assessment to be viewed.
     """
@@ -283,7 +295,6 @@ class FirstPaediatricAssessmentViewSet(ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticated,
         CanAccessOrganisation,
-        permissions.AllowAny,
     ]
     lookup_field = "nhs_number"
 
@@ -302,42 +313,30 @@ class FirstPaediatricAssessmentViewSet(ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    def list(self, request):
-        raise serializers.ValidationError(
-            "A List all first paediatric assessments is not permitted."
-        )
-
-    @action(
-        detail=True,
-        methods=["put"],
-        permission_classes=[permissions.IsAuthenticated, CanAccessOrganisation],
-    )
-    def update_by_nhs_number(self, request, nhs_number=None):
+    def update(self, request, nhs_number=None):
         """
-        Updates the first paediatric assessment fields.
-        Accepts an NHS number, and first paediatric assessment form fields
+        Update first paediatric assessment fields by NHS number
         """
         case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
         if hasattr(case, "registration"):
             if hasattr(case.registration, "firstpaediatricassessment"):
-                instance = FirstPaediatricAssessment.objects.get(
-                    pk=case.registration.firstpaediatricassessment.pk
-                )
+                instance = case.registration.firstpaediatricassessment
                 serializer = FirstPaediatricAssessmentSerializer(
                     instance=instance, data=request.data
                 )
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(
             {f"{case} is invalid or not yet registered on Epilepsy12"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
 
-class EpilepsyContextViewSet(viewsets.ReadOnlyModelViewSet):
+class EpilepsyContextViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows children's epilepsy risk factors to be viewed.
     """
@@ -345,9 +344,56 @@ class EpilepsyContextViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = EpilepsyContext.objects.all()
     serializer_class = EpilepsyContextSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve epilepsy context fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "epilepsycontext"):
+                instance = EpilepsyContext.objects.get(
+                    pk=case.registration.epilepsycontext.pk
+                )
+                serializer = EpilepsyContextSerializer(instance=instance)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update epilepsy context fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "epilepsycontext"):
+                instance = EpilepsyContext.objects.get(
+                    pk=case.registration.epilepsycontext.pk
+                )
+                serializer = EpilepsyContextSerializer(
+                    instance=instance, data=request.data
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class MultiaxialDiagnosisViewSet(viewsets.ReadOnlyModelViewSet):
+class MultiaxialDiagnosisViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows a multiaxial diagnosis of the child's epilepsy to be viewed.
     """
@@ -355,9 +401,66 @@ class MultiaxialDiagnosisViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MultiaxialDiagnosis.objects.all()
     serializer_class = MultiaxialDiagnosisSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return context
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "epilepsycontext"):
+                instance = MultiaxialDiagnosis.objects.get(
+                    pk=case.registration.multiaxialdiagnosis.pk
+                )
+                serializer = MultiaxialDiagnosisSerializer(instance=instance)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update multiaxial diagnosis fields by NHS number
+        Epilepy cause is passed in as a SNOMED-CT code (sctid)
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                instance = MultiaxialDiagnosis.objects.get(
+                    pk=case.registration.multiaxialdiagnosis.pk
+                )
+
+                # this is a custom field passed in as a param
+                # it is validated and converted to an EpilepsyCauseEntity object in the serializer
+                data = {"sctid": request.data.get("sctid")}
+
+                serializer = MultiaxialDiagnosisSerializer(
+                    instance=instance, data=request.data, context=data
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
+class EpisodeViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows each seizure episode to be viewed.
     """
@@ -365,9 +468,57 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Episode.objects.all()
     serializer_class = EpisodeSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                if hasattr(case.registration.multiaxialdiagnosis, "episode"):
+                    instance = Episode.objects.filter(
+                        multiaxialdiagnosis=case.registration.multiaxialdiagnosis
+                    )
+                    serializer = EpisodeSerializer(instance=instance)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                instance = MultiaxialDiagnosis.objects.get(
+                    pk=case.registration.multiaxialdiagnosis.pk
+                )
+                serializer = MultiaxialDiagnosisSerializer(
+                    instance=instance, data=request.data
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class SyndromeViewSet(viewsets.ReadOnlyModelViewSet):
+class SyndromeViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows each syndrome to be viewed.
     """
@@ -377,7 +528,9 @@ class SyndromeViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
 
 
-class ComorbidityViewSet(viewsets.ReadOnlyModelViewSet):
+class ComorbidityViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows each comorbidity to be viewed.
     """
@@ -387,7 +540,9 @@ class ComorbidityViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
 
 
-class InvestigationsViewSet(viewsets.ReadOnlyModelViewSet):
+class InvestigationsViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows a panel of investigations for each registration to be viewed.
     """
@@ -395,9 +550,56 @@ class InvestigationsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Investigations.objects.all()
     serializer_class = InvestigationsSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve investigations fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "investigations"):
+                instance = Investigations.objects.filter(
+                    pk=case.registration.investigations.pk
+                ).get()
+                serializer = InvestigationsSerializer(instance=instance)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update investigations fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "investigations"):
+                instance = Investigations.objects.get(
+                    pk=case.registration.investigations.pk
+                )
+                serializer = InvestigationsSerializer(
+                    instance=instance, data=request.data
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class AssessmentViewSet(viewsets.ReadOnlyModelViewSet):
+class AssessmentViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows key Epilepsy12 milestones to be viewed.
     """
@@ -405,9 +607,12 @@ class AssessmentViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Assessment.objects.all()
     serializer_class = AssessmentSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
 
 
-class ManagementViewSet(viewsets.ReadOnlyModelViewSet):
+class ManagementViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows management plans (including medications and individualised care plans) to be viewed.
     """
@@ -415,9 +620,52 @@ class ManagementViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Management.objects.all()
     serializer_class = ManagementSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve management fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "management"):
+                instance = Management.objects.filter(
+                    pk=case.registration.management.pk
+                ).get()
+                serializer = ManagementSerializer(instance=instance)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update management fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "management"):
+                instance = Management.objects.get(pk=case.registration.management.pk)
+                serializer = ManagementSerializer(instance=instance, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
-class AntiEpilepsyMedicineViewSet(viewsets.ReadOnlyModelViewSet):
+class AntiEpilepsyMedicineViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows antiseizure medicines to be viewed.
     """
@@ -427,7 +675,7 @@ class AntiEpilepsyMedicineViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
 
 
-class SiteViewSet(viewsets.ReadOnlyModelViewSet):
+class SiteViewSet(GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     """
     API endpoint that allows allocated sites to be viewed.
     """
@@ -483,11 +731,23 @@ class KeywordViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
 
 
-class AuditProgressViewSet(viewsets.ReadOnlyModelViewSet):
+class AuditProgressViewSet(
+    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+):
     """
     API endpoint that allows a child's progress through audit completion to be viewed.
     """
 
     queryset = AuditProgress.objects.all()
     serializer_class = AuditProgressSerializer
+    permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+
+
+class EpilepsyCauseEntityViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows all selectable epilepsy causes to be viewed.
+    """
+
+    queryset = EpilepsyCauseEntity.objects.all()
+    serializer_class = EpilepsyCauseEntitySerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]

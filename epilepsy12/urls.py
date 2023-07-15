@@ -9,24 +9,41 @@ from django.contrib.auth import urls as auth_urls
 router = routers.DefaultRouter()
 
 router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
+router.register(r"cases", viewset=CaseViewSet)
 router.register(r"registration", viewset=RegistrationViewSet)
-router.register(r"case", viewset=CaseViewSet)
 router.register(
     r"first_paediatric_assessment", viewset=FirstPaediatricAssessmentViewSet
 )
-router.register(r"epilepsycontext", viewset=EpilepsyContextViewSet)
-router.register(r"multiaxialdiagnosis", viewset=MultiaxialDiagnosisViewSet)
+router.register(
+    r"epilepsy_contexts", viewset=EpilepsyContextViewSet, basename="epilepsycontexts"
+)
+router.register(
+    r"multiaxial_diagnosis",
+    viewset=MultiaxialDiagnosisViewSet,
+    basename="multiaxialdiagnosis",
+)
+router.register(
+    r"epilepsy_cause_entity",
+    viewset=EpilepsyCauseEntityViewSet,
+    basename="epilepsycauseentity",
+)
 router.register(r"episode", viewset=EpisodeViewSet)
 router.register(r"syndrome", viewset=SyndromeViewSet)
 router.register(r"comorbidity", viewset=ComorbidityViewSet)
 router.register(r"assessment", viewset=AssessmentViewSet)
 router.register(r"investigations", viewset=InvestigationsViewSet)
 router.register(r"management", viewset=ManagementViewSet)
-router.register(r"antiepilepsymedicine", viewset=AntiEpilepsyMedicineViewSet)
+router.register(
+    r"antiepilepsy_medicine",
+    viewset=AntiEpilepsyMedicineViewSet,
+    basename="antiepilepsymedicine",
+)
 router.register(r"site", viewset=SiteViewSet)
-router.register(r"organisation", viewset=OrganisationViewSet)
+router.register(r"organisations", viewset=OrganisationViewSet)
 router.register(r"keyword", viewset=KeywordViewSet)
-router.register(r"auditprogress", viewset=AuditProgressViewSet)
+router.register(
+    r"audit_progress", viewset=AuditProgressViewSet, basename="auditprogress"
+)
 
 # Auth, login, password reset
 user_patterns = [
