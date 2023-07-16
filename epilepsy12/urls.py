@@ -44,6 +44,14 @@ router.register(r"keyword", viewset=KeywordViewSet)
 router.register(
     r"audit_progress", viewset=AuditProgressViewSet, basename="auditprogress"
 )
+router.register(
+    r"syndrome_entities", viewset=SyndromeEntityViewSet, basename="syndromeentity"
+)
+router.register(
+    r"comorbidity_entities",
+    viewset=ComorbidityEntityViewSet,
+    basename="comorbidityentity",
+)
 
 # Auth, login, password reset
 user_patterns = [

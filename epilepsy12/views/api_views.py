@@ -16,7 +16,6 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from epilepsy12.serializers import *
 from epilepsy12.permissions import CanAccessOrganisation
-from epilepsy12.common_view_functions import calculate_kpis
 
 
 class Epilepsy12UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -413,7 +412,7 @@ class MultiaxialDiagnosisViewSet(
         """
         case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
         if hasattr(case, "registration"):
-            if hasattr(case.registration, "epilepsycontext"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
                 instance = MultiaxialDiagnosis.objects.get(
                     pk=case.registration.multiaxialdiagnosis.pk
                 )
@@ -526,10 +525,80 @@ class SyndromeViewSet(
     queryset = Syndrome.objects.all()
     serializer_class = SyndromeSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    lookup_field = "nhs_number"
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                if hasattr(case.registration.multiaxialdiagnosis, "syndrome"):
+                    instance = Syndrome.objects.filter(
+                        multiaxialdiagnosis=case.registration.multiaxialdiagnosis
+                    )
+                    serializer = SyndromeSerializer(instance=instance)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        {f"{case} has no valid syndromes documented yet."},
+                        status=status.HTTP_200_OK,
+                    )
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                if hasattr(case.registration.multiaxialdiagnosis, "syndrome"):
+                    instance = Syndrome.objects.get(
+                        multiaxial_diagnosis=case.registration.multiaxialdiagnosis.pk
+                    )
+                    serializer = Syndrome(instance=instance, data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return Response(serializer.data, status=status.HTTP_200_OK)
+                    else:
+                        return Response(
+                            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                        )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    def create(self, request, nhs_number=None):
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                serializer = Syndrome(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class ComorbidityViewSet(
-    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
+    GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
 ):
     """
     API endpoint that allows each comorbidity to be viewed.
@@ -537,7 +606,99 @@ class ComorbidityViewSet(
 
     queryset = Comorbidity.objects.all()
     serializer_class = ComorbiditySerializer
-    permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "nhs_number"
+
+    def retrieve(self, request, nhs_number=None):
+        """
+        Retrieve multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                if hasattr(case.registration.multiaxialdiagnosis, "comorbidity"):
+                    instance = Comorbidity.objects.filter(
+                        multiaxialdiagnosis=case.registration.multiaxialdiagnosis
+                    )
+                    serializer = ComorbiditySerializer(instance=instance)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        {f"{case} has no valid comorbidities documented yet."},
+                        status=status.HTTP_200_OK,
+                    )
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, nhs_number=None):
+        """
+        Update multiaxial diagnosis fields by NHS number
+        """
+        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                if hasattr(case.registration.multiaxialdiagnosis, "comorbidity"):
+                    instance = Syndrome.objects.get(
+                        multiaxial_diagnosis=case.registration.multiaxialdiagnosis.pk
+                    )
+                    serializer = Comorbidity(instance=instance, data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return Response(serializer.data, status=status.HTTP_200_OK)
+                    else:
+                        return Response(
+                            serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                        )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    def create(self, request):
+        if "nhs_number" not in request.data:
+            raise serializers.ValidationError(
+                {"create comorbidity": "NHS number not supplied."}
+            )
+        try:
+            case = Case.objects.filter(nhs_number=request.data.get("nhs_number")).get()
+        except Case.DoesNotExist:
+            raise serializers.ValidationError(
+                {
+                    "create comorbidity": "NHS number not associated with a case registered to E12."
+                }
+            )
+        if hasattr(case, "registration"):
+            if hasattr(case.registration, "multiaxialdiagnosis"):
+                serializer = ComorbiditySerializer(
+                    data=request.data,
+                    context={
+                        "nhs_number": request.data["nhs_number"],
+                        "comorbidityentity_sctid": request.data[
+                            "comorbidityentity_sctid"
+                        ],
+                    },
+                )
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
+            return Response(
+                {
+                    f"{case} does not have a valid multiaxial diagnosis record to register a comorbidity against."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {f"{case} is invalid or not yet registered on Epilepsy12"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class InvestigationsViewSet(
@@ -750,4 +911,24 @@ class EpilepsyCauseEntityViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = EpilepsyCauseEntity.objects.all()
     serializer_class = EpilepsyCauseEntitySerializer
+    permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+
+
+class SyndromeEntityViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows all selectable syndromes to be viewed.
+    """
+
+    queryset = SyndromeEntity.objects.all()
+    serializer_class = SyndromeEntitySerializer
+    permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
+
+
+class ComorbidityEntityViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows all selectable syndromes to be viewed.
+    """
+
+    queryset = ComorbidityEntity.objects.all()
+    serializer_class = ComorbidityEntitySerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]

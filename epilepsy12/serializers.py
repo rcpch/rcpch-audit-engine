@@ -132,7 +132,6 @@ class EpilepsyContextSerializer(serializers.ModelSerializer):
             "were_any_of_the_epileptic_seizures_convulsive",
             "experienced_prolonged_generalized_convulsive_seizures",
             "experienced_prolonged_focal_seizures",
-            "registration",
         ]
 
     def update(self, instance, validated_data):
@@ -177,11 +176,6 @@ class EpilepsyContextSerializer(serializers.ModelSerializer):
 
 
 class FirstPaediatricAssessmentSerializer(serializers.ModelSerializer):
-    # case = serializers.CharField(source="registration.case", required=False)
-    # nhs_number = serializers.CharField(
-    #     source="registration.case.nhs_number", required=True
-    # )
-
     class Meta:
         model = FirstPaediatricAssessment
         registration = serializers.PrimaryKeyRelatedField(
@@ -195,8 +189,6 @@ class FirstPaediatricAssessmentSerializer(serializers.ModelSerializer):
             "neurological_examination_performed",
             "developmental_learning_or_schooling_problems",
             "behavioural_or_emotional_problems",
-            "registration",
-            # "nhs_number",
         ]
 
     def update(self, instance, validated_data):
@@ -427,24 +419,40 @@ class EpisodeSerializer(serializers.ModelSerializer):
             return instance
 
 
+class SyndromeEntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SyndromeEntity
+        syndrome = serializers.PrimaryKeyRelatedField(queryset=Syndrome.objects.all())
+        fields = "__all__"
+
+
 class SyndromeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Syndrome
         multiaxial_diagnosis = serializers.PrimaryKeyRelatedField(
             queryset=MultiaxialDiagnosis.objects.all()
         )
+        syndrome = serializers.PrimaryKeyRelatedField(
+            queryset=SyndromeEntity.objects.all()
+        )
         fields = ["syndrome_diagnosis_date", "syndrome"]
 
-        def update(self, instance, validated_data):
-            instance.syndrome_diagnosis_date = validated_data.get(
-                "syndrome_diagnosis_date", instance.syndrome_diagnosis_date
-            )
-            instance.syndrome = validated_data.get("syndrome", instance.syndrome)
+    def update(self, instance, validated_data):
+        instance.syndrome_diagnosis_date = validated_data.get(
+            "syndrome_diagnosis_date", instance.syndrome_diagnosis_date
+        )
+        instance.syndrome = validated_data.get("syndrome", instance.syndrome)
 
-            instance.save()
-            update_audit_progress(instance)
-            calculate_kpis(instance.registration)
-            return instance
+        instance.save()
+        update_audit_progress(instance)
+        calculate_kpis(instance.registration)
+        return instance
+
+    def create(self, validated_data):
+        instance = Comorbidity.objects.create(**validated_data)
+        update_audit_progress(instance)
+        calculate_kpis(instance.registration)
+        return instance
 
 
 class ComorbiditySerializer(serializers.ModelSerializer):
@@ -453,19 +461,101 @@ class ComorbiditySerializer(serializers.ModelSerializer):
         multiaxial_diagnosis = serializers.PrimaryKeyRelatedField(
             queryset=MultiaxialDiagnosis.objects.all()
         )
-        fields = ["comorbidity_diagnosis_date", "comorbidityentity"]
+        comorbidityentity = serializers.PrimaryKeyRelatedField(
+            queryset=ComorbidityEntity.objects.all()
+        )
+        fields = [
+            "comorbidity_diagnosis_date",
+            "comorbidityentity",
+        ]
 
-        def update(self, instance, validated_data):
-            instance.comorbidity_diagnosis_date = validated_data.get(
-                "comorbidity_diagnosis_date", instance.comorbidity_diagnosis_date
+    def validate(self, data):
+        if "nhs_number" not in self.context:
+            raise serializers.ValidationError(
+                {"Comorbidity": "NHS Number not supplied!"}
             )
-            instance.comorbidityentity = validated_data.get(
-                "comorbidityentity", instance.comorbidityentity
+        else:
+            if (
+                Case.objects.filter(nhs_number=self.context.get("nhs_number")).count()
+                < 1
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "Comorbidity": "NHS Number supplied does not exist in the Epilepsy12 database!"
+                    }
+                )
+
+        if "comorbidityentity_sctid" not in self.context:
+            raise serializers.ValidationError(
+                {"comorbidity": "ComorbidityEntity SNOMED code not supplied!"}
+            )
+        else:
+            case = Case.objects.get(nhs_number=self.context.get("nhs_number"))
+            if (
+                Comorbidity.objects.filter(
+                    multiaxial_diagnosis=case.registration.multiaxialdiagnosis
+                ).count()
+                > 0
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "Comorbidity": f"{Comorbidity.objects.filter(multiaxial_diagnosis=case.registration.multiaxialdiagnosis).first()} already exists in {case}'s record as a comorbidity!"
+                    }
+                )
+
+        if "comorbidity_diagnosis_date" not in data:
+            raise serializers.ValidationError(
+                {"comorbidity": "Date of comorbidity diagnosis not supplied!"}
             )
 
-            instance.save()
-            update_audit_progress(instance)
-            calculate_kpis(instance.registration)
+        return data
+
+    def update(self, instance, validated_data):
+        instance.comorbidity_diagnosis_date = validated_data.get(
+            "comorbidity_diagnosis_date", instance.comorbidity_diagnosis_date
+        )
+        instance.comorbidityentity = validated_data.get(
+            "comorbidityentity", instance.comorbidityentity
+        )
+
+        instance.save()
+        update_audit_progress(instance)
+        calculate_kpis(instance.registration)
+        return instance
+
+    def create(self, validated_data):
+        if (
+            ComorbidityEntity.objects.filter(
+                conceptId=self.context.get("comorbidityentity_sctid")
+            ).count()
+            < 1
+        ):
+            raise serializers.ValidationError(
+                {
+                    "create comorbidity": "SNOMED CT id supplied invalid or not in Epilepsy12 refset."
+                }
+            )
+        else:
+            comorbidityentity = ComorbidityEntity.objects.filter(
+                conceptId=self.context.get("comorbidityentity_sctid")
+            ).first()
+            nhs_number = self.context.get("nhs_number")
+            try:
+                case = Case.objects.get(nhs_number=nhs_number)
+            except Exception as error:
+                raise serializers.ValidationError({"create comorbidity": error})
+            instance = Comorbidity.objects.create(
+                multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
+                comorbidityentity=comorbidityentity,
+                comorbidity_diagnosis_date=validated_data["comorbidity_diagnosis_date"],
+            )
+            # set RIBE to true
+            multiaxial_diagnosis = case.registration.multiaxialdiagnosis
+            multiaxial_diagnosis.relevant_impairments_behavioural_educational = True
+            multiaxial_diagnosis.save()
+
+            update_audit_progress(case.registration)
+            calculate_kpis(case.registration)
             return instance
 
 
@@ -632,19 +722,12 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
         """
         Update function called by view on PUT request
         """
-        instance.syndrome_present = validated_data.get(
-            "syndrome_present", instance.syndrome_present
-        )
         instance.epilepsy_cause_known = validated_data.get(
             "epilepsy_cause_known", instance.epilepsy_cause_known
         )
 
         instance.epilepsy_cause_categories = validated_data.get(
             "epilepsy_cause_categories", instance.epilepsy_cause_categories
-        )
-        instance.relevant_impairments_behavioural_educational = validated_data.get(
-            "relevant_impairments_behavioural_educational",
-            instance.relevant_impairments_behavioural_educational,
         )
         instance.mental_health_screen = validated_data.get(
             "mental_health_screen", instance.mental_health_screen
@@ -689,11 +772,13 @@ class InvestigationsSerializer(serializers.ModelSerializer):
             "eeg_indicated",
             "eeg_request_date",
             "eeg_performed_date",
+            "eeg_wait",
             "twelve_lead_ecg_status",
             "ct_head_scan_status",
             "mri_indicated",
             "mri_brain_requested_date",
             "mri_brain_reported_date",
+            "mri_`wait",
         ]
 
         def update(self, instance, validated_data):
@@ -1107,6 +1192,12 @@ class KeywordSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Keyword
         fields = ["keyword", "category"]
+
+
+class ComorbidityEntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComorbidityEntity
+        fields = "__all__"
 
 
 class CaseSerializer(serializers.ModelSerializer):
