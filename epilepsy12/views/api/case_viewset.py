@@ -30,6 +30,7 @@ from epilepsy12.serializers.multiaxial_diagnosis_serializer import (
 )
 from epilepsy12.serializers.comorbidity_serializer import ComorbiditySerializer
 from epilepsy12.serializers.assessment_serializer import AssessmentSerializer
+from epilepsy12.serializers.syndrome_serializer import SyndromeSerializer
 from epilepsy12.models import (
     Case,
     Organisation,
@@ -37,6 +38,7 @@ from epilepsy12.models import (
     Episode,
     MultiaxialDiagnosis,
     Comorbidity,
+    Syndrome,
 )
 from epilepsy12.permissions import CanAccessOrganisation
 
@@ -505,6 +507,58 @@ class CaseViewSet(
             data=request.data,
             context={
                 "nhs_number": nhs_number,
+            },
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[permissions.IsAuthenticated, CanAccessOrganisation],
+    )
+    def syndromes(self, request, nhs_number=None):
+        """
+        Returns a list of syndromes for a given Case
+        """
+        if nhs_number is None:
+            raise serializers.ValidationError({"Syndromes": "No NHS number supplied."})
+        if not Case.objects.filter(nhs_number=nhs_number).exists():
+            raise serializers.ValidationError(
+                {
+                    "Syndromes": "No Case in Epilepsy12 is associated with the NHS number supplied."
+                }
+            )
+
+        case = Case.objects.get(nhs_number=nhs_number)
+
+        return Response(
+            SyndromeSerializer(
+                instance=Syndrome.objects.filter(
+                    multiaxial_diagnosis=case.registration.multiaxialdiagnosis
+                ),
+                many=True,
+            ).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticated, CanAccessOrganisation],
+    )
+    def syndrome(self, request, nhs_number=None):
+        """
+        create Syndrome associated with nhs number
+        """
+        serializer = SyndromeSerializer(
+            data=request.data,
+            context={
+                "nhs_number": nhs_number,
+                "syndrome_name": request.data.get("syndrome_name", None),
             },
         )
         if serializer.is_valid(raise_exception=True):

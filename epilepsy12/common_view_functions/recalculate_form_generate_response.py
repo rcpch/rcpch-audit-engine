@@ -351,7 +351,7 @@ def avoid_fields(model_instance):
             "registration",
             "multiaxial_diagnosis",
             "episodes",
-            "syndrome",
+            "syndromes",
             "comorbidities",
         ]
 

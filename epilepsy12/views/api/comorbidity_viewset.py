@@ -20,14 +20,10 @@ from epilepsy12.models import Comorbidity, ComorbidityEntity
 from epilepsy12.permissions import CanAccessOrganisation
 
 
-class ComorbidityViewSet(
-    GenericViewSet,
-    mixins.UpdateModelMixin,
-    mixins.RetrieveModelMixin,
-):
+class ComorbidityViewSet(GenericViewSet, mixins.UpdateModelMixin):
     """
-    API endpoint that allows each comorbidity to be viewed or updated.
-    Creation of comorbidities occurs through the case viewset.
+    API endpoint that allows each comorbidity to be updated by id.
+    Creation or list of comorbidities occurs through the case viewset.
     """
 
     queryset = Comorbidity.objects.all()

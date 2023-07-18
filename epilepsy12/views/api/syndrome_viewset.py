@@ -19,83 +19,30 @@ from epilepsy12.models import Case, Syndrome, SyndromeEntity
 from epilepsy12.permissions import CanAccessOrganisation
 
 
-class SyndromeViewSet(
-    GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin
-):
+class SyndromeViewSet(GenericViewSet, mixins.UpdateModelMixin):
     """
-    API endpoint that allows each syndrome to be viewed.
+    API endpoint that allows each syndrome to be updated by id.
+    Creation or list of comorbidities occurs through the case viewset.
     """
 
     queryset = Syndrome.objects.all()
     serializer_class = SyndromeSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
-    lookup_field = "nhs_number"
 
-    def retrieve(self, request, nhs_number=None):
-        """
-        Retrieve multiaxial diagnosis fields by NHS number
-        """
-        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
-        if hasattr(case, "registration"):
-            if hasattr(case.registration, "multiaxialdiagnosis"):
-                if hasattr(case.registration.multiaxialdiagnosis, "syndrome"):
-                    instance = Syndrome.objects.filter(
-                        multiaxialdiagnosis=case.registration.multiaxialdiagnosis
-                    )
-                    serializer = SyndromeSerializer(instance=instance)
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(
-                        {f"{case} has no valid syndromes documented yet."},
-                        status=status.HTTP_200_OK,
-                    )
-        return Response(
-            {f"{case} is invalid or not yet registered on Epilepsy12"},
-            status=status.HTTP_200_OK,
-        )
-
-    def update(self, request, nhs_number=None):
+    def update(self, request, pk=None):
         """
         Update multiaxial diagnosis fields by NHS number
         """
-        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
-        if hasattr(case, "registration"):
-            if hasattr(case.registration, "multiaxialdiagnosis"):
-                if hasattr(case.registration.multiaxialdiagnosis, "syndrome"):
-                    instance = Syndrome.objects.get(
-                        multiaxial_diagnosis=case.registration.multiaxialdiagnosis.pk
-                    )
-                    serializer = Syndrome(instance=instance, data=request.data)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_200_OK)
-                    else:
-                        return Response(
-                            serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                        )
-
-        return Response(
-            {f"{case} is invalid or not yet registered on Epilepsy12"},
-            status=status.HTTP_400_BAD_REQUEST,
+        instance = Syndrome.objects.get(pk=pk)
+        context = {"syndrome_name": request.data.get("syndrome_name", None)}
+        serializer = SyndromeSerializer(
+            instance=instance, data=request.data, context=context
         )
-
-    def create(self, request, nhs_number=None):
-        case = get_object_or_404(Case.objects.all(), nhs_number=nhs_number)
-        if hasattr(case, "registration"):
-            if hasattr(case.registration, "multiaxialdiagnosis"):
-                serializer = Syndrome(data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(
-                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                    )
-
-        return Response(
-            {f"{case} is invalid or not yet registered on Epilepsy12"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SyndromeEntityViewSet(viewsets.ReadOnlyModelViewSet):

@@ -8,13 +8,14 @@ from rest_framework import serializers
 # E12 imports
 from epilepsy12.models import MultiaxialDiagnosis, Registration, EpilepsyCauseEntity
 from epilepsy12.serializers.episode_serializer import EpisodeSerializer
+from epilepsy12.serializers.syndrome_serializer import SyndromeSerializer
 from epilepsy12.serializers.comorbidity_serializer import ComorbiditySerializer
 from epilepsy12.common_view_functions import update_audit_progress, calculate_kpis
 
 
 class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
     episodes = EpisodeSerializer(many=True)
-    syndromes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    syndromes = SyndromeSerializer(many=True)
     epilepsy_cause = serializers.SlugRelatedField(
         queryset=EpilepsyCauseEntity.objects.all(), slug_field="preferredTerm"
     )
