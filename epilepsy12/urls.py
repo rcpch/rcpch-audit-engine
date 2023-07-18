@@ -1,5 +1,22 @@
 from django.conf.urls import include
 from .views import *
+from .views.api.epilepsy12user_viewset import Epilepsy12UserViewSet
+from .views.api.case_viewset import CaseViewSet
+from .views.api.registration_viewset import RegistrationViewSet
+from .views.api.entity_viewsets import (
+    EpilepsyCauseEntityViewSet,
+    KeywordViewSet,
+    OrganisationViewSet,
+    AntiEpilepsyMedicineViewSet,
+)
+from .views.api.episode_viewset import EpisodeViewSet
+from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeEntityViewSet
+from .views.api.comorbidity_viewset import ComorbidityViewSet, ComorbidityEntityViewSet
+from .views.api.assessment_viewset import AssessmentViewSet
+from .views.api.management_viewset import ManagementViewSet
+from .views.api.investigations_viewset import InvestigationsViewSet
+from .views.api.site_viewset import SiteViewSet
+from .views.api.audit_progress_viewset import AuditProgressViewSet
 
 from rest_framework import routers, urls
 from rest_framework.authtoken.views import obtain_auth_token
@@ -11,17 +28,7 @@ router = routers.DefaultRouter()
 router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
 router.register(r"cases", viewset=CaseViewSet)
 router.register(r"registration", viewset=RegistrationViewSet)
-router.register(
-    r"first_paediatric_assessment", viewset=FirstPaediatricAssessmentViewSet
-)
-router.register(
-    r"epilepsy_contexts", viewset=EpilepsyContextViewSet, basename="epilepsycontexts"
-)
-router.register(
-    r"multiaxial_diagnosis",
-    viewset=MultiaxialDiagnosisViewSet,
-    basename="multiaxialdiagnosis",
-)
+
 router.register(
     r"epilepsy_cause_entity",
     viewset=EpilepsyCauseEntityViewSet,
@@ -52,6 +59,7 @@ router.register(
     viewset=ComorbidityEntityViewSet,
     basename="comorbidityentity",
 )
+
 
 # Auth, login, password reset
 user_patterns = [
