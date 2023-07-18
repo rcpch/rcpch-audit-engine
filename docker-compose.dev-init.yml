@@ -25,7 +25,7 @@ services:
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
       - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
-      - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
+      - POSTCODES_IO_API_URL=https://api.postcodes.io
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
       - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed 
@@ -43,7 +43,7 @@ services:
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&
-            python manage.py seed --mode=seed_dummy_cases &&
+            python manage.py seed --mode=cases --cases 100 &&
             python manage.py seed --mode=seed_registrations &&
             python manage.py seed --mode=seed_groups_and_permissions &&
             python manage.py createsuperuser --noinput &&
@@ -51,7 +51,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
 
-  # db container - runs postgres
+  # db container - runs postgis
   db:
     image: postgis/postgis:15-3.3
     volumes:

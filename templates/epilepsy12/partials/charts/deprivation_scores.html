@@ -29,7 +29,7 @@
             var myChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: [{% for data in cases_aggregated_by_deprivation %}'{{ data.index_of_multiple_deprivation_quintile_display }}',{% endfor %}], //loop through queryset,
+                    labels: [{% for data in cases_aggregated_by_deprivation %}'{{ data.index_of_multiple_deprivation_quintile_display_str }}',{% endfor %}], //loop through queryset,
                     datasets: [{
                         data: [{% for case in cases_aggregated_by_deprivation %}{{ case.cases_aggregated_by_deprivation }},{% endfor %}],
                         backgroundColor: [

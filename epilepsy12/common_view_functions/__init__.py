@@ -2,7 +2,7 @@ from .calculate_kpis import calculate_kpis, annotate_kpis
 from .recalculate_form_generate_response import (
     recalculate_form_generate_response,
     completed_fields,
-    test_fields_update_audit_progress,
+    update_audit_progress,
     trigger_client_event,
     count_episode_fields,
     expected_score_for_single_episode,
@@ -22,3 +22,4 @@ from .report_queries import (
 )
 from .sanction_user_access import return_selected_organisation, sanction_user
 from .group_for_group import group_for_role
+from .tiles_for_region import return_tile_for_region

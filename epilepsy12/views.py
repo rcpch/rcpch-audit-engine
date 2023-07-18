@@ -49,6 +49,13 @@ def epilepsy12_login(request):
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
+                if user.organisation_employer is not None:
+                    # select the first hospital in the list if no allocated employing hospital
+                    selected_organisation = Organisation.objects.get(
+                        OrganisationName=user.organisation_employer
+                    )
+                else:
+                    selected_organisation = Organisation.objects.first()
                 if user.email_confirmed == False:
                     user.email_confirmed = True
                     user.save()
@@ -78,7 +85,10 @@ def epilepsy12_login(request):
                         selected_organisation = Organisation.objects.order_by(
                             "OrganisationName"
                         ).first()
-                return redirect("organisation_reports")
+                return redirect(
+                    "selected_organisation_summary",
+                    organisation_id=selected_organisation.pk,
+                )
             else:
                 messages.error(request, "Invalid email or password.")
         else:
@@ -95,9 +105,14 @@ def index(request):
     except the children and families page which requires an organisation id to filter against. An organisation is chosen
     here at random, but in future might be chosen based on the location of the visitor's ISP.
     """
-    random_organisation = Organisation.objects.order_by("?").first()
+    if getattr(request.user, "organisation_employer", None) is not None:
+        organisation = Organisation.objects.get(
+            OrganisationName=request.user.organisation_employer
+        )
+    else:
+        organisation = Organisation.objects.order_by("?").first()
     template_name = "epilepsy12/epilepsy12index.html"
-    context = {"organisation": random_organisation}
+    context = {"organisation": organisation}
     return render(request=request, template_name=template_name, context=context)
 
 
@@ -156,6 +171,7 @@ def open_access(request, organisation_id):
     context = {
         "organisation": organisation,
         "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
     return render(request, template_name, context=context)
 
@@ -189,24 +205,29 @@ def signup(request, *args, **kwargs):
             logged_in_user.is_superuser = False
             if logged_in_user.role == AUDIT_CENTRE_LEAD_CLINICIAN:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_FULL_ACCESS)
-                logged_in_user.is_staff = True
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             elif logged_in_user.role == AUDIT_CENTRE_CLINICIAN:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-                logged_in_user.is_staff = True
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             elif logged_in_user.role == AUDIT_CENTRE_ADMINISTRATOR:
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_EDIT_ACCESS)
-                logged_in_user.is_staff = True
-            elif logged_in_user.role == RCPCH_AUDIT_LEAD:
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
+            elif logged_in_user.role == RCPCH_AUDIT_TEAM:
                 group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS)
-            elif logged_in_user.role == RCPCH_AUDIT_ANALYST:
-                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_EDIT_ACCESS)
-            elif logged_in_user.role == RCPCH_AUDIT_ADMINISTRATOR:
-                group = Group.objects.get(name=EPILEPSY12_AUDIT_TEAM_VIEW_ONLY)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = True
             elif logged_in_user.role == RCPCH_AUDIT_PATIENT_FAMILY:
                 group = Group.objects.get(name=PATIENT_ACCESS)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
             else:
                 # no group
                 group = Group.objects.get(name=TRUST_AUDIT_TEAM_VIEW_ONLY)
+                logged_in_user.is_staff = False
+                logged_in_user.is_rcpch_staff = False
 
             logged_in_user.save()
             logged_in_user.groups.add(group)
@@ -521,17 +542,23 @@ def rcpch_403(request, exception):
     # from django-htmx middleware forces a redirect. Neat.
     if request.htmx:
         redirect = reverse_lazy("redirect_403")
-        return HttpResponseClientRedirect(redirect)
+        return HttpResponseClientRedirect(redirect, status=403)
     else:
         return render(
-            request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}
+            request,
+            template_name="epilepsy12/error_pages/rcpch_403.html",
+            context={},
+            status=403,
         )
 
 
 def redirect_403(request):
     # return the custom 403 template. There is no context to add.
     return render(
-        request, template_name="epilepsy12/error_pages/rcpch_403.html", context={}
+        request,
+        template_name="epilepsy12/error_pages/rcpch_403.html",
+        context={},
+        status=403,
     )
 
 

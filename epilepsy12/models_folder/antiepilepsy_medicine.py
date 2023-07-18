@@ -49,7 +49,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     is_a_pregnancy_prevention_programme_needed = models.BooleanField(
         help_text={
             'label': "Is a pregnancy prevention programme indicated?",
-            'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+            'reference': "For girls and young women who are prescribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
         },
         default=None,
         null=True,
@@ -58,7 +58,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     has_a_valproate_annual_risk_acknowledgement_form_been_completed = models.BooleanField(
         help_text={
             'label': "Has a Valproate - Annual Risk Acknowledgment Form been completed?",
-            'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
+            'reference': "For girls and young women who are prescribed sodium valproate, it is recommended that Has an annual Valproate - Annual Risk Acknowledgment Form is completed.",
         },
         default=None,
         null=True,
@@ -68,7 +68,7 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     is_a_pregnancy_prevention_programme_in_place = models.BooleanField(
         help_text={
             'label': "Is the Valproate Pregnancy Prevention Programme in place?",
-            'reference': "For girls and young women who are presecribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
+            'reference': "For girls and young women who are prescribed sodium valproate, it is recommended that pregnancy prevention is actively discussed and documented.",
         },
         default=None,
         null=True,
@@ -118,9 +118,9 @@ class AntiEpilepsyMedicine(TimeStampAbstractBaseClass, UserStampAbstractBaseClas
     def length_of_treatment(self):
         "Returns length of treatment if dates supplied"
         if (self.antiepilepsy_medicine_start_date and self.antiepilepsy_medicine_stop_date):
-            if (self.antiepilepsy_medicine_stop_date > self.antiepilepsy_medicine_start_date):
+            if (self.antiepilepsy_medicine_stop_date <= self.antiepilepsy_medicine_start_date):
                 raise Exception(
-                    "The medication stop date cannot be before the medication start date.")
+                    "The medication stop date cannot be before or the same as the medication start date.")
 
             else:
                 difference = (self.antiepilepsy_medicine_stop_date -

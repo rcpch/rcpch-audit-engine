@@ -21,11 +21,14 @@
             <div 
                 class='ui rcpch_light_blue label'
             >{{keyword}}
-                <i class='icon close' 
-                    hx-post='{{hx_post}}' 
-                    hx-target='#description_results' 
-                    hx-trigger='click' 
-                    hx-swap='innerHTML'></i>
+                {% if perms.epilepsy12.change_episode %}
+                    <i 
+                        class='icon close' 
+                        hx-post='{{hx_post}}' 
+                        hx-target='#description_results' 
+                        hx-trigger='click' 
+                        hx-swap='innerHTML'></i>
+                {% endif %}
             </div>
         {% endfor %}
     </div>

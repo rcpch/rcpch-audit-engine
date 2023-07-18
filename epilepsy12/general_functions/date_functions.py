@@ -1,21 +1,20 @@
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta, TU
 
+def nth_tuesday_of_year(year:int, n:int)->date:
+    """Returns the nth Tuesday for a given year.
 
-def next_weekday(d, weekday):
-    # Thanks to Phihag for this snippet
-    # https://stackoverflow.com/questions/6558535/find-the-date-for-the-first-monday-after-a-given-date
-    # 0=Monday
-    days_ahead = weekday - d.weekday()
-    if days_ahead <= 0:  # Target day already happened this week
-        days_ahead += 7
-    return d + timedelta(days_ahead)
+    Args:
+        year (int): year in which to find nth Tuesday of Jan.
+        n (int): which Tuesday of Jan to return e.g. if year=2022 n=2 returns 2nd Tues of Jan; n=5 returns 1st Tues of Feb.
 
+    Returns:
+        date: nth Tuesday as date.
+    """
+    jan_first = date(year, 1, 1)
+    return jan_first + relativedelta(weekday=TU(n))
 
 def first_tuesday_in_january(year):
-    jan_first = date(year, 1, 1)
-    if jan_first.weekday() == 1:
-        # Jan first of year supplied is a Tuesday
-        first_tuesday = jan_first
-    else:
-        first_tuesday = next_weekday(jan_first, 1)
-    return first_tuesday
+    """Fn which makes it simpler to get first Tues of Jan for a given year, if used already in codebase.
+    """
+    return nth_tuesday_of_year(year, n=1)

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# scripts may need to be made executable on some platforms before they can be run
+# chmod +x <filename> is the command to do this on unixy systems
+
+# runs tests in the context of the django development server
+# by default the --verbose flag is passed to pytest for more detailed output
+# all arguments passed to this script are passed to pytest
+
+docker compose -f docker-compose.dev.yml exec web pytest -v $*

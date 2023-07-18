@@ -1,24 +1,22 @@
 import requests
 from django.conf import settings
-from ..constants import UNKNOWN_POSTCODES
+from ..constants import UNKNOWN_POSTCODES_NO_SPACES
 
 
 def is_valid_postcode(postcode):
     """
-    Test if valid postcode using api.postcodes.io 
+    Test if valid postcode using api.postcodes.io
     Allow any no fixed abode etc standard codes
     """
 
     # convert to upper case and remove spaces
-    formatted = postcode.upper().replace(' ', '')
+    formatted = postcode.upper().replace(" ", "")
     # look for unknown postcodes
-    unknown = [code for code in UNKNOWN_POSTCODES if code.replace(
-        ' ', '') == formatted]
-    if len(unknown) > 0:
+    if formatted in UNKNOWN_POSTCODES_NO_SPACES:
         return True
 
     # check against API
-    url = f"{settings.POSTCODES_IO_API_URL}/{postcode}/validate"
+    url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{postcode}/validate"
     response = requests.get(url=url)
     if response.status_code == 404:
         print("Postcode validation failure. Could not validate postcode.")
@@ -29,12 +27,24 @@ def is_valid_postcode(postcode):
 
 def ons_region_for_postcode(postcode):
     # convert to upper case and remove spaces
-    formatted = postcode.upper().replace(' ', '')
+    formatted = postcode.upper().replace(" ", "")
     # check against API
-    url = f"{settings.POSTCODES_IO_API_URL}/{formatted}"
+    url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{formatted}"
     response = requests.get(url=url)
     if response.status_code == 404:
         print("Postcode failure.")
         return False
     else:
-        return response.json()["result"]['region']
+        return response.json()["result"]["region"]
+
+
+def return_random_postcode():
+    # get random postcode from API
+    url = f"{settings.POSTCODES_IO_API_URL}/random/postcodes"
+
+    response = requests.get(url=url)
+    if response.status_code == 404:
+        print("Postcode generation failure. Could not get random postcode.")
+        return None
+    else:
+        return response.json()["result"]["postcode"]

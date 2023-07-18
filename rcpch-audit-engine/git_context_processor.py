@@ -23,7 +23,7 @@ def get_active_branch_and_commit(request):
         refs_dir = Path(".") / ".git" / "refs" / "heads" / active_git_branch
         with refs_dir.open("r") as f:
             latest_git_commit = f.read().splitlines()[0]
-            print(latest_git_commit)
+            
 
     except FileNotFoundError:
         latest_git_commit = "[latest commit hash not found]"

@@ -39,7 +39,7 @@ from ..general_functions import (
 @user_may_view_this_child()
 def register(request, case_id):
     """
-    Called on registration form page load. If first time, creates new Registration objectm KPI object and
+    Called on registration form page load. If first time, creates new Registration object KPI object and
     AuditProgress object. Creates a new Site with selected organisation and associates with this case.
     Returns register.html template.
     """
@@ -269,7 +269,7 @@ def edit_lead_site(request, registration_id, site_id):
         "transfer": False,
     }
 
-    template_name = "epilepsy12/partials/registration/lead_site.html"
+    template_name = "epilepsy12/partials/registration/edit_or_transfer_lead_site.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,
@@ -289,7 +289,8 @@ def edit_lead_site(request, registration_id, site_id):
 def transfer_lead_site(request, registration_id, site_id):
     """
     POST request from lead_site.html on click of transfer lead centre button
-    Returns a lead_site partial
+    Does not update model
+    Returns a edit_or_transfer_lead_site partial
     """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
@@ -304,9 +305,11 @@ def transfer_lead_site(request, registration_id, site_id):
         "transfer": True,
     }
 
+    template_name = "epilepsy12/partials/registration/edit_or_transfer_lead_site.html"
+
     response = render(
         request=request,
-        template_name="epilepsy12/partials/registration/lead_site.html",
+        template_name=template_name,
         context=context,
     )
 
@@ -360,8 +363,8 @@ def update_lead_site(request, registration_id, site_id, update):
     If the update parameter is 'edit'
     this updates updating the current site to a new centre.
 
-    Transfers trigger an email to the new lead centre lead clinician and the rcpch audit lead
-    Edits can only be performed by superusers or the RCPCH audit lead - no emails are sent with this option
+    Transfers trigger an email to the new lead centre lead clinician and the rcpch audit team
+    Edits can only be performed by superusers or the RCPCH audit team - no emails are sent with this option
     so it is reserved for editing lead centres centrally in rare situations.
 
     Redirects to the cases table
@@ -371,6 +374,7 @@ def update_lead_site(request, registration_id, site_id, update):
     previous_lead_site = Site.objects.get(pk=site_id)
 
     if update == "edit":
+        # no email is sent - this just updates the lead centre
         new_trust_id = request.POST.get("edit_lead_site")
         new_organisation = Organisation.objects.get(pk=new_trust_id)
         Site.objects.filter(pk=site_id).update(
@@ -380,31 +384,67 @@ def update_lead_site(request, registration_id, site_id, update):
             updated_at=timezone.now(),
             updated_by=request.user,
         )
+        messages.success(
+            request,
+            f"{registration.case} has been successfully updated to {new_organisation.ParentOrganisation_OrganisationName}.",
+        )
     elif update == "transfer":
         new_trust_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_trust_id)
+        # update current site record to show nolonger actively involved in care
         Site.objects.filter(pk=site_id).update(
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=False,
             updated_at=timezone.now(),
             updated_by=request.user,
         )
-        Site.objects.create(
+        # create new record in Site table for child against new centre
+        if Site.objects.filter(
             organisation=new_organisation,
-            site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
             case=registration.case,
-        )
+        ).exists:
+            # this new site already cares for this child in some capacity, either past or present
+            Site.objects.filter(
+                organisation=new_organisation,
+                case=registration.case,
+            ).update(
+                site_is_primary_centre_of_epilepsy_care=True,
+                site_is_actively_involved_in_epilepsy_care=True,
+            )
+        else:
+            Site.objects.create(
+                organisation=new_organisation,
+                site_is_primary_centre_of_epilepsy_care=True,
+                site_is_actively_involved_in_epilepsy_care=True,
+                updated_at=timezone.now(),
+                updated_by=request.user,
+                case=registration.case,
+            )
+        # find clinical lead of organisation to which child transfered
+        if Epilepsy12User.objects.filter(
+            organisation_employer=new_organisation
+        ).exists():
+            # send to all RCPCH audit team and clinical lead of new organisation
+            recipients = Epilepsy12User.objects.filter(
+                (
+                    Q(organisation_employer=new_organisation)
+                    & Q(is_active=True)
+                    & Q(role=1)  # Audit Centre Lead Clinician
+                )
+                | (Q(is_active=True) & Q(is_rcpch_audit_team_member=True))
+            ).all()
+        else:
+            # there is no allocated clinical lead. Send to all RCPCH staff
+            recipients = Epilepsy12User.objects.filter(
+                Q(is_active=True) & Q(is_rcpch_audit_team_member=True)
+            ).all()
 
         subject = "Epilepsy12 Lead Site Transfer"
-        recipients = Epilepsy12User.objects.filter(is_active=True, role=4).all()
         for recipient in recipients:
             email = construct_transfer_epilepsy12_site_email(
                 request=request,
                 user=recipient,
-                target_organisation=new_organisation.ParentName,
+                target_organisation=new_organisation.ParentOrganisation_OrganisationName,
                 child=registration.case,
             )
             try:
@@ -421,7 +461,7 @@ def update_lead_site(request, registration_id, site_id, update):
 
         messages.success(
             request,
-            f"{registration.case} has been successfully transferred to {new_organisation.ParentName}.",
+            f"{registration.case} has been successfully transferred to {new_organisation.ParentOrganisation_OrganisationName}. Email notifications have been sent to RCPCH and the lead clinicians.",
         )
 
     return HttpResponseClientRedirect(
@@ -539,13 +579,17 @@ def confirm_eligible(request, registration_id):
     to True and replace the button with the is_eligible partial, a label confirming
     eligibility. The button will not be shown again.
     """
-    context = {"has_error": False, "message": "Eligibility Criteria Confirmed."}
+    context = {
+        "has_error": False,
+        "message": "Eligibility Criteria Confirmed.",
+        "is_positive": True,
+    }
     try:
         Registration.objects.update_or_create(
             pk=registration_id, defaults={"eligibility_criteria_met": True}
         )
     except Exception as error:
-        context = {"has_error": True, "message": error}
+        context = {"has_error": True, "message": error, "is_positive": False}
 
     registration = Registration.objects.filter(pk=registration_id).get()
 
@@ -573,7 +617,7 @@ def confirm_eligible(request, registration_id):
 
 
 @login_required
-# @user_may_view_this_child()
+@user_may_view_this_child()
 @permission_required("epilepsy12.change_registration", raise_exception=True)
 def registration_status(request, registration_id):
     registration = Registration.objects.get(pk=registration_id)

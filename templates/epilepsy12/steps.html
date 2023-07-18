@@ -47,12 +47,22 @@
     {% url 'management' case_id as active_url %}
     {% include 'epilepsy12/step.html' with active_url=active_url title="Treatment and care planning" description="Medication, other treatment,<br>teams and care plans" active_template=active_template template_name='management' complete_instance=audit_progress.management_complete registration_status=audit_progress.registration_complete %}
     
-        <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
-          <div class='content'>
-            <div class="title">Performance summary</div>
-            <div class="description">Key performance indicators</div>
-          </div>
-        </a>
+    {% if perms.epilepsy12.can_consent_to_audit_participation %}
+        {% url 'consent' case_id as active_url %}
+        {% if audit_progress.consent_patient_confirmed is not None %}
+            {% include 'epilepsy12/step.html' with active_url=active_url title="Consent" description="Declaration" active_template=active_template template_name='consent' complete_instance=True registration_status=audit_progress.registration_complete %}
+        {% else %}
+            {% include 'epilepsy12/step.html' with active_url=active_url title="Consent" description="Declaration" active_template=active_template template_name='consent' complete_instance=False registration_status=audit_progress.registration_complete %}
+        {% endif %}
+    {% endif %}
+
+    <a href="{% url 'case_performance_summary' case_id %}" {% if active_template == 'case_performance_summary' %}class='active step'{% else %}class='rcpch_summary step' {% endif %}>
+        <div class='content'>
+        <div class="title">Performance summary</div>
+        <div class="description">Key performance indicators</div>
+        </div>
+    </a>
+        
 
     {% if active_template == "register" %}
         {% include 'epilepsy12/progress_wheel.html' with total_expected_fields=audit_progress.registration_total_expected_fields total_completed_fields=audit_progress.registration_total_completed_fields title="Verification and registration" %}
@@ -83,4 +93,4 @@
     {% endif %}
 
   </div>
-  <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=organisation_id %}">Back to child and young person view</a>
+  <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=organisation_id %}">Back to Cohort View</a>

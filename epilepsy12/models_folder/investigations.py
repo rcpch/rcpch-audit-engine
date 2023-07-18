@@ -1,12 +1,16 @@
-# django
-from django.contrib.gis.db import models
+# TODO: attribute names inconsistent e.g. eeg_indicatED & eeg_performED_date (past tense) but eeg_request_date (present tense); and mri_indicated but mri_BRAIN_requested_date & mri_BRAIN_reported_date; and perhaps eeg_PERFORMED but mri_BRAIN_REPORTED Should refactor
+
+# standard imports
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # 3rd party
+from django.contrib.gis.db import models
 from simple_history.models import HistoricalRecords
 
 # rcpch
 from .help_text_mixin import HelpTextMixin
-from ..general_functions import calculate_time_elapsed
+from ..general_functions import stringify_time_elapsed
 from .time_and_user_abstract_base_classes import *
 
 
@@ -16,7 +20,7 @@ class Investigations(
     eeg_indicated = models.BooleanField(
         help_text={
             "label": "Has a first EEG been requested?",
-            "reference": "All children with Epilepsy should have an EEG",
+            "reference": "If a diagnosis of epilepsy is suspected, a routine EEG should be carried out to support the diagnosis. CYP undergoing initial investigations for epilepsy should have tests within 4 weeks of being requested.",
         },
         default=None,
         null=True,
@@ -107,18 +111,17 @@ class Investigations(
         Calculated field. Returns time elapsed between date EEG requested and performed as a string.
         """
         if self.mri_brain_reported_date and self.mri_brain_requested_date:
-            return calculate_time_elapsed(
-                self.mri_brain_requested_date, self.mri_brain_reported_date
-            )
+            return (self.mri_brain_reported_date - self.mri_brain_requested_date).days
 
     def eeg_wait(self):
         """
         Calculated field. Returns time elapsed between date EEG requested and performed as a string.
         """
         if self.eeg_performed_date and self.eeg_request_date:
-            return calculate_time_elapsed(
-                self.eeg_request_date, self.eeg_performed_date
-            )
+            return (self.eeg_performed_date - self.eeg_request_date).days
+
+    def get_current_date(self):
+        return date.today()
 
     # relationships
     registration = models.OneToOneField(

@@ -8,9 +8,9 @@ class OPENUKNetworkEntity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass
     country = models.CharField()
 
     class Meta:
-        verbose_name = 'OPENUK Network'
-        verbose_name_plural = 'OPENUK Networks'
-        ordering = ('OPEN_UK_Network_Name',)
+        verbose_name = "OPENUK Network"
+        verbose_name_plural = "OPENUK Networks"
+        ordering = ("OPEN_UK_Network_Name",)
 
     def __str__(self) -> str:
         return self.OPEN_UK_Network_Name
