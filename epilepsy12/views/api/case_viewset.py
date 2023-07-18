@@ -451,7 +451,9 @@ class CaseViewSet(
             data=request.data,
             context={
                 "nhs_number": nhs_number,
-                "comorbidityentity_sctid": request.data["comorbidityentity_sctid"],
+                "comorbidityentity_sctid": request.data.get(
+                    "comorbidityentity_sctid", None
+                ),
             },
         )
         if serializer.is_valid(raise_exception=True):

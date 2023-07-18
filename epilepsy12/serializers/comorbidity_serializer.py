@@ -20,10 +20,13 @@ class ComorbiditySerializer(serializers.ModelSerializer):
         multiaxial_diagnosis = serializers.PrimaryKeyRelatedField(
             queryset=MultiaxialDiagnosis.objects.all()
         )
-        fields = "__all__"
+        fields = ("id", "comorbidityentity", "comorbidity_diagnosis_date")
 
     def validate(self, data):
-        if "comorbidityentity_sctid" not in self.context:
+        if (
+            "comorbidityentity_sctid" not in self.context
+            or self.context.get("comorbidityentity_sctid") is None
+        ):
             raise serializers.ValidationError(
                 {"comorbidity": "ComorbidityEntity SNOMED code not supplied!"}
             )
@@ -39,23 +42,23 @@ class ComorbiditySerializer(serializers.ModelSerializer):
         instance.comorbidity_diagnosis_date = validated_data.get(
             "comorbidity_diagnosis_date", instance.comorbidity_diagnosis_date
         )
-        comorbidityentity = ComorbidityEntity.objects.get(
-            pk=self.context.get("comorbidityentity_sctid")
-        )
+        comorbidityentity = ComorbidityEntity.objects.filter(
+            conceptId=self.context.get("comorbidityentity_sctid")
+        ).first()
         instance.comorbidityentity = comorbidityentity
-        instance.multiaxial_diagnosis = validated_data(
-            "multiaxial_diagnosis", instance.multiaxial_diagnosis
-        )
+        # instance.multiaxial_diagnosis = validated_data(
+        #     "multiaxial_diagnosis", instance.multiaxial_diagnosis
+        # )
 
         instance.save()
 
         # set RIBE to true
-        multiaxial_diagnosis = instance.multiaxialdiagnosis
+        multiaxial_diagnosis = instance.multiaxial_diagnosis
         multiaxial_diagnosis.relevant_impairments_behavioural_educational = True
         multiaxial_diagnosis.save()
 
-        update_audit_progress(instance)
-        calculate_kpis(instance.registration)
+        update_audit_progress(multiaxial_diagnosis.registration)
+        calculate_kpis(multiaxial_diagnosis.registration)
         return instance
 
     def create(self, validated_data):

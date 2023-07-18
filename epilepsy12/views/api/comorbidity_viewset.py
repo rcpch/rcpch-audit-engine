@@ -41,7 +41,14 @@ class ComorbidityViewSet(
 
         if Comorbidity.objects.filter(pk=pk).exists():
             instance = Comorbidity.objects.get(pk=pk)
-            serializer = ComorbiditySerializer(instance=instance, data=request.data)
+            context = {
+                "comorbidityentity_sctid": self.request.data.get(
+                    "comorbidityentity_sctid", None
+                )
+            }
+            serializer = ComorbiditySerializer(
+                instance=instance, data=request.data, context=context
+            )
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
