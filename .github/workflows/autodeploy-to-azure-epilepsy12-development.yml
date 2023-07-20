@@ -19,7 +19,7 @@ jobs:
 
     # this 'environment' refers to GitHub Environments, not environment variables
     environment:
-      name: 'development'
+      name: "development"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     # this 'env' refers to environment variables
@@ -54,10 +54,12 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install PostGIS dependencies
-        run: sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal
+        run: |
+          sudo apt-get update 
+          apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal
 
       - name: Create and start virtual environment
         run: |
@@ -81,11 +83,11 @@ jobs:
         run: pytest -rP
 
       # Deploy to Azure
-      - name: 'Deploy to Azure Web App'
+      - name: "Deploy to Azure Web App"
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
-          app-name: 'epilepsy12-development'
-          slot-name: 'Production'
+          app-name: "epilepsy12-development"
+          slot-name: "Production"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
           package: .
