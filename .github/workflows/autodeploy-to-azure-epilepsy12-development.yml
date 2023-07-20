@@ -59,7 +59,7 @@ jobs:
       - name: Install PostGIS dependencies
         run: |
           sudo apt-get update 
-          apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal
+          sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal
 
       - name: Create and start virtual environment
         run: |
