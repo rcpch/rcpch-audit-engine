@@ -1,5 +1,22 @@
 from django.conf.urls import include
 from .views import *
+from .views.api.epilepsy12user_viewset import Epilepsy12UserViewSet
+from .views.api.case_viewset import CaseViewSet
+from .views.api.registration_viewset import RegistrationViewSet
+from .views.api.entity_viewsets import (
+    EpilepsyCauseEntityViewSet,
+    KeywordViewSet,
+    OrganisationViewSet,
+    AntiEpilepsyMedicineViewSet,
+)
+from .views.api.episode_viewset import EpisodeViewSet
+from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeEntityViewSet
+from .views.api.comorbidity_viewset import ComorbidityViewSet, ComorbidityEntityViewSet
+from .views.api.assessment_viewset import AssessmentViewSet
+from .views.api.management_viewset import ManagementViewSet
+from .views.api.investigations_viewset import InvestigationsViewSet
+from .views.api.site_viewset import SiteViewSet
+from .views.api.audit_progress_viewset import AuditProgressViewSet
 
 from rest_framework import routers, urls
 from rest_framework.authtoken.views import obtain_auth_token
@@ -9,24 +26,40 @@ from django.contrib.auth import urls as auth_urls
 router = routers.DefaultRouter()
 
 router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
+router.register(r"cases", viewset=CaseViewSet)
 router.register(r"registration", viewset=RegistrationViewSet)
-router.register(r"case", viewset=CaseViewSet)
+
 router.register(
-    r"first_paediatric_assessments", viewset=FirstPaediatricAssessmentViewSet
+    r"epilepsy_cause_entity",
+    viewset=EpilepsyCauseEntityViewSet,
+    basename="epilepsycauseentity",
 )
-router.register(r"epilepsycontext", viewset=EpilepsyContextViewSet)
-router.register(r"multiaxialdiagnosis", viewset=MultiaxialDiagnosisViewSet)
 router.register(r"episode", viewset=EpisodeViewSet)
 router.register(r"syndrome", viewset=SyndromeViewSet)
 router.register(r"comorbidity", viewset=ComorbidityViewSet)
 router.register(r"assessment", viewset=AssessmentViewSet)
 router.register(r"investigations", viewset=InvestigationsViewSet)
 router.register(r"management", viewset=ManagementViewSet)
-router.register(r"antiepilepsymedicine", viewset=AntiEpilepsyMedicineViewSet)
+router.register(
+    r"antiepilepsy_medicine",
+    viewset=AntiEpilepsyMedicineViewSet,
+    basename="antiepilepsymedicine",
+)
 router.register(r"site", viewset=SiteViewSet)
-router.register(r"organisation", viewset=OrganisationViewSet)
+router.register(r"organisations", viewset=OrganisationViewSet)
 router.register(r"keyword", viewset=KeywordViewSet)
-router.register(r"auditprogress", viewset=AuditProgressViewSet)
+router.register(
+    r"audit_progress", viewset=AuditProgressViewSet, basename="auditprogress"
+)
+router.register(
+    r"syndrome_entities", viewset=SyndromeEntityViewSet, basename="syndromeentity"
+)
+router.register(
+    r"comorbidity_entities",
+    viewset=ComorbidityEntityViewSet,
+    basename="comorbidityentity",
+)
+
 
 # Auth, login, password reset
 user_patterns = [

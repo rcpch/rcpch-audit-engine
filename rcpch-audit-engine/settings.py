@@ -67,12 +67,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    "epilepsy12",
     # third party
     "widget_tweaks",
     "django_htmx",
     "rest_framework.authtoken",
     "simple_history",
+    "django_filters",
+    # application
+    "epilepsy12",
 ]
 
 MIDDLEWARE = [
@@ -224,6 +226,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
 
 # Optional Logging for Debugging Purposes (esp with DEBUG=False)
@@ -287,4 +290,3 @@ LOGGING = {
 #         },
 #     }
 # }
-

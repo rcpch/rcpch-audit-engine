@@ -350,9 +350,9 @@ def avoid_fields(model_instance):
         return META_VARIABLES + [
             "registration",
             "multiaxial_diagnosis",
-            "episode",
-            "syndrome",
-            "comorbidity",
+            "episodes",
+            "syndromes",
+            "comorbidities",
         ]
 
     elif model_class_name == "Management":

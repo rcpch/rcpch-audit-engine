@@ -12,4 +12,4 @@ from .organisation_views import *
 from .route_views import *
 from .redirects import *
 from .htmx_globals import *
-from .api_views import *
+from .api import *

@@ -18,4 +18,4 @@ pytest-django
 pytest-factoryboy
 rapidfuzz
 whitenoise
-nhs-number
+django-filter
