@@ -23,6 +23,7 @@ def score_kpi_9A(registration_instance) -> int:
     fields_not_filled = [
         (management.individualised_care_plan_in_place is None),
         (management.has_individualised_care_plan_been_updated_in_the_last_year is None),
+        (management.individualised_care_plan_has_parent_carer_child_agreement is None),
     ]
 
     # unscored
@@ -33,6 +34,7 @@ def score_kpi_9A(registration_instance) -> int:
     pass_criteria = [
         (management.individualised_care_plan_in_place is True),
         (management.has_individualised_care_plan_been_updated_in_the_last_year is True),
+        (management.individualised_care_plan_has_parent_carer_child_agreement is True),
     ]
 
     if all(pass_criteria):
