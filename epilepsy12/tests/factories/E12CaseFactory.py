@@ -26,6 +26,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Case
+        skip_postgeneration_save=True
 
     class Params:
         # helper eligibility flags to set age

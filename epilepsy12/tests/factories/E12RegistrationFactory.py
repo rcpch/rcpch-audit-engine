@@ -24,6 +24,7 @@ from .E12EpilepsyContextFactory import E12EpilepsyContextFactory
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Registration
+        skip_postgeneration_save=True
 
     # Once Case instance made, it will attach to this instance
     case = None
@@ -93,7 +94,7 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
 
         sodium_valproate = kwargs.pop('sodium_valproate', None)
 
-        E12ManagementFactory(
+        E12ManagementFactory.create(
                 registration=self, 
                 antiepilepsymedicine__sodium_valproate=sodium_valproate if sodium_valproate else None,
                 **kwargs,

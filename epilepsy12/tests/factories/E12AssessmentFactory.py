@@ -29,6 +29,7 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Assessment
+        skip_postgeneration_save=True
 
     # Once Registration instance made, it will attach to this instance
     registration = None

@@ -26,6 +26,7 @@ from epilepsy12.models import (
 class E12UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Epilepsy12User  # returns the Epilepsy12User object
+        skip_postgeneration_save=True
 
     email = factory.Sequence(lambda n: f"e12_test_user_{n}@nhs.net")
     first_name = "Mandel"

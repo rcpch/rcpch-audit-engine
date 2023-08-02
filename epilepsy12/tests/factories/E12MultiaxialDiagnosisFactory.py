@@ -17,6 +17,7 @@ from .E12SyndromeFactory import E12SyndromeFactory
 class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = MultiaxialDiagnosis
+        skip_postgeneration_save=True
 
     # Once Registration instance made, it will attach to this instance
     registration = None
