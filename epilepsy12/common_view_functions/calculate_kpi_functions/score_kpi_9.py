@@ -59,24 +59,12 @@ def score_kpi_9Ai(registration_instance) -> int:
 
     management = registration_instance.management
 
-    fields_not_filled = [
-        (management.individualised_care_plan_in_place is None),
-        (management.individualised_care_plan_has_parent_carer_child_agreement is None),
-        (management.has_individualised_care_plan_been_updated_in_the_last_year is None),
-    ]
-
     # unscored
-    if any(fields_not_filled):
+    if management.individualised_care_plan_in_place is None:
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi
-    pass_criteria = [
-        (management.individualised_care_plan_in_place),
-        (management.individualised_care_plan_has_parent_carer_child_agreement),
-        (management.has_individualised_care_plan_been_updated_in_the_last_year),
-    ]
-
-    if all(pass_criteria):
+    if management.individualised_care_plan_in_place is True:
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]

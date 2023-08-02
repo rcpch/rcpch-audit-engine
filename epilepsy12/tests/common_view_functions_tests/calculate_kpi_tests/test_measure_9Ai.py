@@ -1,15 +1,11 @@
 """
 9i `patient_held_individualised_epilepsy_document` - Percentage of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information.
 
-All must be true to pass:
-    individualised_care_plan_in_place
-    individualised_care_plan_has_parent_carer_child_agreement
-    has_individualised_care_plan_been_updated_in_the_last_year
+PASS IF individualised_care_plan_in_place is True
 
-- [x] Measure 9i passed (registration.kpi.comprehensive_care_planning_agreement == 1) if all true
-- [x] Measure 9i failed (registration.kpi.comprehensive_care_planning_agreement == 1) if individualised_care_plan_in_place == False and others not None
-- [x] Measure 9i failed (registration.kpi.comprehensive_care_planning_agreement == 1) if individualised_care_plan_has_parent_carer_child_agreement == False and others not None
-- [x] Measure 9i failed (registration.kpi.comprehensive_care_planning_agreement == 1) if has_individualised_care_plan_been_updated_in_the_last_year == False and others not None
+- [x] Measure 9i passed (registration.kpi.comprehensive_care_planning_agreement == 1) if individualised_care_plan_in_place is True
+- [x] Measure 9i failed (registration.kpi.comprehensive_care_planning_agreement == 1) if individualised_care_plan_in_place is False
+- [x] Measure 9i not scored (registration.kpi.comprehensive_care_planning_agreement == None) if individualised_care_plan_in_place is None
 """
 # Standard imports
 
@@ -23,39 +19,31 @@ from epilepsy12.models import KPI, Registration
 
 
 @pytest.mark.parametrize(
-    "individualised_care_plan_in_place, individualised_care_plan_has_parent_carer_child_agreement,has_individualised_care_plan_been_updated_in_the_last_year, expected_score",
+    "individualised_care_plan_in_place, expected_score",
     [
-        (True, True, True, KPI_SCORE["PASS"]),
-        (False, True, True, KPI_SCORE["FAIL"]),
-        (True, False, True, KPI_SCORE["FAIL"]),
-        (True, True, False, KPI_SCORE["FAIL"]),
+        (True, KPI_SCORE["PASS"]),
+        (False, KPI_SCORE["FAIL"]),
+        (None, KPI_SCORE["NOT_SCORED"]),
     ],
 )
 @pytest.mark.django_db
 def test_measure_9Ai_epilepsy_document(
     e12_case_factory,
     individualised_care_plan_in_place,
-    individualised_care_plan_has_parent_carer_child_agreement,
-    has_individualised_care_plan_been_updated_in_the_last_year,
     expected_score,
 ):
     """
     *PASS*
-    1) all true:
-        individualised_care_plan_in_place
-        individualised_care_plan_has_parent_carer_child_agreement
-        has_individualised_care_plan_been_updated_in_the_last_year
+    1) individualised_care_plan_in_place is True
     *FAIL*
     1) individualised_care_plan_in_place == False
-    2) individualised_care_plan_has_parent_carer_child_agreement == False
-    3) has_individualised_care_plan_been_updated_in_the_last_year == False
+    *INELIGIBLE*
+    1) individualised_care_plan_in_place is None
     """
 
     # create case
     case = e12_case_factory(
         registration__management__individualised_care_plan_in_place=individualised_care_plan_in_place,
-        registration__management__individualised_care_plan_has_parent_carer_child_agreement=individualised_care_plan_has_parent_carer_child_agreement,
-        registration__management__has_individualised_care_plan_been_updated_in_the_last_year=has_individualised_care_plan_been_updated_in_the_last_year,
     )
 
     # get registration for the saved case model
@@ -69,15 +57,12 @@ def test_measure_9Ai_epilepsy_document(
     ).patient_held_individualised_epilepsy_document
 
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f"Care plan in place, with carer-child-agreement, updated in last year, but not passing"
+        assertion_message = f"Care plan in place but not passing"
     elif expected_score == KPI_SCORE["FAIL"]:
-        if not individualised_care_plan_in_place:
-            assertion_message = (
-                f"No individualised_care_plan_in_place but not failing measure"
-            )
-        elif not has_individualised_care_plan_been_updated_in_the_last_year:
-            assertion_message = f"has_individualised_care_plan_been_updated_in_the_last_year=False but not failing measure"
-        else:
-            assertion_message = f"individualised_care_plan_has_parent_carer_child_agreement=False but not failing measure"
+        assertion_message = (
+            f"{individualised_care_plan_in_place=} but not failing measure"
+        )
+    elif expected_score == KPI_SCORE["NOT_SCORED"]:
+        assertion_message = f"{individualised_care_plan_in_place} but not getting `KPI_SCORE['NOT_SCORED']`"
 
     assert kpi_score == expected_score, assertion_message
