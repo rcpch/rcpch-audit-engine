@@ -1,4 +1,5 @@
 # python imports
+from dateutil.relativedelta import relativedelta
 
 # django imports
 
@@ -33,14 +34,11 @@ def score_kpi_2(registration_instance) -> int:
         return KPI_SCORE["NOT_SCORED"]
 
     # score check
-    has_seen_nurse_before_close_date = (
-        assessment.epilepsy_specialist_nurse_input_date
-        <= registration_instance.registration_close_date
-        or assessment.epilepsy_specialist_nurse_referral_date
-        <= registration_instance.registration_close_date
+    has_seen_nurse_within_1_yr_registration = (
+        assessment.epilepsy_specialist_nurse_input_date <= registration_instance.registration_date + relativedelta(years=1)
     )
 
-    if has_seen_nurse_before_close_date:
+    if has_seen_nurse_within_1_yr_registration:
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]
