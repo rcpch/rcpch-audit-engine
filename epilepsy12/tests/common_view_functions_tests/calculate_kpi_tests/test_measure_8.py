@@ -10,10 +10,10 @@ Number of females >= 12yo diagnosed with epilepsy at first year AND on valproate
 - [x] Measure 8 passed (registration.kpi.sodium_valproate == 1) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and (is_a_pregnancy_prevention_programme_needed==True OR has_a_valproate_annual_risk_acknowledgement_form_been_completed==True)
 - [x] Measure 8 failed (registration.kpi.sodium_valproate == 0) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and is_a_pregnancy_prevention_programme_needed is False AND has_a_valproate_annual_risk_acknowledgement_form_been_completed is False
 
-- [ ] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if age_at_first_paediatric_assessment < 12
-- [ ] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.case.sex == 1
-- [ ] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.management.has_an_aed_been_given == False
-- [ ] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if AEM is not valproate or AEM is None
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if age_at_first_paediatric_assessment < 12
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.case.sex == 1
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.management.has_an_aed_been_given == False
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if AEM is not valproate or AEM is None
 """
 
 # Standard imports
