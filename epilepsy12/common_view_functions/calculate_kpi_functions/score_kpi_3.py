@@ -67,7 +67,6 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
     ]
 
     # if input neurologist or referral CESS, they pass
-    print(pass_criteria)
     if any(pass_criteria):
         return KPI_SCORE["PASS"]
     else:
