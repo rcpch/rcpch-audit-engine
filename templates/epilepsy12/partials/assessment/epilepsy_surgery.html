@@ -31,15 +31,39 @@
                 
                 {% url 'childrens_epilepsy_surgical_service_referral_date' assessment_id=assessment.pk as hx_post %}
                 {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_referral_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_referral_date input_date_field_name="childrens_epilepsy_surgical_service_referral_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
-            
-                {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
-                {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
-
                 
-                <div class="inline field">
-                    <label class='toggle_button_label'>Time to Review</label>
-                    <input class="ui input" type="text" value="{% wait_days_and_weeks assessment.childrens_epilepsy_surgery_wait %}" disabled/>
-                </div>
+                {% if show_input_date %}
+                    <div class="two fields">
+                        <div class="ten wide field">
+                            {% url 'childrens_epilepsy_surgical_service_input_date' assessment_id=assessment.pk as hx_post %}
+                            {% include 'epilepsy12/partials/page_elements/date_field.html' with hx_post=hx_post hx_swap="innerHTML" hx_target="#childrens_epilepsy_surgical_service" hx_trigger="change delay:1s" label=assessment.get_childrens_epilepsy_surgical_service_input_date_help_label_text reference=assessment.get_childrens_epilepsy_surgical_service_input_date_help_reference_text date_value=assessment.childrens_epilepsy_surgical_service_input_date input_date_field_name="childrens_epilepsy_surgical_service_input_date" error_message=error_message enabled=perms.epilepsy12.change_assessment has_permission=perms.epilepsy12.change_assessment %}
+                        </div>
+                        <div class="six wide field">
+                            <label class='toggle_button_label'>Time to Review</label>
+                            <input class="ui input" type="text" value="{% wait_days_and_weeks assessment.childrens_epilepsy_surgery_wait %}" disabled/>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div 
+                            class="ui rcpch_primary button"
+                            hx-post={% url 'childrens_epilepsy_surgical_service_review_date_status' assessment_id=assessment.pk status="unknown" %}
+                            hx-trigger="click"
+                            hx-swap="innerHTML"
+                            hx-target="#childrens_epilepsy_surgical_service"
+                            >Date of epilepsy surgery centre review is not known
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="inline field">
+                        <div 
+                            class="ui rcpch_primary button"
+                            hx-post={% url 'childrens_epilepsy_surgical_service_review_date_status' assessment_id=assessment.pk status="known" %}
+                            hx-trigger="click"
+                            hx-swap="innerHTML"
+                            hx-target="#childrens_epilepsy_surgical_service"
+                        >Date of epilepsy surgery centre review is known</div>
+                    </div>
+                {% endif %}
 
                 {% if error_message %}
                     <div class='ui rcpch_warning message'>

@@ -478,6 +478,11 @@ assessment_patterns = [
         name="childrens_epilepsy_surgical_service_referral_date",
     ),
     path(
+        "assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_review_date_status/<str:status>",
+        childrens_epilepsy_surgical_service_review_date_status,
+        name="childrens_epilepsy_surgical_service_review_date_status",
+    ),
+    path(
         "assessment/<int:assessment_id>/childrens_epilepsy_surgical_service_input_date",
         childrens_epilepsy_surgical_service_input_date,
         name="childrens_epilepsy_surgical_service_input_date",
