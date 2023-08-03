@@ -145,10 +145,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     7. Percentage of children and young people with epilepsy and a mental health problem who have evidence of mental health support
-    
-    Calculation Method
-    Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue identified AND had evidence of mental health support received
-    Denominator= Number of children and young people diagnosed with epilepsy AND had a mental health issue identified
     """
     mental_health_support = models.IntegerField(
         help_text={
