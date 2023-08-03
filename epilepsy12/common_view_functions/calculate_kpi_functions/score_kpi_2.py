@@ -13,9 +13,9 @@ def score_kpi_2(registration_instance) -> int:
     % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
 
     Calculation Method
-
+    
     Numerator= Number of children and young people [diagnosed with epilepsy] AND who had [input from or referral to an Epilepsy Specialist Nurse] by first year
-
+    
     Denominator = Number of children and young people [diagnosed with epilepsy] at first year
     """
 
