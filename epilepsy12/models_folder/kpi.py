@@ -193,10 +193,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     9ii. Percentage of children and young people with epilepsy after 12 months where there was evidence of agreement between the person, their family and/or carers as appropriate.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of agreement
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     patient_carer_parent_agreement_to_the_care_planning = models.IntegerField(
         help_text={
@@ -209,10 +205,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     9iii. Percentage of children and young people with epilepsy after 12 months where there is evidence that the care plan has been updated where necessary.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with care plan which is updated where necessary
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     care_planning_has_been_updated_when_necessary = models.IntegerField(
         help_text={
@@ -225,10 +217,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     9B. Percentage of children diagnosed with epilepsy with documented evidence of communication regarding core elements of care planning.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND evidence of written prolonged seizures plan if prescribed rescue medication AND evidence of discussion regarding water safety AND first aid AND participation and risk AND service contact details AND SUDEP
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     comprehensive_care_planning_content = models.IntegerField(
         help_text={
@@ -240,11 +228,7 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """
-    9i. Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication AND evidence of a written prolonged seizures plan 
-    Denominator = Number of children and young people diagnosed with epilepsy at first year AND prescribed rescue medication
+    9Bi. Percentage of children and young people with epilepsy who have been prescribed rescue medication and have evidence of a written prolonged seizures plan.
     """
     parental_prolonged_seizures_care_plan = models.IntegerField(
         help_text={
@@ -256,13 +240,9 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """
-    9ii. Water Safety
+    9Bii. Water Safety
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding water safety.
-
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding water safety
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     water_safety = models.IntegerField(
         help_text={
@@ -274,13 +254,9 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """    
-    9iii. First Aid
+    9Biii. First Aid
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding first aid.
-
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding first aid
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     first_aid = models.IntegerField(
         help_text={
@@ -292,13 +268,9 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """
-    9iv. General participation and risk
+    9Biv. General participation and risk
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding general participation and risk.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion regarding general participation and risk
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     general_participation_and_risk = models.IntegerField(
         help_text={
@@ -310,13 +282,9 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """
-    9v. SUDEP
+    9Bv. SUDEP
 
     Percentage of children and young people with epilepsy with evidence of discussion regarding SUDEP and evidence of a prolonged seizures care plan.
-
-    Calculation Method
-    Numerator = Number of children diagnosed with epilepsy AND had evidence of discussions regarding SUDEP AND evidence of a written prolonged seizures plan at first year
-    Denominator = Number of children diagnosed with epilepsy at first year
     """
     sudep = models.IntegerField(
         help_text={
@@ -328,13 +296,9 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     """    
-    9vi. Service contact details
+    9Bvi. Service contact details
 
     Percentage of children and young people with epilepsy with evidence of being given service contact details.
-
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND with evidence of discussion of been given service contact details
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
     service_contact_details = models.IntegerField(
