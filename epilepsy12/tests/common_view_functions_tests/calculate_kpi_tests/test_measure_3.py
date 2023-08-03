@@ -1,7 +1,9 @@
 """
 Tests for Measure 3 `tertiary_input.
 
-Each test depends on whether child has been referred / seen by a neurologist OR epilepsy surgery OR both, so first each test parametrizes each of these cases.
+Each test depends on whether child has been AT LEAST ONE OF:
+    - received input by neurologist 
+    - referred to epilepsy surgery
 
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if age at first paediatric assessment is < 3 and seen by neurologist / epilepsy surgery/both ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
 - [x] Measure 3 passed (registration.kpi.tertiary_input == 1) if child is on 3 or more AEMS (see lines 115-120 for query) and seen by neurologist / epilepsy surgery/both

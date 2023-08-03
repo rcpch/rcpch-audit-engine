@@ -61,10 +61,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     1. Percentage of children and young people with epilepsy, with input by a 'consultant paediatrician with expertise in epilepsies' within 2 weeks of initial referral
-    
-    Calculation Method
-    Numerator = Number of children and young people  [diagnosed with epilepsy] at first year AND (who had [input from a paediatrician with expertise in epilepsy] OR a [input from a paediatric neurologist] within 2 weeks of initial referral. (initial referral to mean first paediatric assessment)
-    Denominator = Number of and young people [diagnosed with epilepsy] at first year
     """
     paediatrician_with_expertise_in_epilepsies = models.IntegerField(
         help_text={
@@ -405,35 +401,35 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     parent_trust = models.CharField(max_length=250)
-    
+
     def get_kpis(self):
         """
         Returns dictionary of KPI attributes with related scores.
         """
         kpis = {
-            "paediatrician_with_expertise_in_epilepsies" : self.paediatrician_with_expertise_in_epilepsies,
-            "epilepsy_specialist_nurse" : self.epilepsy_specialist_nurse,
-            "tertiary_input" : self.tertiary_input,
-            "epilepsy_surgery_referral" : self.epilepsy_surgery_referral,
-            "ecg" : self.ecg,
-            "mri" : self.mri,
-            "assessment_of_mental_health_issues" : self.assessment_of_mental_health_issues,
-            "mental_health_support" : self.mental_health_support,
-            "sodium_valproate" : self.sodium_valproate,
-            "comprehensive_care_planning_agreement" : self.comprehensive_care_planning_agreement,
-            "patient_held_individualised_epilepsy_document" : self.patient_held_individualised_epilepsy_document,
-            "patient_carer_parent_agreement_to_the_care_planning" : self.patient_carer_parent_agreement_to_the_care_planning,
-            "care_planning_has_been_updated_when_necessary" : self.care_planning_has_been_updated_when_necessary,
-            "comprehensive_care_planning_content" : self.comprehensive_care_planning_content,
-            "parental_prolonged_seizures_care_plan" : self.parental_prolonged_seizures_care_plan,
-            "water_safety" : self.water_safety,
-            "first_aid" : self.first_aid,
-            "general_participation_and_risk" : self.general_participation_and_risk,
-            "sudep" : self.sudep,
-            "service_contact_details" : self.service_contact_details,
-            "school_individual_healthcare_plan" : self.school_individual_healthcare_plan,
+            "paediatrician_with_expertise_in_epilepsies": self.paediatrician_with_expertise_in_epilepsies,
+            "epilepsy_specialist_nurse": self.epilepsy_specialist_nurse,
+            "tertiary_input": self.tertiary_input,
+            "epilepsy_surgery_referral": self.epilepsy_surgery_referral,
+            "ecg": self.ecg,
+            "mri": self.mri,
+            "assessment_of_mental_health_issues": self.assessment_of_mental_health_issues,
+            "mental_health_support": self.mental_health_support,
+            "sodium_valproate": self.sodium_valproate,
+            "comprehensive_care_planning_agreement": self.comprehensive_care_planning_agreement,
+            "patient_held_individualised_epilepsy_document": self.patient_held_individualised_epilepsy_document,
+            "patient_carer_parent_agreement_to_the_care_planning": self.patient_carer_parent_agreement_to_the_care_planning,
+            "care_planning_has_been_updated_when_necessary": self.care_planning_has_been_updated_when_necessary,
+            "comprehensive_care_planning_content": self.comprehensive_care_planning_content,
+            "parental_prolonged_seizures_care_plan": self.parental_prolonged_seizures_care_plan,
+            "water_safety": self.water_safety,
+            "first_aid": self.first_aid,
+            "general_participation_and_risk": self.general_participation_and_risk,
+            "sudep": self.sudep,
+            "service_contact_details": self.service_contact_details,
+            "school_individual_healthcare_plan": self.school_individual_healthcare_plan,
         }
-        
+
         return kpis
 
     class Meta:
