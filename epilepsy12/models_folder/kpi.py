@@ -133,10 +133,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     6. Percentage of children and young people with epilepsy where there is documented evidence that they have been asked about mental health either through clinical screening, or a questionnaire/measure.
-
-    Calculation Method
-    Numerator = Number of children and young people over 5 years diagnosed with epilepsy AND who had documented evidence of enquiry or screening for their mental health
-    Denominator = = Number of children and young people over 5 years diagnosed with epilepsy
     """
     assessment_of_mental_health_issues = models.IntegerField(
         help_text={
