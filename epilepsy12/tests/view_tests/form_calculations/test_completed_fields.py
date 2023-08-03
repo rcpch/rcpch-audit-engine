@@ -473,7 +473,9 @@ def test_completed_fields_assessment_all_fields(e12_case_factory, GOSH):
         "paediatric_neurologist_input_date": date(2023, 1, 2),
         "childrens_epilepsy_surgical_service_referral_made": True,
         "childrens_epilepsy_surgical_service_referral_date": date(2023, 1, 1),
-        "childrens_epilepsy_surgical_service_input_date": date(2023, 1, 2),
+        "childrens_epilepsy_surgical_service_input_date": date(
+            2023, 1, 2
+        ),  # not a mandatory field
         "epilepsy_specialist_nurse_referral_made": True,
         "epilepsy_specialist_nurse_referral_date": date(2023, 1, 1),
         "epilepsy_specialist_nurse_input_date": date(2023, 1, 2),
@@ -492,9 +494,11 @@ def test_completed_fields_assessment_all_fields(e12_case_factory, GOSH):
 
     assessment = Assessment.objects.get(registration=CASE.registration)
 
-    assert completed_fields(assessment) == len(
-        fields_and_answers
-    ), f"Completed assessment, `completed_fields(assessment)` should return {len(fields_and_answers)}. Instead returned {completed_fields(assessment)}"
+    assert (
+        completed_fields(assessment)
+        == len(fields_and_answers)
+        - 1  # childrens_epilepsy_surgical_service_input_date is not scored
+    ), f"Completed assessment, `completed_fields(assessment)` should return {len(fields_and_answers)-1}. Instead returned {completed_fields(assessment)}"
 
 
 @pytest.mark.django_db
@@ -550,7 +554,10 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
 
         INPUT_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_input_date"
         INPUT_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
-        if INPUT_ANSWER is not None:
+        if (
+            INPUT_ANSWER is not None
+            and INPUT_KEY_NAME != "childrens_epilepsy_surgical_service_input_date"
+        ):
             EXPECTED_SCORE += 1
 
         date_answers = {

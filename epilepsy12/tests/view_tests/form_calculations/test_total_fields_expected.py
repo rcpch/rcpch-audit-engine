@@ -374,7 +374,10 @@ def test_total_fields_expected_assessment(e12_case_factory, GOSH):
         answer_set.update({f"{BASE_KEY_NAME}{field}": answer})
 
         if answer is not None:
-            if field == "epilepsy_specialist_nurse_referral_made":
+            if field in [
+                "epilepsy_specialist_nurse_referral_made",
+                "childrens_epilepsy_surgical_service_referral_made",
+            ]:
                 expected_value += 2
             else:
                 expected_value += 3
