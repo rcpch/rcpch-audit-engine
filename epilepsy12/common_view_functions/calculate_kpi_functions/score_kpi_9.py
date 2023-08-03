@@ -12,9 +12,12 @@ def score_kpi_9A(registration_instance) -> int:
     % of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary
 
     Calculation Method
-
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below
-
+    
+    Numerator = Number of children and young people diagnosed with epilepsy at first year AND ALL OF:
+    1) an individualised epilepsy document or copy clinic letter that includes care planning information 
+    2) evidence of agreement 
+    3) care plan is up to date including elements where necessary
+    
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 
@@ -49,9 +52,9 @@ def score_kpi_9Ai(registration_instance) -> int:
     % of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information
 
     Calculation Method
-
+    
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
-
+    
     Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
 

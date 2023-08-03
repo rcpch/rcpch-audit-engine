@@ -169,10 +169,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     9A. Percentage of children and young people with epilepsy after 12 months where there is evidence of a comprehensive care plan that is agreed between the person, their family and/or carers and primary and secondary care providers, and the care plan has been updated where necessary.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with an individualised epilepsy document or copy clinic letter that includes care planning information )AND evidence of agreement AND care plan is up to date including elements where appropriate as below 
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     comprehensive_care_planning_agreement = models.IntegerField(
         help_text={
@@ -185,10 +181,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     9i. Percentage of children and young people with epilepsy after 12 months that had an individualised epilepsy document with individualised epilepsy document or a copy clinic letter that includes care planning information.
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND( with individualised epilepsy document or copy clinic letter that includes care planning information )
-    Denominator = Number of children and young people diagnosed with epilepsy at first year
     """
     patient_held_individualised_epilepsy_document = models.IntegerField(
         help_text={
