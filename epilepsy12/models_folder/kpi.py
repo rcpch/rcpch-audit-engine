@@ -157,10 +157,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     8. Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
-
-    Calculation Method
-    Numerator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate AND annual risk acknowledgement forms completed AND pregnancy prevention programme in place
-    Denominator = Number of females aged 12 and above diagnosed with epilepsy at first year AND on valproate
     """
     sodium_valproate = models.IntegerField(
         help_text={
