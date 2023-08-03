@@ -15,8 +15,8 @@ def score_kpi_5(registration_instance, age_at_first_paediatric_assessment) -> in
     Calculation Method
 
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
-
-    Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under 2 years  at first assessment with a diagnosis of epilepsy at first year))
+    
+    Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
     """
     multiaxial_diagnosis = registration_instance.multiaxialdiagnosis
     investigations = registration_instance.investigations

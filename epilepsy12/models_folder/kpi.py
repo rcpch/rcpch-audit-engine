@@ -121,10 +121,6 @@ class KPI(models.Model, HelpTextMixin):
 
     """
     5. Percentage of children and young people with defined indications for an MRI, who had timely MRI within 6 weeks of request
-    
-    Calculation Method
-    Numerator = Number of children and young people diagnosed with epilepsy at first year AND who are NOT JME or JAE or CAE or CECTS/Rolandic OR number of children aged under 2 years at first assessment with a diagnosis of epilepsy at first year AND who had an MRI within 6 weeks of request
-    Denominator = Number of children and young people diagnosed with epilepsy at first year AND ((who are NOT JME or JAE or CAE or BECTS) OR (number of children aged under  2 years  at first assessment with a diagnosis of epilepsy at first year))
     """
     mri = models.IntegerField(
         help_text={
