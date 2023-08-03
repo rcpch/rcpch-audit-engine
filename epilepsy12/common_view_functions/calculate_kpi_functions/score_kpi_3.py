@@ -1,4 +1,5 @@
 # python imports
+from datetime import date
 
 # django imports
 from django.contrib.gis.db.models import Q
@@ -52,22 +53,21 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
     if not any(eligibility_criteria):
         return KPI_SCORE["INELIGIBLE"]
 
-    # Eligible for measure - EVALUATE IF AT LEAST REFERRED FROM NEUROLOGIST OR CESS. NOTE: technically the Assessment model allows a referral_date & input_date filled WITHOUT referral_made, but this is a rare edge case just for API-use. The UI does not allow you to enter either date, if referral_made is False. If the API has an endpoint for this measure, need to ensure referral_made==True, if dates are both valid.
-
     # first evaluate relevant fields complete
-    tertiary_input_complete = (
-        assessment.paediatric_neurologist_referral_made is not None
+    tertiary_input_answered = (
+        assessment.paediatric_neurologist_input_date is not None
     ) or (assessment.childrens_epilepsy_surgical_service_referral_made is not None)
 
-    if not tertiary_input_complete:
+    if not tertiary_input_answered:
         return KPI_SCORE["NOT_SCORED"]
 
     pass_criteria = [
-        (assessment.paediatric_neurologist_referral_made is True),
+        (isinstance(assessment.paediatric_neurologist_input_date, date)),
         (assessment.childrens_epilepsy_surgical_service_referral_made is True),
     ]
 
-    # if referral made to either neurologist or CESS, they pass
+    # if input neurologist or referral CESS, they pass
+    print(pass_criteria)
     if any(pass_criteria):
         return KPI_SCORE["PASS"]
     else:
@@ -82,7 +82,7 @@ def score_kpi_3b(registration_instance) -> int:
 
     Calculation Method
     Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral of CESS]
-    
+
     Denominator =Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
     """
 
@@ -106,7 +106,7 @@ def score_kpi_3b(registration_instance) -> int:
     # score KPI
     if (
         assessment.childrens_epilepsy_surgical_service_referral_made
-        or assessment.paediatric_neurologist_referral_made
+        or assessment.paediatric_neurologist_input_date
     ):
         return KPI_SCORE["PASS"]
     else:
