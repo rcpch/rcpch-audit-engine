@@ -314,10 +314,6 @@ class KPI(models.Model, HelpTextMixin):
     10. School Individual Healthcare Plan
 
     Percentage of children and young people with epilepsy aged 4 years and above with evidence of a school individual healthcare plan by 1 year after first paediatric assessment.	
-    
-    Calculation Method
-    Numerator = Number of children and young people aged 4 years and above diagnosed with epilepsy at first year AND with evidence of EHCP
-    Denominator =Number of children and young people aged 4 years and above diagnosed with epilepsy at first year
     """
     school_individual_healthcare_plan = models.IntegerField(
         help_text={
