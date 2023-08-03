@@ -14,7 +14,7 @@ def score_kpi_3(registration_instance, age_at_first_paediatric_assessment) -> in
 
     Calculation Method
 
-    Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of referral or involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
+    Numerator = Number of children ([less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year) OR (Number of children less than 4 years old at first assessment with epilepsy AND myoclonic seizures)  OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] ) AND had [evidence of involvement of a paediatric neurologist] OR [evidence of referral or involvement of CESS]
 
     Denominator = Number of children [less than 3 years old at first assessment] AND [diagnosed with epilepsy] OR (number of children and young people diagnosed with epilepsy who had [3 or more maintenance AEDS] at first year )OR (number of children and young people diagnosed with epilepsy  who met [CESS criteria] OR (Number of children less than 4 years old at first assessment with epilepsy AND  [myoclonic seizures])
     """
@@ -80,9 +80,10 @@ def score_kpi_3b(registration_instance) -> int:
     % of ongoing children and young people meeting defined epilepsy surgery referral criteria with evidence of epilepsy surgery referral
     Calculation Method
 
-    Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral or involvement of CESS]
-
-    Denominator = Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
+    Calculation Method
+    Numerator = Number of children and young people diagnosed with epilepsy AND met [CESS criteria] at first year AND had [evidence of referral of CESS]
+    
+    Denominator =Number of children and young people diagnosed with epilepsy AND met CESS criteria at first year
     """
 
     assessment = registration_instance.assessment
