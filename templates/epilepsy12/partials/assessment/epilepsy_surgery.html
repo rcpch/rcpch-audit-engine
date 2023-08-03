@@ -45,7 +45,11 @@
                     </div>
                     <div class="field">
                         <div 
-                            class="ui rcpch_primary button"
+                            {% if perms.epilepsy12.change_assessment %}
+                                class="ui rcpch_primary button"
+                            {% else %}
+                                class="ui disabled rcpch_primary button"
+                            {% endif %}
                             hx-post={% url 'childrens_epilepsy_surgical_service_review_date_status' assessment_id=assessment.pk status="unknown" %}
                             hx-trigger="click"
                             hx-swap="innerHTML"
