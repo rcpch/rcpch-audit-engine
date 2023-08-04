@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="two fields">
-    {% if request.user|has_group:"trust_audit_team_full_access, trust_audit_team_edit_access, epilepsy12_audit_team_edit_access, epilepsy12_audit_team_full_access" %}
+    
     <div class="field">
       <label>Date of Birth</label>
       {{form.date_of_birth}} {% if form.date_of_birth.errors %}
@@ -29,7 +29,6 @@
       </div>
       {% endif %}
     </div>
-    {% endif %}
 
     <div class="field">
       <label>Sex</label>
