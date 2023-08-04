@@ -26,6 +26,7 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Management
+        skip_postgeneration_save=True
 
     class Params:
         pass_mental_health_support = factory.Trait(
@@ -83,7 +84,7 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
                 self.has_an_aed_been_given = True
 
                 if kwargs["sodium_valproate"] == "pass":
-                    E12AntiEpilepsyMedicineFactory(
+                    E12AntiEpilepsyMedicineFactory.create(
                         management=self,
                         is_rescue_medicine=False,
                         medicine_entity=MedicineEntity.objects.get(
@@ -94,7 +95,7 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
                         has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
                     )
                 elif kwargs["sodium_valproate"] == "fail":
-                    E12AntiEpilepsyMedicineFactory(
+                    E12AntiEpilepsyMedicineFactory.create(
                         management=self,
                         is_rescue_medicine=False,
                         medicine_entity=MedicineEntity.objects.get(
@@ -104,3 +105,5 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
                         is_a_pregnancy_prevention_programme_needed=False,
                         has_a_valproate_annual_risk_acknowledgement_form_been_completed=False,
                     )
+                
+                self.save()

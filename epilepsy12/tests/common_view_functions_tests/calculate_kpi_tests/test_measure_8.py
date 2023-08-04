@@ -1,19 +1,19 @@
 """
 Measure 8 `sodium_valproate` - Percentage of all females 12 years and above currently on valproate treatment with annual risk acknowledgement form completed
 
-Number of females >= 12yo diagnosed with epilepsy at first year 
-    AND on valproate 
-    AND annual risk acknowledgement forms completed 
-    AND pregnancy prevention programme in place
+Number of females >= 12yo diagnosed with epilepsy at first year AND on valproate AND (
+     annual risk acknowledgement forms completed 
+     OR
+     pregnancy prevention programme in place
+    )
 
-- [x] Measure 8 passed (registration.kpi.sodium_valproate == 1) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and is_a_pregnancy_prevention_programme_needed==True and has_a_valproate_annual_risk_acknowledgement_form_been_completed==True
-- [x] Measure 8 failed (registration.kpi.sodium_valproate == 0) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and is_a_pregnancy_prevention_programme_needed is False or None
-- [x] Measure 8 failed (registration.kpi.sodium_valproate == 0) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and has_a_valproate_annual_risk_acknowledgement_form_been_completed is False or None
+- [x] Measure 8 passed (registration.kpi.sodium_valproate == 1) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and (is_a_pregnancy_prevention_programme_needed==True OR has_a_valproate_annual_risk_acknowledgement_form_been_completed==True)
+- [x] Measure 8 failed (registration.kpi.sodium_valproate == 0) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and is_a_pregnancy_prevention_programme_needed is False AND has_a_valproate_annual_risk_acknowledgement_form_been_completed is False
 
-- [ x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if age_at_first_paediatric_assessment < 12
-- [ x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.case.sex == 1
-- [ x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.management.has_an_aed_been_given == False
-- [ x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if AEM is not valproate or AEM is None
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if age_at_first_paediatric_assessment < 12
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.case.sex == 1
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.management.has_an_aed_been_given == False
+- [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if AEM is not valproate or AEM is None
 """
 
 # Standard imports
@@ -33,9 +33,11 @@ from epilepsy12.models import KPI, AntiEpilepsyMedicine, Registration, MedicineE
     "is_a_pregnancy_prevention_programme_needed, has_a_valproate_annual_risk_acknowledgement_form_been_completed,expected_score",
     [
         (True, True, KPI_SCORE["PASS"]),
-        (False, None, KPI_SCORE["FAIL"]),
-        (None, False, KPI_SCORE["FAIL"]),
-        (None, None, KPI_SCORE["FAIL"]),
+        (True, False, KPI_SCORE["PASS"]),
+        (False, True, KPI_SCORE["PASS"]),
+        (False, False, KPI_SCORE["FAIL"]),
+        (None, True, KPI_SCORE['NOT_SCORED']),
+        (True, None, KPI_SCORE['NOT_SCORED']),
     ],
 )
 @pytest.mark.django_db
@@ -47,14 +49,13 @@ def test_measure_8_sodium_valproate_risk_eligible(
 ):
     """
     *PASS*
-    1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate)
-            && is_a_pregnancy_prevention_programme_needed==True
-            && has_a_valproate_annual_risk_acknowledgement_form_been_completed==True
+    1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate) AND ONE OF:
+            - is_a_pregnancy_prevention_programme_needed==True
+            - has_a_valproate_annual_risk_acknowledgement_form_been_completed==True
     *FAIL*
-    1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate)
-            && is_a_pregnancy_prevention_programme_needed is False OR None
-    2) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate)
-            && has_a_valproate_annual_risk_acknowledgement_form_been_completed is False OR None
+    1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate) AND BOTH
+            - is_a_pregnancy_prevention_programme_needed==False
+            - has_a_valproate_annual_risk_acknowledgement_form_been_completed==False
 
     """
 
@@ -68,7 +69,7 @@ def test_measure_8_sodium_valproate_risk_eligible(
         sex=SEX,
         date_of_birth=DATE_OF_BIRTH,
         registration__registration_date=REGISTRATION_DATE,
-        registration__management__has_an_aed_been_given = True
+        registration__management__has_an_aed_been_given=True,
     )
 
     # get management
@@ -96,9 +97,11 @@ def test_measure_8_sodium_valproate_risk_eligible(
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).sodium_valproate
 
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f">=12yo on valproate with valproate pregnancy prevention in place & completed annual risk acknowledgement, but not passing measure"
+        assertion_message = f">=12yo on valproate with valproate pregnancy prevention in place & has: {'annual risk acknowledgement=True' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} {'is_a_pregnancy_prevention_programme_needed=True' if is_a_pregnancy_prevention_programme_needed else ''}, but not passing measure"
     elif expected_score == KPI_SCORE["FAIL"]:
         assertion_message = f">=12yo on valproate with \n{is_a_pregnancy_prevention_programme_needed=}\n{has_a_valproate_annual_risk_acknowledgement_form_been_completed=},\nbut not failing measure"
+    elif expected_score==KPI_SCORE["NOT_SCORED"]:
+        assertion_message = f">=12yo on valproate but {'is_a_pregnancy_prevention_programme_needed' if is_a_pregnancy_prevention_programme_needed else ''} {'has_a_valproate_annual_risk_acknowledgement_form_been_completed' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} is None, but not getting `KPI_SCORE['NOT_SCORED']`"
 
     assert kpi_score == expected_score, assertion_message
 
@@ -171,11 +174,10 @@ def test_measure_8_sodium_valproate_risk_ineligible(
     aem.delete()
 
     if aed_given:
-        
         # AED given, update management
         management.has_an_aed_been_given = True
         management.save()
-        
+
         # create and save an AEM entry which ISN'T valproate
         if not_valproate:
             AntiEpilepsyMedicine.objects.create(

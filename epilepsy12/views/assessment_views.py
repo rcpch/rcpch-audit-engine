@@ -918,7 +918,12 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     # filter list to include only NHS organisations
     organisation_list = Organisation.objects.order_by("OrganisationName")
 
-    context = {"assessment": assessment, "organisation_list": organisation_list}
+    context = {
+        "assessment": assessment,
+        "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
+    }
 
     template_name = "epilepsy12/partials/assessment/epilepsy_surgery.html"
 
@@ -991,6 +996,8 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
         "surgery_edit_active": False,
         "error": None,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context
@@ -1047,6 +1054,61 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
         "surgery_edit_active": False,
         "error": None,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
+    }
+
+    # add previous and current sites to context
+    sites_context = add_sites_and_site_history_to_context(assessment.registration.case)
+
+    context.update(sites_context)
+
+    template_name = "epilepsy12/partials/assessment/epilepsy_surgery.html"
+
+    response = recalculate_form_generate_response(
+        model_instance=assessment,
+        request=request,
+        template=template_name,
+        context=context,
+        error_message=error_message,
+    )
+
+    return response
+
+
+@login_required
+@permission_required("epilepsy12.change_assessment", raise_exception=True)
+@user_may_view_this_child()
+def childrens_epilepsy_surgical_service_review_date_status(
+    request, assessment_id, status
+):
+    """
+    This is an HTMX callback from the epilepsy_surgery partial template
+    This toggles show/hide on the childrens_epilepsy_surgical_service_input_date field as
+    this is not a mandatory field.
+    Accepts status (string) values of 'known' and 'unknown'
+    """
+    error_message = None
+
+    try:
+        assessment = Assessment.objects.get(pk=assessment_id)
+    except Exception as e:
+        error_message = e
+
+    # filter list to include only NHS organisations
+    organisation_list = Organisation.objects.order_by("OrganisationName")
+
+    if status == "unknown":
+        # remove any previously stored surgical review date
+        assessment.childrens_epilepsy_surgical_service_input_date = None
+        assessment.save()
+
+    context = {
+        "assessment": assessment,
+        "surgery_edit_active": False,
+        "error": None,
+        "organisation_list": organisation_list,
+        "show_input_date": status == "known",
     }
 
     # add previous and current sites to context
@@ -1103,6 +1165,8 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
         "surgery_edit_active": False,
         "error": None,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context
@@ -1172,6 +1236,8 @@ def epilepsy_surgery_centre(request, assessment_id):
         "surgery_edit_active": False,
         "error": None,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context
@@ -1242,6 +1308,8 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
         "surgery_edit_active": False,
         "error": None,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context
@@ -1284,6 +1352,8 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
         "surgery_edit_active": surgery_edit_active,
         "error": None,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context
@@ -1347,6 +1417,8 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
         "surgery_edit_active": False,
         "error": error_message,
         "organisation_list": organisation_list,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context
@@ -1541,6 +1613,8 @@ def assessment(request, case_id):
         "active_template": "assessment",
         "organisation_list": organisation_list,
         "organisation_id": organisation_id,
+        "show_input_date": assessment.childrens_epilepsy_surgical_service_input_date
+        is not None,
     }
 
     # add previous and current sites to context

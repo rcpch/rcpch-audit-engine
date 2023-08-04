@@ -533,6 +533,7 @@ div.ui.card > div.content > div.organisation_address_container {
 /* toggle buttons / date_field input */
 
 .toggle_button_label {
+  padding-bottom: 10px;
   color: black;
 }
 
@@ -1794,6 +1795,10 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
 
 .multiple_toggle_buttons_wrapper .rcpch_dark_blue.button {
   flex-grow: 1;
+}
+
+.add_user_button:hover a {
+  color: var(--rcpch_white);
 }
 
 table.ui.rcpch.table.user_table thead {

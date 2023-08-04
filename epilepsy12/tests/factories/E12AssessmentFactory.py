@@ -29,6 +29,7 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Assessment
+        skip_postgeneration_save=True
 
     # Once Registration instance made, it will attach to this instance
     registration = None
@@ -84,13 +85,12 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
         # KPI 3 and 3b
         pass_tertiary_input_AND_epilepsy_surgery_referral = factory.Trait(
             childrens_epilepsy_surgical_service_referral_criteria_met = True,
-            paediatric_neurologist_referral_made = True,
             childrens_epilepsy_surgical_service_referral_made = True,
         )
 
         fail_tertiary_input_AND_epilepsy_surgery_referral = factory.Trait(
             childrens_epilepsy_surgical_service_referral_criteria_met = True,
-            paediatric_neurologist_referral_made = False,
+            paediatric_neurologist_input_date = None,
             childrens_epilepsy_surgical_service_referral_made = False,
         )
         
