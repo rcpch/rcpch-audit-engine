@@ -276,17 +276,17 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
 
     METHOD:
         - define EXPECTED_KPI_SCORE_OUTPUT dict, all zeros initially
-        
+
         - Over 50 iterations:
-            1) Create a Case with attributes set according to KPI answers (automatically ineligible for KPIs 6,8,10)  
+            1) Create a Case with attributes set according to KPI answers (automatically ineligible for KPIs 6,8,10)
             2) Create a Case with attributes set according to KPI answers (automatically ineligible for KPIs 3,5)
-            
-            NOTE: 
+
+            NOTE:
                 - The Case constructor gets these attributes from get_ans_dict_update_expected_score_dict fn. This fn also updates the EXPECTED_KPI_SCORE_OUTPUT eg. if it determines KPI_1 should 'PASS', it adds 1 to 'paediatrician_with_expertise_in_epilepsies' and 'paediatrician_with_expertise_in_epilepsies_total'
                 - The Cases are all assigned to the same organisation
-            
-            3) calculate KPIs for each Case 
-        
+
+            3) calculate KPIs for each Case
+
         - assert aggregated_kpis == EXPECTED_KPI_SCORE_OUTPUT
     """
 
@@ -374,7 +374,6 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     kpi_metric_eligible_6_8_10_object = KPIMetric(
         eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
     )
-
 
     def get_ans_dict_update_expected_score_dict(
         EXPECTED_KPI_SCORE_OUTPUT, eligible_3_5_only
@@ -470,11 +469,17 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
         calculate_kpis(registration)
 
     # Add average keys
-    only_numerators = [kpi for kpi in EXPECTED_KPI_SCORE_OUTPUT.keys() if not (kpi.endswith('_total') or kpi == 'total_number_of_cases')]
+    only_numerators = [
+        kpi
+        for kpi in EXPECTED_KPI_SCORE_OUTPUT.keys()
+        if not (kpi.endswith("_total") or kpi == "total_number_of_cases")
+    ]
 
     for kpi in only_numerators:
-        EXPECTED_KPI_SCORE_OUTPUT[f"{kpi}_average"] = EXPECTED_KPI_SCORE_OUTPUT[kpi] / EXPECTED_KPI_SCORE_OUTPUT[f"{kpi}_total"]
-    
+        EXPECTED_KPI_SCORE_OUTPUT[f"{kpi}_average"] = (
+            EXPECTED_KPI_SCORE_OUTPUT[kpi] / EXPECTED_KPI_SCORE_OUTPUT[f"{kpi}_total"]
+        )
+
     organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
         organisation_instance=CHELWEST,
         cohort=6,
@@ -485,3 +490,93 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
     aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level)
 
     assert aggregated_kpis == EXPECTED_KPI_SCORE_OUTPUT
+
+
+@pytest.mark.django_db
+def test_debug(e12_case_factory, client):
+    # define constants
+    CHELWEST = Organisation.objects.get(
+        ODSCode="RQM01",
+        ParentOrganisation_ODSCode="RQM",
+    )
+
+    # Generate KPIMetric objects
+    kpi_metric_eligible_3_5_object = KPIMetric(
+        eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
+    )
+    kpi_metric_eligible_6_8_10_object = KPIMetric(
+        eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
+    )
+
+    ecg_answers_ineligible = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="INELIGIBLE",
+        kpi_5="PASS",
+        kpi_7="PASS",
+        kpi_9="PASS",
+    )
+    ecg_answers_pass = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="PASS",
+        kpi_5="PASS",
+        kpi_7="PASS",
+        kpi_9="PASS",
+    )
+    ecg_answers_fail = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="FAIL",
+        kpi_5="PASS",
+        kpi_7="PASS",
+        kpi_9="PASS",
+    )
+
+    names = ['ecg_answers_ineligible','ecg_answers_ineligible','ecg_answers_pass', 'ecg_answers_fail']
+    for ix, answer in enumerate([ecg_answers_ineligible, ecg_answers_ineligible, ecg_answers_pass, ecg_answers_fail]):
+        e12_case_factory(organisations__organisation=CHELWEST, **answer, first_name=f'test_{names[ix]}')
+
+    # add an incomplete child
+    the_incomplete_case = e12_case_factory(
+        organisations__organisation=CHELWEST,
+        registration__investigations__twelve_lead_ecg_status=None, 
+        registration__epilepsy_context__were_any_of_the_epileptic_seizures_convulsive=None,
+        first_name='test_incomplete'
+    )
+
+    from epilepsy12.models import Registration, KPI, Epilepsy12User
+    test_cases = Case.objects.filter(first_name__startswith='test_').all()
+    print(test_cases)
+    for a_case in test_cases:
+        calculate_kpis(registration_instance=a_case.registration)
+    
+    from django.urls import reverse
+    
+    user = Epilepsy12User.objects.all()[0]
+    client.force_login(user)
+    
+    url = reverse('selected_trust_select_kpi', kwargs={
+        'organisation_id':CHELWEST.id
+    })
+    r = client.post(
+        url,
+        headers={"Hx-Request": "true"},
+        data={
+            'kpi_name':'ecg'
+        }
+    )
+    
+    
+    
+    # organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
+    #     organisation_instance=CHELWEST,
+    #     cohort=6,
+    #     case_complete=False,
+    #     abstraction_level="organisation",
+    # )
+
+    # aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level, kpi_measure='ecg')
