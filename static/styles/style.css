@@ -1797,6 +1797,10 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   flex-grow: 1;
 }
 
+.add_user_button:hover a {
+  color: var(--rcpch_white);
+}
+
 table.ui.rcpch.table.user_table thead {
   vertical-align: top;
 }
