@@ -130,6 +130,66 @@ def cases_aggregated_by_ethnicity(selected_organisation):
 
     return cases_aggregated_by_ethnicity
 
+def refactored_aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measures:list):
+    """WIP Fn, to refactor aggregate_all_elibible_kpi_fields without affecting application.
+    
+
+    Args:
+        filtered_cases (QuerySet[Case]): QuerySet of filtered Cases on which to perform aggregation queries.
+        kpi_measures (list): list of KPI measures for which to aggregate
+    """
+    final_aggregation_dict = {}
+    KPI = apps.get_model('epilepsy12','KPI')
+    all_kpi_measures = [
+        "paediatrician_with_expertise_in_epilepsies",
+        "epilepsy_specialist_nurse",
+        "tertiary_input",
+        "epilepsy_surgery_referral",
+        "ecg",
+        "mri",
+        "assessment_of_mental_health_issues",
+        "mental_health_support",
+        "sodium_valproate",
+        "comprehensive_care_planning_agreement",
+        "patient_held_individualised_epilepsy_document",
+        "patient_carer_parent_agreement_to_the_care_planning",
+        "care_planning_has_been_updated_when_necessary",
+        "comprehensive_care_planning_content",
+        "parental_prolonged_seizures_care_plan",
+        "water_safety",
+        "first_aid",
+        "general_participation_and_risk",
+        "service_contact_details",
+        "sudep",
+        "school_individual_healthcare_plan",
+    ]
+    for measure in all_kpi_measures:
+        
+        # Creates value counts of each value, per kpi measure, including Nulls (using "*")
+        value_counts = KPI.objects.values(**{f"{measure}_score":F(measure)}).annotate(count=Count("*"))
+        
+        if measure == 'assessment_of_mental_health_issues': print(value_counts)
+        for value_count in value_counts:
+            
+            score = value_count[f"{measure}_score"]
+            count = value_count["count"]
+            total_eligible = 0
+
+            if score is None:
+                final_aggregation_dict['value_counts'][f"{measure}_incomplete"] = count
+            elif score == 0:
+                total_eligible += count
+            
+            elif score == 1:
+                total_eligible += count
+                final_aggregation_dict['value_counts'][f"{measure}_passed"] = count
+         
+            elif score == 2:
+                final_aggregation_dict['value_counts'][f"{measure}_ineligible"] = count
+            
+            final_aggregation_dict['value_counts'][f"{measure}_total_eligible"] = total_eligible  
+    
+    return final_aggregation_dict            
 
 def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     """
