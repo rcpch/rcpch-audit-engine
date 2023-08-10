@@ -131,8 +131,8 @@ def cases_aggregated_by_ethnicity(selected_organisation):
 
 def refactored_aggregate_all_eligible_kpi_fields(
     filtered_cases, kpi_measures: list[str]
-) -> None:
-    """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and updates the KPIAggregate model.
+) -> dict:
+    """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and returns a dict of value counts, which can be used to update the KPIAggregation model.
 
     **WIP Fn, to refactor aggregate_all_elibible_kpi_fields without affecting application.**
 
@@ -177,8 +177,6 @@ def refactored_aggregate_all_eligible_kpi_fields(
 
         initial_object[f"{kpi_name}_total_eligible"] = total_eligible
         final_aggregation_dict.update(initial_object)
-
-    KPIAggregation = apps.get_model("epilepsy12", "KPIAggregation")
 
     return final_aggregation_dict
 
