@@ -552,13 +552,15 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
         if REFERRAL_ANSWER is not None:
             EXPECTED_SCORE += 1
 
-        INPUT_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_input_date"
-        INPUT_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
-        if (
-            INPUT_ANSWER is not None
-            and INPUT_KEY_NAME != "childrens_epilepsy_surgical_service_input_date"
-        ):
-            EXPECTED_SCORE += 1
+        # E12 updated kpi scoring - CESS just needs referral, actual input does not matter
+        if bool_field != 'childrens_epilepsy_surgical_service':
+            INPUT_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_input_date"
+            INPUT_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
+            if (
+                INPUT_ANSWER is not None
+                and INPUT_KEY_NAME != "childrens_epilepsy_surgical_service_input_date"
+            ):
+                EXPECTED_SCORE += 1
 
         date_answers = {
             REFERRAL_KEY_NAME: REFERRAL_ANSWER,
