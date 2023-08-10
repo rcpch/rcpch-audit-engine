@@ -141,11 +141,18 @@ def get_kpi_value_counts(
         kpi_measures (list): list of KPI measures for which to aggregate
     """
     final_aggregation_dict = {}
+    
+    # Get models
     KPI = apps.get_model("epilepsy12", "KPI")
+    
+    # To get the filtered KPI objects, we use the following defined model relations:
+    # Case <~1-2-1~> Registration <~1-2-1~> KPI
+    filtered_registration_ids = filtered_cases.values_list('registration__id')
+    filtered_kpis = KPI.objects.filter(registration__id__in=filtered_registration_ids)
 
     for kpi_name in kpi_measures:
         # Creates value counts of each value, per kpi measure, including Nulls (using "*")
-        value_counts = KPI.objects.values(
+        value_counts = filtered_kpis.values(
             **{f"{kpi_name}_score": F(kpi_name)}
         ).annotate(count=Count("*"))
 
@@ -161,7 +168,6 @@ def get_kpi_value_counts(
         for value_count in value_counts:
             score = value_count[f"{kpi_name}_score"]
             count = value_count["count"]
-
             if score is None:
                 initial_object[f"{kpi_name}_incomplete"] = count
             elif score == 0:
