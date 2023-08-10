@@ -129,9 +129,7 @@ def cases_aggregated_by_ethnicity(selected_organisation):
     return cases_aggregated_by_ethnicity
 
 
-def get_kpi_value_counts(
-    filtered_cases, kpi_measures: list[str]
-) -> dict:
+def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
     """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and returns a dict of value counts, which can be used to update the KPIAggregation model.
 
     **WIP Fn, to refactor aggregate_all_elibible_kpi_fields without affecting application.**
@@ -141,13 +139,13 @@ def get_kpi_value_counts(
         kpi_measures (list): list of KPI measures for which to aggregate
     """
     final_aggregation_dict = {}
-    
+
     # Get models
     KPI = apps.get_model("epilepsy12", "KPI")
-    
+
     # To get the filtered KPI objects, we use the following defined model relations:
     # Case <~1-2-1~> Registration <~1-2-1~> KPI
-    filtered_registration_ids = filtered_cases.values_list('registration__id')
+    filtered_registration_ids = filtered_cases.values_list("registration__id")
     filtered_kpis = KPI.objects.filter(registration__id__in=filtered_registration_ids)
 
     for kpi_name in kpi_measures:
@@ -165,6 +163,7 @@ def get_kpi_value_counts(
         }
         total_eligible = 0
 
+        # For each value count for this kpi, update the final aggregation dict with appropriate values depending on pass, incomplete, ineligible, and finally, total eligible
         for value_count in value_counts:
             score = value_count[f"{kpi_name}_score"]
             count = value_count["count"]
@@ -183,7 +182,7 @@ def get_kpi_value_counts(
 
         initial_object[f"{kpi_name}_total_eligible"] = total_eligible
         final_aggregation_dict.update(initial_object)
-    print(final_aggregation_dict)
+
     return final_aggregation_dict
 
 

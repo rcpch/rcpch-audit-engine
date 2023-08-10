@@ -825,8 +825,145 @@ def test_get_kpi_value_counts_eligible_6_8_10_pass_fail(e12_case_factory):
 
 @pytest.mark.django_db
 def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
-    """Test the refactored `get_kpi_value_counts` fn returns correct aggregate. Tests:"""
-    pass
+    """Test the refactored `get_kpi_value_counts` fn returns correct aggregate.
+
+    Due to the construction of the `KPIMetrics` class, the remaining possibility of kpi measure scores includes ineligible for kpi 4 + 7. This is a separate test to the previous two for clarity.
+
+    Tests:
+
+    KPI 4,7 (also 3,5 -> previously tested)
+        INELIGIBLE
+    KPI 1,2,6,8,9,10
+        PASS
+
+
+    """
+    expected_output = {
+        "paediatrician_with_expertise_in_epilepsies_passed": 10,
+        "paediatrician_with_expertise_in_epilepsies_total_eligible": 10,
+        "paediatrician_with_expertise_in_epilepsies_ineligible": 0,
+        "paediatrician_with_expertise_in_epilepsies_incomplete": 0,
+        "epilepsy_specialist_nurse_passed": 10,
+        "epilepsy_specialist_nurse_total_eligible": 10,
+        "epilepsy_specialist_nurse_ineligible": 0,
+        "epilepsy_specialist_nurse_incomplete": 0,
+        "tertiary_input_passed": 0,
+        "tertiary_input_total_eligible": 0,
+        "tertiary_input_ineligible": 10,
+        "tertiary_input_incomplete": 0,
+        "epilepsy_surgery_referral_passed": 0,
+        "epilepsy_surgery_referral_total_eligible": 0,
+        "epilepsy_surgery_referral_ineligible": 10,
+        "epilepsy_surgery_referral_incomplete": 0,
+        "ecg_passed": 0,
+        "ecg_total_eligible": 0,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 0,
+        "mri_passed": 0,
+        "mri_total_eligible": 0,
+        "mri_ineligible": 10,
+        "mri_incomplete": 0,
+        "assessment_of_mental_health_issues_passed": 10,
+        "assessment_of_mental_health_issues_total_eligible": 10,
+        "assessment_of_mental_health_issues_ineligible": 0,
+        "assessment_of_mental_health_issues_incomplete": 0,
+        "mental_health_support_passed": 0,
+        "mental_health_support_total_eligible": 0,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 0,
+        "sodium_valproate_passed": 10,
+        "sodium_valproate_total_eligible": 10,
+        "sodium_valproate_ineligible": 0,
+        "sodium_valproate_incomplete": 0,
+        "comprehensive_care_planning_agreement_passed": 10,
+        "comprehensive_care_planning_agreement_total_eligible": 10,
+        "comprehensive_care_planning_agreement_ineligible": 0,
+        "comprehensive_care_planning_agreement_incomplete": 0,
+        "patient_held_individualised_epilepsy_document_passed": 10,
+        "patient_held_individualised_epilepsy_document_total_eligible": 10,
+        "patient_held_individualised_epilepsy_document_ineligible": 0,
+        "patient_held_individualised_epilepsy_document_incomplete": 0,
+        "patient_carer_parent_agreement_to_the_care_planning_passed": 10,
+        "patient_carer_parent_agreement_to_the_care_planning_total_eligible": 10,
+        "patient_carer_parent_agreement_to_the_care_planning_ineligible": 0,
+        "patient_carer_parent_agreement_to_the_care_planning_incomplete": 0,
+        "care_planning_has_been_updated_when_necessary_passed": 10,
+        "care_planning_has_been_updated_when_necessary_total_eligible": 10,
+        "care_planning_has_been_updated_when_necessary_ineligible": 0,
+        "care_planning_has_been_updated_when_necessary_incomplete": 0,
+        "comprehensive_care_planning_content_passed": 10,
+        "comprehensive_care_planning_content_total_eligible": 10,
+        "comprehensive_care_planning_content_ineligible": 0,
+        "comprehensive_care_planning_content_incomplete": 0,
+        "parental_prolonged_seizures_care_plan_passed": 10,
+        "parental_prolonged_seizures_care_plan_total_eligible": 10,
+        "parental_prolonged_seizures_care_plan_ineligible": 0,
+        "parental_prolonged_seizures_care_plan_incomplete": 0,
+        "water_safety_passed": 10,
+        "water_safety_total_eligible": 10,
+        "water_safety_ineligible": 0,
+        "water_safety_incomplete": 0,
+        "first_aid_passed": 10,
+        "first_aid_total_eligible": 10,
+        "first_aid_ineligible": 0,
+        "first_aid_incomplete": 0,
+        "general_participation_and_risk_passed": 10,
+        "general_participation_and_risk_total_eligible": 10,
+        "general_participation_and_risk_ineligible": 0,
+        "general_participation_and_risk_incomplete": 0,
+        "service_contact_details_passed": 10,
+        "service_contact_details_total_eligible": 10,
+        "service_contact_details_ineligible": 0,
+        "service_contact_details_incomplete": 0,
+        "sudep_passed": 10,
+        "sudep_total_eligible": 10,
+        "sudep_ineligible": 0,
+        "sudep_incomplete": 0,
+        "school_individual_healthcare_plan_passed": 10,
+        "school_individual_healthcare_plan_total_eligible": 10,
+        "school_individual_healthcare_plan_ineligible": 0,
+        "school_individual_healthcare_plan_incomplete": 0,
+    }
+    CHELWEST = Organisation.objects.get(
+        ODSCode="RQM01",
+        ParentOrganisation_ODSCode="RQM",
+    )
+
+    # create answersets for cases to achieve the stated expected output
+    answer_object = KPIMetric(eligible_kpi_6_8_10=True)
+    ineligible_or_pass_answers = answer_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_4="INELIGIBLE",
+        kpi_6="PASS",
+        kpi_7="INELIGIBLE",
+        kpi_8="PASS",
+        kpi_9="PASS",
+        kpi_10="PASS",
+    )
+
+    filled_case_objects = []
+    # iterate through answersets (pass, fail, none) for kpi, create Cases
+    test_cases = e12_case_factory.create_batch(
+        10,
+        organisations__organisation=CHELWEST,
+        first_name="tester",
+        **ineligible_or_pass_answers,
+    )
+    filled_case_objects += test_cases
+
+    for test_case in filled_case_objects:
+        calculate_kpis(registration_instance=test_case.registration)
+
+    # Get just these test cases
+    filtered_cases = Case.objects.filter(first_name="tester")
+
+    result = get_kpi_value_counts(
+        filtered_cases=filtered_cases,
+        kpi_measures=ALL_KPI_NAMES,
+    )
+
+    assert result == expected_output
 
 
 @pytest.mark.django_db
