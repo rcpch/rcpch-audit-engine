@@ -127,3 +127,5 @@ start/hermes-v0.7.5.jar
 # exclude dev data files
 .data
 git_hash.txt
+
+.kube/
