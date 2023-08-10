@@ -14,6 +14,7 @@ from epilepsy12.common_view_functions import (
     cases_aggregated_by_deprivation_score,
     cases_aggregated_by_ethnicity,
     aggregate_all_eligible_kpi_fields,
+    refactored_aggregate_all_eligible_kpi_fields,
     all_registered_cases_for_cohort_and_abstraction_level,
     calculate_kpis,
 )
@@ -493,31 +494,25 @@ def test_aggregate_all_eligible_kpi_fields_correct_kpi_scoring(e12_case_factory)
 
 
 @pytest.mark.django_db
-def test_debug(e12_case_factory, client):
-    # define constants
+def test_kpi_1_aggregate_all_elibible_kpi_fields(e12_case_factory):
+    """Test the refactored `aggregate_all_eligible_kpi_fields` fn returns correct aggregate."""
+
+    # test constants
+    kpi_name = "paediatrician_with_expertise_in_epilepsies"
     CHELWEST = Organisation.objects.get(
         ODSCode="RQM01",
         ParentOrganisation_ODSCode="RQM",
     )
+    expected_output = {
+        f"{kpi_name}_passed": 10,
+        f"{kpi_name}_total_eligible": 20,
+        f"{kpi_name}_ineligible": 0,
+        f"{kpi_name}_incomplete": 10,
+    }
 
-    # Generate KPIMetric objects
-    kpi_metric_eligible_3_5_object = KPIMetric(
-        eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
-    )
-    kpi_metric_eligible_6_8_10_object = KPIMetric(
-        eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
-    )
-
-    ecg_answers_ineligible = kpi_metric_eligible_3_5_object.generate_metrics(
-        kpi_1="PASS",
-        kpi_2="PASS",
-        kpi_3="PASS",
-        kpi_4="INELIGIBLE",
-        kpi_5="PASS",
-        kpi_7="PASS",
-        kpi_9="PASS",
-    )
-    ecg_answers_pass = kpi_metric_eligible_3_5_object.generate_metrics(
+    # create answersets for cases to achieve the stated expected output
+    answer_object = KPIMetric(eligible_kpi_3_5=True, eligible_kpi_6_8_10=False)
+    pass_answers = answer_object.generate_metrics(
         kpi_1="PASS",
         kpi_2="PASS",
         kpi_3="PASS",
@@ -526,57 +521,215 @@ def test_debug(e12_case_factory, client):
         kpi_7="PASS",
         kpi_9="PASS",
     )
-    ecg_answers_fail = kpi_metric_eligible_3_5_object.generate_metrics(
-        kpi_1="PASS",
+    fail_answers = answer_object.generate_metrics(
+        kpi_1="FAIL",
         kpi_2="PASS",
         kpi_3="PASS",
-        kpi_4="FAIL",
+        kpi_4="PASS",
         kpi_5="PASS",
         kpi_7="PASS",
         kpi_9="PASS",
     )
 
-    names = ['ecg_answers_ineligible','ecg_answers_ineligible','ecg_answers_pass', 'ecg_answers_fail']
-    for ix, answer in enumerate([ecg_answers_ineligible, ecg_answers_ineligible, ecg_answers_pass, ecg_answers_fail]):
-        e12_case_factory(organisations__organisation=CHELWEST, **answer, first_name=f'test_{names[ix]}')
+    # iterate through answersets (pass, fail, none) for kpi, create Case
+    for answer_set in [pass_answers, fail_answers, {}]:
+        test_cases = e12_case_factory.create_batch(
+            10, organisations__organisation=CHELWEST, first_name="tester", **answer_set
+        )
 
-    # add an incomplete child
-    the_incomplete_case = e12_case_factory(
-        organisations__organisation=CHELWEST,
-        registration__investigations__twelve_lead_ecg_status=None, 
-        registration__epilepsy_context__were_any_of_the_epileptic_seizures_convulsive=None,
-        first_name='test_incomplete'
-    )
+        for test_case in test_cases:
+            calculate_kpis(registration_instance=test_case.registration)
 
-    from epilepsy12.models import Registration, KPI, Epilepsy12User
-    test_cases = Case.objects.filter(first_name__startswith='test_').all()
-    print(test_cases)
-    for a_case in test_cases:
-        calculate_kpis(registration_instance=a_case.registration)
+    filtered_cases = Case.objects.filter(first_name="tester")
     
-    from django.urls import reverse
-    
-    user = Epilepsy12User.objects.all()[0]
-    client.force_login(user)
-    
-    url = reverse('selected_trust_select_kpi', kwargs={
-        'organisation_id':CHELWEST.id
-    })
-    r = client.post(
-        url,
-        headers={"Hx-Request": "true"},
-        data={
-            'kpi_name':'ecg'
-        }
+    result = refactored_aggregate_all_eligible_kpi_fields(
+        filtered_cases=filtered_cases,
+        kpi_measures=["paediatrician_with_expertise_in_epilepsies"],
     )
     
+    assert result == expected_output
     
     
-    # organisation_level = all_registered_cases_for_cohort_and_abstraction_level(
-    #     organisation_instance=CHELWEST,
-    #     cohort=6,
-    #     case_complete=False,
-    #     abstraction_level="organisation",
-    # )
 
-    # aggregated_kpis = aggregate_all_eligible_kpi_fields(organisation_level, kpi_measure='ecg')
+
+@pytest.mark.django_db
+def test_for_refactor_aggregate_all_eligible_kpi_fields(e12_case_factory):
+    """
+    `aggregate_all_eligible_kpi_fields` called with cases with known KPI scores, should return expected value counts aggregation dict.
+
+    Format of aggregation dict will be, for each kpi:
+    {
+        kpi_name_PASSED : n, # total passed kpi
+        kpi_name_TOTAL_ELIGIBLE : n, # total eligible to be scored for kpi
+        kpi_name_INELIGIBLE: n, # total ineligible for kpi
+        kpi_name_INCOMPLETE: n, # total incomplete (i.e. value is 'None' for scored field(s))
+
+        ...,
+        total_number_of_cases: n, # total number of all cases inserted
+        total_number_of_eligible_cases : n, # total number of eligible cases across all kpis
+    }
+
+    Quick verification: total_eligible + ineligible + incomplete == 60
+
+    *`eligible_kpi_3_5=True`* - 30 cases total
+    *`eligible_kpi_6_8_10=True`* - 30 cases total
+
+        1. paediatrician_with_expertise_in_epilepsies
+            {
+                _passed : 40,
+                _total_eligible: 40,
+                _total_incomplete: 20,
+            }
+        2. epilepsy_specialist_nurse
+            {
+                _passed : 40,
+                _total_eligible: 40,
+                _total_incomplete: 0,
+            }
+        3. tertiary_input
+            {
+                _passed : 20,
+                _total_eligible: 20,
+                _total_incomplete: 10,
+                _total_ineligible: 30,
+            }
+        4. ecg
+            {
+                _passed : 20,
+                _total_eligible: 20,
+                _total_incomplete: 20,
+                _total_ineligible: 20,
+            }
+        5. mri
+            {
+                _passed : 20,
+                _total_eligible: 30,
+                _total_incomplete: 20,
+                _total_ineligible: 20,
+            }
+        6. assessment_of_mental_health_issues
+            {
+                _passed : 20,
+                _total_eligible: 20,
+                _total_incomplete: 10,
+                _total_ineligible: 30,
+            }
+        7. mental_health_support
+            {
+                _passed : ,
+                _total_eligible: ,
+                _total_incomplete: ,
+                _total_ineligible: ,
+            }
+        8. sodium valproate
+            {
+                _passed : ,
+                _total_eligible: ,
+                _total_incomplete: ,
+                _total_ineligible: ,
+            }
+        9. ALL OF THEM {
+                _passed : ,
+                _total_eligible: ,
+                _total_incomplete: ,
+                _total_ineligible: ,
+            }
+        10.
+            {
+                _passed : ,
+                _total_eligible: ,
+                _total_incomplete: ,
+                _total_ineligible: ,
+            }
+
+
+    """
+    # define constants
+    CHELWEST = Organisation.objects.get(
+        ODSCode="RQM01",
+        ParentOrganisation_ODSCode="RQM",
+    )
+
+    # Generate KPIMetric object
+    kpi_metric_eligible_3_5_object = KPIMetric(
+        eligible_kpi_3_5=True, eligible_kpi_6_8_10=False
+    )
+
+    all_pass_answers = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="PASS",
+        kpi_5="PASS",
+        kpi_7="PASS",
+        kpi_9="PASS",
+    )
+    all_incomplete_answers = {}
+    all_ineligible_where_poss_answers = kpi_metric_eligible_3_5_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_3="PASS",
+        kpi_4="INELIGIBLE",
+        kpi_5="PASS",
+        kpi_7="INELIGIBLE",
+        kpi_9="PASS",
+    )
+
+    for answer_set in [
+        all_pass_answers,
+        all_incomplete_answers,
+        all_ineligible_where_poss_answers,
+    ]:
+        test_cases = e12_case_factory.create_batch(
+            10, organisations__organisation=CHELWEST, first_name="tester", **answer_set
+        )
+        for test_case in test_cases:
+            calculate_kpis(registration_instance=test_case.registration)
+
+    # Generate KPIMetric object
+    kpi_metric_eligible_6_8_10_object = KPIMetric(
+        eligible_kpi_3_5=False, eligible_kpi_6_8_10=True
+    )
+
+    all_pass_answers = kpi_metric_eligible_6_8_10_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_4="PASS",
+        kpi_6="PASS",
+        kpi_7="PASS",
+        kpi_8="PASS",
+        kpi_9="PASS",
+        kpi_10="PASS",
+    )
+    all_incomplete_answers = {}
+    all_ineligible_where_poss_answers = (
+        kpi_metric_eligible_6_8_10_object.generate_metrics(
+            kpi_1="PASS",
+            kpi_2="PASS",
+            kpi_4="INELIGIBLE",
+            kpi_6="PASS",
+            kpi_7="INELIGIBLE",
+            kpi_8="PASS",
+            kpi_9="PASS",
+            kpi_10="PASS",
+        )
+    )
+
+    for answer_set in [
+        all_pass_answers,
+        all_incomplete_answers,
+        all_ineligible_where_poss_answers,
+    ]:
+        test_cases = e12_case_factory.create_batch(
+            10, organisations__organisation=CHELWEST, first_name="tester", **answer_set
+        )
+        for test_case in test_cases:
+            calculate_kpis(registration_instance=test_case.registration)
+
+    filtered_cases = Case.objects.filter(first_name="tester")
+
+    aggregation_result = aggregate_all_eligible_kpi_fields(
+        filtered_cases=filtered_cases
+    )
+
+    [print(agg) for agg in aggregation_result["value_counts"].items()]
