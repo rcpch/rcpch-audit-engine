@@ -132,8 +132,6 @@ def cases_aggregated_by_ethnicity(selected_organisation):
 def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
     """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and returns a dict of value counts, which can be used to update the KPIAggregation model.
 
-    **WIP Fn, to refactor aggregate_all_elibible_kpi_fields without affecting application.**
-
     Args:
         filtered_cases (QuerySet[Case]): QuerySet of filtered Cases on which to perform aggregation queries.
         kpi_measures (list): list of KPI measures for which to aggregate
@@ -184,6 +182,15 @@ def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
         final_aggregation_dict.update(initial_object)
 
     return final_aggregation_dict
+
+
+def update_kpi_aggregation_with_value_counts(kpi_value_counts: dict):
+    """Takes in a value counts dict, from `get_kpi_value_counts` and update the KPIAggregation model.
+
+    Args:
+        kpi_value_counts (dict): KPI value counts
+    """
+    pass
 
 
 def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
@@ -273,6 +280,28 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     return filtered_cases.aggregate(**aggregation_fields)
 
 
+def _get_abstraction_sublevel_from_level(abstraction_level: str):
+    """Returns a QuerySet annotated by sublevel"""
+
+    level_map = {
+        "organisation": get_all_organisations,
+        "trust": get_all_trusts,
+        "icb": get_all_icbs,
+        "nhs_region": get_all_nhs_regions,
+        "open_uk": get_all_open_uk_regions,
+        "country": get_all_countries,
+    }
+    
+    # if abstraction_level == 'national':
+    #     abstraction_sublevels = get_all_countries()
+    #     abstraction_sublevel_Q = Q(site__organisation__CountryONSCode=abstraction_sublevel[0])
+    # NOT NEEDED AS COVERED BY  ALL ORGANISATIONS
+
+    get_function = level_map[abstraction_level]
+
+    return get_function()
+
+
 def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
     cohort,
     abstraction_level: Literal[
@@ -285,28 +314,7 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     """
     Case = apps.get_model("epilepsy12", "Case")
 
-    if abstraction_level == "organisation":
-        abstraction_sublevels = get_all_organisations()
-
-    if abstraction_level == "trust":
-        abstraction_sublevels = get_all_trusts()
-
-    if abstraction_level == "icb":
-        abstraction_sublevels = get_all_icbs()
-
-    if abstraction_level == "nhs_region":
-        abstraction_sublevels = get_all_nhs_regions()
-
-    if abstraction_level == "open_uk":
-        abstraction_sublevels = get_all_open_uk_regions()
-
-    if abstraction_level == "country":
-        abstraction_sublevels = get_all_countries()
-
-    # if abstraction_level == 'national':
-    #     abstraction_sublevels = get_all_countries()
-    #     abstraction_sublevel_Q = Q(site__organisation__CountryONSCode=abstraction_sublevel[0])
-    # NOT NEEDED AS COVERED BY  ALL ORGANISATIONS
+    abstraction_sublevels = _get_abstraction_sublevel_from_level(abstraction_level)
 
     final_object = []
     for abstraction_sublevel in abstraction_sublevels:
