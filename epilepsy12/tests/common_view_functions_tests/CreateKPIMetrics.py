@@ -87,9 +87,9 @@ Details on what fields are being set inside factories according to KPI PASS | FA
         fail_school_individual_healthcare_plan = True,
         registration__management__fail_school_individual_healthcare_plan=True,
 """
-
-from dataclasses import dataclass
 from typing import Literal
+
+from epilepsy12.constants import SEX_TYPE
 
 
 class KPIMetric:
@@ -362,10 +362,11 @@ class KPIMetric:
 
         # eligible_kpi_6_8_10=True
         else:
-            # add relevant fields age fields to return dict to set eligibility
+            # add relevant fields to return dict to set eligibility
             e12_case_factory_constructor_args.update(
                 {
                     "eligible_kpi_6_8_10_ineligible_3_5": True,
+                    "sex" : SEX_TYPE[2][0],
                     # extra ineligibility kpi 3
                     "registration__assessment__ineligible_tertiary_input_AND_epilepsy_surgery_referral": True,
                     # extra ineligibility kpi5

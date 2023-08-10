@@ -56,7 +56,8 @@ class E12MultiaxialDiagnosisFactory(factory.django.DjangoModelFactory):
             mental_health_issue_identified = True
         )
         fail_mental_health_support = factory.Trait(
-            mental_health_issue_identified = False
+            mental_health_issue_identified = True
         )
         ineligible_mental_health_support = factory.Trait(
+            mental_health_issue_identified = False
         )
