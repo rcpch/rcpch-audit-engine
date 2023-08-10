@@ -14,7 +14,7 @@ from .aggregate_by import (
     cases_aggregated_by_sex,
     aggregate_all_eligible_kpi_fields,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
-    refactored_aggregate_all_eligible_kpi_fields,
+    get_kpi_value_counts,
 )
 from .report_queries import (
     all_registered_cases_for_cohort_and_abstraction_level,

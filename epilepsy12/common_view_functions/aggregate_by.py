@@ -129,7 +129,7 @@ def cases_aggregated_by_ethnicity(selected_organisation):
     return cases_aggregated_by_ethnicity
 
 
-def refactored_aggregate_all_eligible_kpi_fields(
+def get_kpi_value_counts(
     filtered_cases, kpi_measures: list[str]
 ) -> dict:
     """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and returns a dict of value counts, which can be used to update the KPIAggregation model.
@@ -177,7 +177,7 @@ def refactored_aggregate_all_eligible_kpi_fields(
 
         initial_object[f"{kpi_name}_total_eligible"] = total_eligible
         final_aggregation_dict.update(initial_object)
-
+    print(final_aggregation_dict)
     return final_aggregation_dict
 
 
