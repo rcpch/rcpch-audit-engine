@@ -356,8 +356,6 @@ def selected_trust_select_kpi(request, organisation_id):
         # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
-
-    organisation = Organisation.objects.get(pk=organisation_id)
     cohort_data = get_current_cohort_data()
 
     # aggregate at each level of abstraction
