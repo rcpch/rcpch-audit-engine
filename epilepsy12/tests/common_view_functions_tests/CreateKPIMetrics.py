@@ -160,7 +160,7 @@ class KPIMetric:
     case_2 = e12_case_factory(**answer_set_2)
     """
 
-    def __init__(self, eligible_kpi_3_5: bool, eligible_kpi_6_8_10: bool):
+    def __init__(self, eligible_kpi_3_5: bool=False, eligible_kpi_6_8_10: bool=False):
         if eligible_kpi_3_5 and eligible_kpi_6_8_10:
             raise ValueError(
                 "Only one of the eligibility variables can be True. Currently both are set True."
