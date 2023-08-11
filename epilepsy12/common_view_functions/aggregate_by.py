@@ -184,15 +184,6 @@ def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
     return final_aggregation_dict
 
 
-def update_kpi_aggregation_with_value_counts(kpi_value_counts: dict):
-    """Takes in a value counts dict, from `get_kpi_value_counts` and update the KPIAggregation model.
-
-    Args:
-        kpi_value_counts (dict): KPI value counts
-    """
-    pass
-
-
 def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     """
     Returns a dictionary of all KPI fields with aggregation for each measure ready to persist in KPIAggregations.
@@ -280,7 +271,7 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     return filtered_cases.aggregate(**aggregation_fields)
 
 
-def _get_abstraction_sublevel_from_level(abstraction_level: str):
+def _get_abstraction_sublevels_from_level(abstraction_level: str):
     """Returns a QuerySet annotated by sublevel"""
 
     level_map = {
@@ -314,7 +305,7 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     """
     Case = apps.get_model("epilepsy12", "Case")
 
-    abstraction_sublevels = _get_abstraction_sublevel_from_level(abstraction_level)
+    abstraction_sublevels = _get_abstraction_sublevels_from_level(abstraction_level)
 
     final_object = []
     for abstraction_sublevel in abstraction_sublevels:

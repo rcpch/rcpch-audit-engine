@@ -130,40 +130,34 @@ def aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
 
     # store the results in KPIAggregation model
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=organisation_kpis,
         abstraction_level="organisation",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id, results=trust_kpis, abstraction_level="trust"
+        results=trust_kpis, abstraction_level="trust"
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id, results=icb_kpis, abstraction_level="icb"
+        results=icb_kpis, abstraction_level="icb"
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=nhs_kpis,
         abstraction_level="nhs_region",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=open_uk_kpis,
         abstraction_level="open_uk",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=country_kpis,
         abstraction_level="country",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=national_kpis,
         abstraction_level="national",
     )
 
 
 def persist_aggregation_results_for_abstraction_level(
-    organisation_id: str,
     results: dict,
     abstraction_level: Literal[
         "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
@@ -172,13 +166,10 @@ def persist_aggregation_results_for_abstraction_level(
     """
     Private function to store the aggregation results in KPI_Aggregation results table
     """
-    organisation = Organisation.objects.get(pk=organisation_id)
-    if KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level=abstraction_level
-    ).exists():
-        KPIAggregation.objects.filter(
-            organisation=organisation, abstraction_level=abstraction_level
-        ).update(**results)
+
+    if KPIAggregation.objects.filter(abstraction_level=abstraction_level).exists():
+        KPIAggregation.objects.filter(abstraction_level=abstraction_level).update(
+            **results
+        )
     else:
-        results.update({"organisation": organisation})
-        KPIAggregation.objects.create(**results)
+        KPIAggregation.objects.create(**results, abstraction_level=abstraction_level)

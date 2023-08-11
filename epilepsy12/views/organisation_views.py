@@ -183,25 +183,25 @@ def selected_trust_kpis(request, organisation_id):
 
     # get aggregated KPIs for level of abstraction from KPIAggregation
     organisation_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="organisation"
+        abstraction_level="organisation"
     ).get()
     trust_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="trust"
+        abstraction_level="trust"
     ).get()
     icb_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="icb"
+        abstraction_level="icb"
     ).get()
     nhs_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="nhs_region"
+        abstraction_level="nhs_region"
     ).get()
     open_uk_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="open_uk"
+        abstraction_level="open_uk"
     ).get()
     country_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="country"
+        abstraction_level="country"
     ).get()
     national_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="national"
+        abstraction_level="national"
     ).get()
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
@@ -253,25 +253,25 @@ def selected_trust_kpis_open(request, organisation_id):
 
     # get aggregated KPIs for level of abstraction from KPIAggregation
     organisation_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="organisation"
+        abstraction_level="organisation"
     ).get()
     trust_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="trust"
+        abstraction_level="trust"
     ).get()
     icb_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="icb"
+        abstraction_level="icb"
     ).get()
     nhs_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="nhs_region"
+        abstraction_level="nhs_region"
     ).get()
     open_uk_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="open_uk"
+        abstraction_level="open_uk"
     ).get()
     country_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="country"
+        abstraction_level="country"
     ).get()
     national_kpis = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="national"
+        abstraction_level="national"
     ).get()
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
@@ -358,27 +358,27 @@ def selected_trust_select_kpi(request, organisation_id):
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
     cohort_data = get_current_cohort_data()
 
-    # aggregate at each level of abstraction
+    # get the aggregation for each abstraction level
     organisation_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="organisation"
+         abstraction_level="organisation"
     )
     trust_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="trust"
+         abstraction_level="trust"
     )
     icb_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="icb"
+         abstraction_level="icb"
     )
     nhs_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="nhs_region"
+         abstraction_level="nhs_region"
     )
     open_uk_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="open_uk"
+         abstraction_level="open_uk"
     )
     country_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="country"
+         abstraction_level="country"
     )
     national_kpi = KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level="national"
+         abstraction_level="national"
     )
 
     # Get kpi totals for this measure annotated by region name

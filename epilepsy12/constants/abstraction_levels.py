@@ -1,4 +1,4 @@
-ABSTRACTION_LEVELS = (
+NAABSTRACTION_LEVELS = (
     ("organisation", "Organisation"),
     ("trust", "Trust/Local Health Board"),
     ("icb", "Integrated Care Board"),
