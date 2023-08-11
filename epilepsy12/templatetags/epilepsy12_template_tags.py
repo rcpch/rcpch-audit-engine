@@ -362,3 +362,21 @@ def icon_for_score(score):
                 ></i>
                 """
         )
+
+
+@register.simple_tag
+def get_region_name(region_data: tuple[str, dict]):
+    return region_data[0]
+
+
+@register.simple_tag
+def get_kpi_pct_passed(region_data: tuple[str, dict]):
+    data = region_data[1]
+
+    # Find the KPI_NAME_passed key
+    passed_key = [name for name in data.keys() if name.endswith("_passed")][0]
+    total_eligible_key = [
+        name for name in data.keys() if name.endswith("_total_eligible")
+    ][0]
+
+    return f"{100 * data[passed_key] / data[total_eligible_key]:.2f}"
