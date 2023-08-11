@@ -21,6 +21,7 @@ from ..common_view_functions import (
     get_kpi_value_counts,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
     return_tile_for_region,
+    get_filtered_cases_by_abstraction,
 )
 from ..general_functions import (
     get_current_cohort_data,
@@ -358,16 +359,6 @@ def selected_trust_select_kpi(request, organisation_id):
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
     cohort_data = get_current_cohort_data()
     
-    # 1. Get filtered cases
-    
-    
-    # 2. Get KPI aggregation value counts
-    
-    # 3. Feed value counts to update KPIAggregation
-
-    # 4. Get KPIAggregations for each level of abstraction
-
-    # Get kpi totals for this measure annotated by region name
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data["cohort"], abstraction_level="open_uk", kpi_measure=kpi_name
     )
@@ -405,6 +396,8 @@ def selected_trust_select_kpi(request, organisation_id):
         kpi_data=all_aggregated_kpis_by_country_in_current_cohort,
         kpi=kpi_name,
     )
+    
+    print('PREVIOUS: ',all_aggregated_kpis_by_country_in_current_cohort)
 
     context = {
         "kpi_name": kpi_name,

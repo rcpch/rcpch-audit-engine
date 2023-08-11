@@ -24,6 +24,7 @@ from epilepsy12.models import (
     Case,
     KPI,
     Registration,
+    KPIAggregation
 )
 from epilepsy12.constants import (
     SEX_TYPE,
@@ -968,7 +969,65 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 
 @pytest.mark.django_db
 def test_debug(e12_case_factory):
-    """Test the refactored `get_kpi_value_counts` fn returns correct aggregate. Tests:"""
-    from epilepsy12.common_view_functions import get_kpi_value_counts
+    """debug"""
+    from epilepsy12.common_view_functions import get_kpi_value_counts,get_filtered_cases_by_abstraction
 
-    r
+    def _calculate_kpi_and_get_filtered_cases():
+        CHELWEST = Organisation.objects.get(
+        ODSCode="RQM01",
+        ParentOrganisation_ODSCode="RQM",
+    )
+
+        # create answersets for cases to achieve the stated expected output
+        answer_object = KPIMetric(eligible_kpi_6_8_10=True)
+        pass_answers = answer_object.generate_metrics(
+            kpi_1="PASS",
+            kpi_2="PASS",
+            kpi_4="PASS",
+            kpi_6="PASS",
+            kpi_7="PASS",
+            kpi_8="PASS",
+            kpi_9="PASS",
+            kpi_10="PASS",
+        )
+        fail_answers = answer_object.generate_metrics(
+            kpi_1="FAIL",
+            kpi_2="FAIL",
+            kpi_4="FAIL",
+            kpi_6="FAIL",
+            kpi_7="FAIL",
+            kpi_8="FAIL",
+            kpi_9="FAIL",
+            kpi_10="FAIL",
+        )
+
+        filled_case_objects = []
+        # iterate through answersets (pass, fail, none) for kpi, create Cases
+        # NOTE: here we specify date of birth for 'empty answer set', as the default age would otherwise be 1yo, making them ineligible for kpis 6,8,10
+        for answer_set in [pass_answers, fail_answers, {"date_of_birth": date(2011, 1, 1)}]:
+            test_cases = e12_case_factory.create_batch(
+                10, organisations__organisation=CHELWEST, first_name="tester", **answer_set
+            )
+            filled_case_objects += test_cases
+
+        for test_case in filled_case_objects:
+            calculate_kpis(registration_instance=test_case.registration)
+
+        # Get just these test cases
+        return Case.objects.filter(first_name="tester")
+    _calculate_kpi_and_get_filtered_cases()
+    
+    # 1. Get filtered cases
+    labelled_filtered_cases = get_filtered_cases_by_abstraction(abstraction_level='organisation', cohort=6)
+    
+    # 2. Get KPI aggregation value counts
+    for filtered_cases in labelled_filtered_cases:
+        
+        value_counts = get_kpi_value_counts(filtered_cases=filtered_cases['filtered_cases'])
+        
+        # 3. Feed value counts to update KPIAggregation
+        organisation = Organisation.objects.filter(ODSCode=filtered_cases['region'])[0]
+        KPIAggregation.objects.create(**value_counts, organisation=organisation)
+
+    # 4. Get KPIAggregations for each level of abstraction
+    print(KPIAggregation.objects.all())

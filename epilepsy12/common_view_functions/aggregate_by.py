@@ -128,51 +128,117 @@ def cases_aggregated_by_ethnicity(selected_organisation):
 
     return cases_aggregated_by_ethnicity
 
-def _get_queryobjects_from_sublevel(abstraction_level: Literal[
+
+def _get_queryobjects_from_sublevel(
+    abstraction_level: Literal[
         "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
-    ], sublevel)->Q:
+    ],
+    sublevel,
+) -> Q:
     """Returns a sublevel Q object for a given abstraction level"""
-    
+
     if abstraction_level == "organisation":
-            sublevel_Q = Q(
-                site__organisation__ODSCode=sublevel.ODSCode
-            )
-            
+        sublevel_Q = Q(site__organisation__ODSCode=sublevel.ODSCode)
+
     if abstraction_level == "trust":
         sublevel_Q = Q(
             site__organisation__ParentOrganisation_ODSCode=sublevel.ParentOrganisation_ODSCode
         )
-        
+
     if abstraction_level == "icb":
         sublevel_Q = Q(
             site__organisation__integrated_care_board__ODS_ICB_Code=sublevel.ODS_ICB_Code
         )
-        
+
     if abstraction_level == "nhs_region":
         sublevel_Q = Q(
             site__organisation__nhs_region__NHS_Region_Code=sublevel.NHS_Region_Code
         )
-        
+
     if abstraction_level == "open_uk":
         sublevel_Q = Q(
             site__organisation__openuk_network__OPEN_UK_Network_Code=sublevel.OPEN_UK_Network_Code
         )
-        
+
     if abstraction_level == "country":
         sublevel_Q = Q(
             site__organisation__ons_region__ons_country__Country_ONS_Code=sublevel.Country_ONS_Code
         )
-        
-    
-    return sublevel_Q    
 
-def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
+    return sublevel_Q
+
+
+def _get_abstraction_sublevels_from_level(abstraction_level: str) -> list:
+    """Returns a list of (label, subunitEntity)"""
+
+    Organisation = apps.get_model("epilepsy12", "Organisation")
+    if abstraction_level == "organisation":
+        sublevels = Organisation.objects.order_by(
+            "OrganisationName", "ODSCode"
+        ).distinct()
+        labels = [entity.ODSCode for entity in sublevels]
+    elif abstraction_level == "trust":
+        sublevels = Organisation.objects.order_by(
+            "ParentOrganisation_OrganisationName", "ParentOrganisation_ODSCode"
+        ).distinct()
+        labels = [entity.ParentOrganisation_ODSCode for entity in sublevels]
+    elif abstraction_level == "icb":
+        sublevels = get_all_icbs()
+        labels = [entity.ICB_Name for entity in sublevels]
+    elif abstraction_level == "nhs_region":
+        sublevels = get_all_nhs_regions()
+        labels = [entity.NHS_Region for entity in sublevels]
+    elif abstraction_level == "open_uk":
+        sublevels = get_all_open_uk_regions()
+        labels = [entity.OPEN_UK_Network_Name for entity in sublevels]
+    elif abstraction_level == "country":
+        sublevels = get_all_countries()
+        labels = [entity.Country_ONS_Name for entity in sublevels]
+
+    return [(label, sublevel) for label, sublevel in zip(labels, sublevels)]
+
+
+def get_filtered_cases_by_abstraction(
+    abstraction_level: Literal[
+        "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
+    ],
+    cohort: int,
+) -> list[dict]:
+    """Returns a list of dicts of {label,filtered cases} for abstraction, labelled per each sub-unit of that abstraction."""
+
+    Case = apps.get_model("epilepsy12", "Case")
+    filtered_cases_per_subunit = []
+
+    # Get list of label, subunit entity for this abstraction
+    subunits = _get_abstraction_sublevels_from_level(abstraction_level)
+
+    for unit in subunits:
+        label, entity = unit
+
+        q_obj = _get_queryobjects_from_sublevel(abstraction_level, sublevel=entity)
+
+        filtered_cases = Case.objects.filter(
+            Q(site__site_is_actively_involved_in_epilepsy_care=True)
+            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            & q_obj
+            & Q(registration__cohort=cohort)
+        )
+
+        filtered_cases_per_subunit.append(
+            {"region": label, "filtered_cases": filtered_cases}
+        )
+
+    return filtered_cases_per_subunit
+
+
+def get_kpi_value_counts(filtered_cases, kpi_measures: list[str] = None) -> dict:
     """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and returns a dict of value counts, which can be used to update the KPIAggregation model.
 
     Args:
         filtered_cases (QuerySet[Case]): QuerySet of filtered Cases on which to perform aggregation queries.
-        kpi_measures (list): list of KPI measures for which to aggregate
+        kpi_measures (list): list of KPI measures for which to aggregate. If not supplied, default will use all KPI Measures.
     """
+
     final_aggregation_dict = {}
 
     # Get models
@@ -182,6 +248,31 @@ def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
     # Case <~1-2-1~> Registration <~1-2-1~> KPI
     filtered_registration_ids = filtered_cases.values_list("registration__id")
     filtered_kpis = KPI.objects.filter(registration__id__in=filtered_registration_ids)
+
+    if kpi_measures is None:
+        kpi_measures = [
+            "paediatrician_with_expertise_in_epilepsies",
+            "epilepsy_specialist_nurse",
+            "tertiary_input",
+            "epilepsy_surgery_referral",
+            "ecg",
+            "mri",
+            "assessment_of_mental_health_issues",
+            "mental_health_support",
+            "sodium_valproate",
+            "comprehensive_care_planning_agreement",
+            "patient_held_individualised_epilepsy_document",
+            "patient_carer_parent_agreement_to_the_care_planning",
+            "care_planning_has_been_updated_when_necessary",
+            "comprehensive_care_planning_content",
+            "parental_prolonged_seizures_care_plan",
+            "water_safety",
+            "first_aid",
+            "general_participation_and_risk",
+            "service_contact_details",
+            "sudep",
+            "school_individual_healthcare_plan",
+        ]
 
     for kpi_name in kpi_measures:
         # Creates value counts of each value, per kpi measure, including Nulls (using "*")
@@ -219,6 +310,22 @@ def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
         final_aggregation_dict.update(initial_object)
 
     return final_aggregation_dict
+
+
+def update_kpi_aggregation_model_using_value_counts(
+    value_counts: dict, organisation
+) -> None:
+    """Updates the KPI Aggregation model using value_counts_dict and chosen Organisation.
+
+    Args
+        value_counts (dict) - value_counts dict from `get_kpi_value_counts`
+        organisation (Organisation) - instance of Organisation to attach to KPIAggregation model
+    """
+
+    KPIAggregation = apps.get_model("epilepsy12", "KPIAggregation")
+
+    KPIAggregation.objects.update_or_create(**value_counts, organisation=organisation)
+
 
 def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
     """
@@ -306,27 +413,6 @@ def aggregate_all_eligible_kpi_fields(filtered_cases, kpi_measure=None):
 
     return filtered_cases.aggregate(**aggregation_fields)
 
-
-def _get_abstraction_sublevels_from_level(abstraction_level: str):
-    """Returns a QuerySet annotated by sublevel"""
-
-    level_map = {
-        "organisation": get_all_organisations,
-        "trust": get_all_trusts,
-        "icb": get_all_icbs,
-        "nhs_region": get_all_nhs_regions,
-        "open_uk": get_all_open_uk_regions,
-        "country": get_all_countries,
-    }
-    
-    # if abstraction_level == 'national':
-    #     abstraction_sublevels = get_all_countries()
-    #     abstraction_sublevel_Q = Q(site__organisation__CountryONSCode=abstraction_sublevel[0])
-    # NOT NEEDED AS COVERED BY  ALL ORGANISATIONS
-
-    get_function = level_map[abstraction_level]
-
-    return get_function()
 
 def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
     cohort,
@@ -416,4 +502,3 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
         )
 
     return final_object
-

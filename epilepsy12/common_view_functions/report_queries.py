@@ -193,6 +193,6 @@ def get_all_organisations():
     Organisation = apps.get_model("epilepsy12", "Organisation")
     return (
         Organisation.objects.order_by("OrganisationName", "ODSCode")
-        .values_list("OrganisationName", "ODSCode")
+        .values("OrganisationName", "ODSCode")
         .distinct()
     )
