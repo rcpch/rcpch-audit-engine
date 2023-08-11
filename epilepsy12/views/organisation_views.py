@@ -18,7 +18,7 @@ from ..common_view_functions import (
     cases_aggregated_by_ethnicity,
     cases_aggregated_by_deprivation_score,
     all_registered_cases_for_cohort_and_abstraction_level,
-    aggregate_all_eligible_kpi_fields,
+    get_kpi_value_counts,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
     return_tile_for_region,
 )
@@ -176,67 +176,67 @@ def selected_trust_kpis(request, organisation_id):
 
     organisation = Organisation.objects.get(pk=organisation_id)
 
-    # run the aggregations
-    aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
-        organisation_id=organisation.pk, open_access=False
-    )
+    # # run the aggregations
+    # aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
+    #     organisation_id=organisation.pk, open_access=False
+    # )
 
-    # get aggregated KPIs for level of abstraction from KPIAggregation
-    organisation_kpis = KPIAggregation.objects.filter(
-        abstraction_level="organisation"
-    ).get()
-    trust_kpis = KPIAggregation.objects.filter(
-        abstraction_level="trust"
-    ).get()
-    icb_kpis = KPIAggregation.objects.filter(
-        abstraction_level="icb"
-    ).get()
-    nhs_kpis = KPIAggregation.objects.filter(
-        abstraction_level="nhs_region"
-    ).get()
-    open_uk_kpis = KPIAggregation.objects.filter(
-        abstraction_level="open_uk"
-    ).get()
-    country_kpis = KPIAggregation.objects.filter(
-        abstraction_level="country"
-    ).get()
-    national_kpis = KPIAggregation.objects.filter(
-        abstraction_level="national"
-    ).get()
+    # # get aggregated KPIs for level of abstraction from KPIAggregation
+    # organisation_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="organisation"
+    # ).get()
+    # trust_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="trust"
+    # ).get()
+    # icb_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="icb"
+    # ).get()
+    # nhs_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="nhs_region"
+    # ).get()
+    # open_uk_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="open_uk"
+    # ).get()
+    # country_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="country"
+    # ).get()
+    # national_kpis = KPIAggregation.objects.filter(
+    #     abstraction_level="national"
+    # ).get()
 
-    # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
-    # and has very little overhead
-    organisation = Organisation.objects.get(pk=organisation_id)
-    kpis = KPI.objects.create(
-        organisation=organisation,
-        parent_trust=organisation.ParentOrganisation_OrganisationName,
-    )
+    # # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
+    # # and has very little overhead
+    # organisation = Organisation.objects.get(pk=organisation_id)
+    # kpis = KPI.objects.create(
+    #     organisation=organisation,
+    #     parent_trust=organisation.ParentOrganisation_OrganisationName,
+    # )
 
-    template_name = "epilepsy12/partials/kpis/kpis.html"
-    context = {
-        "organisation": organisation,
-        "organisation_kpis": organisation_kpis,
-        "trust_kpis": trust_kpis,
-        "icb_kpis": icb_kpis,
-        "nhs_kpis": nhs_kpis,
-        "open_uk_kpis": open_uk_kpis,
-        "country_kpis": country_kpis,
-        "national_kpis": national_kpis,
-        "kpis": kpis,
-        "open_access": False,
-    }
+    # template_name = "epilepsy12/partials/kpis/kpis.html"
+    # context = {
+    #     "organisation": organisation,
+    #     "organisation_kpis": organisation_kpis,
+    #     "trust_kpis": trust_kpis,
+    #     "icb_kpis": icb_kpis,
+    #     "nhs_kpis": nhs_kpis,
+    #     "open_uk_kpis": open_uk_kpis,
+    #     "country_kpis": country_kpis,
+    #     "national_kpis": national_kpis,
+    #     "kpis": kpis,
+    #     "open_access": False,
+    # }
 
-    # remove the temporary instance as otherwise would contribute to totals
-    kpis.delete()
+    # # remove the temporary instance as otherwise would contribute to totals
+    # kpis.delete()
 
-    response = render(request=request, template_name=template_name, context=context)
+    # response = render(request=request, template_name=template_name, context=context)
 
-    # trigger a GET request from the steps template
-    trigger_client_event(
-        response=response, name="registration_active", params={}
-    )  # reloads the form to show the active steps
+    # # trigger a GET request from the steps template
+    # trigger_client_event(
+    #     response=response, name="registration_active", params={}
+    # )  # reloads the form to show the active steps
 
-    return response
+    return render(request=request, template_name="epilepsy12/partials/kpis/kpis.html", context={'organisation' : organisation})
 
 
 def selected_trust_kpis_open(request, organisation_id):
@@ -357,29 +357,15 @@ def selected_trust_select_kpi(request, organisation_id):
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
     cohort_data = get_current_cohort_data()
+    
+    # 1. Get filtered cases
+    
+    
+    # 2. Get KPI aggregation value counts
+    
+    # 3. Feed value counts to update KPIAggregation
 
-    # get the aggregation for each abstraction level
-    organisation_kpi = KPIAggregation.objects.filter(
-         abstraction_level="organisation"
-    )
-    trust_kpi = KPIAggregation.objects.filter(
-         abstraction_level="trust"
-    )
-    icb_kpi = KPIAggregation.objects.filter(
-         abstraction_level="icb"
-    )
-    nhs_kpi = KPIAggregation.objects.filter(
-         abstraction_level="nhs_region"
-    )
-    open_uk_kpi = KPIAggregation.objects.filter(
-         abstraction_level="open_uk"
-    )
-    country_kpi = KPIAggregation.objects.filter(
-         abstraction_level="country"
-    )
-    national_kpi = KPIAggregation.objects.filter(
-         abstraction_level="national"
-    )
+    # 4. Get KPIAggregations for each level of abstraction
 
     # Get kpi totals for this measure annotated by region name
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
@@ -424,24 +410,6 @@ def selected_trust_select_kpi(request, organisation_id):
         "kpi_name": kpi_name,
         "kpi_value": kpi_value,
         "selected_organisation": organisation,
-        "organisation_kpi": getattr(organisation_kpi, kpi_name, None),
-        "total_organisation_kpi_cases": getattr(
-            organisation_kpi, "total_number_of_cases", None
-        ),
-        "trust_kpi": getattr(trust_kpi, kpi_name, None),
-        "total_trust_kpi_cases": getattr(trust_kpi, "total_number_of_cases", None),
-        "icb_kpi": getattr(icb_kpi, kpi_name, None),
-        "total_icb_kpi_cases": getattr(icb_kpi, "total_number_of_cases", None),
-        "nhs_kpi": getattr(nhs_kpi, kpi_name, None),
-        "total_nhs_kpi_cases": getattr(nhs_kpi, "total_number_of_cases", None),
-        "open_uk_kpi": getattr(open_uk_kpi, kpi_name, None),
-        "total_open_uk_kpi_cases": getattr(open_uk_kpi, "total_number_of_cases", None),
-        "country_kpi": getattr(country_kpi, kpi_name, None),
-        "total_country_kpi_cases": getattr(country_kpi, "total_number_of_cases", None),
-        "national_kpi": getattr(national_kpi, kpi_name, None),
-        "total_national_kpi_cases": getattr(
-            national_kpi, "total_number_of_cases", None
-        ),
         "open_uk": all_aggregated_kpis_by_open_uk_region_in_current_cohort,
         "open_uk_avg": open_uk_avg,
         "open_uk_title": f"{kpi_value} by OPEN UK Region",

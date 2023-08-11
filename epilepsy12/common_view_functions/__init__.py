@@ -15,6 +15,7 @@ from .aggregate_by import (
     aggregate_all_eligible_kpi_fields,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
     get_kpi_value_counts,
+    get_filtered_cases_for_abstraction,
 )
 from .report_queries import (
     all_registered_cases_for_cohort_and_abstraction_level,

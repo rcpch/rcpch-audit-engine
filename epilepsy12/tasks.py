@@ -131,29 +131,24 @@ def aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
     # store the results in KPIAggregation model
     persist_aggregation_results_for_abstraction_level(
         results=organisation_kpis,
-        abstraction_level="organisation",
     )
     persist_aggregation_results_for_abstraction_level(
-        results=trust_kpis, abstraction_level="trust"
+        results=trust_kpis,
     )
     persist_aggregation_results_for_abstraction_level(
-        results=icb_kpis, abstraction_level="icb"
+        results=icb_kpis,
     )
     persist_aggregation_results_for_abstraction_level(
         results=nhs_kpis,
-        abstraction_level="nhs_region",
     )
     persist_aggregation_results_for_abstraction_level(
         results=open_uk_kpis,
-        abstraction_level="open_uk",
     )
     persist_aggregation_results_for_abstraction_level(
         results=country_kpis,
-        abstraction_level="country",
     )
     persist_aggregation_results_for_abstraction_level(
         results=national_kpis,
-        abstraction_level="national",
     )
 
 

@@ -969,28 +969,7 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 @pytest.mark.django_db
 def test_debug(e12_case_factory):
     """Test the refactored `get_kpi_value_counts` fn returns correct aggregate. Tests:"""
-    answer_object = KPIMetric(eligible_kpi_6_8_10=True)
-    answers = answer_object.generate_metrics(
-        kpi_1="FAIL",
-        kpi_2="FAIL",
-        kpi_4="FAIL",
-        kpi_6="FAIL",
-        kpi_7="FAIL",
-        kpi_8="FAIL",
-        kpi_9="FAIL",
-        kpi_10="FAIL",
-    )
+    from epilepsy12.common_view_functions import get_filtered_cases_for_abstraction, return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel
 
-    case = e12_case_factory.create_batch(10, first_name="tester")
-
-    for a in case:
-        calculate_kpis(a.registration)
-    # Get just these test cases
-    filtered_cases = Case.objects.filter(first_name="tester")
-
-    print(filtered_cases.values("date_of_birth"))
-
-    result = get_kpi_value_counts(
-        filtered_cases=filtered_cases,
-        kpi_measures=ALL_KPI_NAMES,
-    )
+    return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(cohort=6,abstraction_level='organisation')
+    get_filtered_cases_for_abstraction(cohort=6, abstraction_level='organisation')
