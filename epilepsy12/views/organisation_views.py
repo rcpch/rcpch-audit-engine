@@ -6,6 +6,7 @@ from django.urls import reverse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
+from django.db.models import Sum
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation
@@ -237,7 +238,11 @@ def selected_trust_kpis(request, organisation_id):
     #     response=response, name="registration_active", params={}
     # )  # reloads the form to show the active steps
 
-    return render(request=request, template_name="epilepsy12/partials/kpis/kpis.html", context={'organisation' : organisation})
+    return render(
+        request=request,
+        template_name="epilepsy12/partials/kpis/kpis.html",
+        context={"organisation": organisation},
+    )
 
 
 def selected_trust_kpis_open(request, organisation_id):
@@ -256,24 +261,12 @@ def selected_trust_kpis_open(request, organisation_id):
     organisation_kpis = KPIAggregation.objects.filter(
         abstraction_level="organisation"
     ).get()
-    trust_kpis = KPIAggregation.objects.filter(
-        abstraction_level="trust"
-    ).get()
-    icb_kpis = KPIAggregation.objects.filter(
-        abstraction_level="icb"
-    ).get()
-    nhs_kpis = KPIAggregation.objects.filter(
-        abstraction_level="nhs_region"
-    ).get()
-    open_uk_kpis = KPIAggregation.objects.filter(
-        abstraction_level="open_uk"
-    ).get()
-    country_kpis = KPIAggregation.objects.filter(
-        abstraction_level="country"
-    ).get()
-    national_kpis = KPIAggregation.objects.filter(
-        abstraction_level="national"
-    ).get()
+    trust_kpis = KPIAggregation.objects.filter(abstraction_level="trust").get()
+    icb_kpis = KPIAggregation.objects.filter(abstraction_level="icb").get()
+    nhs_kpis = KPIAggregation.objects.filter(abstraction_level="nhs_region").get()
+    open_uk_kpis = KPIAggregation.objects.filter(abstraction_level="open_uk").get()
+    country_kpis = KPIAggregation.objects.filter(abstraction_level="country").get()
+    national_kpis = KPIAggregation.objects.filter(abstraction_level="national").get()
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
@@ -358,7 +351,7 @@ def selected_trust_select_kpi(request, organisation_id):
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
     cohort_data = get_current_cohort_data()
-    
+
     all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort_data["cohort"], abstraction_level="open_uk", kpi_measure=kpi_name
     )
@@ -396,8 +389,21 @@ def selected_trust_select_kpi(request, organisation_id):
         kpi_data=all_aggregated_kpis_by_country_in_current_cohort,
         kpi=kpi_name,
     )
+
+    country_kpi_data = (
+        KPIAggregation.objects.all()
+        .values("organisation__ons_region__ons_country__Country_ONS_Name")
+        .annotate(
+            **{
+                f"{kpi_name}_passed": Sum(f"{kpi_name}_passed"),
+                f"{kpi_name}_total_eligible": Sum(f"{kpi_name}_total_eligible"),
+                f"{kpi_name}_ineligible": Sum(f"{kpi_name}_ineligible"),
+                f"{kpi_name}_incomplete": Sum(f"{kpi_name}_incomplete"),
+            }
+        )
+    )
     
-    print('PREVIOUS: ',all_aggregated_kpis_by_country_in_current_cohort)
+    print(country_kpi_data)
 
     context = {
         "kpi_name": kpi_name,
@@ -425,6 +431,12 @@ def selected_trust_select_kpi(request, organisation_id):
         "nhs_region_color": colors.RCPCH_STRONG_BLUE,
         "country_color": colors.RCPCH_DARK_BLUE,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+        # TODO: remove this comment once refactor complete-> REFACTORED KPI STUFF
+        "country_kpi_data": country_kpi_data,
+        "country_kpi_chart_title": f"{kpi_value} by Country",
+        "country_kpi_chart_id": "country_id",
+        "country_kpi_avg_pct": "",
+        "country_kpi_abstraction_color": colors.RCPCH_DARK_BLUE,
     }
 
     template_name = "epilepsy12/partials/organisation/metric.html"
