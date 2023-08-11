@@ -132,6 +132,9 @@
         <div id="country_kpi_ranking" class="row">
             {% include 'epilepsy12/partials/charts/organisations_ranked_by_kpi_measure.html' with data=country data_title=country_title data_id=country_id avg_pct=country_avg abstraction_color=country_color %}
         </div>
+        <div id="NEW_country_kpi_ranking" class="row">
+            {% include 'epilepsy12/partials/charts/UPDATE_organisations_ranked_by_kpi_measure.html' with data=country_kpi_data data_id=country_kpi_chart_id %}
+        </div>
     </div>
 
 </div>
