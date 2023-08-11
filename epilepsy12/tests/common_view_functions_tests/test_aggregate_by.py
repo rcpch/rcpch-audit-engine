@@ -1017,17 +1017,22 @@ def test_debug(e12_case_factory):
         return Case.objects.filter(first_name="tester")
     _calculate_kpi_and_get_filtered_cases()
     
-    # 1. Get filtered cases
+    # 1. Get organisation-labelled filtered cases
     labelled_filtered_cases = get_filtered_cases_by_abstraction(abstraction_level='organisation', cohort=6)
     
     # 2. Get KPI aggregation value counts
+    all_kpi_agg_objects = []
     for filtered_cases in labelled_filtered_cases:
         
         value_counts = get_kpi_value_counts(filtered_cases=filtered_cases['filtered_cases'])
         
-        # 3. Feed value counts to update KPIAggregation
-        organisation = Organisation.objects.filter(ODSCode=filtered_cases['region'])[0]
-        KPIAggregation.objects.create(**value_counts, organisation=organisation)
+        # 3. Feed value counts to update KPIAggregation, append to factory list
+        organisation = Organisation.objects.filter(ODSCode=filtered_cases['region']).first()
+        kpi_agg = KPIAggregation(**value_counts, organisation=organisation)
+        all_kpi_agg_objects.append(kpi_agg)
+        print(f"Created {kpi_agg}")
+    
+    # 4. Bulk create insert
+    KPIAggregation.objects.bulk_create(all_kpi_agg_objects)
 
-    # 4. Get KPIAggregations for each level of abstraction
     print(KPIAggregation.objects.all())
