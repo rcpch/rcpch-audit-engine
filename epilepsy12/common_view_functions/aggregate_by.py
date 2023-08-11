@@ -164,46 +164,7 @@ def _get_queryobjects_from_sublevel(abstraction_level: Literal[
         )
         
     
-    return sublevel_Q
-
-def get_filtered_cases_for_abstraction(
-    cohort:int,
-    abstraction_level: Literal[
-        "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
-    ],
-):
-    """Function to get filtered cases to perform KPI Aggregations on, returning a QuerySet[Case] object.
-
-    Args:
-        cohort (int): required Cohort from which to filter Cases
-        abstraction_level (Literal[ organisation, "trust", "icb", "nhs_region", "open_uk", "country", "national" ]): Level of abstraction to get cases from.
-    """
-    # Avoiding import errors
-    Case = apps.get_model("epilepsy12", "Case")
-    
-    # For a given abstraction level, get a list of that level's "subunits". E.g. for 'nhs_region', the QuerySet contains <NHSRegionEntity: East of England>, <NHSRegionEntity: London> ...
-    abstraction_subunits = _get_abstraction_sublevels_from_level(abstraction_level)
-    
-    print(abstraction_subunits)
-    
-    subunit_querys = [_get_queryobjects_from_sublevel(abstraction_level=abstraction_level,sublevel=subunit) for subunit in abstraction_subunits]
-    
-    print(subunit_querys)
-    
-    filtered_cases = []
-    
-    for subquery in subunit_querys:
-        filtered_cases.append(Case.objects.filter(
-                Q(site__site_is_actively_involved_in_epilepsy_care=True)
-                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-                & subquery
-                & Q(registration__cohort=cohort)
-            ))
-    
-    print(filtered_cases)
-    
-    
-    
+    return sublevel_Q    
 
 def get_kpi_value_counts(filtered_cases, kpi_measures: list[str]) -> dict:
     """Takes in a QuerySet[Cases] and list of selected kpi measure names, calculates an aggregate value count, and returns a dict of value counts, which can be used to update the KPIAggregation model.
