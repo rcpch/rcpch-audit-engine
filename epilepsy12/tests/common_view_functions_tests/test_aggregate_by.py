@@ -969,7 +969,6 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 @pytest.mark.django_db
 def test_debug(e12_case_factory):
     """Test the refactored `get_kpi_value_counts` fn returns correct aggregate. Tests:"""
-    from epilepsy12.common_view_functions import get_filtered_cases_for_abstraction, return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel
+    from epilepsy12.common_view_functions import get_kpi_value_counts
 
-    return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(cohort=6,abstraction_level='organisation')
-    get_filtered_cases_for_abstraction(cohort=6, abstraction_level='organisation')
+    r
