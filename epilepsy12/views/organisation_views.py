@@ -390,7 +390,7 @@ def selected_trust_select_kpi(request, organisation_id):
         kpi=kpi_name,
     )
 
-    country_kpi_data = (
+    country_kpi_data_queryset = (
         KPIAggregation.objects.all()
         .values("organisation__ons_region__ons_country__Country_ONS_Name")
         .annotate(
@@ -402,8 +402,13 @@ def selected_trust_select_kpi(request, organisation_id):
             }
         )
     )
-    
-    print(country_kpi_data)
+    country_kpi_data = []
+    for queryset in country_kpi_data_queryset:
+        country_name = queryset.pop(
+            "organisation__ons_region__ons_country__Country_ONS_Name"
+        )
+
+        country_kpi_data.append((country_name, queryset))
 
     context = {
         "kpi_name": kpi_name,
@@ -434,7 +439,7 @@ def selected_trust_select_kpi(request, organisation_id):
         # TODO: remove this comment once refactor complete-> REFACTORED KPI STUFF
         "country_kpi_data": country_kpi_data,
         "country_kpi_chart_title": f"{kpi_value} by Country",
-        "country_kpi_chart_id": "country_id",
+        "country_kpi_chart_id": "country__kpi_chart_id",
         "country_kpi_avg_pct": "",
         "country_kpi_abstraction_color": colors.RCPCH_DARK_BLUE,
     }
