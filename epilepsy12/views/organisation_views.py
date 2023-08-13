@@ -36,6 +36,33 @@ from ..tasks import (
 )
 
 
+def debug(request):
+    from django.http import HttpResponse
+    from epilepsy12.models import Case
+    from epilepsy12.common_view_functions.calculate_kpis import calculate_kpis
+    from django.db.models import Count, Sum, Q, Case as djCase, F, When, IntegerField
+
+    # 1. starting with organisation abstraction level, calculate kpis for each case, update their kpi model. ?THIS IS THE SLOWEST STEP?
+    for child in Case.objects.all():
+        calculate_kpis(child.registration)
+
+    # 2. Get all KPIs, per organisation (abstraction unit)
+    kpi_name = "ecg"
+    organisation = Organisation.objects.first()
+
+    print(
+        KPI.objects
+        .filter(organisation=organisation)
+        .annotate(
+            ecg_passed=(
+                djCase(When(ecg=1), then=Count('ecg'), default=0, output_field=IntegerField()),
+            )
+        )
+    )
+
+    return HttpResponse()
+
+
 @login_required
 @user_may_view_this_organisation()
 def selected_organisation_summary(request, organisation_id):

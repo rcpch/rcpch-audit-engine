@@ -1059,3 +1059,6 @@ urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 
 urlpatterns += drf_routes
+
+from .views.organisation_views import debug
+urlpatterns += [path('debug', debug, name='debug')]
