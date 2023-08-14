@@ -1170,6 +1170,77 @@ def test_calculate_kpi_value_counts_queryset_nhs_region_level(e12_case_factory):
         ods_code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[ods_code]
 
+@pytest.mark.django_db
+def test_calculate_kpi_value_counts_queryset_open_uk_level(e12_case_factory):
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at OPENUK level. See those docstrings for details.
+    """
+    # openuk_network__OPEN_UK_Network_Code
+    abstraction_codes = ['EPEN','NTPEN']
+    kpi_scores_expected = {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        }
+    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+    abstraction_level = EnumAbstractionLevel.OPEN_UK
+
+    ods_codes = ["RGT01", "RQM01"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=[
+            "ecg",
+            "mental_health_support",
+        ],
+    )
+
+    for vc in value_counts:
+        ods_code = vc.pop(f"organisation__{abstraction_level.value}")
+        assert vc == expected_scores[ods_code]
+
+@pytest.mark.django_db
+def test_calculate_kpi_value_counts_queryset_country_level(e12_case_factory):
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at country level. See those docstrings for details.
+    """
+    # ons_region__ons_country__Country_ONS_Code
+    abstraction_codes = ['E92000001','W92000004']
+    kpi_scores_expected = {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        }
+    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+    abstraction_level = EnumAbstractionLevel.COUNTRY
+
+    ods_codes = ["RGT01", "7A6AV"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=[
+            "ecg",
+            "mental_health_support",
+        ],
+    )
+
+    for vc in value_counts:
+        ods_code = vc.pop(f"organisation__{abstraction_level.value}")
+        assert vc == expected_scores[ods_code]
+
+
 
 @pytest.mark.django_db
 def test_debug(e12_case_factory):
