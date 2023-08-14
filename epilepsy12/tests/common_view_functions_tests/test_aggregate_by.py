@@ -963,7 +963,7 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 
     assert result == expected_output
 
-def _calculate_kpi_and_get_filtered_cases(e12_case_factory, ods_codes: "list[str]"):
+def _get_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
         ORGANISATIONS = Organisation.objects.filter(
             ODSCode__in=ods_codes,
         )
@@ -1050,7 +1050,7 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
     expected_scores = {ods_code:kpi_scores_expected for ods_code in ods_codes}
 
     
-    filtered_cases = _calculate_kpi_and_get_filtered_cases(e12_case_factory, ods_codes=ods_codes)
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
 
     value_counts = calculate_kpi_value_counts_queryset(
         filtered_cases=filtered_cases,
@@ -1069,7 +1069,7 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
 def test_calculate_kpi_value_counts_queryset_trust_level(e12_case_factory):
     """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at trust level. See those docstrings for details.
     """
-    
+    # ParentOrganisation_ODSCode
     abstraction_codes = ['RGT','RQM']
     kpi_scores_expected = {
             "ecg_passed": 10,
@@ -1085,7 +1085,77 @@ def test_calculate_kpi_value_counts_queryset_trust_level(e12_case_factory):
     abstraction_level = EnumAbstractionLevel.TRUST
 
     ods_codes = ["RGT01", "RQM01"]
-    filtered_cases = _calculate_kpi_and_get_filtered_cases(e12_case_factory, ods_codes=ods_codes)
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=[
+            "ecg",
+            "mental_health_support",
+        ],
+    )
+
+    for vc in value_counts:
+        ods_code = vc.pop(f"organisation__{abstraction_level.value}")
+        assert vc == expected_scores[ods_code]
+
+@pytest.mark.django_db
+def test_calculate_kpi_value_counts_queryset_icb_level(e12_case_factory):
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at icb level. See those docstrings for details.
+    """
+    # integrated_care_board__ODS_ICB_Code
+    abstraction_codes = ['QUE','QRV']
+    kpi_scores_expected = {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        }
+    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+    abstraction_level = EnumAbstractionLevel.ICB
+
+    ods_codes = ["RGT01", "RQM01"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=[
+            "ecg",
+            "mental_health_support",
+        ],
+    )
+
+    for vc in value_counts:
+        ods_code = vc.pop(f"organisation__{abstraction_level.value}")
+        assert vc == expected_scores[ods_code]
+
+@pytest.mark.django_db
+def test_calculate_kpi_value_counts_queryset_nhs_region_level(e12_case_factory):
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at nhs region level. See those docstrings for details.
+    """
+    # nhs_region__NHS_Region_Code
+    abstraction_codes = ['Y61','Y56']
+    kpi_scores_expected = {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        }
+    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+    abstraction_level = EnumAbstractionLevel.NHS_REGION
+
+    ods_codes = ["RGT01", "RQM01"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
 
     value_counts = calculate_kpi_value_counts_queryset(
         filtered_cases=filtered_cases,
