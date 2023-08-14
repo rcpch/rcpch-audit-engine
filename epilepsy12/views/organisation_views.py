@@ -36,57 +36,6 @@ from ..tasks import (
 )
 
 
-def debug(request):
-    from django.http import HttpResponse
-    from epilepsy12.models import Case
-    from epilepsy12.common_view_functions.calculate_kpis import calculate_kpis
-    from django.db.models import Count, Sum, Q, Case as djCase, F, When, IntegerField
-
-    # 1. starting with organisation abstraction level, calculate kpis for each case, update their kpi model. ?THIS IS THE SLOWEST STEP?
-    for child in Case.objects.all():
-        calculate_kpis(child.registration)
-
-
-    # dict of kpi names
-    kpi_names = KPI().get_kpis()
-    
-    # initialise aggregation queries dict
-    aggregate_queries = {}
-    
-    # for the given abstraction, e.g. 'ODSCode', 
-    # for each kpi name, eg. 'ecg', 
-    # perform aggregations to calculate total passed, total eligible, total ineligble, incompelete
-    for kpi_name in kpi_names:
-        aggregate_queries.update(
-            {
-                f"{kpi_name}_passed": Count(djCase(When(**{f'{kpi_name}':1}, then=1))),
-                f"{kpi_name}_total_eligible": Count(
-                    djCase(When(Q(**{f'{kpi_name}':1}) | Q(**{f'{kpi_name}':0}), then=1))
-                ),
-                f"{kpi_name}_ineligible": Count(djCase(When(**{f'{kpi_name}':2}, then=1))),
-                f"{kpi_name}_incomplete": Count(djCase(When(**{f'{kpi_name}':None}, then=1))),
-            }
-        )
-
-    kpi_value_counts = (
-        KPI.objects
-        .values('organisation__ODSCode') # GROUPBY abstraction level
-        .annotate(**aggregate_queries) # AGGREGATE on each abstraction
-        .order_by('organisation__ODSCode') # To ensure order is always as expected
-    )
-    
-    # Update/ create the KPIAggregation for that abstraction
-    for vc in kpi_value_counts:
-        ods_code = vc.pop('organisation__ODSCode')
-        organisation = Organisation.objects.get(ODSCode=ods_code)
-        agg = KPIAggregation.objects.create(organisation=organisation, **vc)
-        print(f"Creating {agg}")
-        
-        
-    
-    return HttpResponse()
-
-
 @login_required
 @user_may_view_this_organisation()
 def selected_organisation_summary(request, organisation_id):
