@@ -1,6 +1,6 @@
 from typing import Literal
 
-from .models import Organisation, KPIAggregation
+from .models import Organisation, OrganisationKPIAggregation
 from .common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     aggregate_all_eligible_kpi_fields,
@@ -128,7 +128,7 @@ def aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
     country_kpis.update({"abstraction_level": "country", "open_access": open_access})
     national_kpis.update({"abstraction_level": "national", "open_access": open_access})
 
-    # store the results in KPIAggregation model
+    # store the results in OrganisationKPIAggregation model
     persist_aggregation_results_for_abstraction_level(
         results=organisation_kpis,
     )
@@ -162,9 +162,9 @@ def persist_aggregation_results_for_abstraction_level(
     Private function to store the aggregation results in KPI_Aggregation results table
     """
 
-    if KPIAggregation.objects.filter(abstraction_level=abstraction_level).exists():
-        KPIAggregation.objects.filter(abstraction_level=abstraction_level).update(
+    if OrganisationKPIAggregation.objects.filter(abstraction_level=abstraction_level).exists():
+        OrganisationKPIAggregation.objects.filter(abstraction_level=abstraction_level).update(
             **results
         )
     else:
-        KPIAggregation.objects.create(**results, abstraction_level=abstraction_level)
+        OrganisationKPIAggregation.objects.create(**results, abstraction_level=abstraction_level)

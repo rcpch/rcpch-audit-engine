@@ -11,7 +11,7 @@ from django.db.models import Sum
 # E12 imports
 from ..decorator import user_may_view_this_organisation
 from epilepsy12.constants import INDIVIDUAL_KPI_MEASURES
-from epilepsy12.models import Organisation, KPI, KPIAggregation
+from epilepsy12.models import Organisation, KPI
 from ..common_view_functions import (
     sanction_user,
     trigger_client_event,
