@@ -963,15 +963,7 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 
     assert result == expected_output
 
-
-@pytest.mark.django_db
-def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory):
-    """This test generates 60 children total at 2 different organisations (30 each), with known KPI scorings. Asserts the value counts function returns the expected KPI value counts.
-
-    NOTE: To simplify the expected score fields, we just use 2 KPIs. This is a valid simplification as the function does not touch KPI scorings - only getting scorings from the model and aggregating. Thus, if it works for 2 kpis (or even 1), it should work for all.
-    """
-
-    def _calculate_kpi_and_get_filtered_cases(ods_codes: "list[str]"):
+def _calculate_kpi_and_get_filtered_cases(e12_case_factory, ods_codes: "list[str]"):
         ORGANISATIONS = Organisation.objects.filter(
             ODSCode__in=ods_codes,
         )
@@ -1036,10 +1028,16 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
             first_name="tester", organisations__ODSCode__in=ods_codes
         )
 
-    filtered_cases = _calculate_kpi_and_get_filtered_cases(ods_codes=["RGT01", "RQM01"])
 
-    expected_scores = {
-        "RGT01": {
+@pytest.mark.django_db
+def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory):
+    """This test generates 60 children total at 2 different organisations (30 each), with known KPI scorings. Asserts the value counts function returns the expected KPI value counts.
+
+    NOTE: To simplify the expected score fields, we just use 2 KPIs. This is a valid simplification as the function does not touch KPI scorings - only getting scorings from the model and aggregating. Thus, if it works for 2 kpis (or even 1), it should work for all.
+    """
+    
+    ods_codes = ["RGT01", "RQM01"]
+    kpi_scores_expected = {
             "ecg_passed": 10,
             "ecg_total_eligible": 20,
             "ecg_ineligible": 10,
@@ -1048,18 +1046,11 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
             "mental_health_support_total_eligible": 20,
             "mental_health_support_ineligible": 10,
             "mental_health_support_incomplete": 10,
-        },
-        "RQM01": {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        },
-    }
+        }
+    expected_scores = {ods_code:kpi_scores_expected for ods_code in ods_codes}
+
+    
+    filtered_cases = _calculate_kpi_and_get_filtered_cases(e12_case_factory, ods_codes=ods_codes)
 
     value_counts = calculate_kpi_value_counts_queryset(
         filtered_cases=filtered_cases,
@@ -1072,6 +1063,41 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
 
     for vc in value_counts:
         ods_code = vc.pop(f"organisation__{EnumAbstractionLevel.ORGANISATION.value}")
+        assert vc == expected_scores[ods_code]
+
+@pytest.mark.django_db
+def test_calculate_kpi_value_counts_queryset_trust_level(e12_case_factory):
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at trust level. See those docstrings for details.
+    """
+    
+    abstraction_codes = ['RGT','RQM']
+    kpi_scores_expected = {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        }
+    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+    abstraction_level = EnumAbstractionLevel.TRUST
+
+    ods_codes = ["RGT01", "RQM01"]
+    filtered_cases = _calculate_kpi_and_get_filtered_cases(e12_case_factory, ods_codes=ods_codes)
+
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=[
+            "ecg",
+            "mental_health_support",
+        ],
+    )
+
+    for vc in value_counts:
+        ods_code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[ods_code]
 
 
