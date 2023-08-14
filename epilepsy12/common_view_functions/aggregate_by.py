@@ -508,17 +508,19 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
 
 def calculate_kpi_value_counts_queryset(
-    filtered_cases, abstraction_level: EnumAbstractionLevel, kpis: "list[str] | Literal['all']"='all'
+    filtered_cases,
+    abstraction_level: EnumAbstractionLevel,
+    kpis: "list[str] | Literal['all']" = "all",
 ):
     """For the given filtered_cases queryset, for all KPIs, calculates the value counts, per abstraction level.
 
     Assumes the filtered_cases already have kpi scores calculated.
-    
+
     Args
         `filtered_cases` (QuerySet[Case]) - filtered Cases, for which KPI model has already been updated
-        
+
         `abstraction_level` (EnumAbstractionLevel) - specifies the abstraction level on which to return value counts. E.g. if EnumAbstractionLevel.ORGANISATION, each queryset in the return object will have 'organisation__ODSCode'.
-        
+
         `kpis` (list[str] or Literal['all']) - Default 'all'. List of KPI model fields to perform aggregation on. If 'all', then all available fields on the KPI model, found using KPI.get_kpis() method, will be used.
 
     Returns `ValuesQuerySet[KPI, dict[str, any]]`.
@@ -527,7 +529,7 @@ def calculate_kpi_value_counts_queryset(
     KPI = apps.get_model("epilepsy12", "KPI")
 
     # Dict of kpi names
-    kpi_names = KPI().get_kpis() if kpis == 'all' else kpis
+    kpi_names = KPI().get_kpis() if kpis == "all" else kpis
 
     # Initialise aggregation queries dict
     aggregate_queries = {}
@@ -561,7 +563,9 @@ def calculate_kpi_value_counts_queryset(
         )  # filter for KPIs associated with filtered cases
         .values(f"organisation__{abstraction_level.value}")  # GROUPBY abstraction level
         .annotate(**aggregate_queries)  # AGGREGATE on each abstraction
-        .order_by(f"organisation__{abstraction_level.value}")  # To ensure order is always as expected
+        .order_by(
+            f"organisation__{abstraction_level.value}"
+        )  # To ensure order is always as expected
     )
 
     return kpi_value_counts
