@@ -18,21 +18,18 @@ from epilepsy12.common_view_functions import (
     get_kpi_value_counts,
     all_registered_cases_for_cohort_and_abstraction_level,
     calculate_kpis,
+    calculate_kpi_value_counts_queryset,
 )
-from epilepsy12.models import (
-    Organisation,
-    Case,
-    KPI,
-    Registration,
-    KPIAggregation
-)
+from epilepsy12.models import Organisation, Case, KPI, Registration, KPIAggregation
 from epilepsy12.constants import (
     SEX_TYPE,
     DEPRIVATION_QUINTILES,
     ETHNICITIES,
     KPI_SCORE,
+    EnumAbstractionLevel
 )
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
+
 
 
 @pytest.mark.django_db
@@ -968,15 +965,16 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 
 
 @pytest.mark.django_db
-def test_debug(e12_case_factory):
-    """debug"""
-    from epilepsy12.common_view_functions import get_kpi_value_counts,get_filtered_cases_by_abstraction
+def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory):
+    """This test generates 60 children total at 2 different organisations (30 each), with known KPI scorings. Asserts the value counts function returns the expected KPI value counts.
 
-    def _calculate_kpi_and_get_filtered_cases():
-        CHELWEST = Organisation.objects.get(
-        ODSCode="RQM01",
-        ParentOrganisation_ODSCode="RQM",
-    )
+    NOTE: To simplify the expected score fields, we just use 2 KPIs. This is a valid simplification as the function does not touch KPI scorings - only getting scorings from the model and aggregating. Thus, if it works for 2 kpis (or even 1), it should work for all.
+    """
+
+    def _calculate_kpi_and_get_filtered_cases(ods_codes: "list[str]"):
+        ORGANISATIONS = Organisation.objects.filter(
+            ODSCode__in=ods_codes,
+        )
 
         # create answersets for cases to achieve the stated expected output
         answer_object = KPIMetric(eligible_kpi_6_8_10=True)
@@ -1000,39 +998,84 @@ def test_debug(e12_case_factory):
             kpi_9="FAIL",
             kpi_10="FAIL",
         )
+        ineligible_answers = answer_object.generate_metrics(
+            kpi_1="FAIL",
+            kpi_2="FAIL",
+            kpi_4="INELIGIBLE",
+            kpi_6="FAIL",
+            kpi_7="INELIGIBLE",
+            kpi_8="FAIL",
+            kpi_9="FAIL",
+            kpi_10="FAIL",
+        )
+        # NOTE: here we specify date of birth for 'empty answer set', as the default age would otherwise be 1yo, making them ineligible for kpis 6,8,10
+        incomplete_answers = {"date_of_birth": date(2011, 1, 1)}
 
         filled_case_objects = []
-        # iterate through answersets (pass, fail, none) for kpi, create Cases
-        # NOTE: here we specify date of birth for 'empty answer set', as the default age would otherwise be 1yo, making them ineligible for kpis 6,8,10
-        for answer_set in [pass_answers, fail_answers, {"date_of_birth": date(2011, 1, 1)}]:
-            test_cases = e12_case_factory.create_batch(
-                10, organisations__organisation=CHELWEST, first_name="tester", **answer_set
-            )
-            filled_case_objects += test_cases
+        # iterate through answersets (pass, fail, ineligble, incomplete) for kpi, create 10 Cases per answerset
+        for organisation in ORGANISATIONS:
+            for answer_set in [
+                pass_answers,
+                fail_answers,
+                ineligible_answers,
+                incomplete_answers,
+            ]:
+                test_cases = e12_case_factory.create_batch(
+                    10,
+                    organisations__organisation=organisation,
+                    first_name="tester",
+                    **answer_set,
+                )
+                filled_case_objects += test_cases
 
         for test_case in filled_case_objects:
             calculate_kpis(registration_instance=test_case.registration)
 
         # Get just these test cases
-        return Case.objects.filter(first_name="tester")
-    _calculate_kpi_and_get_filtered_cases()
-    
-    # 1. Get organisation-labelled filtered cases
-    labelled_filtered_cases = get_filtered_cases_by_abstraction(abstraction_level='organisation', cohort=6)
-    
-    # 2. Get KPI aggregation value counts
-    all_kpi_agg_objects = []
-    for filtered_cases in labelled_filtered_cases:
-        
-        value_counts = get_kpi_value_counts(filtered_cases=filtered_cases['filtered_cases'])
-        
-        # 3. Feed value counts to update KPIAggregation, append to factory list
-        organisation = Organisation.objects.filter(ODSCode=filtered_cases['region']).first()
-        kpi_agg = KPIAggregation(**value_counts, organisation=organisation)
-        all_kpi_agg_objects.append(kpi_agg)
-        print(f"Created {kpi_agg}")
-    
-    # 4. Bulk create insert
-    KPIAggregation.objects.bulk_create(all_kpi_agg_objects)
+        return Case.objects.filter(
+            first_name="tester", organisations__ODSCode__in=ods_codes
+        )
 
-    print(KPIAggregation.objects.all())
+    filtered_cases = _calculate_kpi_and_get_filtered_cases(ods_codes=["RGT01", "RQM01"])
+
+    expected_scores = {
+        "RGT01": {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        },
+        "RQM01": {
+            "ecg_passed": 10,
+            "ecg_total_eligible": 20,
+            "ecg_ineligible": 10,
+            "ecg_incomplete": 10,
+            "mental_health_support_passed": 10,
+            "mental_health_support_total_eligible": 20,
+            "mental_health_support_ineligible": 10,
+            "mental_health_support_incomplete": 10,
+        },
+    }
+
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=EnumAbstractionLevel.ORGANISATION,
+        kpis=[
+            "ecg",
+            "mental_health_support",
+        ],
+    )
+
+    for vc in value_counts:
+        ods_code = vc.pop(f"organisation__{EnumAbstractionLevel.ORGANISATION.value}")
+        assert vc == expected_scores[ods_code]
+
+
+@pytest.mark.django_db
+def test_debug(e12_case_factory):
+    """debug"""
+    pass
