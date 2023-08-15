@@ -509,60 +509,70 @@ class TrustKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
+    # NOTE: parent_organisation_ods_code is not unique (multiple Organisation objects can share the same) so just store in a charfield
     parent_organisation_ods_code = models.CharField(max_length=100)
 
     class Meta:
-        verbose_name = _("Organisation KPI Aggregation Model")
-        verbose_name_plural = _("Organisation KPI Aggregation Models")
+        verbose_name = _("Trust KPI Aggregation Model")
+        verbose_name_plural = _("Trust KPI Aggregation Models")
 
     def __str__(self):
-        return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+        return f"Trust (parent_organisation_ods_code={self.parent_organisation_ods_code}) KPIAggregations"
 
 
-# class ICBKPIAggregation(BaseKPIAggregation):
-#     """
-#     KPI summary statistics for organisations.
-#     """
+class ICBKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for IntegratedCareBoardEntity.
+    """
 
-#     # Define relationships
-#     parent_organisation_ods_code = models.CharField(max_length=100)
+    # Define relationships
+    abstraction_relation = models.ForeignKey(
+        to="epilepsy12.IntegratedCareBoardEntity",
+        on_delete=models.CASCADE,
+    )
 
-#     class Meta:
-#         verbose_name = _("Organisation KPI Aggregation Model")
-#         verbose_name_plural = _("Organisation KPI Aggregation Models")
+    class Meta:
+        verbose_name = _("IntegratedCareBoardEntity KPI Aggregation Model")
+        verbose_name_plural = _("IntegratedCareBoardEntity KPI Aggregation Models")
 
-#     def __str__(self):
-#         return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+    def __str__(self):
+        return f"IntegratedCareBoardEntity (IntegratedCareBoardEntity={self.abstraction_relation}) KPIAggregations"
 
-# class NHSRegionKPIAggregation(BaseKPIAggregation):
-#     """
-#     KPI summary statistics for organisations.
-#     """
+class NHSRegionKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for NHSRegion.
+    """
 
-#     # Define relationships
-#     parent_organisation_ods_code = models.CharField(max_length=100)
+    # Define relationships
+    abstraction_relation = models.ForeignKey(
+        to="epilepsy12.NHSRegionEntity",
+        on_delete=models.CASCADE,
+    )
 
-#     class Meta:
-#         verbose_name = _("Organisation KPI Aggregation Model")
-#         verbose_name_plural = _("Organisation KPI Aggregation Models")
+    class Meta:
+        verbose_name = _("NHSRegionEntity KPI Aggregation Model")
+        verbose_name_plural = _("NHSRegionEntity KPI Aggregation Models")
 
-#     def __str__(self):
-#         return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+    def __str__(self):
+        return f"NHSRegionEntity (NHSRegionEntity={self.abstraction_relation}) KPIAggregations"
 
-# class OpenUKKPIAggregation(BaseKPIAggregation):
-#     """
-#     KPI summary statistics for organisations.
-#     """
+class OpenUKKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for OpenUK.
+    """
 
-#     # Define relationships
-#     parent_organisation_ods_code = models.CharField(max_length=100)
+    # Define relationships
+    abstraction_relation = models.ForeignKey(
+        to="epilepsy12.OPENUKNetworkEntity",
+        on_delete=models.CASCADE,
+    )
 
-#     class Meta:
-#         verbose_name = _("Organisation KPI Aggregation Model")
-#         verbose_name_plural = _("Organisation KPI Aggregation Models")
+    class Meta:
+        verbose_name = _("OpenUK KPI Aggregation Model")
+        verbose_name_plural = _("OpenUK KPI Aggregation Models")
 
-#     def __str__(self):
-#         return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+    def __str__(self):
+        return f"OpenUK (OPENUKNetworkEntity={self.abstraction_relation}) KPIAggregations"
 
 
 class CountryKPIAggregation(BaseKPIAggregation):
@@ -581,4 +591,4 @@ class CountryKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Country KPI Aggregation Models")
 
     def __str__(self):
-        return f"Country (Country_ONS_Code={self.abstraction_relation}) KPIAggregations"
+        return f"Country (ONSCountryEntity={self.abstraction_relation}) KPIAggregations"
