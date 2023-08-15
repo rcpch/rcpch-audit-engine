@@ -640,9 +640,15 @@ def update_kpi_aggregation_model(
         )
 
         # Get instance of the related entity model to link with Aggregation model
-        abstraction_relation_instance = abstraction_entity_model.objects.get(
+        # NOTE Trust is only abstraction level which doesn't have 1-2-1 correspondance with Organisation
+        if abstraction_level is EnumAbstractionLevel.TRUST:
+            abstraction_relation_instance = abstraction_entity_model.objects.filter(
             **{f"{related_key_field}": ABSTRACTION_CODE}
-        )
+        ).first()
+        else:
+            abstraction_relation_instance = abstraction_entity_model.objects.get(
+                **{f"{related_key_field}": ABSTRACTION_CODE}
+            )
 
         new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
             defaults={

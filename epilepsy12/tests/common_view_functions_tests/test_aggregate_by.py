@@ -1310,6 +1310,61 @@ def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
             == expected_scores[abstraction_relation_entity]
         )
 
+@pytest.mark.django_db
+def test_update_kpi_aggregation_model_trust_level(e12_case_factory):
+    """Testing the `update_kpi_aggregation_model` fn.
+
+    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but on Trust level. See those docstrings for details.
+    """
+    # Define constants
+    kpis_tested = ["ecg", "mental_health_support"]
+
+    abstraction_level = EnumAbstractionLevel.TRUST
+    abstractions = [
+        Organisation.objects.filter(ParentOrganisation_ODSCode=abstraction_code).first()
+        for abstraction_code in ("RGT", "7A6")
+    ]
+    kpi_scores_expected = {
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+
+    # Generate expected scores
+    expected_scores = {code: kpi_scores_expected for code in abstractions}
+
+    # Get scored test cases
+    ods_codes = ["RGT01", "7A6AV"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+
+    # Get value counts
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=kpis_tested,
+    )
+
+    # ACTION: run update kpi agg model fn
+    update_kpi_aggregation_model(
+        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.TRUST
+    )
+
+    # For each abstraction code, check output is expected
+    for abstraction_relation_entity in expected_scores:
+        abstraction_kpi_aggregation_model = TrustKPIAggregation.objects.get(
+            abstraction_relation=abstraction_relation_entity
+        )
+
+        assert (
+            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
+            == expected_scores[abstraction_relation_entity]
+        )
+
 
 # TODO: NOT PASSING AS NOT ALL ORGANISATIONS HAVE AN ICB (EG WELSH ORG)
 @pytest.mark.django_db
