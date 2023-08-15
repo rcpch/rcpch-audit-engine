@@ -490,7 +490,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    organisation = models.ForeignKey(
+    abstraction_relation = models.ForeignKey(
         to="epilepsy12.Organisation",
         on_delete=models.CASCADE,
     )
@@ -500,7 +500,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Organisation KPI Aggregation Models")
 
     def __str__(self):
-        return f"Organisation ({self.organisation.OrganisationName}) KPIAggregations"
+        return f"Organisation (ODSCode={self.abstraction_relation}) KPIAggregations"
 
 
 class TrustKPIAggregation(BaseKPIAggregation):
@@ -510,14 +510,14 @@ class TrustKPIAggregation(BaseKPIAggregation):
 
     # Define relationships
     # NOTE: parent_organisation_ods_code is not unique (multiple Organisation objects can share the same) so just store in a charfield
-    parent_organisation_ods_code = models.CharField(max_length=100)
+    abstraction_relation = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = _("Trust KPI Aggregation Model")
         verbose_name_plural = _("Trust KPI Aggregation Models")
 
     def __str__(self):
-        return f"Trust (parent_organisation_ods_code={self.parent_organisation_ods_code}) KPIAggregations"
+        return f"Trust (parent_organisation_ods_code={self.abstraction_relation}) KPIAggregations"
 
 
 class ICBKPIAggregation(BaseKPIAggregation):
