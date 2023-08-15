@@ -19,17 +19,23 @@ from epilepsy12.common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     calculate_kpis,
     calculate_kpi_value_counts_queryset,
+    update_kpi_aggregation_model,
 )
-from epilepsy12.models import Organisation, Case, KPI, Registration, KPIAggregation
+from epilepsy12.models import (
+    Organisation,
+    Case,
+    Registration,
+    OrganisationKPIAggregation,
+    CountryKPIAggregation,
+    ONSCountryEntity,
+)
 from epilepsy12.constants import (
     SEX_TYPE,
     DEPRIVATION_QUINTILES,
     ETHNICITIES,
-    KPI_SCORE,
-    EnumAbstractionLevel
+    EnumAbstractionLevel,
 )
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
-
 
 
 @pytest.mark.django_db
@@ -963,70 +969,71 @@ def test_get_kpi_value_counts_others_ineligible(e12_case_factory):
 
     assert result == expected_output
 
+
 def _get_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
-        ORGANISATIONS = Organisation.objects.filter(
-            ODSCode__in=ods_codes,
-        )
+    ORGANISATIONS = Organisation.objects.filter(
+        ODSCode__in=ods_codes,
+    )
 
-        # create answersets for cases to achieve the stated expected output
-        answer_object = KPIMetric(eligible_kpi_6_8_10=True)
-        pass_answers = answer_object.generate_metrics(
-            kpi_1="PASS",
-            kpi_2="PASS",
-            kpi_4="PASS",
-            kpi_6="PASS",
-            kpi_7="PASS",
-            kpi_8="PASS",
-            kpi_9="PASS",
-            kpi_10="PASS",
-        )
-        fail_answers = answer_object.generate_metrics(
-            kpi_1="FAIL",
-            kpi_2="FAIL",
-            kpi_4="FAIL",
-            kpi_6="FAIL",
-            kpi_7="FAIL",
-            kpi_8="FAIL",
-            kpi_9="FAIL",
-            kpi_10="FAIL",
-        )
-        ineligible_answers = answer_object.generate_metrics(
-            kpi_1="FAIL",
-            kpi_2="FAIL",
-            kpi_4="INELIGIBLE",
-            kpi_6="FAIL",
-            kpi_7="INELIGIBLE",
-            kpi_8="FAIL",
-            kpi_9="FAIL",
-            kpi_10="FAIL",
-        )
-        # NOTE: here we specify date of birth for 'empty answer set', as the default age would otherwise be 1yo, making them ineligible for kpis 6,8,10
-        incomplete_answers = {"date_of_birth": date(2011, 1, 1)}
+    # create answersets for cases to achieve the stated expected output
+    answer_object = KPIMetric(eligible_kpi_6_8_10=True)
+    pass_answers = answer_object.generate_metrics(
+        kpi_1="PASS",
+        kpi_2="PASS",
+        kpi_4="PASS",
+        kpi_6="PASS",
+        kpi_7="PASS",
+        kpi_8="PASS",
+        kpi_9="PASS",
+        kpi_10="PASS",
+    )
+    fail_answers = answer_object.generate_metrics(
+        kpi_1="FAIL",
+        kpi_2="FAIL",
+        kpi_4="FAIL",
+        kpi_6="FAIL",
+        kpi_7="FAIL",
+        kpi_8="FAIL",
+        kpi_9="FAIL",
+        kpi_10="FAIL",
+    )
+    ineligible_answers = answer_object.generate_metrics(
+        kpi_1="FAIL",
+        kpi_2="FAIL",
+        kpi_4="INELIGIBLE",
+        kpi_6="FAIL",
+        kpi_7="INELIGIBLE",
+        kpi_8="FAIL",
+        kpi_9="FAIL",
+        kpi_10="FAIL",
+    )
+    # NOTE: here we specify date of birth for 'empty answer set', as the default age would otherwise be 1yo, making them ineligible for kpis 6,8,10
+    incomplete_answers = {"date_of_birth": date(2011, 1, 1)}
 
-        filled_case_objects = []
-        # iterate through answersets (pass, fail, ineligble, incomplete) for kpi, create 10 Cases per answerset
-        for organisation in ORGANISATIONS:
-            for answer_set in [
-                pass_answers,
-                fail_answers,
-                ineligible_answers,
-                incomplete_answers,
-            ]:
-                test_cases = e12_case_factory.create_batch(
-                    10,
-                    organisations__organisation=organisation,
-                    first_name="tester",
-                    **answer_set,
-                )
-                filled_case_objects += test_cases
+    filled_case_objects = []
+    # iterate through answersets (pass, fail, ineligble, incomplete) for kpi, create 10 Cases per answerset
+    for organisation in ORGANISATIONS:
+        for answer_set in [
+            pass_answers,
+            fail_answers,
+            ineligible_answers,
+            incomplete_answers,
+        ]:
+            test_cases = e12_case_factory.create_batch(
+                10,
+                organisations__organisation=organisation,
+                first_name="tester",
+                **answer_set,
+            )
+            filled_case_objects += test_cases
 
-        for test_case in filled_case_objects:
-            calculate_kpis(registration_instance=test_case.registration)
+    for test_case in filled_case_objects:
+        calculate_kpis(registration_instance=test_case.registration)
 
-        # Get just these test cases
-        return Case.objects.filter(
-            first_name="tester", organisations__ODSCode__in=ods_codes
-        )
+    # Get just these test cases
+    return Case.objects.filter(
+        first_name="tester", organisations__ODSCode__in=ods_codes
+    )
 
 
 @pytest.mark.django_db
@@ -1035,21 +1042,20 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
 
     NOTE: To simplify the expected score fields, we just use 2 KPIs. This is a valid simplification as the function does not touch KPI scorings - only getting scorings from the model and aggregating. Thus, if it works for 2 kpis (or even 1), it should work for all.
     """
-    
+
     ods_codes = ["RGT01", "RQM01"]
     kpi_scores_expected = {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        }
-    expected_scores = {ods_code:kpi_scores_expected for ods_code in ods_codes}
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    expected_scores = {ods_code: kpi_scores_expected for ods_code in ods_codes}
 
-    
     filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
 
     value_counts = calculate_kpi_value_counts_queryset(
@@ -1065,23 +1071,23 @@ def test_calculate_kpi_value_counts_queryset_organisation_level(e12_case_factory
         ods_code = vc.pop(f"organisation__{EnumAbstractionLevel.ORGANISATION.value}")
         assert vc == expected_scores[ods_code]
 
+
 @pytest.mark.django_db
 def test_calculate_kpi_value_counts_queryset_trust_level(e12_case_factory):
-    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at trust level. See those docstrings for details.
-    """
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at trust level. See those docstrings for details."""
     # ParentOrganisation_ODSCode
-    abstraction_codes = ['RGT','RQM']
+    abstraction_codes = ["RGT", "RQM"]
     kpi_scores_expected = {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        }
-    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
     abstraction_level = EnumAbstractionLevel.TRUST
 
     ods_codes = ["RGT01", "RQM01"]
@@ -1100,23 +1106,23 @@ def test_calculate_kpi_value_counts_queryset_trust_level(e12_case_factory):
         ods_code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[ods_code]
 
+
 @pytest.mark.django_db
 def test_calculate_kpi_value_counts_queryset_icb_level(e12_case_factory):
-    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at icb level. See those docstrings for details.
-    """
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at icb level. See those docstrings for details."""
     # integrated_care_board__ODS_ICB_Code
-    abstraction_codes = ['QUE','QRV']
+    abstraction_codes = ["QUE", "QRV"]
     kpi_scores_expected = {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        }
-    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
     abstraction_level = EnumAbstractionLevel.ICB
 
     ods_codes = ["RGT01", "RQM01"]
@@ -1135,23 +1141,23 @@ def test_calculate_kpi_value_counts_queryset_icb_level(e12_case_factory):
         ods_code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[ods_code]
 
+
 @pytest.mark.django_db
 def test_calculate_kpi_value_counts_queryset_nhs_region_level(e12_case_factory):
-    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at nhs region level. See those docstrings for details.
-    """
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at nhs region level. See those docstrings for details."""
     # nhs_region__NHS_Region_Code
-    abstraction_codes = ['Y61','Y56']
+    abstraction_codes = ["Y61", "Y56"]
     kpi_scores_expected = {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        }
-    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
     abstraction_level = EnumAbstractionLevel.NHS_REGION
 
     ods_codes = ["RGT01", "RQM01"]
@@ -1170,23 +1176,23 @@ def test_calculate_kpi_value_counts_queryset_nhs_region_level(e12_case_factory):
         ods_code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[ods_code]
 
+
 @pytest.mark.django_db
 def test_calculate_kpi_value_counts_queryset_open_uk_level(e12_case_factory):
-    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at OPENUK level. See those docstrings for details.
-    """
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at OPENUK level. See those docstrings for details."""
     # openuk_network__OPEN_UK_Network_Code
-    abstraction_codes = ['EPEN','NTPEN']
+    abstraction_codes = ["EPEN", "NTPEN"]
     kpi_scores_expected = {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        }
-    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
     abstraction_level = EnumAbstractionLevel.OPEN_UK
 
     ods_codes = ["RGT01", "RQM01"]
@@ -1205,23 +1211,23 @@ def test_calculate_kpi_value_counts_queryset_open_uk_level(e12_case_factory):
         ods_code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[ods_code]
 
+
 @pytest.mark.django_db
 def test_calculate_kpi_value_counts_queryset_country_level(e12_case_factory):
-    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at country level. See those docstrings for details.
-    """
+    """Same as `test_calculate_kpi_value_counts_queryset_organisation_level` but at country level. See those docstrings for details."""
     # ons_region__ons_country__Country_ONS_Code
-    abstraction_codes = ['E92000001','W92000004']
+    abstraction_codes = ["E92000001", "W92000004"]
     kpi_scores_expected = {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
-        }
-    expected_scores = {code:kpi_scores_expected for code in abstraction_codes}
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
     abstraction_level = EnumAbstractionLevel.COUNTRY
 
     ods_codes = ["RGT01", "7A6AV"]
@@ -1237,9 +1243,63 @@ def test_calculate_kpi_value_counts_queryset_country_level(e12_case_factory):
     )
 
     for vc in value_counts:
-        ods_code = vc.pop(f"organisation__{abstraction_level.value}")
-        assert vc == expected_scores[ods_code]
+        code = vc.pop(f"organisation__{abstraction_level.value}")
+        assert vc == expected_scores[code]
 
+
+@pytest.mark.django_db
+def test_update_kpi_aggregation_model_country_level(e12_case_factory):
+    """Testing the `update_kpi_aggregation_model` fn.
+
+    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but at country level. See those docstrings for details.
+    """
+    # Define constants
+    kpis_tested = ["ecg", "mental_health_support"]
+    abstraction_level = EnumAbstractionLevel.COUNTRY
+    abstractions = [
+        ONSCountryEntity.objects.get(Country_ONS_Code=abstraction_code)
+        for abstraction_code in ("E92000001", "W92000004")
+    ]
+    kpi_scores_expected = {
+        "ecg_passed": 10,
+        "ecg_total_eligible": 20,
+        "ecg_ineligible": 10,
+        "ecg_incomplete": 10,
+        "mental_health_support_passed": 10,
+        "mental_health_support_total_eligible": 20,
+        "mental_health_support_ineligible": 10,
+        "mental_health_support_incomplete": 10,
+    }
+    
+    # Generate expected scores
+    expected_scores = {code: kpi_scores_expected for code in abstractions}
+
+    # Get scored test cases
+    ods_codes = ["RGT01", "7A6AV"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+
+    # Get value counts
+    value_counts = calculate_kpi_value_counts_queryset(
+        filtered_cases=filtered_cases,
+        abstraction_level=abstraction_level,
+        kpis=kpis_tested,
+    )
+
+    # ACTION: run update kpi agg model fn
+    update_kpi_aggregation_model(
+        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.COUNTRY
+    )
+
+    # For each abstraction code, check output is expected
+    for abstraction_relation_entity in expected_scores:
+        abstraction_kpi_aggregation_model = CountryKPIAggregation.objects.get(
+            abstraction_relation=abstraction_relation_entity
+        )
+
+        assert (
+            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
+            == expected_scores[abstraction_relation_entity]
+        )
 
 
 @pytest.mark.django_db

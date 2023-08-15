@@ -569,3 +569,85 @@ def calculate_kpi_value_counts_queryset(
     )
 
     return kpi_value_counts
+
+
+def _get_abstraction_model(abstraction_level: EnumAbstractionLevel):
+    abstraction_model_map = {
+        EnumAbstractionLevel.ORGANISATION: "Organisation",
+        EnumAbstractionLevel.TRUST: "Organisation",
+        EnumAbstractionLevel.ICB: "IntegratedCareBoardEntity",
+        EnumAbstractionLevel.NHS_REGION: "NHSRegionEntity",
+        EnumAbstractionLevel.OPEN_UK: "OPENUKNetworkEntity",
+        EnumAbstractionLevel.COUNTRY: "CountryKPIAggregation",
+    }
+
+    return abstraction_model_map[abstraction_level]
+
+
+def update_kpi_aggregation_model(
+    abstraction_level: EnumAbstractionLevel, kpi_value_counts
+) -> None:
+    """Updates the relevant KPI Aggregation model, chosen via the `abstraction_level`. Takes output of `calculate_kpi_value_counts_queryset` to update model.
+
+    Args:
+        abstraction_level (EnumAbstractionLevel): chosen abstraction level
+        kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
+    """
+
+    abstraction_model_map = {
+        EnumAbstractionLevel.ORGANISATION: {
+            "kpi_aggregation_model": "OrganisationKPIAggregation",
+            "abstraction_relation_model": "Organisation",
+        },
+        EnumAbstractionLevel.TRUST: {
+            "kpi_aggregation_model": "TrustKPIAggregation",
+            "abstraction_relation_model": "Organisation",
+        },
+        EnumAbstractionLevel.ICB: {
+            "kpi_aggregation_model": "ICBKPIAggregation",
+            "abstraction_relation_model": "",
+        },
+        EnumAbstractionLevel.NHS_REGION: {
+            "kpi_aggregation_model": "NHSRegionKPIAggregation",
+            "abstraction_relation_model": "",
+        },
+        EnumAbstractionLevel.OPEN_UK: {
+            "kpi_aggregation_model": "OpenUKKPIAggregation",
+            "abstraction_relation_model": "",
+        },
+        EnumAbstractionLevel.COUNTRY: {
+            "kpi_aggregation_model": "CountryKPIAggregation",
+            "abstraction_relation_model": "ONSCountryEntity",
+        },
+    }
+
+    abstraction_level_models = abstraction_model_map[abstraction_level]
+
+    # Get KPIAggregation model for the given abstraction level
+    AbstractionKPIAggregationModel = apps.get_model(
+        "epilepsy12", abstraction_level_models["kpi_aggregation_model"]
+    )
+
+    for value_count in kpi_value_counts:
+        ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
+
+        # Get the model field name for the given abstraction model. As the enum values are all with respected to Organisation, this split and grab last gets just that related model's related field.
+        related_key_field = abstraction_level.value.split("__")[-1]
+
+        # Get instance of the KPIAggregation model's related model
+        abstraction_relation_instance = apps.get_model(
+            "epilepsy12", abstraction_level_models["abstraction_relation_model"]
+        ).objects.get(**{f"{related_key_field}": ABSTRACTION_CODE})
+
+        new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
+            defaults={
+                "abstraction_relation": abstraction_relation_instance,
+                **value_count,
+            },
+            abstraction_relation=abstraction_relation_instance,
+        )
+
+        if created:
+            print(f"Adding new {new_obj}")
+        else:
+            print(f"Updating {new_obj}")
