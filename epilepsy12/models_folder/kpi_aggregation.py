@@ -470,6 +470,16 @@ class BaseKPIAggregation(models.Model, HelpTextMixin):
         verbose_name = _("Base KPI Aggregation Model")
         verbose_name_plural = _("Base KPI Aggregation Models")
 
+    def get_value_counts_for_kpis(self, kpis: list[str]) -> dict:
+        """Getter for value count values. Accepts a list of kpi names as strings. For each KPI, will return the 4 associated value count fields, in a single combined dict."""
+        all_value_counts = {}
+        for kpi in kpis:
+            for metric in ["passed", "total_eligible", "ineligible", "incomplete"]:
+                kpi_metric = f"{kpi}_{metric}"
+                value = getattr(self, kpi_metric)
+                all_value_counts.update({kpi_metric: value})
+        return all_value_counts
+
     def __str__(self):
         return f"Base KPI aggregation result model"
 
@@ -485,11 +495,90 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        verbose_name = _("Organisation KPI Aggregation Model")
+        verbose_name_plural = _("Organisation KPI Aggregation Models")
+
+    def __str__(self):
+        return f"Organisation ({self.organisation.OrganisationName}) KPIAggregations"
+
 
 class TrustKPIAggregation(BaseKPIAggregation):
     """
-    KPI summary statistics for organisations.
+    KPI summary statistics for Trusts.
     """
 
     # Define relationships
     parent_organisation_ods_code = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = _("Organisation KPI Aggregation Model")
+        verbose_name_plural = _("Organisation KPI Aggregation Models")
+
+    def __str__(self):
+        return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+
+
+# class ICBKPIAggregation(BaseKPIAggregation):
+#     """
+#     KPI summary statistics for organisations.
+#     """
+
+#     # Define relationships
+#     parent_organisation_ods_code = models.CharField(max_length=100)
+
+#     class Meta:
+#         verbose_name = _("Organisation KPI Aggregation Model")
+#         verbose_name_plural = _("Organisation KPI Aggregation Models")
+
+#     def __str__(self):
+#         return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+
+# class NHSRegionKPIAggregation(BaseKPIAggregation):
+#     """
+#     KPI summary statistics for organisations.
+#     """
+
+#     # Define relationships
+#     parent_organisation_ods_code = models.CharField(max_length=100)
+
+#     class Meta:
+#         verbose_name = _("Organisation KPI Aggregation Model")
+#         verbose_name_plural = _("Organisation KPI Aggregation Models")
+
+#     def __str__(self):
+#         return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+
+# class OpenUKKPIAggregation(BaseKPIAggregation):
+#     """
+#     KPI summary statistics for organisations.
+#     """
+
+#     # Define relationships
+#     parent_organisation_ods_code = models.CharField(max_length=100)
+
+#     class Meta:
+#         verbose_name = _("Organisation KPI Aggregation Model")
+#         verbose_name_plural = _("Organisation KPI Aggregation Models")
+
+#     def __str__(self):
+#         return f"Trust (ParentOrganisation_ODSCode={self.parent_organisation_ods_code}) KPIAggregations"
+
+
+class CountryKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for countries.
+    """
+
+    # Define relationships
+    abstraction_relation = models.ForeignKey(
+        to="epilepsy12.ONSCountryEntity",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = _("Country KPI Aggregation Model")
+        verbose_name_plural = _("Country KPI Aggregation Models")
+
+    def __str__(self):
+        return f"Country (Country_ONS_Code={self.abstraction_relation}) KPIAggregations"
