@@ -597,27 +597,27 @@ def update_kpi_aggregation_model(
     abstraction_model_map = {
         EnumAbstractionLevel.ORGANISATION: {
             "kpi_aggregation_model": "OrganisationKPIAggregation",
-            "abstraction_relation_model": "Organisation",
+            "abstraction_entity_model": "Organisation",
         },
         EnumAbstractionLevel.TRUST: {
             "kpi_aggregation_model": "TrustKPIAggregation",
-            "abstraction_relation_model": "Organisation",
+            "abstraction_entity_model": "Organisation",
         },
         EnumAbstractionLevel.ICB: {
             "kpi_aggregation_model": "ICBKPIAggregation",
-            "abstraction_relation_model": "IntegratedCareBoardEntity",
+            "abstraction_entity_model": "IntegratedCareBoardEntity",
         },
         EnumAbstractionLevel.NHS_REGION: {
             "kpi_aggregation_model": "NHSRegionKPIAggregation",
-            "abstraction_relation_model": "NHSRegionEntity",
+            "abstraction_entity_model": "NHSRegionEntity",
         },
         EnumAbstractionLevel.OPEN_UK: {
             "kpi_aggregation_model": "OpenUKKPIAggregation",
-            "abstraction_relation_model": "OPENUKNetworkEntity",
+            "abstraction_entity_model": "OPENUKNetworkEntity",
         },
         EnumAbstractionLevel.COUNTRY: {
             "kpi_aggregation_model": "CountryKPIAggregation",
-            "abstraction_relation_model": "ONSCountryEntity",
+            "abstraction_entity_model": "ONSCountryEntity",
         },
     }
 
@@ -631,13 +631,18 @@ def update_kpi_aggregation_model(
     for value_count in kpi_value_counts:
         ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
 
-        # Get the model field name for the given abstraction model. As the enum values are all with respected to Organisation, this split and grab last gets just that related model's related field.
+        # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
         related_key_field = abstraction_level.value.split("__")[-1]
 
-        # Get instance of the KPIAggregation model's related model
-        abstraction_relation_instance = apps.get_model(
-            "epilepsy12", abstraction_level_models["abstraction_relation_model"]
-        ).objects.get(**{f"{related_key_field}": ABSTRACTION_CODE})
+        # Get related entity model
+        abstraction_entity_model = apps.get_model(
+            "epilepsy12", abstraction_level_models["abstraction_entity_model"]
+        )
+
+        # Get instance of the related entity model to link with Aggregation model
+        abstraction_relation_instance = abstraction_entity_model.objects.get(
+            **{f"{related_key_field}": ABSTRACTION_CODE}
+        )
 
         new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
             defaults={
