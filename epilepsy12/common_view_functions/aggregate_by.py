@@ -605,15 +605,15 @@ def update_kpi_aggregation_model(
         },
         EnumAbstractionLevel.ICB: {
             "kpi_aggregation_model": "ICBKPIAggregation",
-            "abstraction_relation_model": "",
+            "abstraction_relation_model": "IntegratedCareBoardEntity",
         },
         EnumAbstractionLevel.NHS_REGION: {
             "kpi_aggregation_model": "NHSRegionKPIAggregation",
-            "abstraction_relation_model": "",
+            "abstraction_relation_model": "NHSRegionEntity",
         },
         EnumAbstractionLevel.OPEN_UK: {
             "kpi_aggregation_model": "OpenUKKPIAggregation",
-            "abstraction_relation_model": "",
+            "abstraction_relation_model": "OPENUKNetworkEntity",
         },
         EnumAbstractionLevel.COUNTRY: {
             "kpi_aggregation_model": "CountryKPIAggregation",
