@@ -17,7 +17,7 @@ def is_valid_postcode(postcode):
 
     # check against API
     url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{postcode}/validate"
-    print(url)
+
     response = requests.get(url=url)
     if response.status_code == 404:
         print("Postcode validation failure. Could not validate postcode.")
