@@ -1658,7 +1658,7 @@ def test_get_filtered_cases_queryset_all_levels(e12_case_factory):
 def test_get_filtered_cases_queryset_organisation_level_includes_only_specified_cohort(
     e12_case_factory,
 ):
-    """Testing the `get_filtered_cases_queryset_for` function on organisational level."""
+    """Testing the `get_filtered_cases_queryset_for` function ignores kids who are from different cohort to specificed `cohort` arg. Here, all test kids are part of Cohort 4, but we request Cohort 6 Cases."""
 
     # Ensure Case db empty for this test
     Registration.objects.all().delete()
@@ -1684,7 +1684,6 @@ def test_get_filtered_cases_queryset_organisation_level_includes_only_specified_
         abstraction_level=EnumAbstractionLevel.ORGANISATION, cohort=6
     )
 
-    # Current test db are all from Cohort 4 so should be 0 filtered cases returned
     assert 0 == output_filtered_cases.count()
 
 
