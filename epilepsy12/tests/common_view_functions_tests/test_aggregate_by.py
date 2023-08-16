@@ -20,6 +20,7 @@ from epilepsy12.common_view_functions import (
     calculate_kpis,
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
+    get_filtered_cases_queryset,
 )
 from epilepsy12.models import (
     Organisation,
@@ -1030,7 +1031,7 @@ def _get_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
             test_cases = e12_case_factory.create_batch(
                 10,
                 organisations__organisation=organisation,
-                first_name="tester",
+                first_name=f"{organisation.OrganisationName}",
                 **answer_set,
             )
             filled_case_objects += test_cases
@@ -1040,7 +1041,7 @@ def _get_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
 
     # Get just these test cases
     return Case.objects.filter(
-        first_name="tester", organisations__ODSCode__in=ods_codes
+        first_name__in=[org.OrganisationName for org in ORGANISATIONS], organisations__ODSCode__in=ods_codes
     )
 
 
@@ -1565,7 +1566,7 @@ def test_update_kpi_aggregation_model_country_level(e12_case_factory):
     # Get scored test cases
     ods_codes = ["RGT01", "7A6AV"]
     filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
+    print(filtered_cases)
     # Get value counts
     value_counts = calculate_kpi_value_counts_queryset(
         filtered_cases=filtered_cases,
@@ -1589,6 +1590,15 @@ def test_update_kpi_aggregation_model_country_level(e12_case_factory):
             == expected_scores[abstraction_relation_entity]
         )
 
+@pytest.mark.django_db
+def test_get_filtered_cases_queryset_organisation_level(e12_case_factory):
+    """Testing the `get_filtered_cases_queryset` function on organisational level."""
+    
+    # Register scored test cases
+    ods_codes = ["RGT01", "7A6AV"]
+    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+    
+    get_filtered_cases_queryset(abstraction_level=EnumAbstractionLevel.ORGANISATION, cohort=6)
 
 @pytest.mark.django_db
 def test_debug(e12_case_factory):
