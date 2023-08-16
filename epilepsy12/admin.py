@@ -157,6 +157,7 @@ admin.site.register(CountryBoundaries)
 admin.site.register(NHSEnglandRegionBoundaries)
 admin.site.register(LocalHealthBoardBoundaries)
 admin.site.register(IntegratedCareBoardBoundaries)
+admin.site.register(NHSRegionEntity)
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
