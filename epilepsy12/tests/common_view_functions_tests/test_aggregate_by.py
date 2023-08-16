@@ -20,7 +20,7 @@ from epilepsy12.common_view_functions import (
     calculate_kpis,
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
-    get_filtered_cases_queryset,
+    get_filtered_cases_queryset_for,
 )
 from epilepsy12.models import (
     Organisation,
@@ -1031,7 +1031,7 @@ def _get_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
             test_cases = e12_case_factory.create_batch(
                 10,
                 organisations__organisation=organisation,
-                first_name=f"{organisation.OrganisationName}",
+                first_name=f"temp_{organisation.OrganisationName}",
                 **answer_set,
             )
             filled_case_objects += test_cases
@@ -1041,7 +1041,8 @@ def _get_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
 
     # Get just these test cases
     return Case.objects.filter(
-        first_name__in=[org.OrganisationName for org in ORGANISATIONS], organisations__ODSCode__in=ods_codes
+        first_name__in=[f"temp_{org.OrganisationName}" for org in ORGANISATIONS],
+        organisations__ODSCode__in=ods_codes,
     )
 
 
@@ -1256,6 +1257,7 @@ def test_calculate_kpi_value_counts_queryset_country_level(e12_case_factory):
         code = vc.pop(f"organisation__{abstraction_level.value}")
         assert vc == expected_scores[code]
 
+
 @pytest.mark.django_db
 def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
     """Testing the `update_kpi_aggregation_model` fn.
@@ -1297,7 +1299,8 @@ def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
-        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.ORGANISATION
+        kpi_value_counts=value_counts,
+        abstraction_level=EnumAbstractionLevel.ORGANISATION,
     )
 
     # For each abstraction code, check output is expected
@@ -1310,6 +1313,7 @@ def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
             abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
             == expected_scores[abstraction_relation_entity]
         )
+
 
 @pytest.mark.django_db
 def test_update_kpi_aggregation_model_trust_level(e12_case_factory):
@@ -1376,7 +1380,11 @@ def test_update_kpi_aggregation_model_icb_level(e12_case_factory):
     """
     # Define constants
     kpis_tested = ["ecg", "mental_health_support"]
-    print(Organisation.objects.filter(ODSCode__in=["RGT01", "7A6AV"]).values('integrated_care_board__ODS_ICB_Code'))
+    print(
+        Organisation.objects.filter(ODSCode__in=["RGT01", "7A6AV"]).values(
+            "integrated_care_board__ODS_ICB_Code"
+        )
+    )
     abstraction_level = EnumAbstractionLevel.ICB
     abstractions = [
         IntegratedCareBoardEntity.objects.get(ODS_ICB_Code=abstraction_code)
@@ -1590,15 +1598,95 @@ def test_update_kpi_aggregation_model_country_level(e12_case_factory):
             == expected_scores[abstraction_relation_entity]
         )
 
+
 @pytest.mark.django_db
-def test_get_filtered_cases_queryset_organisation_level(e12_case_factory):
-    """Testing the `get_filtered_cases_queryset` function on organisational level."""
-    
-    # Register scored test cases
+def test_get_filtered_cases_queryset_all_levels(e12_case_factory):
+    """Testing the `get_filtered_cases_queryset_for` returns the correct count for filtered cases. Specifically ensuring Welsh hospitals ignored for ICB abstraction."""
+
+    # Ensure Case db empty for this test
+    Registration.objects.all().delete()
+    Case.objects.all().delete()
+
+    # Generate test cases
+    expected_first_names = []
     ods_codes = ["RGT01", "7A6AV"]
-    filtered_cases = _get_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
+    for code in ods_codes:
+        org = Organisation.objects.get(ODSCode=code)
+
+        # Used to filter these Cases
+        expected_first_names.append(f"temp_{org.OrganisationName}")
+
+        e12_case_factory.create_batch(
+            10,
+            organisations__organisation=org,
+            first_name=f"temp_{org.OrganisationName}",
+        )
+
+    # Universal abstractions
+    for ABSTRACTION_LEVEL in [
+        EnumAbstractionLevel.ORGANISATION,
+        EnumAbstractionLevel.TRUST,
+        EnumAbstractionLevel.NHS_REGION,
+        EnumAbstractionLevel.OPEN_UK,
+        EnumAbstractionLevel.COUNTRY,
+    ]:
+        output_filtered_cases = get_filtered_cases_queryset_for(
+            abstraction_level=ABSTRACTION_LEVEL, cohort=6
+        )
+
+        if ABSTRACTION_LEVEL == EnumAbstractionLevel.NHS_REGION: print(output_filtered_cases)
+
+        assert (
+            20 == output_filtered_cases.count()
+        ), f"Did not output correct COUNT(filtered_cases) for {ABSTRACTION_LEVEL}"
     
-    get_filtered_cases_queryset(abstraction_level=EnumAbstractionLevel.ORGANISATION, cohort=6)
+    # Distinction for Welsh hospitals
+    for ABSTRACTION_LEVEL in [
+        EnumAbstractionLevel.ICB,
+        
+    ]:
+        output_filtered_cases = get_filtered_cases_queryset_for(
+            abstraction_level=ABSTRACTION_LEVEL, cohort=6
+        )
+
+        assert (
+            10 == output_filtered_cases.count()
+        ), f"Did not output correct COUNT(filtered_cases) for {ABSTRACTION_LEVEL}"
+
+
+@pytest.mark.django_db
+def test_get_filtered_cases_queryset_organisation_level_includes_only_specified_cohort(
+    e12_case_factory,
+):
+    """Testing the `get_filtered_cases_queryset_for` function on organisational level."""
+
+    # Ensure Case db empty for this test
+    Registration.objects.all().delete()
+    Case.objects.all().delete()
+
+    # Generate test cases
+    expected_first_names = []
+    ods_codes = ["RGT01", "7A6AV"]
+    for code in ods_codes:
+        org = Organisation.objects.get(ODSCode=code)
+
+        # Used to filter these Cases
+        expected_first_names.append(f"temp_{org.OrganisationName}")
+
+        e12_case_factory.create_batch(
+            10,
+            organisations__organisation=org,
+            first_name=f"temp_{org.OrganisationName}",
+            registration__registration_date=date(2021, 1, 1),
+        )
+
+    output_filtered_cases = get_filtered_cases_queryset_for(
+        abstraction_level=EnumAbstractionLevel.ORGANISATION, cohort=6
+    )
+
+    # Current test db are all from Cohort 4 so should be 0 filtered cases returned
+    assert 0 == output_filtered_cases.count()
+
 
 @pytest.mark.django_db
 def test_debug(e12_case_factory):

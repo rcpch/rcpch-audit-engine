@@ -507,6 +507,40 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     return final_object
 
 
+def get_filtered_cases_queryset_for(
+    abstraction_level: EnumAbstractionLevel,
+    cohort: int,
+):
+    """Returns queryset of filtered cases for a given abstraction level. Ensures the Case is filtered for an activate, primary Site, and in the correct cohort."""
+
+    abstraction_level_all_subunit_map = {
+        EnumAbstractionLevel.ORGANISATION: get_all_organisations(),
+        EnumAbstractionLevel.TRUST: get_all_trusts(),
+        EnumAbstractionLevel.ICB: get_all_icbs(),
+        EnumAbstractionLevel.NHS_REGION: get_all_nhs_regions(),
+        EnumAbstractionLevel.OPEN_UK: get_all_open_uk_regions(),
+        EnumAbstractionLevel.COUNTRY: get_all_countries(),
+    }
+
+    # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
+    related_key_field = abstraction_level.value.split("__")[-1]
+
+    all_subunits = abstraction_level_all_subunit_map[abstraction_level].values_list(
+        related_key_field
+    )
+
+    Case = apps.get_model("epilepsy12", "Case")
+
+    filtered_cases = Case.objects.filter(
+        Q(**{f"site__organisation__{abstraction_level.value}__in": all_subunits}),
+        site__site_is_actively_involved_in_epilepsy_care=True,
+        site__site_is_primary_centre_of_epilepsy_care=True,
+        registration__cohort=cohort,
+    )
+
+    return filtered_cases
+
+
 def calculate_kpi_value_counts_queryset(
     filtered_cases,
     abstraction_level: EnumAbstractionLevel,
@@ -571,19 +605,6 @@ def calculate_kpi_value_counts_queryset(
     return kpi_value_counts
 
 
-def _get_abstraction_model(abstraction_level: EnumAbstractionLevel):
-    abstraction_model_map = {
-        EnumAbstractionLevel.ORGANISATION: "Organisation",
-        EnumAbstractionLevel.TRUST: "Organisation",
-        EnumAbstractionLevel.ICB: "IntegratedCareBoardEntity",
-        EnumAbstractionLevel.NHS_REGION: "NHSRegionEntity",
-        EnumAbstractionLevel.OPEN_UK: "OPENUKNetworkEntity",
-        EnumAbstractionLevel.COUNTRY: "CountryKPIAggregation",
-    }
-
-    return abstraction_model_map[abstraction_level]
-
-
 def update_kpi_aggregation_model(
     abstraction_level: EnumAbstractionLevel, kpi_value_counts
 ) -> None:
@@ -643,8 +664,8 @@ def update_kpi_aggregation_model(
         # NOTE Trust is only abstraction level which doesn't have 1-2-1 correspondance with Organisation
         if abstraction_level is EnumAbstractionLevel.TRUST:
             abstraction_relation_instance = abstraction_entity_model.objects.filter(
-            **{f"{related_key_field}": ABSTRACTION_CODE}
-        ).first()
+                **{f"{related_key_field}": ABSTRACTION_CODE}
+            ).first()
         else:
             abstraction_relation_instance = abstraction_entity_model.objects.get(
                 **{f"{related_key_field}": ABSTRACTION_CODE}
