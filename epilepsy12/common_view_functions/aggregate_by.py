@@ -511,7 +511,7 @@ def get_filtered_cases_queryset_for(
     abstraction_level: EnumAbstractionLevel,
     cohort: int,
 ):
-    """Returns queryset of filtered cases for a given abstraction level. Ensures the Case is filtered for an activate, primary Site, and in the correct cohort."""
+    """Returns queryset of filtered cases for a given abstraction level. Ensures the Case is filtered for an active, primary Site, and in the correct cohort."""
 
     abstraction_level_all_subunit_map = {
         EnumAbstractionLevel.ORGANISATION: get_all_organisations(),
