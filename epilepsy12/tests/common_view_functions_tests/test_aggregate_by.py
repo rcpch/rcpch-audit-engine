@@ -1353,6 +1353,7 @@ def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
+        cohort=6,
         kpi_value_counts=value_counts,
         abstraction_level=EnumAbstractionLevel.ORGANISATION,
     )
@@ -1418,7 +1419,9 @@ def test_update_kpi_aggregation_model_trust_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
-        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.TRUST
+        cohort=6,
+        kpi_value_counts=value_counts,
+        abstraction_level=EnumAbstractionLevel.TRUST,
     )
 
     # For each abstraction code, check output is expected
@@ -1478,7 +1481,7 @@ def test_update_kpi_aggregation_model_icb_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
-        kpi_value_counts=value_counts, abstraction_level=abstraction_level
+        cohort=6, kpi_value_counts=value_counts, abstraction_level=abstraction_level
     )
 
     # For each abstraction code, check output is expected
@@ -1542,7 +1545,9 @@ def test_update_kpi_aggregation_model_nhs_region_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
-        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.NHS_REGION
+        cohort=6,
+        kpi_value_counts=value_counts,
+        abstraction_level=EnumAbstractionLevel.NHS_REGION,
     )
 
     # For each abstraction code, check output is expected
@@ -1606,7 +1611,9 @@ def test_update_kpi_aggregation_model_open_uk_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
-        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.OPEN_UK
+        cohort=6,
+        kpi_value_counts=value_counts,
+        abstraction_level=EnumAbstractionLevel.OPEN_UK,
     )
 
     # For each abstraction code, check output is expected
@@ -1669,7 +1676,9 @@ def test_update_kpi_aggregation_model_country_level(e12_case_factory):
 
     # ACTION: run update kpi agg model fn
     update_kpi_aggregation_model(
-        kpi_value_counts=value_counts, abstraction_level=EnumAbstractionLevel.COUNTRY
+        cohort=6,
+        kpi_value_counts=value_counts,
+        abstraction_level=EnumAbstractionLevel.COUNTRY,
     )
 
     # For each abstraction code, check output is expected
@@ -1717,9 +1726,6 @@ def test_get_filtered_cases_queryset_all_levels(e12_case_factory):
         output_filtered_cases = get_filtered_cases_queryset_for(
             abstraction_level=ABSTRACTION_LEVEL, cohort=6
         )
-
-        if ABSTRACTION_LEVEL == EnumAbstractionLevel.NHS_REGION:
-            print(output_filtered_cases)
 
         assert (
             20 == output_filtered_cases.count()
