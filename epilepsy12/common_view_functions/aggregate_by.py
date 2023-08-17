@@ -677,7 +677,3 @@ def update_kpi_aggregation_model(
             cohort=cohort,
         )
 
-        if created:
-            print(f"Adding new {new_obj}")
-        else:
-            print(f"Updating {new_obj}")
