@@ -10,7 +10,25 @@ class BaseKPIAggregation(models.Model, HelpTextMixin):
     KPI summary statistics.
     """
 
-    open_access = models.BooleanField(default=False, null=True, blank=True)
+    # If True, this KPIAgg is available to access by public
+    open_access = models.BooleanField(
+        default=False,
+    )
+
+    last_updated = models.DateTimeField(
+        help_text={"label": "", "reference": ""},
+        auto_now=True,
+    )
+
+    cohort = models.PositiveSmallIntegerField(
+        default=None,
+    )
+
+    # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
+    final_publication = models.BooleanField(
+        default=False,
+        null=False,
+    )
 
     paediatrician_with_expertise_in_epilepsies_passed = models.IntegerField(
         help_text={"label": "", "reference": ""},
@@ -460,11 +478,6 @@ class BaseKPIAggregation(models.Model, HelpTextMixin):
         default=None,
     )
 
-    last_updated = models.DateTimeField(
-        help_text={"label": "", "reference": ""},
-        auto_now=True,
-    )
-
     class Meta:
         abstract = True
         verbose_name = _("Base KPI Aggregation Model")
@@ -538,6 +551,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
     def __str__(self):
         return f"IntegratedCareBoardEntity (IntegratedCareBoardEntity={self.abstraction_relation}) KPIAggregations"
 
+
 class NHSRegionKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for NHSRegion.
@@ -556,6 +570,7 @@ class NHSRegionKPIAggregation(BaseKPIAggregation):
     def __str__(self):
         return f"NHSRegionEntity (NHSRegionEntity={self.abstraction_relation}) KPIAggregations"
 
+
 class OpenUKKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for OpenUK.
@@ -572,7 +587,9 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("OpenUK KPI Aggregation Models")
 
     def __str__(self):
-        return f"OpenUK (OPENUKNetworkEntity={self.abstraction_relation}) KPIAggregations"
+        return (
+            f"OpenUK (OPENUKNetworkEntity={self.abstraction_relation}) KPIAggregations"
+        )
 
 
 class CountryKPIAggregation(BaseKPIAggregation):
