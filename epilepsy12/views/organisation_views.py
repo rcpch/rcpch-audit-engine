@@ -260,6 +260,11 @@ def selected_trust_kpis(request, organisation_id):
                 "total_cases_registered": total_cases_registered,
             }
     [print(d) for d in ALL_DATA.items()]
+    print(ALL_DATA['ORGANISATION_KPIS']['aggregation_model'].get_value_counts_for_kpis(['paediatrician_with_expertise_in_epilepsies']))
+    
+    # TODO: national kpi not yet implemented but placeholder
+    ALL_DATA['NATIONAL_KPIS'] = {}
+    
     context = {
         "organisation": organisation,
         "all_data": ALL_DATA,

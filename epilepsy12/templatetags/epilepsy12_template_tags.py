@@ -380,3 +380,32 @@ def get_kpi_pct_passed(region_data: tuple[str, dict]):
     ][0]
 
     return f"{100 * data[passed_key] / data[total_eligible_key]:.2f}"
+
+
+@register.simple_tag
+def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
+    
+    print(f"Looking at {aggregation_model} and {kpi}")
+
+    if not aggregation_model:
+        return -1
+    
+    total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
+
+    if total_eligible_count == 0:
+        return 0
+
+    passed_count = getattr(aggregation_model, f"{kpi}_passed")
+
+    pct_passed = round(100 * passed_count / total_eligible_count)
+    
+    return f"{pct_passed}% ({total_eligible_count})"
+
+@register.simple_tag
+def get_total_counts_passed(aggregation_model, kpi: str):
+    
+    passed_count = getattr(aggregation_model, f"{kpi}_passed")
+    
+    total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
+    
+    return f"{passed_count} passed out of {total_eligible_count} total eligible children"

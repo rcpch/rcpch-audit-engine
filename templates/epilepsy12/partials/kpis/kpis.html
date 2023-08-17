@@ -47,7 +47,7 @@ will be persisted and run as a cron job once a day.
                                         data-content="Number of children registered in this organisation" {% if organisation.OrganisationName is not None %} + "{({{organisation.OrganisationName}})" {% endif %}
                                         data-position='top right'
                                         _="init js $('#totals_organisation').popup(); end"
-                                    ></i>({{organisation_kpis.total_number_of_cases}})</p>
+                                    ></i>({{all_data.ORGANISATION_KPIS.total_cases_registered}})</p>
                                 
                             </th>
                             <th class='right aligned'>
@@ -59,7 +59,7 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered in this Trust" {% if organisation.ParentOrganisation_OrganisationName is not None %} + "{({{organisation.ParentOrganisation_OrganisationName}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_trust').popup(); end"
-                                ></i>({{trust_kpis.total_number_of_cases}})</p>
+                                ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
                                 <p>Integrated Care Board</p>
@@ -70,7 +70,7 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered in this Integrated Care Board" {% if organisation.ICBName is not None %} + "{({{organisation.ICBName}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_icb').popup(); end"
-                                ></i>({{icb_kpis.total_number_of_cases}})</p>
+                                ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
                                 <p>NHS Region</p>
@@ -81,7 +81,7 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered in this NHS Region" {% if organisation.NHSEnglandRegion is not None %} + "{({{organisation.NHSEnglandRegion}})" {% endif %} 
                                     data-position='top right'
                                     _="init js $('#totals_nhs').popup(); end"
-                                ></i>({{nhs_kpis.total_number_of_cases}})</p>
+                                ></i>({{all_data.NHS_REGION_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
                                 <p>OPEN UK Region</p>
@@ -92,7 +92,7 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered in this OPEN UK Region" {% if organisation.openuk_network is not None %} + "{({{organisation.openuk_network.OPEN_UK_Network_Name}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_open_uk').popup(); end"
-                                ></i>({{open_uk_kpis.total_number_of_cases}})</p>
+                                ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
                                 <p>Country</p>
@@ -103,7 +103,7 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered in this country" {% if organisation.ons_region.ons_country.Country_ONS_Name is not None %} + "{({{organisation.ons_region.ons_country.Country_ONS_Name}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_country').popup(); end"
-                                ></i>({{country_kpis.total_number_of_cases}})</p>
+                                ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
                                 <p>England & Wales Combined</p>
@@ -114,19 +114,20 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered nationally."
                                     data-position='top right'
                                     _="init js $('#totals_national').popup(); end"
-                                ></i>({{national_kpis.total_number_of_cases}})</p>
+                                ></i>({{national_kpis.total_cases_registered}})</p>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            {% percentage_of_total organisation_kpis.paediatrician_with_expertise_in_epilepsies organisation_kpis.paediatrician_with_expertise_in_epilepsies_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.paediatrician_with_expertise_in_epilepsies trust_kpis.paediatrician_with_expertise_in_epilepsies_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.paediatrician_with_expertise_in_epilepsies icb_kpis.paediatrician_with_expertise_in_epilepsies_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.paediatrician_with_expertise_in_epilepsies nhs_kpis.paediatrician_with_expertise_in_epilepsies_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.paediatrician_with_expertise_in_epilepsies open_uk_kpis.paediatrician_with_expertise_in_epilepsies_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.paediatrician_with_expertise_in_epilepsies country_kpis.paediatrician_with_expertise_in_epilepsies_total as country_percentage %}
-                            {% percentage_of_total national_kpis.paediatrician_with_expertise_in_epilepsies national_kpis.paediatrician_with_expertise_in_epilepsies_total as national_percentage %}
+
+                            {% percentage_of_total all_data.ORGANISATION_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.ORGANISATION_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as organisation_percentage %}
+                            {% percentage_of_total all_data.TRUST_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.TRUST_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as trust_percentage %}
+                            {% percentage_of_total all_data.ICB_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.ICB_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as icb_percentage %}
+                            {% percentage_of_total all_data.NHS_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.NHS_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as nhs_percentage %}
+                            {% percentage_of_total all_data.OPEN_UK_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.OPEN_UK_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as open_uk_percentage %}
+                            {% percentage_of_total all_data.COUNTRY_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.COUNTRY_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as country_percentage %}
+                            {% percentage_of_total all_data.NATIONAL_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.NATIONAL_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as national_percentage %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
                                 <p>{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}</p>
@@ -134,22 +135,50 @@ will be persisted and run as a cron job once a day.
                                     class="rcpch question circle icon"
                                     id='paediatrician_with_expertise_in_epilepsies'
                                     data-title='Paediatrician with expertise in epilepsies'
-                                    data-content="{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_reference_text}}. Note: different measures have different denominators."
+                                    data-content="{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_reference_text}}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)"
                                     data-position='top right'
                                     _="init js $('#paediatrician_with_expertise_in_epilepsies').popup(); end">
                                 </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.paediatrician_with_expertise_in_epilepsies_total}})</td>{% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.paediatrician_with_expertise_in_epilepsies_total}}){% endif %}</td>
+
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model 'paediatrician_with_expertise_in_epilepsies' as kpi_1_data %}
+                                    {% if kpi_1_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_1_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='kpi_1_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#kpi_1_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='kpi_1_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model 'paediatrician_with_expertise_in_epilepsies' %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#kpi_1_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_1_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
                         </tr>
-                        <tr>
-                            {% percentage_of_total organisation_kpis.epilepsy_specialist_nurse organisation_kpis.epilepsy_specialist_nurse_total as organisation_percentage %}
+                        <!-- <tr>
+                            {% percentage_of_total organisation_kpis.aggregation_model.epilepsy_specialist_nurse_passed organisation_kpis.aggregation_model.epilepsy_specialist_nurse_total_eligible as organisation_percentage %}
                             {% percentage_of_total trust_kpis.epilepsy_specialist_nurse trust_kpis.epilepsy_specialist_nurse_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.epilepsy_specialist_nurse icb_kpis.epilepsy_specialist_nurse_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.epilepsy_specialist_nurse nhs_kpis.epilepsy_specialist_nurse_total as nhs_percentage %}
@@ -168,7 +197,7 @@ will be persisted and run as a cron job once a day.
                                     
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.epilepsy_specialist_nurse_total_eligible}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
@@ -177,7 +206,7 @@ will be persisted and run as a cron job once a day.
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
                         </tr>
                         <tr class="subcategory-header">
-                            {% percentage_of_total organisation_kpis.tertiary_input organisation_kpis.tertiary_input_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.tertiary_input_passed organisation_kpis.aggregation_model.tertiary_input_total_eligible as organisation_percentage %}
                             {% percentage_of_total trust_kpis.tertiary_input trust_kpis.tertiary_input_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.tertiary_input icb_kpis.tertiary_input_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.tertiary_input nhs_kpis.tertiary_input_total as nhs_percentage %}
@@ -196,7 +225,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.tertiary_input_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.tertiary_input_total_eligible}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.tertiary_input_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.tertiary_input_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.tertiary_input_total}}){% endif %}</td>
@@ -205,7 +234,7 @@ will be persisted and run as a cron job once a day.
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.tertiary_input_total}}){% endif %}</td>
                         </tr>
                         <tr class="subcategory-row">
-                            {% percentage_of_total organisation_kpis.epilepsy_surgery_referral organisation_kpis.epilepsy_surgery_referral_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.epilepsy_surgery_referral_passed organisation_kpis.aggregation_model.epilepsy_surgery_referral_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.epilepsy_surgery_referral trust_kpis.epilepsy_surgery_referral_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.epilepsy_surgery_referral icb_kpis.epilepsy_surgery_referral_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.epilepsy_surgery_referral nhs_kpis.epilepsy_surgery_referral_total as nhs_percentage %}
@@ -224,14 +253,14 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.epilepsy_surgery_referral_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
 
@@ -251,7 +280,7 @@ will be persisted and run as a cron job once a day.
                     </thead>
                     <tbody>
                         <tr>
-                            {% percentage_of_total organisation_kpis.ecg organisation_kpis.ecg_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.ecg organisation_kpis.aggregation_model.ecg_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.ecg trust_kpis.ecg_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.ecg icb_kpis.ecg_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.ecg nhs_kpis.ecg_total as nhs_percentage %}
@@ -270,7 +299,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.ecg_total}}) {% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.ecg_total}}) {% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.ecg_total}}) {% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.ecg_total}}) {% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.ecg_total}}) {% endif %}</td>
@@ -279,7 +308,7 @@ will be persisted and run as a cron job once a day.
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.ecg_total}}) {% endif %}</td>
                         </tr>
                         <tr>
-                            {% percentage_of_total organisation_kpis.mri organisation_kpis.mri_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.mri organisation_kpis.aggregation_model.mri_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.mri trust_kpis.mri_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.mri icb_kpis.mri_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.mri nhs_kpis.mri_total as nhs_percentage %}
@@ -298,7 +327,7 @@ will be persisted and run as a cron job once a day.
                                         </i>
                                     </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.mri_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.mri_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.mri_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.mri_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.mri_total}}){% endif %}</td>
@@ -325,7 +354,7 @@ will be persisted and run as a cron job once a day.
                     </thead>
                     <tbody>
                         <tr>
-                            {% percentage_of_total organisation_kpis.assessment_of_mental_health_issues organisation_kpis.assessment_of_mental_health_issues_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.assessment_of_mental_health_issues organisation_kpis.aggregation_model.assessment_of_mental_health_issues_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.assessment_of_mental_health_issues trust_kpis.assessment_of_mental_health_issues_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.assessment_of_mental_health_issues icb_kpis.assessment_of_mental_health_issues_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.assessment_of_mental_health_issues nhs_kpis.assessment_of_mental_health_issues_total as nhs_percentage %}
@@ -345,7 +374,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.assessment_of_mental_health_issues_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
@@ -354,7 +383,7 @@ will be persisted and run as a cron job once a day.
                             <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
                         </tr>
                         <tr>
-                            {% percentage_of_total organisation_kpis.mental_health_support organisation_kpis.mental_health_support_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.mental_health_support organisation_kpis.aggregation_model.mental_health_support_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.mental_health_support trust_kpis.mental_health_support_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.mental_health_support icb_kpis.mental_health_support_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.mental_health_support nhs_kpis.mental_health_support_total as nhs_percentage %}
@@ -374,7 +403,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.mental_health_support_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.mental_health_support_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.mental_health_support_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.mental_health_support_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.mental_health_support_total}}){% endif %}</td>
@@ -402,7 +431,7 @@ will be persisted and run as a cron job once a day.
                     <tbody>
 
                         <tr>
-                            {% percentage_of_total organisation_kpis.sodium_valproate organisation_kpis.sodium_valproate_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.sodium_valproate organisation_kpis.aggregation_model.sodium_valproate_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.sodium_valproate trust_kpis.sodium_valproate_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.sodium_valproate icb_kpis.sodium_valproate_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.sodium_valproate nhs_kpis.sodium_valproate_total as nhs_percentage %}
@@ -422,7 +451,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.sodium_valproate_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.sodium_valproate_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sodium_valproate_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sodium_valproate_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None_kpis.sodium_valproate_total > 0 %}({{nhs_kpis.sodium_valproate_total}}){% endif %}</td>
@@ -450,7 +479,7 @@ will be persisted and run as a cron job once a day.
                     </thead>
                     <tbody>
                         <tr class="subcategory-header"> <!-- 9A comprehensive_care_planning_agreement -->
-                            {% percentage_of_total organisation_kpis.comprehensive_care_planning_agreement organisation_kpis.comprehensive_care_planning_agreement_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.comprehensive_care_planning_agreement organisation_kpis.aggregation_model.comprehensive_care_planning_agreement_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.comprehensive_care_planning_agreement trust_kpis.comprehensive_care_planning_agreement_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.comprehensive_care_planning_agreement icb_kpis.comprehensive_care_planning_agreement_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.comprehensive_care_planning_agreement nhs_kpis.comprehensive_care_planning_agreement_total as nhs_percentage %}
@@ -470,7 +499,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.comprehensive_care_planning_agreement_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
@@ -480,7 +509,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9A (a) patient_held_individualised_epilepsy_document -->
-                            {% percentage_of_total organisation_kpis.patient_held_individualised_epilepsy_document organisation_kpis.patient_held_individualised_epilepsy_document_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.patient_held_individualised_epilepsy_document organisation_kpis.aggregation_model.patient_held_individualised_epilepsy_document_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.patient_held_individualised_epilepsy_document trust_kpis.patient_held_individualised_epilepsy_document_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.patient_held_individualised_epilepsy_document icb_kpis.patient_held_individualised_epilepsy_document_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.patient_held_individualised_epilepsy_document nhs_kpis.patient_held_individualised_epilepsy_document_total as nhs_percentage %}
@@ -502,7 +531,7 @@ will be persisted and run as a cron job once a day.
                                     
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
@@ -512,7 +541,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
                         
                         <tr class="subcategory-row"> <!-- 9A (b) patient_carer_parent_agreement_to_the_care_planning -->
-                            {% percentage_of_total organisation_kpis.patient_carer_parent_agreement_to_the_care_planning organisation_kpis.patient_carer_parent_agreement_to_the_care_planning_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.patient_carer_parent_agreement_to_the_care_planning organisation_kpis.aggregation_model.patient_carer_parent_agreement_to_the_care_planning_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.patient_carer_parent_agreement_to_the_care_planning trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.patient_carer_parent_agreement_to_the_care_planning icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.patient_carer_parent_agreement_to_the_care_planning nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total as nhs_percentage %}
@@ -534,7 +563,7 @@ will be persisted and run as a cron job once a day.
                                     
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
@@ -544,7 +573,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9A (c) care_planning_has_been_updated_when_necessary -->
-                            {% percentage_of_total organisation_kpis.care_planning_has_been_updated_when_necessary organisation_kpis.care_planning_has_been_updated_when_necessary_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.care_planning_has_been_updated_when_necessary organisation_kpis.aggregation_model.care_planning_has_been_updated_when_necessary_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.care_planning_has_been_updated_when_necessary trust_kpis.care_planning_has_been_updated_when_necessary_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.care_planning_has_been_updated_when_necessary icb_kpis.care_planning_has_been_updated_when_necessary_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.care_planning_has_been_updated_when_necessary nhs_kpis.care_planning_has_been_updated_when_necessary_total as nhs_percentage %}
@@ -564,7 +593,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
@@ -574,7 +603,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-header"> <!-- 9B comprehensive_care_planning_content -->
-                            {% percentage_of_total organisation_kpis.comprehensive_care_planning_content organisation_kpis.comprehensive_care_planning_content_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.comprehensive_care_planning_content organisation_kpis.aggregation_model.comprehensive_care_planning_content_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.comprehensive_care_planning_content trust_kpis.comprehensive_care_planning_content_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.comprehensive_care_planning_content icb_kpis.comprehensive_care_planning_content_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.comprehensive_care_planning_content nhs_kpis.comprehensive_care_planning_content_total as nhs_percentage %}
@@ -593,7 +622,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.comprehensive_care_planning_content_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
@@ -603,7 +632,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (a) parental_prolonged_seizures_care_plan -->
-                            {% percentage_of_total organisation_kpis.parental_prolonged_seizures_care_plan organisation_kpis.parental_prolonged_seizures_care_plan_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.parental_prolonged_seizures_care_plan organisation_kpis.aggregation_model.parental_prolonged_seizures_care_plan_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.parental_prolonged_seizures_care_plan trust_kpis.parental_prolonged_seizures_care_plan_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.parental_prolonged_seizures_care_plan icb_kpis.parental_prolonged_seizures_care_plan_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.parental_prolonged_seizures_care_plan nhs_kpis.parental_prolonged_seizures_care_plan_total as nhs_percentage %}
@@ -622,7 +651,7 @@ will be persisted and run as a cron job once a day.
                                                              </i>
                              </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
@@ -632,7 +661,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (b) water_safety -->
-                            {% percentage_of_total organisation_kpis.water_safety organisation_kpis.water_safety_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.water_safety organisation_kpis.aggregation_model.water_safety_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.water_safety trust_kpis.water_safety_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.water_safety icb_kpis.water_safety_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.water_safety nhs_kpis.water_safety_total as nhs_percentage %}
@@ -651,7 +680,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %} ({{organisation_kpis.water_safety_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %} ({{organisation_kpis.aggregation_model.water_safety_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %} ({{trust_kpis.water_safety_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %} ({{icb_kpis.water_safety_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %} ({{nhs_kpis.water_safety_total}}){% endif %}</td>
@@ -661,7 +690,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (c) first_aid -->
-                            {% percentage_of_total organisation_kpis.first_aid organisation_kpis.first_aid_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.first_aid organisation_kpis.aggregation_model.first_aid_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.first_aid trust_kpis.first_aid_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.first_aid icb_kpis.first_aid_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.first_aid nhs_kpis.first_aid_total as nhs_percentage %}
@@ -680,7 +709,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.first_aid_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.first_aid_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.first_aid_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.first_aid_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.first_aid_total}}){% endif %}</td>
@@ -690,7 +719,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (d) general_participation_and_risk -->
-                            {% percentage_of_total organisation_kpis.general_participation_and_risk organisation_kpis.general_participation_and_risk_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.general_participation_and_risk organisation_kpis.aggregation_model.general_participation_and_risk_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.general_participation_and_risk trust_kpis.general_participation_and_risk_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.general_participation_and_risk icb_kpis.general_participation_and_risk_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.general_participation_and_risk nhs_kpis.general_participation_and_risk_total as nhs_percentage %}
@@ -709,7 +738,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.general_participation_and_risk_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.general_participation_and_risk_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.general_participation_and_risk_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.general_participation_and_risk_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.general_participation_and_risk_total}}){% endif %}</td>
@@ -719,7 +748,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (e) sudep -->
-                            {% percentage_of_total organisation_kpis.sudep organisation_kpis.sudep_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.sudep organisation_kpis.aggregation_model.sudep_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.sudep trust_kpis.sudep_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.sudep icb_kpis.sudep_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.sudep nhs_kpis.sudep_total as nhs_percentage %}
@@ -735,7 +764,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.sudep_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.sudep_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sudep_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sudep_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.sudep_total}}){% endif %}</td>
@@ -745,7 +774,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr class="subcategory-row"> <!-- 9B (f) service_contact_details -->
-                            {% percentage_of_total organisation_kpis.service_contact_details organisation_kpis.service_contact_details_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.service_contact_details organisation_kpis.aggregation_model.service_contact_details_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.service_contact_details trust_kpis.service_contact_details_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.service_contact_details icb_kpis.service_contact_details_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.service_contact_details nhs_kpis.service_contact_details_total as nhs_percentage %}
@@ -764,7 +793,7 @@ will be persisted and run as a cron job once a day.
                                     </i>
                                 </div>
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.service_contact_details_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.service_contact_details_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.service_contact_details_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.service_contact_details_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.service_contact_details_total}}){% endif %}</td>
@@ -774,7 +803,7 @@ will be persisted and run as a cron job once a day.
                         </tr>
 
                         <tr> <!-- 10 school_individual_healthcare_plan -->
-                            {% percentage_of_total organisation_kpis.school_individual_healthcare_plan organisation_kpis.school_individual_healthcare_plan_total as organisation_percentage %}
+                            {% percentage_of_total organisation_kpis.aggregation_model.school_individual_healthcare_plan organisation_kpis.aggregation_model.school_individual_healthcare_plan_total as organisation_percentage %}
                             {% percentage_of_total trust_kpis.school_individual_healthcare_plan trust_kpis.school_individual_healthcare_plan_total as trust_percentage %}
                             {% percentage_of_total icb_kpis.school_individual_healthcare_plan icb_kpis.school_individual_healthcare_plan_total as icb_percentage %}
                             {% percentage_of_total nhs_kpis.school_individual_healthcare_plan nhs_kpis.school_individual_healthcare_plan_total as nhs_percentage %}
@@ -794,7 +823,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.school_individual_healthcare_plan_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
                             <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
