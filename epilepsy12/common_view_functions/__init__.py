@@ -20,6 +20,7 @@ from .aggregate_by import (
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
     calculate_kpi_value_counts_queryset,
+    get_abstraction_model_from_level,
 )
 from .report_queries import (
     all_registered_cases_for_cohort_and_abstraction_level,

@@ -513,7 +513,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Organisation KPI Aggregation Models")
 
     def __str__(self):
-        return f"Organisation (ODSCode={self.abstraction_relation}) KPIAggregations"
+        return f"OrganisationKPIAggregation (ODSCode={self.abstraction_relation.ODSCode}) KPIAggregations"
 
 
 class TrustKPIAggregation(BaseKPIAggregation):
@@ -530,7 +530,7 @@ class TrustKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Trust KPI Aggregation Models")
 
     def __str__(self):
-        return f"Trust (parent_organisation_ods_code={self.abstraction_relation}) KPIAggregations"
+        return f"TrustKPIAggregation (parent_organisation_ods_code={self.abstraction_relation})"
 
 
 class ICBKPIAggregation(BaseKPIAggregation):
@@ -549,7 +549,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("IntegratedCareBoardEntity KPI Aggregation Models")
 
     def __str__(self):
-        return f"IntegratedCareBoardEntity (IntegratedCareBoardEntity={self.abstraction_relation}) KPIAggregations"
+        return f"ICBKPIAggregation (IntegratedCareBoardEntity={self.abstraction_relation})"
 
 
 class NHSRegionKPIAggregation(BaseKPIAggregation):
@@ -568,7 +568,7 @@ class NHSRegionKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("NHSRegionEntity KPI Aggregation Models")
 
     def __str__(self):
-        return f"NHSRegionEntity (NHSRegionEntity={self.abstraction_relation}) KPIAggregations"
+        return f"KPIAggregations (NHSRegionEntity={self.abstraction_relation})"
 
 
 class OpenUKKPIAggregation(BaseKPIAggregation):
@@ -588,7 +588,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
 
     def __str__(self):
         return (
-            f"OpenUK (OPENUKNetworkEntity={self.abstraction_relation}) KPIAggregations"
+            f"KPIAggregations (OPENUKNetworkEntity={self.abstraction_relation})"
         )
 
 
@@ -608,4 +608,4 @@ class CountryKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Country KPI Aggregation Models")
 
     def __str__(self):
-        return f"Country (ONSCountryEntity={self.abstraction_relation}) KPIAggregations"
+        return f"KPIAggregations (ONSCountryEntity={self.abstraction_relation})"

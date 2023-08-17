@@ -604,18 +604,14 @@ def calculate_kpi_value_counts_queryset(
 
     return kpi_value_counts
 
-
-def update_kpi_aggregation_model(
-    abstraction_level: EnumAbstractionLevel, kpi_value_counts, cohort:int,
-) -> None:
-    """Updates the relevant KPI Aggregation model, chosen via the `abstraction_level`. Takes output of `calculate_kpi_value_counts_queryset` to update model.
-
-    Args:
-        abstraction_level (EnumAbstractionLevel): chosen abstraction level
-        kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
-        cohort (int): cohort of aggregation
-    """
-
+def get_abstraction_model_from_level(enum_abstraction_level:EnumAbstractionLevel)->dict:
+    """Returns dict, for abstraction, of structure:
+    
+        {
+            "kpi_aggregation_model": abstractionKPIAggregation model name (str),
+            "abstraction_entity_model": that KPIAggregation's abstraction_relation entity model's name (str)
+        }
+        """
     abstraction_model_map = {
         EnumAbstractionLevel.ORGANISATION: {
             "kpi_aggregation_model": "OrganisationKPIAggregation",
@@ -642,8 +638,22 @@ def update_kpi_aggregation_model(
             "abstraction_entity_model": "ONSCountryEntity",
         },
     }
+    return abstraction_model_map[enum_abstraction_level]
 
-    abstraction_level_models = abstraction_model_map[abstraction_level]
+def update_kpi_aggregation_model(
+    abstraction_level: EnumAbstractionLevel,
+    kpi_value_counts,
+    cohort: int,
+) -> None:
+    """Updates the relevant KPI Aggregation model, chosen via the `abstraction_level`. Takes output of `calculate_kpi_value_counts_queryset` to update model.
+
+    Args:
+        abstraction_level (EnumAbstractionLevel): chosen abstraction level
+        kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
+        cohort (int): cohort of aggregation
+    """
+
+    abstraction_level_models = get_abstraction_model_from_level(abstraction_level)
 
     # Get KPIAggregation model for the given abstraction level
     AbstractionKPIAggregationModel = apps.get_model(
@@ -662,18 +672,23 @@ def update_kpi_aggregation_model(
         )
 
         # Get instance of the related entity model to link with Aggregation model
-        # NOTE Trust is only abstraction level which doesn't have 1-2-1 correspondance with Organisation
-        abstraction_relation_instance = abstraction_entity_model.objects.filter(
+        # NOTE Trust is only abstraction level whose abstraction_relation field is Charfield, not foreign key
+        if abstraction_level is EnumAbstractionLevel.TRUST:
+            abstraction_relation_instance=ABSTRACTION_CODE
+        else:
+            abstraction_relation_instance = abstraction_entity_model.objects.filter(
                 **{f"{related_key_field}": ABSTRACTION_CODE}
             ).first()
-
+        
         new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
             defaults={
                 "abstraction_relation": abstraction_relation_instance,
-                'cohort':cohort,
+                "cohort": cohort,
                 **value_count,
             },
             abstraction_relation=abstraction_relation_instance,
             cohort=cohort,
         )
 
+        if created:
+            print(f"created {new_obj}")

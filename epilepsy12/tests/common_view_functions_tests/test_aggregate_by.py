@@ -1384,10 +1384,7 @@ def test_update_kpi_aggregation_model_trust_level(e12_case_factory):
     kpis_tested = ["ecg", "mental_health_support"]
 
     abstraction_level = EnumAbstractionLevel.TRUST
-    abstractions = [
-        Organisation.objects.filter(ParentOrganisation_ODSCode=abstraction_code).first()
-        for abstraction_code in ("RGT", "7A6")
-    ]
+    abstractions = ("RGT", "7A6")
     kpi_scores_expected = {
         "ecg_passed": 10,
         "ecg_total_eligible": 20,
