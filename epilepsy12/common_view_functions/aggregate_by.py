@@ -604,14 +604,17 @@ def calculate_kpi_value_counts_queryset(
 
     return kpi_value_counts
 
-def get_abstraction_model_from_level(enum_abstraction_level:EnumAbstractionLevel)->dict:
+
+def get_abstraction_model_from_level(
+    enum_abstraction_level: EnumAbstractionLevel,
+) -> dict:
     """Returns dict, for abstraction, of structure:
-    
-        {
-            "kpi_aggregation_model": abstractionKPIAggregation model name (str),
-            "abstraction_entity_model": that KPIAggregation's abstraction_relation entity model's name (str)
-        }
-        """
+
+    {
+        "kpi_aggregation_model": abstractionKPIAggregation model name (str),
+        "abstraction_entity_model": that KPIAggregation's abstraction_relation entity model's name (str)
+    }
+    """
     abstraction_model_map = {
         EnumAbstractionLevel.ORGANISATION: {
             "kpi_aggregation_model": "OrganisationKPIAggregation",
@@ -639,6 +642,7 @@ def get_abstraction_model_from_level(enum_abstraction_level:EnumAbstractionLevel
         },
     }
     return abstraction_model_map[enum_abstraction_level]
+
 
 def update_kpi_aggregation_model(
     abstraction_level: EnumAbstractionLevel,
@@ -674,12 +678,12 @@ def update_kpi_aggregation_model(
         # Get instance of the related entity model to link with Aggregation model
         # NOTE Trust is only abstraction level whose abstraction_relation field is Charfield, not foreign key
         if abstraction_level is EnumAbstractionLevel.TRUST:
-            abstraction_relation_instance=ABSTRACTION_CODE
+            abstraction_relation_instance = ABSTRACTION_CODE
         else:
             abstraction_relation_instance = abstraction_entity_model.objects.filter(
                 **{f"{related_key_field}": ABSTRACTION_CODE}
             ).first()
-        
+
         new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
             defaults={
                 "abstraction_relation": abstraction_relation_instance,
@@ -692,3 +696,37 @@ def update_kpi_aggregation_model(
 
         if created:
             print(f"created {new_obj}")
+
+
+def _get_related_entity_attribute_for_abstraction_level(
+    organisation, abstraction_level: EnumAbstractionLevel
+):
+    """For the given abstraction level, will call getattr until the final object is returned"""
+    return_object = organisation
+    for attribute in abstraction_level.value.split("__"):
+        return_object = getattr(return_object, attribute)
+    return return_object
+
+
+def get_total_cases_registered_for_abstraction_level(
+    organisation, abstraction_level: EnumAbstractionLevel, cohort: int
+) -> int:
+    """Returns total Cases registered for the organisation for the given abstraction.
+
+    Filter ensures Case is correct cohort and site is primary, active epilepsy centre.
+    """
+
+    cases_filter_key = f"organisations__{abstraction_level.value}"
+
+    cases_filter_value = _get_related_entity_attribute_for_abstraction_level(
+        organisation=organisation, abstraction_level=abstraction_level
+    )
+
+    Case = apps.get_model("epilepsy12", "Case")
+
+    return Case.objects.filter(
+        **{cases_filter_key: cases_filter_value},
+        site__site_is_actively_involved_in_epilepsy_care=True,
+        site__site_is_primary_centre_of_epilepsy_care=True,
+        registration__cohort=cohort,
+    ).count()

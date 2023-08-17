@@ -31,13 +31,13 @@ from ..common_view_functions import (
     cases_aggregated_by_ethnicity,
     cases_aggregated_by_deprivation_score,
     all_registered_cases_for_cohort_and_abstraction_level,
-    get_kpi_value_counts,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
     return_tile_for_region,
     get_filtered_cases_queryset_for,
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
     get_abstraction_model_from_level,
+    get_total_cases_registered_for_abstraction_level,
 )
 from ..general_functions import (
     get_current_cohort_data,
@@ -195,7 +195,7 @@ def selected_trust_kpis(request, organisation_id):
 
     ALL_DATA = {}
     for enum_abstraction_level in EnumAbstractionLevel:
-        print(f"Currently on {enum_abstraction_level}")
+    
         filtered_cases = get_filtered_cases_queryset_for(
             abstraction_level=enum_abstraction_level,
             cohort=cohort,
@@ -223,11 +223,6 @@ def selected_trust_kpis(request, organisation_id):
             "epilepsy12", abstraction_kpi_agg_model_name
         )
 
-        # Get total cases
-        total_cases_registered = Case.objects.filter(
-            organisations__ODSCode=organisation.ODSCode
-        ).count()
-
         # Get this organisation instance's abstraction relation entity. All the enum values are with respect to Organisation, thus the first element of .split('__') is the related field.
         abstraction_relation_field_name = enum_abstraction_level.value.split("__")[0]
 
@@ -239,6 +234,13 @@ def selected_trust_kpis(request, organisation_id):
             )
             if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
                 abstraction_relation = getattr(abstraction_relation, "ons_country")
+
+        # Get total cases
+        total_cases_registered = get_total_cases_registered_for_abstraction_level(
+            organisation=organisation,
+            abstraction_level=enum_abstraction_level,
+            cohort=cohort,
+        )
 
         # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
         if abstraction_kpi_agg_model.objects.filter(
@@ -257,16 +259,10 @@ def selected_trust_kpis(request, organisation_id):
                 "aggregation_model": None,
                 "total_cases_registered": total_cases_registered,
             }
-
+    [print(d) for d in ALL_DATA.items()]
     context = {
         "organisation": organisation,
         "all_data": ALL_DATA,
-        # "trust_kpis": trust_kpis,
-        # "icb_kpis": icb_kpis,
-        # "nhs_kpis": nhs_kpis,
-        # "open_uk_kpis": open_uk_kpis,
-        # "country_kpis": country_kpis,
-        # "national_kpis": national_kpis,
         "kpis": KPI(),  # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
         "open_access": False,
     }
