@@ -77,7 +77,7 @@ def test_get_filtered_cases_queryset_all_levels(e12_case_factory):
 
 
 @pytest.mark.django_db
-def test_get_filtered_cases_queryset_organisation_level_includes_only_specified_cohort(
+def test_get_filtered_cases_queryset_includes_only_specified_cohort(
     e12_case_factory,
 ):
     """Testing the `get_filtered_cases_queryset_for` function ignores kids who are from different cohort to specificed `cohort` arg. Here, all test kids are part of Cohort 4, but we request Cohort 6 Cases."""
@@ -102,8 +102,9 @@ def test_get_filtered_cases_queryset_organisation_level_includes_only_specified_
             registration__registration_date=date(2021, 1, 1),
         )
 
-    output_filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=EnumAbstractionLevel.ORGANISATION, cohort=6
-    )
+    for abstraction_level in EnumAbstractionLevel:
+        output_filtered_cases = get_filtered_cases_queryset_for(
+            abstraction_level=abstraction_level, cohort=6
+        )
 
-    assert 0 == output_filtered_cases.count()
+        assert 0 == output_filtered_cases.count()
