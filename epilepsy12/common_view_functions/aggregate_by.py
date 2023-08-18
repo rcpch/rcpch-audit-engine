@@ -701,10 +701,13 @@ def update_kpi_aggregation_model(
 def _get_related_entity_attribute_for_abstraction_level(
     organisation, abstraction_level: EnumAbstractionLevel
 ):
-    """For the given abstraction level, will call getattr until the final object is returned"""
+    """For the given abstraction level, will call getattr until the final object is returned.
+    
+    If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
+    """
     return_object = organisation
     for attribute in abstraction_level.value.split("__"):
-        return_object = getattr(return_object, attribute)
+        return_object = getattr(return_object, attribute, None) 
     return return_object
 
 
