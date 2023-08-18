@@ -384,8 +384,6 @@ def get_kpi_pct_passed(region_data: tuple[str, dict]):
 
 @register.simple_tag
 def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
-    
-    print(f"Looking at {aggregation_model} and {kpi}")
 
     if not aggregation_model:
         return -1
