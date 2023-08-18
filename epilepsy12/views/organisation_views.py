@@ -193,6 +193,7 @@ def selected_trust_kpis(request, organisation_id):
     cohort = get_current_cohort_data()["cohort"]
     organisation = Organisation.objects.get(pk=organisation_id)
 
+    # TODO: gathering ALL_DATA can be refactored into a function
     ALL_DATA = {}
     for enum_abstraction_level in EnumAbstractionLevel:
     
@@ -223,7 +224,7 @@ def selected_trust_kpis(request, organisation_id):
             "epilepsy12", abstraction_kpi_agg_model_name
         )
 
-        # Get this organisation instance's abstraction relation entity. All the enum values are with respect to Organisation, thus the first element of .split('__') is the related field.
+        # Get THIS organisation instance's abstraction relation entity. All the enum values are with respect to Organisation, thus the first element of .split('__') is the related field.
         abstraction_relation_field_name = enum_abstraction_level.value.split("__")[0]
 
         if enum_abstraction_level is EnumAbstractionLevel.ORGANISATION:
@@ -235,7 +236,7 @@ def selected_trust_kpis(request, organisation_id):
             if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
                 abstraction_relation = getattr(abstraction_relation, "ons_country")
 
-        # Get total cases
+        # Get total cases for THIS organisation's abstraction
         total_cases_registered = get_total_cases_registered_for_abstraction_level(
             organisation=organisation,
             abstraction_level=enum_abstraction_level,
@@ -259,16 +260,18 @@ def selected_trust_kpis(request, organisation_id):
                 "aggregation_model": None,
                 "total_cases_registered": total_cases_registered,
             }
-    [print(d) for d in ALL_DATA.items()]
-    print(ALL_DATA['ORGANISATION_KPIS']['aggregation_model'].get_value_counts_for_kpis(['paediatrician_with_expertise_in_epilepsies']))
     
     # TODO: national kpi not yet implemented but placeholder
     ALL_DATA['NATIONAL_KPIS'] = {}
     
+    kpi_instance = KPI(organisation=organisation, parent_trust='TEMP')
+    kpi_names_list = list(kpi_instance.get_kpis().keys())
+
     context = {
         "organisation": organisation,
         "all_data": ALL_DATA,
-        "kpis": KPI(),  # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
+        "kpis": kpi_instance,  # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
+        'kpi_names_list': kpi_names_list,
         "open_access": False,
     }
 
