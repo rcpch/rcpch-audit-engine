@@ -119,152 +119,169 @@ will be persisted and run as a cron job once a day.
                         </tr>
                     </thead>
                     <tbody>
+                    {% comment %} 
+                    [
+                    'paediatrician_with_expertise_in_epilepsies', 
+                    'epilepsy_specialist_nurse', 
+                    ] 
+                    {% endcomment %}
+                    {% for kpi_name in kpi_names_list|slice:":2" %}
                         <tr>
-
-                            {% percentage_of_total all_data.ORGANISATION_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.ORGANISATION_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as organisation_percentage %}
-                            {% percentage_of_total all_data.TRUST_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.TRUST_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as trust_percentage %}
-                            {% percentage_of_total all_data.ICB_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.ICB_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as icb_percentage %}
-                            {% percentage_of_total all_data.NHS_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.NHS_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as nhs_percentage %}
-                            {% percentage_of_total all_data.OPEN_UK_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.OPEN_UK_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as open_uk_percentage %}
-                            {% percentage_of_total all_data.COUNTRY_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.COUNTRY_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as country_percentage %}
-                            {% percentage_of_total all_data.NATIONAL_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_passed all_data.NATIONAL_KPIS.aggregation_model.paediatrician_with_expertise_in_epilepsies_total_eligible as national_percentage %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_label_text}}</p>
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
                                 <i 
                                     class="rcpch question circle icon"
-                                    id='paediatrician_with_expertise_in_epilepsies'
-                                    data-title='Paediatrician with expertise in epilepsies'
-                                    data-content="{{kpis.get_paediatrician_with_expertise_in_epilepsies_help_reference_text}}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
                                     data-position='top right'
-                                    _="init js $('#paediatrician_with_expertise_in_epilepsies').popup(); end">
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
                                 </i>
                                 </div>
                             </td>
-
                             {% for abstraction, data in all_data.items %}
                                 <td class='right aligned'>
-                                    {% get_pct_passed_and_total_eligible data.aggregation_model 'paediatrician_with_expertise_in_epilepsies' as kpi_1_data %}
-                                    {% if kpi_1_data == -1 %}
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
                                         <i 
                                             class="rcpch clock icon"
-                                            id='_{{abstraction}}'
+                                            id='_{{abstraction}}_{{kpi_name}}'
                                             data-title='No aggregation data'
                                             data-content="Aggregation not yet performed"
                                             data-position='top right'
-                                            _="init js $('#_{{abstraction}}').popup(); end">
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                         </i>
-                                    {% elif kpi_1_data == 0 %}
+                                    {% elif kpi_data == 0 %}
                                         <i 
                                             class="rcpch exclamation circle icon"
-                                            id='kpi_1_none_eligible_model_icon_{{abstraction}}'
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligble'
                                             data-content="No eligible Cases scored for this metric."
                                             data-position='top right'
-                                            _="init js $('#kpi_1_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
                                     {% else %}
                                         <span
                                             class="rcpch"
-                                            id='kpi_1_data_{{abstraction}}'
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
                                             data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model 'paediatrician_with_expertise_in_epilepsies' %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
                                             data-position='top right'
-                                            _="init js $('#kpi_1_data_{{abstraction}}').popup(); end">
-                                        {{ kpi_1_data }}
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
                                     </span>
                                     {% endif %}
                                 </td>
                             {% endfor %}
                         </tr>
-                        <!-- <tr>
-                            {% percentage_of_total organisation_kpis.aggregation_model.epilepsy_specialist_nurse_passed organisation_kpis.aggregation_model.epilepsy_specialist_nurse_total_eligible as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.epilepsy_specialist_nurse trust_kpis.epilepsy_specialist_nurse_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.epilepsy_specialist_nurse icb_kpis.epilepsy_specialist_nurse_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.epilepsy_specialist_nurse nhs_kpis.epilepsy_specialist_nurse_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.epilepsy_specialist_nurse open_uk_kpis.epilepsy_specialist_nurse_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.epilepsy_specialist_nurse country_kpis.epilepsy_specialist_nurse_total as country_percentage %}
-                            {% percentage_of_total national_kpis.epilepsy_specialist_nurse national_kpis.epilepsy_specialist_nurse_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_epilepsy_specialist_nurse_help_label_text}}</p>
-                                        <i
-                                            class="rcpch question circle icon"
-                                            id='epilepsy_specialist_nurse' data-title='Epilepsy specialist nurse'
-                                            data-content="{{kpis.get_epilepsy_specialist_nurse_help_reference_text}} Note: different measures have different denominators."
-                                            data-position='top right' _="init js $('#epilepsy_specialist_nurse').popup(); end">
+                    {% endfor %}
+                    <tr class="subcategory-header">
+                        
+                        <td>
+                            <div class="rcpch_td_data_indicator_wrapper">
+                                <p>{{kpis.get_tertiary_input_help_label_text}}</p>
+                                <i
+                                    class="rcpch question circle icon"
+                                    id='tertiary_input' data-title='Tertiary Input'
+                                    data-content="{{kpis.get_tertiary_input_help_reference_text}} Note: different measures have different denominators."
+                                    data-position='top right' _="init js $('#tertiary_input').popup(); end">
+                                </i>
+                            </div>
+                        
+                        </td>
+                        {% for abstraction, data in all_data.items %}
+                        {% with kpi_name='tertiary_input' %}
+                            {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                <td class='right aligned'>
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                         </i>
-                                    
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.epilepsy_specialist_nurse_total_eligible}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.epilepsy_specialist_nurse_total}}){% endif %}</td>
-                        </tr>
-                        <tr class="subcategory-header">
-                            {% percentage_of_total organisation_kpis.aggregation_model.tertiary_input_passed organisation_kpis.aggregation_model.tertiary_input_total_eligible as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.tertiary_input trust_kpis.tertiary_input_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.tertiary_input icb_kpis.tertiary_input_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.tertiary_input nhs_kpis.tertiary_input_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.tertiary_input open_uk_kpis.tertiary_input_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.tertiary_input country_kpis.tertiary_input_total as country_percentage %}
-                            {% percentage_of_total national_kpis.tertiary_input national_kpis.tertiary_input_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_tertiary_input_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='tertiary_input' data-title='Tertiary Input'
-                                        data-content="{{kpis.get_tertiary_input_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#tertiary_input').popup(); end">
-                                    </i>
-                                </div>
-                            
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.tertiary_input_total_eligible}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.tertiary_input_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.tertiary_input_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.tertiary_input_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.tertiary_input_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.tertiary_input_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.tertiary_input_total}}){% endif %}</td>
-                        </tr>
-                        <tr class="subcategory-row">
-                            {% percentage_of_total organisation_kpis.aggregation_model.epilepsy_surgery_referral_passed organisation_kpis.aggregation_model.epilepsy_surgery_referral_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.epilepsy_surgery_referral trust_kpis.epilepsy_surgery_referral_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.epilepsy_surgery_referral icb_kpis.epilepsy_surgery_referral_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.epilepsy_surgery_referral nhs_kpis.epilepsy_surgery_referral_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.epilepsy_surgery_referral open_uk_kpis.epilepsy_surgery_referral_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.epilepsy_surgery_referral country_kpis.epilepsy_surgery_referral_total as country_percentage %}
-                            {% percentage_of_total national_kpis.epilepsy_surgery_referral national_kpis.epilepsy_surgery_referral_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_epilepsy_surgery_referral_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='epilepsy_surgery_referral' data-title='Epilepsy surgery referral'
-                                        data-content="{{kpis.get_epilepsy_surgery_referral_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#epilepsy_surgery_referral').popup(); end">
-                                    </i>
-                                </div>
-                            
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.epilepsy_surgery_referral_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.epilepsy_surgery_referral_total}}){% endif %}</td>
-                        </tr> -->
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{ abstraction }}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    <tr class="subcategory-row">
+
+                        <td>
+                            <div class="rcpch_td_data_indicator_wrapper">
+                                <p>{{kpis.get_epilepsy_surgery_referral_help_label_text}}</p>
+                                <i
+                                    class="rcpch question circle icon"
+                                    id='epilepsy_surgery_referral' data-title='Epilepsy surgery referral'
+                                    data-content="{{kpis.get_epilepsy_surgery_referral_help_reference_text}} Note: different measures have different denominators."
+                                    data-position='top right' _="init js $('#epilepsy_surgery_referral').popup(); end">
+                                </i>
+                            </div>
+                        
+                        </td>
+                        {% for abstraction, data in all_data.items %}
+                            {% with kpi_name='epilepsy_surgery_referral' %}
+                            {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                <td class='right aligned'>
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{ abstraction }}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                            {{ kpi_data }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            {% endwith %}
+                        {% endfor %}
                     </tbody>
                 </table>
 
                 <h3>Investigations</h3>
+                {% comment %} [ECG, MRI,] {% endcomment %}
                 <table class='ui rcpch small table'>
                     <thead>
                         <tr>
@@ -279,66 +296,63 @@ will be persisted and run as a cron job once a day.
                         </tr>
                     </thead>
                     <tbody>
+                    
+                    {% for kpi_name in kpi_names_list|slice:"4:6" %}
                         <tr>
-                            {% percentage_of_total organisation_kpis.aggregation_model.ecg organisation_kpis.aggregation_model.ecg_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.ecg trust_kpis.ecg_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.ecg icb_kpis.ecg_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.ecg nhs_kpis.ecg_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.ecg open_uk_kpis.ecg_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.ecg country_kpis.ecg_total as country_percentage %}
-                            {% percentage_of_total national_kpis.ecg national_kpis.ecg_total as national_percentage %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_ecg_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='ecg' data-title='ECG'
-                                        data-content="{{kpis.get_ecg_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#ecg').popup(); end">
-                                    </i>
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
+                                    class="rcpch question circle icon"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
+                                </i>
                                 </div>
-                            
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.ecg_total}}) {% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.ecg_total}}) {% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.ecg_total}}) {% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.ecg_total}}) {% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.ecg_total}}) {% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.ecg_total}}) {% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.ecg_total}}) {% endif %}</td>
-                        </tr>
-                        <tr>
-                            {% percentage_of_total organisation_kpis.aggregation_model.mri organisation_kpis.aggregation_model.mri_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.mri trust_kpis.mri_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.mri icb_kpis.mri_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.mri nhs_kpis.mri_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.mri open_uk_kpis.mri_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.mri country_kpis.mri_total as country_percentage %}
-                            {% percentage_of_total national_kpis.mri national_kpis.mri_total as national_percentage %}
-                            <td>
-                                
-                                    <div class="rcpch_td_data_indicator_wrapper">
-                                        <p>{{kpis.get_mri_help_label_text}}</p>
-                                        <i
-                                            class="rcpch question circle icon"
-                                            id='mri' data-title='MRI'
-                                            data-content="{{kpis.get_mri_help_reference_text}} Note: different measures have different denominators."
-                                            data-position='top right' _="init js $('#mri').popup(); end">
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                         </i>
-                                    </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.mri_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.mri_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.mri_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.mri_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.mri_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.mri_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.mri_total}}){% endif %}</td>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
                         </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
 
                 <h3>Mental Health</h3>
+                {% comment %} ['assessment_of_mental_health_issues', 'mental_health_support'] {% endcomment %}
                 <table class='ui rcpch small table'>
                     <thead>
                         <tr>
@@ -353,68 +367,63 @@ will be persisted and run as a cron job once a day.
                         </tr>
                     </thead>
                     <tbody>
+                    
+                    {% for kpi_name in kpi_names_list|slice:"6:8" %}
                         <tr>
-                            {% percentage_of_total organisation_kpis.aggregation_model.assessment_of_mental_health_issues organisation_kpis.aggregation_model.assessment_of_mental_health_issues_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.assessment_of_mental_health_issues trust_kpis.assessment_of_mental_health_issues_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.assessment_of_mental_health_issues icb_kpis.assessment_of_mental_health_issues_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.assessment_of_mental_health_issues nhs_kpis.assessment_of_mental_health_issues_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.assessment_of_mental_health_issues open_uk_kpis.assessment_of_mental_health_issues_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.assessment_of_mental_health_issues country_kpis.assessment_of_mental_health_issues_total as country_percentage %}
-                            {% percentage_of_total national_kpis.assessment_of_mental_health_issues national_kpis.assessment_of_mental_health_issues_total as national_percentage %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_assessment_of_mental_health_issues_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='assessment_of_mental_health_issues'
-                                        data-title='Assessment of mental health issues'
-                                        data-content="{{kpis.get_assessment_of_mental_health_issues_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#assessment_of_mental_health_issues').popup(); end">
-                                    </i>
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
+                                    class="rcpch question circle icon"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
+                                </i>
                                 </div>
-                            
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.assessment_of_mental_health_issues_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.assessment_of_mental_health_issues_total}}){% endif %}</td>
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
                         </tr>
-                        <tr>
-                            {% percentage_of_total organisation_kpis.aggregation_model.mental_health_support organisation_kpis.aggregation_model.mental_health_support_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.mental_health_support trust_kpis.mental_health_support_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.mental_health_support icb_kpis.mental_health_support_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.mental_health_support nhs_kpis.mental_health_support_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.mental_health_support open_uk_kpis.mental_health_support_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.mental_health_support country_kpis.mental_health_support_total as country_percentage %}
-                            {% percentage_of_total national_kpis.mental_health_support national_kpis.mental_health_support_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_mental_health_support_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='mental_health_support'
-                                        data-title='Mental health support'
-                                        data-content="{{kpis.get_mental_health_support_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#mental_health_support').popup(); end">
-                                    </i>
-                                </div>
-                            
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.mental_health_support_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.mental_health_support_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.mental_health_support_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.mental_health_support_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.mental_health_support_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.mental_health_support_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.mental_health_support_total}}){% endif %}</td>
-                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
                 
                 <h3>Medication</h3>
+                {% comment %} [Sodium valproate] {% endcomment %}
                 <table class='ui rcpch small table'>
                     <thead>
                         <tr>
@@ -429,41 +438,63 @@ will be persisted and run as a cron job once a day.
                         </tr>
                     </thead>
                     <tbody>
-
+                    {% comment %}  {% endcomment %}
+                    {% for kpi_name in kpi_names_list|slice:"8:9" %}
                         <tr>
-                            {% percentage_of_total organisation_kpis.aggregation_model.sodium_valproate organisation_kpis.aggregation_model.sodium_valproate_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.sodium_valproate trust_kpis.sodium_valproate_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.sodium_valproate icb_kpis.sodium_valproate_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.sodium_valproate nhs_kpis.sodium_valproate_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.sodium_valproate open_uk_kpis.sodium_valproate_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.sodium_valproate country_kpis.sodium_valproate_total as country_percentage %}
-                            {% percentage_of_total national_kpis.sodium_valproate national_kpis.sodium_valproate_total as national_percentage %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_sodium_valproate_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='sodium_valproate'
-                                        data-title='Sodium valproate'
-                                        data-content="{{kpis.get_sodium_valproate_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#sodium_valproate').popup(); end">
-                                    </i>
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
+                                    class="rcpch question circle icon"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
+                                </i>
                                 </div>
-                            
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.sodium_valproate_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sodium_valproate_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sodium_valproate_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None_kpis.sodium_valproate_total > 0 %}({{nhs_kpis.sodium_valproate_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.sodium_valproate_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.sodium_valproate_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.sodium_valproate_total}}){% endif %}</td>
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
                         </tr>
-
+                    {% endfor %}
                     </tbody>
                 </table>
 
                 <h3>Care Planning</h3>
+                {% comment %} ['comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details', 'school_individual_healthcare_plan'] {% endcomment %}
                 <table class='ui rcpch small table'>
                     <thead>
                         <tr>
@@ -478,364 +509,274 @@ will be persisted and run as a cron job once a day.
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="subcategory-header"> <!-- 9A comprehensive_care_planning_agreement -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.comprehensive_care_planning_agreement organisation_kpis.aggregation_model.comprehensive_care_planning_agreement_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.comprehensive_care_planning_agreement trust_kpis.comprehensive_care_planning_agreement_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.comprehensive_care_planning_agreement icb_kpis.comprehensive_care_planning_agreement_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.comprehensive_care_planning_agreement nhs_kpis.comprehensive_care_planning_agreement_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.comprehensive_care_planning_agreement open_uk_kpis.comprehensive_care_planning_agreement_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.comprehensive_care_planning_agreement country_kpis.comprehensive_care_planning_agreement_total as country_percentage %}
-                            {% percentage_of_total national_kpis.comprehensive_care_planning_agreement national_kpis.comprehensive_care_planning_agreement_total as national_percentage %}
+                        {% comment %} comprehensive_care_planning_agreement {% endcomment %}
+                        <tr class="subcategory-header"> 
+                            {% with kpi_name='comprehensive_care_planning_agreement' %}
                             <td>
                                 <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_comprehensive_care_planning_agreement_help_label_text}}</p>
-                                    <i
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
                                         class="rcpch question circle icon"
-                                        id='comprehensive_care_planning_agreement'
-                                        data-title='Comprehensive care planning agreement'
-                                        data-content="{{kpis.get_comprehensive_care_planning_agreement_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#comprehensive_care_planning_agreement').popup(); end">
-                                    </i>
-                                </div>
-                            
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.comprehensive_care_planning_agreement_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9A (a) patient_held_individualised_epilepsy_document -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.patient_held_individualised_epilepsy_document organisation_kpis.aggregation_model.patient_held_individualised_epilepsy_document_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.patient_held_individualised_epilepsy_document trust_kpis.patient_held_individualised_epilepsy_document_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.patient_held_individualised_epilepsy_document icb_kpis.patient_held_individualised_epilepsy_document_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.patient_held_individualised_epilepsy_document nhs_kpis.patient_held_individualised_epilepsy_document_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.patient_held_individualised_epilepsy_document open_uk_kpis.patient_held_individualised_epilepsy_document_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.patient_held_individualised_epilepsy_document country_kpis.patient_held_individualised_epilepsy_document_total as country_percentage %}
-                            {% percentage_of_total national_kpis.patient_held_individualised_epilepsy_document national_kpis.patient_held_individualised_epilepsy_document_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_patient_held_individualised_epilepsy_document_help_label_text}}</p>
-                                    
-                                        <i
-                                            class="rcpch question circle icon"
-                                            id='patient_held_individualised_epilepsy_document'
-                                            data-title='Parent-held individualised epilepsy document'
-                                            data-content="{{kpis.get_patient_held_individualised_epilepsy_document_help_reference_text}} Note: different measures have different denominators."
-                                            data-position='top right'
-                                            _="init js $('#patient_held_individualised_epilepsy_document').popup(); end">
-                                        </i>
-                                    
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.patient_held_individualised_epilepsy_document_total}}){% endif %}</td>
-                        </tr>
-                        
-                        <tr class="subcategory-row"> <!-- 9A (b) patient_carer_parent_agreement_to_the_care_planning -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.patient_carer_parent_agreement_to_the_care_planning organisation_kpis.aggregation_model.patient_carer_parent_agreement_to_the_care_planning_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.patient_carer_parent_agreement_to_the_care_planning trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.patient_carer_parent_agreement_to_the_care_planning icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.patient_carer_parent_agreement_to_the_care_planning nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.patient_carer_parent_agreement_to_the_care_planning country_kpis.patient_carer_parent_agreement_to_the_care_planning_total as country_percentage %}
-                            {% percentage_of_total national_kpis.patient_carer_parent_agreement_to_the_care_planning national_kpis.patient_carer_parent_agreement_to_the_care_planning_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_patient_carer_parent_agreement_to_the_care_planning_help_label_text}}</p>
-                                    
-                                        <i
-                                            class="rcpch question circle icon"
-                                            id='patient_carer_parent_agreement_to_the_care_planning'
-                                            data-title='Patient/Carer/Parent agreement'
-                                            data-content="{{kpis.get_patient_carer_parent_agreement_to_the_care_planning_help_reference_text}} Note: different measures have different denominators."
-                                            data-position='top right'
-                                            _="init js $('#patient_carer_parent_agreement_to_the_care_planning').popup(); end">
-                                        </i>
-                                    
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.patient_carer_parent_agreement_to_the_care_planning_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9A (c) care_planning_has_been_updated_when_necessary -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.care_planning_has_been_updated_when_necessary organisation_kpis.aggregation_model.care_planning_has_been_updated_when_necessary_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.care_planning_has_been_updated_when_necessary trust_kpis.care_planning_has_been_updated_when_necessary_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.care_planning_has_been_updated_when_necessary icb_kpis.care_planning_has_been_updated_when_necessary_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.care_planning_has_been_updated_when_necessary nhs_kpis.care_planning_has_been_updated_when_necessary_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.care_planning_has_been_updated_when_necessary open_uk_kpis.care_planning_has_been_updated_when_necessary_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.care_planning_has_been_updated_when_necessary country_kpis.care_planning_has_been_updated_when_necessary_total as country_percentage %}
-                            {% percentage_of_total national_kpis.care_planning_has_been_updated_when_necessary national_kpis.care_planning_has_been_updated_when_necessary_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_care_planning_has_been_updated_when_necessary_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='care_planning_has_been_updated_when_necessary'
-                                        data-title='Care planning has been updated when necessary'
-                                        data-content="{{kpis.get_care_planning_has_been_updated_when_necessary_help_reference_text}} Note: different measures have different denominators."
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
                                         data-position='top right'
-                                        _="init js $('#care_planning_has_been_updated_when_necessary').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.care_planning_has_been_updated_when_necessary_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-header"> <!-- 9B comprehensive_care_planning_content -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.comprehensive_care_planning_content organisation_kpis.aggregation_model.comprehensive_care_planning_content_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.comprehensive_care_planning_content trust_kpis.comprehensive_care_planning_content_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.comprehensive_care_planning_content icb_kpis.comprehensive_care_planning_content_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.comprehensive_care_planning_content nhs_kpis.comprehensive_care_planning_content_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.comprehensive_care_planning_content open_uk_kpis.comprehensive_care_planning_content_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.comprehensive_care_planning_content country_kpis.comprehensive_care_planning_content_total as country_percentage %}
-                            {% percentage_of_total national_kpis.comprehensive_care_planning_content national_kpis.comprehensive_care_planning_content_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_comprehensive_care_planning_content_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='comprehensive_care_planning_content'
-                                        data-title='Comprehensive care planning content'
-                                        data-content="{{kpis.get_comprehensive_care_planning_content_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#comprehensive_care_planning_content').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.comprehensive_care_planning_content_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.comprehensive_care_planning_content_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (a) parental_prolonged_seizures_care_plan -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.parental_prolonged_seizures_care_plan organisation_kpis.aggregation_model.parental_prolonged_seizures_care_plan_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.parental_prolonged_seizures_care_plan trust_kpis.parental_prolonged_seizures_care_plan_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.parental_prolonged_seizures_care_plan icb_kpis.parental_prolonged_seizures_care_plan_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.parental_prolonged_seizures_care_plan nhs_kpis.parental_prolonged_seizures_care_plan_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.parental_prolonged_seizures_care_plan open_uk_kpis.parental_prolonged_seizures_care_plan_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.parental_prolonged_seizures_care_plan country_kpis.parental_prolonged_seizures_care_plan_total as country_percentage %}
-                            {% percentage_of_total national_kpis.parental_prolonged_seizures_care_plan national_kpis.parental_prolonged_seizures_care_plan_total as national_percentage %}
-                            <td>
-                             <div class="rcpch_td_data_indicator_wrapper">
-                                 <p>{{kpis.get_parental_prolonged_seizures_care_plan_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='parental_prolonged_seizures_care_plan'
-                                        data-title='Parental care plan for prolonged seizures'
-                                        data-content="{{kpis.get_parental_prolonged_seizures_care_plan_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#parental_prolonged_seizures_care_plan').popup(); end">
-                                                             </i>
-                             </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.parental_prolonged_seizures_care_plan_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (b) water_safety -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.water_safety organisation_kpis.aggregation_model.water_safety_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.water_safety trust_kpis.water_safety_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.water_safety icb_kpis.water_safety_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.water_safety nhs_kpis.water_safety_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.water_safety open_uk_kpis.water_safety_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.water_safety country_kpis.water_safety_total as country_percentage %}
-                            {% percentage_of_total national_kpis.water_safety national_kpis.water_safety_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_water_safety_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='water_safety'
-                                        data-title='Water safety'
-                                        data-content="{{kpis.get_water_safety_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#water_safety').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %} ({{organisation_kpis.aggregation_model.water_safety_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %} ({{trust_kpis.water_safety_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %} ({{icb_kpis.water_safety_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %} ({{nhs_kpis.water_safety_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %} ({{open_uk_kpis.water_safety_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %} ({{country_kpis.water_safety_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %} ({{national_kpis.water_safety_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (c) first_aid -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.first_aid organisation_kpis.aggregation_model.first_aid_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.first_aid trust_kpis.first_aid_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.first_aid icb_kpis.first_aid_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.first_aid nhs_kpis.first_aid_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.first_aid open_uk_kpis.first_aid_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.first_aid country_kpis.first_aid_total as country_percentage %}
-                            {% percentage_of_total national_kpis.first_aid national_kpis.first_aid_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_first_aid_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='first_aid'
-                                        data-title='First aid'
-                                        data-content="{{kpis.get_first_aid_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#first_aid').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.first_aid_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.first_aid_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.first_aid_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.first_aid_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.first_aid_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.first_aid_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.first_aid_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (d) general_participation_and_risk -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.general_participation_and_risk organisation_kpis.aggregation_model.general_participation_and_risk_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.general_participation_and_risk trust_kpis.general_participation_and_risk_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.general_participation_and_risk icb_kpis.general_participation_and_risk_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.general_participation_and_risk nhs_kpis.general_participation_and_risk_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.general_participation_and_risk open_uk_kpis.general_participation_and_risk_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.general_participation_and_risk country_kpis.general_participation_and_risk_total as country_percentage %}
-                            {% percentage_of_total national_kpis.general_participation_and_risk national_kpis.general_participation_and_risk_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_general_participation_and_risk_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='general_participation_and_risk'
-                                        data-title='General participation and risk'
-                                        data-content="{{kpis.get_general_participation_and_risk_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#general_participation_and_risk').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.general_participation_and_risk_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.general_participation_and_risk_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.general_participation_and_risk_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.general_participation_and_risk_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.general_participation_and_risk_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.general_participation_and_risk_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.general_participation_and_risk_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (e) sudep -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.sudep organisation_kpis.aggregation_model.sudep_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.sudep trust_kpis.sudep_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.sudep icb_kpis.sudep_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.sudep nhs_kpis.sudep_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.sudep open_uk_kpis.sudep_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.sudep country_kpis.sudep_total as country_percentage %}
-                            {% percentage_of_total national_kpis.sudep national_kpis.sudep_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_sudep_help_label_text}}</p>
-                                    <i class="rcpch question circle icon" id='sudep' data-title='Sudden unexplained death in epilepsy'
-                                        data-content="{{kpis.get_sudep_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#sudep').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.sudep_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.sudep_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr class="subcategory-row"> <!-- 9B (f) service_contact_details -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.service_contact_details organisation_kpis.aggregation_model.service_contact_details_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.service_contact_details trust_kpis.service_contact_details_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.service_contact_details icb_kpis.service_contact_details_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.service_contact_details nhs_kpis.service_contact_details_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.service_contact_details open_uk_kpis.service_contact_details_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.service_contact_details country_kpis.service_contact_details_total as country_percentage %}
-                            {% percentage_of_total national_kpis.service_contact_details national_kpis.service_contact_details_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_service_contact_details_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='service_contact_details'
-                                        data-title='Service contact details'
-                                        data-content="{{kpis.get_service_contact_details_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#service_contact_details').popup(); end">
-                                    </i>
-                                </div>
-                            </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.service_contact_details_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.service_contact_details_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.service_contact_details_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.service_contact_details_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.service_contact_details_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.service_contact_details_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.service_contact_details_total}}){% endif %}</td>
-                        </tr>
-
-                        <tr> <!-- 10 school_individual_healthcare_plan -->
-                            {% percentage_of_total organisation_kpis.aggregation_model.school_individual_healthcare_plan organisation_kpis.aggregation_model.school_individual_healthcare_plan_total as organisation_percentage %}
-                            {% percentage_of_total trust_kpis.school_individual_healthcare_plan trust_kpis.school_individual_healthcare_plan_total as trust_percentage %}
-                            {% percentage_of_total icb_kpis.school_individual_healthcare_plan icb_kpis.school_individual_healthcare_plan_total as icb_percentage %}
-                            {% percentage_of_total nhs_kpis.school_individual_healthcare_plan nhs_kpis.school_individual_healthcare_plan_total as nhs_percentage %}
-                            {% percentage_of_total open_uk_kpis.school_individual_healthcare_plan open_uk_kpis.school_individual_healthcare_plan_total as open_uk_percentage %}
-                            {% percentage_of_total country_kpis.school_individual_healthcare_plan country_kpis.school_individual_healthcare_plan_total as country_percentage %}
-                            {% percentage_of_total national_kpis.school_individual_healthcare_plan national_kpis.school_individual_healthcare_plan_total as national_percentage %}
-                            <td>
-                                <div class="rcpch_td_data_indicator_wrapper">
-                                    <p>{{kpis.get_school_individual_healthcare_plan_help_label_text}}</p>
-                                    <i
-                                        class="rcpch question circle icon"
-                                        id='school_individual_healthcare_plan'
-                                        data-title='School individual health care plan'
-                                        data-content="{{kpis.get_school_individual_healthcare_plan_help_reference_text}} Note: different measures have different denominators."
-                                        data-position='top right' _="init js $('#school_individual_healthcare_plan').popup(); end">
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
                                     </i>
                                 </div>
                             
                             </td>
-                            <td class='right aligned'>{% none_percentage organisation_percentage %} {% if organisation_percentage is not None %}({{organisation_kpis.aggregation_model.school_individual_healthcare_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage trust_percentage %} {% if trust_percentage is not None %}({{trust_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage icb_percentage %} {% if icb_percentage is not None %}({{icb_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage nhs_percentage %} {% if nhs_percentage is not None %}({{nhs_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage open_uk_percentage %} {% if open_uk_percentage is not None %}({{open_uk_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage country_percentage %} {% if country_percentage is not None %}({{country_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
-                            <td class='right aligned'>{% none_percentage national_percentage %} {% if national_percentage is not None %}({{national_kpis.school_individual_healthcare_plan_total}}){% endif %}</td>
+                            {% for abstraction, data in all_data.items %}
+                                {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    <td class='right aligned'>
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligble'
+                                                data-content="No eligible Cases scored for this metric."
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{ abstraction }}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                                {{ kpi_data }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            {% endwith %} 
                         </tr>
+
+                        {% comment %} 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', {% endcomment %}
+                        {% for kpi_name in kpi_names_list|slice:"10:13" %}
+                        <tr class="subcategory-row">
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
+                                    class="rcpch question circle icon"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
+                                </i>
+                                </div>
+                            </td>
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+
+                        {% comment %} comprehensive_care_planning_content {% endcomment %}
+                        <tr class="subcategory-header"> 
+                            {% with kpi_name='comprehensive_care_planning_content' %}
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                    <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                    <i 
+                                        class="rcpch question circle icon"
+                                        id='{{ kpi_name }}'
+                                        data-title='{% render_title_kpi_name kpi_name|title %}'
+                                        data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}').popup(); end">
+                                    </i>
+                                </div>
+                            
+                            </td>
+                            {% for abstraction, data in all_data.items %}
+                                {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    <td class='right aligned'>
+                                        {% if kpi_data == -1 %}
+                                            <i 
+                                                class="rcpch clock icon"
+                                                id='_{{abstraction}}_{{kpi_name}}'
+                                                data-title='No aggregation data'
+                                                data-content="Aggregation not yet performed"
+                                                data-position='top right'
+                                                _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                            </i>
+                                        {% elif kpi_data == 0 %}
+                                            <i 
+                                                class="rcpch exclamation circle icon"
+                                                id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                                data-title='None eligble'
+                                                data-content="No eligible Cases scored for this metric."
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                            </i>
+                                        {% else %}
+                                            <span
+                                                class="rcpch"
+                                                id='{{ kpi_name }}_data_{{ abstraction }}'
+                                                data-title='% Passed Metric'
+                                                data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                                data-position='top right'
+                                                _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                                {{ kpi_data }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            {% endwith %} 
+                        </tr>
+
+                        {% comment %} 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details' {% endcomment %}
+                        {% for kpi_name in kpi_names_list|slice:"13:20" %}
+                        <tr class="subcategory-row">
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
+                                    class="rcpch question circle icon"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
+                                </i>
+                                </div>
+                            </td>
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+
+                        {% comment %} 'school_individual_healthcare_plan' {% endcomment %}
+                        {% for kpi_name in kpi_names_list|slice:"20:" %}
+                        <tr>
+                            <td>
+                                <div class="rcpch_td_data_indicator_wrapper">
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
+                                    class="rcpch question circle icon"
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
+                                </i>
+                                </div>
+                            </td>
+                            {% for abstraction, data in all_data.items %}
+                                <td class='right aligned'>
+                                    {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                    {% if kpi_data == -1 %}
+                                        <i 
+                                            class="rcpch clock icon"
+                                            id='_{{abstraction}}_{{kpi_name}}'
+                                            data-title='No aggregation data'
+                                            data-content="Aggregation not yet performed"
+                                            data-position='top right'
+                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                        </i>
+                                    {% elif kpi_data == 0 %}
+                                        <i 
+                                            class="rcpch exclamation circle icon"
+                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                            data-title='None eligble'
+                                            data-content="No eligible Cases scored for this metric."
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                        </i>
+                                    {% else %}
+                                        <span
+                                            class="rcpch"
+                                            id='{{ kpi_name }}_data_{{abstraction}}'
+                                            data-title='% Passed Metric'
+                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                            data-position='top right'
+                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                        {{ kpi_data }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
-
-            {% comment %} </div> {% endcomment %}
-
         </div>
 
         <div class="ui bottom attached rcpch_footer info icon message">
