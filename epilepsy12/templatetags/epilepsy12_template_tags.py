@@ -384,10 +384,9 @@ def get_kpi_pct_passed(region_data: tuple[str, dict]):
 
 @register.simple_tag
 def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
-
     if not aggregation_model:
         return -1
-    
+
     total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
 
     if total_eligible_count == 0:
@@ -396,14 +395,41 @@ def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
     passed_count = getattr(aggregation_model, f"{kpi}_passed")
 
     pct_passed = round(100 * passed_count / total_eligible_count)
-    
+
     return f"{pct_passed}% ({total_eligible_count})"
+
 
 @register.simple_tag
 def get_total_counts_passed(aggregation_model, kpi: str):
     
     passed_count = getattr(aggregation_model, f"{kpi}_passed")
-    
+
     total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
     
-    return f"{passed_count} passed out of {total_eligible_count} total eligible children"
+    ineligible_count = getattr(aggregation_model, f"{kpi}_ineligible")
+    incomplete_count = getattr(aggregation_model, f"{kpi}_incomplete")
+
+    return mark_safe(
+        f"""{passed_count} passed out of {total_eligible_count} total eligible children.
+        
+        Ineligible: {ineligible_count} children.
+        Incomplete: {incomplete_count} children.
+        
+        """
+    )
+
+@register.simple_tag
+def get_help_label_text_for_kpi(kpi_name: str, kpi_instance):
+    help_label_attribute_name = f"get_{kpi_name}_help_label_text"
+    help_label_text_method = getattr(kpi_instance, help_label_attribute_name)
+    return help_label_text_method()
+
+@register.simple_tag
+def get_help_reference_text_for_kpi(kpi_name: str, kpi_instance):
+    help_reference_attribute_name = f"get_{kpi_name}_help_reference_text"
+    help_reference_text_method = getattr(kpi_instance, help_reference_attribute_name)
+    return help_reference_text_method()
+
+@register.simple_tag
+def render_title_kpi_name(kpi_name:str):
+    return kpi_name.replace('_',' ')
