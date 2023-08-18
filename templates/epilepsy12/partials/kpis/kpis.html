@@ -44,7 +44,7 @@ will be persisted and run as a cron job once a day.
                                         class="info circle icon"
                                         id='totals_organisation'
                                         data-title='Epilepsy12 totals'
-                                        data-content="Number of children registered in this organisation" {% if organisation.OrganisationName is not None %} + "{({{organisation.OrganisationName}})" {% endif %}
+                                        data-content="Number of children registered in this organisation" {% if organisation.OrganisationName is not None %} + "({{organisation.OrganisationName}})" {% endif %}
                                         data-position='top right'
                                         _="init js $('#totals_organisation').popup(); end"
                                     ></i>({{all_data.ORGANISATION_KPIS.total_cases_registered}})</p>
@@ -56,7 +56,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_trust'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Trust" {% if organisation.ParentOrganisation_OrganisationName is not None %} + "{({{organisation.ParentOrganisation_OrganisationName}})" {% endif %}
+                                    data-content="Number of children registered in this Trust" {% if organisation.ParentOrganisation_OrganisationName is not None %} + "({{organisation.ParentOrganisation_OrganisationName}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_trust').popup(); end"
                                 ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
@@ -67,7 +67,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_icb'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Integrated Care Board" {% if organisation.ICBName is not None %} + "{({{organisation.ICBName}})" {% endif %}
+                                    data-content="Number of children registered in this Integrated Care Board" {% if organisation.ICBName is not None %} + "({{organisation.ICBName}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_icb').popup(); end"
                                 ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
@@ -78,7 +78,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_nhs'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this NHS Region" {% if organisation.NHSEnglandRegion is not None %} + "{({{organisation.NHSEnglandRegion}})" {% endif %} 
+                                    data-content="Number of children registered in this NHS Region" {% if organisation.NHSEnglandRegion is not None %} + "({{organisation.NHSEnglandRegion}})" {% endif %} 
                                     data-position='top right'
                                     _="init js $('#totals_nhs').popup(); end"
                                 ></i>({{all_data.NHS_REGION_KPIS.total_cases_registered}})</p>
@@ -89,7 +89,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_open_uk'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this OPEN UK Region" {% if organisation.openuk_network is not None %} + "{({{organisation.openuk_network.OPEN_UK_Network_Name}})" {% endif %}
+                                    data-content="Number of children registered in this OPEN UK Region" {% if organisation.openuk_network is not None %} + "({{organisation.openuk_network.OPEN_UK_Network_Name}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_open_uk').popup(); end"
                                 ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
@@ -100,7 +100,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_country'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this country" {% if organisation.ons_region.ons_country.Country_ONS_Name is not None %} + "{({{organisation.ons_region.ons_country.Country_ONS_Name}})" {% endif %}
+                                    data-content="Number of children registered in this country" {% if organisation.ons_region.ons_country.Country_ONS_Name is not None %} + "({{organisation.ons_region.ons_country.Country_ONS_Name}})" {% endif %}
                                     data-position='top right'
                                     _="init js $('#totals_country').popup(); end"
                                 ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
@@ -176,22 +176,25 @@ will be persisted and run as a cron job once a day.
                             {% endfor %}
                         </tr>
                     {% endfor %}
-                    <tr class="subcategory-header">
-                        
+                    
+                    {% comment %} tertiary input {% endcomment %}
+                    <tr class="subcategory-header"> 
+                        {% with kpi_name='tertiary_input' %}
                         <td>
                             <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{{kpis.get_tertiary_input_help_label_text}}</p>
-                                <i
+                                <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                                <i 
                                     class="rcpch question circle icon"
-                                    id='tertiary_input' data-title='Tertiary Input'
-                                    data-content="{{kpis.get_tertiary_input_help_reference_text}} Note: different measures have different denominators."
-                                    data-position='top right' _="init js $('#tertiary_input').popup(); end">
+                                    id='{{ kpi_name }}'
+                                    data-title='{% render_title_kpi_name kpi_name|title %}'
+                                    data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                    data-position='top right'
+                                    _="init js $('#{{ kpi_name }}').popup(); end">
                                 </i>
                             </div>
                         
                         </td>
                         {% for abstraction, data in all_data.items %}
-                        {% with kpi_name='tertiary_input' %}
                             {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                 <td class='right aligned'>
                                     {% if kpi_data == -1 %}
@@ -224,59 +227,62 @@ will be persisted and run as a cron job once a day.
                                         </span>
                                     {% endif %}
                                 </td>
-                            {% endwith %}
+                            {% endfor %}
+                        {% endwith %} 
+                    </tr>
+
+                    {% comment %} 'epilepsy surgery referral', {% endcomment %}
+                    {% for kpi_name in kpi_names_list|slice:"3:4" %}
+                    <tr class="subcategory-row">
+                        <td>
+                            <div class="rcpch_td_data_indicator_wrapper">
+                            <p>{% get_help_label_text_for_kpi kpi_name kpis %}</p>
+                            <i 
+                                class="rcpch question circle icon"
+                                id='{{ kpi_name }}'
+                                data-title='{% render_title_kpi_name kpi_name|title %}'
+                                data-content="{% get_help_reference_text_for_kpi kpi_name kpis %}. Note: showing percentage passed of total eligible for KPI (count denoted inside brackets)."
+                                data-position='top right'
+                                _="init js $('#{{ kpi_name }}').popup(); end">
+                            </i>
+                            </div>
+                        </td>
+                        {% for abstraction, data in all_data.items %}
+                            <td class='right aligned'>
+                                {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
+                                {% if kpi_data == -1 %}
+                                    <i 
+                                        class="rcpch clock icon"
+                                        id='_{{abstraction}}_{{kpi_name}}'
+                                        data-title='No aggregation data'
+                                        data-content="Aggregation not yet performed"
+                                        data-position='top right'
+                                        _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
+                                    </i>
+                                {% elif kpi_data == 0 %}
+                                    <i 
+                                        class="rcpch exclamation circle icon"
+                                        id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
+                                        data-title='None eligible'
+                                        data-content="No eligible Cases scored for this metric."
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
+                                    </i>
+                                {% else %}
+                                    <span
+                                        class="rcpch"
+                                        id='{{ kpi_name }}_data_{{abstraction}}'
+                                        data-title='% Passed Metric'
+                                        data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
+                                        data-position='top right'
+                                        _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
+                                    {{ kpi_data }}
+                                </span>
+                                {% endif %}
+                            </td>
                         {% endfor %}
                     </tr>
-                    <tr class="subcategory-row">
-
-                        <td>
-                            <div class="rcpch_td_data_indicator_wrapper">
-                                <p>{{kpis.get_epilepsy_surgery_referral_help_label_text}}</p>
-                                <i
-                                    class="rcpch question circle icon"
-                                    id='epilepsy_surgery_referral' data-title='Epilepsy surgery referral'
-                                    data-content="{{kpis.get_epilepsy_surgery_referral_help_reference_text}} Note: different measures have different denominators."
-                                    data-position='top right' _="init js $('#epilepsy_surgery_referral').popup(); end">
-                                </i>
-                            </div>
-                        
-                        </td>
-                        {% for abstraction, data in all_data.items %}
-                            {% with kpi_name='epilepsy_surgery_referral' %}
-                            {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
-                                <td class='right aligned'>
-                                    {% if kpi_data == -1 %}
-                                        <i 
-                                            class="rcpch clock icon"
-                                            id='_{{abstraction}}_{{kpi_name}}'
-                                            data-title='No aggregation data'
-                                            data-content="Aggregation not yet performed"
-                                            data-position='top right'
-                                            _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
-                                        </i>
-                                    {% elif kpi_data == 0 %}
-                                        <i 
-                                            class="rcpch exclamation circle icon"
-                                            id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
-                                            data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
-                                        </i>
-                                    {% else %}
-                                        <span
-                                            class="rcpch"
-                                            id='{{ kpi_name }}_data_{{ abstraction }}'
-                                            data-title='% Passed Metric'
-                                            data-content="{% get_total_counts_passed data.aggregation_model kpi_name %}. Last updated {{data.aggregation_model.last_updated}}"
-                                            data-position='top right'
-                                            _="init js $('#{{ kpi_name }}_data_{{abstraction}}').popup(); end">
-                                            {{ kpi_data }}
-                                        </span>
-                                    {% endif %}
-                                </td>
-                            {% endwith %}
-                        {% endfor %}
+                    {% endfor %}
                     </tbody>
                 </table>
 
