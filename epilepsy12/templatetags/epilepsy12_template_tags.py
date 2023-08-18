@@ -413,8 +413,7 @@ def get_total_counts_passed(aggregation_model, kpi: str):
         f"""{passed_count} passed out of {total_eligible_count} total eligible children.
         
         Ineligible: {ineligible_count} children.
-        Incomplete: {incomplete_count} children.
-        
+        Incomplete: {incomplete_count} children
         """
     )
 
