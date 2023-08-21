@@ -507,14 +507,16 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
     return final_object
 
 
-def get_abstraction_key_from(organisation, abstraction_level: EnumAbstractionLevel):
+def get_abstraction_value_from(organisation, abstraction_level: EnumAbstractionLevel):
     """For the given abstraction level, will call getattr until the final object's value is returned.
 
     If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
     """
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
-        raise ValueError('EnumAbstractionLevel.NATIONAL should not be used with this function.')
-    
+        raise ValueError(
+            "EnumAbstractionLevel.NATIONAL should not be used with this function."
+        )
+
     return_object = organisation
     for attribute in abstraction_level.value.split("__"):
         return_object = getattr(return_object, attribute, None)
@@ -539,7 +541,7 @@ def get_filtered_cases_queryset_for(
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
         abstraction_filter = {}
     else:
-        abstraction_key = get_abstraction_key_from(
+        abstraction_key = get_abstraction_value_from(
             organisation, abstraction_level=abstraction_level
         )
         abstraction_filter = {cases_filter_key: abstraction_key}
@@ -600,18 +602,27 @@ def calculate_kpi_value_counts_queryset(
                 ),
             }
         )
-        
-    # Perform aggregation
-    kpi_value_counts = (
-        KPI.objects.filter(
+
+    if abstraction_level is not EnumAbstractionLevel.NATIONAL:
+        # Perform aggregation
+        kpi_value_counts = (
+            KPI.objects.filter(
+                registration__id__in=filtered_cases.values_list("registration")
+            )  # filter for KPIs associated with filtered cases
+            .values(
+                f"organisation__{abstraction_level.value}"
+            )  # GROUPBY abstraction level
+            .annotate(**aggregate_queries)  # AGGREGATE on each abstraction
+            .order_by(
+                f"organisation__{abstraction_level.value}"
+            )  # To ensure order is always as expected
+        )
+    else:
+        # Perform aggregation with NO GROUPBY KEY
+        # filter for KPIs associated with filtered cases
+        kpi_value_counts = KPI.objects.filter(
             registration__id__in=filtered_cases.values_list("registration")
-        )  # filter for KPIs associated with filtered cases
-        .values(f"organisation__{abstraction_level.value}")  # GROUPBY abstraction level
-        .annotate(**aggregate_queries)  # AGGREGATE on each abstraction
-        .order_by(
-            f"organisation__{abstraction_level.value}"
-        )  # To ensure order is always as expected
-    )
+        ).aggregate(**aggregate_queries)
 
     return kpi_value_counts
 
@@ -651,8 +662,20 @@ def get_abstraction_model_from_level(
             "kpi_aggregation_model": "CountryKPIAggregation",
             "abstraction_entity_model": "ONSCountryEntity",
         },
+        EnumAbstractionLevel.NATIONAL: {
+            "kpi_aggregation_model": "NationalKPIAggregation",
+            "abstraction_entity_model": "ONSCountryEntity",
+        },
     }
     return abstraction_model_map[enum_abstraction_level]
+
+
+# def _update_NationalKPIAggregation(
+#     kpi_value_counts,
+#     cohort: int,
+# ) -> None:
+#     print(kpi_value_counts)
+#     print(kpi_value_counts.values())
 
 
 def update_kpi_aggregation_model(

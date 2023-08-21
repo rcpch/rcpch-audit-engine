@@ -64,7 +64,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
 def test_calculate_kpi_value_counts_queryset_all_levels(
     abstraction_level, abstraction_codes, ods_codes, e12_case_factory
 ):
-    """"""
+    """This registers kids in different organisations, with different abstraction keys, and ensures aggregation output is correct."""
 
     # Clean
     _clean_cases_from_test_db()
@@ -81,7 +81,14 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
     }
     expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
 
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes, num_cases=5 if abstraction_level not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST] else 10)
+    _register_kpi_scored_cases(
+        e12_case_factory,
+        ods_codes=ods_codes,
+        num_cases=5
+        if abstraction_level
+        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST]
+        else 10,
+    )
 
     for code in ods_codes:
         organisation = Organisation.objects.get(ODSCode=code)
@@ -100,9 +107,20 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
                 "mental_health_support",
             ],
         )
-        
-        print(value_counts)
 
-        for vc in value_counts:
-            abstraction_code = vc.pop(f"organisation__{abstraction_level.value}")
-            assert vc == expected_scores[abstraction_code]
+        if abstraction_level is EnumAbstractionLevel.NATIONAL:
+            expected_scores = {
+                "ecg_passed": 20,
+                "ecg_total_eligible": 40,
+                "ecg_ineligible": 20,
+                "ecg_incomplete": 20,
+                "mental_health_support_passed": 20,
+                "mental_health_support_total_eligible": 40,
+                "mental_health_support_ineligible": 20,
+                "mental_health_support_incomplete": 20,
+            }
+            assert value_counts == expected_scores
+        else:
+            for vc in value_counts:
+                abstraction_code = vc.pop(f"organisation__{abstraction_level.value}")
+                assert vc == expected_scores[abstraction_code]
