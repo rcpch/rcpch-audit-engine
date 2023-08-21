@@ -506,35 +506,46 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
     return final_object
 
-def get_abstraction_key_from(
-    organisation, abstraction_level: EnumAbstractionLevel
-):
+
+def get_abstraction_key_from(organisation, abstraction_level: EnumAbstractionLevel):
     """For the given abstraction level, will call getattr until the final object's value is returned.
-    
+
     If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
     """
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        raise ValueError('EnumAbstractionLevel.NATIONAL should not be used with this function.')
+    
     return_object = organisation
     for attribute in abstraction_level.value.split("__"):
-        return_object = getattr(return_object, attribute, None) 
+        return_object = getattr(return_object, attribute, None)
     return return_object
+
 
 def get_filtered_cases_queryset_for(
     abstraction_level: EnumAbstractionLevel,
     organisation,
     cohort: int,
 ):
-    """Returns queryset of current audit filtered cases within the same abstraction level. 
-    
-    Ensures the Case is filtered for an active, primary Site, and in the correct cohort."""
-    
+    """Returns queryset of current audit filtered cases within the same abstraction level.
+
+    Ensures the Case is filtered for an active, primary Site, and in the correct cohort.
+    """
+
     cases_filter_key = f"organisations__{abstraction_level.value}"
 
     Case = apps.get_model("epilepsy12", "Case")
-    
-    abstraction_key = get_abstraction_key_from(organisation, abstraction_level=abstraction_level)
+
+    # This should just be all cases so no filtering
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        abstraction_filter = {}
+    else:
+        abstraction_key = get_abstraction_key_from(
+            organisation, abstraction_level=abstraction_level
+        )
+        abstraction_filter = {cases_filter_key: abstraction_key}
 
     return Case.objects.filter(
-        **{cases_filter_key: abstraction_key},
+        **abstraction_filter,
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
@@ -696,8 +707,3 @@ def update_kpi_aggregation_model(
 
         if created:
             print(f"created {new_obj}")
-
-
-
-
-

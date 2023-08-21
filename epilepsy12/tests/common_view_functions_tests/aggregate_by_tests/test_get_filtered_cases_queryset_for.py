@@ -45,6 +45,7 @@ from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
         (EnumAbstractionLevel.NHS_REGION, ("RP401", "RQM01", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.OPEN_UK, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.COUNTRY, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
+        (EnumAbstractionLevel.NATIONAL, ("RP401", "RP416", "7A6AV"), (30, 30, 30)),
     ],
 )
 @pytest.mark.django_db
@@ -76,6 +77,8 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
             abstraction_level=abstraction_level,
             cohort=6,
         ).count()
+        
+        print(output)
 
         assert (
             output == expected_count[ix]
