@@ -588,7 +588,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
 
     def __str__(self):
         return (
-            f"KPIAggregations (OPENUKNetworkEntity={self.abstraction_relation})"
+            f"OPENUKKPIAggregations (OPENUKNetworkEntity={self.abstraction_relation})"
         )
 
 
@@ -608,4 +608,16 @@ class CountryKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("Country KPI Aggregation Models")
 
     def __str__(self):
-        return f"KPIAggregations (ONSCountryEntity={self.abstraction_relation})"
+        return f"CountryKPIAggregations (ONSCountryEntity={self.abstraction_relation})"
+
+class NationalKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for England and Wales.
+    """
+
+    class Meta:
+        verbose_name = _("National KPI Aggregation Model")
+        verbose_name_plural = _("National KPI Aggregation Models")
+
+    def __str__(self):
+        return f"National KPIAggregations for England and Wales"
