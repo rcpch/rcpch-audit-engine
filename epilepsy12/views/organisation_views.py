@@ -37,7 +37,6 @@ from ..common_view_functions import (
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
     get_abstraction_model_from_level,
-    get_total_cases_registered_for_abstraction_level,
 )
 from ..general_functions import (
     get_current_cohort_data,
