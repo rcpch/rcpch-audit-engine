@@ -18,6 +18,19 @@ from epilepsy12.models import (
 from epilepsy12.tests.common_view_functions_tests.CreateKPIMetrics import KPIMetric
 
 
+def _register_cases_in_organisation(
+    ods_codes: list[str], e12_case_factory, n_cases: int = 10
+) -> list:
+    for code in ods_codes:
+        org = Organisation.objects.get(ODSCode=code)
+
+        e12_case_factory.create_batch(
+            n_cases,
+            organisations__organisation=org,
+            first_name=f"temp_{org.OrganisationName}",
+        )
+
+
 def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
     """Helper function to return a queryset of 60 kids with scored, known KPI scores."""
     ORGANISATIONS = Organisation.objects.filter(
@@ -78,6 +91,7 @@ def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
 
     for test_case in filled_case_objects:
         calculate_kpis(registration_instance=test_case.registration)
+
 
 def _clean_cases_from_test_db() -> None:
     Registration.objects.all().delete()
