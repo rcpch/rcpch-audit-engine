@@ -82,8 +82,8 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         cases = 50
 
     # In batches of batch_size
-    batch_size = 50
-    num_batches = (cases + 49) // batch_size
+    batch_size = 10
+    num_batches = (cases + batch_size-1) // batch_size
     organisations_list = Organisation.objects.all().order_by('OrganisationName')
     for batch in range(num_batches):
         # Create random attributes
@@ -117,7 +117,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
             },
         )
         for child in new_cases:
-            print(f"Saved {child} in {child.organisations.OrganisationName}")
+            print(f"Saved {child} in {organisation.OrganisationName}")
         print(f"(Created total {batch_size} Cases)")
 
 
