@@ -2,13 +2,15 @@
 import pytest
 
 # 3rd party imports
-
+from django.apps import apps
 
 # E12 imports
 from epilepsy12.common_view_functions import (
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
+    get_abstraction_model_from_level,
+    get_abstraction_value_from,
 )
 from epilepsy12.models import (
     Organisation,
@@ -22,6 +24,7 @@ from epilepsy12.models import (
     TrustKPIAggregation,
     NHSRegionEntity,
     IntegratedCareBoardEntity,
+    NationalKPIAggregation,
 )
 from epilepsy12.constants import (
     EnumAbstractionLevel,
@@ -29,24 +32,64 @@ from epilepsy12.constants import (
 from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
 
 
+@pytest.mark.parametrize(
+    "abstraction_level, abstraction_codes, ods_codes",
+    [
+        (
+            EnumAbstractionLevel.ORGANISATION,
+            ["RGT01", "RQM01"],
+            ["RGT01", "RQM01"],
+        ),
+        (
+            EnumAbstractionLevel.TRUST,
+            ["RGT", "RQM"],
+            ["RGT01", "RQM01"],
+        ),
+        (
+            EnumAbstractionLevel.ICB,
+            ["QUE", "QRV"],
+            ["RGT01", "RYVD9", "RYJ03", "RQM01"],
+        ),
+        (
+            EnumAbstractionLevel.NHS_REGION,
+            ["Y61", "Y56"],
+            ["RGT01", "RAJ12", "RAL26", "R1K02"],
+        ),
+        (
+            EnumAbstractionLevel.OPEN_UK,
+            ["EPEN", "NTPEN"],
+            ["RGT01", "RC979", "RAL26", "RAJ12"],
+        ),
+        (
+            EnumAbstractionLevel.COUNTRY,
+            ["E92000001", "W92000004"],
+            ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
+        ),
+        (
+            EnumAbstractionLevel.NATIONAL,
+            ["England", "Wales"],
+            ["RGT01", "7A6BJ"],
+        ),
+    ],
+)
 @pytest.mark.django_db
-def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
+def test_update_kpi_aggregation_model_all_levels(
+    abstraction_level, abstraction_codes, ods_codes, e12_case_factory
+):
     """Testing the `update_kpi_aggregation_model` fn.
 
-    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level`. See those docstrings for details.
+    Similar test setup as `test_calculate_kpi_value_counts_queryset_all_levels`. See those docstrings for details.
     """
 
-    # Clean
-    _clean_cases_from_test_db()
-
-    # Define constants
-    kpis_tested = ["ecg", "mental_health_support"]
-
-    abstraction_level = EnumAbstractionLevel.ORGANISATION
-    abstractions = [
-        Organisation.objects.get(ODSCode=abstraction_code)
-        for abstraction_code in ("RGT01", "7A6AV")
+    # CONSTANTS
+    kpis_tested = [
+        "ecg",
+        "mental_health_support",
     ]
+
+    # Clean
+    _clean_cases_from_test_db()
+
     kpi_scores_expected = {
         "ecg_passed": 10,
         "ecg_total_eligible": 20,
@@ -57,359 +100,97 @@ def test_update_kpi_aggregation_model_organisation_level(e12_case_factory):
         "mental_health_support_ineligible": 10,
         "mental_health_support_incomplete": 10,
     }
+    expected_scores = {code: kpi_scores_expected for code in abstraction_codes}
 
-    # Generate expected scores
-    expected_scores = {code: kpi_scores_expected for code in abstractions}
-
-    # Get scored test cases
-    ods_codes = ["RGT01", "7A6AV"]
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
-    filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=EnumAbstractionLevel.ORGANISATION, cohort=6
+    _register_kpi_scored_cases(
+        e12_case_factory,
+        ods_codes=ods_codes,
+        num_cases=5
+        if abstraction_level
+        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.NATIONAL]
+        else 10,
     )
 
-    # Get value counts
-    value_counts = calculate_kpi_value_counts_queryset(
-        filtered_cases=filtered_cases,
-        abstraction_level=abstraction_level,
-        kpis=kpis_tested,
-    )
+    # PERFORM AGGREGATIONS AND UPDATE AGGREGATION MODEL
+    for code in ods_codes:
+        organisation = Organisation.objects.get(ODSCode=code)
 
-    # ACTION: run update kpi agg model fn
-    update_kpi_aggregation_model(
-        cohort=6,
-        kpi_value_counts=value_counts,
-        abstraction_level=EnumAbstractionLevel.ORGANISATION,
-    )
-
-    # For each abstraction code, check output is expected
-    for abstraction_relation_entity in expected_scores:
-        abstraction_kpi_aggregation_model = OrganisationKPIAggregation.objects.get(
-            abstraction_relation=abstraction_relation_entity
+        # Get filtered cases
+        filtered_cases = get_filtered_cases_queryset_for(
+            organisation=organisation,
+            abstraction_level=abstraction_level,
+            cohort=6,
         )
 
-        assert (
-            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
-            == expected_scores[abstraction_relation_entity]
+        # Get value counts
+        value_counts = calculate_kpi_value_counts_queryset(
+            filtered_cases=filtered_cases,
+            abstraction_level=abstraction_level,
+            kpis=kpis_tested,
         )
 
-
-@pytest.mark.django_db
-def test_update_kpi_aggregation_model_trust_level(e12_case_factory):
-    """Testing the `update_kpi_aggregation_model` fn.
-
-    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but on Trust level. See those docstrings for details.
-    """
-
-    # Clean
-    _clean_cases_from_test_db()
-
-    # Define constants
-    kpis_tested = ["ecg", "mental_health_support"]
-
-    abstraction_level = EnumAbstractionLevel.TRUST
-    abstractions = ("RGT", "7A6")
-    kpi_scores_expected = {
-        "ecg_passed": 10,
-        "ecg_total_eligible": 20,
-        "ecg_ineligible": 10,
-        "ecg_incomplete": 10,
-        "mental_health_support_passed": 10,
-        "mental_health_support_total_eligible": 20,
-        "mental_health_support_ineligible": 10,
-        "mental_health_support_incomplete": 10,
-    }
-
-    # Generate expected scores
-    expected_scores = {code: kpi_scores_expected for code in abstractions}
-
-    # Get scored test cases
-    ods_codes = ["RGT01", "7A6AV"]
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
-    filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=EnumAbstractionLevel.TRUST, cohort=6
-    )
-
-    # Get value counts
-    value_counts = calculate_kpi_value_counts_queryset(
-        filtered_cases=filtered_cases,
-        abstraction_level=abstraction_level,
-        kpis=kpis_tested,
-    )
-
-    # ACTION: run update kpi agg model fn
-    update_kpi_aggregation_model(
-        cohort=6,
-        kpi_value_counts=value_counts,
-        abstraction_level=EnumAbstractionLevel.TRUST,
-    )
-
-    # For each abstraction code, check output is expected
-    for abstraction_relation_entity in expected_scores:
-        abstraction_kpi_aggregation_model = TrustKPIAggregation.objects.get(
-            abstraction_relation=abstraction_relation_entity
+        # ACTION: run update kpi agg model fn
+        update_kpi_aggregation_model(
+            cohort=6,
+            kpi_value_counts=value_counts,
+            abstraction_level=abstraction_level,
         )
 
-        assert (
-            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
-            == expected_scores[abstraction_relation_entity]
-        )
-
-
-@pytest.mark.django_db
-def test_update_kpi_aggregation_model_icb_level(e12_case_factory):
-    """Testing the `update_kpi_aggregation_model` fn.
-
-    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but at icb level. See those docstrings for details.
-    """
-
-    # Clean
-    _clean_cases_from_test_db()
-
-    # Define constants
-    kpis_tested = ["ecg", "mental_health_support"]
-
-    abstraction_level = EnumAbstractionLevel.ICB
-
-    expected_scores = {
-        IntegratedCareBoardEntity.objects.get(ODS_ICB_Code="QUE"): {
-            "ecg_passed": 10,
-            "ecg_total_eligible": 20,
-            "ecg_ineligible": 10,
-            "ecg_incomplete": 10,
-            "mental_health_support_passed": 10,
-            "mental_health_support_total_eligible": 20,
-            "mental_health_support_ineligible": 10,
-            "mental_health_support_incomplete": 10,
+    # ASSERTION
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        
+        output = NationalKPIAggregation.objects.get(cohort=6).get_value_counts_for_kpis(kpis_tested)
+        
+        expected_scores = {
+            "ecg_passed": 20,
+            "ecg_total_eligible": 40,
+            "ecg_ineligible": 20,
+            "ecg_incomplete": 20,
+            "mental_health_support_passed": 20,
+            "mental_health_support_total_eligible": 40,
+            "mental_health_support_ineligible": 20,
+            "mental_health_support_incomplete": 20,
         }
-    }
-
-    # Get scored test cases
-    ods_codes = ["RGT01", "7A6AV"]
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
-    filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=abstraction_level, cohort=6
-    )
-
-    # Get value counts
-    value_counts = calculate_kpi_value_counts_queryset(
-        filtered_cases=filtered_cases,
-        abstraction_level=abstraction_level,
-        kpis=kpis_tested,
-    )
-
-    # ACTION: run update kpi agg model fn
-    update_kpi_aggregation_model(
-        cohort=6, kpi_value_counts=value_counts, abstraction_level=abstraction_level
-    )
-
-    # For each abstraction code, check output is expected
-    for abstraction_relation_entity in expected_scores:
-        abstraction_kpi_aggregation_model = ICBKPIAggregation.objects.get(
-            abstraction_relation=abstraction_relation_entity
+        
+        assert output == expected_scores
+    
+    else:
+    
+        abstraction_kpi_aggregation_model_name = get_abstraction_model_from_level(
+            enum_abstraction_level=abstraction_level
+        )["kpi_aggregation_model"]
+        abstraction_kpi_aggregation_model = apps.get_model(
+            "epilepsy12", abstraction_kpi_aggregation_model_name
         )
 
-        assert (
-            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
-            == expected_scores[abstraction_relation_entity]
+        abstraction_entity_model_name = get_abstraction_model_from_level(
+            enum_abstraction_level=abstraction_level
+        )["abstraction_entity_model"]
+        abstraction_entity_model = apps.get_model(
+            "epilepsy12", abstraction_entity_model_name
         )
 
+        for abstraction_relation_code in expected_scores:
+            
+            abstraction_relation_instance_key = abstraction_level.value.split('__')[-1]
 
-@pytest.mark.django_db
-def test_update_kpi_aggregation_model_nhs_region_level(e12_case_factory):
-    """Testing the `update_kpi_aggregation_model` fn.
+            abstraction_relation_instance = abstraction_entity_model.objects.filter(
+                **{abstraction_relation_instance_key: abstraction_relation_code}
+            ).first()
 
-    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but at nhs region level. See those docstrings for details.
-    """
+            # Trust is a char field
+            if abstraction_level is EnumAbstractionLevel.TRUST:
+                kpi_aggregation_model_instance = abstraction_kpi_aggregation_model.objects.get(
+                    abstraction_relation=abstraction_relation_instance.ParentOrganisation_ODSCode
+                )
+            else:
+                kpi_aggregation_model_instance = (
+                    abstraction_kpi_aggregation_model.objects.get(
+                        abstraction_relation=abstraction_relation_instance
+                    )
+                )
 
-    # Clean
-    _clean_cases_from_test_db()
+            output = kpi_aggregation_model_instance.get_value_counts_for_kpis(kpis_tested)
 
-    # Define constants
-    kpis_tested = ["ecg", "mental_health_support"]
+            assert output == expected_scores[abstraction_relation_code]
 
-    abstraction_level = EnumAbstractionLevel.NHS_REGION
-    abstractions = [
-        NHSRegionEntity.objects.get(NHS_Region_Code=abstraction_code)
-        for abstraction_code in ("Y61", "7A6")
-    ]
-    kpi_scores_expected = {
-        "ecg_passed": 10,
-        "ecg_total_eligible": 20,
-        "ecg_ineligible": 10,
-        "ecg_incomplete": 10,
-        "mental_health_support_passed": 10,
-        "mental_health_support_total_eligible": 20,
-        "mental_health_support_ineligible": 10,
-        "mental_health_support_incomplete": 10,
-    }
-
-    # Generate expected scores
-    expected_scores = {code: kpi_scores_expected for code in abstractions}
-
-    # Get scored test cases
-    ods_codes = ["RGT01", "7A6AV"]
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
-    filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=EnumAbstractionLevel.NHS_REGION, cohort=6
-    )
-
-    # Get value counts
-    value_counts = calculate_kpi_value_counts_queryset(
-        filtered_cases=filtered_cases,
-        abstraction_level=abstraction_level,
-        kpis=kpis_tested,
-    )
-
-    # ACTION: run update kpi agg model fn
-    update_kpi_aggregation_model(
-        cohort=6,
-        kpi_value_counts=value_counts,
-        abstraction_level=EnumAbstractionLevel.NHS_REGION,
-    )
-
-    # For each abstraction code, check output is expected
-    for abstraction_relation_entity in expected_scores:
-        abstraction_kpi_aggregation_model = NHSRegionKPIAggregation.objects.get(
-            abstraction_relation=abstraction_relation_entity
-        )
-
-        assert (
-            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
-            == expected_scores[abstraction_relation_entity]
-        )
-
-
-@pytest.mark.django_db
-def test_update_kpi_aggregation_model_open_uk_level(e12_case_factory):
-    """Testing the `update_kpi_aggregation_model` fn.
-
-    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but at openuk level. See those docstrings for details.
-    """
-
-    # Clean
-    _clean_cases_from_test_db()
-
-    # Define constants
-    kpis_tested = ["ecg", "mental_health_support"]
-
-    abstraction_level = EnumAbstractionLevel.OPEN_UK
-    abstractions = [
-        OPENUKNetworkEntity.objects.get(OPEN_UK_Network_Code=abstraction_code)
-        for abstraction_code in ("EPEN", "SWEP")
-    ]
-    kpi_scores_expected = {
-        "ecg_passed": 10,
-        "ecg_total_eligible": 20,
-        "ecg_ineligible": 10,
-        "ecg_incomplete": 10,
-        "mental_health_support_passed": 10,
-        "mental_health_support_total_eligible": 20,
-        "mental_health_support_ineligible": 10,
-        "mental_health_support_incomplete": 10,
-    }
-
-    # Generate expected scores
-    expected_scores = {code: kpi_scores_expected for code in abstractions}
-
-    # Get scored test cases
-    ods_codes = ["RGT01", "7A6AV"]
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
-    filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=EnumAbstractionLevel.OPEN_UK, cohort=6
-    )
-
-    # Get value counts
-    value_counts = calculate_kpi_value_counts_queryset(
-        filtered_cases=filtered_cases,
-        abstraction_level=abstraction_level,
-        kpis=kpis_tested,
-    )
-
-    # ACTION: run update kpi agg model fn
-    update_kpi_aggregation_model(
-        cohort=6,
-        kpi_value_counts=value_counts,
-        abstraction_level=EnumAbstractionLevel.OPEN_UK,
-    )
-
-    # For each abstraction code, check output is expected
-    for abstraction_relation_entity in expected_scores:
-        abstraction_kpi_aggregation_model = OpenUKKPIAggregation.objects.get(
-            abstraction_relation=abstraction_relation_entity
-        )
-
-        assert (
-            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
-            == expected_scores[abstraction_relation_entity]
-        )
-
-
-@pytest.mark.django_db
-def test_update_kpi_aggregation_model_country_level(e12_case_factory):
-    """Testing the `update_kpi_aggregation_model` fn.
-
-    Similar test setup as `test_calculate_kpi_value_counts_queryset_organisation_level` but at country level. See those docstrings for details.
-    """
-
-    # Clean
-    _clean_cases_from_test_db()
-
-    # Define constants
-    kpis_tested = ["ecg", "mental_health_support"]
-    abstraction_level = EnumAbstractionLevel.COUNTRY
-    abstractions = [
-        ONSCountryEntity.objects.get(Country_ONS_Code=abstraction_code)
-        for abstraction_code in ("E92000001", "W92000004")
-    ]
-    kpi_scores_expected = {
-        "ecg_passed": 10,
-        "ecg_total_eligible": 20,
-        "ecg_ineligible": 10,
-        "ecg_incomplete": 10,
-        "mental_health_support_passed": 10,
-        "mental_health_support_total_eligible": 20,
-        "mental_health_support_ineligible": 10,
-        "mental_health_support_incomplete": 10,
-    }
-
-    # Generate expected scores
-    expected_scores = {code: kpi_scores_expected for code in abstractions}
-
-    # Get scored test cases
-    ods_codes = ["RGT01", "7A6AV"]
-    _register_kpi_scored_cases(e12_case_factory, ods_codes=ods_codes)
-
-    filtered_cases = get_filtered_cases_queryset_for(
-        abstraction_level=EnumAbstractionLevel.COUNTRY, cohort=6
-    )
-
-    # Get value counts
-    value_counts = calculate_kpi_value_counts_queryset(
-        filtered_cases=filtered_cases,
-        abstraction_level=abstraction_level,
-        kpis=kpis_tested,
-    )
-
-    # ACTION: run update kpi agg model fn
-    update_kpi_aggregation_model(
-        cohort=6,
-        kpi_value_counts=value_counts,
-        abstraction_level=EnumAbstractionLevel.COUNTRY,
-    )
-
-    # For each abstraction code, check output is expected
-    for abstraction_relation_entity in expected_scores:
-        abstraction_kpi_aggregation_model = CountryKPIAggregation.objects.get(
-            abstraction_relation=abstraction_relation_entity
-        )
-
-        assert (
-            abstraction_kpi_aggregation_model.get_value_counts_for_kpis(kpis_tested)
-            == expected_scores[abstraction_relation_entity]
-        )

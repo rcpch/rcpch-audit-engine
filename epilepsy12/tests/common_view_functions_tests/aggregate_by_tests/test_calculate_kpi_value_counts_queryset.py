@@ -56,7 +56,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
         (
             EnumAbstractionLevel.NATIONAL,
             ["England", "Wales"],
-            ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
+            ["RGT01", "7A6BJ"],
         ),
     ],
 )
@@ -86,7 +86,7 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
         ods_codes=ods_codes,
         num_cases=5
         if abstraction_level
-        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST]
+        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.NATIONAL]
         else 10,
     )
 
@@ -107,6 +107,7 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
                 "mental_health_support",
             ],
         )
+        
 
         if abstraction_level is EnumAbstractionLevel.NATIONAL:
             expected_scores = {

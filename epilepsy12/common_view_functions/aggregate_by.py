@@ -603,8 +603,13 @@ def calculate_kpi_value_counts_queryset(
             }
         )
 
-    if abstraction_level is not EnumAbstractionLevel.NATIONAL:
-        # Perform aggregation
+    # Perform aggregation
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        # NO NEED TO GROUPBY IF NATIONAL
+        kpi_value_counts = KPI.objects.filter(
+            registration__id__in=filtered_cases.values_list("registration")
+        ).aggregate(**aggregate_queries)
+    else:
         kpi_value_counts = (
             KPI.objects.filter(
                 registration__id__in=filtered_cases.values_list("registration")
@@ -617,12 +622,6 @@ def calculate_kpi_value_counts_queryset(
                 f"organisation__{abstraction_level.value}"
             )  # To ensure order is always as expected
         )
-    else:
-        # Perform aggregation with NO GROUPBY KEY
-        # filter for KPIs associated with filtered cases
-        kpi_value_counts = KPI.objects.filter(
-            registration__id__in=filtered_cases.values_list("registration")
-        ).aggregate(**aggregate_queries)
 
     return kpi_value_counts
 
@@ -670,14 +669,6 @@ def get_abstraction_model_from_level(
     return abstraction_model_map[enum_abstraction_level]
 
 
-# def _update_NationalKPIAggregation(
-#     kpi_value_counts,
-#     cohort: int,
-# ) -> None:
-#     print(kpi_value_counts)
-#     print(kpi_value_counts.values())
-
-
 def update_kpi_aggregation_model(
     abstraction_level: EnumAbstractionLevel,
     kpi_value_counts,
@@ -697,6 +688,23 @@ def update_kpi_aggregation_model(
     AbstractionKPIAggregationModel = apps.get_model(
         "epilepsy12", abstraction_level_models["kpi_aggregation_model"]
     )
+
+    # Separate logic for national as no groupby key in aggregation value counts
+    if abstraction_level is EnumAbstractionLevel.NATIONAL:
+        NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
+
+        new_obj, created = NationalKPIAggregation.objects.update_or_create(
+            defaults={
+                "cohort": cohort,
+                **kpi_value_counts,
+            },
+            cohort=cohort,
+        )
+
+        if created:
+            print(f"created {new_obj}")
+
+        return None
 
     for value_count in kpi_value_counts:
         ABSTRACTION_CODE = value_count.pop(f"organisation__{abstraction_level.value}")
