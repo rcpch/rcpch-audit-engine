@@ -18,4 +18,4 @@ class EnumAbstractionLevel(Enum):
     NHS_REGION = 'nhs_region__NHS_Region_Code'
     OPEN_UK = 'openuk_network__OPEN_UK_Network_Code'
     COUNTRY = 'ons_region__ons_country__Country_ONS_Code'
-    NATIONAL = 'NATIONAL'
+    NATIONAL = 'ons_region__ons_country__Country_ONS_Name' 

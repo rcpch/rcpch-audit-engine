@@ -31,8 +31,8 @@ def _register_cases_in_organisation(
         )
 
 
-def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
-    """Helper function to return a queryset of 60 kids with scored, known KPI scores."""
+def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]",num_cases:int=10):
+    """Helper function to return a queryset of num_cases kids with scored, known KPI scores."""
     ORGANISATIONS = Organisation.objects.filter(
         ODSCode__in=ods_codes,
     )
@@ -82,7 +82,7 @@ def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]"):
             incomplete_answers,
         ]:
             test_cases = e12_case_factory.create_batch(
-                10,
+                num_cases,
                 organisations__organisation=organisation,
                 first_name=f"temp_{organisation.OrganisationName}",
                 **answer_set,

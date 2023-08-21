@@ -77,14 +77,12 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
             abstraction_level=abstraction_level,
             cohort=6,
         ).count()
-        
-        print(output)
 
         assert (
             output == expected_count[ix]
         ), f"""get_total_cases_registered_for_abstraction_level(
             organisation={organisation},
-            abstraction_level={abstraction_level},
+            abstraction_level={abstraction_level.name if not EnumAbstractionLevel.NATIONAL else 'EnumAbstractionLevel.NATIONAL'},
             cohort=6,
         ) should be {expected_count[ix]}"""
 

@@ -535,7 +535,7 @@ def get_filtered_cases_queryset_for(
 
     Case = apps.get_model("epilepsy12", "Case")
 
-    # This should just be all cases so no filtering
+    # This should just be all cases so no filtering based on code
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
         abstraction_filter = {}
     else:
@@ -600,7 +600,7 @@ def calculate_kpi_value_counts_queryset(
                 ),
             }
         )
-
+        
     # Perform aggregation
     kpi_value_counts = (
         KPI.objects.filter(

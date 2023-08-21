@@ -55,7 +55,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
         ),
         (
             EnumAbstractionLevel.NATIONAL,
-            ["E92000001", "W92000004"],
+            ["England", "Wales"],
             ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
         ),
     ],
