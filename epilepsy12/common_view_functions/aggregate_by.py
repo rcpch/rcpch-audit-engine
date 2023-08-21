@@ -506,39 +506,39 @@ def return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sub
 
     return final_object
 
+def get_abstraction_key_from(
+    organisation, abstraction_level: EnumAbstractionLevel
+):
+    """For the given abstraction level, will call getattr until the final object's value is returned.
+    
+    If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
+    """
+    return_object = organisation
+    for attribute in abstraction_level.value.split("__"):
+        return_object = getattr(return_object, attribute, None) 
+    return return_object
 
 def get_filtered_cases_queryset_for(
     abstraction_level: EnumAbstractionLevel,
+    organisation,
     cohort: int,
 ):
-    """Returns queryset of filtered cases for a given abstraction level. Ensures the Case is filtered for an active, primary Site, and in the correct cohort."""
-
-    abstraction_level_all_subunit_map = {
-        EnumAbstractionLevel.ORGANISATION: get_all_organisations(),
-        EnumAbstractionLevel.TRUST: get_all_trusts(),
-        EnumAbstractionLevel.ICB: get_all_icbs(),
-        EnumAbstractionLevel.NHS_REGION: get_all_nhs_regions(),
-        EnumAbstractionLevel.OPEN_UK: get_all_open_uk_regions(),
-        EnumAbstractionLevel.COUNTRY: get_all_countries(),
-    }
-
-    # Get the model field name for the given abstraction model. As the enum values are all with respect to Organisation, this split and grab last gets just that related model's related field.
-    related_key_field = abstraction_level.value.split("__")[-1]
-
-    all_subunits = abstraction_level_all_subunit_map[abstraction_level].values_list(
-        related_key_field
-    )
+    """Returns queryset of current audit filtered cases within the same abstraction level. 
+    
+    Ensures the Case is filtered for an active, primary Site, and in the correct cohort."""
+    
+    cases_filter_key = f"organisations__{abstraction_level.value}"
 
     Case = apps.get_model("epilepsy12", "Case")
+    
+    abstraction_key = get_abstraction_key_from(organisation, abstraction_level=abstraction_level)
 
-    filtered_cases = Case.objects.filter(
-        Q(**{f"site__organisation__{abstraction_level.value}__in": all_subunits}),
+    return Case.objects.filter(
+        **{cases_filter_key: abstraction_key},
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
     )
-
-    return filtered_cases
 
 
 def calculate_kpi_value_counts_queryset(
@@ -698,38 +698,6 @@ def update_kpi_aggregation_model(
             print(f"created {new_obj}")
 
 
-def _get_related_entity_attribute_for_abstraction_level(
-    organisation, abstraction_level: EnumAbstractionLevel
-):
-    """For the given abstraction level, will call getattr until the final object is returned.
-    
-    If attribute can't be found, default return is None. E.g. Welsh hospitals will not have an ICB Code.
-    """
-    return_object = organisation
-    for attribute in abstraction_level.value.split("__"):
-        return_object = getattr(return_object, attribute, None) 
-    return return_object
 
 
-def get_total_cases_registered_for_abstraction_level(
-    organisation, abstraction_level: EnumAbstractionLevel, cohort: int
-) -> int:
-    """Returns total Cases registered for the organisation for the given abstraction.
 
-    Filter ensures Case is correct cohort and site is primary, active epilepsy centre.
-    """
-
-    cases_filter_key = f"organisations__{abstraction_level.value}"
-
-    cases_filter_value = _get_related_entity_attribute_for_abstraction_level(
-        organisation=organisation, abstraction_level=abstraction_level
-    )
-
-    Case = apps.get_model("epilepsy12", "Case")
-
-    return Case.objects.filter(
-        **{cases_filter_key: cases_filter_value},
-        site__site_is_actively_involved_in_epilepsy_care=True,
-        site__site_is_primary_centre_of_epilepsy_care=True,
-        registration__cohort=cohort,
-    ).count()
