@@ -22,6 +22,7 @@ class BaseKPIAggregation(models.Model, HelpTextMixin):
 
     cohort = models.PositiveSmallIntegerField(
         default=None,
+        unique=True,
     )
 
     # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
@@ -503,7 +504,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.ForeignKey(
+    abstraction_relation = models.OneToOneField(
         to="epilepsy12.Organisation",
         on_delete=models.CASCADE,
     )
@@ -523,7 +524,10 @@ class TrustKPIAggregation(BaseKPIAggregation):
 
     # Define relationships
     # NOTE: parent_organisation_ods_code is not unique (multiple Organisation objects can share the same) so just store in a charfield
-    abstraction_relation = models.CharField(max_length=100)
+    abstraction_relation = models.CharField(
+        max_length=100,
+        unique=True,
+    )
 
     class Meta:
         verbose_name = _("Trust KPI Aggregation Model")
@@ -539,7 +543,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.ForeignKey(
+    abstraction_relation = models.OneToOneField(
         to="epilepsy12.IntegratedCareBoardEntity",
         on_delete=models.CASCADE,
     )
@@ -549,7 +553,9 @@ class ICBKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("IntegratedCareBoardEntity KPI Aggregation Models")
 
     def __str__(self):
-        return f"ICBKPIAggregation (IntegratedCareBoardEntity={self.abstraction_relation})"
+        return (
+            f"ICBKPIAggregation (IntegratedCareBoardEntity={self.abstraction_relation})"
+        )
 
 
 class NHSRegionKPIAggregation(BaseKPIAggregation):
@@ -558,7 +564,7 @@ class NHSRegionKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.ForeignKey(
+    abstraction_relation = models.OneToOneField(
         to="epilepsy12.NHSRegionEntity",
         on_delete=models.CASCADE,
     )
@@ -577,7 +583,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.ForeignKey(
+    abstraction_relation = models.OneToOneField(
         to="epilepsy12.OPENUKNetworkEntity",
         on_delete=models.CASCADE,
     )
@@ -598,7 +604,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    abstraction_relation = models.ForeignKey(
+    abstraction_relation = models.OneToOneField(
         to="epilepsy12.ONSCountryEntity",
         on_delete=models.CASCADE,
     )
@@ -609,6 +615,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
 
     def __str__(self):
         return f"CountryKPIAggregations (ONSCountryEntity={self.abstraction_relation})"
+
 
 class NationalKPIAggregation(BaseKPIAggregation):
     """
