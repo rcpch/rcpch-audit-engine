@@ -38,6 +38,8 @@ from ..common_view_functions import (
     calculate_kpi_value_counts_queryset,
     update_kpi_aggregation_model,
     get_abstraction_model_from_level,
+    get_all_kpi_aggregation_data_for_view,
+    aggregate_kpis_update_models_for_all_abstractions,
 )
 from ..general_functions import (
     get_current_cohort_data,
@@ -192,83 +194,18 @@ def selected_trust_kpis(request, organisation_id):
     """
 
     # Get all relevant data for this cohort
-    
     cohort = get_current_cohort_data()["cohort"]
     organisation = Organisation.objects.get(pk=organisation_id)
 
-    # TODO: gathering ALL_DATA can be refactored into a function
-    ALL_DATA = {}
-    for enum_abstraction_level in EnumAbstractionLevel:
-        filtered_cases = get_filtered_cases_queryset_for(
-            organisation=organisation,
-            abstraction_level=enum_abstraction_level,
-            cohort=cohort,
-        )
+    # perform aggregations and update all the KPIAggregation models
+    aggregate_kpis_update_models_for_all_abstractions(
+        organisation=organisation, cohort=cohort
+    )
 
-        # For these Cases, calculate KPI value counts, grouped by specified abstraction level
-        kpi_value_counts = calculate_kpi_value_counts_queryset(
-            filtered_cases=filtered_cases,
-            abstraction_level=enum_abstraction_level,
-            kpis="all",
-        )
-
-        # Update the relevant abstraction's KPIAggregation model(s)
-        update_kpi_aggregation_model(
-            abstraction_level=enum_abstraction_level,
-            kpi_value_counts=kpi_value_counts,
-            cohort=cohort,
-        )
-
-        # For the given abstraction, get the {ABSTRACTION}KPIAggregation model
-        abstraction_kpi_agg_model_name = get_abstraction_model_from_level(
-            enum_abstraction_level
-        )["kpi_aggregation_model"]
-        abstraction_kpi_agg_model = apps.get_model(
-            "epilepsy12", abstraction_kpi_agg_model_name
-        )
-
-        # Get THIS organisation instance's abstraction relation entity. All the enum values are with respect to Organisation, thus the first element of .split('__') is the related field.
-        abstraction_relation_field_name = enum_abstraction_level.value.split("__")[0]
-
-        if enum_abstraction_level is EnumAbstractionLevel.ORGANISATION:
-            abstraction_relation = organisation
-        else:
-            abstraction_relation = getattr(
-                organisation, f"{abstraction_relation_field_name}"
-            )
-            if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
-                abstraction_relation = getattr(abstraction_relation, "ons_country")
-
-        # Get total cases for THIS organisation's abstraction
-        total_cases_registered = filtered_cases.count()
-
-        # NationalKPIAggregation model does not have abstraction relation field, so handle differently to the rest and skip rest of loop
-        if abstraction_kpi_agg_model == NationalKPIAggregation:
-            ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
-                "aggregation_model": abstraction_kpi_agg_model.objects.get(
-                    cohort=cohort
-                ),
-                "total_cases_registered": total_cases_registered,
-            }
-            continue
-
-        # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
-        if abstraction_kpi_agg_model.objects.filter(
-            abstraction_relation=abstraction_relation,
-            cohort=cohort,
-        ).exists():
-            ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
-                "aggregation_model": abstraction_kpi_agg_model.objects.get(
-                    abstraction_relation=abstraction_relation,
-                    cohort=cohort,
-                ),
-                "total_cases_registered": total_cases_registered,
-            }
-        else:
-            ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
-                "aggregation_model": None,
-                "total_cases_registered": total_cases_registered,
-            }
+    # Gather relevant data specific for this view
+    all_data = get_all_kpi_aggregation_data_for_view(
+        organisation=organisation, cohort=cohort
+    )
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
     kpi_instance = KPI(organisation=organisation, parent_trust="TEMP")
@@ -276,12 +213,17 @@ def selected_trust_kpis(request, organisation_id):
 
     context = {
         "organisation": organisation,
-        "all_data": ALL_DATA,
-        "kpis": kpi_instance,  
+        "all_data": all_data,
+        "kpis": kpi_instance,
         "kpi_names_list": kpi_names_list,
         "open_access": False,
     }
 
+    return render(
+        request=request,
+        template_name="epilepsy12/partials/kpis/kpis.html",
+        context=context,
+    )
     # TODO: 17/8/2023 -> check with @eatyourpeas re this trigger client code
     # response = render(request=request, template_name=template_name, context=context)
 
@@ -289,12 +231,6 @@ def selected_trust_kpis(request, organisation_id):
     # trigger_client_event(
     #     response=response, name="registration_active", params={}
     # )  # reloads the form to show the active steps
-
-    return render(
-        request=request,
-        template_name="epilepsy12/partials/kpis/kpis.html",
-        context=context,
-    )
 
 
 def selected_trust_kpis_open(request, organisation_id):
@@ -374,8 +310,8 @@ def view_preference(request, organisation_id, template_name):
     )
 
 
-# @login_required
-# @user_may_view_this_organisation()
+@login_required
+@user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
     POST request from dropdown in selected_organisation_summary.html
@@ -390,19 +326,16 @@ def selected_trust_select_kpi(request, organisation_id):
         # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
-    cohort_data = get_current_cohort_data()
+    cohort = get_current_cohort_data()["cohort"]
 
-    all_aggregated_kpis_by_open_uk_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data["cohort"], abstraction_level="open_uk", kpi_measure=kpi_name
+    print(f"{kpi_name}")
+    all_data = get_all_kpi_aggregation_data_for_view(
+        organisation=organisation, cohort=cohort, kpis=[kpi_name]
     )
-    open_uk_avg = calculate_kpi_average(
-        decimal_places=1,
-        kpi_data=all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-        kpi=kpi_name,
-    )
+    print(f"ALL DATA: {all_data}")
 
     all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data["cohort"],
+        cohort=cohort,
         abstraction_level="nhs_region",
         kpi_measure=kpi_name,
     )
@@ -413,7 +346,7 @@ def selected_trust_select_kpi(request, organisation_id):
     )
 
     all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data["cohort"], abstraction_level="icb", kpi_measure=kpi_name
+        cohort=cohort, abstraction_level="icb", kpi_measure=kpi_name
     )
     icb_avg = calculate_kpi_average(
         decimal_places=1,
@@ -422,7 +355,7 @@ def selected_trust_select_kpi(request, organisation_id):
     )
 
     all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort_data["cohort"], abstraction_level="country", kpi_measure=kpi_name
+        cohort=cohort, abstraction_level="country", kpi_measure=kpi_name
     )
     country_avg = calculate_kpi_average(
         decimal_places=1,
@@ -434,8 +367,8 @@ def selected_trust_select_kpi(request, organisation_id):
         "kpi_name": kpi_name,
         "kpi_value": kpi_value,
         "selected_organisation": organisation,
-        "open_uk": all_aggregated_kpis_by_open_uk_region_in_current_cohort,
-        "open_uk_avg": open_uk_avg,
+        "all_data": all_data,
+        # ALL BELOW TO BE REPLACED
         "open_uk_title": f"{kpi_value} by OPEN UK Region",
         "open_uk_id": "open_uk_id",
         "icb": all_aggregated_kpis_by_icb_in_current_cohort,

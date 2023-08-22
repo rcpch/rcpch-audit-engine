@@ -743,3 +743,104 @@ def update_kpi_aggregation_model(
 
         if created:
             print(f"created {new_obj}")
+
+
+def aggregate_kpis_update_models_for_all_abstractions(
+    organisation,
+    cohort: int,
+)->None:
+    """
+    Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
+    """
+
+    for enum_abstraction_level in EnumAbstractionLevel:
+        filtered_cases = get_filtered_cases_queryset_for(
+            organisation=organisation,
+            abstraction_level=enum_abstraction_level,
+            cohort=cohort,
+        )
+
+        # For these Cases, calculate KPI value counts, grouped by specified abstraction level
+        kpi_value_counts = calculate_kpi_value_counts_queryset(
+            filtered_cases=filtered_cases,
+            abstraction_level=enum_abstraction_level,
+            kpis='all',
+        )
+
+        # Update the relevant abstraction's KPIAggregation model(s)
+        update_kpi_aggregation_model(
+            abstraction_level=enum_abstraction_level,
+            kpi_value_counts=kpi_value_counts,
+            cohort=cohort,
+        )
+
+
+def get_all_kpi_aggregation_data_for_view(
+    organisation,
+    cohort: int,
+    kpis: "list[str] | Literal['all']" = "all",
+) -> dict:
+    """
+    Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel and returns the KPI model as a dict.
+    """
+    ALL_DATA = {}
+    for enum_abstraction_level in EnumAbstractionLevel:
+        
+        filtered_cases = get_filtered_cases_queryset_for(
+            organisation=organisation,
+            abstraction_level=enum_abstraction_level,
+            cohort=cohort,
+        )
+        
+        # For the given abstraction, get the {ABSTRACTION}KPIAggregation model
+        abstraction_kpi_agg_model_name = get_abstraction_model_from_level(
+            enum_abstraction_level
+        )["kpi_aggregation_model"]
+        abstraction_kpi_agg_model = apps.get_model(
+            "epilepsy12", abstraction_kpi_agg_model_name
+        )
+
+        # Get THIS organisation instance's abstraction relation entity. All the enum values are with respect to Organisation, thus the first element of .split('__') is the related field.
+        abstraction_relation_field_name = enum_abstraction_level.value.split("__")[0]
+
+        if enum_abstraction_level is EnumAbstractionLevel.ORGANISATION:
+            abstraction_relation = organisation
+        else:
+            abstraction_relation = getattr(
+                organisation, f"{abstraction_relation_field_name}"
+            )
+            if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
+                abstraction_relation = getattr(abstraction_relation, "ons_country")
+
+        # Get total cases for THIS organisation's abstraction
+        total_cases_registered = filtered_cases.count()
+
+        # NationalKPIAggregation model does not have abstraction relation field, so handle differently to the rest and skip rest of loop
+        NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
+        if abstraction_kpi_agg_model == NationalKPIAggregation:
+            ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
+                "aggregation_model": abstraction_kpi_agg_model.objects.get(
+                    cohort=cohort
+                ),
+                "total_cases_registered": total_cases_registered,
+            }
+            continue
+
+        # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
+        if abstraction_kpi_agg_model.objects.filter(
+            abstraction_relation=abstraction_relation,
+            cohort=cohort,
+        ).exists():
+            ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
+                "aggregation_model": abstraction_kpi_agg_model.objects.get(
+                    abstraction_relation=abstraction_relation,
+                    cohort=cohort,
+                ),
+                "total_cases_registered": total_cases_registered,
+            }
+        else:
+            ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
+                "aggregation_model": None,
+                "total_cases_registered": total_cases_registered,
+            }
+    return ALL_DATA
