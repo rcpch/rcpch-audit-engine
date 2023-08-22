@@ -47,7 +47,14 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
     # Position the % pass in the center of the hole
     pct_passed = round(passed / total * 100)
     fig.add_annotation(
-        text=f"{pct_passed}%", x=0.5, y=0.5, font=dict(size=30), showarrow=False
+        text=f"{pct_passed}%",
+        x=0.5,
+        y=0.5,
+        font=dict(
+            size=30,
+            color=RCPCH_LIGHT_BLUE,
+        ),
+        showarrow=False,
     )
 
     fig.update_layout(
@@ -56,7 +63,7 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
         height=110,
         width=110,
         margin=dict(l=0, r=0, b=0, t=0, pad=0),
-        font={'family': 'Montserrat-Regular'},
+        font={"family": "Montserrat-Regular"},
     )
 
     # convert to html
