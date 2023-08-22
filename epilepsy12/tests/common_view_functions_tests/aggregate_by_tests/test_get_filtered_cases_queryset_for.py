@@ -18,7 +18,7 @@ import pytest
 from datetime import date
 
 # 3rd party imports
-
+from django.db.models import Count
 
 # E12 imports
 from epilepsy12.common_view_functions import (
@@ -41,7 +41,7 @@ from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
     [
         (EnumAbstractionLevel.ORGANISATION, ("RGT01", "7A6AV"), (10, 10)),
         (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.ICB, ("RGT01", "RYVD9", "7A6AV"), (20, 20, 10)),
+        (EnumAbstractionLevel.ICB, ("RGT01", "RYVD9", "7A6AV"), (20, 20, 0)),
         (EnumAbstractionLevel.NHS_REGION, ("RP401", "RQM01", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.OPEN_UK, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.COUNTRY, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
@@ -111,3 +111,47 @@ def test_get_filtered_cases_queryset_includes_only_specified_cohort(
         )
 
         assert 0 == output_filtered_cases.count()
+
+
+@pytest.mark.django_db
+def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
+    e12_case_factory,
+):
+    """Some abstractions for organisations will be None e.g. Welsh organisations do not have an ICB; English organisations will not have a health board.
+
+    TODO: healthboards model not yet implemented - add test once done.
+    """
+    # Ensure Case db empty for this test
+    _clean_cases_from_test_db()
+
+    ods_codes_where_icb_null = [
+        code[0]
+        for code in Organisation.objects.all()
+        .values("ODSCode", "OrganisationName", "integrated_care_board")
+        .annotate(count=Count("integrated_care_board"))
+        .filter(count__lt=1)
+        .values_list("ODSCode")
+        .distinct()
+    ]
+
+    # Generate test cases - 10 in each ODSCode given
+    _register_cases_in_organisation(
+        ods_codes=ods_codes_where_icb_null, e12_case_factory=e12_case_factory, n_cases=10
+    )
+
+    for ods_code in ods_codes_where_icb_null:
+        
+        # Community Paediatrics Org returning with the actual org so need to do filter.first()
+        organisation = Organisation.objects.filter(ODSCode=ods_code).first()
+
+        output = get_filtered_cases_queryset_for(
+            organisation=organisation,
+            abstraction_level=EnumAbstractionLevel.ICB,
+            cohort=6,
+        ).count()
+
+        assert output == 0, f"""(Usually Welsh) organisations with null ICB codes should not be returned from get_filtered_cases_queryset_for(
+            organisation=organisation,
+            abstraction_level=EnumAbstractionLevel.ICB,
+            cohort=6,
+        )"""

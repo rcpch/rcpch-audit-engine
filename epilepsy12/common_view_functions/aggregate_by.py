@@ -544,6 +544,11 @@ def get_filtered_cases_queryset_for(
         abstraction_key = get_abstraction_value_from(
             organisation, abstraction_level=abstraction_level
         )
+
+        # Some organisations have null values for abstraction e.g. Welsh Orgs don't have ICBs. Therefore, should return no Cases
+        if abstraction_key is None:
+            return Case.objects.none()
+
         abstraction_filter = {cases_filter_key: abstraction_key}
 
     return Case.objects.filter(
