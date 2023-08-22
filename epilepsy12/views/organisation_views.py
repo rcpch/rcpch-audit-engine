@@ -328,9 +328,15 @@ def selected_trust_select_kpi(request, organisation_id):
     kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
     cohort = get_current_cohort_data()["cohort"]
 
+    # perform aggregations and update all the KPIAggregation models
+    aggregate_kpis_update_models_for_all_abstractions(
+        organisation=organisation, cohort=cohort
+    )
+
     print(f"{kpi_name}")
     all_data = get_all_kpi_aggregation_data_for_view(
-        organisation=organisation, cohort=cohort, kpis=[kpi_name]
+        organisation=organisation,
+        cohort=cohort,
     )
     print(f"ALL DATA: {all_data}")
 
