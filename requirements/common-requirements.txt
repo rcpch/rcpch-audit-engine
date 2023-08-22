@@ -19,3 +19,4 @@ pytest-factoryboy
 rapidfuzz
 whitenoise
 django-filter
+plotly
