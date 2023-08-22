@@ -183,7 +183,7 @@ def selected_organisation_summary(request, organisation_id):
 @user_may_view_this_organisation()
 def selected_trust_kpis(request, organisation_id):
     """
-    HTMX get request returning trust_level_kpi.html partial
+    HTMX get request returning kpis.html 'Real-time Key Performance Indicator (KPI) Metrics' table.
 
     This aggregates all KPI measures at different levels of abstraction related to the selected organisation
     Organisation level, Trust level, ICB level, NHS Region, OPEN UK level, country level and national level.
@@ -191,7 +191,8 @@ def selected_trust_kpis(request, organisation_id):
     It then presents each abstraction level's KPIAggregation model.
     """
 
-    # Get all relevant Cases for this cohort
+    # Get all relevant data for this cohort
+    
     cohort = get_current_cohort_data()["cohort"]
     organisation = Organisation.objects.get(pk=organisation_id)
 
