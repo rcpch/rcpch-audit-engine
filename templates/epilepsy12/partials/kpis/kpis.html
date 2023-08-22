@@ -44,7 +44,7 @@ will be persisted and run as a cron job once a day.
                                         class="info circle icon"
                                         id='totals_organisation'
                                         data-title='Epilepsy12 totals'
-                                        data-content="Number of children registered in this organisation" {% if organisation.OrganisationName is not None %} + "({{organisation.OrganisationName}})" {% endif %}
+                                        data-content="Number of children registered in this organisation ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.OrganisationName}})"
                                         data-position='top right'
                                         _="init js $('#totals_organisation').popup(); end"
                                     ></i>({{all_data.ORGANISATION_KPIS.total_cases_registered}})</p>
@@ -56,7 +56,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_trust'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Trust" {% if organisation.ParentOrganisation_OrganisationName is not None %} + "({{organisation.ParentOrganisation_OrganisationName}})" {% endif %}
+                                    data-content="Number of children registered in this Trust ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.ParentOrganisation_OrganisationName}})"
                                     data-position='top right'
                                     _="init js $('#totals_trust').popup(); end"
                                 ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
@@ -67,7 +67,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_icb'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Integrated Care Board" {% if organisation.ICBName is not None %} + "({{organisation.ICBName}})" {% endif %}
+                                    data-content="Number of children registered in this Integrated Care Board ({% formatlabel all_data.ICB_KPIS.aggregation_model.abstraction_relation.ICB_Name %})"
                                     data-position='top right'
                                     _="init js $('#totals_icb').popup(); end"
                                 ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
@@ -78,7 +78,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_nhs'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this NHS Region" {% if organisation.NHSEnglandRegion is not None %} + "({{organisation.NHSEnglandRegion}})" {% endif %} 
+                                    data-content="Number of children registered in this NHS Region ({{all_data.NHS_REGION_KPIS.aggregation_model.abstraction_relation.NHS_Region}})" 
                                     data-position='top right'
                                     _="init js $('#totals_nhs').popup(); end"
                                 ></i>({{all_data.NHS_REGION_KPIS.total_cases_registered}})</p>
@@ -89,24 +89,24 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_open_uk'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this OPEN UK Region" {% if organisation.openuk_network is not None %} + "({{organisation.openuk_network.OPEN_UK_Network_Name}})" {% endif %}
+                                    data-content="Number of children registered in this OPEN UK Region ({{all_data.OPEN_UK_KPIS.aggregation_model.abstraction_relation.OPEN_UK_Network_Name}})"
                                     data-position='top right'
                                     _="init js $('#totals_open_uk').popup(); end"
                                 ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>Country</p>
+                                <p>{{all_data.COUNTRY_KPIS.aggregation_model.abstraction_relation.Country_ONS_Name}}</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_country'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this country" {% if organisation.ons_region.ons_country.Country_ONS_Name is not None %} + "({{organisation.ons_region.ons_country.Country_ONS_Name}})" {% endif %}
+                                    data-content="Number of children registered in this country."
                                     data-position='top right'
                                     _="init js $('#totals_country').popup(); end"
                                 ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
                             </th>
                             <th class='right aligned'>
-                                <p>England & Wales Combined</p>
+                                <p>National</p>
                                 <p><i 
                                     class="info circle icon"
                                     id='totals_national'
@@ -114,7 +114,7 @@ will be persisted and run as a cron job once a day.
                                     data-content="Number of children registered nationally."
                                     data-position='top right'
                                     _="init js $('#totals_national').popup(); end"
-                                ></i>({{national_kpis.total_cases_registered}})</p>
+                                ></i>({{all_data.NATIONAL_KPIS.total_cases_registered}})</p>
                             </th>
                         </tr>
                     </thead>
