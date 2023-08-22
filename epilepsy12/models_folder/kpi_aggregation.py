@@ -620,10 +620,15 @@ class NationalKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for England and Wales.
     """
+    
+    # National can only have cohort as unique
+    cohort = models.PositiveSmallIntegerField(
+        unique=True,
+    )
 
     class Meta:
         verbose_name = _("National KPI Aggregation Model")
         verbose_name_plural = _("National KPI Aggregation Models")
 
     def __str__(self):
-        return f"National KPIAggregations for England and Wales"
+        return f"National KPIAggregations for England and Wales (Cohort {self.cohort})"
