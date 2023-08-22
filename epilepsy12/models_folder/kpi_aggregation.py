@@ -22,7 +22,6 @@ class BaseKPIAggregation(models.Model, HelpTextMixin):
 
     cohort = models.PositiveSmallIntegerField(
         default=None,
-        unique=True,
     )
 
     # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
