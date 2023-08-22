@@ -7,8 +7,8 @@ Number of females >= 12yo diagnosed with epilepsy at first year AND on valproate
      pregnancy prevention programme in place
     )
 
-- [x] Measure 8 passed (registration.kpi.sodium_valproate == 1) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and (is_a_pregnancy_prevention_programme_needed==True OR has_a_valproate_annual_risk_acknowledgement_form_been_completed==True)
-- [x] Measure 8 failed (registration.kpi.sodium_valproate == 0) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and is_a_pregnancy_prevention_programme_needed is False AND has_a_valproate_annual_risk_acknowledgement_form_been_completed is False
+- [x] Measure 8 passed (registration.kpi.sodium_valproate == 1) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and (is_a_pregnancy_prevention_programme_in_place==True OR has_a_valproate_annual_risk_acknowledgement_form_been_completed==True)
+- [x] Measure 8 failed (registration.kpi.sodium_valproate == 0) if (age_at_first_paediatric_assessment >= 12 and sex == 2 and medicine is valproate) and is_a_pregnancy_prevention_programme_in_place is False AND has_a_valproate_annual_risk_acknowledgement_form_been_completed is False
 
 - [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if age_at_first_paediatric_assessment < 12
 - [x] Measure 8 ineligible (registration.kpi.sodium_valproate == 2) if registration_instance.case.sex == 1
@@ -30,7 +30,7 @@ from epilepsy12.models import KPI, AntiEpilepsyMedicine, Registration, MedicineE
 
 
 @pytest.mark.parametrize(
-    "is_a_pregnancy_prevention_programme_needed, has_a_valproate_annual_risk_acknowledgement_form_been_completed,expected_score",
+    "is_a_pregnancy_prevention_programme_in_place, has_a_valproate_annual_risk_acknowledgement_form_been_completed,expected_score",
     [
         (True, True, KPI_SCORE["PASS"]),
         (True, False, KPI_SCORE["PASS"]),
@@ -43,18 +43,18 @@ from epilepsy12.models import KPI, AntiEpilepsyMedicine, Registration, MedicineE
 @pytest.mark.django_db
 def test_measure_8_sodium_valproate_risk_eligible(
     e12_case_factory,
-    is_a_pregnancy_prevention_programme_needed,
+    is_a_pregnancy_prevention_programme_in_place,
     has_a_valproate_annual_risk_acknowledgement_form_been_completed,
     expected_score,
 ):
     """
     *PASS*
     1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate) AND ONE OF:
-            - is_a_pregnancy_prevention_programme_needed==True
+            - is_a_pregnancy_prevention_programme_in_place==True
             - has_a_valproate_annual_risk_acknowledgement_form_been_completed==True
     *FAIL*
     1) (age_at_first_paediatric_assessment >= 12 && sex == 2 && medicine is valproate) AND BOTH
-            - is_a_pregnancy_prevention_programme_needed==False
+            - is_a_pregnancy_prevention_programme_in_place==False
             - has_a_valproate_annual_risk_acknowledgement_form_been_completed==False
 
     """
@@ -84,7 +84,7 @@ def test_measure_8_sodium_valproate_risk_eligible(
         is_rescue_medicine=False,
         medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
         antiepilepsy_medicine_risk_discussed=True,
-        is_a_pregnancy_prevention_programme_needed=is_a_pregnancy_prevention_programme_needed,
+        is_a_pregnancy_prevention_programme_in_place=is_a_pregnancy_prevention_programme_in_place,
         has_a_valproate_annual_risk_acknowledgement_form_been_completed=has_a_valproate_annual_risk_acknowledgement_form_been_completed,
     )
 
@@ -97,11 +97,11 @@ def test_measure_8_sodium_valproate_risk_eligible(
     kpi_score = KPI.objects.get(pk=registration.kpi.pk).sodium_valproate
 
     if expected_score == KPI_SCORE["PASS"]:
-        assertion_message = f">=12yo on valproate with valproate pregnancy prevention in place & has: {'annual risk acknowledgement=True' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} {'is_a_pregnancy_prevention_programme_needed=True' if is_a_pregnancy_prevention_programme_needed else ''}, but not passing measure"
+        assertion_message = f">=12yo on valproate with valproate pregnancy prevention in place & has: {'annual risk acknowledgement=True' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} {'is_a_pregnancy_prevention_programme_in_place=True' if is_a_pregnancy_prevention_programme_in_place else ''}, but not passing measure"
     elif expected_score == KPI_SCORE["FAIL"]:
-        assertion_message = f">=12yo on valproate with \n{is_a_pregnancy_prevention_programme_needed=}\n{has_a_valproate_annual_risk_acknowledgement_form_been_completed=},\nbut not failing measure"
+        assertion_message = f">=12yo on valproate with \n{is_a_pregnancy_prevention_programme_in_place=}\n{has_a_valproate_annual_risk_acknowledgement_form_been_completed=},\nbut not failing measure"
     elif expected_score==KPI_SCORE["NOT_SCORED"]:
-        assertion_message = f">=12yo on valproate but {'is_a_pregnancy_prevention_programme_needed' if is_a_pregnancy_prevention_programme_needed else ''} {'has_a_valproate_annual_risk_acknowledgement_form_been_completed' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} is None, but not getting `KPI_SCORE['NOT_SCORED']`"
+        assertion_message = f">=12yo on valproate but {'is_a_pregnancy_prevention_programme_in_place' if is_a_pregnancy_prevention_programme_in_place else ''} {'has_a_valproate_annual_risk_acknowledgement_form_been_completed' if has_a_valproate_annual_risk_acknowledgement_form_been_completed else ''} is None, but not getting `KPI_SCORE['NOT_SCORED']`"
 
     assert kpi_score == expected_score, assertion_message
 
