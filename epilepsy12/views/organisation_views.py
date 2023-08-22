@@ -41,6 +41,7 @@ from ..common_view_functions import (
     get_all_kpi_aggregation_data_for_view,
     aggregate_kpis_update_models_for_all_abstractions,
 )
+from epilepsy12.common_view_functions.render_charts import viz
 from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
@@ -317,7 +318,39 @@ def selected_trust_select_kpi(request, organisation_id):
     POST request from dropdown in selected_organisation_summary.html
 
     It takes the kpi_name parameter in the HTMX request which contains the value of the selected KPI measure from
-    the select field. This is then aggregated across the levels of abstraction
+    the select field. This is then aggregated across the levels of abstraction.
+
+    all_data is of the format:
+    {
+    "ORGANISATION_KPIS":{
+        "aggregation_model":"<OrganisationKPIAggregation":OrganisationKPIAggregation (ODSCode=RGT01) KPIAggregations>,
+        "total_cases_registered":10
+    },
+    "TRUST_KPIS":{
+        "aggregation_model":"<TrustKPIAggregation":"TrustKPIAggregation (parent_organisation_ods_code=RGT)>",
+        "total_cases_registered":10
+    },
+    "ICB_KPIS":{
+        "aggregation_model":"<ICBKPIAggregation":"ICBKPIAggregation (IntegratedCareBoardEntity=NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD)>",
+        "total_cases_registered":10
+    },
+    "NHS_REGION_KPIS":{
+        "aggregation_model":"<NHSRegionKPIAggregation":"KPIAggregations (NHSRegionEntity=East of England)>",
+        "total_cases_registered":20
+    },
+    "OPEN_UK_KPIS":{
+        "aggregation_model":"<OpenUKKPIAggregation":"OPENUKKPIAggregations (OPENUKNetworkEntity=Eastern Paediatric Epilepsy Network)>",
+        "total_cases_registered":10
+    },
+    "COUNTRY_KPIS":{
+        "aggregation_model":"<CountryKPIAggregation":"CountryKPIAggregations (ONSCountryEntity=England)>",
+        "total_cases_registered":170
+    },
+    "NATIONAL_KPIS":{
+        "aggregation_model":"<NationalKPIAggregation":National KPIAggregations for England and Wales (Cohort 6)>,
+        "total_cases_registered":200
+    },
+    }
     """
 
     organisation = Organisation.objects.get(pk=organisation_id)
@@ -338,7 +371,11 @@ def selected_trust_select_kpi(request, organisation_id):
         organisation=organisation,
         cohort=cohort,
     )
-    print(f"ALL DATA: {all_data}")
+    print(all_data)
+    org_kpi_model = all_data["ORGANISATION_KPIS"]["aggregation_model"]
+    org_pct_passed_for_kpi_html = viz.render_pie_pct_passed_for_kpi_agg(
+        org_kpi_model, kpi_name
+    )
 
     all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
         cohort=cohort,
@@ -374,6 +411,9 @@ def selected_trust_select_kpi(request, organisation_id):
         "kpi_value": kpi_value,
         "selected_organisation": organisation,
         "all_data": all_data,
+        "individual_measures": {
+            "org_pct_passed_pie": org_pct_passed_for_kpi_html,
+        },
         # ALL BELOW TO BE REPLACED
         "open_uk_title": f"{kpi_value} by OPEN UK Region",
         "open_uk_id": "open_uk_id",

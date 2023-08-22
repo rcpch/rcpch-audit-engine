@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from .help_text_mixin import HelpTextMixin
 
 # RCPCH imports
+from epilepsy12.constants import EnumAbstractionLevel
 
 
 class BaseKPIAggregation(models.Model, HelpTextMixin):
@@ -512,6 +513,12 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         verbose_name = _("Organisation KPI Aggregation Model")
         verbose_name_plural = _("Organisation KPI Aggregation Models")
 
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.ORGANISATION
+    
+    def get_name(self)->str:
+        return f"{self.abstraction_relation.OrganisationName}"
+
     def __str__(self):
         return f"OrganisationKPIAggregation (ODSCode={self.abstraction_relation.ODSCode}) KPIAggregations"
 
@@ -532,6 +539,9 @@ class TrustKPIAggregation(BaseKPIAggregation):
         verbose_name = _("Trust KPI Aggregation Model")
         verbose_name_plural = _("Trust KPI Aggregation Models")
 
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.TRUST
+
     def __str__(self):
         return f"TrustKPIAggregation (parent_organisation_ods_code={self.abstraction_relation})"
 
@@ -550,6 +560,9 @@ class ICBKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("IntegratedCareBoardEntity KPI Aggregation Model")
         verbose_name_plural = _("IntegratedCareBoardEntity KPI Aggregation Models")
+
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.ICB
 
     def __str__(self):
         return (
@@ -572,6 +585,9 @@ class NHSRegionKPIAggregation(BaseKPIAggregation):
         verbose_name = _("NHSRegionEntity KPI Aggregation Model")
         verbose_name_plural = _("NHSRegionEntity KPI Aggregation Models")
 
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.NHS_REGION
+
     def __str__(self):
         return f"KPIAggregations (NHSRegionEntity={self.abstraction_relation})"
 
@@ -590,6 +606,9 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("OpenUK KPI Aggregation Model")
         verbose_name_plural = _("OpenUK KPI Aggregation Models")
+
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.OPEN_UK
 
     def __str__(self):
         return (
@@ -612,6 +631,12 @@ class CountryKPIAggregation(BaseKPIAggregation):
         verbose_name = _("Country KPI Aggregation Model")
         verbose_name_plural = _("Country KPI Aggregation Models")
 
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.COUNTRY
+    
+    def get_name(self)->str:
+        return f"{self.abstraction_relation.Country_ONS_Name}"
+
     def __str__(self):
         return f"CountryKPIAggregations (ONSCountryEntity={self.abstraction_relation})"
 
@@ -620,7 +645,7 @@ class NationalKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for England and Wales.
     """
-    
+
     # National can only have cohort as unique
     cohort = models.PositiveSmallIntegerField(
         unique=True,
@@ -629,6 +654,12 @@ class NationalKPIAggregation(BaseKPIAggregation):
     class Meta:
         verbose_name = _("National KPI Aggregation Model")
         verbose_name_plural = _("National KPI Aggregation Models")
+
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.NATIONAL
+    
+    def get_name(self)->str:
+        return "England and Wales"
 
     def __str__(self):
         return f"National KPIAggregations for England and Wales (Cohort {self.cohort})"

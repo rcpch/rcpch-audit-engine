@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from ..general_functions import fetch_concept
 
 
+
 register = template.Library()
 
 
@@ -401,11 +402,10 @@ def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
 
 @register.simple_tag
 def get_total_counts_passed(aggregation_model, kpi: str):
-    
     passed_count = getattr(aggregation_model, f"{kpi}_passed")
 
     total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
-    
+
     ineligible_count = getattr(aggregation_model, f"{kpi}_ineligible")
     incomplete_count = getattr(aggregation_model, f"{kpi}_incomplete")
 
@@ -417,11 +417,13 @@ def get_total_counts_passed(aggregation_model, kpi: str):
         """
     )
 
+
 @register.simple_tag
 def get_help_label_text_for_kpi(kpi_name: str, kpi_instance):
     help_label_attribute_name = f"get_{kpi_name}_help_label_text"
     help_label_text_method = getattr(kpi_instance, help_label_attribute_name)
     return help_label_text_method()
+
 
 @register.simple_tag
 def get_help_reference_text_for_kpi(kpi_name: str, kpi_instance):
@@ -429,6 +431,7 @@ def get_help_reference_text_for_kpi(kpi_name: str, kpi_instance):
     help_reference_text_method = getattr(kpi_instance, help_reference_attribute_name)
     return help_reference_text_method()
 
+
 @register.simple_tag
-def render_title_kpi_name(kpi_name:str):
-    return kpi_name.replace('_',' ')
+def render_title_kpi_name(kpi_name: str):
+    return kpi_name.replace("_", " ")
