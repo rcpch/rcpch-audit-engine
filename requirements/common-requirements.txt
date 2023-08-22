@@ -20,3 +20,4 @@ rapidfuzz
 whitenoise
 django-filter
 plotly
+pandas
