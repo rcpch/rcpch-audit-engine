@@ -178,7 +178,7 @@ def test_update_kpi_aggregation_model_all_levels(
                 **{abstraction_relation_instance_key: abstraction_relation_code}
             ).first()
 
-            # Trust is a char field
+            # Trust is a char field so must deal with differently
             if abstraction_level is EnumAbstractionLevel.TRUST:
                 kpi_aggregation_model_instance = abstraction_kpi_aggregation_model.objects.get(
                     abstraction_relation=abstraction_relation_instance.ParentOrganisation_ODSCode
