@@ -12,6 +12,29 @@ PLOTLY_CONFIG_OPTIONS = {
 }
 
 
+class ChartHTML:
+    """Simple container class to hold chart HTML content.
+
+    Useful to avoid lots of rendered html if trying to print a view's context.
+    """
+
+    def __init__(self, chart_html: str, name: str):
+        self.chart_html = chart_html
+        self.name = name
+
+    def get_html(self) -> str:
+        return self.chart_html
+
+    def get_name(self) -> str:
+        return self.name
+
+    def __str__(self):
+        return f"<{self.get_name()} ChartHTML object>"
+
+    def __repr__(self):
+        return f"<{self.get_name()} ChartHTML object>"
+
+
 def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
     """
     For a given KPIAggregation model, returns Plotly HTML pie chart.
@@ -23,8 +46,8 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
 
     # Pie chart args
     labels = [
-        "pass",
-        "failed",
+        "Passed",
+        "Failed",
     ]
     values = [
         passed,
@@ -40,8 +63,9 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
             labels=labels,
             values=values,
             marker=dict(colors=colors),
-            hole=0.9,
+            hole=0.9,  # sets the middle hole size
             textinfo="none",
+            hovertemplate=None,
         )
     )
     # Position the % pass in the center of the hole
@@ -59,9 +83,9 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
 
     fig.update_layout(
         showlegend=False,  # remove legend
-        autosize=False,
+        autosize=False,  # remove any auto sizing to place nicely inside template
         height=110,
-        width=110,
+        width=200,
         margin=dict(l=0, r=0, b=0, t=0, pad=0),
         font={"family": "Montserrat-Regular"},
     )
