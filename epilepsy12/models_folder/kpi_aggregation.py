@@ -7,39 +7,9 @@ from .help_text_mixin import HelpTextMixin
 from epilepsy12.constants import EnumAbstractionLevel
 from django.apps import apps
 
-
-class BaseKPIAggregation(models.Model, HelpTextMixin):
-    """
-    KPI summary statistics.
-    """
-
-    abstraction_name = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        default=None,
-    )
-
-    # If True, this KPIAgg is available to access by public
-    open_access = models.BooleanField(
-        default=False,
-    )
-
-    last_updated = models.DateTimeField(
-        help_text={"label": "", "reference": ""},
-        auto_now=True,
-    )
-
-    cohort = models.PositiveSmallIntegerField(
-        default=None,
-    )
-
-    # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
-    final_publication = models.BooleanField(
-        default=False,
-        null=False,
-    )
-
+class BaseKPIMetrics(models.Model):
+    """Base class containing only the metric fields themselves."""
+    
     paediatrician_with_expertise_in_epilepsies_passed = models.IntegerField(
         help_text={"label": "", "reference": ""},
         null=True,
@@ -488,11 +458,52 @@ class BaseKPIAggregation(models.Model, HelpTextMixin):
         default=None,
     )
 
+class BaseKPIAggregation(HelpTextMixin, BaseKPIMetrics):
+    """
+    KPI summary statistics base class.
+    
+    Metric fields inherited from BaseKPIMetrics.
+    """
+
+    abstraction_name = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+    # If True, this KPIAgg is available to access by public
+    open_access = models.BooleanField(
+        default=False,
+    )
+
+    last_updated = models.DateTimeField(
+        help_text={"label": "", "reference": ""},
+        auto_now=True,
+    )
+
+    cohort = models.PositiveSmallIntegerField(
+        default=None,
+    )
+
+    # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
+    final_publication = models.BooleanField(
+        default=False,
+        null=False,
+    )
+
     class Meta:
         abstract = True
         verbose_name = _("Base KPI Aggregation Model")
         verbose_name_plural = _("Base KPI Aggregation Models")
 
+    def get_pct_passed_kpi(self, kpi_name:str, round_to:int=2)->float:
+        
+        passed = getattr(self, f"{kpi_name}_passed")
+        total = getattr(self, f"{kpi_name}_total_eligible")
+        
+        return round(passed/total, round_to)
+    
     def get_value_counts_for_kpis(self, kpis: list[str]) -> dict:
         """Getter for value count values. Accepts a list of kpi names as strings. For each KPI, will return the 4 associated value count fields, in a single combined dict."""
         all_value_counts = {}
@@ -575,7 +586,7 @@ class TrustKPIAggregation(BaseKPIAggregation):
                 ParentOrganisation_ODSCode=self.abstraction_relation
             ).first()
 
-            self.abstraction_name = organisation.OrganisationName
+            self.abstraction_name = organisation.ParentOrganisation_OrganisationName
 
         return super().save(*args, **kwargs)
 
