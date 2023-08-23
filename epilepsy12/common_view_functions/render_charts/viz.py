@@ -39,6 +39,9 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
     """
     For a given KPIAggregation model, returns Plotly HTML pie chart.
     """
+    
+    if aggregation_model is None:
+        raise ValueError('aggregation_model cannot be None')
 
     passed = getattr(aggregation_model, f"{kpi_name}_passed")
     total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
