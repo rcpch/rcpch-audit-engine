@@ -7,7 +7,6 @@ from django.utils.safestring import mark_safe
 from ..general_functions import fetch_concept
 
 
-
 register = template.Library()
 
 
@@ -385,7 +384,7 @@ def get_kpi_pct_passed(region_data: tuple[str, dict]):
 
 @register.simple_tag
 def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
-    if not aggregation_model:
+    if not aggregation_model or (not aggregation_model.aggregation_performed()):
         return -1
 
     total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
@@ -402,6 +401,10 @@ def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
 
 @register.simple_tag
 def get_total_counts_passed(aggregation_model, kpi: str):
+    
+    if not aggregation_model.aggregation_performed():
+        return mark_safe('Aggregation not yet performed. This is most likely because there are no eligible data upon which to aggregate.')
+    
     passed_count = getattr(aggregation_model, f"{kpi}_passed")
 
     total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
@@ -436,23 +439,23 @@ def get_help_reference_text_for_kpi(kpi_name: str, kpi_instance):
 def render_title_kpi_name(kpi_name: str):
     return kpi_name.replace("_", " ")
 
-@register.simple_tag
-def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name:str):
-    
-    if aggregation_model is None:
-        return None
-    
-    pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name)
-    
-    return int(round(pct_passed*100, 0))
 
 @register.simple_tag
-def get_n_passed_and_total(aggregation_model, kpi_name:str):
-    
-    if aggregation_model is None:
+def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name: str):
+    if (aggregation_model is None) or (not aggregation_model.aggregation_performed()):
         return None
-    
+
+    pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name)
+
+    return int(round(pct_passed * 100, 0))
+
+
+@register.simple_tag
+def get_n_passed_and_total(aggregation_model, kpi_name: str):
+    if (aggregation_model is None) or (not aggregation_model.aggregation_performed()):
+        return None
+
     passed = getattr(aggregation_model, f"{kpi_name}_passed")
     total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
-    
+
     return f"{passed} / {total}"

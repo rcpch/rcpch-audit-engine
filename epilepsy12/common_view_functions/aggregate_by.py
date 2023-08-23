@@ -706,7 +706,6 @@ def update_kpi_aggregation_model(
                 **kpi_value_counts,
             },
             cohort=cohort,
-            **kpi_value_counts,
         )
 
         if created:
@@ -744,7 +743,6 @@ def update_kpi_aggregation_model(
             },
             abstraction_relation=abstraction_relation_instance,
             cohort=cohort,
-            **value_count,
         )
 
         if created:

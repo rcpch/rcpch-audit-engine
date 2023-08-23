@@ -460,7 +460,7 @@ class BaseKPIMetrics(models.Model):
 
 class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
     """
-    KPI summary statistics base class.
+    KPI summary statistics base class. Handles data and logic common to all aggregation models.
     
     Metric fields inherited from BaseKPIMetrics.
     """
@@ -485,6 +485,7 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
     cohort = models.PositiveSmallIntegerField(
         default=None,
     )
+    
 
     # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
     final_publication = models.BooleanField(
@@ -503,6 +504,13 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         total = getattr(self, f"{kpi_name}_total_eligible")
         
         return passed / total
+    
+    def aggregation_performed(self)->bool:
+        """All fields should be updated at the same time. Therefore, if one field is None, all will be None -> aggregations are not performed."""
+        if self.ecg_passed is None:
+            return False
+        else:
+            return True
     
     def get_value_counts_for_kpis(self, kpis: list[str]) -> dict:
         """Getter for value count values. Accepts a list of kpi names as strings. For each KPI, will return the 4 associated value count fields, in a single combined dict."""

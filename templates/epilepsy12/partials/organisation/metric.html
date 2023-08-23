@@ -15,14 +15,14 @@
                 <h3>Organisation</h3>
             </div>
             <div class="content chart">
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
             <div class='description'>
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     <b>{% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name %}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                 {% else %}
@@ -42,14 +42,14 @@
                 <h3>Trust</h3>
             </div>
             <div class="content chart">
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
             <div class='description'>
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     <b>{% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name %}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                 {% else %}
@@ -69,14 +69,14 @@
                 <h3>ICB</h3>
             </div>
             <div class="content chart">
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
             <div class='description'>
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     <b>{% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name %}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                 {% else %}
@@ -99,14 +99,14 @@
                 <h3>NHS Region</h3>
             </div>
             <div class="content">
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
             <div class='description'>
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     <b>{% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name %}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                 {% else %}
@@ -126,14 +126,14 @@
                 <h3>OPENUK</h3>
             </div>
             <div class="content">
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
             <div class='description'>
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     <b>{% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name %}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                 {% else %}
@@ -153,14 +153,14 @@
                 <h3>National</h3>
             </div>
             <div class="content">
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
             <div class='description'>
-                {% if total_cases is not None and total_cases > 0 %}
+                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     <b>{% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name %}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                 {% else %}
