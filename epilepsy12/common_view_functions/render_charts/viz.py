@@ -68,7 +68,7 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
             marker=dict(colors=colors),
             hole=0.9,  # sets the middle hole size
             textinfo="none",
-            hovertemplate=None,
+            hoverinfo="none",
         )
     )
     # Position the % pass in the center of the hole
@@ -87,8 +87,8 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
     fig.update_layout(
         showlegend=False,  # remove legend
         autosize=False,  # remove any auto sizing to place nicely inside template
-        height=300,
-        width=300,
+        height=150,
+        width=150,
         margin=dict(l=0, r=0, b=20, t=0, pad=0),
         font={"family": "Montserrat-Regular"},
     )

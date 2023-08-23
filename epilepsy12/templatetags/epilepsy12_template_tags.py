@@ -444,7 +444,7 @@ def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name:str):
     
     pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name)
     
-    return round(pct_passed*100, 2)
+    return int(round(pct_passed*100, 0))
 
 @register.simple_tag
 def get_n_passed_and_total(aggregation_model, kpi_name:str):

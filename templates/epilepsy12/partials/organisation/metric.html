@@ -14,7 +14,7 @@
             <div class="content summary_kpi_pie_title">
                 <h3>Organisation</h3>
             </div>
-            <div class="content">
+            <div class="content chart">
                 {% if total_cases is not None and total_cases > 0 %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
@@ -41,7 +41,7 @@
             <div class="content summary_kpi_pie_title">
                 <h3>Trust</h3>
             </div>
-            <div class="content">
+            <div class="content chart">
                 {% if total_cases is not None and total_cases > 0 %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
@@ -68,7 +68,7 @@
             <div class="content summary_kpi_pie_title">
                 <h3>ICB</h3>
             </div>
-            <div class="content">
+            <div class="content chart">
                 {% if total_cases is not None and total_cases > 0 %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}

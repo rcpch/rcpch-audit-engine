@@ -1855,11 +1855,6 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   padding-right: 1em;
 }
 
-.individual_measures .plotly.plotly-container {
-  height: "100%";
-  width: "100%";
-}
-
 .org_view_all_buttons_wrapper a.ui.button {
   display: flex;
   justify-content: center;
