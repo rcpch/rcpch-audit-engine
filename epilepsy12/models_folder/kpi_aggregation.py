@@ -458,7 +458,7 @@ class BaseKPIMetrics(models.Model):
         default=None,
     )
 
-class BaseKPIAggregation(HelpTextMixin, BaseKPIMetrics):
+class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
     """
     KPI summary statistics base class.
     
