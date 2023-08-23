@@ -87,9 +87,9 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
     fig.update_layout(
         showlegend=False,  # remove legend
         autosize=False,  # remove any auto sizing to place nicely inside template
-        height=110,
-        width=200,
-        margin=dict(l=0, r=0, b=0, t=0, pad=0),
+        height=300,
+        width=300,
+        margin=dict(l=0, r=0, b=20, t=0, pad=0),
         font={"family": "Montserrat-Regular"},
     )
 
@@ -98,6 +98,8 @@ def render_pie_pct_passed_for_kpi_agg(aggregation_model, kpi_name: str) -> str:
         full_html=False,
         include_plotlyjs="cdn",
         div_id=f"pie_passed_{aggregation_model.get_abstraction_level()}_{kpi_name}",
+        default_width='100%',
+        default_height='100%',
         config=PLOTLY_CONFIG_OPTIONS,
     )
 

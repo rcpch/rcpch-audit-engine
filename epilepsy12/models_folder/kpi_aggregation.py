@@ -497,12 +497,12 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         verbose_name = _("Base KPI Aggregation Model")
         verbose_name_plural = _("Base KPI Aggregation Models")
 
-    def get_pct_passed_kpi(self, kpi_name:str, round_to:int=2)->float:
+    def get_pct_passed_kpi(self, kpi_name:str)->float:
         
         passed = getattr(self, f"{kpi_name}_passed")
         total = getattr(self, f"{kpi_name}_total_eligible")
         
-        return round(passed/total, round_to)
+        return passed / total
     
     def get_value_counts_for_kpis(self, kpis: list[str]) -> dict:
         """Getter for value count values. Accepts a list of kpi names as strings. For each KPI, will return the 4 associated value count fields, in a single combined dict."""
