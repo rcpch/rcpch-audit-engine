@@ -1,15 +1,24 @@
+# TODO: an improvement refactor would be adding a 'get_abstraction_name' to the EnumAbstractionLevel Class, and then using that to save the .abstraction_name field for each of these models
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
 from .help_text_mixin import HelpTextMixin
 
 # RCPCH imports
 from epilepsy12.constants import EnumAbstractionLevel
+from django.apps import apps
 
 
 class BaseKPIAggregation(models.Model, HelpTextMixin):
     """
     KPI summary statistics.
     """
+
+    abstraction_name = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        default=None,
+    )
 
     # If True, this KPIAgg is available to access by public
     open_access = models.BooleanField(
@@ -515,12 +524,20 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.ORGANISATION
-    
-    def get_name(self)->str:
-        return f"{self.abstraction_relation.OrganisationName}"
+
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
 
     def __str__(self):
         return f"OrganisationKPIAggregation (ODSCode={self.abstraction_relation.ODSCode}) KPIAggregations"
+
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.OrganisationName
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
 
 
 class TrustKPIAggregation(BaseKPIAggregation):
@@ -542,8 +559,25 @@ class TrustKPIAggregation(BaseKPIAggregation):
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.TRUST
 
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
+
     def __str__(self):
         return f"TrustKPIAggregation (parent_organisation_ods_code={self.abstraction_relation})"
+
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            # As Trust is the only abstraction relation without a 1-2-1 model, need to search Org to get Trust name
+            Organisation = apps.get_model("epilepsy12", "Organisation")
+
+            organisation = Organisation.objects.filter(
+                ParentOrganisation_ODSCode=self.abstraction_relation
+            )
+
+            self.abstraction_name = organisation.OrganisationName
+
+        return super().save(*args, **kwargs)
 
 
 class ICBKPIAggregation(BaseKPIAggregation):
@@ -563,11 +597,22 @@ class ICBKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.ICB
+    
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
 
     def __str__(self):
         return (
             f"ICBKPIAggregation (IntegratedCareBoardEntity={self.abstraction_relation})"
         )
+    
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.ICB_Name
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
 
 
 class NHSRegionKPIAggregation(BaseKPIAggregation):
@@ -587,10 +632,20 @@ class NHSRegionKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.NHS_REGION
+    
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
 
     def __str__(self):
         return f"KPIAggregations (NHSRegionEntity={self.abstraction_relation})"
 
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.NHS_Region
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
 
 class OpenUKKPIAggregation(BaseKPIAggregation):
     """
@@ -609,11 +664,22 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.OPEN_UK
+    
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
 
     def __str__(self):
         return (
             f"OPENUKKPIAggregations (OPENUKNetworkEntity={self.abstraction_relation})"
         )
+    
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.OPEN_UK_Network_Name
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
 
 
 class CountryKPIAggregation(BaseKPIAggregation):
@@ -633,12 +699,20 @@ class CountryKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.COUNTRY
-    
-    def get_name(self)->str:
-        return f"{self.abstraction_relation.Country_ONS_Name}"
+
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
 
     def __str__(self):
         return f"CountryKPIAggregations (ONSCountryEntity={self.abstraction_relation})"
+    
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.Country_ONS_Name
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
 
 
 class NationalKPIAggregation(BaseKPIAggregation):
@@ -657,8 +731,8 @@ class NationalKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.NATIONAL
-    
-    def get_name(self)->str:
+
+    def get_name(self) -> str:
         return "England and Wales"
 
     def __str__(self):
