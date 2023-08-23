@@ -6,7 +6,7 @@ from django.urls import reverse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
-from django.db.models import Sum
+from django.db.models import Sum, F
 
 # E12 imports
 from django.apps import apps
@@ -321,7 +321,7 @@ def selected_trust_select_kpi(request, organisation_id):
 
     It takes the kpi_name parameter in the HTMX request which contains the value of the selected KPI measure from
     the select field. This is then aggregated across the levels of abstraction.
-    
+
     Aggregations should already be performed.
 
     all_data is of the format:
@@ -372,11 +372,10 @@ def selected_trust_select_kpi(request, organisation_id):
 
     # Add chart HTMLs to all_data
     for abstraction, kpi_data in all_data.items():
-        
         # Skip loop if aggregation model None (when there are no data to aggregate on so no AggregationModel made)
-        if kpi_data['aggregation_model'] is None:
+        if kpi_data["aggregation_model"] is None:
             continue
-        
+
         # Initialise dict
         kpi_data["charts"] = {}
 
@@ -385,9 +384,38 @@ def selected_trust_select_kpi(request, organisation_id):
             kpi_data["aggregation_model"],
             kpi_name,
         )
-        pie_html = viz.ChartHTML(chart_html=pie_html_raw, name=f"{abstraction}_pct_pass_pie_{kpi_name}")
+        pie_html = viz.ChartHTML(
+            chart_html=pie_html_raw, name=f"{abstraction}_pct_pass_pie_{kpi_name}"
+        )
         kpi_data["charts"]["passed_pie"] = pie_html
-        
+
+        # Gather data for abstraction's sub-unit barchart
+        # ORGANISATION_KPIS do not have sublevels
+        if abstraction not in ["ORGANISATION_KPIS", "TRUST_KPIS"]:
+            places = (
+                kpi_data["aggregation_model"]
+                ._meta.model.objects.filter(cohort=cohort)
+                .annotate(
+                    pct_passed=100
+                    * F(f"{kpi_name}_passed")
+                    / F(f"{kpi_name}_total_eligible"),
+                )
+                .values(
+                    "abstraction_name",
+                    "pct_passed",
+                )
+            )
+
+            bar_html_raw = viz.render_bar_pct_passed_for_kpi_agg(
+                kpi_data["aggregation_model"],
+                kpi_name,
+            )
+
+            bar_html = viz.ChartHTML(
+                chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
+            )
+            kpi_data["charts"]["passed_bar"] = bar_html
+
     print(all_data)
 
     all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
