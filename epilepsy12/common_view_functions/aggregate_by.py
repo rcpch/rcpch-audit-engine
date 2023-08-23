@@ -743,6 +743,8 @@ def update_kpi_aggregation_model(
 
         if created:
             print(f"created {new_obj}")
+        else:
+            print(f"updated {new_obj}")
 
 
 def aggregate_kpis_update_models_for_all_abstractions(
