@@ -435,3 +435,19 @@ def get_help_reference_text_for_kpi(kpi_name: str, kpi_instance):
 @register.simple_tag
 def render_title_kpi_name(kpi_name: str):
     return kpi_name.replace("_", " ")
+
+@register.simple_tag
+def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name:str):
+    
+    passed = getattr(aggregation_model, f"{kpi_name}_passed")
+    total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
+    
+    return round(passed/total*100)
+
+@register.simple_tag
+def get_n_passed_and_total(aggregation_model, kpi_name:str):
+    
+    passed = getattr(aggregation_model, f"{kpi_name}_passed")
+    total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
+    
+    return f"{passed} / {total}"
