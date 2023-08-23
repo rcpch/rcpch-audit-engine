@@ -439,13 +439,18 @@ def render_title_kpi_name(kpi_name: str):
 @register.simple_tag
 def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name:str):
     
-    passed = getattr(aggregation_model, f"{kpi_name}_passed")
-    total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
+    if aggregation_model is None:
+        return None
     
-    return round(passed/total*100)
+    pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name, round_to=0)
+    
+    return pct_passed*100
 
 @register.simple_tag
 def get_n_passed_and_total(aggregation_model, kpi_name:str):
+    
+    if aggregation_model is None:
+        return None
     
     passed = getattr(aggregation_model, f"{kpi_name}_passed")
     total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
