@@ -573,7 +573,7 @@ class TrustKPIAggregation(BaseKPIAggregation):
 
             organisation = Organisation.objects.filter(
                 ParentOrganisation_ODSCode=self.abstraction_relation
-            )
+            ).first()
 
             self.abstraction_name = organisation.OrganisationName
 
