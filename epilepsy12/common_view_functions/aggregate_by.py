@@ -686,6 +686,8 @@ def update_kpi_aggregation_model(
         kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
         cohort (int): cohort of aggregation
     """
+    
+    print(f'Running update KPIAggregation function for {abstraction_level}')
 
     abstraction_level_models = get_abstraction_model_from_level(abstraction_level)
 
@@ -704,10 +706,13 @@ def update_kpi_aggregation_model(
                 **kpi_value_counts,
             },
             cohort=cohort,
+            **kpi_value_counts,
         )
 
         if created:
             print(f"created {new_obj}")
+        else:
+            print(f"updated {new_obj}")
 
         return None
 
@@ -739,6 +744,7 @@ def update_kpi_aggregation_model(
             },
             abstraction_relation=abstraction_relation_instance,
             cohort=cohort,
+            **value_count,
         )
 
         if created:
