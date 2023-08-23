@@ -1855,6 +1855,11 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   padding-bottom: 1em;
 }
 
+.individual_measures .description {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
 .org_view_all_buttons_wrapper a.ui.button {
   display: flex;
   justify-content: center;
