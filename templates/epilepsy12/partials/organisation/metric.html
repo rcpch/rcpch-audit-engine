@@ -184,6 +184,33 @@
         {% endwith %}
         {% endwith %}
     </div>
+    <div id="open_uk_kpi_ranking">
+        {% with all_data.OPEN_UK_KPIS as KPI_DATA %}
+        {% with KPI_DATA.total_cases_registered as total_cases %}
+        {% with KPI_DATA.aggregation_model as aggregation_model %}
+            {{ KPI_DATA.charts.passed_bar.get_html|safe }}
+        {% endwith %}
+        {% endwith %}
+        {% endwith %}
+    </div>
+    <div id="nhs_region_kpi_ranking">
+        {% with all_data.NHS_REGION_KPIS as KPI_DATA %}
+        {% with KPI_DATA.total_cases_registered as total_cases %}
+        {% with KPI_DATA.aggregation_model as aggregation_model %}
+            {{ KPI_DATA.charts.passed_bar.get_html|safe }}
+        {% endwith %}
+        {% endwith %}
+        {% endwith %}
+    </div>
+    <div id="country_kpi_ranking">
+        {% with all_data.COUNTRY_KPIS as KPI_DATA %}
+        {% with KPI_DATA.total_cases_registered as total_cases %}
+        {% with KPI_DATA.aggregation_model as aggregation_model %}
+            {{ KPI_DATA.charts.passed_bar.get_html|safe }}
+        {% endwith %}
+        {% endwith %}
+        {% endwith %}
+    </div>
 
 
 </div>

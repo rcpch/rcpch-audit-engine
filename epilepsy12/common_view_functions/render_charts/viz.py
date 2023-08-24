@@ -135,9 +135,21 @@ def format_subunit_name_ticktext(color, text):
 
 ABSTRACTION_GRAPH_COLOR_MAP = {
     EnumAbstractionLevel.ICB: RCPCH_STRONG_BLUE,
-    EnumAbstractionLevel.NHS_REGION: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.OPEN_UK: RCPCH_AQUA_GREEN,
+    EnumAbstractionLevel.NHS_REGION: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.COUNTRY: RCPCH_DARK_BLUE,
+}
+ABSTRACTION_CHART_HEIGHT = {
+    EnumAbstractionLevel.ICB: '100vh',
+    EnumAbstractionLevel.OPEN_UK: '80vh',
+    EnumAbstractionLevel.NHS_REGION: '70vh',
+    EnumAbstractionLevel.COUNTRY: '50vh',
+}
+ABSTRACTION_GRAPH_TITLE_SUBUNIT = {
+    EnumAbstractionLevel.ICB: "Integrated Care Board",
+    EnumAbstractionLevel.OPEN_UK: 'OPEN UK Region',
+    EnumAbstractionLevel.NHS_REGION: 'NHS Region',
+    EnumAbstractionLevel.COUNTRY: 'Country',
 }
 
 def render_bar_pct_passed_for_kpi_agg(
@@ -148,10 +160,8 @@ def render_bar_pct_passed_for_kpi_agg(
 ) -> str:
     # Constants
     abstraction_level = aggregation_model.get_abstraction_level()
-    region = ""
-    if abstraction_level is EnumAbstractionLevel.ICB:
-        region = "Integrated Care Board"
-    title = f"% Passed {kpi_name_title} per {region}"
+
+    title = f"% Passed {kpi_name_title} per {ABSTRACTION_GRAPH_TITLE_SUBUNIT[abstraction_level]}"
 
     # Gather data
     names = []
@@ -162,6 +172,7 @@ def render_bar_pct_passed_for_kpi_agg(
     BG_BAR_COLOR = []
     PCT_BAR_COLOR = []
     NAMES_TEXT_COLOR = []
+    bar_widths = [1 for _ in names]
 
     ABSTRACTION_COLOR = ABSTRACTION_GRAPH_COLOR_MAP[abstraction_level]
 
@@ -204,6 +215,8 @@ def render_bar_pct_passed_for_kpi_agg(
             textfont=dict(color=PCT_TEXT_COLOR),
             orientation="h",
             marker_color=BG_BAR_COLOR,
+            width=bar_widths,
+            hoverinfo="none",
         )
     )
 
@@ -214,6 +227,7 @@ def render_bar_pct_passed_for_kpi_agg(
             y=names,
             orientation="h",
             marker_color=PCT_BAR_COLOR,
+            width=bar_widths,
         )
     )
 
@@ -253,7 +267,7 @@ def render_bar_pct_passed_for_kpi_agg(
         include_plotlyjs=False,
         div_id=f"bar_passed_{aggregation_model.get_abstraction_level().name}",
         default_width="100%",
-        default_height="100vh",
+        default_height=ABSTRACTION_CHART_HEIGHT[abstraction_level],
         # config=PLOTLY_CONFIG_OPTIONS,
     )
 

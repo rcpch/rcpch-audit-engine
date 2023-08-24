@@ -369,7 +369,7 @@ def selected_trust_select_kpi(request, organisation_id):
         organisation=organisation,
         cohort=cohort,
     )
-
+    
     # Add chart HTMLs to all_data
     for abstraction, kpi_data in all_data.items():
         # Skip loop if aggregation model None (when there are no data to aggregate on so no AggregationModel made)
@@ -391,7 +391,7 @@ def selected_trust_select_kpi(request, organisation_id):
 
         # Gather data for abstraction's sub-unit barchart
         # ORGANISATION_KPIS do not have sublevels
-        if abstraction not in ["ORGANISATION_KPIS", "TRUST_KPIS"]:
+        if abstraction in ["ICB_KPIS", "OPEN_UK_KPIS", "NHS_REGION_KPIS", "COUNTRY_KPIS"]:
             bar_data = (
                 kpi_data["aggregation_model"]
                 ._meta.model.objects.filter(cohort=cohort)
@@ -411,7 +411,7 @@ def selected_trust_select_kpi(request, organisation_id):
                 data=bar_data,
                 kpi_name=kpi_name,
                 kpi_name_title=kpi_value,
-                
+
             )
 
             bar_html = viz.ChartHTML(
