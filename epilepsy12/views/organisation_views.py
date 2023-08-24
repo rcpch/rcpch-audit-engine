@@ -392,7 +392,7 @@ def selected_trust_select_kpi(request, organisation_id):
         # Gather data for abstraction's sub-unit barchart
         # ORGANISATION_KPIS do not have sublevels
         if abstraction not in ["ORGANISATION_KPIS", "TRUST_KPIS"]:
-            places = (
+            bar_data = (
                 kpi_data["aggregation_model"]
                 ._meta.model.objects.filter(cohort=cohort)
                 .annotate(
@@ -407,8 +407,11 @@ def selected_trust_select_kpi(request, organisation_id):
             )
 
             bar_html_raw = viz.render_bar_pct_passed_for_kpi_agg(
-                kpi_data["aggregation_model"],
-                kpi_name,
+                aggregation_model=kpi_data["aggregation_model"],
+                data=bar_data,
+                kpi_name=kpi_name,
+                kpi_name_title=kpi_value,
+                
             )
 
             bar_html = viz.ChartHTML(
