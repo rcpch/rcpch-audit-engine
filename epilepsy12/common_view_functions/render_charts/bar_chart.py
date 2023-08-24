@@ -20,17 +20,18 @@ ABSTRACTION_GRAPH_COLOR_MAP = {
     EnumAbstractionLevel.COUNTRY: RCPCH_DARK_BLUE,
 }
 ABSTRACTION_CHART_HEIGHT = {
-    EnumAbstractionLevel.ICB: '100vh',
-    EnumAbstractionLevel.OPEN_UK: '80vh',
-    EnumAbstractionLevel.NHS_REGION: '70vh',
-    EnumAbstractionLevel.COUNTRY: '50vh',
+    EnumAbstractionLevel.ICB: "100vh",
+    EnumAbstractionLevel.OPEN_UK: "80vh",
+    EnumAbstractionLevel.NHS_REGION: "70vh",
+    EnumAbstractionLevel.COUNTRY: "50vh",
 }
 ABSTRACTION_GRAPH_TITLE_SUBUNIT = {
     EnumAbstractionLevel.ICB: "Integrated Care Board",
-    EnumAbstractionLevel.OPEN_UK: 'OPEN UK Region',
-    EnumAbstractionLevel.NHS_REGION: 'NHS Region',
-    EnumAbstractionLevel.COUNTRY: 'Country',
+    EnumAbstractionLevel.OPEN_UK: "OPEN UK Region",
+    EnumAbstractionLevel.NHS_REGION: "NHS Region",
+    EnumAbstractionLevel.COUNTRY: "Country",
 }
+
 
 def render_bar_pct_passed_for_kpi_agg(
     aggregation_model,
@@ -54,7 +55,11 @@ def render_bar_pct_passed_for_kpi_agg(
     NAMES_TEXT_COLOR = []
     bar_widths = [1 for _ in names]
 
+    # Gather colors for each of the bar charts
     ABSTRACTION_COLOR = ABSTRACTION_GRAPH_COLOR_MAP[abstraction_level]
+
+    # Gather text for hoverlabel NOTE: <extra></extra> removes the "trace1" trace label
+    hovertemplate = f"""<b>%{{x}}%</b> of cases passed this metric.<extra></extra>"""
 
     for item in data:
         name = item["abstraction_name"]
@@ -108,6 +113,7 @@ def render_bar_pct_passed_for_kpi_agg(
             orientation="h",
             marker_color=PCT_BAR_COLOR,
             width=bar_widths,
+            hovertemplate=hovertemplate,
         )
     )
 
@@ -119,10 +125,8 @@ def render_bar_pct_passed_for_kpi_agg(
         template="none",
         # Set size
         autosize=True,
-        # height=950,
-        # width=1200,
         margin=dict(l=0, r=0, b=10, t=75, pad=0),
-        font={"family": "Montserrat-Regular"},
+        font={"family": "Montserrat-Regular"},  # set font
     )
 
     # Move name ticks inside bars
@@ -148,7 +152,9 @@ def render_bar_pct_passed_for_kpi_agg(
         div_id=f"bar_passed_{aggregation_model.get_abstraction_level().name}",
         default_width="100%",
         default_height=ABSTRACTION_CHART_HEIGHT[abstraction_level],
-        # config=PLOTLY_CONFIG_OPTIONS,
+        config={
+            "modeBarButtonsToRemove": ["zoom", "pan"],
+        },
     )
 
     return fig_as_html
