@@ -42,7 +42,9 @@ from ..common_view_functions import (
     aggregate_kpis_update_models_for_all_abstractions,
 )
 from epilepsy12.common_view_functions.render_charts import (
-    viz,
+    render_bar_pct_passed_for_kpi_agg,
+    render_pie_pct_passed_for_kpi_agg,
+    ChartHTML,
 )
 from ..general_functions import (
     get_current_cohort_data,
@@ -369,7 +371,7 @@ def selected_trust_select_kpi(request, organisation_id):
         organisation=organisation,
         cohort=cohort,
     )
-    
+
     # Add chart HTMLs to all_data
     for abstraction, kpi_data in all_data.items():
         # Skip loop if aggregation model None (when there are no data to aggregate on so no AggregationModel made)
@@ -380,18 +382,23 @@ def selected_trust_select_kpi(request, organisation_id):
         kpi_data["charts"] = {}
 
         # Add individual kpi passed pie chart
-        pie_html_raw = viz.render_pie_pct_passed_for_kpi_agg(
+        pie_html_raw = render_pie_pct_passed_for_kpi_agg(
             kpi_data["aggregation_model"],
             kpi_name,
         )
-        pie_html = viz.ChartHTML(
+        pie_html = ChartHTML(
             chart_html=pie_html_raw, name=f"{abstraction}_pct_pass_pie_{kpi_name}"
         )
         kpi_data["charts"]["passed_pie"] = pie_html
 
         # Gather data for abstraction's sub-unit barchart
         # ORGANISATION_KPIS do not have sublevels
-        if abstraction in ["ICB_KPIS", "OPEN_UK_KPIS", "NHS_REGION_KPIS", "COUNTRY_KPIS"]:
+        if abstraction in [
+            "ICB_KPIS",
+            "OPEN_UK_KPIS",
+            "NHS_REGION_KPIS",
+            "COUNTRY_KPIS",
+        ]:
             bar_data = (
                 kpi_data["aggregation_model"]
                 ._meta.model.objects.filter(cohort=cohort)
@@ -406,15 +413,14 @@ def selected_trust_select_kpi(request, organisation_id):
                 )
             )
 
-            bar_html_raw = viz.render_bar_pct_passed_for_kpi_agg(
+            bar_html_raw = render_bar_pct_passed_for_kpi_agg(
                 aggregation_model=kpi_data["aggregation_model"],
                 data=bar_data,
                 kpi_name=kpi_name,
                 kpi_name_title=kpi_value,
-
             )
 
-            bar_html = viz.ChartHTML(
+            bar_html = ChartHTML(
                 chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
             )
             kpi_data["charts"]["passed_bar"] = bar_html
