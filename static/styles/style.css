@@ -1846,6 +1846,11 @@ div.ui.three.stackable.cards.individual_measures {
   text-align: center;
 }
 
+.individual_measures_pies_wrapper .chart {
+  border-top: none !important;
+}
+
+
 .individual_measures_pies_wrapper .ui.rcpch_chart_container.segment {
   padding: 0em;
   display: flex;
