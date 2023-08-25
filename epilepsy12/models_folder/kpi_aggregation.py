@@ -503,6 +503,9 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         passed = getattr(self, f"{kpi_name}_passed")
         total = getattr(self, f"{kpi_name}_total_eligible")
         
+        if total == 0:
+            return None
+        
         return passed / total
     
     def aggregation_performed(self)->bool:

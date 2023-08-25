@@ -401,10 +401,11 @@ def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
 
 @register.simple_tag
 def get_total_counts_passed(aggregation_model, kpi: str):
-    
     if not aggregation_model.aggregation_performed():
-        return mark_safe('Aggregation not yet performed. This is most likely because there are no eligible data upon which to aggregate.')
-    
+        return mark_safe(
+            "Aggregation not yet performed. This is most likely because there are no eligible data upon which to aggregate."
+        )
+
     passed_count = getattr(aggregation_model, f"{kpi}_passed")
 
     total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
@@ -446,6 +447,9 @@ def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name: str):
         return None
 
     pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name)
+    
+    if pct_passed is None:
+        return None
 
     return int(round(pct_passed * 100, 0))
 
@@ -459,3 +463,22 @@ def get_n_passed_and_total(aggregation_model, kpi_name: str):
     total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
 
     return f"{passed} / {total}"
+
+
+def _plural(num):
+    if num == 1:
+        return ""
+    else:
+        return "s"
+
+
+@register.simple_tag
+def no_eligible_cases(aggregation_model, kpi_name: str):
+    n_ineligible = getattr(aggregation_model, f"{kpi_name}_ineligible")
+    n_incomplete = getattr(aggregation_model, f"{kpi_name}_incomplete")
+
+    return mark_safe(
+        f"""No eligible Cases to score.<br>
+        <b>{n_ineligible}</b> case{_plural(n_ineligible)} ineligible.<br>
+        <b>{n_incomplete}</b> case{_plural(n_incomplete)} incomplete."""
+    )
