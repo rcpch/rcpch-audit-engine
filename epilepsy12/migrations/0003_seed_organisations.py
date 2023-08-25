@@ -81,6 +81,9 @@ def seed_organisations(apps, schema_editor):
                 ons_region_name = ons_region_for_postcode(
                     rcpch_organisation["Postcode"]
                 )
+                if ons_region_name is False:
+                    print(f"Unable to save {rcpch_organisation['OrganisationName']}: postcodes.io returned 404 for {rcpch_organisation['Postcode']}")
+                    continue
             ons_region = ONSRegionEntity.objects.filter(
                 Region_ONS_Name=ons_region_name
             ).get()
