@@ -141,6 +141,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                                
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -153,11 +154,12 @@ will be persisted and run as a cron job once a day.
                                             _="init js $('#_{{abstraction}}_{{kpi_name}}').popup(); end">
                                         </i>
                                     {% elif kpi_data == 0 %}
+                                    
                                         <i 
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -211,7 +213,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -264,7 +266,7 @@ will be persisted and run as a cron job once a day.
                                         class="rcpch exclamation circle icon"
                                         id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                         data-title='None eligible'
-                                        data-content="No eligible Cases scored for this metric."
+                                        data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                         data-position='top right'
                                         _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                     </i>
@@ -335,7 +337,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -406,7 +408,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -477,7 +479,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -549,7 +551,7 @@ will be persisted and run as a cron job once a day.
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
-                                                data-content="No eligible Cases scored for this metric."
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                                 data-position='top right'
                                                 _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                             </i>
@@ -602,7 +604,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -656,7 +658,7 @@ will be persisted and run as a cron job once a day.
                                                 class="rcpch exclamation circle icon"
                                                 id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                                 data-title='None eligible'
-                                                data-content="No eligible Cases scored for this metric."
+                                                data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                                 data-position='top right'
                                                 _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                             </i>
@@ -709,7 +711,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
@@ -762,7 +764,7 @@ will be persisted and run as a cron job once a day.
                                             class="rcpch exclamation circle icon"
                                             id='{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}'
                                             data-title='None eligible'
-                                            data-content="No eligible Cases scored for this metric."
+                                            data-html='{% no_eligible_cases data.aggregation_model kpi_name %}'
                                             data-position='top right'
                                             _="init js $('#{{ kpi_name }}_none_eligible_model_icon_{{abstraction}}').popup(); end">
                                         </i>
