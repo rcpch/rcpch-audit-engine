@@ -140,7 +140,7 @@ def render_bar_pct_passed_for_kpi_agg(
     )
 
     fig.update_xaxes(
-        range=[0, 108],
+        range=[0, 104.5],
         visible=False,
         automargin=True,
     )
