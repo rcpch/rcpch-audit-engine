@@ -427,60 +427,12 @@ def selected_trust_select_kpi(request, organisation_id):
 
     print(all_data)
 
-    all_aggregated_kpis_by_nhs_region_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort,
-        abstraction_level="nhs_region",
-        kpi_measure=kpi_name,
-    )
-    nhs_region_avg = calculate_kpi_average(
-        decimal_places=1,
-        kpi_data=all_aggregated_kpis_by_nhs_region_in_current_cohort,
-        kpi=kpi_name,
-    )
-
-    all_aggregated_kpis_by_icb_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort, abstraction_level="icb", kpi_measure=kpi_name
-    )
-    icb_avg = calculate_kpi_average(
-        decimal_places=1,
-        kpi_data=all_aggregated_kpis_by_icb_in_current_cohort,
-        kpi=kpi_name,
-    )
-
-    all_aggregated_kpis_by_country_in_current_cohort = return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel(
-        cohort=cohort, abstraction_level="country", kpi_measure=kpi_name
-    )
-    country_avg = calculate_kpi_average(
-        decimal_places=1,
-        kpi_data=all_aggregated_kpis_by_country_in_current_cohort,
-        kpi=kpi_name,
-    )
-
+    
     context = {
         "kpi_name": kpi_name,
         "kpi_name_title_case": kpi_value,
         "selected_organisation": organisation,
         "all_data": all_data,
-        # ALL BELOW TO BE REPLACED
-        "open_uk_title": f"{kpi_value} by OPEN UK Region",
-        "open_uk_id": "open_uk_id",
-        "icb": all_aggregated_kpis_by_icb_in_current_cohort,
-        "icb_avg": icb_avg,
-        "icb_title": f"{kpi_value} by Integrated Care Board",
-        "icb_id": "icb_id",
-        "nhs_region": all_aggregated_kpis_by_nhs_region_in_current_cohort,
-        "nhs_region_avg": nhs_region_avg,
-        "nhs_region_title": f"{kpi_value} by NHS Region",
-        "nhs_region_id": "nhs_region_id",
-        "country": all_aggregated_kpis_by_country_in_current_cohort,
-        "country_avg": country_avg,
-        "country_title": f"{kpi_value} by Country",
-        "country_id": "country_id",
-        # ADD COLOR PER ABSTRACTION
-        "icb_color": colors.RCPCH_AQUA_GREEN,
-        "open_uk_color": colors.RCPCH_LIGHT_BLUE,
-        "nhs_region_color": colors.RCPCH_STRONG_BLUE,
-        "country_color": colors.RCPCH_DARK_BLUE,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
 

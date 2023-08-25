@@ -299,7 +299,14 @@
                     <div id='kpis'>
                         <div class="ui active centered inline loader"></div>
                     </div>
-                    {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
+                    
+                </div>
+
+                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
+
+                <div class="ui bottom attached rcpch_footer info icon message">
+                    <i class="info circle icon"></i>
+                    These are key indicators for your Health Board/Trust, compared to the percentages for your relevant ICB, NHS England Region, OPEN UK Region, Country and England and Wales combined.       
                 </div>
                 
             </div>
