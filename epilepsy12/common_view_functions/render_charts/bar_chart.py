@@ -39,6 +39,7 @@ def render_bar_pct_passed_for_kpi_agg(
     kpi_name: str,
     kpi_name_title: str,
 ) -> str:
+
     # Constants
     abstraction_level = aggregation_model.get_abstraction_level()
 
@@ -127,6 +128,7 @@ def render_bar_pct_passed_for_kpi_agg(
         autosize=True,
         margin=dict(l=0, r=0, b=10, t=75, pad=0),
         font={"family": "Montserrat-Regular"},  # set font
+        hovermode='closest',
     )
 
     # Move name ticks inside bars
@@ -140,7 +142,7 @@ def render_bar_pct_passed_for_kpi_agg(
     )
 
     fig.update_xaxes(
-        range=[0, 104.5],
+        range=[0, 104.5], # the "No data" labels require space past the end of the axes
         visible=False,
         automargin=True,
     )
