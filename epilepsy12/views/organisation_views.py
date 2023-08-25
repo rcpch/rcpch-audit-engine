@@ -6,7 +6,7 @@ from django.urls import reverse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Avg, Q, When, Case as DjangoCase, FloatField, Value
 
 # E12 imports
 from django.apps import apps
@@ -403,9 +403,18 @@ def selected_trust_select_kpi(request, organisation_id):
                 kpi_data["aggregation_model"]
                 ._meta.model.objects.filter(cohort=cohort)
                 .annotate(
-                    pct_passed=100
-                    * F(f"{kpi_name}_passed")
-                    / F(f"{kpi_name}_total_eligible"),
+                    pct_passed=DjangoCase(
+                        When(
+                            **{f'{kpi_name}_total_eligible':0},
+                            then=Value(0),
+                        ),
+                        default=(
+                            100
+                            * F(f"{kpi_name}_passed")
+                            / F(f"{kpi_name}_total_eligible")
+                        ),
+                        output_field=FloatField(),
+                    ),
                 )
                 .values(
                     "abstraction_name",
@@ -427,7 +436,6 @@ def selected_trust_select_kpi(request, organisation_id):
 
     print(all_data)
 
-    
     context = {
         "kpi_name": kpi_name,
         "kpi_name_title_case": kpi_value,

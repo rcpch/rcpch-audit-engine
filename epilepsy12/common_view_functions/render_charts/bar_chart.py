@@ -6,6 +6,7 @@ NOTE: "No data" for bars denotes that KPIAggregation model's field is None. This
 
 # 3rd Party imports
 import plotly.graph_objects as go
+import numpy as np
 
 # E12 Imports
 from epilepsy12.constants.colors import *
@@ -39,7 +40,6 @@ def render_bar_pct_passed_for_kpi_agg(
     kpi_name: str,
     kpi_name_title: str,
 ) -> str:
-
     # Constants
     abstraction_level = aggregation_model.get_abstraction_level()
 
@@ -49,6 +49,10 @@ def render_bar_pct_passed_for_kpi_agg(
     names = []
     pct_passed = []
     pct_passed_text = []
+    n_passed = []
+    n_total_eligible = []
+    n_ineligible = []
+    n_incomplete = []
     # COLORS
     PCT_TEXT_COLOR = []
     BG_BAR_COLOR = []
@@ -60,7 +64,9 @@ def render_bar_pct_passed_for_kpi_agg(
     ABSTRACTION_COLOR = ABSTRACTION_GRAPH_COLOR_MAP[abstraction_level]
 
     # Gather text for hoverlabel NOTE: <extra></extra> removes the "trace1" trace label
-    hovertemplate = f"""<b>%{{x}}%</b> of cases passed this metric.<extra></extra>"""
+    hovertemplate_pct_passed = (
+        f"""<b>%{{x}}%</b> of cases passed this metric.<extra></extra>"""
+    )
 
     for item in data:
         name = item["abstraction_name"]
@@ -74,6 +80,17 @@ def render_bar_pct_passed_for_kpi_agg(
 
         # pct labels
         pct_passed_text.append(format_pct_text(pct_passed_item))
+
+        # hover template for absolute counts
+        kpi_passed_count = getattr(aggregation_model, f"{kpi_name}_passed")
+        kpi_total_eligible_count = getattr(aggregation_model, f"{kpi_name}_passed")
+        kpi_passed_text = f"({kpi_passed_count} / {kpi_total_eligible_count})"
+        kpi_ineglible_count = getattr(aggregation_model, f"{kpi_name}_ineligible")
+        kpi_incomplete_count = getattr(aggregation_model, f"{kpi_name}_incomplete")
+
+        n_passed.append(kpi_passed_text)
+        n_incomplete.append(kpi_ineglible_count)
+        n_ineligible.append(kpi_incomplete_count)
 
         # Colors
         if pct_passed_item is None:
@@ -91,6 +108,17 @@ def render_bar_pct_passed_for_kpi_agg(
                 format_subunit_name_ticktext(color=RCPCH_WHITE, text=name)
             )
 
+    # Generate the hover bar for those passed / incomplete / inelgible. Access attributes via index order set in customdata_bg_bar
+    customdata_bg_bar = np.stack(
+        (
+            n_passed,
+            n_incomplete,
+            n_ineligible,
+        ),
+        axis=-1,
+    )
+    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata[0]}<br>incomplete: %{customdata[1]}<br>ineligible: %{customdata[2]}<extra></extra>"
+
     # Bg Bars
     fig = go.Figure(
         go.Bar(
@@ -102,7 +130,8 @@ def render_bar_pct_passed_for_kpi_agg(
             orientation="h",
             marker_color=BG_BAR_COLOR,
             width=bar_widths,
-            hoverinfo="none",
+            customdata=customdata_bg_bar,
+            hovertemplate=hovertemplate_bg_bar,
         )
     )
 
@@ -114,7 +143,7 @@ def render_bar_pct_passed_for_kpi_agg(
             orientation="h",
             marker_color=PCT_BAR_COLOR,
             width=bar_widths,
-            hovertemplate=hovertemplate,
+            hovertemplate=hovertemplate_pct_passed,
         )
     )
 
@@ -128,7 +157,7 @@ def render_bar_pct_passed_for_kpi_agg(
         autosize=True,
         margin=dict(l=0, r=0, b=10, t=75, pad=0),
         font={"family": "Montserrat-Regular"},  # set font
-        hovermode='closest',
+        hovermode="closest",
     )
 
     # Move name ticks inside bars
@@ -141,8 +170,23 @@ def render_bar_pct_passed_for_kpi_agg(
         automargin=True,
     )
 
+    # Calculate average
+    pct_pass_exc_none = [num for num in pct_passed if num is not None]
+    average_for_eligible = int(
+        round(sum(pct_pass_exc_none) / len(pct_pass_exc_none), 0)
+    )
+
+    # Add avg line
+    fig.add_vline(
+        x=average_for_eligible,
+        annotation_text=f"Average for those eligible: {average_for_eligible}%",
+        annotation_position="top",
+        line_color=RCPCH_PINK,
+        opacity=0.69,
+    )
+
     fig.update_xaxes(
-        range=[0, 104.5], # the "No data" labels require space past the end of the axes
+        range=[0, 104.5],  # the "No data" labels require space past the end of the axes
         visible=False,
         automargin=True,
     )
