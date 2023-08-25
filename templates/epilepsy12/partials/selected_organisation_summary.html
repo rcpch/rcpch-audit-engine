@@ -299,11 +299,13 @@
                     <div id='kpis'>
                         <div class="ui active centered inline loader"></div>
                     </div>
+                    {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
                 </div>
+                
             </div>
 
             <div class="ui bottom attached tab segment" data-tab="second">
-                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
+                <!-- {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %} -->
             </div>
         
         </div>
