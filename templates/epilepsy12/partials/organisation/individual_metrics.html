@@ -1,22 +1,58 @@
 {% csrf_token %}
-<div class="sixteen wide segment">
-  <p>
-    Within the clinical audit there are 12 'Performance Indicator' measures
-    which are derived from national guidelines and recommendations.
-  </p>
-  {% url "selected_trust_select_kpi" organisation_id=selected_organisation.pk as hx_post%} 
-  {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_select_kpi' hx_trigger='change' hx_swap='innerHTML' label='Select a measure' reference="Select one of the 12 measures to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
-  <div
-    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-    hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
-    hx-target="#selected_trust_select_kpi"
-    hx-swap="innerHTML"
-    hx-trigger="change, load"
-    hx_indicator="#selected_trust_select_kpi"
-  >
-    <div id="selected_trust_select_kpi">
-        <div class="ui active centered inline loader"></div>
-    </div>
+<div class="sixteen wide column">
+
+    <div class="ui top attached inverted clearing segment" id="audit_top_attached_segment">
+        <div class='ui header'>
+            <div class='content kpi_header'>
+                <p>Real-time Individual Key Performance Indicator (KPI) Metrics</p>
+                <!-- <div class="sub header"> -->
+                <p>{{selected_organisation.OrganisationName}} ({{ selected_organisation.ParentOrganisation_OrganisationName }})</p>
+                <!-- </div>     -->
+            </div>
+            
+            <button 
+                class='ui right floated rcpch_primary button'
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
+                hx-trigger="click" hx-swap='innerHTML'
+                hx_indicator='#selected_trust_select_kpi'
+                hx-target="#selected_trust_select_kpi">
+                Refresh
+                <i class="htmx-indicator spinner loading icon" id="spinner"></i>
+            </button>
+            
+        </div>
+      
+      </div>
     
-  </div>
+      <div class="ui raised attached rcpch_dark_blue segment">
+    
+          <p>
+            Within the clinical audit there are 12 'Performance Indicator' measures
+            which are derived from national guidelines and recommendations.
+          </p>
+          {% url "selected_trust_select_kpi" organisation_id=selected_organisation.pk as hx_post%} 
+          {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_select_kpi' hx_trigger='change' hx_swap='innerHTML' label='Select a measure' reference="Select one of the 12 measures to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
+          <div
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
+            hx-target="#selected_trust_select_kpi"
+            hx-swap="innerHTML"
+            hx-trigger="change, load"
+            hx_indicator="#selected_trust_select_kpi"
+          >
+            <div id="selected_trust_select_kpi">
+                <div class="ui active centered inline loader"></div>
+            </div>
+            
+          </div>
+          
+
+      </div>
+
+      <div class="ui bottom attached rcpch_footer info icon message">
+        <i class="info circle icon"></i>
+        These are key indicators for your Health Board/Trust, compared to the percentages for your relevant ICB, NHS England Region, OPEN UK Region, Country and England and Wales combined.       
+      </div>
+
 </div>
