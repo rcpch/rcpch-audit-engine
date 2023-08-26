@@ -98,7 +98,7 @@ def render_bar_pct_passed_for_kpi_agg(
             PCT_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
             PCT_TEXT_COLOR.append(RCPCH_CHARCOAL)
             NAMES_TEXT_COLOR.append(
-                format_subunit_name_ticktext(color=RCPCH_CHARCOAL, text=name)
+                format_subunit_name_ticktext(color=RCPCH_LIGHTEST_GREY, text=name)
             )
         else:
             BG_BAR_COLOR.append(RCPCH_LIGHT_GREY)
@@ -159,6 +159,14 @@ def render_bar_pct_passed_for_kpi_agg(
         margin=dict(l=0, r=0, b=10, t=75, pad=0),
         font={"family": "Montserrat-Regular"},  # set font
         hovermode="closest",
+        hoverlabel=dict(
+            bgcolor=ABSTRACTION_COLOR,
+            font_size=10,
+            font_family="Montserrat-Regular",
+            bordercolor=ABSTRACTION_COLOR,
+            font={"color": "white"},
+            align="left",
+        ),
     )
 
     # Move name ticks inside bars
