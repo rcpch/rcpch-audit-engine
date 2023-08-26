@@ -392,6 +392,10 @@ def selected_trust_select_kpi(request, organisation_id):
                 .values(
                     "abstraction_name",
                     "pct_passed",
+                    f"{kpi_name}_total_eligible",
+                    f"{kpi_name}_passed",
+                    f"{kpi_name}_ineligible",
+                    f"{kpi_name}_incomplete",
                 )
             )
 

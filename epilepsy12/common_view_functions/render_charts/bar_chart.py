@@ -50,7 +50,6 @@ def render_bar_pct_passed_for_kpi_agg(
     pct_passed = []
     pct_passed_text = []
     n_passed = []
-    n_total_eligible = []
     n_ineligible = []
     n_incomplete = []
     # COLORS
@@ -68,6 +67,8 @@ def render_bar_pct_passed_for_kpi_agg(
         f"""<b>%{{x}}%</b> of cases passed this metric.<extra></extra>"""
     )
 
+    customdata_bg_bar = []
+
     for item in data:
         name = item["abstraction_name"]
         if abstraction_level is EnumAbstractionLevel.ICB:
@@ -82,15 +83,14 @@ def render_bar_pct_passed_for_kpi_agg(
         pct_passed_text.append(format_pct_text(pct_passed_item))
 
         # hover template for absolute counts
-        kpi_passed_count = getattr(aggregation_model, f"{kpi_name}_passed")
-        kpi_total_eligible_count = getattr(aggregation_model, f"{kpi_name}_passed")
-        kpi_passed_text = f"({kpi_passed_count} / {kpi_total_eligible_count})"
-        kpi_ineglible_count = getattr(aggregation_model, f"{kpi_name}_ineligible")
-        kpi_incomplete_count = getattr(aggregation_model, f"{kpi_name}_incomplete")
-
-        n_passed.append(kpi_passed_text)
-        n_incomplete.append(kpi_ineglible_count)
-        n_ineligible.append(kpi_incomplete_count)
+        kpi_passed_count = item[f"{kpi_name}_passed"]
+        kpi_total_eligible_count = item[f"{kpi_name}_total_eligible"]
+        if kpi_passed_count is None or kpi_total_eligible_count is None:
+            kpi_passed_text = "No passes"
+        else:
+            kpi_passed_text = f"({kpi_passed_count} / {kpi_total_eligible_count})"
+        kpi_ineglible_count = item[f"{kpi_name}_ineligible"]
+        kpi_incomplete_count = item[f"{kpi_name}_incomplete"]
 
         # Colors
         if pct_passed_item is None:
@@ -108,16 +108,12 @@ def render_bar_pct_passed_for_kpi_agg(
                 format_subunit_name_ticktext(color=RCPCH_WHITE, text=name)
             )
 
+        customdata_bg_bar.append(
+            (kpi_passed_text, f"{kpi_ineglible_count}", f"{kpi_incomplete_count}")
+        )
+
     # Generate the hover bar for those passed / incomplete / inelgible. Access attributes via index order set in customdata_bg_bar
-    customdata_bg_bar = np.stack(
-        (
-            n_passed,
-            n_incomplete,
-            n_ineligible,
-        ),
-        axis=-1,
-    )
-    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata.0}<br>incomplete: %{customdata.1}<br>ineligible: %{customdata.2}<extra></extra>"
+    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata[0]}<br>incomplete: %{customdata[1]}<br>ineligible: %{customdata[2]}<extra></extra>"
 
     # Bg Bars
     fig = go.Figure(
