@@ -296,15 +296,7 @@
                     
                 </div>
                 
-                <div 
-                    class="sixteen wide rcpch segment" 
-                    hx-get="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}" 
-                    hx-trigger="load, post" hx-swap='innerHTML'
-                    hx-indicator='#individual-kpis'
-                    hx-target="#individual-kpis">
-                    <div id='individual-kpis'>
-                        <div class="ui active centered inline loader"></div>
-                    </div>
+                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk %}
                     
                 </div>
                 
