@@ -5,22 +5,25 @@
 
 {% with 'children and young people diagnosed with epilepsy' as CYP_TEXT %}
 <div class="individual_measures_pies_wrapper">
+
     <div class="ui three stackable cards individual_measures">
         
         {% with all_data.ORGANISATION_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
-        <div class="ui card">
+        <div class="ui rcpch_individual_kpi_fixed card">
             <div class="content summary_kpi_pie_title">
                 <h3>Organisation</h3>
             </div>
-            <div class="content chart">
+
+            <div class="description">
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
+
             <div class='description'>
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
@@ -29,7 +32,7 @@
                         <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                     {% endif %}
                 {% else %}
-                    Aggregations not yet performed.
+                    {{selected_organisation.OrganisationName}} has no eligible data on this measure yet.
                 {% endif %}
             </div>
         </div>
@@ -40,17 +43,19 @@
         {% with all_data.TRUST_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
-        <div class="ui card" >
+        <div class="ui rcpch_individual_kpi_fixed card">
             <div class="content summary_kpi_pie_title">
                 <h3>Trust</h3>
             </div>
-            <div class="content chart">
+
+            <div class="description">
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
+
             <div class='description'>
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
@@ -59,9 +64,10 @@
                         <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                     {% endif %}
                 {% else %}
-                    Aggregations not yet performed.
+                    {{selected_organisation.ParentOrganisation_OrganisationName}} has no eligible data on this measure yet.
                 {% endif %}
             </div>
+
         </div>
         {% endwith %}
         {% endwith %}
@@ -70,17 +76,19 @@
         {% with all_data.ICB_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
-        <div class="ui card clickable_card" _="on click go to the top of #icb_kpi_ranking">
+        <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #icb_kpi_ranking">
             <div class="content summary_kpi_pie_title">
                 <h3>ICB</h3>
             </div>
-            <div class="content chart">
+            
+            <div class="description">
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     {{ KPI_DATA.charts.passed_pie.get_html|safe }}
                 {% else %}
                     <h5>No data yet!<h5>
                 {% endif %}
             </div>
+
             <div class='description'>
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
@@ -89,7 +97,7 @@
                         <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                     {% endif %}
                 {% else %}
-                    Aggregations not yet performed.
+                    {{all_data.ICB_KPIS.aggregation_model.get_name}} has no eligible data on this measure yet.
                 {% endif %}
             </div>
         </div>
@@ -100,29 +108,34 @@
         
     </div>
     <div class="ui three stackable cards individual_measures">
+
         {% with all_data.NHS_REGION_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
-        <div class="ui card clickable_card" _="on click go to the top of #nhs_region_kpi_ranking">
+        <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #nhs_region_kpi_ranking">
             <div class="content summary_kpi_pie_title">
                 <h3>NHS Region</h3>
             </div>
-            <div class="content">
-                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                    {{ KPI_DATA.charts.passed_pie.get_html|safe }}
-                {% else %}
-                    <h5>No data yet!<h5>
-                {% endif %}
+
+            <div class="rcpch_individual_kpi_content">
+                <div class="description">
+                    {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
+                        {{ KPI_DATA.charts.passed_pie.get_html|safe }}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
+                </div>
             </div>
+            
             <div class='description'>
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                     {% if pct_passed_kpi is not None %}
-                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
+                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure in the {{all_data.NHS_REGION_KPIS.aggregation_model.get_name}} region.
                     {% endif %}
                 {% else %}
-                    Aggregations not yet performed.
+                {{all_data.NHS_REGION_KPIS.aggregation_model.get_name}} has no eligible data on this measure yet.
                 {% endif %}
             </div>
         </div>
@@ -133,28 +146,33 @@
         {% with all_data.OPEN_UK_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
-        <div class="ui card clickable_card" _="on click go to the top of #open_uk_kpi_ranking">
+        <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #open_uk_kpi_ranking">
             <div class="content summary_kpi_pie_title">
                 <h3>OPENUK</h3>
             </div>
-            <div class="content">
-                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                    {{ KPI_DATA.charts.passed_pie.get_html|safe }}
-                {% else %}
-                    <h5>No data yet!<h5>
-                {% endif %}
+            
+            <div class="rcpch_individual_kpi_content">
+                <div class="description">
+                    {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
+                        {{ KPI_DATA.charts.passed_pie.get_html|safe }}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
+                </div>
             </div>
+            
             <div class='description'>
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                     {% if pct_passed_kpi is not None %}
-                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
+                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure in {{all_data.OPEN_UK_KPIS.aggregation_model.get_name}}.
                     {% endif %}
                 {% else %}
-                    Aggregations not yet performed.
+                {{all_data.OPEN_UK_KPIS.aggregation_model.get_name}} has no eligible data on this measure yet.
                 {% endif %}
             </div>
+            
         </div>
         {% endwith %}
         {% endwith %}
@@ -163,26 +181,30 @@
         {% with all_data.NATIONAL_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
-        <div class="ui card clickable_card" _="on click go to the top of #country_kpi_ranking">
+        <div class="ui rcpch_individual_kpi card" _="on click go to the top of #country_kpi_ranking">
             <div class="content summary_kpi_pie_title">
                 <h3>National</h3>
             </div>
-            <div class="content">
-                {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                    {{ KPI_DATA.charts.passed_pie.get_html|safe }}
-                {% else %}
-                    <h5>No data yet!<h5>
-                {% endif %}
+
+            <div class="rcpch_individual_kpi_content">
+                <div class="description">
+                    {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
+                        {{ KPI_DATA.charts.passed_pie.get_html|safe }}
+                    {% else %}
+                        <h5>No data yet!<h5>
+                    {% endif %}
+                </div>
             </div>
-            <div class='description'>
+
+            <div class="description">
                 {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
                     <br>
                     {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                     {% if pct_passed_kpi is not None %}
-                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
+                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure in {{all_data.NATIONAL_KPIS.aggregation_model.get_name}}.
                     {% endif %}
                 {% else %}
-                    Aggregations not yet performed.
+                {{all_data.NATIONAL_KPIS.aggregation_model.get_name}} have no eligible data on this measure yet.
                 {% endif %}
             </div>
         </div>
@@ -201,7 +223,9 @@
         {% endwith %}
         {% endwith %}
         {% endwith %}
+        {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
     </div>
+    
     <div id="open_uk_kpi_ranking">
         {% with all_data.OPEN_UK_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
@@ -210,6 +234,7 @@
         {% endwith %}
         {% endwith %}
         {% endwith %}
+        {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
     </div>
     <div id="nhs_region_kpi_ranking">
         {% with all_data.NHS_REGION_KPIS as KPI_DATA %}
@@ -219,6 +244,7 @@
         {% endwith %}
         {% endwith %}
         {% endwith %}
+        {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
     </div>
     <div id="country_kpi_ranking">
         {% with all_data.COUNTRY_KPIS as KPI_DATA %}
@@ -228,6 +254,7 @@
         {% endwith %}
         {% endwith %}
         {% endwith %}
+        {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
     </div>
 
 

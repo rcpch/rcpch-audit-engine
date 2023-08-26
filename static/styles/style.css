@@ -1864,9 +1864,11 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
   justify-content: space-evenly;
   align-items: center;
   padding-bottom: 1em;
+  background-color: white;
 }
 
-.individual_measures .description {
+.individual_measures .header {
+  background-color: var(--rcpch_strong_blue);
   padding-left: 1em;
   padding-right: 1em;
 }
@@ -1992,4 +1994,64 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .ui.rcpch_pink.segment {
   border-top-color: var(--rcpch_pink);
+}
+
+.ui.rcpch_individual_kpi.card {
+  display: flex;
+  flex-direction: column;
+  background-color: white !important;
+  font-family: var(--rcpch_standard_font);
+  color: white;
+  text-align: center;
+  font-weight: 400;
+  align-content: center;
+}
+
+.ui.rcpch_individual_kpi_fixed.card {
+  display: flex;
+  flex-direction: column;
+  background-color: white !important;
+  font-family: var(--rcpch_standard_font);
+  color: white;
+  text-align: center;
+  font-weight: 400;
+  align-content: center;
+}
+
+.ui.rcpch_individual_kpi_fixed.card .content{
+  background-color: var(--rcpch_mid_grey);
+  width: 100%;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_individual_kpi.card .content{
+  background-color: var(--rcpch_strong_blue);
+  width: 100%;
+  border-radius: 0% !important;
+}
+
+.ui.rcpch_individual_kpi.card:hover .content{
+  background-color: var(--rcpch_light_blue);
+}
+
+.ui.rcpch_individual_kpi.card .content.summary_kpi_pie_title h3{
+  color: white;
+}
+
+.ui.rcpch_individual_kpi_fixed.card .content.summary_kpi_pie_title h3{
+  color: white;
+}
+
+.ui.rcpch_individual_kpi.card .description{
+  padding-top: 10px;
+  color: var(--rcpch_charcoal);
+  text-align: left;
+  margin: 10px;
+}
+
+.ui.rcpch_individual_kpi_fixed.card .description{
+  padding-top: 10px;
+  color: var(--rcpch_charcoal);
+  text-align: left;
+  margin: 10px;
 }

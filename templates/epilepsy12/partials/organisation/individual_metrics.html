@@ -5,9 +5,7 @@
         <div class='ui header'>
             <div class='content kpi_header'>
                 <p>Real-time Individual Key Performance Indicator (KPI) Metrics</p>
-                <!-- <div class="sub header"> -->
                 <p>{{selected_organisation.OrganisationName}} ({{ selected_organisation.ParentOrganisation_OrganisationName }})</p>
-                <!-- </div>     -->
             </div>
             
             <button 
@@ -25,14 +23,16 @@
       
       </div>
     
-      <div class="ui raised attached rcpch_dark_blue segment">
-    
+      <div class="ui raised attached rcpch_dark_blue segment" id="selected_trust_select_kpi_marker">
+        
+        <div class="ui rcpch_info message">
           <p>
             Within the clinical audit there are 12 'Performance Indicator' measures
             which are derived from national guidelines and recommendations.
           </p>
+        </div>
           {% url "selected_trust_select_kpi" organisation_id=selected_organisation.pk as hx_post%} 
-          {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_select_kpi' hx_trigger='change' hx_swap='innerHTML' label='Select a measure' reference="Select one of the 12 measures to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
+          {% include 'epilepsy12/partials/page_elements/kpi_select.html' with hx_post=hx_post hx_target='#selected_trust_select_kpi' hx_trigger='change' hx_swap='innerHTML' label='Select a measure and then click on a region' reference="Select one of the 12 measures and then click on a region to view how it compares." choices=individual_kpi_choices test_positive=individual_kpi_choices.0.0 hx_name='kpi_name' %}
           <div
             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
             hx-post="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}"
@@ -41,12 +41,12 @@
             hx-trigger="change, load"
             hx_indicator="#selected_trust_select_kpi"
           >
+
             <div id="selected_trust_select_kpi">
                 <div class="ui active centered inline loader"></div>
             </div>
             
           </div>
-          
 
       </div>
 
