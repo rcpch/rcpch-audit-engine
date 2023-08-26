@@ -27,7 +27,7 @@ def score_kpi_6(registration_instance, age_at_first_paediatric_assessment) -> in
         return KPI_SCORE["NOT_SCORED"]
 
     # score kpi
-    if multiaxial_diagnosis.mental_health_screen:
+    if multiaxial_diagnosis.mental_health_screen is True:
         return KPI_SCORE["PASS"]
     else:
         return KPI_SCORE["FAIL"]

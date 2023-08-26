@@ -14,6 +14,16 @@ from .aggregate_by import (
     cases_aggregated_by_sex,
     aggregate_all_eligible_kpi_fields,
     return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
+    get_kpi_value_counts,
+    get_filtered_cases_by_abstraction,
+    calculate_kpi_value_counts_queryset,
+    update_kpi_aggregation_model,
+    get_filtered_cases_queryset_for,
+    calculate_kpi_value_counts_queryset,
+    get_abstraction_model_from_level,
+    get_abstraction_value_from,
+    get_all_kpi_aggregation_data_for_view,
+    aggregate_kpis_update_models_for_all_abstractions,
 )
 from .report_queries import (
     all_registered_cases_for_cohort_and_abstraction_level,

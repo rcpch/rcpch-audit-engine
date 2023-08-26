@@ -362,3 +362,123 @@ def icon_for_score(score):
                 ></i>
                 """
         )
+
+
+@register.simple_tag
+def get_region_name(region_data: tuple[str, dict]):
+    return region_data[0]
+
+
+@register.simple_tag
+def get_kpi_pct_passed(region_data: tuple[str, dict]):
+    data = region_data[1]
+
+    # Find the KPI_NAME_passed key
+    passed_key = [name for name in data.keys() if name.endswith("_passed")][0]
+    total_eligible_key = [
+        name for name in data.keys() if name.endswith("_total_eligible")
+    ][0]
+
+    return f"{100 * data[passed_key] / data[total_eligible_key]:.2f}"
+
+
+@register.simple_tag
+def get_pct_passed_and_total_eligible(aggregation_model, kpi: str):
+    if not aggregation_model or (not aggregation_model.aggregation_performed()):
+        return -1
+
+    total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
+
+    if total_eligible_count == 0:
+        return 0
+
+    passed_count = getattr(aggregation_model, f"{kpi}_passed")
+
+    pct_passed = round(100 * passed_count / total_eligible_count)
+
+    return f"{pct_passed}% ({total_eligible_count})"
+
+
+@register.simple_tag
+def get_total_counts_passed(aggregation_model, kpi: str):
+    if not aggregation_model.aggregation_performed():
+        return mark_safe(
+            "Aggregation not yet performed. This is most likely because there are no eligible data upon which to aggregate."
+        )
+
+    passed_count = getattr(aggregation_model, f"{kpi}_passed")
+
+    total_eligible_count = getattr(aggregation_model, f"{kpi}_total_eligible")
+
+    ineligible_count = getattr(aggregation_model, f"{kpi}_ineligible")
+    incomplete_count = getattr(aggregation_model, f"{kpi}_incomplete")
+
+    return mark_safe(
+        f"""{passed_count} passed out of {total_eligible_count} total eligible children.
+        
+        Ineligible: {ineligible_count} children.
+        Incomplete: {incomplete_count} children
+        """
+    )
+
+
+@register.simple_tag
+def get_help_label_text_for_kpi(kpi_name: str, kpi_instance):
+    help_label_attribute_name = f"get_{kpi_name}_help_label_text"
+    help_label_text_method = getattr(kpi_instance, help_label_attribute_name)
+    return help_label_text_method()
+
+
+@register.simple_tag
+def get_help_reference_text_for_kpi(kpi_name: str, kpi_instance):
+    help_reference_attribute_name = f"get_{kpi_name}_help_reference_text"
+    help_reference_text_method = getattr(kpi_instance, help_reference_attribute_name)
+    return help_reference_text_method()
+
+
+@register.simple_tag
+def render_title_kpi_name(kpi_name: str):
+    return kpi_name.replace("_", " ")
+
+
+@register.simple_tag
+def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name: str):
+    if (aggregation_model is None) or (not aggregation_model.aggregation_performed()):
+        return None
+
+    pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name)
+    
+    if pct_passed is None:
+        return None
+
+    return int(round(pct_passed * 100, 0))
+
+
+@register.simple_tag
+def get_n_passed_and_total(aggregation_model, kpi_name: str):
+    if (aggregation_model is None) or (not aggregation_model.aggregation_performed()):
+        return None
+
+    passed = getattr(aggregation_model, f"{kpi_name}_passed")
+    total = getattr(aggregation_model, f"{kpi_name}_total_eligible")
+
+    return f"{passed} / {total}"
+
+
+def _plural(num):
+    if num == 1:
+        return ""
+    else:
+        return "s"
+
+
+@register.simple_tag
+def no_eligible_cases(aggregation_model, kpi_name: str):
+    n_ineligible = getattr(aggregation_model, f"{kpi_name}_ineligible")
+    n_incomplete = getattr(aggregation_model, f"{kpi_name}_incomplete")
+
+    return mark_safe(
+        f"""No eligible Cases to score.<br>
+        <b>{n_ineligible}</b> case{_plural(n_ineligible)} ineligible.<br>
+        <b>{n_incomplete}</b> case{_plural(n_incomplete)} incomplete."""
+    )

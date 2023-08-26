@@ -1059,3 +1059,4 @@ urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 
 urlpatterns += drf_routes
+

@@ -167,7 +167,7 @@
             
             <div class="ui three stackable cards">
                                
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_individual_kpi card">
                     <div class="content">
                         
                         <h3 >Distribution by Ethnicity</h3>
@@ -186,7 +186,7 @@
                     </div>
                 </div>
                 
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         
                             <h3>Distribution by Sex</h3>
@@ -205,7 +205,7 @@
                     </div>
                 </div>
 
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         
                             <h3>
@@ -244,7 +244,7 @@
         <div class="sixteen wide right fluid column">
             <div class="ui three stackable cards">
                                
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
                         <h3 >Local Health Board</h3>
@@ -261,7 +261,7 @@
                     </div>
                 </div>
 
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         <h3 >NHS Region</h3>
                     </div>
@@ -282,31 +282,26 @@
             </div>
         </div>
 
-        <div class='sixteen wide right fluid column'>
-
-            <div class="ui top attached tabular rcpch menu" _="init js $('.menu .item').tab();">
-                <a class="active item" data-tab="first">Overview</a>
-                <a class="item" data-tab="second">Individual Measures</a>
-            </div>
-
-            <div class="ui bottom attached active tab segment" data-tab="first">
-                <div 
-                    class="sixteen wide stackable column" 
-                    hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}" 
-                    hx-trigger="load" hx-swap='innerHTML'
-                    hx_indicator='#kpis'
-                    hx-target="#kpis">
-                    <div id='kpis'>
-                        <div class="ui active centered inline loader"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ui bottom attached tab segment" data-tab="second">
-                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
-            </div>
         
+            
+        <div 
+            class="sixteen wide rcpch segment" 
+            hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}" 
+            hx-trigger="load" hx-swap='innerHTML'
+            hx-indicator='#kpis'
+            hx-target="#kpis">
+            <div id='kpis'>
+                <div class="ui active centered inline loader"></div>
+            </div>
+            
         </div>
+        
+        {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk %}
+            
+        </div>
+                
+            
+            
 
     
 </div>

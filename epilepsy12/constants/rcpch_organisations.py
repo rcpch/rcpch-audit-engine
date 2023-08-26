@@ -1001,7 +1001,7 @@ RCPCH_ORGANISATIONS = [
         "Address3": "",
         "City": "BIRMINGHAM",
         "County": "WEST MIDLANDS",
-        "Postcode": "B9 5ST",
+        "Postcode": "SW10 9NH",
         "Latitude": "52.47799116365538",
         "Longitude": "-1.8275362317445312",
         "ParentODSCode": "RYW",

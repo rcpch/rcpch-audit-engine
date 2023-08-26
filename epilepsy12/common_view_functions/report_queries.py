@@ -142,13 +142,13 @@ def get_all_countries():
 
 def get_all_nhs_regions():
     """
-    Returns a list of all NHS Regions
-    [('Y56', 'London'), ('Y58', 'South West'), ('Y59', 'South East'), ('Y60', 'Midlands (Y60)'), ('Y61', 'East of England'), ('Y62', 'North West'), ('Y63', 'North East and Yorkshire'), (None, None)]
+    Returns a list of all NHS Regions.
+
+    <QuerySet [<NHSRegionEntity: Aneurin Bevan University Health Board>, <NHSRegionEntity: Betsi Cadwaladr University Health Board>, <NHSRegionEntity: Cardiff and Vale University Health Board>, <NHSRegionEntity: Cwm Taf Morgannwg University Health Board>, <NHSRegionEntity: East of England>, <NHSRegionEntity: Hywel Dda University Health Board>, <NHSRegionEntity: London>, <NHSRegionEntity: Midlands (Y60)>, <NHSRegionEntity: North East and Yorkshire>, <NHSRegionEntity: North West>, <NHSRegionEntity: Powys Teaching Health Board>, <NHSRegionEntity: South East>, <NHSRegionEntity: South West>, <NHSRegionEntity: Swansea Bay University Health Board>]>
     """
     NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
-    return NHSRegionEntity.objects.filter(year=2019).order_by(
-        "NHS_Region", "NHS_Region_Code"
-    )
+
+    return NHSRegionEntity.objects.order_by("NHS_Region", "NHS_Region_Code")
 
 
 def get_all_open_uk_regions():
@@ -193,6 +193,6 @@ def get_all_organisations():
     Organisation = apps.get_model("epilepsy12", "Organisation")
     return (
         Organisation.objects.order_by("OrganisationName", "ODSCode")
-        .values_list("OrganisationName", "ODSCode")
+        .values("OrganisationName", "ODSCode")
         .distinct()
     )

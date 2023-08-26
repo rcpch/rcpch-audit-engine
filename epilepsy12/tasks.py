@@ -1,6 +1,6 @@
 from typing import Literal
 
-from .models import Organisation, KPIAggregation
+from .models import Organisation, OrganisationKPIAggregation
 from .common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     aggregate_all_eligible_kpi_fields,
@@ -128,42 +128,31 @@ def aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously(
     country_kpis.update({"abstraction_level": "country", "open_access": open_access})
     national_kpis.update({"abstraction_level": "national", "open_access": open_access})
 
-    # store the results in KPIAggregation model
+    # store the results in OrganisationKPIAggregation model
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=organisation_kpis,
-        abstraction_level="organisation",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id, results=trust_kpis, abstraction_level="trust"
+        results=trust_kpis,
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id, results=icb_kpis, abstraction_level="icb"
+        results=icb_kpis,
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=nhs_kpis,
-        abstraction_level="nhs_region",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=open_uk_kpis,
-        abstraction_level="open_uk",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=country_kpis,
-        abstraction_level="country",
     )
     persist_aggregation_results_for_abstraction_level(
-        organisation_id=organisation_id,
         results=national_kpis,
-        abstraction_level="national",
     )
 
 
 def persist_aggregation_results_for_abstraction_level(
-    organisation_id: str,
     results: dict,
     abstraction_level: Literal[
         "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
@@ -172,13 +161,10 @@ def persist_aggregation_results_for_abstraction_level(
     """
     Private function to store the aggregation results in KPI_Aggregation results table
     """
-    organisation = Organisation.objects.get(pk=organisation_id)
-    if KPIAggregation.objects.filter(
-        organisation=organisation, abstraction_level=abstraction_level
-    ).exists():
-        KPIAggregation.objects.filter(
-            organisation=organisation, abstraction_level=abstraction_level
-        ).update(**results)
+
+    if OrganisationKPIAggregation.objects.filter(abstraction_level=abstraction_level).exists():
+        OrganisationKPIAggregation.objects.filter(abstraction_level=abstraction_level).update(
+            **results
+        )
     else:
-        results.update({"organisation": organisation})
-        KPIAggregation.objects.create(**results)
+        OrganisationKPIAggregation.objects.create(**results, abstraction_level=abstraction_level)

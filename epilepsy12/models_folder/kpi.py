@@ -329,8 +329,9 @@ class KPI(models.Model, HelpTextMixin):
     )
 
     parent_trust = models.CharField(max_length=250)
+    
 
-    def get_kpis(self):
+    def get_kpis(self)->dict:
         """
         Returns dictionary of KPI attributes with related scores.
         """
