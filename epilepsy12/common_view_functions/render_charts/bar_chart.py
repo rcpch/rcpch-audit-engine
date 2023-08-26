@@ -15,9 +15,9 @@ from .helpers import format_icb, format_pct_text, format_subunit_name_ticktext
 
 
 ABSTRACTION_GRAPH_COLOR_MAP = {
-    EnumAbstractionLevel.ICB: RCPCH_STRONG_BLUE,
+    EnumAbstractionLevel.ICB: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.OPEN_UK: RCPCH_AQUA_GREEN,
-    EnumAbstractionLevel.NHS_REGION: RCPCH_LIGHT_BLUE,
+    EnumAbstractionLevel.NHS_REGION: RCPCH_STRONG_BLUE,
     EnumAbstractionLevel.COUNTRY: RCPCH_DARK_BLUE,
 }
 ABSTRACTION_CHART_HEIGHT = {
@@ -94,7 +94,7 @@ def render_bar_pct_passed_for_kpi_agg(
 
         # Colors
         if pct_passed_item is None:
-            BG_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
+            BG_BAR_COLOR.append(RCPCH_WHITE)
             PCT_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
             PCT_TEXT_COLOR.append(RCPCH_CHARCOAL)
             NAMES_TEXT_COLOR.append(
@@ -117,7 +117,7 @@ def render_bar_pct_passed_for_kpi_agg(
         ),
         axis=-1,
     )
-    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata[0]}<br>incomplete: %{customdata[1]}<br>ineligible: %{customdata[2]}<extra></extra>"
+    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata.0}<br>incomplete: %{customdata.1}<br>ineligible: %{customdata.2}<extra></extra>"
 
     # Bg Bars
     fig = go.Figure(
@@ -132,7 +132,8 @@ def render_bar_pct_passed_for_kpi_agg(
             width=bar_widths,
             customdata=customdata_bg_bar,
             hovertemplate=hovertemplate_bg_bar,
-        )
+        ),
+        layout=go.Layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"),
     )
 
     # Fg Bars with pct passed

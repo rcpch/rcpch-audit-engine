@@ -282,40 +282,38 @@
             </div>
         </div>
 
-        <div class='sixteen wide right fluid column'>
-
-            <div class="ui top attached tabular rcpch menu" _="init js $('.menu .item').tab();">
-                <a class="active item" data-tab="first">Overview</a>
-                <a class="item" data-tab="second">Individual Measures</a>
-            </div>
-
-            <div class="ui bottom attached active tab segment" data-tab="first">
+        
+            
                 <div 
-                    class="sixteen wide stackable column" 
+                    class="sixteen wide rcpch segment" 
                     hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}" 
                     hx-trigger="load" hx-swap='innerHTML'
-                    hx_indicator='#kpis'
+                    hx-indicator='#kpis'
                     hx-target="#kpis">
                     <div id='kpis'>
                         <div class="ui active centered inline loader"></div>
                     </div>
                     
                 </div>
-
-                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
-
-                <div class="ui bottom attached rcpch_footer info icon message">
-                    <i class="info circle icon"></i>
-                    These are key indicators for your Health Board/Trust, compared to the percentages for your relevant ICB, NHS England Region, OPEN UK Region, Country and England and Wales combined.       
+                
+                <div 
+                    class="sixteen wide rcpch segment" 
+                    hx-get="{% url 'selected_trust_select_kpi' organisation_id=selected_organisation.pk %}" 
+                    hx-trigger="load, post" hx-swap='innerHTML'
+                    hx-indicator='#individual-kpis'
+                    hx-target="#individual-kpis">
+                    <div id='individual-kpis'>
+                        <div class="ui active centered inline loader"></div>
+                    </div>
+                    
                 </div>
                 
-            </div>
-
-            <div class="ui bottom attached tab segment" data-tab="second">
-                <!-- {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %} -->
-            </div>
-        
-        </div>
+                
+                
+                
+                
+            
+            
 
     
 </div>

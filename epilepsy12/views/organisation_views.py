@@ -26,18 +26,11 @@ from epilepsy12.models import (
     NationalKPIAggregation,
 )
 from ..common_view_functions import (
-    sanction_user,
-    trigger_client_event,
     cases_aggregated_by_sex,
     cases_aggregated_by_ethnicity,
     cases_aggregated_by_deprivation_score,
     all_registered_cases_for_cohort_and_abstraction_level,
-    return_all_aggregated_kpis_for_cohort_and_abstraction_level_annotated_by_sublevel,
     return_tile_for_region,
-    get_filtered_cases_queryset_for,
-    calculate_kpi_value_counts_queryset,
-    update_kpi_aggregation_model,
-    get_abstraction_model_from_level,
     get_all_kpi_aggregation_data_for_view,
     aggregate_kpis_update_models_for_all_abstractions,
 )
@@ -49,12 +42,6 @@ from epilepsy12.common_view_functions.render_charts import (
 from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
-    calculate_kpi_average,
-)
-from ..constants import colors
-
-from ..tasks import (
-    aggregate_kpis_for_each_level_of_abstraction_by_organisation_asynchronously,
 )
 
 
@@ -229,13 +216,6 @@ def selected_trust_kpis(request, organisation_id):
         template_name="epilepsy12/partials/kpis/kpis.html",
         context=context,
     )
-    # TODO: 17/8/2023 -> check with @eatyourpeas re this trigger client code
-    # response = render(request=request, template_name=template_name, context=context)
-
-    # # trigger a GET request from the steps template
-    # trigger_client_event(
-    #     response=response, name="registration_active", params={}
-    # )  # reloads the form to show the active steps
 
 
 def selected_trust_kpis_open(request, organisation_id):
@@ -259,13 +239,6 @@ def selected_trust_kpis_open(request, organisation_id):
     template_name = "epilepsy12/partials/kpis/kpis.html"
     context = {
         "organisation": organisation,
-        # "organisation_kpis": organisation_kpis,
-        # "trust_kpis": trust_kpis,
-        # "icb_kpis": icb_kpis,
-        # "nhs_kpis": nhs_kpis,
-        # "open_uk_kpis": open_uk_kpis,
-        # "country_kpis": country_kpis,
-        # "national_kpis": national_kpis,
         "kpis": kpis,
         "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
         "open_access": True,
@@ -405,7 +378,7 @@ def selected_trust_select_kpi(request, organisation_id):
                 .annotate(
                     pct_passed=DjangoCase(
                         When(
-                            **{f'{kpi_name}_total_eligible':0},
+                            **{f"{kpi_name}_total_eligible": 0},
                             then=Value(0),
                         ),
                         default=(
@@ -433,8 +406,6 @@ def selected_trust_select_kpi(request, organisation_id):
                 chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
             )
             kpi_data["charts"]["passed_bar"] = bar_html
-
-    print(all_data)
 
     context = {
         "kpi_name": kpi_name,
