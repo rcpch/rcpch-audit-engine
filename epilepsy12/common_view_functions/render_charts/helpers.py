@@ -1,5 +1,6 @@
 import re
 
+
 def format_icb(label):
     if label is None:
         return "Unclassified"
@@ -19,4 +20,5 @@ def format_pct_text(label):
 
 
 def format_subunit_name_ticktext(color, text):
-    return f"<span style='color:{str(color)}'> {str(text)} </span>"
+    return f"<span style='color:{str(color)};'> {str(text)} </span>"
+    # return "$\color{" + str(color) + "}{" + str(text) + "}$"

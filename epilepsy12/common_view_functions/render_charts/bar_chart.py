@@ -98,7 +98,7 @@ def render_bar_pct_passed_for_kpi_agg(
             PCT_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
             PCT_TEXT_COLOR.append(RCPCH_CHARCOAL)
             NAMES_TEXT_COLOR.append(
-                format_subunit_name_ticktext(color=RCPCH_LIGHTEST_GREY, text=name)
+                format_subunit_name_ticktext(color=RCPCH_CHARCOAL_DARK, text=name)
             )
         else:
             BG_BAR_COLOR.append(RCPCH_LIGHT_GREY)
@@ -144,6 +144,16 @@ def render_bar_pct_passed_for_kpi_agg(
         )
     )
 
+    # Move name ticks inside bars
+    fig.update_yaxes(
+        tickmode="array",
+        # categoryorder="total ascending",
+        tickvals=names,
+        ticktext=NAMES_TEXT_COLOR,
+        ticklabelposition="inside",
+        automargin=True,
+    )
+
     # Overlay bars, add title, set minimal theme
     fig.update_layout(
         title=title,
@@ -163,16 +173,6 @@ def render_bar_pct_passed_for_kpi_agg(
             font={"color": "white"},
             align="left",
         ),
-    )
-
-    # Move name ticks inside bars
-    fig.update_yaxes(
-        tickmode="array",
-        # categoryorder="total ascending",
-        tickvals=names,
-        ticktext=NAMES_TEXT_COLOR,
-        ticklabelposition="inside",
-        automargin=True,
     )
 
     # Calculate average
