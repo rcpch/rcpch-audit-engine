@@ -3,7 +3,6 @@ from typing import Literal
 from .models import Organisation, OrganisationKPIAggregation
 from .common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
-    aggregate_all_eligible_kpi_fields,
 )
 from .general_functions import get_current_cohort_data
 
