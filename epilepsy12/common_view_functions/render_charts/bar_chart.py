@@ -40,6 +40,7 @@ def render_bar_pct_passed_for_kpi_agg(
     kpi_name: str,
     kpi_name_title: str,
 ) -> str:
+
     # Constants
     abstraction_level = aggregation_model.get_abstraction_level()
 
@@ -49,9 +50,7 @@ def render_bar_pct_passed_for_kpi_agg(
     names = []
     pct_passed = []
     pct_passed_text = []
-    n_passed = []
-    n_ineligible = []
-    n_incomplete = []
+
     # COLORS
     PCT_TEXT_COLOR = []
     BG_BAR_COLOR = []
@@ -85,12 +84,25 @@ def render_bar_pct_passed_for_kpi_agg(
         # hover template for absolute counts
         kpi_passed_count = item[f"{kpi_name}_passed"]
         kpi_total_eligible_count = item[f"{kpi_name}_total_eligible"]
-        if kpi_passed_count is None or kpi_total_eligible_count is None:
-            kpi_passed_text = "No passes"
-        else:
-            kpi_passed_text = f"({kpi_passed_count} / {kpi_total_eligible_count})"
         kpi_ineglible_count = item[f"{kpi_name}_ineligible"]
         kpi_incomplete_count = item[f"{kpi_name}_incomplete"]
+        
+        # Generate text from above
+        if kpi_passed_count is None: 
+            kpi_passed_text = "No passes"
+        else:
+            kpi_passed_text = f"{kpi_passed_count} out of {kpi_total_eligible_count}"
+
+        if kpi_ineglible_count is None:
+            kpi_ineligible_text = f"None ineligble"
+        else:
+            kpi_ineligible_text = kpi_ineglible_count
+        
+        if kpi_incomplete_count is None:
+            kpi_incomplete_text = f"None incomplete"
+        else:
+            kpi_incomplete_text = kpi_incomplete_count
+
 
         # Colors
         if pct_passed_item is None:
@@ -98,7 +110,7 @@ def render_bar_pct_passed_for_kpi_agg(
             PCT_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
             PCT_TEXT_COLOR.append(RCPCH_CHARCOAL)
             NAMES_TEXT_COLOR.append(
-                format_subunit_name_ticktext(color=RCPCH_CHARCOAL_DARK, text=name)
+                format_subunit_name_ticktext(color=RCPCH_LIGHT_GREY, text=name)
             )
         else:
             BG_BAR_COLOR.append(RCPCH_LIGHT_GREY)
@@ -109,11 +121,11 @@ def render_bar_pct_passed_for_kpi_agg(
             )
 
         customdata_bg_bar.append(
-            (kpi_passed_text, f"{kpi_ineglible_count}", f"{kpi_incomplete_count}")
+            (kpi_passed_text, kpi_ineligible_text, kpi_incomplete_text)
         )
 
     # Generate the hover bar for those passed / incomplete / inelgible. Access attributes via index order set in customdata_bg_bar
-    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata[0]}<br>incomplete: %{customdata[1]}<br>ineligible: %{customdata[2]}<extra></extra>"
+    hovertemplate_bg_bar = "<b>%{y}</b><br>For this measure:<br>Total passed: %{customdata[0]}<br>Total incomplete: %{customdata[1]}<br>Total ineligible: %{customdata[2]}<extra></extra>"
 
     # Bg Bars
     fig = go.Figure(
