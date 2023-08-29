@@ -1,10 +1,9 @@
-# Python/Django imports
+# Python imports
 
+# third party libraries
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-
-# third party libraries
 from django_htmx.http import HttpResponseClientRedirect
 from django.db.models import F, When, Case as DjangoCase, FloatField, Value
 
@@ -26,11 +25,7 @@ from ..common_view_functions import (
     get_all_kpi_aggregation_data_for_view,
     aggregate_kpis_update_models_for_all_abstractions,
 )
-from epilepsy12.common_view_functions.render_charts import (
-    render_bar_pct_passed_for_kpi_agg,
-    render_pie_pct_passed_for_kpi_agg,
-    ChartHTML,
-)
+from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
@@ -225,7 +220,7 @@ def selected_trust_select_kpi(request, organisation_id):
     {
     "ORGANISATION_KPIS":{
         'aggregation_model': <OrganisationKPIAggregation: OrganisationKPIAggregation (ODSCode=RGT01) KPIAggregations>,
-        'total_cases_registered': 10, 
+        'total_cases_registered': 10,
         'charts': {
             'passed_pie': <ORGANISATION_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>
             }
@@ -243,10 +238,10 @@ def selected_trust_select_kpi(request, organisation_id):
         ...
     },
     "COUNTRY_KPIS":{
-        'aggregation_model': <CountryKPIAggregation: CountryKPIAggregations (ONSCountryEntity=England)>, 
-        'total_cases_registered': 200, 
+        'aggregation_model': <CountryKPIAggregation: CountryKPIAggregations (ONSCountryEntity=England)>,
+        'total_cases_registered': 200,
         'charts': {
-            'passed_pie': <COUNTRY_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>, 
+            'passed_pie': <COUNTRY_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>,
             'passed_bar': <COUNTRY_KPIS_pct_pass_bar_paediatrician_with_expertise_in_epilepsies ChartHTML object>
             }
     },
@@ -261,7 +256,7 @@ def selected_trust_select_kpi(request, organisation_id):
     if kpi_name is None:
         # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
         kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
-    kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
+    kpi_name_title_case = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
     cohort = get_current_cohort_data()["cohort"]
 
     all_data = get_all_kpi_aggregation_data_for_view(
@@ -269,77 +264,16 @@ def selected_trust_select_kpi(request, organisation_id):
         cohort=cohort,
     )
 
-    # Add chart HTMLs to all_data
-    for abstraction, kpi_data in all_data.items():
-        # Skip loop if aggregation model None (when there are no data to aggregate on so no AggregationModel made)
-        if kpi_data["aggregation_model"] is None:
-            continue
-
-        # Initialise dict
-        kpi_data["charts"] = {}
-
-        # Add individual kpi passed pie chart
-        pie_html_raw = render_pie_pct_passed_for_kpi_agg(
-            kpi_data["aggregation_model"],
-            kpi_name,
-        )
-        pie_html = ChartHTML(
-            chart_html=pie_html_raw, name=f"{abstraction}_pct_pass_pie_{kpi_name}"
-        )
-        kpi_data["charts"]["passed_pie"] = pie_html
-
-        # Skip loop if Organisation / Trust / National level
-        if abstraction not in [
-            "ICB_KPIS",
-            "OPEN_UK_KPIS",
-            "NHS_REGION_KPIS",
-            "COUNTRY_KPIS",
-        ]:
-            continue
-        
-        # Gather data for selected abstraction's sub-unit barchart
-        bar_data = (
-            kpi_data["aggregation_model"]
-            ._meta.model.objects.filter(cohort=cohort)
-            .annotate(
-                pct_passed=DjangoCase(
-                    When(
-                        **{f"{kpi_name}_total_eligible": 0},
-                        then=Value(0), # Handles any division by zero errors by skipping
-                    ),
-                    default=(
-                        100
-                        * F(f"{kpi_name}_passed")
-                        / F(f"{kpi_name}_total_eligible")
-                    ),
-                    output_field=FloatField(),
-                ),
-            )
-            .values(
-                "abstraction_name",
-                "pct_passed",
-                f"{kpi_name}_total_eligible",
-                f"{kpi_name}_passed",
-                f"{kpi_name}_ineligible",
-                f"{kpi_name}_incomplete",
-            )
-        )
-
-        bar_html_raw = render_bar_pct_passed_for_kpi_agg(
-            aggregation_model=kpi_data["aggregation_model"],
-            data=bar_data,
-            kpi_name=kpi_name,
-            kpi_name_title=kpi_value,
-        )
-
-        bar_html = ChartHTML(
-            chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
-        )
-        kpi_data["charts"]["passed_bar"] = bar_html
+    all_data = update_all_data_with_charts(
+        all_data=all_data,
+        kpi_name=kpi_name,
+        kpi_name_title_case=kpi_name_title_case,
+        cohort=cohort,
+    )
 
     context = {
         "kpi_name": kpi_name,
-        "kpi_name_title_case": kpi_value,
+        "kpi_name_title_case": kpi_name_title_case,
         "selected_organisation": organisation,
         "all_data": all_data,
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
@@ -348,6 +282,7 @@ def selected_trust_select_kpi(request, organisation_id):
     template_name = "epilepsy12/partials/organisation/metric.html"
 
     return render(request=request, template_name=template_name, context=context)
+
 
 def selected_trust_kpis_open(request, organisation_id):
     """
