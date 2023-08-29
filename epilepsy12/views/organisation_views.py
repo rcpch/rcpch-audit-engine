@@ -6,24 +6,16 @@ from django.urls import reverse
 
 # third party libraries
 from django_htmx.http import HttpResponseClientRedirect
-from django.db.models import Sum, F, Avg, Q, When, Case as DjangoCase, FloatField, Value
+from django.db.models import F, When, Case as DjangoCase, FloatField, Value
 
 # E12 imports
-from django.apps import apps
 from ..decorator import user_may_view_this_organisation
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
-    EnumAbstractionLevel,
 )
 from epilepsy12.models import (
     Organisation,
-    Case,
     KPI,
-    OrganisationKPIAggregation,
-    TrustKPIAggregation,
-    NHSRegionKPIAggregation,
-    CountryKPIAggregation,
-    NationalKPIAggregation,
 )
 from ..common_view_functions import (
     cases_aggregated_by_sex,
@@ -218,81 +210,11 @@ def selected_trust_kpis(request, organisation_id):
     )
 
 
-def selected_trust_kpis_open(request, organisation_id):
-    """
-    Open access endpoint for KPIs table
-    """
-
-    organisation = Organisation.objects.get(pk=organisation_id)
-
-    # run the aggregations TODO This will need ultimately throttling to run only periodically
-
-    # get aggregated KPIs for level of abstraction from KPIAggregation
-
-    # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
-    # and has very little overhead
-    kpis = KPI.objects.create(
-        organisation=organisation,
-        parent_trust=organisation.ParentOrganisation_OrganisationName,
-    )
-
-    template_name = "epilepsy12/partials/kpis/kpis.html"
-    context = {
-        "organisation": organisation,
-        "kpis": kpis,
-        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
-        "open_access": True,
-    }
-
-    # remove the temporary instance as otherwise would contribute to totals
-    kpis.delete()
-
-    response = render(request=request, template_name=template_name, context=context)
-
-    return response
-
-
-@login_required
-@user_may_view_this_organisation()
-def child_organisation_select(request, organisation_id, template_name):
-    """
-    POST call back from organisation_select to allow user to toggle between organisations in selected trust
-    """
-
-    selected_organisation_id = request.POST.get("child_organisation_select")
-
-    # get currently selected organisation
-    organisation = Organisation.objects.get(pk=selected_organisation_id)
-
-    # trigger page reload with new organisation
-    return HttpResponseClientRedirect(
-        reverse(template_name, kwargs={"organisation_id": organisation.pk})
-    )
-
-
-@login_required
-@user_may_view_this_organisation()
-def view_preference(request, organisation_id, template_name):
-    """
-    POST request from Toggle in has rcpch_view_preference.html template
-    Users can toggle between national, trust and organisation views.
-    Only RCPCH staff can request a National level.
-    """
-    organisation = Organisation.objects.get(pk=organisation_id)
-
-    request.user.view_preference = request.htmx.trigger_name
-    request.user.save()
-
-    return HttpResponseClientRedirect(
-        reverse(template_name, kwargs={"organisation_id": organisation.pk})
-    )
-
-
 @login_required
 @user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
-    POST request from dropdown in selected_organisation_summary.html
+    POST request from dropdown in selected_organisation_summary.html returning the individual kpis data and visualisations.
 
     It takes the kpi_name parameter in the HTMX request which contains the value of the selected KPI measure from
     the select field. This is then aggregated across the levels of abstraction.
@@ -366,51 +288,54 @@ def selected_trust_select_kpi(request, organisation_id):
         )
         kpi_data["charts"]["passed_pie"] = pie_html
 
-        # Gather data for selected abstraction's sub-unit barchart
-        if abstraction in [
+        # Skip loop if Organisation / Trust / National level
+        if abstraction not in [
             "ICB_KPIS",
             "OPEN_UK_KPIS",
             "NHS_REGION_KPIS",
             "COUNTRY_KPIS",
         ]:
-            bar_data = (
-                kpi_data["aggregation_model"]
-                ._meta.model.objects.filter(cohort=cohort)
-                .annotate(
-                    pct_passed=DjangoCase(
-                        When(
-                            **{f"{kpi_name}_total_eligible": 0},
-                            then=Value(0), # Handles any division by zero errors by skipping
-                        ),
-                        default=(
-                            100
-                            * F(f"{kpi_name}_passed")
-                            / F(f"{kpi_name}_total_eligible")
-                        ),
-                        output_field=FloatField(),
+            continue
+        
+        # Gather data for selected abstraction's sub-unit barchart
+        bar_data = (
+            kpi_data["aggregation_model"]
+            ._meta.model.objects.filter(cohort=cohort)
+            .annotate(
+                pct_passed=DjangoCase(
+                    When(
+                        **{f"{kpi_name}_total_eligible": 0},
+                        then=Value(0), # Handles any division by zero errors by skipping
                     ),
-                )
-                .values(
-                    "abstraction_name",
-                    "pct_passed",
-                    f"{kpi_name}_total_eligible",
-                    f"{kpi_name}_passed",
-                    f"{kpi_name}_ineligible",
-                    f"{kpi_name}_incomplete",
-                )
+                    default=(
+                        100
+                        * F(f"{kpi_name}_passed")
+                        / F(f"{kpi_name}_total_eligible")
+                    ),
+                    output_field=FloatField(),
+                ),
             )
+            .values(
+                "abstraction_name",
+                "pct_passed",
+                f"{kpi_name}_total_eligible",
+                f"{kpi_name}_passed",
+                f"{kpi_name}_ineligible",
+                f"{kpi_name}_incomplete",
+            )
+        )
 
-            bar_html_raw = render_bar_pct_passed_for_kpi_agg(
-                aggregation_model=kpi_data["aggregation_model"],
-                data=bar_data,
-                kpi_name=kpi_name,
-                kpi_name_title=kpi_value,
-            )
+        bar_html_raw = render_bar_pct_passed_for_kpi_agg(
+            aggregation_model=kpi_data["aggregation_model"],
+            data=bar_data,
+            kpi_name=kpi_name,
+            kpi_name_title=kpi_value,
+        )
 
-            bar_html = ChartHTML(
-                chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
-            )
-            kpi_data["charts"]["passed_bar"] = bar_html
+        bar_html = ChartHTML(
+            chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
+        )
+        kpi_data["charts"]["passed_bar"] = bar_html
 
     context = {
         "kpi_name": kpi_name,
@@ -423,3 +348,72 @@ def selected_trust_select_kpi(request, organisation_id):
     template_name = "epilepsy12/partials/organisation/metric.html"
 
     return render(request=request, template_name=template_name, context=context)
+
+def selected_trust_kpis_open(request, organisation_id):
+    """
+    Open access endpoint for KPIs table
+    """
+
+    organisation = Organisation.objects.get(pk=organisation_id)
+
+    # run the aggregations TODO This will need ultimately throttling to run only periodically
+
+    # get aggregated KPIs for level of abstraction from KPIAggregation
+
+    # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
+    # and has very little overhead
+    kpis = KPI.objects.create(
+        organisation=organisation,
+        parent_trust=organisation.ParentOrganisation_OrganisationName,
+    )
+
+    template_name = "epilepsy12/partials/kpis/kpis.html"
+    context = {
+        "organisation": organisation,
+        "kpis": kpis,
+        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "open_access": True,
+    }
+
+    # remove the temporary instance as otherwise would contribute to totals
+    kpis.delete()
+
+    response = render(request=request, template_name=template_name, context=context)
+
+    return response
+
+
+@login_required
+@user_may_view_this_organisation()
+def child_organisation_select(request, organisation_id, template_name):
+    """
+    POST call back from organisation_select to allow user to toggle between organisations in selected trust
+    """
+
+    selected_organisation_id = request.POST.get("child_organisation_select")
+
+    # get currently selected organisation
+    organisation = Organisation.objects.get(pk=selected_organisation_id)
+
+    # trigger page reload with new organisation
+    return HttpResponseClientRedirect(
+        reverse(template_name, kwargs={"organisation_id": organisation.pk})
+    )
+
+
+@login_required
+@user_may_view_this_organisation()
+def view_preference(request, organisation_id, template_name):
+    """
+    POST request from Toggle in has rcpch_view_preference.html template
+    Users can toggle between national, trust and organisation views.
+    Only RCPCH staff can request a National level.
+    """
+    organisation = Organisation.objects.get(pk=organisation_id)
+
+    request.user.view_preference = request.htmx.trigger_name
+    request.user.save()
+
+    return HttpResponseClientRedirect(
+        reverse(template_name, kwargs={"organisation_id": organisation.pk})
+    )
