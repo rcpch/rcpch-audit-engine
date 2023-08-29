@@ -81,3 +81,5 @@ def update_all_data_with_charts(all_data:dict, kpi_name:str, kpi_name_title_case
             chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
         )
         kpi_data["charts"]["passed_bar"] = bar_html
+    
+    return all_data
