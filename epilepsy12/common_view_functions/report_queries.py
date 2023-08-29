@@ -5,16 +5,6 @@ from typing import Literal
 from django.contrib.gis.db.models import Q
 from django.apps import apps
 
-# E12 imports
-# from ..models import (
-#     Case,
-#     Organisation,
-#     NHSRegionEntity,
-#     OPENUKNetworkEntity,
-#     IntegratedCareBoardEntity,
-#     ONSCountryEntity,
-# )
-
 
 def all_registered_cases_for_cohort_and_abstraction_level(
     organisation_instance,
