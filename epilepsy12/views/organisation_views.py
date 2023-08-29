@@ -302,36 +302,38 @@ def selected_trust_select_kpi(request, organisation_id):
     all_data is of the format:
     {
     "ORGANISATION_KPIS":{
-        "aggregation_model":"<OrganisationKPIAggregation":OrganisationKPIAggregation (ODSCode=RGT01) KPIAggregations>,
-        "total_cases_registered":10
+        'aggregation_model': <OrganisationKPIAggregation: OrganisationKPIAggregation (ODSCode=RGT01) KPIAggregations>,
+        'total_cases_registered': 10, 
+        'charts': {
+            'passed_pie': <ORGANISATION_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>
+            }
     },
     "TRUST_KPIS":{
-        "aggregation_model":"<TrustKPIAggregation":"TrustKPIAggregation (parent_organisation_ods_code=RGT)>",
-        "total_cases_registered":10
+        ...
     },
     "ICB_KPIS":{
-        "aggregation_model":"<ICBKPIAggregation":"ICBKPIAggregation (IntegratedCareBoardEntity=NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD)>",
-        "total_cases_registered":10
+        ...
     },
     "NHS_REGION_KPIS":{
-        "aggregation_model":"<NHSRegionKPIAggregation":"KPIAggregations (NHSRegionEntity=East of England)>",
-        "total_cases_registered":20
+        ...
     },
     "OPEN_UK_KPIS":{
-        "aggregation_model":"<OpenUKKPIAggregation":"OPENUKKPIAggregations (OPENUKNetworkEntity=Eastern Paediatric Epilepsy Network)>",
-        "total_cases_registered":10
+        ...
     },
     "COUNTRY_KPIS":{
-        "aggregation_model":"<CountryKPIAggregation":"CountryKPIAggregations (ONSCountryEntity=England)>",
-        "total_cases_registered":170
+        'aggregation_model': <CountryKPIAggregation: CountryKPIAggregations (ONSCountryEntity=England)>, 
+        'total_cases_registered': 200, 
+        'charts': {
+            'passed_pie': <COUNTRY_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>, 
+            'passed_bar': <COUNTRY_KPIS_pct_pass_bar_paediatrician_with_expertise_in_epilepsies ChartHTML object>
+            }
     },
     "NATIONAL_KPIS":{
-        "aggregation_model":"<NationalKPIAggregation":National KPIAggregations for England and Wales (Cohort 6)>,
-        "total_cases_registered":200
+        ...
     },
     }
     """
-
+    # Gather data for use later
     organisation = Organisation.objects.get(pk=organisation_id)
     kpi_name = request.POST.get("kpi_name")
     if kpi_name is None:
@@ -364,8 +366,7 @@ def selected_trust_select_kpi(request, organisation_id):
         )
         kpi_data["charts"]["passed_pie"] = pie_html
 
-        # Gather data for abstraction's sub-unit barchart
-        # ORGANISATION_KPIS do not have sublevels
+        # Gather data for selected abstraction's sub-unit barchart
         if abstraction in [
             "ICB_KPIS",
             "OPEN_UK_KPIS",
@@ -379,7 +380,7 @@ def selected_trust_select_kpi(request, organisation_id):
                     pct_passed=DjangoCase(
                         When(
                             **{f"{kpi_name}_total_eligible": 0},
-                            then=Value(0),
+                            then=Value(0), # Handles any division by zero errors by skipping
                         ),
                         default=(
                             100
