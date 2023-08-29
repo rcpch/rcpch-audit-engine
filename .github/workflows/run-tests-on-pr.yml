@@ -65,10 +65,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # run migrations
-      - name: Run migrations
-        run: python manage.py migrate
       
       # Runs tests
       - name: Pytest Suite
