@@ -16,6 +16,8 @@ def get_active_branch_and_commit(request):
         for line in head_branch:
             if line[0:4] == "ref:":
                 active_git_branch = line.partition("refs/heads/")[2]
+            else:
+                raise Exception
     except Exception as e:
         print(f"Failed to get GitBranch. Error: {e}")
         active_git_branch = "[branch name not found]"
