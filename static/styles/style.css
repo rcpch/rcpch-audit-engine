@@ -1769,6 +1769,7 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   justify-content: space-evenly;
   align-items: center;
   margin: 1em 0em;
+  text-align: center;
 }
 
 .rcpch_summary_stats > .rcpch_summary_stats_row > * {
