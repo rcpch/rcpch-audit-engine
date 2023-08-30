@@ -187,20 +187,21 @@ def render_bar_pct_passed_for_kpi_agg(
         ),
     )
 
-    # Calculate average
+    # Calculate average, add line IF len not 0
     pct_pass_exc_none = [num for num in pct_passed if num is not None]
-    average_for_eligible = int(
-        round(sum(pct_pass_exc_none) / len(pct_pass_exc_none), 0)
-    )
+    if len(pct_pass_exc_none):
+        average_for_eligible = int(
+            round(sum(pct_pass_exc_none) / len(pct_pass_exc_none), 0)
+        )
 
-    # Add avg line
-    fig.add_vline(
-        x=average_for_eligible,
-        annotation_text=f"Average for those eligible: {average_for_eligible}%",
-        annotation_position="top",
-        line_color=RCPCH_PINK,
-        opacity=0.69,
-    )
+        # Add avg line
+        fig.add_vline(
+            x=average_for_eligible,
+            annotation_text=f"Average for those eligible: {average_for_eligible}%",
+            annotation_position="top",
+            line_color=RCPCH_PINK,
+            opacity=0.69,
+        )
 
     fig.update_xaxes(
         range=[0, 104.5],  # the "No data" labels require space past the end of the axes
