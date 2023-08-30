@@ -1494,6 +1494,29 @@ a.ui.button {
   background-color: var(--rcpch_dark_blue);
 }
 
+.e12_users_footer_wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.e12_users_footer_wrapper > .e12_users_footer_text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ui.message .e12_users_footer_text > p {
+  margin-top: 0.4em;
+  color: var(--rcpch_white);
+}
+
+.ui.rcpch_positive.download.button a {
+  color: white;
+}
+
+.ui.rcpch_positive.download.button:hover {
+  background-color: var(--rcpch_pink);
+}
+
 .ui.rcpch_purple_footer.message {
   color: var(--rcpch_white);
   background-color: var(--rcpch_purple);
@@ -1850,7 +1873,6 @@ div.ui.three.stackable.cards.individual_measures {
   border-top: none !important;
 }
 
-
 .individual_measures_pies_wrapper .ui.rcpch_chart_container.segment {
   padding: 0em;
   display: flex;
@@ -1876,7 +1898,6 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
 .bar_charts_wrapper {
   margin: 1em 0em;
 }
-
 
 .org_view_all_buttons_wrapper a.ui.button {
   display: flex;
@@ -2018,38 +2039,38 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   align-content: center;
 }
 
-.ui.rcpch_individual_kpi_fixed.card .content{
+.ui.rcpch_individual_kpi_fixed.card .content {
   background-color: var(--rcpch_mid_grey);
   width: 100%;
   border-radius: 0% !important;
 }
 
-.ui.rcpch_individual_kpi.card .content{
+.ui.rcpch_individual_kpi.card .content {
   background-color: var(--rcpch_strong_blue);
   width: 100%;
   border-radius: 0% !important;
 }
 
-.ui.rcpch_individual_kpi.card:hover .content{
+.ui.rcpch_individual_kpi.card:hover .content {
   background-color: var(--rcpch_light_blue);
 }
 
-.ui.rcpch_individual_kpi.card .content.summary_kpi_pie_title h3{
+.ui.rcpch_individual_kpi.card .content.summary_kpi_pie_title h3 {
   color: white;
 }
 
-.ui.rcpch_individual_kpi_fixed.card .content.summary_kpi_pie_title h3{
+.ui.rcpch_individual_kpi_fixed.card .content.summary_kpi_pie_title h3 {
   color: white;
 }
 
-.ui.rcpch_individual_kpi.card .description{
+.ui.rcpch_individual_kpi.card .description {
   padding-top: 10px;
   color: var(--rcpch_charcoal);
   text-align: left;
   margin: 10px;
 }
 
-.ui.rcpch_individual_kpi_fixed.card .description{
+.ui.rcpch_individual_kpi_fixed.card .description {
   padding-top: 10px;
   color: var(--rcpch_charcoal);
   text-align: left;

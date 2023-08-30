@@ -17,6 +17,7 @@ from django.utils.html import strip_tags
 
 # 3rd party
 from django_htmx.http import HttpResponseClientRedirect
+import pandas as pd
 
 # epilepsy12
 from ..models import Epilepsy12User, Organisation, VisitActivity
@@ -671,3 +672,43 @@ def log_list(request, organisation_id, epilepsy12_user_id):
     }
 
     return render(request=request, template_name=template_name, context=context)
+
+
+@login_required
+@user_may_view_this_organisation()
+def all_epilepsy12_users_list(request, organisation_id):
+    
+    user_has_correct_group_perm = request.user.groups.filter(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS).exists()
+
+    if not user_has_correct_group_perm:
+        return HttpResponseForbidden()
+        
+    all_users = Epilepsy12User.objects.all().values(
+        "id",
+        "last_login",
+        "first_name",
+        "last_name",
+        "email",
+        "organisation_employer",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "is_rcpch_audit_team_member",
+        "is_rcpch_staff",
+        "is_patient_or_carer",
+        "date_joined",
+        "role",
+        "email_confirmed",
+    )
+    
+    df = pd.DataFrame(all_users)
+    
+    # Convert DataFrame to CSV format
+    csv_data = df.to_csv(index=False)
+    
+    # Create an HTTP response with the CSV data
+    response = HttpResponse(csv_data, content_type='text/csv')
+    
+    response['Content-Disposition'] = 'attachment; filename="epilepsy12users.csv"'
+
+    return response

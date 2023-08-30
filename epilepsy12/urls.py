@@ -82,6 +82,11 @@ user_patterns = [
         name="epilepsy12_user_list",
     ),
     path(
+        "organisation/<int:organisation_id>/full_e12user_list",
+        view=all_epilepsy12_users_list,
+        name='download_e12_users',
+        ),
+    path(
         "organisation/<int:organisation_id>/epilepsy12_users/<str:user_type>/create",
         # accepts params organisation-staff or rcpch-staff
         view=create_epilepsy12_user,
