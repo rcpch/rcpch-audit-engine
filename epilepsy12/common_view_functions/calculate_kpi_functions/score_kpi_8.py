@@ -58,9 +58,6 @@ def score_kpi_8(registration_instance, age_at_first_paediatric_assessment) -> in
         valproate.is_a_pregnancy_prevention_programme_in_place
         or valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed
     ):
-        print('this child passes valrpotate because')
-        print(f"{valproate.is_a_pregnancy_prevention_programme_in_place=} \n\n {valproate.has_a_valproate_annual_risk_acknowledgement_form_been_completed=}")
         return KPI_SCORE["PASS"]
     else:
-        print('failing as both false')
         return KPI_SCORE["FAIL"]
