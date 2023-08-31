@@ -81,10 +81,11 @@ def run_dummy_cases_seed(verbose=True, cases=50):
     if cases is None or cases == 0:
         cases = 50
 
-    different_organisations = ["RGT01", "RCF22", "7A2AJ", "7A6BJ"]
+    different_organisations = ["RGT01", "RBS25", "RQM01", "RCF22", "7A2AJ", "7A6BJ", "7A6AV"]
     organisations_list = Organisation.objects.filter(ODSCode__in=different_organisations).order_by('OrganisationName')
     for org in organisations_list:
-        print(f"Creating 50 Cases in {org}")
+        num_cases_to_seed_in_org = int(cases / len(different_organisations))
+        print(f"Creating {num_cases_to_seed_in_org} Cases in {org}")
         
         # Create random attributes
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
@@ -97,7 +98,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         postcode = return_random_postcode()
 
         E12CaseFactory.create_batch(
-            50,
+            num_cases_to_seed_in_org,
             locked=False,
             sex=sex,
             date_of_birth=date_of_birth,
