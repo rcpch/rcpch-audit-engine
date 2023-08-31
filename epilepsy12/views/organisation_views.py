@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 from django.db.models import F, When, Case as DjangoCase, FloatField, Value
+from django.http import HttpResponseForbidden, HttpResponse
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation
@@ -23,7 +24,8 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
-    aggregate_kpis_update_models_for_all_abstractions,
+    aggregate_kpis_update_models_all_abstractions_for_organisation,
+    update_all_kpi_agg_models,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -177,7 +179,7 @@ def selected_trust_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # perform aggregations and update all the KPIAggregation models
-    aggregate_kpis_update_models_for_all_abstractions(
+    aggregate_kpis_update_models_all_abstractions_for_organisation(
         organisation=organisation, cohort=cohort
     )
 
@@ -283,6 +285,23 @@ def selected_trust_select_kpi(request, organisation_id):
 
     return render(request=request, template_name=template_name, context=context)
 
+@login_required
+def aggregate_and_update_all_kpi_agg_models(request):
+    """HTMX GET request to aggregate and update all kpi aggregation models.
+    """
+    
+    # Only superusers allowed
+    if not request.user.is_superuser:
+        return HttpResponseForbidden
+    
+    # Gather constants
+    cohort = get_current_cohort_data()["cohort"]
+    
+    # Run agg fun
+    update_all_kpi_agg_models(cohort=cohort)
+    
+    return HttpResponse(status=200, content='Sucessfully aggregated and updated all KPIAggregation models, for all levels of abstraction.')
+    
 
 def selected_trust_kpis_open(request, organisation_id):
     """

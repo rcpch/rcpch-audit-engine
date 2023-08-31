@@ -376,14 +376,13 @@ def update_kpi_aggregation_model(
             print(f"updated {new_obj}")
 
 
-def aggregate_kpis_update_models_for_all_abstractions(
+def aggregate_kpis_update_models_all_abstractions_for_organisation(
     organisation,
     cohort: int,
 )->None:
     """
     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
     """
-
     for enum_abstraction_level in EnumAbstractionLevel:
         filtered_cases = get_filtered_cases_queryset_for(
             organisation=organisation,
@@ -405,6 +404,11 @@ def aggregate_kpis_update_models_for_all_abstractions(
             cohort=cohort,
         )
 
+def update_all_kpi_agg_models(
+    cohort:int,
+):
+    for enum_abstraction_level in EnumAbstractionLevel:
+        print(enum_abstraction_level)
 
 def get_all_kpi_aggregation_data_for_view(
     organisation,

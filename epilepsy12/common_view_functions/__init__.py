@@ -19,7 +19,8 @@ from .aggregate_by import (
     get_abstraction_model_from_level,
     get_abstraction_value_from,
     get_all_kpi_aggregation_data_for_view,
-    aggregate_kpis_update_models_for_all_abstractions,
+    aggregate_kpis_update_models_all_abstractions_for_organisation,
+    update_all_kpi_agg_models,
 )
 from .report_queries import (
     all_registered_cases_for_cohort_and_abstraction_level,
