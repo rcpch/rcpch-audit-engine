@@ -10,20 +10,10 @@ from epilepsy12.common_view_functions import (
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
     get_abstraction_model_from_level,
-    get_abstraction_value_from,
+
 )
 from epilepsy12.models import (
     Organisation,
-    OrganisationKPIAggregation,
-    CountryKPIAggregation,
-    ONSCountryEntity,
-    OPENUKNetworkEntity,
-    NHSRegionKPIAggregation,
-    OpenUKKPIAggregation,
-    ICBKPIAggregation,
-    TrustKPIAggregation,
-    NHSRegionEntity,
-    IntegratedCareBoardEntity,
     NationalKPIAggregation,
 )
 from epilepsy12.constants import (
