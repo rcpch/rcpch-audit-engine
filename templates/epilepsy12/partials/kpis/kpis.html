@@ -17,14 +17,16 @@ will be persisted and run as a cron job once a day.
                     <!-- </div>     -->
                 </div>
                 {% if not open_access %}
-                <button 
-                    class='ui right floated rcpch_primary button'
-                    hx-get="{% url 'aggregate_and_update_all_kpi_agg_models' %}" 
-                    hx-trigger="click"
-                    >
-                    Aggregate & Update
-                    <i class="htmx-indicator spinner loading icon"></i>
-                </button>
+                    {% if user.is_superuser %}
+                        <button 
+                            class='ui right floated rcpch_primary button'
+                            hx-get="{% url 'aggregate_and_update_all_kpi_agg_models' %}" 
+                            hx-trigger="click"
+                            >
+                            Aggregate & Update
+                            <i class="htmx-indicator spinner loading icon"></i>
+                        </button>
+                    {% endif %}
                 <button 
                     class='ui right floated rcpch_primary button'
                     hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 

@@ -300,7 +300,7 @@ def aggregate_and_update_all_kpi_agg_models(request):
     # Run agg fun
     update_all_kpi_agg_models(cohort=cohort)
     
-    return HttpResponse(status=200, content='Sucessfully aggregated and updated all KPIAggregation models, for all levels of abstraction.')
+    return HttpResponse(status=204) # 204 to signify to HTMX that nothing returned, just running server-side code
     
 
 def selected_trust_kpis_open(request, organisation_id):

@@ -407,8 +407,20 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
 def update_all_kpi_agg_models(
     cohort:int,
 ):
-    for enum_abstraction_level in EnumAbstractionLevel:
-        print(enum_abstraction_level)
+    
+    Case = apps.get_model("epilepsy12", "Case")
+    
+    all_cases = Case.objects.filter(
+        site__site_is_actively_involved_in_epilepsy_care=True,
+        site__site_is_primary_centre_of_epilepsy_care=True,
+        registration__cohort=cohort,
+    )
+    
+    ABSTRACTION_LEVEL = EnumAbstractionLevel.ORGANISATION
+    
+    all_abstraction_keys = all_cases.values(f'organisations__{ABSTRACTION_LEVEL.value}').distinct()
+    
+    print(all_abstraction_keys)
 
 def get_all_kpi_aggregation_data_for_view(
     organisation,
