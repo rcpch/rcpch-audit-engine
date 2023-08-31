@@ -26,8 +26,6 @@ from epilepsy12.common_view_functions import (
 )
 from epilepsy12.models import (
     Organisation,
-    Case,
-    Registration,
 )
 from epilepsy12.constants import (
     EnumAbstractionLevel,
