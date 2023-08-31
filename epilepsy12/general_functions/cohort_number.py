@@ -4,10 +4,9 @@ Cohort numbers functions
 
 # python imports
 from datetime import date
-from dateutil.relativedelta import relativedelta
 
 # e12 imports
-from .date_functions import first_tuesday_in_january, nth_tuesday_of_year
+from .date_functions import nth_tuesday_of_year
 
 
 def cohort_number_from_enrolment_date(enrolment_date: date) -> int:
@@ -84,7 +83,7 @@ def get_current_cohort_data(
     'submission_date'
     'days_remaining'
     """
-    current_cohort = cohort_number_from_enrolment_date(current_cohort_start_date())
+    current_cohort = cohort_number_from_enrolment_date(current_cohort_start_date(current_date))
 
     cohort_start_date = cohort_start_date_from_cohort_number(current_cohort)
     cohort_end_date = date(current_cohort_start_date().year + 1, 11, 30)
