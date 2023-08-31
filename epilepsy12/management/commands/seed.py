@@ -81,11 +81,11 @@ def run_dummy_cases_seed(verbose=True, cases=50):
     if cases is None or cases == 0:
         cases = 50
 
-    # In batches of batch_size
-    batch_size = 10
-    num_batches = (cases + batch_size-1) // batch_size
-    organisations_list = Organisation.objects.all().order_by('OrganisationName')
-    for batch in range(num_batches):
+    different_organisations = ["RGT01", "RCF22", "7A2AJ", "7A6BJ"]
+    organisations_list = Organisation.objects.filter(ODSCode__in=different_organisations).order_by('OrganisationName')
+    for org in organisations_list:
+        print(f"Creating 50 Cases in {org}")
+        
         # Create random attributes
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         date_of_birth = random_date
@@ -96,29 +96,20 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         ethnicity = ETHNICITIES[random_ethnicity][0]
         postcode = return_random_postcode()
 
-        # Assign first 50 cases to the first Organisation, then assign randomly
-        organisation = (
-            organisations_list[0]
-            if batch == 0
-            else organisations_list[randint(0, len(organisations_list))]
-        )
-
-        new_cases = E12CaseFactory.create_batch(
-            batch_size,
+        E12CaseFactory.create_batch(
+            50,
             locked=False,
             sex=sex,
             date_of_birth=date_of_birth,
             postcode=postcode,
             ethnicity=ethnicity,
-            organisations__organisation=organisation,
+            organisations__organisation=org,
             **{
                 "seed_male": seed_male,
                 "seed_female": seed_female,
             },
         )
-        for child in new_cases:
-            print(f"Saved {child} in {organisation.OrganisationName}")
-        print(f"(Created total {batch_size} Cases)")
+        
 
 
 def run_registrations(verbose=True):
