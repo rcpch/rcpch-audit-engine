@@ -70,6 +70,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+        
+      # Required for tests which read template content
+      - name: collect static files
+        run: python manage.py collectstatic --noinput
       
       # Runs tests
       - name: Pytest Suite
