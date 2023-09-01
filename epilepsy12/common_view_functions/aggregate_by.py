@@ -417,7 +417,7 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
 
 def update_all_kpi_agg_models(
     cohort: int,
-) -> int:
+) -> None:
     """
     Using all cases in a given cohort,
         for all abstraction levels,
