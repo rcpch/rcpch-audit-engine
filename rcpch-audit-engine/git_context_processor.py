@@ -4,6 +4,8 @@ from pathlib import Path
 def get_active_branch_and_commit(request):
     """
     Gets the `GIT_HASH` environment variable, created in GitHub Actions workflow, inserts into all templates.
+    
+    If there is no git_hash.txt, such as in local dev, looks directly in the .git folder.
     """
     # Load the txt file containing hash
     try:
