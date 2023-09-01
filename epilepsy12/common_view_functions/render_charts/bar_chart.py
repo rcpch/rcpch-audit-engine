@@ -3,15 +3,24 @@
 NOTE: "No data" for bars denotes that KPIAggregation model's field is None. This will be because aggregations have not yet been performed - because there are no eligibile kids to perform aggregations on.
 """
 # Python imports
+from typing import Union
 
 # 3rd Party imports
 import plotly.graph_objects as go
-import numpy as np
 
 # E12 Imports
 from epilepsy12.constants.colors import *
 from epilepsy12.constants import EnumAbstractionLevel
 from .helpers import format_icb, format_pct_text, format_subunit_name_ticktext
+from epilepsy12.models import (
+    OrganisationKPIAggregation,
+    TrustKPIAggregation,
+    ICBKPIAggregation,
+    NHSRegionKPIAggregation,
+    OpenUKKPIAggregation,
+    CountryKPIAggregation,
+    NationalKPIAggregation,
+)
 
 
 ABSTRACTION_GRAPH_COLOR_MAP = {
@@ -35,12 +44,19 @@ ABSTRACTION_GRAPH_TITLE_SUBUNIT = {
 
 
 def render_bar_pct_passed_for_kpi_agg(
-    aggregation_model,
+    aggregation_model: Union[
+        OrganisationKPIAggregation,
+        TrustKPIAggregation,
+        ICBKPIAggregation,
+        NHSRegionKPIAggregation,
+        OpenUKKPIAggregation,
+        CountryKPIAggregation,
+        NationalKPIAggregation,
+    ],
     data,
     kpi_name: str,
     kpi_name_title: str,
 ) -> str:
-
     # Constants
     abstraction_level = aggregation_model.get_abstraction_level()
 
@@ -68,6 +84,7 @@ def render_bar_pct_passed_for_kpi_agg(
 
     customdata_bg_bar = []
 
+    # NOTE: this could be refactored to using pandas df instead of python lists. `data` is a ValuesQuerySet, which can be directly read in using pd.from_records(data). Advantage of df is much faster.
     for item in data:
         name = item["abstraction_name"]
         if abstraction_level is EnumAbstractionLevel.ICB:
@@ -79,7 +96,6 @@ def render_bar_pct_passed_for_kpi_agg(
         pct_passed.append(pct_passed_item)
 
         # pct labels
-        print(item['pct_passed'])
         pct_passed_text.append(format_pct_text(pct_passed_item))
 
         # hover template for absolute counts
@@ -87,9 +103,9 @@ def render_bar_pct_passed_for_kpi_agg(
         kpi_total_eligible_count = item[f"{kpi_name}_total_eligible"]
         kpi_ineglible_count = item[f"{kpi_name}_ineligible"]
         kpi_incomplete_count = item[f"{kpi_name}_incomplete"]
-        
+
         # Generate text from above
-        if kpi_passed_count is None: 
+        if kpi_passed_count is None:
             kpi_passed_text = "No passes"
         else:
             kpi_passed_text = f"{kpi_passed_count} out of {kpi_total_eligible_count}"
@@ -98,12 +114,11 @@ def render_bar_pct_passed_for_kpi_agg(
             kpi_ineligible_text = f"None ineligble"
         else:
             kpi_ineligible_text = kpi_ineglible_count
-        
+
         if kpi_incomplete_count is None:
             kpi_incomplete_text = f"None incomplete"
         else:
             kpi_incomplete_text = kpi_incomplete_count
-
 
         # Colors
         if pct_passed_item is None:

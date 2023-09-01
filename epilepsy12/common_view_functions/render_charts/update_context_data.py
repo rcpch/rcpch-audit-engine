@@ -1,7 +1,7 @@
 # Python imports
 
 # third party libraries
-from django.db.models import F, When, Case as DjangoCase, IntegerField, Value
+from django.db.models import F, When, Case as DjangoCase, IntegerField, BooleanField, Value
 
 # E12 imports
 from epilepsy12.common_view_functions.render_charts import (
@@ -10,7 +10,10 @@ from epilepsy12.common_view_functions.render_charts import (
     ChartHTML,
 )
 
-def update_all_data_with_charts(all_data:dict, kpi_name:str, kpi_name_title_case:str, cohort:int)->dict:
+
+def update_all_data_with_charts(
+    all_data: dict, kpi_name: str, kpi_name_title_case: str, cohort: int
+) -> dict:
     """
     Takes in KPI aggregation `all_data` and for the appropriate abstraction, adds in appropriate chart HTML data to be displayed in template, and returns the updated `all_data` dict.
     """
@@ -41,7 +44,7 @@ def update_all_data_with_charts(all_data:dict, kpi_name:str, kpi_name_title_case
             "COUNTRY_KPIS",
         ]:
             continue
-        
+
         # Gather data for selected abstraction's sub-unit barchart
         bar_data = (
             kpi_data["aggregation_model"]
@@ -50,16 +53,23 @@ def update_all_data_with_charts(all_data:dict, kpi_name:str, kpi_name_title_case
                 pct_passed=DjangoCase(
                     When(
                         **{f"{kpi_name}_total_eligible": 0},
-                        then=Value(0), # Handles any division by zero errors by skipping
+                        then=Value(
+                            0
+                        ),  # Handles any division by zero errors by skipping
                     ),
                     default=(
-                        100
-                        * F(f"{kpi_name}_passed")
-                        / F(f"{kpi_name}_total_eligible")
+                        100 * F(f"{kpi_name}_passed") / F(f"{kpi_name}_total_eligible")
                     ),
                     output_field=IntegerField(),
                 ),
+                # Create an index for nulls, to sort by nulls, THEN by descending numerical order
+                none_group=DjangoCase(
+                    When(pct_passed__isnull=True, then=Value(True)),
+                    default=Value(False),
+                    output_field=BooleanField(),
+                ),
             )
+            .order_by('-none_group','pct_passed')
             .values(
                 "abstraction_name",
                 "pct_passed",
@@ -81,5 +91,5 @@ def update_all_data_with_charts(all_data:dict, kpi_name:str, kpi_name_title_case
             chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
         )
         kpi_data["charts"]["passed_bar"] = bar_html
-    
+
     return all_data
