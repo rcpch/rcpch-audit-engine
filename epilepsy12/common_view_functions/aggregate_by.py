@@ -5,10 +5,7 @@ from typing import Literal, Union
 from django.apps import apps
 from django.contrib.gis.db.models import (
     Q,
-    F,
     Count,
-    Sum,
-    Avg,
     When,
     Value,
     CharField,
@@ -18,18 +15,6 @@ from django.contrib.gis.db.models import (
 
 # E12 imports
 from epilepsy12.constants import ETHNICITIES, SEX_TYPE, EnumAbstractionLevel
-
-from epilepsy12.common_view_functions import (
-    calculate_kpis,
-)
-from .report_queries import (
-    get_all_organisations,
-    get_all_trusts,
-    get_all_icbs,
-    get_all_nhs_regions,
-    get_all_open_uk_regions,
-    get_all_countries,
-)
 
 """
 Reporting
