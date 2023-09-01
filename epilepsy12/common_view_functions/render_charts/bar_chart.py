@@ -79,6 +79,7 @@ def render_bar_pct_passed_for_kpi_agg(
         pct_passed.append(pct_passed_item)
 
         # pct labels
+        print(item['pct_passed'])
         pct_passed_text.append(format_pct_text(pct_passed_item))
 
         # hover template for absolute counts

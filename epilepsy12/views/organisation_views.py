@@ -179,9 +179,7 @@ def selected_trust_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # perform aggregations and update all the KPIAggregation models
-    aggregate_kpis_update_models_all_abstractions_for_organisation(
-        organisation=organisation, cohort=cohort
-    )
+    update_all_kpi_agg_models(cohort=cohort)
 
     # Gather relevant data specific for this view
     all_data = get_all_kpi_aggregation_data_for_view(
@@ -287,7 +285,9 @@ def selected_trust_select_kpi(request, organisation_id):
 
 @login_required
 def aggregate_and_update_all_kpi_agg_models(request):
-    """HTMX GET request to aggregate and update all kpi aggregation models.
+    """Aggregates and update all kpi aggregation models.
+    
+    Used by temp 'Aggregate and update' button and in future, async calls
     """
     
     # Only superusers allowed

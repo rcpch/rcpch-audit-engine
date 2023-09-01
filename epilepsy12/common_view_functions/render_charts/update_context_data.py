@@ -1,7 +1,7 @@
 # Python imports
 
 # third party libraries
-from django.db.models import F, When, Case as DjangoCase, FloatField, Value
+from django.db.models import F, When, Case as DjangoCase, IntegerField, Value
 
 # E12 imports
 from epilepsy12.common_view_functions.render_charts import (
@@ -57,7 +57,7 @@ def update_all_data_with_charts(all_data:dict, kpi_name:str, kpi_name_title_case
                         * F(f"{kpi_name}_passed")
                         / F(f"{kpi_name}_total_eligible")
                     ),
-                    output_field=FloatField(),
+                    output_field=IntegerField(),
                 ),
             )
             .values(
