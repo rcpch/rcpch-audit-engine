@@ -253,6 +253,18 @@ def calculate_kpi_value_counts_queryset(
             )  # To ensure order is always as expected
         )
 
+    # WALES HAS NO ICB
+    if abstraction_level is EnumAbstractionLevel.ICB:
+        Case = apps.get_model("epilepsy12", "Case")
+        welsh_cases = Case.objects.filter(
+            **{f"organisations__{EnumAbstractionLevel.ICB.value}": None}
+        )
+
+        # Filter out Welsh Cases from the value count
+        kpi_value_counts = kpi_value_counts.exclude(
+            registration__id__in=welsh_cases.values_list("registration")
+        )
+
     return kpi_value_counts
 
 
@@ -311,8 +323,6 @@ def update_kpi_aggregation_model(
         kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
         cohort (int): cohort of aggregation
     """
-    
-    print(f'Running update KPIAggregation function for {abstraction_level}')
 
     abstraction_level_models = get_abstraction_model_from_level(abstraction_level)
 
@@ -379,7 +389,7 @@ def update_kpi_aggregation_model(
 def aggregate_kpis_update_models_all_abstractions_for_organisation(
     organisation,
     cohort: int,
-)->None:
+) -> None:
     """
     Aggregates all KPI data, for each level of EnumAbstractionLevel abstraction, updates the relevant AbstractionModel. Returns None.
     """
@@ -394,7 +404,7 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
         kpi_value_counts = calculate_kpi_value_counts_queryset(
             filtered_cases=filtered_cases,
             abstraction_level=enum_abstraction_level,
-            kpis='all',
+            kpis="all",
         )
 
         # Update the relevant abstraction's KPIAggregation model(s)
@@ -404,23 +414,38 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
             cohort=cohort,
         )
 
+
 def update_all_kpi_agg_models(
-    cohort:int,
-):
-    
+    cohort: int,
+) -> int:
+    """
+    Using all cases in a given cohort,
+        for all abstraction levels,
+            aggregate kpi scores and update that abstraction's KPIAggregation model
+    """
+
     Case = apps.get_model("epilepsy12", "Case")
-    
+
     all_cases = Case.objects.filter(
         site__site_is_actively_involved_in_epilepsy_care=True,
         site__site_is_primary_centre_of_epilepsy_care=True,
         registration__cohort=cohort,
     )
-    
-    ABSTRACTION_LEVEL = EnumAbstractionLevel.ORGANISATION
-    
-    all_abstraction_keys = all_cases.values(f'organisations__{ABSTRACTION_LEVEL.value}').distinct()
-    
-    print(all_abstraction_keys)
+
+    for ABSTRACTION_LEVEL in EnumAbstractionLevel:
+        kpi_value_counts = calculate_kpi_value_counts_queryset(
+            filtered_cases=all_cases,
+            abstraction_level=ABSTRACTION_LEVEL,
+            kpis="all",
+        )
+
+        # Update all KPIAggregation models for abstraction
+        update_kpi_aggregation_model(
+            abstraction_level=ABSTRACTION_LEVEL,
+            kpi_value_counts=kpi_value_counts,
+            cohort=cohort,
+        )
+
 
 def get_all_kpi_aggregation_data_for_view(
     organisation,
@@ -432,13 +457,12 @@ def get_all_kpi_aggregation_data_for_view(
     """
     ALL_DATA = {}
     for enum_abstraction_level in EnumAbstractionLevel:
-        
         filtered_cases = get_filtered_cases_queryset_for(
             organisation=organisation,
             abstraction_level=enum_abstraction_level,
             cohort=cohort,
         )
-        
+
         # For the given abstraction, get the {ABSTRACTION}KPIAggregation model
         abstraction_kpi_agg_model_name = get_abstraction_model_from_level(
             enum_abstraction_level
@@ -491,3 +515,108 @@ def get_all_kpi_aggregation_data_for_view(
                 "total_cases_registered": total_cases_registered,
             }
     return ALL_DATA
+
+def _seed_all_aggregation_models()->None:
+    
+    from epilepsy12.general_functions import get_current_cohort_data
+    
+    Organisation = apps.get_model('epilepsy12','Organisation')
+    OrganisationKPIAggregation = apps.get_model('epilepsy12','OrganisationKPIAggregation')
+    TrustKPIAggregation = apps.get_model('epilepsy12','TrustKPIAggregation')
+    IntegratedCareBoardEntity = apps.get_model('epilepsy12','IntegratedCareBoardEntity')
+    ICBKPIAggregation = apps.get_model('epilepsy12','ICBKPIAggregation')
+    NHSRegionEntity = apps.get_model('epilepsy12','NHSRegionEntity')
+    NHSRegionKPIAggregation = apps.get_model('epilepsy12','NHSRegionKPIAggregation')
+    OPENUKNetworkEntity = apps.get_model('epilepsy12','OPENUKNetworkEntity')
+    OpenUKKPIAggregation = apps.get_model('epilepsy12','OpenUKKPIAggregation')
+    ONSCountryEntity = apps.get_model('epilepsy12','ONSCountryEntity')
+    CountryKPIAggregation = apps.get_model('epilepsy12','CountryKPIAggregation')
+    NationalKPIAggregation = apps.get_model('epilepsy12','NationalKPIAggregation')
+    
+    current_cohort = get_current_cohort_data()["cohort"]
+
+    all_orgs = Organisation.objects.all().distinct()
+    all_parent_organisation_ods_codes = [
+        code[0]
+        for code in Organisation.objects.all()
+        .values_list("ParentOrganisation_ODSCode")
+        .distinct()
+    ]
+    all_icbs = IntegratedCareBoardEntity.objects.all().distinct()
+    all_nhs_regions = NHSRegionEntity.objects.all().distinct()
+    all_open_uks = OPENUKNetworkEntity.objects.all().distinct()
+    all_countries = ONSCountryEntity.objects.all().distinct()
+
+    all_entities = [
+        all_orgs,
+        all_parent_organisation_ods_codes,
+        all_icbs,
+        all_nhs_regions,
+        all_open_uks,
+        all_countries,
+    ]
+    all_agg_models = [
+        OrganisationKPIAggregation,
+        TrustKPIAggregation,
+        ICBKPIAggregation,
+        NHSRegionKPIAggregation,
+        OpenUKKPIAggregation,
+        CountryKPIAggregation,
+    ]
+
+    if len(all_entities) != len(all_agg_models):
+        raise ValueError("Incorrect lengths for entities")
+
+    for entities, AggregationModel in zip(all_entities, all_agg_models):
+        print(f"Creating aggregations for {AggregationModel}")
+        for entity in entities:
+            if AggregationModel.objects.filter(
+                abstraction_relation=entity,
+                cohort=current_cohort,
+            ).exists():
+                print(f"AggregationModel for {entity} already exists. Skipping...")
+                continue
+
+            new_agg_model = AggregationModel.objects.create(
+                abstraction_relation=entity,
+                cohort=current_cohort,
+            )
+
+            print(f"Created {new_agg_model}")
+
+    # National handled separately as it has no abstraction relation field 
+    if NationalKPIAggregation.objects.filter(
+        cohort=current_cohort,
+    ).exists():
+        print(f"NationalKPIAggregation for {entity} already exists. Skipping...")
+    else:
+        new_agg_model = NationalKPIAggregation.objects.create(
+            cohort=current_cohort,
+        )
+        print(f"Created {new_agg_model} (Cohort {current_cohort})")
+        
+def ___delete_and_recreate_all_kpi_aggregation_models():
+    """WARNING: DESTRUCTIVE FUNCTION, only for use in local dev environments.
+
+    This 'wipes clean' the KPIAggregation models - it first deletes all models, then it creates new, empty ones where values are none.
+
+    Its purpose is for internal testing.
+    """
+    
+    ALL_AGGREGATION_MODEL_NAMES = [
+        "OrganisationKPIAggregation",
+        "TrustKPIAggregation",
+        "ICBKPIAggregation",
+        "NHSRegionKPIAggregation",
+        "OpenUKKPIAggregation",
+        "CountryKPIAggregation",
+        "NationalKPIAggregation",
+    ]
+
+    for aggregation_model_name in ALL_AGGREGATION_MODEL_NAMES:
+        aggregation_model = apps.get_model("epilepsy12", aggregation_model_name)
+        
+        aggregation_model.objects.all().delete()
+    
+    _seed_all_aggregation_models()
+
