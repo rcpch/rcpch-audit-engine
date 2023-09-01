@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Union
 
 
 # Django imports
@@ -416,13 +416,28 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
 
 
 def update_all_kpi_agg_models(
-    cohort: int,
+    cohort: int, abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all"
 ) -> None:
     """
     Using all cases in a given cohort,
-        for all abstraction levels,
+        for all abstraction levels | specified `abstractions`,
             aggregate kpi scores and update that abstraction's KPIAggregation model
+
+    Args:
+        `cohort` - cohort filter for Cases
+        `abstraction` (optional, default='all') - specify abstraction level(s) to update. Provide list of EnumAbstractionLevel values if required.
     """
+
+    if (abstractions != "all") or not isinstance(abstractions, list):
+        raise ValueError(
+            'Can only be string literall "all" or list of EnumAbstraction values'
+        )
+
+    if isinstance(abstractions, list):
+        if not all(isinstance(item, EnumAbstractionLevel) for item in abstractions):
+            raise ValueError(
+                "If providing list, all items must be EnumAbstraction values"
+            )
 
     Case = apps.get_model("epilepsy12", "Case")
 
@@ -432,7 +447,9 @@ def update_all_kpi_agg_models(
         registration__cohort=cohort,
     )
 
-    for ABSTRACTION_LEVEL in EnumAbstractionLevel:
+    abstraction_levels = EnumAbstractionLevel if abstractions == "all" else abstractions
+
+    for ABSTRACTION_LEVEL in abstraction_levels:
         kpi_value_counts = calculate_kpi_value_counts_queryset(
             filtered_cases=all_cases,
             abstraction_level=ABSTRACTION_LEVEL,
@@ -516,23 +533,27 @@ def get_all_kpi_aggregation_data_for_view(
             }
     return ALL_DATA
 
-def _seed_all_aggregation_models()->None:
-    
+
+def _seed_all_aggregation_models() -> None:
     from epilepsy12.general_functions import get_current_cohort_data
-    
-    Organisation = apps.get_model('epilepsy12','Organisation')
-    OrganisationKPIAggregation = apps.get_model('epilepsy12','OrganisationKPIAggregation')
-    TrustKPIAggregation = apps.get_model('epilepsy12','TrustKPIAggregation')
-    IntegratedCareBoardEntity = apps.get_model('epilepsy12','IntegratedCareBoardEntity')
-    ICBKPIAggregation = apps.get_model('epilepsy12','ICBKPIAggregation')
-    NHSRegionEntity = apps.get_model('epilepsy12','NHSRegionEntity')
-    NHSRegionKPIAggregation = apps.get_model('epilepsy12','NHSRegionKPIAggregation')
-    OPENUKNetworkEntity = apps.get_model('epilepsy12','OPENUKNetworkEntity')
-    OpenUKKPIAggregation = apps.get_model('epilepsy12','OpenUKKPIAggregation')
-    ONSCountryEntity = apps.get_model('epilepsy12','ONSCountryEntity')
-    CountryKPIAggregation = apps.get_model('epilepsy12','CountryKPIAggregation')
-    NationalKPIAggregation = apps.get_model('epilepsy12','NationalKPIAggregation')
-    
+
+    Organisation = apps.get_model("epilepsy12", "Organisation")
+    OrganisationKPIAggregation = apps.get_model(
+        "epilepsy12", "OrganisationKPIAggregation"
+    )
+    TrustKPIAggregation = apps.get_model("epilepsy12", "TrustKPIAggregation")
+    IntegratedCareBoardEntity = apps.get_model(
+        "epilepsy12", "IntegratedCareBoardEntity"
+    )
+    ICBKPIAggregation = apps.get_model("epilepsy12", "ICBKPIAggregation")
+    NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
+    NHSRegionKPIAggregation = apps.get_model("epilepsy12", "NHSRegionKPIAggregation")
+    OPENUKNetworkEntity = apps.get_model("epilepsy12", "OPENUKNetworkEntity")
+    OpenUKKPIAggregation = apps.get_model("epilepsy12", "OpenUKKPIAggregation")
+    ONSCountryEntity = apps.get_model("epilepsy12", "ONSCountryEntity")
+    CountryKPIAggregation = apps.get_model("epilepsy12", "CountryKPIAggregation")
+    NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
+
     current_cohort = get_current_cohort_data()["cohort"]
 
     all_orgs = Organisation.objects.all().distinct()
@@ -584,7 +605,7 @@ def _seed_all_aggregation_models()->None:
 
             print(f"Created {new_agg_model}")
 
-    # National handled separately as it has no abstraction relation field 
+    # National handled separately as it has no abstraction relation field
     if NationalKPIAggregation.objects.filter(
         cohort=current_cohort,
     ).exists():
@@ -594,7 +615,8 @@ def _seed_all_aggregation_models()->None:
             cohort=current_cohort,
         )
         print(f"Created {new_agg_model} (Cohort {current_cohort})")
-        
+
+
 def ___delete_and_recreate_all_kpi_aggregation_models():
     """WARNING: DESTRUCTIVE FUNCTION, only for use in local dev environments.
 
@@ -602,7 +624,7 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 
     Its purpose is for internal testing.
     """
-    
+
     ALL_AGGREGATION_MODEL_NAMES = [
         "OrganisationKPIAggregation",
         "TrustKPIAggregation",
@@ -615,8 +637,7 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
 
     for aggregation_model_name in ALL_AGGREGATION_MODEL_NAMES:
         aggregation_model = apps.get_model("epilepsy12", aggregation_model_name)
-        
-        aggregation_model.objects.all().delete()
-    
-    _seed_all_aggregation_models()
 
+        aggregation_model.objects.all().delete()
+
+    _seed_all_aggregation_models()
