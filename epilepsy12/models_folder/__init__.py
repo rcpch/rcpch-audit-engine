@@ -61,15 +61,20 @@ from .semiology_keyword import Keyword
 # Organisation has many to one relationship with OPENUKNetworkEntity, IntegratedCareBoardEntity,
 # ONSCountryEntity, ONSRegionEntity and NHSRegionEntity
 # IntegratedCareBoardEntity has a one to many relationship with NHSRegionEntity
-from .entities.open_uk_network_entity import OPENUKNetworkEntity
-from .entities.integrated_care_board_entity import IntegratedCareBoardEntity
-from .entities.ons_region_entity import ONSRegionEntity
-from .entities.ons_country_entity import ONSCountryEntity
-from .entities.nhs_region_entity import NHSRegionEntity
+
+from .entities.country import Country
+from .entities.london_borough import LondonBorough
+
+from .entities.open_uk_network import OPENUKNetwork
+from .entities.integrated_care_board import IntegratedCareBoard
+from .entities.nhs_region import NHSEnglandRegion
 from .entities.organisation import Organisation
+from .entities.trust import Trust
+from .entities.local_health_board import LocalHealthBoard
 
 # maps
 from .entities.nhs_england_region_boundaries import NHSEnglandRegionBoundaries
 from .entities.integrated_care_board_boundaries import IntegratedCareBoardBoundaries
 from .entities.local_health_board_boundaries import LocalHealthBoardBoundaries
 from .entities.country_boundaries import CountryBoundaries
+from .entities.london_borough_boundaries import LondonBoroughBoundaries

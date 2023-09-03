@@ -26,6 +26,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.cuh.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000008",
     },
     {
         "OrganisationID": "40270",
@@ -50,6 +51,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.airedaletrust.nhs.uk/",
         "Fax": "01535 655129",
+        "LocalAuthority": "E08000032",
     },
     {
         "OrganisationID": "40195",
@@ -74,6 +76,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.alderhey.nhs.uk",
         "Fax": "0151 252 5846",
+        "LocalAuthority": "E08000012",
     },
     {
         "OrganisationID": "41948",
@@ -98,6 +101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/our-locations/alnwick-infirmary",
         "Fax": "",
+        "LocalAuthority": "E06000057",
     },
     {
         "OrganisationID": "43210",
@@ -122,6 +126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk/For%20patients%20and%20visitors/amersham-hospital.htm",
         "Fax": "",
+        "LocalAuthority": "E06000060",
     },
     {
         "OrganisationID": "40163",
@@ -146,6 +151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "wuth.patientexperience@nhs.net",
         "Website": "http://www.wuth.nhs.uk",
         "Fax": "0151 604 7148",
+        "LocalAuthority": "E08000015",
     },
     {
         "OrganisationID": "42027",
@@ -170,6 +176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "asp-tr.patient.advice@nhs.net",
         "Website": "http://www.ashfordstpeters.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000213",
     },
     {
         "OrganisationID": "72361",
@@ -194,6 +201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.royalfree.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000003",
     },
     {
         "OrganisationID": "40570",
@@ -218,6 +226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.barnsleyhospital.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000016",
     },
     {
         "OrganisationID": "",
@@ -242,6 +251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000023",
     },
     {
         "OrganisationID": "",
@@ -266,6 +276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000066",
     },
     {
         "OrganisationID": "41260",
@@ -290,6 +301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "customercare@hhft.nhs.uk",
         "Website": "http://www.hampshirehospitals.nhs.uk",
         "Fax": "01256 313098",
+        "LocalAuthority": "E07000084",
     },
     {
         "OrganisationID": "41405",
@@ -314,6 +326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.dbth.nhs.uk",
         "Fax": "01909 502246",
+        "LocalAuthority": "E07000171",
     },
     {
         "OrganisationID": "",
@@ -338,6 +351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000044",
     },
     {
         "OrganisationID": "",
@@ -362,6 +376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000055",
     },
     {
         "OrganisationID": "41507",
@@ -386,6 +401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.bwc.nhs.uk",
         "Fax": "0121 333 9998",
+        "LocalAuthority": "E08000025",
     },
     {
         "OrganisationID": "43192",
@@ -410,6 +426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "information@cddft.nhs.uk",
         "Website": "http://www.cddft.nhs.uk/",
         "Fax": "01388 454127",
+        "LocalAuthority": "E06000047",
     },
     {
         "OrganisationID": "43136",
@@ -434,6 +451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.bfwh.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000009",
     },
     {
         "OrganisationID": "",
@@ -458,6 +476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000030",
     },
     {
         "OrganisationID": "41957",
@@ -482,6 +501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/blyth",
         "Fax": "",
+        "LocalAuthority": "E06000057",
     },
     {
         "OrganisationID": "",
@@ -506,6 +526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000032",
     },
     {
         "OrganisationID": "",
@@ -530,6 +551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000001",
     },
     {
         "OrganisationID": "39995",
@@ -554,6 +576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.uhbristol.nhs.uk/your-hospitals/bristol-royal-hospital-for-children.html",
         "Fax": "",
+        "LocalAuthority": "E06000023",
     },
     {
         "OrganisationID": "",
@@ -578,6 +601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000008",
     },
     {
         "OrganisationID": "7828770",
@@ -602,6 +626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.mse.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000070",
     },
     {
         "OrganisationID": "43211",
@@ -626,6 +651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk",
         "Fax": "01280 824966",
+        "LocalAuthority": "E06000060",
     },
     {
         "OrganisationID": "42363",
@@ -650,6 +676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/buckland",
         "Fax": "",
+        "LocalAuthority": "E07000108",
     },
     {
         "OrganisationID": "43223",
@@ -674,6 +701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contact@elht.nhs.uk",
         "Website": "http://www.elht.nhs.uk",
         "Fax": "01282 474444",
+        "LocalAuthority": "E07000117",
     },
     {
         "OrganisationID": "",
@@ -698,6 +726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "78514",
@@ -722,6 +751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhdb.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000193",
     },
     {
         "OrganisationID": "42865",
@@ -746,6 +776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.cht.nhs.uk",
         "Fax": "01422 380357",
+        "LocalAuthority": "E08000033",
     },
     {
         "OrganisationID": "",
@@ -770,6 +801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000058",
     },
     {
         "OrganisationID": "2917652",
@@ -794,6 +826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "lnwh-tr.trust@nhs.net",
         "Website": "http://www.lnwh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000005",
     },
     {
         "OrganisationID": "",
@@ -818,6 +851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000055",
     },
     {
         "OrganisationID": "41545",
@@ -842,6 +876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.chelwest.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000020",
     },
     {
         "OrganisationID": "41887",
@@ -866,6 +901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.gloshospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000078",
     },
     {
         "OrganisationID": "",
@@ -890,6 +926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000021",
     },
     {
         "OrganisationID": "40583",
@@ -914,6 +951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "crhft.communications@nhs.net",
         "Website": "http://www.chesterfieldroyal.nhs.uk",
         "Fax": "01246 512737",
+        "LocalAuthority": "E07000034",
     },
     {
         "OrganisationID": "",
@@ -938,6 +976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000047",
     },
     {
         "OrganisationID": "",
@@ -962,6 +1001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000020",
     },
     {
         "OrganisationID": "",
@@ -986,6 +1026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000020",
     },
     {
         "OrganisationID": "",
@@ -1010,6 +1051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000008",
     },
     {
         "OrganisationID": "",
@@ -1034,6 +1076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000068",
     },
     {
         "OrganisationID": "",
@@ -1058,6 +1101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000073",
     },
     {
         "OrganisationID": "",
@@ -1082,6 +1126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000047",
     },
     {
         "OrganisationID": "",
@@ -1106,6 +1151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000245",
     },
     {
         "OrganisationID": "",
@@ -1130,6 +1176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000003",
     },
     {
         "OrganisationID": "",
@@ -1154,6 +1201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000002",
     },
     {
         "OrganisationID": "",
@@ -1178,6 +1226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000026",
     },
     {
         "OrganisationID": "",
@@ -1202,6 +1251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000225",
     },
     {
         "OrganisationID": "",
@@ -1226,6 +1276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000025",
     },
     {
         "OrganisationID": "",
@@ -1250,6 +1301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000222",
     },
     {
         "OrganisationID": "",
@@ -1274,6 +1326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000031",
     },
     {
         "OrganisationID": "",
@@ -1298,6 +1351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000017",
     },
     {
         "OrganisationID": "",
@@ -1322,6 +1376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000012",
     },
     {
         "OrganisationID": "",
@@ -1346,6 +1401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000042",
     },
     {
         "OrganisationID": "",
@@ -1370,6 +1426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000052",
     },
     {
         "OrganisationID": "",
@@ -1394,6 +1451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000023",
     },
     {
         "OrganisationID": "",
@@ -1418,6 +1476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000018",
     },
     {
         "OrganisationID": "43182",
@@ -1442,6 +1501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "enquiries@lthtr.nhs.uk",
         "Website": "https://www.lancsteachinghospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000118",
     },
     {
         "OrganisationID": "43108",
@@ -1466,6 +1526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.swbh.nhs.uk",
         "Fax": "0121 507 5636",
+        "LocalAuthority": "E08000025",
     },
     {
         "OrganisationID": "40342",
@@ -1490,6 +1551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@esneft.nhs.uk",
         "Website": "https://www.esneft.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000071",
     },
     {
         "OrganisationID": "",
@@ -1514,6 +1576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000015",
     },
     {
         "OrganisationID": "",
@@ -1538,6 +1601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000014",
     },
     {
         "OrganisationID": "",
@@ -1562,6 +1626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000011",
     },
     {
         "OrganisationID": "",
@@ -1586,6 +1651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000148",
     },
     {
         "OrganisationID": "",
@@ -1610,6 +1676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000061",
     },
     {
         "OrganisationID": "",
@@ -1634,6 +1701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000015",
     },
     {
         "OrganisationID": "",
@@ -1658,6 +1726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000221",
     },
     {
         "OrganisationID": "",
@@ -1682,6 +1751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000049",
     },
     {
         "OrganisationID": "",
@@ -1706,6 +1776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000015",
     },
     {
         "OrganisationID": "",
@@ -1730,6 +1801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000027",
     },
     {
         "OrganisationID": "",
@@ -1754,6 +1826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000016",
     },
     {
         "OrganisationID": "",
@@ -1778,6 +1851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000030",
     },
     {
         "OrganisationID": "",
@@ -1802,6 +1876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000066",
     },
     {
         "OrganisationID": "",
@@ -1826,6 +1901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000034",
     },
     {
         "OrganisationID": "",
@@ -1850,6 +1926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000044",
     },
     {
         "OrganisationID": "",
@@ -1874,6 +1951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000008",
     },
     {
         "OrganisationID": "",
@@ -1898,6 +1976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "",
@@ -1922,6 +2001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000091",
     },
     {
         "OrganisationID": "43032",
@@ -1946,6 +2026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.esht.nhs.uk/conquest",
         "Fax": "",
+        "LocalAuthority": "E07000062",
     },
     {
         "OrganisationID": "41035",
@@ -1970,6 +2051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "cochpals@nhs.net",
         "Website": "http://www.coch.nhs.uk",
         "Fax": "01244 365 292",
+        "LocalAuthority": "E06000050",
     },
     {
         "OrganisationID": "",
@@ -1994,6 +2076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000238",
     },
     {
         "OrganisationID": "",
@@ -2018,6 +2101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000008",
     },
     {
         "OrganisationID": "40924",
@@ -2042,6 +2126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.croydonhealthservices.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000008",
     },
     {
         "OrganisationID": "10855536",
@@ -2066,6 +2151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000028",
     },
     {
         "OrganisationID": "41265",
@@ -2090,6 +2176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "dgn-tr.enquiries@nhs.net",
         "Website": "http://www.dgt.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000107",
     },
     {
         "OrganisationID": "43202",
@@ -2114,6 +2201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "information@cddft.nhs.uk",
         "Website": "http://www.cddft.nhs.uk",
         "Fax": "01325 743200",
+        "LocalAuthority": "E06000005",
     },
     {
         "OrganisationID": "41066",
@@ -2138,6 +2226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.plymouthhospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000026",
     },
     {
         "OrganisationID": "41019",
@@ -2162,6 +2251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.nlg.nhs.uk/hospitals/grimsby",
         "Fax": "",
+        "LocalAuthority": "E06000012",
     },
     {
         "OrganisationID": "",
@@ -2186,6 +2276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000041",
     },
     {
         "OrganisationID": "41406",
@@ -2210,6 +2301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.dbth.nhs.uk",
         "Fax": "01302 320098",
+        "LocalAuthority": "E08000017",
     },
     {
         "OrganisationID": "40130",
@@ -2234,6 +2326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "headquarters@dchft.nhs.uk",
         "Website": "http://www.dchft.nhs.uk",
         "Fax": "01305 254155",
+        "LocalAuthority": "E06000059",
     },
     {
         "OrganisationID": "",
@@ -2258,6 +2351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000024",
     },
     {
         "OrganisationID": "2917654",
@@ -2282,6 +2376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "lnwh-tr.trust@nhs.net",
         "Website": "https://www.lnwh.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000009",
     },
     {
         "OrganisationID": "43033",
@@ -2306,6 +2401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.esht.nhs.uk/eastbournedgh",
         "Fax": "",
+        "LocalAuthority": "E07000061",
     },
     {
         "OrganisationID": "",
@@ -2330,6 +2426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000023",
     },
     {
         "OrganisationID": "",
@@ -2354,6 +2451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "",
@@ -2378,6 +2476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000010",
     },
     {
         "OrganisationID": "42351",
@@ -2402,6 +2501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@epsom-sthelier.nhs.uk",
         "Website": "http://www.epsom-sthelier.nhs.uk",
         "Fax": "01372 735 159",
+        "LocalAuthority": "E07000208",
     },
     {
         "OrganisationID": "",
@@ -2426,6 +2526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000005",
     },
     {
         "OrganisationID": "41862",
@@ -2450,6 +2551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.newcastle-hospitals.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E08000021",
     },
     {
         "OrganisationID": "42129",
@@ -2474,6 +2576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.southtees.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000164",
     },
     {
         "OrganisationID": "40395",
@@ -2498,6 +2601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.fhft.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000214",
     },
     {
         "OrganisationID": "42186",
@@ -2522,6 +2626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "trusthq@mbht.nhs.uk",
         "Website": "http://www.uhmb.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000027",
     },
     {
         "OrganisationID": "",
@@ -2546,6 +2651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000024",
     },
     {
         "OrganisationID": "",
@@ -2570,6 +2676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000219",
     },
     {
         "OrganisationID": "",
@@ -2594,6 +2701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000010",
     },
     {
         "OrganisationID": "41889",
@@ -2618,6 +2726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.gloshospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000081",
     },
     {
         "OrganisationID": "",
@@ -2642,6 +2751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000217",
     },
     {
         "OrganisationID": "9445753",
@@ -2666,6 +2776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhb.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000025",
     },
     {
         "OrganisationID": "",
@@ -2690,6 +2801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000141",
     },
     {
         "OrganisationID": "41403",
@@ -2714,6 +2826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.gosh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000007",
     },
     {
         "OrganisationID": "",
@@ -2738,6 +2851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000022",
     },
     {
         "OrganisationID": "",
@@ -2762,6 +2876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000027",
     },
     {
         "OrganisationID": "43802",
@@ -2786,6 +2901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.imperial.nhs.uk/our-locations/hammersmith-hospital",
         "Fax": "",
+        "LocalAuthority": "E09000013",
     },
     {
         "OrganisationID": "40261",
@@ -2810,6 +2926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "hello@hdft.nhs.uk",
         "Website": "http://www.hdft.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000165",
     },
     {
         "OrganisationID": "",
@@ -2834,6 +2951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000018",
     },
     {
         "OrganisationID": "9445752",
@@ -2858,6 +2976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhb.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000025",
     },
     {
         "OrganisationID": "",
@@ -2882,6 +3001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000040",
     },
     {
         "OrganisationID": "41122",
@@ -2906,6 +3026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@wvt.nhs.uk",
         "Website": "http://www.wyevalley.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000019",
     },
     {
         "OrganisationID": "42721",
@@ -2930,6 +3051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.enherts-tr.nhs.uk/our-hospitals/hertford-county/",
         "Fax": "",
+        "LocalAuthority": "E07000242",
     },
     {
         "OrganisationID": "41954",
@@ -2954,6 +3076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/hexham",
         "Fax": "",
+        "LocalAuthority": "E06000057",
     },
     {
         "OrganisationID": "40095",
@@ -2978,6 +3101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.thh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000017",
     },
     {
         "OrganisationID": "7353080",
@@ -3002,6 +3126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.nwangliaft.nhs.uk/our-hospitals/hinchingbrooke-hospital/",
         "Fax": "",
+        "LocalAuthority": "E07000011",
     },
     {
         "OrganisationID": "41569",
@@ -3026,6 +3151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.homerton.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000012",
     },
     {
         "OrganisationID": "41986",
@@ -3050,6 +3176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@ouh.nhs.uk",
         "Website": "http://www.ouh.nhs.uk/hospitals/horton/default.aspx",
         "Fax": "",
+        "LocalAuthority": "E07000177",
     },
     {
         "OrganisationID": "41072",
@@ -3074,6 +3201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "info@uhcw.nhs.uk",
         "Website": "http://www.uhcw.nhs.uk/",
         "Fax": "01788 545151",
+        "LocalAuthority": "E07000220",
     },
     {
         "OrganisationID": "42660",
@@ -3098,6 +3226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.hey.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000010",
     },
     {
         "OrganisationID": "",
@@ -3122,6 +3251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000036",
     },
     {
         "OrganisationID": "68584",
@@ -3146,6 +3276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@esneft.nhs.uk",
         "Website": "https://www.esneft.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000202",
     },
     {
         "OrganisationID": "",
@@ -3170,6 +3301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "40663",
@@ -3194,6 +3326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@jpaget.nhs.uk",
         "Website": "http://www.jpaget.nhs.uk/",
         "Fax": "01493 453086",
+        "LocalAuthority": "E07000145",
     },
     {
         "OrganisationID": "41987",
@@ -3218,6 +3351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@ouh.nhs.uk",
         "Website": "http://www.ouh.nhs.uk/hospitals/jr/default.aspx",
         "Fax": "",
+        "LocalAuthority": "E07000178",
     },
     {
         "OrganisationID": "42445",
@@ -3242,6 +3376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/kentandcanterburyhospital",
         "Fax": "",
+        "LocalAuthority": "E07000106",
     },
     {
         "OrganisationID": "41341",
@@ -3266,6 +3401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "enquiries@kgh.nhs.uk",
         "Website": "http://www.kgh.nhs.uk",
         "Fax": "01536 493767",
+        "LocalAuthority": "E06000061",
     },
     {
         "OrganisationID": "41042",
@@ -3290,6 +3426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "kch-tr.palsdh@nhs.net",
         "Website": "http://www.kch.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000022",
     },
     {
         "OrganisationID": "41053",
@@ -3314,6 +3451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "sfh-tr.pet@nhs.net",
         "Website": "http://www.sfh-tr.nhs.uk",
         "Fax": "01623 621770",
+        "LocalAuthority": "E07000170",
     },
     {
         "OrganisationID": "40109",
@@ -3338,6 +3476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "khft.pals@nhs.net",
         "Website": "http://www.kingstonhospital.nhs.uk/",
         "Fax": "020 85472182",
+        "LocalAuthority": "E09000021",
     },
     {
         "OrganisationID": "",
@@ -3362,6 +3501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000025",
     },
     {
         "OrganisationID": "41611",
@@ -3386,6 +3526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.leedsth.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000035",
     },
     {
         "OrganisationID": "42680",
@@ -3410,6 +3551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.leicestershospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000016",
     },
     {
         "OrganisationID": "40199",
@@ -3434,6 +3576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.mchft.nhs.uk",
         "Fax": "01270 587696",
+        "LocalAuthority": "E06000049",
     },
     {
         "OrganisationID": "",
@@ -3458,6 +3601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000222",
     },
     {
         "OrganisationID": "42670",
@@ -3482,6 +3626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.ulh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000138",
     },
     {
         "OrganisationID": "42718",
@@ -3506,6 +3651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.enherts-tr.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000243",
     },
     {
         "OrganisationID": "40233",
@@ -3530,6 +3676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@ldh.nhs.uk",
         "Website": "https://www.ldh.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000032",
     },
     {
         "OrganisationID": "",
@@ -3554,6 +3701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000091",
     },
     {
         "OrganisationID": "41031",
@@ -3578,6 +3726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.eastcheshire.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000049",
     },
     {
         "OrganisationID": "40242",
@@ -3602,6 +3751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.york.nhs.uk",
         "Fax": "01653 604521",
+        "LocalAuthority": "E07000167",
     },
     {
         "OrganisationID": "",
@@ -3626,6 +3776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000003",
     },
     {
         "OrganisationID": "40154",
@@ -3650,6 +3801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@walsallhealthcare.nhs.uk",
         "Website": "http://www.walsallhealthcare.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000030",
     },
     {
         "OrganisationID": "40330",
@@ -3674,6 +3826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.mkuh.nhs.uk",
         "Fax": "01908 669348",
+        "LocalAuthority": "E06000042",
     },
     {
         "OrganisationID": "",
@@ -3698,6 +3851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000042",
     },
     {
         "OrganisationID": "",
@@ -3722,6 +3876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000030",
     },
     {
         "OrganisationID": "",
@@ -3746,6 +3901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000011",
     },
     {
         "OrganisationID": "",
@@ -3770,6 +3926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000007",
     },
     {
         "OrganisationID": "",
@@ -3794,6 +3951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000026",
     },
     {
         "OrganisationID": "",
@@ -3818,6 +3976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000246",
     },
     {
         "OrganisationID": "",
@@ -3842,6 +4001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000012",
     },
     {
         "OrganisationID": "",
@@ -3866,6 +4026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000021",
     },
     {
         "OrganisationID": "41093",
@@ -3890,6 +4051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "rwh-tr.pals@nhs.net",
         "Website": "http://www.royalwolverhampton.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E08000031",
     },
     {
         "OrganisationID": "",
@@ -3914,6 +4076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000030",
     },
     {
         "OrganisationID": "39967",
@@ -3938,6 +4101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "nuhpals@bartshealth.nhs.uk",
         "Website": "http://www.bartshealth.nhs.uk",
         "Fax": "020 7363 8181",
+        "LocalAuthority": "E09000025",
     },
     {
         "OrganisationID": "43679",
@@ -3962,6 +4126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "dchst.patientexperienceteam@nhs.net",
         "Website": "http://www.dchs.nhs.uk/home_redesign/our-services/find_services_by_location/newholmehospital/",
         "Fax": "",
+        "LocalAuthority": "E07000035",
     },
     {
         "OrganisationID": "",
@@ -3986,6 +4151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000015",
     },
     {
         "OrganisationID": "41147",
@@ -4010,6 +4176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@nnuh.nhs.uk",
         "Website": "http://www.nnuh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000149",
     },
     {
         "OrganisationID": "",
@@ -4034,6 +4201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000043",
     },
     {
         "OrganisationID": "",
@@ -4058,6 +4226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000003",
     },
     {
         "OrganisationID": "40091",
@@ -4082,6 +4251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.northmid.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000010",
     },
     {
         "OrganisationID": "41969",
@@ -4106,6 +4276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/north-tyneside",
         "Fax": "",
+        "LocalAuthority": "E08000022",
     },
     {
         "OrganisationID": "2917659",
@@ -4130,6 +4301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000062",
     },
     {
         "OrganisationID": "2131250",
@@ -4154,6 +4326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/emergency/",
         "Fax": "",
+        "LocalAuthority": "E06000057",
     },
     {
         "OrganisationID": "2917651",
@@ -4178,6 +4351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "lnwh-tr.trust@nhs.net",
         "Website": "http://www.lnwh.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000005",
     },
     {
         "OrganisationID": "43655",
@@ -4202,6 +4376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.norfolkcommunityhealthandcare.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000148",
     },
     {
         "OrganisationID": "",
@@ -4226,6 +4401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000222",
     },
     {
         "OrganisationID": "42484",
@@ -4250,6 +4426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "soh-tr.info@nhs.net",
         "Website": "http://www.southportandormskirk.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000127",
     },
     {
         "OrganisationID": "",
@@ -4274,6 +4451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000023",
     },
     {
         "OrganisationID": "",
@@ -4298,6 +4476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000019",
     },
     {
         "OrganisationID": "",
@@ -4322,6 +4501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000025",
     },
     {
         "OrganisationID": "",
@@ -4346,6 +4526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000026",
     },
     {
         "OrganisationID": "",
@@ -4370,6 +4551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "40658",
@@ -4394,6 +4576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.nwangliaft.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000031",
     },
     {
         "OrganisationID": "42671",
@@ -4418,6 +4601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.ulh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000136",
     },
     {
         "OrganisationID": "43048",
@@ -4442,6 +4626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.midyorks.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000036",
     },
     {
         "OrganisationID": "",
@@ -4466,6 +4651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000058",
     },
     {
         "OrganisationID": "",
@@ -4490,6 +4676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000024",
     },
     {
         "OrganisationID": "",
@@ -4514,6 +4701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000010",
     },
     {
         "OrganisationID": "41556",
@@ -4538,6 +4726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.pah.nhs.uk/",
         "Fax": "01279 429371",
+        "LocalAuthority": "E07000073",
     },
     {
         "OrganisationID": "40847",
@@ -4562,6 +4751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "patientsupportservices@uhs.nhs.uk",
         "Website": "http://www.uhs.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "",
@@ -4586,6 +4776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000013",
     },
     {
         "OrganisationID": "1094756",
@@ -4610,6 +4801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://pruh.kch.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000006",
     },
     {
         "OrganisationID": "",
@@ -4634,6 +4826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000018",
     },
     {
         "OrganisationID": "",
@@ -4658,6 +4851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000018",
     },
     {
         "OrganisationID": "40868",
@@ -4682,6 +4876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.porthosp.nhs.uk",
         "Fax": "023 9286 6413",
+        "LocalAuthority": "E06000044",
     },
     {
         "OrganisationID": "43803",
@@ -4706,6 +4901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.imperial.nhs.uk/our-locations/queen-charlottes-and-chelsea-hospital",
         "Fax": "",
+        "LocalAuthority": "E09000013",
     },
     {
         "OrganisationID": "41607",
@@ -4730,6 +4926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "ghnt.pals.service@nhs.net",
         "Website": "http://www.qegateshead.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000037",
     },
     {
         "OrganisationID": "68511",
@@ -4754,6 +4951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.lewishamandgreenwich.nhs.uk/",
         "Fax": "020 8836 4590",
+        "LocalAuthority": "E09000011",
     },
     {
         "OrganisationID": "42720",
@@ -4763,7 +4961,7 @@ RCPCH_ORGANISATIONS = [
         "Sector": "NHS Sector",
         "OrganisationStatus": "Visible",
         "IsPimsManaged": "TRUE",
-        "OrganisationName": "QUEEN ELIZABETH I I HOSPITAL AND COMMUNITY PAEDIATRICS",
+        "OrganisationName": "QUEEN ELIZABETH II HOSPITAL AND COMMUNITY PAEDIATRICS",
         "Address1": "HOWLANDS",
         "Address2": "",
         "Address3": "",
@@ -4778,6 +4976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.newqeii.info/",
         "Fax": "",
+        "LocalAuthority": "E07000241",
     },
     {
         "OrganisationID": "42366",
@@ -4802,6 +5001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/qeqm",
         "Fax": "",
+        "LocalAuthority": "E07000114",
     },
     {
         "OrganisationID": "42349",
@@ -4826,6 +5026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "est-tr.pals@nhs.net",
         "Website": "http://www.epsom-sthelier.nhs.uk",
         "Fax": "020 8641 4546",
+        "LocalAuthority": "E09000029",
     },
     {
         "OrganisationID": "",
@@ -4850,6 +5051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000004",
     },
     {
         "OrganisationID": "",
@@ -4874,6 +5076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000228",
     },
     {
         "OrganisationID": "40568",
@@ -4898,6 +5101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.bhrhospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000016",
     },
     {
         "OrganisationID": "",
@@ -4922,6 +5126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000032",
     },
     {
         "OrganisationID": "",
@@ -4946,6 +5151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000219",
     },
     {
         "OrganisationID": "",
@@ -4970,6 +5176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000019",
     },
     {
         "OrganisationID": "40573",
@@ -4994,6 +5201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.therotherhamft.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000018",
     },
     {
         "OrganisationID": "41724",
@@ -5018,6 +5226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "patient.relations@wwl.nhs.uk",
         "Website": "http://www.wwl.nhs.uk/hospitals/raei.aspx",
         "Fax": "01942 822042",
+        "LocalAuthority": "E08000010",
     },
     {
         "OrganisationID": "40884",
@@ -5042,6 +5251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "nhs.choices@royalberkshire.nhs.uk",
         "Website": "http://www.royalberkshire.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000038",
     },
     {
         "OrganisationID": "43224",
@@ -5066,6 +5276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contact@elht.nhs.uk",
         "Website": "http://www.elht.nhs.uk",
         "Fax": "01254 293512",
+        "LocalAuthority": "E06000008",
     },
     {
         "OrganisationID": "41197",
@@ -5090,6 +5301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.boltonft.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000001",
     },
     {
         "OrganisationID": "10955535",
@@ -5114,6 +5326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000058",
     },
     {
         "OrganisationID": "40472",
@@ -5138,6 +5351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "rcht.patientexperience@nhs.net",
         "Website": "http://www.royalcornwall.nhs.uk",
         "Fax": "01872 252708",
+        "LocalAuthority": "E06000052",
     },
     {
         "OrganisationID": "41982",
@@ -5162,6 +5376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "uhdb.contactpalsderby@nhs.net",
         "Website": "https://www.uhdb.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000015",
     },
     {
         "OrganisationID": "",
@@ -5186,6 +5401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000041",
     },
     {
         "OrganisationID": "40782",
@@ -5210,6 +5426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "rde-tr.pals@nhs.net",
         "Website": "http://www.rdehospital.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000041",
     },
     {
         "OrganisationID": "40073",
@@ -5234,6 +5451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "rf.pals@nhs.net",
         "Website": "http://www.royalfree.nhs.uk/",
         "Fax": "020 7830 2468",
+        "LocalAuthority": "E09000007",
     },
     {
         "OrganisationID": "",
@@ -5258,6 +5476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000022",
     },
     {
         "OrganisationID": "41261",
@@ -5282,6 +5501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "hampshire.hospitals@hhft.nhs.uk",
         "Website": "http://www.hampshirehospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000094",
     },
     {
         "OrganisationID": "8228423",
@@ -5306,6 +5526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://mft.nhs.uk/rmch/",
         "Fax": "",
+        "LocalAuthority": "E08000003",
     },
     {
         "OrganisationID": "",
@@ -5330,6 +5551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000004",
     },
     {
         "OrganisationID": "43183",
@@ -5354,6 +5576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "enquiries@lthtr.nhs.uk",
         "Website": "http://www.lancsteachinghospitals.nhs.uk",
         "Fax": "01772 522162",
+        "LocalAuthority": "E07000123",
     },
     {
         "OrganisationID": "43348",
@@ -5378,6 +5601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "sath.commsteam@nhs.net",
         "Website": "http://www.sath.nhs.uk/",
         "Fax": "01743 261006",
+        "LocalAuthority": "E06000051",
     },
     {
         "OrganisationID": "",
@@ -5402,6 +5626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "41013",
@@ -5426,6 +5651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhnm.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000021",
     },
     {
         "OrganisationID": "39970",
@@ -5450,6 +5676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.royalsurrey.nhs.uk",
         "Fax": "01483 537747",
+        "LocalAuthority": "E07000209",
     },
     {
         "OrganisationID": "",
@@ -5474,6 +5701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000022",
     },
     {
         "OrganisationID": "",
@@ -5498,6 +5726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000112",
     },
     {
         "OrganisationID": "",
@@ -5522,6 +5751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000030",
     },
     {
         "OrganisationID": "41268",
@@ -5546,6 +5776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@dgh.nhs.uk",
         "Website": "https://www.dgft.nhs.uk/",
         "Fax": "01384 244051",
+        "LocalAuthority": "E08000027",
     },
     {
         "OrganisationID": "",
@@ -5570,6 +5801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000019",
     },
     {
         "OrganisationID": "41161",
@@ -5594,6 +5826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.northerncarealliance.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "41354",
@@ -5618,6 +5851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "sft.pals@nhs.net",
         "Website": "http://www.salisbury.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000054",
     },
     {
         "OrganisationID": "9242464",
@@ -5642,6 +5876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhdb.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000194",
     },
     {
         "OrganisationID": "",
@@ -5666,6 +5901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "43107",
@@ -5690,6 +5926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.swbh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000028",
     },
     {
         "OrganisationID": "864773",
@@ -5714,6 +5951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.york.nhs.uk",
         "Fax": "01723 342 581",
+        "LocalAuthority": "E07000168",
     },
     {
         "OrganisationID": "41021",
@@ -5738,6 +5976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.nlg.nhs.uk/hospitals/scunthorpe",
         "Fax": "",
+        "LocalAuthority": "E06000013",
     },
     {
         "OrganisationID": "40282",
@@ -5762,6 +6001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "sheffield.childrenshospital@sch.nhs.uk",
         "Website": "http://www.sheffieldchildrens.nhs.uk/",
         "Fax": "0114 272 3418",
+        "LocalAuthority": "E08000019",
     },
     {
         "OrganisationID": "",
@@ -5786,6 +6026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000018",
     },
     {
         "OrganisationID": "",
@@ -5810,6 +6051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E09000014",
     },
     {
         "OrganisationID": "",
@@ -5834,6 +6076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000011",
     },
     {
         "OrganisationID": "",
@@ -5858,6 +6101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000137",
     },
     {
         "OrganisationID": "9445754",
@@ -5882,6 +6126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhb.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000029",
     },
     {
         "OrganisationID": "40002",
@@ -5906,6 +6151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.uhbristol.nhs.uk/patients-and-visitors/your-hospitals/south-bristol-community-hospital/",
         "Fax": "",
+        "LocalAuthority": "E06000023",
     },
     {
         "OrganisationID": "",
@@ -5930,6 +6176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000025",
     },
     {
         "OrganisationID": "40843",
@@ -5954,6 +6201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "patientsupportservices@uhs.nhs.uk",
         "Website": "http://www.uhs.nhs.uk",
         "Fax": "023 8120 4715",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "40067",
@@ -5978,6 +6226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.mse.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000033",
     },
     {
         "OrganisationID": "",
@@ -6002,6 +6251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000098",
     },
     {
         "OrganisationID": "",
@@ -6026,6 +6276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000028",
     },
     {
         "OrganisationID": "",
@@ -6050,6 +6301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000018",
     },
     {
         "OrganisationID": "40949",
@@ -6074,6 +6326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@stgeorges.nhs.uk",
         "Website": "http://www.stgeorges.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000032",
     },
     {
         "OrganisationID": "40169",
@@ -6098,6 +6351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.sthk.nhs.uk",
         "Fax": "01744 646301",
+        "LocalAuthority": "E08000013",
     },
     {
         "OrganisationID": "",
@@ -6122,6 +6376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000202",
     },
     {
         "OrganisationID": "42347",
@@ -6146,6 +6401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@epsom-sthelier.nhs.uk",
         "Website": "http://www.epsom-sthelier.nhs.uk",
         "Fax": "020 8641 4546",
+        "LocalAuthority": "E09000029",
     },
     {
         "OrganisationID": "41615",
@@ -6170,6 +6426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.leedsth.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000035",
     },
     {
         "OrganisationID": "",
@@ -6194,6 +6451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000030",
     },
     {
         "OrganisationID": "41381",
@@ -6218,6 +6476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.nhft.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000061",
     },
     {
         "OrganisationID": "60338",
@@ -6242,6 +6501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "iownt.pals@nhs.net",
         "Website": "https://www.iow.nhs.uk/our-services/mental-health-services/isle-talk.htm",
         "Fax": "",
+        "LocalAuthority": "E06000046",
     },
     {
         "OrganisationID": "43800",
@@ -6266,6 +6526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.imperial.nhs.uk/our-locations/st-marys-hospital",
         "Fax": "",
+        "LocalAuthority": "E09000033",
     },
     {
         "OrganisationID": "39991",
@@ -6290,6 +6551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.uhbristol.nhs.uk/your-hospitals/st-michaels-hospital.html",
         "Fax": "",
+        "LocalAuthority": "E06000023",
     },
     {
         "OrganisationID": "42026",
@@ -6314,6 +6576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "asp-tr.patient.advice@nhs.net",
         "Website": "http://www.ashfordstpeters.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000212",
     },
     {
         "OrganisationID": "43869",
@@ -6338,6 +6601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhsussex.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000225",
     },
     {
         "OrganisationID": "",
@@ -6362,6 +6626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000007",
     },
     {
         "OrganisationID": "40919",
@@ -6386,6 +6651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pals@gstt.nhs.uk",
         "Website": "https://www.guysandstthomas.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000022",
     },
     {
         "OrganisationID": "",
@@ -6410,6 +6676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000022",
     },
     {
         "OrganisationID": "",
@@ -6434,6 +6701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000213",
     },
     {
         "OrganisationID": "42725",
@@ -6458,6 +6726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "pcs@stockport.nhs.uk",
         "Website": "http://www.stockport.nhs.uk",
         "Fax": "0161 419 4679",
+        "LocalAuthority": "E08000007",
     },
     {
         "OrganisationID": "43208",
@@ -6482,6 +6751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk/For%20patients%20and%20visitors/stoke-mandeville-hospital.htm",
         "Fax": "01296 316640",
+        "LocalAuthority": "E06000060",
     },
     {
         "OrganisationID": "",
@@ -6506,6 +6776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000018",
     },
     {
         "OrganisationID": "10512886",
@@ -6530,6 +6801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000024",
     },
     {
         "OrganisationID": "",
@@ -6554,6 +6826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000030",
     },
     {
         "OrganisationID": "",
@@ -6578,6 +6851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "41222",
@@ -6602,6 +6876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.tamesidehospital.nhs.uk",
         "Fax": "0161 331 6026",
+        "LocalAuthority": "E08000008",
     },
     {
         "OrganisationID": "",
@@ -6626,6 +6901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "",
@@ -6650,6 +6926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000020",
     },
     {
         "OrganisationID": "41247",
@@ -6674,6 +6951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.gwh.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000030",
     },
     {
         "OrganisationID": "42131",
@@ -6698,6 +6976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.southtees.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000002",
     },
     {
         "OrganisationID": "42686",
@@ -6722,6 +7001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "mtw-tr.palsoffice@nhs.net",
         "Website": "http://www.mtw.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000110",
     },
     {
         "OrganisationID": "",
@@ -6746,6 +7026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000012",
     },
     {
         "OrganisationID": "",
@@ -6770,6 +7051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000220",
     },
     {
         "OrganisationID": "43349",
@@ -6794,6 +7076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "sath.commsteam@nhs.net",
         "Website": "http://www.sath.nhs.uk",
         "Fax": "01952 243405",
+        "LocalAuthority": "E06000020",
     },
     {
         "OrganisationID": "40289",
@@ -6818,6 +7101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.qehkl.nhs.uk",
         "Fax": "01553 613 700",
+        "LocalAuthority": "E07000146",
     },
     {
         "OrganisationID": "",
@@ -6842,6 +7126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000016",
     },
     {
         "OrganisationID": "39955",
@@ -6866,6 +7151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "rlhpals@bartshealth.nhs.uk",
         "Website": "http://www.bartshealth.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000030",
     },
     {
         "OrganisationID": "41863",
@@ -6890,6 +7176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.newcastle-hospitals.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E08000021",
     },
     {
         "OrganisationID": "42710",
@@ -6914,6 +7201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "mtw-tr.palsoffice@nhs.net",
         "Website": "http://www.mtw.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000116",
     },
     {
         "OrganisationID": "41078",
@@ -6938,6 +7226,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.whittington.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000019",
     },
     {
         "OrganisationID": "40006",
@@ -6962,6 +7251,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "chiefexecutive.sdhct@nhs.net",
         "Website": "http://www.torbayandsouthdevon.nhs.uk/",
         "Fax": "01803 616334",
+        "LocalAuthority": "E06000027",
     },
     {
         "OrganisationID": "",
@@ -6986,6 +7276,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000009",
     },
     {
         "OrganisationID": "",
@@ -7010,6 +7301,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000009",
     },
     {
         "OrganisationID": "41804",
@@ -7034,6 +7326,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uclh.nhs.uk/our-services/our-hospitals/university-college-hospital",
         "Fax": "",
+        "LocalAuthority": "E09000007",
     },
     {
         "OrganisationID": "41070",
@@ -7058,6 +7351,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "info@uhcw.nhs.uk",
         "Website": "http://www.uhcw.nhs.uk",
         "Fax": "024 76966056 ",
+        "LocalAuthority": "E08000026",
     },
     {
         "OrganisationID": "40922",
@@ -7082,6 +7376,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.lewishamandgreenwich.nhs.uk",
         "Fax": "020 8333 3333",
+        "LocalAuthority": "E09000023",
     },
     {
         "OrganisationID": "",
@@ -7106,6 +7401,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000014",
     },
     {
         "OrganisationID": "42476",
@@ -7130,6 +7426,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@nth.nhs.uk",
         "Website": "http://www.nth.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000001",
     },
     {
         "OrganisationID": "43198",
@@ -7154,6 +7451,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "information@cddft.nhs.uk",
         "Website": "http://www.cddft.nhs.uk/",
         "Fax": "0191 333 2685",
+        "LocalAuthority": "E06000047",
     },
     {
         "OrganisationID": "42477",
@@ -7178,6 +7476,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@nth.nhs.uk",
         "Website": "http://www.nth.nhs.uk",
         "Fax": "01642 624089",
+        "LocalAuthority": "E06000004",
     },
     {
         "OrganisationID": "64420",
@@ -7202,6 +7501,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.berkshirehealthcare.nhs.uk/our-sites/slough/upton-hospital/",
         "Fax": "",
+        "LocalAuthority": "E06000039",
     },
     {
         "OrganisationID": "40162",
@@ -7226,6 +7526,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "wuth.patientexperience@nhs.net",
         "Website": "http://www.wuth.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000015",
     },
     {
         "OrganisationID": "",
@@ -7250,6 +7551,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000006",
     },
     {
         "OrganisationID": "41960",
@@ -7274,6 +7576,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "contactus@northumbria.nhs.uk",
         "Website": "https://www.northumbria.nhs.uk/wansbeck",
         "Fax": "",
+        "LocalAuthority": "E06000057",
     },
     {
         "OrganisationID": "42841",
@@ -7298,6 +7601,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "whh.enquiries@nhs.net",
         "Website": "http://www.whh.nhs.uk",
         "Fax": "01925 662424",
+        "LocalAuthority": "E06000007",
     },
     {
         "OrganisationID": "40975",
@@ -7322,6 +7626,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.swft.nhs.uk",
         "Fax": "01926 482603",
+        "LocalAuthority": "E07000222",
     },
     {
         "OrganisationID": "42713",
@@ -7346,6 +7651,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "westherts.pals@nhs.net",
         "Website": "https://www.westhertshospitals.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E07000103",
     },
     {
         "OrganisationID": "10855530",
@@ -7370,6 +7676,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000029",
     },
     {
         "OrganisationID": "4622618",
@@ -7394,6 +7701,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.chelwest.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E09000018",
     },
     {
         "OrganisationID": "40715",
@@ -7418,6 +7726,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.wsh.nhs.uk",
         "Fax": "01284 701993",
+        "LocalAuthority": "E07000245",
     },
     {
         "OrganisationID": "59909",
@@ -7442,6 +7751,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.southernhealth.nhs.uk/locations/western-community-hospital/",
         "Fax": "",
+        "LocalAuthority": "E06000045",
     },
     {
         "OrganisationID": "",
@@ -7466,6 +7776,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E06000024",
     },
     {
         "OrganisationID": "3028092",
@@ -7490,6 +7801,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.fhft.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E06000039",
     },
     {
         "OrganisationID": "39964",
@@ -7514,6 +7826,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "wxpals.bartshealth@nhs.net",
         "Website": "http://www.bartshealth.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E09000031",
     },
     {
         "OrganisationID": "40168",
@@ -7538,6 +7851,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.sthk.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E08000011",
     },
     {
         "OrganisationID": "42362",
@@ -7562,6 +7876,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.ekhuft.nhs.uk/williamharvey",
         "Fax": "",
+        "LocalAuthority": "E07000105",
     },
     {
         "OrganisationID": "",
@@ -7586,6 +7901,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000003",
     },
     {
         "OrganisationID": "",
@@ -7610,6 +7926,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000009",
     },
     {
         "OrganisationID": "42755",
@@ -7634,6 +7951,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.worcsacute.nhs.uk/our-hospitals/worcestershire-royal-hospital/",
         "Fax": "",
+        "LocalAuthority": "E07000237",
     },
     {
         "OrganisationID": "",
@@ -7658,6 +7976,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E07000026",
     },
     {
         "OrganisationID": "43870",
@@ -7682,6 +8001,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "https://www.uhsussex.nhs.uk/",
         "Fax": "",
+        "LocalAuthority": "E07000229",
     },
     {
         "OrganisationID": "",
@@ -7706,6 +8026,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000035",
     },
     {
         "OrganisationID": "",
@@ -7730,6 +8051,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000006",
     },
     {
         "OrganisationID": "43209",
@@ -7754,6 +8076,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.buckshealthcare.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000060",
     },
     {
         "OrganisationID": "",
@@ -7778,6 +8101,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "E08000003",
     },
     {
         "OrganisationID": "39985",
@@ -7802,6 +8126,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "communications@ydh.nhs.uk",
         "Website": "http://www.yeovilhospital.nhs.uk/",
         "Fax": "01935 426850",
+        "LocalAuthority": "E07000189",
     },
     {
         "OrganisationID": "40238",
@@ -7826,6 +8151,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "http://www.york.nhs.uk",
         "Fax": "",
+        "LocalAuthority": "E06000014",
     },
     {
         "OrganisationID": "",
@@ -7850,6 +8176,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000004",
     },
     {
         "OrganisationID": "",
@@ -7874,6 +8201,7 @@ RCPCH_ORGANISATIONS = [
         "Email": "",
         "Website": "",
         "Fax": "",
+        "LocalAuthority": "W06000002",
     },
     {
         "OrganisationID": "",
@@ -7895,5 +8223,6 @@ RCPCH_ORGANISATIONS = [
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
         "Website": "",
+        "LocalAuthority": "W06000018",
     },
 ]

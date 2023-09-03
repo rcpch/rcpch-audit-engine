@@ -12,6 +12,9 @@ class NHSEnglandRegionBoundaries(models.Model):
     globalid = models.CharField(max_length=38)
     geom = models.MultiPolygonField(srid=27700)
 
+    class Meta:
+        abstract = True
+
 
 # Auto-generated `LayerMapping` dictionary for NHSEnglandRegionBoundaries model
 # nhsenglandregionboundaries_mapping = {

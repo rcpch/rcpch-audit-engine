@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from semantic_admin import SemanticModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
@@ -138,10 +137,11 @@ admin.site.register(Organisation, SimpleHistoryAdmin)
 admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
 admin.site.register(Management, SimpleHistoryAdmin)
 admin.site.register(Registration, SimpleHistoryAdmin)
-admin.site.register(Keyword, SimpleHistoryAdmin)
 admin.site.register(Site, SimpleHistoryAdmin)
 admin.site.register(AuditProgress)
 admin.site.register(Episode, SimpleHistoryAdmin)
+
+admin.site.register(Keyword, SimpleHistoryAdmin)
 admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
 admin.site.register(Syndrome, SimpleHistoryAdmin)
 admin.site.register(SyndromeEntity, SimpleHistoryAdmin)
@@ -158,11 +158,15 @@ admin.site.register(EpilepsyCauseEntity)
 admin.site.register(ComorbidityEntity)
 admin.site.register(MedicineEntity)
 
-admin.site.register(CountryBoundaries)
-admin.site.register(NHSEnglandRegionBoundaries)
-admin.site.register(LocalHealthBoardBoundaries)
-admin.site.register(IntegratedCareBoardBoundaries)
-admin.site.register(NHSRegionEntity)
+admin.site.register(Country)
+admin.site.register(LondonBorough)
+admin.site.register(IntegratedCareBoard)
+admin.site.register(NHSEnglandRegion)
+
+# admin.site.register(CountryBoundaries)
+# admin.site.register(NHSEnglandRegionBoundaries)
+# admin.site.register(LocalHealthBoardBoundaries)
+# admin.site.register(IntegratedCareBoardBoundaries)
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"

@@ -29,36 +29,77 @@ class Organisation(models.Model):
     Longitude = FloatField(null=True, blank=True, default=None)
     Postcode = CharField(max_length=10, null=True, blank=True, default=None)
     Geocode_Coordinates = PointField(null=True, blank=True, default=None, srid=27700)
-    ParentOrganisation_ODSCode = CharField(
-        max_length=100, null=True, blank=True, default=None
+
+    trust = models.ForeignKey(
+        to="epilepsy12.Trust",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
     )
-    ParentOrganisation_OrganisationName = CharField(
-        max_length=100, null=True, blank=True, default=None
+    local_health_board = models.ForeignKey(
+        to="epilepsy12.LocalHealthBoard",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
     )
-    LastUpdatedDate = DateTimeField(max_length=100, null=True, blank=True, default=None)
+    integrated_care_board = models.ForeignKey(
+        to="epilepsy12.IntegratedCareBoard",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    nhs_england_region = models.ForeignKey(
+        to="epilepsy12.NHSEnglandRegion",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    openuk_network = models.ForeignKey(
+        to="epilepsy12.OPENUKNetwork",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    # administrative regions
+    london_borough = models.ForeignKey(
+        to="epilepsy12.LondonBorough",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+    country = models.ForeignKey(
+        to="epilepsy12.Country", on_delete=models.PROTECT, null=True, blank=True
+    )
 
     history = HistoricalRecords()
 
     # relationships
 
-    nhs_region = models.ForeignKey(
-        "epilepsy12.NHSRegionEntity", on_delete=models.PROTECT
-    )
+    # nhs_region = models.ForeignKey(
+    #     "epilepsy12.NHSEnglandRegion", on_delete=models.PROTECT
+    # )
 
-    integrated_care_board = models.ForeignKey(
-        "epilepsy12.IntegratedCareBoardEntity",
-        null=True,
-        blank=True,
-        on_delete=models.PROTECT,
-    )
+    # integrated_care_board = models.ForeignKey(
+    #     "epilepsy12.IntegratedCareBoard",
+    #     null=True,
+    #     blank=True,
+    #     on_delete=models.PROTECT,
+    # )
 
-    openuk_network = models.ForeignKey(
-        "epilepsy12.OPENUKNetworkEntity", on_delete=models.PROTECT
-    )
+    # openuk_network = models.ForeignKey(
+    #     "epilepsy12.OPENUKNetwork", on_delete=models.PROTECT
+    # )
 
-    ons_region = models.ForeignKey(
-        "epilepsy12.ONSRegionEntity", on_delete=models.PROTECT
-    )
+    # ons_region = models.ForeignKey(
+    #     "epilepsy12.ONSRegionEntity", on_delete=models.PROTECT
+    # )
 
     @property
     def _history_user(self):

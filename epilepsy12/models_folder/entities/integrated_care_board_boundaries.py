@@ -17,8 +17,8 @@ class IntegratedCareBoardBoundaries(models.Model):
     globalid = models.CharField(max_length=38)
     geom = models.MultiPolygonField(srid=27700)
 
-    def __str__(self) -> str:
-        return self.icb23nm
+    class Meta:
+        abstract = True
 
 
 """

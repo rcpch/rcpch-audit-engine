@@ -13,8 +13,8 @@ class CountryBoundaries(models.Model):
     globalid = models.CharField(max_length=38)
     geom = models.MultiPolygonField(srid=27700)
 
-    def __str__(self) -> str:
-        return self.ctry22nm
+    class Meta:
+        abstract = True
 
 
 """
