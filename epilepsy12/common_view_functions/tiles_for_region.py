@@ -15,25 +15,19 @@ def return_tile_for_region(
     """
     Returns geojson data for a given region.
     """
-    IntegratedCareBoardBoundaries = apps.get_model(
-        "epilepsy12", "IntegratedCareBoardBoundaries"
-    )
-    NHSEnglandRegionBoundaries = apps.get_model(
-        "epilepsy12", "NHSEnglandRegionBoundaries"
-    )
-    CountryBoundaries = apps.get_model("epilepsy12", "CountryBoundaries")
-    LocalHealthBoardBoundaries = apps.get_model(
-        "epilepsy12", "LocalHealthBoardBoundaries"
-    )
+    IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
+    NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
+    CountryBoundaries = apps.get_model("epilepsy12", "Country")
+    LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
 
-    model = IntegratedCareBoardBoundaries
+    model = IntegratedCareBoard
 
     if abstraction_level == "nhs_region":
-        model = NHSEnglandRegionBoundaries
+        model = NHSEnglandRegion
     elif abstraction_level == "country":
         model = CountryBoundaries
     elif abstraction_level == "lhb":
-        model = LocalHealthBoardBoundaries
+        model = LocalHealthBoard
 
     unedited_tile = serialize("geojson", model.objects.all())
     edited_tile = json.loads(unedited_tile)

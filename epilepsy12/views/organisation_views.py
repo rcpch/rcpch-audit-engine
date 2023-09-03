@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
-from django.db.models import F, When, Case as DjangoCase, FloatField, Value
 from django.http import HttpResponseForbidden, HttpResponse
 
 # E12 imports
@@ -24,7 +23,6 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
-    aggregate_kpis_update_models_all_abstractions_for_organisation,
     update_all_kpi_agg_models,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
@@ -62,7 +60,7 @@ def selected_organisation_summary(request, organisation_id):
 
     lhb_tiles = None
 
-    if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if selected_organisation.country.ctry22cd == "W92000004":  # Wales
         lhb_tiles = return_tile_for_region("lhb")
 
     cohort_data = get_current_cohort_data()
@@ -283,25 +281,28 @@ def selected_trust_select_kpi(request, organisation_id):
 
     return render(request=request, template_name=template_name, context=context)
 
+
 @login_required
 def aggregate_and_update_all_kpi_agg_models(request):
     """Aggregates and update all kpi aggregation models.
-    
+
     Used by temp 'Aggregate and update' button and in future, async calls
     """
-    
+
     # Only superusers allowed
     if not request.user.is_superuser:
         return HttpResponseForbidden
-    
+
     # Gather constants
     cohort = get_current_cohort_data()["cohort"]
-    
+
     # Run agg fun
     update_all_kpi_agg_models(cohort=cohort)
-    
-    return HttpResponse(status=204) # 204 to signify to HTMX that nothing returned, just running server-side code
-    
+
+    return HttpResponse(
+        status=204
+    )  # 204 to signify to HTMX that nothing returned, just running server-side code
+
 
 def selected_trust_kpis_open(request, organisation_id):
     """
