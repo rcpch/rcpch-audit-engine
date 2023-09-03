@@ -115,10 +115,15 @@ class RegistrationViewSet(
             except Exception as error:
                 raise serializers.ValidationError(error)
 
+            if lead_centre.country.ctry22cd == "W92000004":
+                parent_trust = lead_centre.organisation.local_health_board.lhb22nm
+            else:
+                parent_trust = lead_centre.organisation.trust.trust_name
+
             try:
                 kpi = KPI.objects.create(
                     organisation=lead_centre,
-                    parent_trust=lead_centre.ParentOrganisation_OrganisationName,
+                    parent_trust=parent_trust,
                     paediatrician_with_expertise_in_epilepsies=0,
                     epilepsy_specialist_nurse=0,
                     tertiary_input=0,

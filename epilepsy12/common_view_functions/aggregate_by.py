@@ -250,6 +250,30 @@ def calculate_kpi_value_counts_queryset(
             registration__id__in=welsh_cases.values_list("registration")
         )
 
+    # WALES HAS NO LHB
+    if abstraction_level is EnumAbstractionLevel.TRUST:
+        Case = apps.get_model("epilepsy12", "Case")
+        welsh_cases = Case.objects.filter(
+            **{f"organisations__{EnumAbstractionLevel.TRUST.value}": None}
+        )
+
+        # Filter out Welsh Cases from the value count
+        kpi_value_counts = kpi_value_counts.exclude(
+            registration__id__in=welsh_cases.values_list("registration")
+        )
+
+    # England HAS NO Local Health Boards
+    if abstraction_level is EnumAbstractionLevel.LOCAL_HEALTH_BOARD:
+        Case = apps.get_model("epilepsy12", "Case")
+        english_cases = Case.objects.filter(
+            **{f"organisations__{EnumAbstractionLevel.LOCAL_HEALTH_BOARD.value}": None}
+        )
+
+        # Filter out Welsh Cases from the value count
+        kpi_value_counts = kpi_value_counts.exclude(
+            registration__id__in=english_cases.values_list("registration")
+        )
+
     return kpi_value_counts
 
 
@@ -270,11 +294,11 @@ def get_abstraction_model_from_level(
         },
         EnumAbstractionLevel.TRUST: {
             "kpi_aggregation_model": "TrustKPIAggregation",
-            "abstraction_entity_model": "Organisation",
+            "abstraction_entity_model": "Trust",
         },
         EnumAbstractionLevel.LOCAL_HEALTH_BOARD: {
-            "kpi_aggregation_model": "TrustKPIAggregation",
-            "abstraction_entity_model": "Organisation",
+            "kpi_aggregation_model": "LocalHealthBoardKPIAggregation",
+            "abstraction_entity_model": "LocalHealthBoard",
         },
         EnumAbstractionLevel.ICB: {
             "kpi_aggregation_model": "ICBKPIAggregation",
@@ -351,23 +375,25 @@ def update_kpi_aggregation_model(
         )
 
         # Get instance of the related entity model to link with Aggregation model
-        # NOTE Trust is only abstraction level whose abstraction_relation field is Charfield, not foreign key
-        if abstraction_level is EnumAbstractionLevel.TRUST:
-            abstraction_relation_instance = ABSTRACTION_CODE
-        else:
-            abstraction_relation_instance = abstraction_entity_model.objects.filter(
-                **{f"{related_key_field}": ABSTRACTION_CODE}
-            ).first()
+        abstraction_relation_instance = abstraction_entity_model.objects.filter(
+            **{f"{related_key_field}": ABSTRACTION_CODE}
+        ).first()
 
-        new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
-            defaults={
-                "abstraction_relation": abstraction_relation_instance,
-                "cohort": cohort,
-                **value_count,
-            },
-            abstraction_relation=abstraction_relation_instance,
-            cohort=cohort,
-        )
+        try:
+            new_obj, created = AbstractionKPIAggregationModel.objects.update_or_create(
+                defaults={
+                    "abstraction_relation": abstraction_relation_instance,
+                    "cohort": cohort,
+                    **value_count,
+                },
+                abstraction_relation=abstraction_relation_instance,
+                cohort=cohort,
+            )
+        except Exception as error:
+            print(
+                f"Can't update/save KPIAggregations for {abstraction_level} for {abstraction_relation_instance}: {error}"
+            )
+            return
 
         if created:
             print(f"created {new_obj}")

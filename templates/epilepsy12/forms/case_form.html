@@ -109,9 +109,12 @@
       <div class="content">
         <div class="header">Organisation</div>
         <p>
-          <b
-            >{{organisation.OrganisationName}}({{organisation.ParentOrganisation_OrganisationName}})</b
-          >
+          <b>{% if organisation.trust %}
+              {{organisation.OrganisationName}}({{organisation.trust.trust_name}})
+              {% else %}
+              {{organisation.OrganisationName}}({{organisation.local_health_board.lhb22nm}})
+              {% endif %}
+          </b>
           will be allocated automatically as the lead Epilepsy12 centre on saving
           this child's information.
         </p>

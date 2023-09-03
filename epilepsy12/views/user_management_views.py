@@ -205,9 +205,7 @@ def epilepsy12_user_list(request, organisation_id):
     filter_term = request.GET.get("filtered_epilepsy12_user_list")
 
     # get all organisations which are in the same parent trust
-    organisation_children = Organisation.objects.filter(
-        ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName
-    ).all()
+    organisation_children = Organisation.objects.filter(trust=organisation.trust).all()
 
     if filter_term:
         filter_term_Q = (
@@ -225,8 +223,12 @@ def epilepsy12_user_list(request, organisation_id):
             )
         elif request.user.view_preference == 1:
             # user has requested trust level view
+            if organisation.country.ctry22cd == "W92000004":
+                parent_trust = organisation.organisation.local_health_board.lhb22nm
+            else:
+                parent_trust = organisation.organisation.trust.trust_name
             basic_filter = Q(
-                organisation_employer__OrganisationName__icontains=organisation.ParentOrganisation_OrganisationName
+                organisation_employer__OrganisationName__icontains=parent_trust
             )
         elif request.user.view_preference == 2:
             # user has requested national level view
@@ -276,8 +278,13 @@ def epilepsy12_user_list(request, organisation_id):
 
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
+            if organisation.country.ctry22cd == "W92000004":
+                parent_trust = organisation.organisation.local_health_board.lhb22nm
+            else:
+                parent_trust = organisation.organisation.trust.trust_name
+
             basic_filter = Q(
-                organisation_employer__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName
+                organisation_employer__trust__trust_name__contains=parent_trust
             )
 
         elif request.user.view_preference == 0:
@@ -381,6 +388,11 @@ def epilepsy12_user_list(request, organisation_id):
         else:
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("surname").all()
 
+    if organisation.country.ctry22cd == "W92000004":
+        parent_trust = organisation.organisation.local_health_board.lhb22nm
+    else:
+        parent_trust = organisation.organisation.trust.trust_name
+
     if (
         request.user.is_rcpch_audit_team_member
         or request.user.is_rcpch_staff
@@ -388,13 +400,13 @@ def epilepsy12_user_list(request, organisation_id):
     ):
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
+            (1, f"Trust level ({parent_trust})"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
+            (1, f"Trust level ({parent_trust})"),
         )
 
     paginator = Paginator(epilepsy12_user_list, 10)
@@ -677,12 +689,13 @@ def log_list(request, organisation_id, epilepsy12_user_id):
 @login_required
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
-    
-    user_has_correct_group_perm = request.user.groups.filter(name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS).exists()
+    user_has_correct_group_perm = request.user.groups.filter(
+        name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
+    ).exists()
 
     if not user_has_correct_group_perm:
         return HttpResponseForbidden()
-        
+
     all_users = Epilepsy12User.objects.all().values(
         "id",
         "last_login",
@@ -700,15 +713,15 @@ def all_epilepsy12_users_list(request, organisation_id):
         "role",
         "email_confirmed",
     )
-    
+
     df = pd.DataFrame(all_users)
-    
+
     # Convert DataFrame to CSV format
     csv_data = df.to_csv(index=False)
-    
+
     # Create an HTTP response with the CSV data
-    response = HttpResponse(csv_data, content_type='text/csv')
-    
-    response['Content-Disposition'] = 'attachment; filename="epilepsy12users.csv"'
+    response = HttpResponse(csv_data, content_type="text/csv")
+
+    response["Content-Disposition"] = 'attachment; filename="epilepsy12users.csv"'
 
     return response

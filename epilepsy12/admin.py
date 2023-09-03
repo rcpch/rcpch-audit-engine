@@ -162,6 +162,8 @@ admin.site.register(Country)
 admin.site.register(LondonBorough)
 admin.site.register(IntegratedCareBoard)
 admin.site.register(NHSEnglandRegion)
+admin.site.register(Trust)
+admin.site.register(LocalHealthBoard)
 
 # admin.site.register(CountryBoundaries)
 # admin.site.register(NHSEnglandRegionBoundaries)

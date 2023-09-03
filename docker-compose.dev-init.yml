@@ -42,10 +42,10 @@ services:
       - .env # env file with the token for RCPCH Census Platform, not committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
-            python manage.py makemigrations &&
+            # python manage.py makemigrations &&
             python manage.py migrate &&
-            # python manage.py seed --mode=cases --cases 200 &&
-            # python manage.py seed --mode=seed_registrations &&
+            python manage.py seed --mode=cases --cases 200 &&
+            python manage.py seed --mode=seed_registrations &&
             python manage.py seed --mode=seed_groups_and_permissions &&
             python manage.py createsuperuser --noinput &&
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&

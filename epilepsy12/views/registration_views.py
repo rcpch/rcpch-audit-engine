@@ -74,9 +74,13 @@ def register(request, case_id):
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
         ).get()
+        if lead_organisation.organisation.country.ctry22cd == "W92000004":
+            parent_trust = lead_organisation.organisation.local_health_board.lhb22nm
+        else:
+            parent_trust = lead_organisation.organisation.trust.trust_name
         kpi = KPI.objects.create(
             organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
+            parent_trust=parent_trust,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -384,9 +388,13 @@ def update_lead_site(request, registration_id, site_id, update):
             updated_at=timezone.now(),
             updated_by=request.user,
         )
+        if new_organisation.organisation.country.ctry22cd == "W92000004":
+            parent_trust = new_organisation.organisation.local_health_board.lhb22nm
+        else:
+            parent_trust = new_organisation.organisation.trust.trust_name
         messages.success(
             request,
-            f"{registration.case} has been successfully updated to {new_organisation.ParentOrganisation_OrganisationName}.",
+            f"{registration.case} has been successfully updated to {parent_trust}.",
         )
     elif update == "transfer":
         new_trust_id = request.POST.get("transfer_lead_site")
@@ -444,7 +452,7 @@ def update_lead_site(request, registration_id, site_id, update):
             email = construct_transfer_epilepsy12_site_email(
                 request=request,
                 user=recipient,
-                target_organisation=new_organisation.ParentOrganisation_OrganisationName,
+                target_organisation=new_organisation,
                 child=registration.case,
             )
             try:
@@ -459,9 +467,14 @@ def update_lead_site(request, registration_id, site_id, update):
             except BadHeaderError:
                 return HttpResponse("Invalid header found.")
 
+        if new_organisation.organisation.country.ctry22cd == "W92000004":
+            parent_trust = new_organisation.organisation.local_health_board.lhb22nm
+        else:
+            parent_trust = new_organisation.organisation.trust.trust_name
+
         messages.success(
             request,
-            f"{registration.case} has been successfully transferred to {new_organisation.ParentOrganisation_OrganisationName}. Email notifications have been sent to RCPCH and the lead clinicians.",
+            f"{registration.case} has been successfully transferred to {parent_trust}. Email notifications have been sent to RCPCH and the lead clinicians.",
         )
 
     return HttpResponseClientRedirect(

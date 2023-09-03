@@ -64,7 +64,11 @@
                         <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                     {% endif %}
                 {% else %}
-                    {{selected_organisation.ParentOrganisation_OrganisationName}} has no eligible data on this measure yet.
+                    {% if selected_organisation.trust %}
+                        {{selected_organisation.trust.trust_name}} has no eligible data on this measure yet.
+                    {% else %}
+                        {{selected_organisation.local_health_board.lhb22nm}} has no eligible data on this measure yet.
+                    {% endif %}
                 {% endif %}
             </div>
 

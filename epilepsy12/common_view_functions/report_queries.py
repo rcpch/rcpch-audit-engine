@@ -15,7 +15,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         "trust",
         "local_health_board",
         "icb",
-        "nhs_region",
+        "nhs_england_region",
         "open_uk",
         "country",
         "national",
@@ -62,19 +62,27 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == "trust":
-        q_filter = (
-            Q(site__organisation__trust__ods_code=organisation_instance.trust.ods_code)
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        )
-    elif abstraction_level == "local_health_board":
-        q_filter = (
-            Q(
-                site__organisation__local_health_board__ods_code=organisation_instance.local_health_board.ods_code
+        if organisation_instance.trust is not None:
+            q_filter = (
+                Q(
+                    site__organisation__trust__ods_code=organisation_instance.trust.ods_code
+                )
+                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
             )
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        )
+        else:
+            return all_cases_for_cohort
+    elif abstraction_level == "local_health_board":
+        if organisation_instance.local_health_board is not None:
+            q_filter = (
+                Q(
+                    site__organisation__local_health_board__ods_code=organisation_instance.local_health_board.ods_code
+                )
+                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            )
+        else:
+            return all_cases_for_cohort
     elif abstraction_level == "icb":
         if organisation_instance.integrated_care_board is not None:
             """
@@ -89,11 +97,11 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             )
         else:
             return all_cases_for_cohort
-    elif abstraction_level == "nhs_region":
+    elif abstraction_level == "nhs_england_region":
         """
         Wales has no NHS regions
         """
-        if organisation_instance.nhs_region is not None:
+        if organisation_instance.nhs_england_region is not None:
             q_filter = (
                 Q(
                     site__organisation__nhs_england_region__NHS_Region_Code=organisation_instance.nhs_england_region.NHS_Region_Code

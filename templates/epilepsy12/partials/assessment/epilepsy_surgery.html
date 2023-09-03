@@ -82,8 +82,11 @@
                             <i class="rcpch_pink check circle outline icon"></i>
                                 <label>Surgical centre actively involved in care</label>
                             <div class="ui right action input">
-                                
-                                <input disabled value="{{active_surgical_site.organisation.OrganisationName}} ({{active_surgical_site.organisation.ParentOrganisation_OrganisationName}})">
+                                {% if active_surgical_site.organisation.trust %}
+                                    <input disabled value="{{active_surgical_site.organisation.OrganisationName}} ({{active_surgical_site.organisation.trust.trust_name}})">
+                                    {% else %}
+                                    <input disabled value="{{active_surgical_site.organisation.OrganisationName}} ({{active_surgical_site.organisation.local_health_board.lhb22nm}})">
+                                {% endif %}
                                 <div class="ui buttons">
                                 
                                     {% if not surgery_edit_active %}

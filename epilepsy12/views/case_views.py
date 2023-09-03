@@ -250,6 +250,11 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
+    if organisation.country.ctry22cd == "W92000004":
+        parent_trust = organisation.local_health_board.lhb22nm
+    else:
+        parent_trust = organisation.trust.trust_name
+
     if (
         request.user.is_rcpch_audit_team_member
         or request.user.is_rcpch_staff
@@ -257,13 +262,13 @@ def case_list(request, organisation_id):
     ):
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.trust.trust_name})"),
+            (1, f"Trust level ({parent_trust})"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.trust.trust_name})"),
+            (1, f"Trust level ({parent_trust})"),
         )
 
     context = {
@@ -302,9 +307,7 @@ def case_statistics(request, organisation_id):
     elif request.user.view_preference == 1:
         # user requesting Trust level - return all cases in the same trust
         total_cases = Case.objects.filter(
-            Q(
-                organisations__ParentOrganisation_OrganisationName__contains=organisation.trust.trust_name
-            )
+            Q(organisations__trust__trust_name__contains=organisation.trust.trust_name)
         )
     elif request.user.view_preference == 0:
         # user requesting Trust level - return all cases in the same organisation

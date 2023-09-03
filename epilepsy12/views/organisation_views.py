@@ -62,6 +62,9 @@ def selected_organisation_summary(request, organisation_id):
 
     if selected_organisation.country.ctry22cd == "W92000004":  # Wales
         lhb_tiles = return_tile_for_region("lhb")
+        abstraction_level = "local_health_board"
+    else:
+        abstraction_level = "trust"
 
     cohort_data = get_current_cohort_data()
 
@@ -74,14 +77,13 @@ def selected_organisation_summary(request, organisation_id):
             abstraction_level="organisation",
         ).count()
     )
-
     # query to return all completed E12 cases in the current cohort in this organisation trust
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
             cohort=cohort_data["cohort"],
             case_complete=True,
-            abstraction_level="trust",
+            abstraction_level=abstraction_level,
         ).count()
     )
     # query to return all cases (including incomplete) registered in the current cohort at this organisation
@@ -99,7 +101,7 @@ def selected_organisation_summary(request, organisation_id):
             organisation_instance=selected_organisation,
             cohort=cohort_data["cohort"],
             case_complete=False,
-            abstraction_level="trust",
+            abstraction_level=abstraction_level,
         ).count()
     )
 
@@ -320,9 +322,13 @@ def selected_trust_kpis_open(request, organisation_id):
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
+    if organisation.country.ctry22cd == "W92000004":
+        parent_trust = organisation.local_health_board.lhb22nm
+    else:
+        parent_trust = organisation.trust.trust_name
     kpis = KPI.objects.create(
         organisation=organisation,
-        parent_trust=organisation.ParentOrganisation_OrganisationName,
+        parent_trust=parent_trust,
     )
 
     template_name = "epilepsy12/partials/kpis/kpis.html"

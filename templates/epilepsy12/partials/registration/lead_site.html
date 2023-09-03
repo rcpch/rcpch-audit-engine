@@ -6,7 +6,11 @@
                         <label>Current Secondary NHS Trust/Health Board</label>
 
                         <div class="ui right action left icon input">
-                            <input disabled value="{{site.organisation.OrganisationName}} ({{site.organisation.ParentOrganisation_OrganisationName}})">
+                            {% if site.organisation.trust %}
+                                <input disabled value="{{site.organisation.OrganisationName}} ({{site.organisation.trust.trust_name}})">
+                            {% else %}
+                                <input disabled value="{{site.organisation.OrganisationName}} ({{site.organisation.local_health_board.lhb22nm}})">
+                            {% endif %}
                             
                             <i class="rcpch_pink check circle outline icon"></i>
 

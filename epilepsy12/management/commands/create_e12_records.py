@@ -97,9 +97,13 @@ def create_registrations(verbose=True):
                 site_is_primary_centre_of_epilepsy_care=True,
                 site_is_actively_involved_in_epilepsy_care=True,
             ).get()
+            if lead_organisation.organisation.country.ctry22cd == "W92000004":
+                parent_trust = lead_organisation.organisation.local_health_board.lhb22nm
+            else:
+                parent_trust = lead_organisation.organisation.trust.trust_name
             kpi = KPI.objects.create(
                 organisation=lead_organisation.organisation,
-                parent_trust=lead_organisation.organisation.trust.trust_name,
+                parent_trust=parent_trust,
                 paediatrician_with_expertise_in_epilepsies=0,
                 epilepsy_specialist_nurse=0,
                 tertiary_input=0,
