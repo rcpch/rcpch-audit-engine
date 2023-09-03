@@ -147,7 +147,7 @@ def get_all_nhs_regions():
     """
     Returns a list of all NHS Regions.
 
-    <QuerySet [<NHSRegionEntity: Aneurin Bevan University Health Board>, <NHSRegionEntity: Betsi Cadwaladr University Health Board>, <NHSRegionEntity: Cardiff and Vale University Health Board>, <NHSRegionEntity: Cwm Taf Morgannwg University Health Board>, <NHSRegionEntity: East of England>, <NHSRegionEntity: Hywel Dda University Health Board>, <NHSRegionEntity: London>, <NHSRegionEntity: Midlands (Y60)>, <NHSRegionEntity: North East and Yorkshire>, <NHSRegionEntity: North West>, <NHSRegionEntity: Powys Teaching Health Board>, <NHSRegionEntity: South East>, <NHSRegionEntity: South West>, <NHSRegionEntity: Swansea Bay University Health Board>]>
+    <QuerySet [<NHSEnglandRegion: Aneurin Bevan University Health Board>, <NHSEnglandRegion: Betsi Cadwaladr University Health Board>, <NHSEnglandRegion: Cardiff and Vale University Health Board>, <NHSEnglandRegion: Cwm Taf Morgannwg University Health Board>, <NHSEnglandRegion: East of England>, <NHSEnglandRegion: Hywel Dda University Health Board>, <NHSEnglandRegion: London>, <NHSEnglandRegion: Midlands (Y60)>, <NHSEnglandRegion: North East and Yorkshire>, <NHSEnglandRegion: North West>, <NHSEnglandRegion: Powys Teaching Health Board>, <NHSEnglandRegion: South East>, <NHSEnglandRegion: South West>, <NHSEnglandRegion: Swansea Bay University Health Board>]>
     """
     NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
 

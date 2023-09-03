@@ -56,7 +56,7 @@ register(E12UserFactory)  # => e12_user_factory
 def GOSH():
     return Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
 
@@ -71,7 +71,7 @@ def CASE_GOSH():
 def ADDENBROOKES():
     Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
 

@@ -46,9 +46,7 @@ def case_list(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # get all organisations which are in the same parent trust
-    organisation_children = Organisation.objects.filter(
-        ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName
-    ).all()
+    organisation_children = Organisation.objects.filter(trust=organisation.trust).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -75,7 +73,7 @@ def case_list(request, organisation_id):
             all_cases = (
                 Case.objects.filter(
                     Q(
-                        site__organisation__ParentOrganisation_ODSCode__contains=organisation.ParentOrganisation_ODSCode
+                        site__organisation__trust__ods_code__contains=organisation.trust__ods_code
                     )
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
@@ -117,7 +115,7 @@ def case_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName,
+                organisations__trust__trust_name__contains=organisation.trust.trust_name,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
@@ -259,13 +257,13 @@ def case_list(request, organisation_id):
     ):
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
+            (1, f"Trust level ({organisation.trust.trust_name})"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
             (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
+            (1, f"Trust level ({organisation.trust.trust_name})"),
         )
 
     context = {
@@ -305,7 +303,7 @@ def case_statistics(request, organisation_id):
         # user requesting Trust level - return all cases in the same trust
         total_cases = Case.objects.filter(
             Q(
-                organisations__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName
+                organisations__ParentOrganisation_OrganisationName__contains=organisation.trust.trust_name
             )
         )
     elif request.user.view_preference == 0:
@@ -411,7 +409,7 @@ def create_case(request, organisation_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if organisation.country.ctry22cd == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (
@@ -470,7 +468,7 @@ def update_case(request, organisation_id, case_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if organisation.country.ctry22cd == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (
@@ -537,7 +535,7 @@ def unknown_postcode(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if organisation.country.ctry22cd == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (

@@ -272,25 +272,29 @@ def get_abstraction_model_from_level(
             "kpi_aggregation_model": "TrustKPIAggregation",
             "abstraction_entity_model": "Organisation",
         },
+        EnumAbstractionLevel.LOCAL_HEALTH_BOARD: {
+            "kpi_aggregation_model": "TrustKPIAggregation",
+            "abstraction_entity_model": "Organisation",
+        },
         EnumAbstractionLevel.ICB: {
             "kpi_aggregation_model": "ICBKPIAggregation",
-            "abstraction_entity_model": "IntegratedCareBoardEntity",
+            "abstraction_entity_model": "IntegratedCareBoard",
         },
-        EnumAbstractionLevel.NHS_REGION: {
-            "kpi_aggregation_model": "NHSRegionKPIAggregation",
-            "abstraction_entity_model": "NHSRegionEntity",
+        EnumAbstractionLevel.NHS_ENGLAND_REGION: {
+            "kpi_aggregation_model": "NHSEnglandRegionKPIAggregation",
+            "abstraction_entity_model": "NHSEnglandRegion",
         },
         EnumAbstractionLevel.OPEN_UK: {
             "kpi_aggregation_model": "OpenUKKPIAggregation",
-            "abstraction_entity_model": "OPENUKNetworkEntity",
+            "abstraction_entity_model": "OPENUKNetwork",
         },
         EnumAbstractionLevel.COUNTRY: {
             "kpi_aggregation_model": "CountryKPIAggregation",
-            "abstraction_entity_model": "ONSCountryEntity",
+            "abstraction_entity_model": "Country",
         },
         EnumAbstractionLevel.NATIONAL: {
             "kpi_aggregation_model": "NationalKPIAggregation",
-            "abstraction_entity_model": "ONSCountryEntity",
+            "abstraction_entity_model": "Country",
         },
     }
     return abstraction_model_map[enum_abstraction_level]
@@ -412,10 +416,9 @@ def update_all_kpi_agg_models(
         `cohort` - cohort filter for Cases
         `abstraction` (optional, default='all') - specify abstraction level(s) to update. Provide list of EnumAbstractionLevel values if required.
     """
-
-    if (abstractions != "all") or not isinstance(abstractions, list):
+    if (abstractions != "all") and not isinstance(abstractions, list):
         raise ValueError(
-            'Can only be string literall "all" or list of EnumAbstraction values'
+            'Can only be string literal "all" or list of EnumAbstraction values'
         )
 
     if isinstance(abstractions, list):
@@ -483,7 +486,7 @@ def get_all_kpi_aggregation_data_for_view(
                 organisation, f"{abstraction_relation_field_name}"
             )
             if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
-                abstraction_relation = getattr(abstraction_relation, "ons_country")
+                abstraction_relation = getattr(abstraction_relation, "ctry22cd")
 
         # Get total cases for THIS organisation's abstraction
         total_cases_registered = filtered_cases.count()
@@ -498,7 +501,6 @@ def get_all_kpi_aggregation_data_for_view(
                 "total_cases_registered": total_cases_registered,
             }
             continue
-
         # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
         if abstraction_kpi_agg_model.objects.filter(
             abstraction_relation=abstraction_relation,
@@ -531,8 +533,10 @@ def _seed_all_aggregation_models() -> None:
         "epilepsy12", "IntegratedCareBoardEntity"
     )
     ICBKPIAggregation = apps.get_model("epilepsy12", "ICBKPIAggregation")
-    NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
-    NHSRegionKPIAggregation = apps.get_model("epilepsy12", "NHSRegionKPIAggregation")
+    NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
+    NHSEnglandRegionKPIAggregation = apps.get_model(
+        "epilepsy12", "NHSEnglandRegionKPIAggregation"
+    )
     OPENUKNetworkEntity = apps.get_model("epilepsy12", "OPENUKNetworkEntity")
     OpenUKKPIAggregation = apps.get_model("epilepsy12", "OpenUKKPIAggregation")
     ONSCountryEntity = apps.get_model("epilepsy12", "ONSCountryEntity")
@@ -544,12 +548,10 @@ def _seed_all_aggregation_models() -> None:
     all_orgs = Organisation.objects.all().distinct()
     all_parent_organisation_ods_codes = [
         code[0]
-        for code in Organisation.objects.all()
-        .values_list("ParentOrganisation_ODSCode")
-        .distinct()
+        for code in Organisation.objects.all().values_list("trust__ods_code").distinct()
     ]
     all_icbs = IntegratedCareBoardEntity.objects.all().distinct()
-    all_nhs_regions = NHSRegionEntity.objects.all().distinct()
+    all_nhs_regions = NHSEnglandRegion.objects.all().distinct()
     all_open_uks = OPENUKNetworkEntity.objects.all().distinct()
     all_countries = ONSCountryEntity.objects.all().distinct()
 
@@ -565,7 +567,7 @@ def _seed_all_aggregation_models() -> None:
         OrganisationKPIAggregation,
         TrustKPIAggregation,
         ICBKPIAggregation,
-        NHSRegionKPIAggregation,
+        NHSEnglandRegionKPIAggregation,
         OpenUKKPIAggregation,
         CountryKPIAggregation,
     ]
@@ -613,8 +615,9 @@ def ___delete_and_recreate_all_kpi_aggregation_models():
     ALL_AGGREGATION_MODEL_NAMES = [
         "OrganisationKPIAggregation",
         "TrustKPIAggregation",
+        "LocalHealthBoardKPIAggregation",
         "ICBKPIAggregation",
-        "NHSRegionKPIAggregation",
+        "NHSEnglandRegionKPIAggregation",
         "OpenUKKPIAggregation",
         "CountryKPIAggregation",
         "NationalKPIAggregation",

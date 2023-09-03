@@ -6,7 +6,7 @@ a = Organisation.objects.get(ODSCode="RP401")
 
 Organisation.objects.exclude(
             # ODSCode=a.ODSCode,
-            # ParentOrganisation_ODSCode=a.ParentOrganisation_ODSCode,
+            # trust__ods_code=a.trust__ods_code,
             # integrated_care_board=a.integrated_care_board,
             # nhs_region=a.nhs_region,
             # openuk_network=a.openuk_network,
@@ -40,7 +40,11 @@ from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
         (EnumAbstractionLevel.ORGANISATION, ("RGT01", "7A6AV"), (10, 10)),
         (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.ICB, ("RGT01", "RYVD9", "7A6AV"), (20, 20, 0)),
-        (EnumAbstractionLevel.NHS_REGION, ("RP401", "RQM01", "7A6AV"), (20, 20, 10)),
+        (
+            EnumAbstractionLevel.NHS_ENGLAND_REGION,
+            ("RP401", "RQM01", "7A6AV"),
+            (20, 20, 10),
+        ),
         (EnumAbstractionLevel.OPEN_UK, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.COUNTRY, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
         (EnumAbstractionLevel.NATIONAL, ("RP401", "RP416", "7A6AV"), (30, 30, 30)),
@@ -134,11 +138,12 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
 
     # Generate test cases - 10 in each ODSCode given
     _register_cases_in_organisation(
-        ods_codes=ods_codes_where_icb_null, e12_case_factory=e12_case_factory, n_cases=10
+        ods_codes=ods_codes_where_icb_null,
+        e12_case_factory=e12_case_factory,
+        n_cases=10,
     )
 
     for ods_code in ods_codes_where_icb_null:
-        
         # Community Paediatrics Org returning with the actual org so need to do filter.first()
         organisation = Organisation.objects.filter(ODSCode=ods_code).first()
 
@@ -148,7 +153,9 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
             cohort=6,
         ).count()
 
-        assert output == 0, f"""(Usually Welsh) organisations with null ICB codes should not be returned from get_filtered_cases_queryset_for(
+        assert (
+            output == 0
+        ), f"""(Usually Welsh) organisations with null ICB codes should not be returned from get_filtered_cases_queryset_for(
             organisation=organisation,
             abstraction_level=EnumAbstractionLevel.ICB,
             cohort=6,

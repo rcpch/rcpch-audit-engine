@@ -757,7 +757,7 @@ def test_user_updates_single_choice_multiple_toggle_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -804,7 +804,7 @@ def test_user_updates_single_choice_multiple_toggle_fail(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -849,7 +849,7 @@ def test_user_updates_toggles_true_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
@@ -893,7 +893,7 @@ def test_user_updates_toggles_false_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -937,7 +937,7 @@ def test_user_updates_toggles_true_fail(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -981,7 +981,7 @@ def test_user_updates_toggles_false_fail(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -1028,7 +1028,7 @@ def test_user_updates_select_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -1127,7 +1127,7 @@ def test_user_updates_select_fail(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
@@ -1217,16 +1217,14 @@ def test_user_updates_select_fail(
 
 
 @pytest.mark.django_db
-def test_age_at_registration_cannot_be_gt_24yo(
-    client, GOSH
-):
+def test_age_at_registration_cannot_be_gt_24yo(client, GOSH):
     """
     Assert date of first paediatric assessment cannot be after 24th birthday
     """
-    
-    REGISTRATION_DATE = date(2023,1,1)
+
+    REGISTRATION_DATE = date(2023, 1, 1)
     DATE_OF_BIRTH = REGISTRATION_DATE - relativedelta.relativedelta(years=24)
-    
+
     # GOSH
     TEST_USER_ORGANISATION = GOSH
 
@@ -1234,7 +1232,7 @@ def test_age_at_registration_cannot_be_gt_24yo(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
         organisations__organisation=TEST_USER_ORGANISATION,
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date = None,
+        registration__registration_date=None,
     )
 
     test_user = Epilepsy12User.objects.get(
@@ -1243,23 +1241,22 @@ def test_age_at_registration_cannot_be_gt_24yo(
 
     client.force_login(test_user)
 
-
     response = client.post(
-            reverse(
-                "registration_date",
-                kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
-            ),
-            headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
-            data={"registration_date": REGISTRATION_DATE},
-        )
-    
-    err_msg = response.context['error_message']
-    
-    assert isinstance(err_msg,ValueError)
-    assert str(err_msg) == 'To be included in Epilepsy12, child_GREAT ORMOND STREET HOSPITAL CENTRAL LONDON SITE Anderson cannot be over 24y at first paediatric assessment.'
+        reverse(
+            "registration_date",
+            kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
+        ),
+        headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
+        data={"registration_date": REGISTRATION_DATE},
+    )
 
-    
-    
+    err_msg = response.context["error_message"]
+
+    assert isinstance(err_msg, ValueError)
+    assert (
+        str(err_msg)
+        == "To be included in Epilepsy12, child_GREAT ORMOND STREET HOSPITAL CENTRAL LONDON SITE Anderson cannot be over 24y at first paediatric assessment."
+    )
 
 
 # Test helper methods - there is one for each page_element

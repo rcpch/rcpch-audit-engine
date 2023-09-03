@@ -226,10 +226,13 @@ def selected_trust_select_kpi(request, organisation_id):
     "TRUST_KPIS":{
         ...
     },
+    "LOCAL_HEALTH_BOARD":{
+        ...
+    },
     "ICB_KPIS":{
         ...
     },
-    "NHS_REGION_KPIS":{
+    "NHS_ENGLAND_REGION_KPIS":{
         ...
     },
     "OPEN_UK_KPIS":{

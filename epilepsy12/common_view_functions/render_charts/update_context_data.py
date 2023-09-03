@@ -1,7 +1,14 @@
 # Python imports
 
 # third party libraries
-from django.db.models import F, When, Case as DjangoCase, IntegerField, BooleanField, Value
+from django.db.models import (
+    F,
+    When,
+    Case as DjangoCase,
+    IntegerField,
+    BooleanField,
+    Value,
+)
 
 # E12 imports
 from epilepsy12.common_view_functions.render_charts import (
@@ -40,7 +47,7 @@ def update_all_data_with_charts(
         if abstraction not in [
             "ICB_KPIS",
             "OPEN_UK_KPIS",
-            "NHS_REGION_KPIS",
+            "NHS_ENGLAND_REGION_KPIS",
             "COUNTRY_KPIS",
         ]:
             continue
@@ -69,7 +76,7 @@ def update_all_data_with_charts(
                     output_field=BooleanField(),
                 ),
             )
-            .order_by('-none_group','pct_passed')
+            .order_by("-none_group", "pct_passed")
             .values(
                 "abstraction_name",
                 "pct_passed",

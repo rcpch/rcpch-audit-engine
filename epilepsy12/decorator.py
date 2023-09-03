@@ -174,7 +174,7 @@ def group_required(*group_names):
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentOrganisation_OrganisationName=request.user.organisation_employer.ParentName,
+                        trust=request.user.organisation_employer.trust,
                     )
 
                 if organisation.exists() or user.is_rcpch_audit_team_member:
@@ -214,8 +214,8 @@ def user_may_view_this_organisation():
                     else:
                         # regular user - not a member of RCPCH
                         if (
-                            user.organisation_employer.ParentOrganisation_ODSCode
-                            == organisation_requested.ParentOrganisation_ODSCode
+                            user.organisation_employer.trust
+                            == organisation_requested.trust
                         ):
                             # user's employing trust is the same as the trust of the organisation requested
                             if kwargs.get("user_type") is not None:
@@ -311,7 +311,7 @@ def user_may_view_this_child():
                         cases=child,
                         site__site_is_actively_involved_in_epilepsy_care=True,
                         site__site_is_primary_centre_of_epilepsy_care=True,
-                        ParentOrganisation_ODSCode=request.user.organisation_employer.ParentOrganisation_ODSCode,
+                        trust=request.user.organisation_employer.trust,
                     )
 
                 if (

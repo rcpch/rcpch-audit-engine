@@ -109,7 +109,7 @@
     </div>
     <div class="ui three stackable cards individual_measures">
 
-        {% with all_data.NHS_REGION_KPIS as KPI_DATA %}
+        {% with all_data.NHS_ENGLAND_REGION_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
         <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #nhs_region_kpi_ranking">
@@ -132,10 +132,10 @@
                     <br>
                     {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                     {% if pct_passed_kpi is not None %}
-                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure in the {{all_data.NHS_REGION_KPIS.aggregation_model.get_name}} region.
+                        <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure in the {{all_data.NHS_ENGLAND_REGION_KPIS.aggregation_model.get_name}} region.
                     {% endif %}
                 {% else %}
-                {{all_data.NHS_REGION_KPIS.aggregation_model.get_name}} has no eligible data on this measure yet.
+                {{all_data.NHS_ENGLAND_REGION_KPIS.aggregation_model.get_name}} has no eligible data on this measure yet.
                 {% endif %}
             </div>
         </div>
@@ -237,7 +237,7 @@
         {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
     </div>
     <div id="nhs_region_kpi_ranking">
-        {% with all_data.NHS_REGION_KPIS as KPI_DATA %}
+        {% with all_data.NHS_ENGLAND_REGION_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
         {% with KPI_DATA.aggregation_model as aggregation_model %}
             {{ KPI_DATA.charts.passed_bar.get_html|safe }}

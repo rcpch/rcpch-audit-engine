@@ -585,7 +585,7 @@ class TrustKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"TrustKPIAggregation (parent_organisation_ods_code={self.abstraction_relation})"
+        return f"TrustKPIAggregation (trust__ods_code={self.abstraction_relation})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -594,10 +594,50 @@ class TrustKPIAggregation(BaseKPIAggregation):
             Organisation = apps.get_model("epilepsy12", "Organisation")
 
             organisation = Organisation.objects.filter(
-                ParentOrganisation_ODSCode=self.abstraction_relation
+                trust__ods_code=self.abstraction_relation
             ).first()
 
-            self.abstraction_name = organisation.ParentOrganisation_OrganisationName
+            self.abstraction_name = organisation.trust.trust_name
+
+        return super().save(*args, **kwargs)
+
+
+class LocalHealthBoardKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for Trusts.
+    """
+
+    # Define relationships
+    # NOTE: parent_organisation_ods_code is not unique (multiple Organisation objects can share the same) so just store in a charfield
+    abstraction_relation = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+
+    class Meta:
+        verbose_name = _("Local Health Board KPI Aggregation Model")
+        verbose_name_plural = _("Local Health Board KPI Aggregation Models")
+
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.LOCAL_HEALTH_BOARD
+
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
+
+    def __str__(self):
+        return f"LocalHealthBoardKPIAggregation (trust__ods_code={self.abstraction_relation})"
+
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            # As Trust is the only abstraction relation without a 1-2-1 model, need to search Org to get Trust name
+            Organisation = apps.get_model("epilepsy12", "Organisation")
+
+            organisation = Organisation.objects.filter(
+                local_health_board__ods_code=self.abstraction_relation
+            ).first()
+
+            self.abstraction_name = organisation.local_health_board.lhb22nm
 
         return super().save(*args, **kwargs)
 
@@ -635,7 +675,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
         return super().save(*args, **kwargs)
 
 
-class NHSRegionKPIAggregation(BaseKPIAggregation):
+class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for NHSRegion.
     """
@@ -651,7 +691,7 @@ class NHSRegionKPIAggregation(BaseKPIAggregation):
         verbose_name_plural = _("NHSEnglandRegion KPI Aggregation Models")
 
     def get_abstraction_level(self) -> str:
-        return EnumAbstractionLevel.NHS_REGION
+        return EnumAbstractionLevel.NHS_ENGLAND_REGION
 
     def get_name(self) -> str:
         return f"{self.abstraction_name}"

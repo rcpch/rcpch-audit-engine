@@ -10,7 +10,6 @@ from epilepsy12.common_view_functions import (
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
     get_abstraction_model_from_level,
-
 )
 from epilepsy12.models import (
     Organisation,
@@ -41,7 +40,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
             ["RGT01", "RYVD9", "RYJ03", "RQM01"],
         ),
         (
-            EnumAbstractionLevel.NHS_REGION,
+            EnumAbstractionLevel.NHS_ENGLAND_REGION,
             ["Y61", "Y56"],
             ["RGT01", "RAJ12", "RAL26", "R1K02"],
         ),
@@ -97,7 +96,11 @@ def test_update_kpi_aggregation_model_all_levels(
         ods_codes=ods_codes,
         num_cases=5
         if abstraction_level
-        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.NATIONAL]
+        not in [
+            EnumAbstractionLevel.ORGANISATION,
+            EnumAbstractionLevel.TRUST,
+            EnumAbstractionLevel.NATIONAL,
+        ]
         else 10,
     )
 
@@ -128,9 +131,10 @@ def test_update_kpi_aggregation_model_all_levels(
 
     # ASSERTION
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
-        
-        output = NationalKPIAggregation.objects.get(cohort=6).get_value_counts_for_kpis(kpis_tested)
-        
+        output = NationalKPIAggregation.objects.get(cohort=6).get_value_counts_for_kpis(
+            kpis_tested
+        )
+
         expected_scores = {
             "ecg_passed": 20,
             "ecg_total_eligible": 40,
@@ -141,11 +145,10 @@ def test_update_kpi_aggregation_model_all_levels(
             "mental_health_support_ineligible": 20,
             "mental_health_support_incomplete": 20,
         }
-        
+
         assert output == expected_scores
-    
+
     else:
-    
         abstraction_kpi_aggregation_model_name = get_abstraction_model_from_level(
             enum_abstraction_level=abstraction_level
         )["kpi_aggregation_model"]
@@ -161,8 +164,7 @@ def test_update_kpi_aggregation_model_all_levels(
         )
 
         for abstraction_relation_code in expected_scores:
-            
-            abstraction_relation_instance_key = abstraction_level.value.split('__')[-1]
+            abstraction_relation_instance_key = abstraction_level.value.split("__")[-1]
 
             abstraction_relation_instance = abstraction_entity_model.objects.filter(
                 **{abstraction_relation_instance_key: abstraction_relation_code}
@@ -171,7 +173,7 @@ def test_update_kpi_aggregation_model_all_levels(
             # Trust is a char field so must deal with differently
             if abstraction_level is EnumAbstractionLevel.TRUST:
                 kpi_aggregation_model_instance = abstraction_kpi_aggregation_model.objects.get(
-                    abstraction_relation=abstraction_relation_instance.ParentOrganisation_ODSCode
+                    abstraction_relation=abstraction_relation_instance.trust.ods_code
                 )
             else:
                 kpi_aggregation_model_instance = (
@@ -180,7 +182,8 @@ def test_update_kpi_aggregation_model_all_levels(
                     )
                 )
 
-            output = kpi_aggregation_model_instance.get_value_counts_for_kpis(kpis_tested)
+            output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
+                kpis_tested
+            )
 
             assert output == expected_scores[abstraction_relation_code]
-

@@ -42,7 +42,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
         if not Epilepsy12User.objects.exists():
             TEST_USER_ORGANISATION = Organisation.objects.get(
                 ODSCode="RP401",
-                ParentOrganisation_ODSCode="RP4",
+                trust__ods_code="RP4",
             )
 
             is_active = True
@@ -52,17 +52,16 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
 
             # seed a user of each type at GOSH
             for user in users:
-                
-                first_name=user.role_str
-                
+                first_name = user.role_str
+
                 # set RCPCH AUDIT TEAM MEMBER ATTRIBUTE
                 if user.role == RCPCH_AUDIT_TEAM:
                     is_rcpch_audit_team_member = True
                     is_rcpch_staff = True
-                
+
                 if user.is_clinical_audit_team:
                     is_rcpch_audit_team_member = True
-                    first_name='CLINICAL_AUDIT_TEAM'
+                    first_name = "CLINICAL_AUDIT_TEAM"
 
                 E12UserFactory(
                     first_name=first_name,

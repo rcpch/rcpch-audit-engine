@@ -24,7 +24,7 @@ from .E12EpilepsyContextFactory import E12EpilepsyContextFactory
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Registration
-        skip_postgeneration_save=True
+        skip_postgeneration_save = True
 
     # Once Case instance made, it will attach to this instance
     case = None
@@ -44,7 +44,7 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         ).get()
         return KPI.objects.create(
             organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
+            parent_trust=lead_organisation.organisation.trust.trust_name,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -92,13 +92,15 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         if not create:
             return None
 
-        sodium_valproate = kwargs.pop('sodium_valproate', None)
+        sodium_valproate = kwargs.pop("sodium_valproate", None)
 
         E12ManagementFactory.create(
-                registration=self, 
-                antiepilepsymedicine__sodium_valproate=sodium_valproate if sodium_valproate else None,
-                **kwargs,
-            )
+            registration=self,
+            antiepilepsymedicine__sodium_valproate=sodium_valproate
+            if sodium_valproate
+            else None,
+            **kwargs,
+        )
 
     class Params:
         ineligible_mri = factory.Trait(registration_date=date(2023, 1, 1))

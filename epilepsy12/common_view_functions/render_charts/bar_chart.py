@@ -16,7 +16,7 @@ from epilepsy12.models import (
     OrganisationKPIAggregation,
     TrustKPIAggregation,
     ICBKPIAggregation,
-    NHSRegionKPIAggregation,
+    NHSEnglandRegionKPIAggregation,
     OpenUKKPIAggregation,
     CountryKPIAggregation,
     NationalKPIAggregation,
@@ -26,19 +26,19 @@ from epilepsy12.models import (
 ABSTRACTION_GRAPH_COLOR_MAP = {
     EnumAbstractionLevel.ICB: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.OPEN_UK: RCPCH_AQUA_GREEN,
-    EnumAbstractionLevel.NHS_REGION: RCPCH_STRONG_BLUE,
+    EnumAbstractionLevel.NHS_ENGLAND_REGION: RCPCH_STRONG_BLUE,
     EnumAbstractionLevel.COUNTRY: RCPCH_DARK_BLUE,
 }
 ABSTRACTION_CHART_HEIGHT = {
     EnumAbstractionLevel.ICB: "100vh",
     EnumAbstractionLevel.OPEN_UK: "80vh",
-    EnumAbstractionLevel.NHS_REGION: "70vh",
+    EnumAbstractionLevel.NHS_ENGLAND_REGION: "70vh",
     EnumAbstractionLevel.COUNTRY: "50vh",
 }
 ABSTRACTION_GRAPH_TITLE_SUBUNIT = {
     EnumAbstractionLevel.ICB: "Integrated Care Board",
     EnumAbstractionLevel.OPEN_UK: "OPEN UK Region",
-    EnumAbstractionLevel.NHS_REGION: "NHS Region",
+    EnumAbstractionLevel.NHS_ENGLAND_REGION: "NHS Region",
     EnumAbstractionLevel.COUNTRY: "Country",
 }
 
@@ -48,7 +48,7 @@ def render_bar_pct_passed_for_kpi_agg(
         OrganisationKPIAggregation,
         TrustKPIAggregation,
         ICBKPIAggregation,
-        NHSRegionKPIAggregation,
+        NHSEnglandRegionKPIAggregation,
         OpenUKKPIAggregation,
         CountryKPIAggregation,
         NationalKPIAggregation,

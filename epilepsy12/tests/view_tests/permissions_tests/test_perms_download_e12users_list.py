@@ -33,7 +33,7 @@ def test_download_button_access(
 
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     for test_user in users:

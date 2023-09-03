@@ -73,13 +73,13 @@ def test_users_opt_out_forbidden(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_SAME_ORG = Case.objects.get(

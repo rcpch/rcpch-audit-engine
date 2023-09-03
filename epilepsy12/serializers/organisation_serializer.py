@@ -28,8 +28,8 @@ class OrganisationCaseSerializer(serializers.ModelSerializer):
             "Longitude",
             "Postcode",
             "Geocode_Coordinates",
-            "ParentOrganisation_ODSCode",
-            "ParentOrganisation_OrganisationName",
+            "trust__ods_code",
+            "trust__trust_name",
             "LastUpdatedDate",
             "cases",
         ]
@@ -51,7 +51,7 @@ class OrganisationSerializer(serializers.HyperlinkedModelSerializer):
             "Longitude",
             "Postcode",
             "Geocode_Coordinates",
-            "ParentOrganisation_ODSCode",
-            "ParentOrganisation_OrganisationName",
+            "trust__ods_code",
+            "trust__trust_name",
             "LastUpdatedDate",
         ]

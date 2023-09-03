@@ -123,11 +123,11 @@ def test_user_delete_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -212,11 +212,11 @@ def test_user_delete_forbidden(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -299,11 +299,11 @@ def test_patient_delete_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -386,11 +386,11 @@ def test_patient_delete_forbidden(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -462,11 +462,11 @@ def test_episode_delete_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [

@@ -297,13 +297,13 @@ def test_users_update_users_forbidden(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     # Seed Test user to be updated
@@ -386,13 +386,13 @@ def test_users_update_users_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
@@ -475,12 +475,12 @@ def test_users_update_cases_forbidden(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -532,7 +532,7 @@ def test_users_update_cases_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -580,7 +580,7 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -637,7 +637,7 @@ def test_users_update_first_paediatric_assessment_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -709,7 +709,7 @@ def test_users_update_first_epilepsy_context_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -768,7 +768,7 @@ def test_users_update_epilepsy_context_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -851,7 +851,7 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -912,7 +912,7 @@ def test_users_update_multiaxial_diagnosis_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -1024,7 +1024,7 @@ def test_update_multiaxial_diagnosis_cause_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -1121,7 +1121,7 @@ def test_users_update_episode_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -1202,7 +1202,7 @@ def test_users_update_episode_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -1373,7 +1373,7 @@ def test_users_update_comorbidity_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -1447,7 +1447,7 @@ def test_users_update_comorbidity_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -1522,7 +1522,7 @@ def test_users_update_assessment_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -1711,7 +1711,7 @@ def test_users_update_assessment_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -1889,7 +1889,6 @@ def test_users_update_assessment_success(client):
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested to update Assessment {URL} for {CASE_FROM_SAME_ORG} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
-
 @pytest.mark.django_db
 def test_users_update_investigations_forbidden(client):
     """
@@ -1902,12 +1901,12 @@ def test_users_update_investigations_forbidden(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
@@ -2024,7 +2023,7 @@ def test_users_update_investigations_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -2142,7 +2141,7 @@ def test_users_update_management_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFFERENT_ORG = Case.objects.get(
@@ -2225,7 +2224,7 @@ def test_users_update_management_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -2309,7 +2308,7 @@ def test_users_update_antiepilepsymedicine_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_DIFFERENT_ORG = Case.objects.get(
@@ -2409,7 +2408,7 @@ def test_users_update_antiepilepsymedicine_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"

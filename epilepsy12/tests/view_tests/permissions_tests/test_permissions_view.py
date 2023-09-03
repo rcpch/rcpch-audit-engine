@@ -238,13 +238,13 @@ def test_users_and_case_list_views_permissions_success(
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     users = Epilepsy12User.objects.all()
@@ -304,7 +304,7 @@ def test_users_and_cases_list_view_permissions_forbidden(
     # ADDENBROOKE'S - DIFFERENT TRUST
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
 
     # RCPCH/CLINICAL AUDIT TEAM HAVE FULL ACCESS SO EXCLUDE
@@ -344,7 +344,7 @@ def test_registration_view_permissions_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -374,7 +374,7 @@ def test_registration_view_permissions_success(client):
         ]:
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
+                trust__ods_code="RGT",
             )
 
             # Request e12 patients list endpoint url different org
@@ -399,7 +399,7 @@ def test_registration_view_permissions_forbidden(client):
     # GOSH
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -445,7 +445,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -506,7 +506,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                 ]:
                     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                         ODSCode="RGT01",
-                        ParentOrganisation_ODSCode="RGT",
+                        trust__ods_code="RGT",
                     )
                     CASE_FROM_DIFF_ORG = Case.objects.get(
                         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -567,7 +567,7 @@ def test_episode_view_permissions_forbidden(client, URL):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -611,7 +611,7 @@ def test_syndrome_view_permissions_forbidden(client, URL):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -657,7 +657,7 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -707,7 +707,7 @@ def test_comborbidity_view_permissions_success(client, URL):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -754,7 +754,7 @@ def test_comborbidity_view_permissions_success(client, URL):
         ]:
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                 ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
+                trust__ods_code="RGT",
             )
             CASE_FROM_DIFF_ORG = Case.objects.get(
                 first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -801,7 +801,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -819,7 +819,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
         first_name__in=[
             test_user_audit_centre_administrator_data.role_str,
             test_user_audit_centre_clinician_data.role_str,
-            test_user_audit_centre_lead_clinician_data.role_str
+            test_user_audit_centre_lead_clinician_data.role_str,
         ]
     )
 
@@ -867,7 +867,7 @@ def test_multiple_views_permissions_success(client):
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
         ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
         first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -905,7 +905,7 @@ def test_multiple_views_permissions_success(client):
             ]:
                 DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
                     ODSCode="RGT01",
-                    ParentOrganisation_ODSCode="RGT",
+                    trust__ods_code="RGT",
                 )
                 CASE_FROM_DIFF_ORG = Case.objects.get(
                     first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
@@ -939,7 +939,7 @@ def test_multiple_views_permissions_forbidden(client):
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
         ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
         first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
@@ -950,7 +950,7 @@ def test_multiple_views_permissions_forbidden(client):
         first_name__in=[
             test_user_audit_centre_administrator_data.role_str,
             test_user_audit_centre_clinician_data.role_str,
-            test_user_audit_centre_lead_clinician_data.role_str
+            test_user_audit_centre_lead_clinician_data.role_str,
         ]
     )
 
