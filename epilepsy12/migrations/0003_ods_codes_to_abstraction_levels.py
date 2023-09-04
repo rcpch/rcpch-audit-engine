@@ -18,20 +18,19 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
 
     print(
         "\033[38;2;17;167;142m",
-        "Updating Integrated Care Boards",
+        "Updating Integrated Care Boards with ODS codes",
         "\033[38;2;17;167;142m",
     )
 
-    for item in IntegratedCareBoard.objects.all():
-        print(item.icb23nm, item.icb23cd)
-
     for icb in INTEGRATED_CARE_BOARDS:
         # iterates through all 42 ICBs and updates model with ODS code
-        if IntegratedCareBoard.objects.filter(icb23cd=icb["gss_code"]).exists():
+        if IntegratedCareBoard.objects.filter(
+            boundary_identifier=icb["gss_code"]
+        ).exists():
             # should already exist in the database
-            IntegratedCareBoard.objects.filter(icb23cd=icb["gss_code"]).update(
-                ods_code=icb["ods_code"]
-            )
+            IntegratedCareBoard.objects.filter(
+                boundary_identifier=icb["gss_code"]
+            ).update(ods_code=icb["ods_code"])
             print(f"Updated {icb['name']} to include ODS code")
         else:
             raise Exception(
@@ -40,20 +39,20 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
 
     print(
         "\033[38;2;17;167;142m",
-        "Updating NHS England Regions",
+        "Updating NHS England Regions with NHS England region codes",
         "\033[38;2;17;167;142m",
     )
 
     for nhs_england_region in NHS_ENGLAND_REGIONS:
         # iterates through all 42 ICBs and updates model with ODS code
         if NHSEnglandRegion.objects.filter(
-            nhser22cd=nhs_england_region["NHS_ENGLAND_REGION_ONS_CODE"]
+            boundary_identifier=nhs_england_region["NHS_ENGLAND_REGION_ONS_CODE"]
         ).exists():
             # should already exist in the database
             nhs_england_region_object = NHSEnglandRegion.objects.filter(
-                nhser22cd=nhs_england_region["NHS_ENGLAND_REGION_ONS_CODE"]
+                boundary_identifier=nhs_england_region["NHS_ENGLAND_REGION_ONS_CODE"]
             ).get()
-            nhs_england_region_object.NHS_Region_Code = nhs_england_region[
+            nhs_england_region_object.region_code = nhs_england_region[
                 "NHS_ENGLAND_REGION_CODE"
             ]
             nhs_england_region_object.save()
@@ -65,18 +64,18 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
 
     print(
         "\033[38;2;17;167;142m",
-        "Updating Local Health Boards",
+        "Updating Local Health Boards with ODS codes.",
         "\033[38;2;17;167;142m",
     )
 
     for local_health_board in LOCAL_HEALTH_BOARDS:
         # iterates through all 42 ICBs and updates model with ODS code
         if LocalHealthBoard.objects.filter(
-            lhb22cd=local_health_board["gss_code"]
+            boundary_identifier=local_health_board["gss_code"]
         ).exists():
             # should already exist in the database
             LocalHealthBoard.objects.filter(
-                lhb22cd=local_health_board["gss_code"]
+                boundary_identifier=local_health_board["gss_code"]
             ).update(ods_code=local_health_board["ods_code"])
             print(f"Updated {local_health_board['health_board']} to include ODS code")
         else:
@@ -84,7 +83,7 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
 
     print(
         "\033[38;2;17;167;142m",
-        "Updating OPEN UK Networks",
+        "Creating OPEN UK Networks...",
         "\033[38;2;17;167;142m",
     )
 
@@ -93,13 +92,13 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
         if OPENUKNetwork.objects.all().count() == 30:
             # should NOT already exist in the database
             print(
-                f"OPEN UK Networks {open_uk_network['OPEN_UK_Network_Name']} have already been added to the database."
+                f"OPEN UK Networks {open_uk_network['name']} have already been added to the database."
             )
             pass
         else:
             OPENUKNetwork.objects.create(
-                OPEN_UK_Network_Name=open_uk_network["OPEN_UK_Network_Name"],
-                OPEN_UK_Network_Code=open_uk_network["OPEN_UK_Network_Code"],
+                name=open_uk_network["OPEN_UK_Network_Name"],
+                boundary_identifier=open_uk_network["OPEN_UK_Network_Code"],
                 country=open_uk_network["country"],
             ).save()
             print(f"Created {open_uk_network['OPEN_UK_Network_Name']}.")

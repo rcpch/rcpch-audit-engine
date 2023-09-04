@@ -31,7 +31,7 @@ def test_cases_aggregated_by_sex(e12_case_factory):
 
     # define constants
     GOSH = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
@@ -68,7 +68,7 @@ def test_cases_aggregated_by_deprivation_score(e12_case_factory, e12_site_factor
 
     # define constants
     CHELWEST = Organisation.objects.get(
-        ODSCode="RQM01",
+        ods_code="RQM01",
         trust__ods_code="RQM",
     )
 
@@ -129,7 +129,7 @@ def test_cases_aggregated_by_ethnicity(e12_case_factory):
 
     # define constants
     GOSH = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 

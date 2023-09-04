@@ -31,12 +31,12 @@ from ..models import (
     Keyword,
     Comorbidity,
     Episode,
-    Syndrome,
     MultiaxialDiagnosis,
     Site,
-    SyndromeEntity,
-    EpilepsyCauseEntity,
-    ComorbidityEntity,
+    Syndrome,
+    SyndromeList,
+    ComorbidityList,
+    EpilepsyCause,
 )
 from ..common_view_functions import (
     validate_and_update_model,
@@ -116,7 +116,7 @@ def multiaxial_diagnosis(request, case_id):
 
     # ecl = '<< 363235000'
     # epilepsy_causes = fetch_ecl(ecl)
-    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by("preferredTerm")
+    epilepsy_causes = ComorbidityList.objects.all().order_by("preferredTerm")
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -1156,7 +1156,7 @@ def add_syndrome(request, multiaxial_diagnosis_id):
         .exclude(pk=syndrome.pk)
         .values_list("syndrome", flat=True)
     )
-    syndrome_selection = SyndromeEntity.objects.exclude(
+    syndrome_selection = SyndromeList.objects.exclude(
         pk__in=all_selected_syndromes
     ).order_by("syndrome_name")
 
@@ -1193,7 +1193,7 @@ def edit_syndrome(request, syndrome_id):
         .exclude(pk=syndrome_id)
         .values_list("syndrome", flat=True)
     )
-    syndrome_selection = SyndromeEntity.objects.exclude(
+    syndrome_selection = SyndromeList.objects.exclude(
         pk__in=all_selected_syndromes
     ).order_by("syndrome_name")
 
@@ -1361,9 +1361,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
-    # ecl = '<< 363235000'
-    # epilepsy_causes = fetch_ecl(ecl)
-    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by("preferredTerm")
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
 
     context = {
         "multiaxial_diagnosis": multiaxial_diagnosis,
@@ -1387,7 +1385,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
-    Choices for causes come from EpilepsyCauseEntity table
+    Choices for causes come from Comorbidity table
     """
 
     try:
@@ -1402,10 +1400,7 @@ def epilepsy_cause(request, multiaxial_diagnosis_id):
     except ValueError as error:
         error_message = error
 
-    # # SNOMED term populating epilepsy cause dropdown
-    # ecl = '<< 363235000'
-    # epilepsy_causes = fetch_ecl(ecl)
-    epilepsy_causes = EpilepsyCauseEntity.objects.all().order_by("preferredTerm")
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
@@ -1533,7 +1528,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     """
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 
-    comorbidityentity = ComorbidityEntity.objects.all().first()
+    comorbidityentity = ComorbidityList.objects.all().first()
 
     comorbidity = Comorbidity.objects.create(
         multiaxial_diagnosis=multiaxial_diagnosis,
@@ -1548,9 +1543,9 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
     ).values_list("comorbidityentity", flat=True)
 
     comorbidity_choices = (
-        ComorbidityEntity.objects.filter(
+        Comorbidity.objects.filter(
             pk__in=Subquery(
-                ComorbidityEntity.objects.all().distinct("conceptId").values("pk")
+                ComorbidityList.objects.all().distinct("conceptId").values("pk")
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
@@ -1586,9 +1581,9 @@ def edit_comorbidity(request, comorbidity_id):
     )
 
     comorbidity_choices = (
-        ComorbidityEntity.objects.filter(
+        Comorbidity.objects.filter(
             pk__in=Subquery(
-                ComorbidityEntity.objects.all().distinct("conceptId").values("pk")
+                ComorbidityList.objects.all().distinct("conceptId").values("pk")
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
@@ -1690,7 +1685,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
             model_id=comorbidity_id,
             field_name="comorbidity_diagnosis_date",
             page_element="date_field",
-            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.registration_date,
+            earliest_allowable_date=comorbidity.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
         )
     except ValueError as error:
         error_message = error
@@ -1706,9 +1701,9 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     )
 
     comorbidity_choices = (
-        ComorbidityEntity.objects.filter(
+        Comorbidity.objects.filter(
             pk__in=Subquery(
-                ComorbidityEntity.objects.all().distinct("conceptId").values("pk")
+                Comorbidity.objects.all().distinct("conceptId").values("pk")
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
@@ -1762,9 +1757,9 @@ def comorbidity_diagnosis(request, comorbidity_id):
     )
 
     comorbidity_choices = (
-        ComorbidityEntity.objects.filter(
+        Comorbidity.objects.filter(
             pk__in=Subquery(
-                ComorbidityEntity.objects.all().distinct("conceptId").values("pk")
+                ComorbidityList.objects.all().distinct("conceptId").values("pk")
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)

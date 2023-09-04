@@ -47,11 +47,11 @@
                                 <div class="organisation_details ">
                                     <div class="organisation_address">
                                         <div class="item">
-                                            {%if selected_organisation.Address1%}<p>{{ selected_organisation.Address1 }}</p>{%endif%}
-                                            {%if selected_organisation.Address2%}<p>{{ selected_organisation.Address2 }}</p>{%endif%}
-                                            {%if selected_organisation.Address3%}<p>{{ selected_organisation.Address3 }}</p>{%endif%}
-                                            {%if selected_organisation.City%}<p>{{ selected_organisation.City }}</p>{%endif%}
-                                            {%if selected_organisation.Postcode%}<p>{{ selected_organisation.Postcode }}</p>{%endif%}
+                                            {%if selected_organisation.address1%}<p>{{ selected_organisation.address1 }}</p>{%endif%}
+                                            {%if selected_organisation.address2%}<p>{{ selected_organisation.address2 }}</p>{%endif%}
+                                            {%if selected_organisation.address3%}<p>{{ selected_organisation.address3 }}</p>{%endif%}
+                                            {%if selected_organisation.city%}<p>{{ selected_organisation.city }}</p>{%endif%}
+                                            {%if selected_organisation.postcode%}<p>{{ selected_organisation.postcode }}</p>{%endif%}
                                         </div>
                                     </div>
                                 </div>
@@ -77,8 +77,8 @@
                                     </div>
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon linkify"></i>
-                                        {%if selected_organisation.Website%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.Website }}</p>
+                                        {%if selected_organisation.website%}
+                                        <p class="rcpch_icon_text">{{ selected_organisation.website }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find website</p>
                                         {%endif%}
@@ -130,7 +130,7 @@
                                     <div class="four wide stackable column">
                                         {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_organisation numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_all_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Organisation" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
-                                            <p><small>{{selected_organisation.OrganisationName}}</small></p>
+                                            <p><small>{{selected_organisation.name}}</small></p>
                                         </div>
                                     </div>
             
@@ -142,7 +142,7 @@
                                             {% if selected_organisation.trust %}
                                                 <p><small>{{selected_organisation.trust.trust_name}}</small></p>
                                             {% else %}
-                                                <p><small>{{selected_organisation.local_health_board.lhb22nm}}</small></p>
+                                                <p><small>{{selected_organisation.local_health_board.name}}</small></p>
                                             {% endif %}
                                         </div>
                                     </div>

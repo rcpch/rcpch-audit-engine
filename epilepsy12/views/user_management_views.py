@@ -102,14 +102,12 @@ def signup(request, *args, **kwargs):
             if user.organisation_employer is not None:
                 # current user is affiliated with an existing organisation - set viewable trust to this
                 selected_organisation = Organisation.objects.get(
-                    OrganisationName=request.user.organisation_employer
+                    name=request.user.organisation_employer
                 )
             else:
                 # current user is a member of the RCPCH audit team and also not affiliated with a organisation
                 # therefore set selected organisation to first of organisation on the list
-                selected_organisation = Organisation.objects.order_by(
-                    "OrganisationName"
-                ).first()
+                selected_organisation = Organisation.objects.order_by("name").first()
             return redirect("organisation_reports")
         for msg in form.error_messages:
             messages.error(
@@ -141,7 +139,7 @@ def epilepsy12_login(request):
                 if user.organisation_employer is not None:
                     # select the first hospital in the list if no allocated employing hospital
                     selected_organisation = Organisation.objects.get(
-                        OrganisationName=user.organisation_employer
+                        name=user.organisation_employer
                     )
                 else:
                     selected_organisation = Organisation.objects.first()
@@ -166,13 +164,13 @@ def epilepsy12_login(request):
                     if request.user.organisation_employer is not None:
                         # current user is affiliated with an existing organisation - set viewable trust to this
                         selected_organisation = Organisation.objects.get(
-                            OrganisationName=request.user.organisation_employer
+                            name=request.user.organisation_employer
                         )
                     else:
                         # current user is a member of the RCPCH audit team and also not affiliated with a organisation
                         # therefore set selected organisation to first of organisation on the list
                         selected_organisation = Organisation.objects.order_by(
-                            "OrganisationName"
+                            "name"
                         ).first()
                 return redirect(
                     "selected_organisation_summary",
@@ -211,25 +209,21 @@ def epilepsy12_user_list(request, organisation_id):
         filter_term_Q = (
             Q(first_name__icontains=filter_term)
             | Q(surname__icontains=filter_term)
-            | Q(organisation_employer__OrganisationName__icontains=filter_term)
+            | Q(organisation_employer__name__icontains=filter_term)
             | Q(email__icontains=filter_term)
         )
 
         # filter_term is called if filtering by search box
         if request.user.view_preference == 0:
             # user has requested organisation level view
-            basic_filter = Q(
-                organisation_employer__OrganisationName__icontains=organisation.OrganisationName
-            )
+            basic_filter = Q(organisation_employer__name__icontains=organisation.name)
         elif request.user.view_preference == 1:
             # user has requested trust level view
-            if organisation.country.ctry22cd == "W92000004":
-                parent_trust = organisation.organisation.local_health_board.lhb22nm
+            if organisation.country.boundary_identifier == "W92000004":
+                parent_trust = organisation.organisation.local_health_board.name
             else:
                 parent_trust = organisation.organisation.trust.trust_name
-            basic_filter = Q(
-                organisation_employer__OrganisationName__icontains=parent_trust
-            )
+            basic_filter = Q(organisation_employer__name__icontains=parent_trust)
         elif request.user.view_preference == 2:
             # user has requested national level view
             basic_filter = None
@@ -278,8 +272,8 @@ def epilepsy12_user_list(request, organisation_id):
 
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
-            if organisation.country.ctry22cd == "W92000004":
-                parent_trust = organisation.organisation.local_health_board.lhb22nm
+            if organisation.country.boundary_identifier == "W92000004":
+                parent_trust = organisation.organisation.local_health_board.name
             else:
                 parent_trust = organisation.organisation.trust.trust_name
 
@@ -289,9 +283,7 @@ def epilepsy12_user_list(request, organisation_id):
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
-            basic_filter = Q(
-                organisation_employer__OrganisationName__contains=organisation.OrganisationName
-            )
+            basic_filter = Q(organisation_employer__name__contains=organisation.name)
         else:
             raise Exception("No View Preference supplied")
 
@@ -388,8 +380,8 @@ def epilepsy12_user_list(request, organisation_id):
         else:
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("surname").all()
 
-    if organisation.country.ctry22cd == "W92000004":
-        parent_trust = organisation.organisation.local_health_board.lhb22nm
+    if organisation.country.boundary_identifier == "W92000004":
+        parent_trust = organisation.organisation.local_health_board.name
     else:
         parent_trust = organisation.organisation.trust.trust_name
 
@@ -399,13 +391,13 @@ def epilepsy12_user_list(request, organisation_id):
         or request.user.is_superuser
     ):
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.OrganisationName})"),
+            (0, f"Organisation level ({organisation.name})"),
             (1, f"Trust level ({parent_trust})"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.OrganisationName})"),
+            (0, f"Organisation level ({organisation.name})"),
             (1, f"Trust level ({parent_trust})"),
         )
 

@@ -51,12 +51,12 @@ def test_measure_7_mental_health_support(
 
     # ensure child is old enough to be scored on mental health
     DATE_OF_BIRTH = date(2018, 1, 1)
-    REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(years=5)
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = DATE_OF_BIRTH + relativedelta(years=5)
 
     # create case
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
     )
 
     # update multiaxial diagnosis to corresponding mental health issue identified

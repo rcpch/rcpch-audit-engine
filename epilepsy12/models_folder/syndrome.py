@@ -30,7 +30,7 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     )
 
     syndrome = models.ForeignKey(
-        "epilepsy12.SyndromeEntity",
+        "epilepsy12.SyndromeList",
         help_text={
             "label": "The syndrome name.",
             "reference": "Methodology for classification and definition of epilepsy syndromes with list of syndromes: Report of the ILAE Task Force on Nosology and Definitions, Epilepsia 2017",

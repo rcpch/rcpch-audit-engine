@@ -7,9 +7,9 @@
 
                         <div class="ui right action left icon input">
                             {% if site.organisation.trust %}
-                                <input disabled value="{{site.organisation.OrganisationName}} ({{site.organisation.trust.trust_name}})">
+                                <input disabled value="{{site.organisation.name}} ({{site.organisation.trust.trust_name}})">
                             {% else %}
-                                <input disabled value="{{site.organisation.OrganisationName}} ({{site.organisation.local_health_board.lhb22nm}})">
+                                <input disabled value="{{site.organisation.name}} ({{site.organisation.local_health_board.name}})">
                             {% endif %}
                             
                             <i class="rcpch_pink check circle outline icon"></i>

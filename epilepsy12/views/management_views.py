@@ -11,7 +11,7 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     AntiEpilepsyMedicine,
     Site,
-    MedicineEntity,
+    Medicine,
 )
 from ..common_view_functions import (
     validate_and_update_model,
@@ -148,7 +148,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     else:
         is_rescue = False
 
-    # medicine = MedicineEntity.objects.filter(is_rescue=is_rescue).first()
+    # medicine = Medicine.objects.filter(is_rescue=is_rescue).first()
 
     antiepilepsy_medicine = AntiEpilepsyMedicine.objects.create(
         is_rescue_medicine=is_rescue,
@@ -169,9 +169,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -258,9 +256,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -357,9 +353,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -368,7 +362,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
     medicine_id = request.POST.get("medicine_id")
 
     # look up the medicine from the pk
-    medicine_entity = MedicineEntity.objects.get(pk=medicine_id)
+    medicine_entity = Medicine.objects.get(pk=medicine_id)
 
     antiepilepsy_medicine.medicine_entity = medicine_entity
 
@@ -467,7 +461,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
             page_element="date_field",
             comparison_date_field_name="antiepilepsy_medicine_stop_date",
             is_earliest_date=True,
-            earliest_allowable_date=antiepilepsy_medicine.management.registration.registration_date,
+            earliest_allowable_date=antiepilepsy_medicine.management.registration.first_paediatric_assessment_date,
         )
     except ValueError as error:
         error_message = error
@@ -485,9 +479,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -540,9 +532,7 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -594,9 +584,7 @@ def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -642,7 +630,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
             page_element="date_field",
             comparison_date_field_name="antiepilepsy_medicine_start_date",
             is_earliest_date=False,
-            earliest_allowable_date=antiepilepsy_medicine.management.registration.registration_date,
+            earliest_allowable_date=antiepilepsy_medicine.management.registration.first_paediatric_assessment_date,
         )
     except ValueError as error:
         error_message = error
@@ -660,9 +648,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -720,9 +706,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -785,9 +769,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -852,9 +834,7 @@ def has_a_valproate_annual_risk_acknowledgement_form_been_completed(
     )
 
     choices = (
-        MedicineEntity.objects.filter(
-            is_rescue=antiepilepsy_medicine.is_rescue_medicine
-        )
+        Medicine.objects.filter(is_rescue=antiepilepsy_medicine.is_rescue_medicine)
         .exclude(pk__in=all_selected_antiepilepsymedicines)
         .order_by("medicine_name")
     )
@@ -1029,7 +1009,7 @@ def individualised_care_plan_date(request, management_id):
             model_id=management_id,
             field_name="individualised_care_plan_date",
             page_element="date_field",
-            earliest_allowable_date=management.registration.registration_date,
+            earliest_allowable_date=management.registration.first_paediatric_assessment_date,
             comparison_date_field_name=None,
             is_earliest_date=None,
         )

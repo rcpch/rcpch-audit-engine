@@ -14,7 +14,7 @@ def is_future_date(value):
     if value > datetime.now().date():
         raise serializers.ValidationError(
             {
-                "registration_date": "First paediatric assessment cannot be in the future."
+                "first_paediatric_assessment_date": "First paediatric assessment cannot be in the future."
             }
         )
     return value
@@ -33,7 +33,9 @@ def is_true(value):
 class RegistrationSerializer(serializers.ModelSerializer):
     registration_close_date = serializers.DateField(read_only=True)
     cohort = serializers.IntegerField(read_only=True)
-    registration_date = serializers.DateField(validators=[is_future_date])
+    first_paediatric_assessment_date = serializers.DateField(
+        validators=[is_future_date]
+    )
     eligibility_criteria_met = serializers.BooleanField(
         required=True, validators=[is_true]
     )
@@ -47,7 +49,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = [
             "pk",
             "case",
-            "registration_date",
+            "first_paediatric_assessment_date",
             "registration_close_date",
             "cohort",
             "eligibility_criteria_met",

@@ -40,7 +40,7 @@ class RegistrationViewSet(
     API endpoint that allows registrations in Epilepsy12 to be viewed.
     """
 
-    queryset = Registration.objects.all().order_by("-registration_date")
+    queryset = Registration.objects.all().order_by("-first_paediatric_assessment_date")
     serializer_class = RegistrationSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
 
@@ -55,11 +55,13 @@ class RegistrationViewSet(
         Essential parameters:
         nhs_number: 10 digit number
         lead_centre: OrganisationID
-        registration_date: date of first paediatric assessment
+        first_paediatric_assessment_date: date of first paediatric assessment
         eligibility_criteria_met: confirmation that child is eligible for audit
         """
         # collect parameters:
-        registration_date = request.POST.get("registration_date")
+        first_paediatric_assessment_date = request.POST.get(
+            "first_paediatric_assessment_date"
+        )
         eligibility_criteria_met = request.POST.get("eligibility_criteria_met")
         nhs_number = request.POST.get("nhs_number")
         lead_centre_id = request.POST.get("lead_centre")
@@ -69,8 +71,8 @@ class RegistrationViewSet(
         if serializer.is_valid(raise_exception=True):
             # validate parameters relating to related models
             if lead_centre_id:
-                if Organisation.objects.filter(ODSCode=lead_centre_id).exists():
-                    lead_centre = Organisation.objects.get(ODSCode=lead_centre_id)
+                if Organisation.objects.filter(ods_code=lead_centre_id).exists():
+                    lead_centre = Organisation.objects.get(ods_code=lead_centre_id)
                 else:
                     raise serializers.ValidationError(
                         {
@@ -115,15 +117,9 @@ class RegistrationViewSet(
             except Exception as error:
                 raise serializers.ValidationError(error)
 
-            if lead_centre.country.ctry22cd == "W92000004":
-                parent_trust = lead_centre.organisation.local_health_board.lhb22nm
-            else:
-                parent_trust = lead_centre.organisation.trust.trust_name
-
             try:
                 kpi = KPI.objects.create(
                     organisation=lead_centre,
-                    parent_trust=parent_trust,
                     paediatrician_with_expertise_in_epilepsies=0,
                     epilepsy_specialist_nurse=0,
                     tertiary_input=0,
@@ -165,8 +161,8 @@ class RegistrationViewSet(
             try:
                 registration = Registration.objects.create(
                     case=case,
-                    registration_date=datetime.strptime(
-                        registration_date, "%Y-%m-%d"
+                    first_paediatric_assessment_date=datetime.strptime(
+                        first_paediatric_assessment_date, "%Y-%m-%d"
                     ).date(),
                     eligibility_criteria_met=eligibility_criteria_met,
                     audit_progress=audit_progress,

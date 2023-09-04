@@ -10,7 +10,7 @@ from ..general_functions import fetch_ecl
 
 def seed_medicines(apps, schema_editor):
     """
-    This function adds medicines to the MedicineEntity model from SNOMED and local Epilepsy12 list.
+    This function adds medicines to the Medicine model from SNOMED and local Epilepsy12 list.
 
     Parameters:
     apps (list): A list of installed apps
@@ -19,18 +19,18 @@ def seed_medicines(apps, schema_editor):
     Returns:
     None
     """
-    MedicineEntity = apps.get_model("epilepsy12", "MedicineEntity")
+    Medicine = apps.get_model("epilepsy12", "Medicine")
     print(
         "\033[33m",
         "Seeding all the medicines from SNOMED and local Epilepsy12 list...",
         "\033[33m",
     )
     for benzo in SNOMED_BENZODIAZEPINE_TYPES:
-        if not MedicineEntity.objects.filter(medicine_name=benzo[1]).exists():
+        if not Medicine.objects.filter(medicine_name=benzo[1]).exists():
             # if the drug is not in the database already
             if benzo[0] not in [1001, 1002]:
                 concept = fetch_ecl(benzo[0])
-                new_drug = MedicineEntity(
+                new_drug = Medicine(
                     medicine_name=benzo[1],
                     is_rescue=True,
                     conceptId=concept[0]["conceptId"],
@@ -40,7 +40,7 @@ def seed_medicines(apps, schema_editor):
                 new_drug.save()
             else:
                 # these are for options other or unknown
-                new_drug = MedicineEntity(
+                new_drug = Medicine(
                     medicine_name=benzo[1],
                     is_rescue=True,
                     conceptId=None,
@@ -51,13 +51,11 @@ def seed_medicines(apps, schema_editor):
         else:
             print(f"{benzo[1]} exists. Skipping...")
     for aem in SNOMED_ANTIEPILEPSY_MEDICINE_TYPES:
-        if not MedicineEntity.objects.filter(
-            medicine_name=aem[1], is_rescue=False
-        ).exists():
+        if not Medicine.objects.filter(medicine_name=aem[1], is_rescue=False).exists():
             # if the drug is not in the database already
             if aem[0] not in [1001, 1002]:
                 concept = fetch_ecl(aem[0])
-                aem_drug = MedicineEntity(
+                aem_drug = Medicine(
                     is_rescue=False,
                     medicine_name=aem[1],
                     conceptId=concept[0]["conceptId"],
@@ -66,7 +64,7 @@ def seed_medicines(apps, schema_editor):
                 )
                 aem_drug.save()
             else:
-                aem_drug = MedicineEntity(
+                aem_drug = Medicine(
                     medicine_name=aem[1],
                     conceptId=None,
                     term=None,

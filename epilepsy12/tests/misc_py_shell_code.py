@@ -27,7 +27,7 @@ users = [
 ]
 
 TEST_USER_ORGANISATION = Organisation.objects.get(
-    ODSCode="RP401",
+    ods_code="RP401",
     trust__ods_code="RP4",
 )
 

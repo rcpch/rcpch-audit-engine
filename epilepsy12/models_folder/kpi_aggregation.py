@@ -551,12 +551,12 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"OrganisationKPIAggregation (ODSCode={self.abstraction_relation.ODSCode}) KPIAggregations"
+        return f"OrganisationKPIAggregation (ods_code={self.abstraction_relation.ods_code}) KPIAggregations"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.OrganisationName
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -620,7 +620,7 @@ class LocalHealthBoardKPIAggregation(BaseKPIAggregation):
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.lhb22nm
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -653,7 +653,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.icb23nm
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -686,7 +686,7 @@ class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.NHS_Region_Code
+            self.abstraction_name = self.abstraction_relation.region_code
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -719,7 +719,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.OPEN_UK_Network_Name
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -752,7 +752,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.ctry22nm
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)

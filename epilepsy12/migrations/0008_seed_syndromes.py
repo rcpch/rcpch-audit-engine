@@ -8,12 +8,12 @@ from django.db import migrations
 
 # RCPCH Imports
 from ..constants import SYNDROMES
-from ..models import SyndromeEntity
+from ..models import SyndromeList
 
 
 def seed_syndromes(apps, schema_editor):
     """
-    This function seeds the SyndromeEntity model with a list of syndromes.
+    This function seeds the Syndrome model with a list of syndromes.
     It should be run periodically to check if the data has already been seeded and to avoid duplicates.
 
     Parameters:
@@ -26,14 +26,11 @@ def seed_syndromes(apps, schema_editor):
     added = 0
     print("\033[33m", "Seeding all the syndromes...", "\033[33m")
     for syndrome in sorted(SYNDROMES, key=itemgetter(1)):
-        if SyndromeEntity.objects.filter(syndrome_name=syndrome[1]).exists():
+        if SyndromeList.objects.filter(syndrome_name=syndrome[1]).exists():
             print("Syndromes already exist. Skipping this step...")
             return
-        new_syndrome = SyndromeEntity(
+        new_syndrome = SyndromeList(
             syndrome_name=syndrome[1],
-            snomed_ct_code=None,
-            icd_10_code=None,
-            icd_10_name=None,
         )
         try:
             new_syndrome.save()

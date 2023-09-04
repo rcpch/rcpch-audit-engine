@@ -6,7 +6,7 @@
 from rest_framework import serializers
 
 # E12 imports
-from epilepsy12.models import MultiaxialDiagnosis, Comorbidity, ComorbidityEntity, Case
+from epilepsy12.models import MultiaxialDiagnosis, Comorbidity, Comorbidity, Case
 from epilepsy12.common_view_functions import update_audit_progress, calculate_kpis
 
 
@@ -28,7 +28,7 @@ class ComorbiditySerializer(serializers.ModelSerializer):
             or self.context.get("comorbidityentity_sctid") is None
         ):
             raise serializers.ValidationError(
-                {"comorbidity": "ComorbidityEntity SNOMED code not supplied!"}
+                {"comorbidity": "Comorbidity SNOMED code not supplied!"}
             )
 
         if "comorbidity_diagnosis_date" not in data:
@@ -42,7 +42,7 @@ class ComorbiditySerializer(serializers.ModelSerializer):
         instance.comorbidity_diagnosis_date = validated_data.get(
             "comorbidity_diagnosis_date", instance.comorbidity_diagnosis_date
         )
-        comorbidityentity = ComorbidityEntity.objects.filter(
+        comorbidityentity = Comorbidity.objects.filter(
             conceptId=self.context.get("comorbidityentity_sctid")
         ).first()
         instance.comorbidityentity = comorbidityentity
@@ -63,7 +63,7 @@ class ComorbiditySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if (
-            ComorbidityEntity.objects.filter(
+            Comorbidity.objects.filter(
                 conceptId=self.context.get("comorbidityentity_sctid")
             ).count()
             < 1
@@ -74,7 +74,7 @@ class ComorbiditySerializer(serializers.ModelSerializer):
                 }
             )
         else:
-            comorbidityentity = ComorbidityEntity.objects.filter(
+            comorbidityentity = Comorbidity.objects.filter(
                 conceptId=self.context.get("comorbidityentity_sctid")
             ).first()
             nhs_number = self.context.get("nhs_number")

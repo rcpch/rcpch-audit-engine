@@ -363,7 +363,7 @@ def avoid_fields(model_instance):
     elif model_class_name == "Management":
         return META_VARIABLES + ["registration", "antiepilepsymedicine"]
 
-    elif model_class_name in ["Syndrome", "Comorbidity", "ComorbidityEntity"]:
+    elif model_class_name in ["Syndrome", "Comorbidity", "Comorbidity"]:
         return META_VARIABLES + ["multiaxial_diagnosis"]
 
     elif model_class_name == "Episode":
@@ -400,7 +400,7 @@ def avoid_fields(model_instance):
             "kpi",
         ]
 
-    elif model_class_name == "MedicineEntity":
+    elif model_class_name == "Medicine":
         return [
             "id",
             "conceptId",

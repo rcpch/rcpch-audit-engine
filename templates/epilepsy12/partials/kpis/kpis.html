@@ -13,7 +13,7 @@ will be persisted and run as a cron job once a day.
                 <div class='content kpi_header'>
                     <p>Real-time Key Performance Indicator (KPI) Metrics</p>
                     <!-- <div class="sub header"> -->
-                    <p>{{organisation.OrganisationName}} ({{ organisation.trust.trust_name }})</p>
+                    <p>{{organisation.name}} ({{ organisation.trust.trust_name }})</p>
                     <!-- </div>     -->
                 </div>
                 {% if not open_access %}
@@ -55,22 +55,34 @@ will be persisted and run as a cron job once a day.
                                         class="info circle icon"
                                         id='totals_organisation'
                                         data-title='Epilepsy12 totals'
-                                        data-content="Number of children registered in this organisation ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.OrganisationName}})"
+                                        data-content="Number of children registered in this organisation ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.name}})"
                                         data-position='top right'
                                         _="init js $('#totals_organisation').popup(); end"
                                     ></i>({{all_data.ORGANISATION_KPIS.total_cases_registered}})</p>
                                 
                             </th>
                             <th class='right aligned'>
-                                <p>Health Board/Trust</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_trust'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Trust ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.ParentOrganisation_OrganisationName}})"
-                                    data-position='top right'
-                                    _="init js $('#totals_trust').popup(); end"
-                                ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
+                                {% if all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.trust %}
+                                    <p>Trust</p>
+                                    <p><i 
+                                        class="info circle icon"
+                                        id='totals_trust'
+                                        data-title='Epilepsy12 totals'
+                                        data-content="Number of children registered in this Trust ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.trust_name}})"
+                                        data-position='top right'
+                                        _="init js $('#totals_trust').popup(); end"
+                                    ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
+                                {% else %}
+                                    <p>Local Health Board</p>
+                                    <p><i 
+                                        class="info circle icon"
+                                        id='totals_trust'
+                                        data-title='Epilepsy12 totals'
+                                        data-content="Number of children registered in this Local Health ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.name}})"
+                                        data-position='top right'
+                                        _="init js $('#totals_trust').popup(); end"
+                                    ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
+                                {% endif %}
                             </th>
                             <th class='right aligned'>
                                 <p>Integrated Care Board</p>
@@ -100,7 +112,7 @@ will be persisted and run as a cron job once a day.
                                     class="info circle icon"
                                     id='totals_open_uk'
                                     data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this OPEN UK Region ({{all_data.OPEN_UK_KPIS.aggregation_model.abstraction_relation.OPEN_UK_Network_Name}})"
+                                    data-content="Number of children registered in this OPEN UK Region ({{all_data.OPEN_UK_KPIS.aggregation_model.abstraction_relation.name}})"
                                     data-position='top right'
                                     _="init js $('#totals_open_uk').popup(); end"
                                 ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>

@@ -50,7 +50,7 @@ class Comorbidity(
     )
 
     comorbidityentity = models.ForeignKey(
-        to="epilepsy12.ComorbidityEntity",
+        to="epilepsy12.ComorbidityList",
         on_delete=models.PROTECT,
         help_text={
             "label": "What is the comorbidity?",

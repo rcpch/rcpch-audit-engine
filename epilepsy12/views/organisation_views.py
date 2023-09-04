@@ -60,7 +60,7 @@ def selected_organisation_summary(request, organisation_id):
 
     lhb_tiles = None
 
-    if selected_organisation.country.ctry22cd == "W92000004":  # Wales
+    if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
         lhb_tiles = return_tile_for_region("lhb")
         abstraction_level = "local_health_board"
     else:
@@ -131,7 +131,7 @@ def selected_organisation_summary(request, organisation_id):
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,
-        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
+        "organisation_list": Organisation.objects.order_by("name").all(),
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
             selected_organisation=selected_organisation
         ),
@@ -187,7 +187,7 @@ def selected_trust_kpis(request, organisation_id):
     )
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
-    kpi_instance = KPI(organisation=organisation, parent_trust="TEMP")
+    kpi_instance = KPI(organisation=organisation)
     kpi_names_list = list(kpi_instance.get_kpis().keys())
 
     context = {
@@ -219,7 +219,7 @@ def selected_trust_select_kpi(request, organisation_id):
     all_data is of the format:
     {
     "ORGANISATION_KPIS":{
-        'aggregation_model': <OrganisationKPIAggregation: OrganisationKPIAggregation (ODSCode=RGT01) KPIAggregations>,
+        'aggregation_model': <OrganisationKPIAggregation: OrganisationKPIAggregation (ods_code=RGT01) KPIAggregations>,
         'total_cases_registered': 10,
         'charts': {
             'passed_pie': <ORGANISATION_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>
@@ -322,20 +322,16 @@ def selected_trust_kpis_open(request, organisation_id):
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
-    if organisation.country.ctry22cd == "W92000004":
-        parent_trust = organisation.local_health_board.lhb22nm
-    else:
-        parent_trust = organisation.trust.trust_name
+
     kpis = KPI.objects.create(
         organisation=organisation,
-        parent_trust=parent_trust,
     )
 
     template_name = "epilepsy12/partials/kpis/kpis.html"
     context = {
         "organisation": organisation,
         "kpis": kpis,
-        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "organisation_list": Organisation.objects.all().order_by("name"),
         "open_access": True,
     }
 

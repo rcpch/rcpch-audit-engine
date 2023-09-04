@@ -30,7 +30,7 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
     case = None
 
     # Sets the minimal 'required' fields for a registration to be valid
-    registration_date = date(2023, 1, 1)
+    first_paediatric_assessment_date = date(2023, 1, 1)
     eligibility_criteria_met = True
     audit_progress = factory.SubFactory(E12AuditProgressFactory)
 
@@ -44,7 +44,6 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         ).get()
         return KPI.objects.create(
             organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.trust.trust_name,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -103,7 +102,9 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         )
 
     class Params:
-        ineligible_mri = factory.Trait(registration_date=date(2023, 1, 1))
+        ineligible_mri = factory.Trait(
+            first_paediatric_assessment_date=date(2023, 1, 1)
+        )
 
         pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
         fail_assessment_of_mental_health_issues = factory.Trait(

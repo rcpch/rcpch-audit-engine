@@ -36,9 +36,9 @@
                             <label>General paediatric centre actively involved in care</label>
                         <div class="ui right action input">
                             {% if active_general_paediatric_site.organisation.trust %}
-                                <input disabled value="{{active_general_paediatric_site.organisation.OrganisationName}} ({{active_general_paediatric_site.organisation.trust.trust_name}})">
+                                <input disabled value="{{active_general_paediatric_site.organisation.name}} ({{active_general_paediatric_site.organisation.trust.trust_name}})">
                             {% else %}
-                                <input disabled value="{{active_general_paediatric_site.organisation.OrganisationName}} ({{active_general_paediatric_site.organisation.local_health_board.lhb22nm}})">
+                                <input disabled value="{{active_general_paediatric_site.organisation.name}} ({{active_general_paediatric_site.organisation.local_health_board.name}})">
                             {% endif %}
 
                             {% if not general_paediatric_edit_active %} 
@@ -106,7 +106,7 @@
             <div class="field">
                     <label>General paediatric centres previously involved in care</label>
                     {% for historical_general_paediatric_site in historical_general_paediatric_sites %}
-                        <li>{{historical_general_paediatric_site.organisation.OrganisationName}}</li>
+                        <li>{{historical_general_paediatric_site.organisation.name}}</li>
                     {% endfor %}
                 </div>
                 

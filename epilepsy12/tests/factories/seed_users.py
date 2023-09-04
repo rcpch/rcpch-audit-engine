@@ -41,7 +41,7 @@ def seed_users_fixture(django_db_setup, django_db_blocker):
         # Don't repeat seed
         if not Epilepsy12User.objects.exists():
             TEST_USER_ORGANISATION = Organisation.objects.get(
-                ODSCode="RP401",
+                ods_code="RP401",
                 trust__ods_code="RP4",
             )
 

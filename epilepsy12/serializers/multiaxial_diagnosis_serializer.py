@@ -6,7 +6,7 @@
 from rest_framework import serializers
 
 # E12 imports
-from epilepsy12.models import MultiaxialDiagnosis, Registration, EpilepsyCauseEntity
+from epilepsy12.models import MultiaxialDiagnosis, Registration, Comorbidity
 from epilepsy12.serializers.episode_serializer import EpisodeSerializer
 from epilepsy12.serializers.syndrome_serializer import SyndromeSerializer
 from epilepsy12.serializers.comorbidity_serializer import ComorbiditySerializer
@@ -17,7 +17,7 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
     episodes = EpisodeSerializer(many=True)
     syndromes = SyndromeSerializer(many=True)
     epilepsy_cause = serializers.SlugRelatedField(
-        queryset=EpilepsyCauseEntity.objects.all(), slug_field="preferredTerm"
+        queryset=Comorbidity.objects.all(), slug_field="preferredTerm"
     )
     registration = serializers.PrimaryKeyRelatedField(
         queryset=Registration.objects.all()
@@ -47,13 +47,13 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
     def get_epilepsy_cause(self):
         """
         This is a custom method as the user passes in an SCTID of the epilepsy cause
-        This is validated and used to look up the value in the the EpilepsyCauseEntity table
+        This is validated and used to look up the value in the the Comorbidity table
         and passed back to the epilepsy_cause field in the Multiaxial Diagnosis instance in the save()
         """
         sctid = self.context.get("sctid")
         if sctid is not None:
-            if EpilepsyCauseEntity.objects.filter(conceptId=sctid).exists():
-                self.instance.epilepsy_cause = EpilepsyCauseEntity.objects.filter(
+            if Comorbidity.objects.filter(conceptId=sctid).exists():
+                self.instance.epilepsy_cause = Comorbidity.objects.filter(
                     conceptId=sctid
                 ).first()
             else:

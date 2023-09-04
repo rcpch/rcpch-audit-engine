@@ -1,5 +1,31 @@
+"""
+# Auto-generated `LayerMapping` dictionary for IntegratedCareBoardBoundaries model
+integratedcareboardboundaries_mapping = {
+    'icb23cd': 'ICB23CD',
+    'name': 'ICB23NM',
+    'bng_e': 'BNG_E',
+    'bng_n': 'BNG_N',
+    'long': 'LONG',
+    'lat': 'LAT',
+    'globalid': 'GlobalID',
+    'geom': 'MULTIPOLYGON',
+}
+"""
 from django.contrib.gis.db import models
-from .integrated_care_board_boundaries import IntegratedCareBoardBoundaries
+
+
+class IntegratedCareBoardBoundaries(models.Model):
+    boundary_identifier = models.CharField(max_length=9)
+    name = models.CharField(max_length=77)
+    bng_e = models.BigIntegerField()
+    bng_n = models.BigIntegerField()
+    long = models.FloatField()
+    lat = models.FloatField()
+    globalid = models.CharField(max_length=38)
+    geom = models.MultiPolygonField(srid=27700)
+
+    class Meta:
+        abstract = True
 
 
 class IntegratedCareBoard(IntegratedCareBoardBoundaries):
@@ -8,10 +34,10 @@ class IntegratedCareBoard(IntegratedCareBoardBoundaries):
     class Meta:
         verbose_name = "Integrated Care Board"
         verbose_name_plural = "Integrated Care Boards"
-        ordering = ("icb23nm",)
+        ordering = ("name",)
 
     def __str__(self) -> str:
-        return self.icb23nm
+        return self.name
 
     def get_ods_code(self) -> str:
         return self.ods_code

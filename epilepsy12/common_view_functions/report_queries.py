@@ -104,10 +104,10 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         if organisation_instance.nhs_england_region is not None:
             q_filter = (
                 Q(
-                    site__organisation__nhs_england_region__NHS_Region_Code=organisation_instance.nhs_england_region.NHS_Region_Code
+                    site__organisation__nhs_england_region__NHS_Region_Code=organisation_instance.nhs_england_region.region_code
                 )
                 & Q(
-                    site__organisation__country__ctry22cd=organisation_instance.country.ctry22cd
+                    site__organisation__country__ctry22cd=organisation_instance.country.boundary_identifier
                 )
                 & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                 & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -117,7 +117,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     elif abstraction_level == "open_uk":
         q_filter = (
             Q(
-                site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.OPEN_UK_Network_Code
+                site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.boundary_identifier
             )
             & Q(site__site_is_actively_involved_in_epilepsy_care=True)
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -125,7 +125,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     elif abstraction_level == "country":
         q_filter = (
             Q(
-                site__organisation__country__ctry22cd=organisation_instance.country.ctry22cd
+                site__organisation__country__ctry22cd=organisation_instance.country.boundary_identifier
             )
             & Q(site__site_is_actively_involved_in_epilepsy_care=True)
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -148,7 +148,7 @@ def get_all_countries():
 
     """
     Country = apps.get_model("epilepsy12", "Country")
-    return Country.objects.order_by("ctry22nm")
+    return Country.objects.order_by("name")
 
 
 def get_all_nhs_regions():
@@ -159,7 +159,7 @@ def get_all_nhs_regions():
     """
     NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
 
-    return NHSEnglandRegion.objects.order_by("nhser22nm")
+    return NHSEnglandRegion.objects.order_by("name")
 
 
 def get_all_open_uk_regions():
@@ -168,7 +168,7 @@ def get_all_open_uk_regions():
     [('BRPNF', 'Birmingham Regional Paediatric Neurology Forum'), ('CEWT', "Children's Epilepsy Workstream in Trent"), ('EPEN', 'Eastern Paediatric Epilepsy Network'), ('EPIC', "Mersey and North Wales network 'Epilepsy In Childhood' interest group"), ('NTPEN', 'North Thames Paediatric Epilepsy Network'), ('NWEIG', "North West Children and Young People's Epilepsy Interest Group"), ('ORENG', 'Oxford region epilepsy interest group'), ('PENNEC', 'Paediatric Epilepsy Network for the North East and Cumbria'), ('SETPEG', 'South East Thames Paediatric Epilepsy Group'), ('SETPEG', 'SSouth East Thames Paediatric Epilepsy Group'), ('SWEP', 'South Wales Epilepsy Forum'), ('SWIPE', 'South West Interest Group Paediatric Epilepsy'), ('SWTPEG', 'South West Thames Paediatric Epilepsy Group'), ('TEN', 'Trent Epilepsy Network'), ('WPNN', 'Wessex Paediatric Neurosciences Network'), ('YPEN', 'Yorkshire Paediatric Neurology Network'), (None, None)]
     """
     OPENUKNetwork = apps.get_model("epilepsy12", "OPENUKNetwork")
-    return OPENUKNetwork.objects.order_by("OPEN_UK_Network_Name", "country")
+    return OPENUKNetwork.objects.order_by("name", "country")
 
 
 def get_all_icbs():
@@ -176,7 +176,7 @@ def get_all_icbs():
     Returns a list of all Integrated Care Boards
     """
     IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
-    return IntegratedCareBoard.objects.order_by("icb23nm")
+    return IntegratedCareBoard.objects.order_by("name")
 
 
 def get_all_trusts():
@@ -197,7 +197,7 @@ def get_all_organisations():
     """
     Organisation = apps.get_model("epilepsy12", "Organisation")
     return (
-        Organisation.objects.order_by("OrganisationName", "ODSCode")
-        .values("OrganisationName", "ODSCode")
+        Organisation.objects.order_by("name", "ods_code")
+        .values("name", "ods_code")
         .distinct()
     )

@@ -5,5 +5,5 @@
 
 <div class="field">
     {% url "epilepsy_cause" multiaxial_diagnosis_id=multiaxial_diagnosis.pk as hx_post %}
-    {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=epilepsy_causes field_name='preferredTerm' hx_post=hx_post hx_name='epilepsy_cause' hx_default_text='Select a cause' hx_swap='innerHTML' hx_target='#epilepsy_causes' hx_trigger='change' test_positive=multiaxial_diagnosis.epilepsy_cause.pk label=multiaxial_diagnosis.get_epilepsy_cause_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_help_reference_text enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
+    {% include 'epilepsy12/partials/page_elements/select_model.html' with choices=epilepsy_causes field_name='preferredTerm' field_name2='term' hx_post=hx_post hx_name='epilepsy_cause' hx_default_text='Select a cause' hx_swap='innerHTML' hx_target='#epilepsy_causes' hx_trigger='change' test_positive=multiaxial_diagnosis.epilepsy_cause.pk label=multiaxial_diagnosis.get_epilepsy_cause_help_label_text reference=multiaxial_diagnosis.get_epilepsy_cause_help_reference_text enabled=perms.epilepsy12.change_multiaxialdiagnosis %}
 </div>

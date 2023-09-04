@@ -83,9 +83,9 @@
                                 <label>Surgical centre actively involved in care</label>
                             <div class="ui right action input">
                                 {% if active_surgical_site.organisation.trust %}
-                                    <input disabled value="{{active_surgical_site.organisation.OrganisationName}} ({{active_surgical_site.organisation.trust.trust_name}})">
+                                    <input disabled value="{{active_surgical_site.organisation.name}} ({{active_surgical_site.organisation.trust.trust_name}})">
                                     {% else %}
-                                    <input disabled value="{{active_surgical_site.organisation.OrganisationName}} ({{active_surgical_site.organisation.local_health_board.lhb22nm}})">
+                                    <input disabled value="{{active_surgical_site.organisation.name}} ({{active_surgical_site.organisation.local_health_board.name}})">
                                 {% endif %}
                                 <div class="ui buttons">
                                 

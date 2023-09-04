@@ -14,9 +14,9 @@
                 <ul>
                     {% for previously_registered_site in previously_registered_sites %}
                         {% if previously_registered_site.organisation.trust %}
-                            <li>{{previously_registered_site.organisation.trust.trust_name}} ({{previously_registered_site.organisation.OrganisationName}})</li>
+                            <li>{{previously_registered_site.organisation.trust.trust_name}} ({{previously_registered_site.organisation.name}})</li>
                         {% else %}
-                            <li>{{previously_registered_site.organisation.local_health_board.lhb22nm}} ({{previously_registered_site.organisation.OrganisationName}})</li>
+                            <li>{{previously_registered_site.organisation.local_health_board.name}} ({{previously_registered_site.organisation.name}})</li>
                         {% endif %}
                     {% endfor %}
                 </ul>

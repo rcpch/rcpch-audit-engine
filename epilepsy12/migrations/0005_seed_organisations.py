@@ -31,8 +31,8 @@ def seed_organisations(apps, schema_editor):
     LondonBorough = apps.get_model("epilepsy12", "LondonBorough")
     OPENUKNetwork = apps.get_model("epilepsy12", "OPENUKNetwork")
     Country = apps.get_model("epilepsy12", "Country")
-    england = Country.objects.get(ctry22cd="E92000001")
-    wales = Country.objects.get(ctry22cd="W92000004")
+    england = Country.objects.get(boundary_identifier="E92000001")
+    wales = Country.objects.get(boundary_identifier="W92000004")
 
     if Organisation.objects.all().count() == 329:
         print(
@@ -65,18 +65,18 @@ def seed_organisations(apps, schema_editor):
             # Create Organisation instances
             try:
                 organisation = Organisation.objects.create(
-                    ODSCode=rcpch_organisation["OrganisationCode"],
-                    OrganisationName=rcpch_organisation["OrganisationName"],
-                    Website=rcpch_organisation["Website"],
-                    Address1=rcpch_organisation["Address1"],
-                    Address2=rcpch_organisation["Address2"],
-                    Address3=rcpch_organisation["Address3"],
-                    City=rcpch_organisation["City"],
-                    County=rcpch_organisation["County"],
-                    Latitude=latitude,
-                    Longitude=longitude,
-                    Postcode=rcpch_organisation["Postcode"],
-                    Geocode_Coordinates=new_point,
+                    ods_code=rcpch_organisation["OrganisationCode"],
+                    name=rcpch_organisation["OrganisationName"],
+                    website=rcpch_organisation["Website"],
+                    address1=rcpch_organisation["Address1"],
+                    address2=rcpch_organisation["Address2"],
+                    address3=rcpch_organisation["Address3"],
+                    city=rcpch_organisation["City"],
+                    county=rcpch_organisation["County"],
+                    latitude=latitude,
+                    longitude=longitude,
+                    postcode=rcpch_organisation["Postcode"],
+                    geocode_coordinates=new_point,
                 )
                 # add trust or local health board
                 if (
@@ -152,7 +152,7 @@ def seed_organisations(apps, schema_editor):
 
         try:
             nhs_england_region = NHSEnglandRegion.objects.get(
-                NHS_Region_Code=icb_trust["NHS England Region Code"]
+                region_code=icb_trust["NHS England Region Code"]
             )
         except Exception as error:
             print(
@@ -203,7 +203,7 @@ def seed_organisations(apps, schema_editor):
             raise Exception(f"{trust_openuk_network['ods trust code']} error")
 
         openuk_network = OPENUKNetwork.objects.get(
-            OPEN_UK_Network_Code=trust_openuk_network["OPEN UK Network Code"]
+            boundary_identifier=trust_openuk_network["OPEN UK Network Code"]
         )
         # upoate the OPENUK netowork for all the Organisations in this trust
         Organisation.objects.filter(query_term).update(openuk_network=openuk_network)

@@ -81,12 +81,22 @@ def run_dummy_cases_seed(verbose=True, cases=50):
     if cases is None or cases == 0:
         cases = 50
 
-    different_organisations = ["RGT01", "RBS25", "RQM01", "RCF22", "7A2AJ", "7A6BJ", "7A6AV"]
-    organisations_list = Organisation.objects.filter(ODSCode__in=different_organisations).order_by('OrganisationName')
+    different_organisations = [
+        "RGT01",
+        "RBS25",
+        "RQM01",
+        "RCF22",
+        "7A2AJ",
+        "7A6BJ",
+        "7A6AV",
+    ]
+    organisations_list = Organisation.objects.filter(
+        ods_code__in=different_organisations
+    ).order_by("name")
     for org in organisations_list:
         num_cases_to_seed_in_org = int(cases / len(different_organisations))
         print(f"Creating {num_cases_to_seed_in_org} Cases in {org}")
-        
+
         # Create random attributes
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
         date_of_birth = random_date
@@ -110,7 +120,6 @@ def run_dummy_cases_seed(verbose=True, cases=50):
                 "seed_female": seed_female,
             },
         )
-        
 
 
 def run_registrations(verbose=True):
@@ -142,7 +151,7 @@ def complete_registrations(verbose=True):
         )
     current_cohort = get_current_cohort_data()
     for registration in Registration.objects.all():
-        registration.registration_date = random_date(
+        registration.first_paediatric_assessment_date = random_date(
             start=current_cohort["cohort_start_date"], end=date.today()
         )
         registration.eligibility_criteria_met = True

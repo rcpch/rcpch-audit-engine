@@ -129,7 +129,7 @@ def download(request, model_name):
                     else:
                         relative_field_name = f"{one_to_one_table}__{field.name}"
                         if field.name == "organisations":
-                            relative_field_name += "__OrganisationName"
+                            relative_field_name += "__name"
                     field_list.append(relative_field_name)
         model_class = Registration
     else:

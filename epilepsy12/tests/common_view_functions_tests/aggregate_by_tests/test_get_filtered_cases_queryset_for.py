@@ -2,15 +2,15 @@
 from django.db.models import Count
 from epilepsy12.models import Organisation
 
-a = Organisation.objects.get(ODSCode="RP401")
+a = Organisation.objects.get(ods_code="RP401")
 
 Organisation.objects.exclude(
-            # ODSCode=a.ODSCode,
+            # ods_code=a.ods_code,
             # trust__ods_code=a.trust__ods_code,
             # integrated_care_board=a.integrated_care_board,
             # nhs_region=a.nhs_region,
             # openuk_network=a.openuk_network,
-        ).filter(openuk_network=a.openuk_network).values_list("ODSCode", "OrganisationName")
+        ).filter(openuk_network=a.openuk_network).values_list("ods_code", "name")
 """
 
 # python imports
@@ -65,14 +65,14 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
     # Ensure Case db empty for this test
     _clean_cases_from_test_db()
 
-    # Generate test cases - 10 in each ODSCode given
+    # Generate test cases - 10 in each ods_code given
     ods_codes = ODSCodes
     _register_cases_in_organisation(
         ods_codes=ods_codes, e12_case_factory=e12_case_factory
     )
 
     for ix, ods_code in enumerate(ods_codes):
-        organisation = Organisation.objects.get(ODSCode=ods_code)
+        organisation = Organisation.objects.get(ods_code=ods_code)
 
         output = get_filtered_cases_queryset_for(
             organisation=organisation,
@@ -99,12 +99,12 @@ def test_get_filtered_cases_queryset_includes_only_specified_cohort(
     _clean_cases_from_test_db()
 
     # Generate test cases
-    org = Organisation.objects.get(ODSCode="RGT01")
+    org = Organisation.objects.get(ods_code="RGT01")
     e12_case_factory.create_batch(
         10,
         organisations__organisation=org,
-        first_name=f"temp_{org.OrganisationName}",
-        registration__registration_date=date(2021, 1, 1),
+        first_name=f"temp_{org.name}",
+        registration__first_paediatric_assessment_date=date(2021, 1, 1),
     )
 
     for abstraction_level in EnumAbstractionLevel:
@@ -129,14 +129,14 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
     ods_codes_where_icb_null = [
         code[0]
         for code in Organisation.objects.all()
-        .values("ODSCode", "OrganisationName", "integrated_care_board")
+        .values("ods_code", "name", "integrated_care_board")
         .annotate(count=Count("integrated_care_board"))
         .filter(count__lt=1)
-        .values_list("ODSCode")
+        .values_list("ods_code")
         .distinct()
     ]
 
-    # Generate test cases - 10 in each ODSCode given
+    # Generate test cases - 10 in each ods_code given
     _register_cases_in_organisation(
         ods_codes=ods_codes_where_icb_null,
         e12_case_factory=e12_case_factory,
@@ -145,7 +145,7 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
 
     for ods_code in ods_codes_where_icb_null:
         # Community Paediatrics Org returning with the actual org so need to do filter.first()
-        organisation = Organisation.objects.filter(ODSCode=ods_code).first()
+        organisation = Organisation.objects.filter(ods_code=ods_code).first()
 
         output = get_filtered_cases_queryset_for(
             organisation=organisation,

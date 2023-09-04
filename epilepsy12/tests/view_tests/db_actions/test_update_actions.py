@@ -184,7 +184,7 @@
 
     
     [] Assert user cannot change 'seizure_onset_date' to before Case.date_of_birth (raise ValidationError)
-    [] Assert user cannot change 'seizure_onset_date' to before Registration.registration_date (raise ValidationError)
+    [] Assert user cannot change 'seizure_onset_date' to before Registration.first_paediatric_assessment_date (raise ValidationError)
     [] Assert user cannot change 'seizure_onset_date' to future date (raise ValidationError)
     
 
@@ -396,14 +396,14 @@ from epilepsy12.models import (
     Case,
     Episode,
     Keyword,
-    EpilepsyCauseEntity,
+    EpilepsyCause,
     MultiaxialDiagnosis,
-    ComorbidityEntity,
     Comorbidity,
-    MedicineEntity,
+    ComorbidityList,
+    Medicine,
     AntiEpilepsyMedicine,
+    SyndromeList,
     Syndrome,
-    SyndromeEntity,
 )
 
 from epilepsy12.constants import (
@@ -756,12 +756,12 @@ def test_user_updates_single_choice_multiple_toggle_success(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -803,12 +803,12 @@ def test_user_updates_single_choice_multiple_toggle_fail(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -848,11 +848,11 @@ def test_user_updates_toggles_true_success(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -892,12 +892,12 @@ def test_user_updates_toggles_false_success(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -936,12 +936,12 @@ def test_user_updates_toggles_true_fail(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -980,12 +980,12 @@ def test_user_updates_toggles_false_fail(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -1027,12 +1027,12 @@ def test_user_updates_select_success(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -1068,9 +1068,7 @@ def test_user_updates_select_success(
                 validate_select(
                     field_name=url.get("field_name"),
                     model_instance=updated_model,
-                    expected_result=EpilepsyCauseEntity.objects.get(
-                        pk=134
-                    ),  # Aicardi's sy.
+                    expected_result=Comorbidity.objects.get(pk=134),  # Aicardi's sy.
                     assert_pass=True,
                 )
         else:
@@ -1081,19 +1079,17 @@ def test_user_updates_select_success(
 
             if url.get("field_name") == "epilepsy_cause":
                 data = {"epilepsy_cause": 134}
-                expected_result = EpilepsyCauseEntity.objects.get(
-                    pk=134
-                )  # Aicardi's sy
+                expected_result = EpilepsyCause.objects.get(pk=134)  # Aicardi's sy
                 htmx_trigger = "epilepsy_cause"
             elif url.get("field_name") == "comorbidity":
                 data = {"comorbidityentity": 134}
-                expected_result = ComorbidityEntity.objects.get(
+                expected_result = ComorbidityList.objects.get(
                     pk=34
                 )  # specific learning difficulty
                 htmx_trigger = "comorbidityentity"
             elif url.get("field_name") == "syndrome_name":
                 data = {"syndrome": 35}
-                expected_result = SyndromeEntity.objects.get(
+                expected_result = SyndromeList.objects.get(
                     pk=35
                 )  # Self-limited (familial) neonatal epilepsy
                 htmx_trigger = "syndrome"
@@ -1126,12 +1122,12 @@ def test_user_updates_select_fail(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -1167,7 +1163,7 @@ def test_user_updates_select_fail(
                 validate_select(
                     field_name=url.get("field_name"),
                     model_instance=updated_model,
-                    expected_result=EpilepsyCauseEntity.objects.get(
+                    expected_result=ComorbidityList.objects.get(
                         pk=135
                     ),  # Dysmorphic sialidosis with renal involvement
                     assert_pass=False,
@@ -1180,19 +1176,19 @@ def test_user_updates_select_fail(
 
             if url.get("field_name") == "epilepsy_cause":
                 data = {"epilepsy_cause": 134}  # Aicardi's sy.
-                expected_result = EpilepsyCauseEntity.objects.get(
+                expected_result = EpilepsyCause.objects.get(
                     pk=135
                 )  # Dysmorphic sialidosis with renal involvement
                 htmx_trigger = "epilepsy_cause"
             elif url.get("field_name") == "comorbidity_diagnosis":
                 data = {"comorbidityentity": 134}
-                expected_result = ComorbidityEntity.objects.get(
+                expected_result = ComorbidityList.objects.get(
                     pk=35
                 )  # Meets criteria for referral to Children's Epilepsy Surgery Service
                 htmx_trigger = "comorbidityentity"
             elif url.get("field_name") == "syndrome_name":
                 data = {"syndrome": 35}
-                expected_result = SyndromeEntity.objects.get(
+                expected_result = SyndromeList.objects.get(
                     pk=34
                 )  # Self-limited (familial) neonatal epilepsy
                 htmx_trigger = "syndrome"
@@ -1222,17 +1218,19 @@ def test_age_at_registration_cannot_be_gt_24yo(client, GOSH):
     Assert date of first paediatric assessment cannot be after 24th birthday
     """
 
-    REGISTRATION_DATE = date(2023, 1, 1)
-    DATE_OF_BIRTH = REGISTRATION_DATE - relativedelta.relativedelta(years=24)
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
+    DATE_OF_BIRTH = FIRST_PAEDIATRIC_ASSESSMENT_DATE - relativedelta.relativedelta(
+        years=24
+    )
 
     # GOSH
     TEST_USER_ORGANISATION = GOSH
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=None,
+        registration__first_paediatric_assessment_date=None,
     )
 
     test_user = Epilepsy12User.objects.get(
@@ -1243,11 +1241,14 @@ def test_age_at_registration_cannot_be_gt_24yo(client, GOSH):
 
     response = client.post(
         reverse(
-            "registration_date",
+            "first_paediatric_assessment_date",
             kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
         ),
-        headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
-        data={"registration_date": REGISTRATION_DATE},
+        headers={
+            "Hx-Trigger-Name": "first_paediatric_assessment_date",
+            "Hx-Request": "true",
+        },
+        data={"first_paediatric_assessment_date": FIRST_PAEDIATRIC_ASSESSMENT_DATE},
     )
 
     err_msg = response.context["error_message"]
@@ -1285,8 +1286,8 @@ def validate_date_assertions(
             date_to_test >= case.date_of_birth
         ), f"{field_name} - {date_to_test} is not before {case}'s date of birth - Expected PASS"
         assert (
-            date_to_test >= case.registration.registration_date
-        ), f"{date_to_test} is not before {case}'s first paediatric assessment date ({case.registration.registration_date}) - Expected PASS"
+            date_to_test >= case.registration.first_paediatric_assessment_date
+        ), f"{date_to_test} is not before {case}'s first paediatric assessment date ({case.registration.first_paediatric_assessment_date}) - Expected PASS"
     else:
         assert (
             date_to_test > date.today()
@@ -1295,8 +1296,8 @@ def validate_date_assertions(
             date_to_test < case.date_of_birth
         ), f"{field_name} - {date_to_test} is before {case}'s date of birth - Expected FAIL"
         assert (
-            date_to_test < case.registration.registration_date
-        ), f"{field_name} - {date_to_test} is before {case}'s first paediatric assessment date ({case.registration.registration_date}) - Expected FAIL"
+            date_to_test < case.registration.first_paediatric_assessment_date
+        ), f"{field_name} - {date_to_test} is before {case}'s first paediatric assessment date ({case.registration.first_paediatric_assessment_date}) - Expected FAIL"
 
     if second_date is not None:
         if assert_pass:
@@ -1385,7 +1386,7 @@ def get_model_from_model(case, model_name):
     elif model_name == "comorbidity":
         comorbidity, created = Comorbidity.objects.get_or_create(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
-            comorbidityentity=ComorbidityEntity.objects.get(
+            comorbidityentity=Comorbidity.objects.get(
                 pk=34
             ),  # specific learning difficulty
         )
@@ -1393,20 +1394,18 @@ def get_model_from_model(case, model_name):
     elif model_name == "syndrome":
         syndrome, created = Syndrome.objects.get_or_create(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
-            syndrome=SyndromeEntity.objects.get(
+            syndrome=Syndrome.objects.get(
                 pk=35
             ),  # Self-limited (familial) neonatal epilepsy
         )
         return syndrome
     elif model_name == "epilepsycauseentity":
-        return EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
+        return Comorbidity.objects.get(pk=135)  # Aicardi's syndrome
     elif model_name == "antiepilepsymedicine":
         return AntiEpilepsyMedicine.objects.create(
             management=case.registration.management,
             is_rescue_medicine=False,
-            medicine_entity=MedicineEntity.objects.get(
-                medicine_name="Sodium valproate"
-            ),
+            medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
         )
     elif model_name == "multiaxialdiagnosis":
         return MultiaxialDiagnosis.objects.get(

@@ -12,32 +12,34 @@ import pytest
 
 # RCPCH imports
 from epilepsy12.models import (
-    ComorbidityEntity,
-    EpilepsyCauseEntity,
-    IntegratedCareBoardEntity,
+    ComorbidityList,
+    EpilepsyCause,
+    SyndromeList,
     Keyword,
-    MedicineEntity,
-    NHSEnglandRegion,
-    ONSCountryEntity,
-    OPENUKNetworkEntity,
+    Medicine,
     Organisation,
-    SyndromeEntity,
+    Trust,
+    IntegratedCareBoard,
+    NHSEnglandRegion,
+    OPENUKNetwork,
+    Country,
 )
 
 
 @pytest.mark.parametrize(
     "entity",
     [
-        ComorbidityEntity,
-        EpilepsyCauseEntity,
-        IntegratedCareBoardEntity,
+        ComorbidityList,
+        EpilepsyCause,
+        SyndromeList,
         Keyword,
-        MedicineEntity,
-        NHSEnglandRegion,
-        ONSCountryEntity,
-        OPENUKNetworkEntity,
+        Medicine,
         Organisation,
-        SyndromeEntity,
+        Trust,
+        IntegratedCareBoard,
+        NHSEnglandRegion,
+        OPENUKNetwork,
+        Country,
     ],
 )
 @pytest.mark.django_db

@@ -110,9 +110,9 @@
         <div class="header">Organisation</div>
         <p>
           <b>{% if organisation.trust %}
-              {{organisation.OrganisationName}}({{organisation.trust.trust_name}})
+              {{organisation.name}}({{organisation.trust.trust_name}})
               {% else %}
-              {{organisation.OrganisationName}}({{organisation.local_health_board.lhb22nm}})
+              {{organisation.name}}({{organisation.local_health_board.name}})
               {% endif %}
           </b>
           will be allocated automatically as the lead Epilepsy12 centre on saving

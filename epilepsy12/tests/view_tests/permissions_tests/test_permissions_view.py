@@ -203,9 +203,9 @@ from epilepsy12.models import (
     Episode,
     Syndrome,
     Comorbidity,
-    ComorbidityEntity,
+    Comorbidity,
     AntiEpilepsyMedicine,
-    MedicineEntity,
+    Medicine,
 )
 
 
@@ -237,13 +237,13 @@ def test_users_and_case_list_views_permissions_success(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
 
@@ -303,7 +303,7 @@ def test_users_and_cases_list_view_permissions_forbidden(
 
     # ADDENBROOKE'S - DIFFERENT TRUST
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
 
@@ -343,11 +343,11 @@ def test_registration_view_permissions_success(client):
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+        first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
     users = Epilepsy12User.objects.all()
@@ -373,7 +373,7 @@ def test_registration_view_permissions_success(client):
             test_user_clinicial_audit_team_data.role_str,
         ]:
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
+                ods_code="RGT01",
                 trust__ods_code="RGT",
             )
 
@@ -398,11 +398,11 @@ def test_registration_view_permissions_forbidden(client):
 
     # GOSH
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE
@@ -444,11 +444,11 @@ def test_episode_syndrome_aem_view_permissions_success(client):
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+        first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
     users = Epilepsy12User.objects.all()
@@ -467,7 +467,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
 
     aem = AntiEpilepsyMedicine.objects.create(
         management=CASE_FROM_SAME_ORG.registration.management,
-        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+        medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
     )
 
     for test_user in users:
@@ -505,11 +505,11 @@ def test_episode_syndrome_aem_view_permissions_success(client):
                     test_user_clinicial_audit_team_data.role_str,
                 ]:
                     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                        ODSCode="RGT01",
+                        ods_code="RGT01",
                         trust__ods_code="RGT",
                     )
                     CASE_FROM_DIFF_ORG = Case.objects.get(
-                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+                        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
                     )
 
                     # Create objs to search for
@@ -527,7 +527,7 @@ def test_episode_syndrome_aem_view_permissions_success(client):
 
                     aem = AntiEpilepsyMedicine.objects.create(
                         management=CASE_FROM_DIFF_ORG.registration.management,
-                        medicine_entity=MedicineEntity.objects.get(
+                        medicine_entity=Medicine.objects.get(
                             medicine_name="Sodium valproate"
                         ),
                     )
@@ -566,11 +566,11 @@ def test_episode_view_permissions_forbidden(client, URL):
     """
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     EPISODE_DIFF_ORG = Episode.objects.get(
@@ -610,11 +610,11 @@ def test_syndrome_view_permissions_forbidden(client, URL):
     """
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     syndrome_DIFF_ORG = Syndrome.objects.get(
@@ -656,16 +656,16 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
     """
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     antiepilepsy_medicine_DIFF_ORG = AntiEpilepsyMedicine.objects.create(
         management=CASE_FROM_DIFF_ORG.registration.management,
-        medicine_entity=MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+        medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE
@@ -706,18 +706,16 @@ def test_comborbidity_view_permissions_success(client, URL):
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+        first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
     COMORBIDITY_SAME_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
-        comorbidityentity=ComorbidityEntity.objects.filter(
-            conceptId="1148757008"
-        ).first(),
+        comorbidityentity=Comorbidity.objects.filter(conceptId="1148757008").first(),
     )
 
     users = Epilepsy12User.objects.all()
@@ -753,16 +751,16 @@ def test_comborbidity_view_permissions_success(client, URL):
             test_user_clinicial_audit_team_data.role_str,
         ]:
             DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                ODSCode="RGT01",
+                ods_code="RGT01",
                 trust__ods_code="RGT",
             )
             CASE_FROM_DIFF_ORG = Case.objects.get(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
             )
 
             comborbidity_DIFF_ORG = Comorbidity.objects.create(
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-                comorbidityentity=ComorbidityEntity.objects.filter(
+                comorbidityentity=Comorbidity.objects.filter(
                     conceptId="1148757008"
                 ).first(),
             )
@@ -800,18 +798,16 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
     """
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     COMORBIDITY_DIFF_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-        comorbidityentity=ComorbidityEntity.objects.filter(
-            conceptId="1148757008"
-        ).first(),
+        comorbidityentity=Comorbidity.objects.filter(conceptId="1148757008").first(),
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE
@@ -866,11 +862,11 @@ def test_multiple_views_permissions_success(client):
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
     CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+        first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
     users = Epilepsy12User.objects.all()
@@ -904,11 +900,11 @@ def test_multiple_views_permissions_success(client):
                 test_user_clinicial_audit_team_data.role_str,
             ]:
                 DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-                    ODSCode="RGT01",
+                    ods_code="RGT01",
                     trust__ods_code="RGT",
                 )
                 CASE_FROM_DIFF_ORG = Case.objects.get(
-                    first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+                    first_name=f"child_{TEST_USER_ORGANISATION.name}"
                 )
 
                 # Request e12 patients list endpoint url different org
@@ -938,11 +934,11 @@ def test_multiple_views_permissions_forbidden(client):
     """
 
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
+        ods_code="RGT01",
         trust__ods_code="RGT",
     )
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE

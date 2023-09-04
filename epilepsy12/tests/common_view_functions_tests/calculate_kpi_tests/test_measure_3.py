@@ -19,7 +19,7 @@ Each test depends on whether child has been AT LEAST ONE OF:
     - referred to epilepsy surgery
 - [ ] Measure 3 failed (registration.kpi.tertiary_input == 0) if age at first paediatric assessment is < 3 and not AT LEAST ONE OF:
     - received input by neurologist 
-    - referred to epilepsy surgery ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.registration_date,registration_instance.case.date_of_birth).years)
+    - referred to epilepsy surgery ( where age_at_first_paediatric_assessment = relativedelta(registration_instance.first_paediatric_assessment_date,registration_instance.case.date_of_birth).years)
 - [ ] Measure 3 failed (registration.kpi.tertiary_input == 0) if child is on 3 or more AEMS (see lines 115-120 for query) and not AT LEAST ONE OF:
     - received input by neurologist 
     - referred to epilepsy surgery
@@ -65,7 +65,7 @@ from epilepsy12.models import (
     Registration,
     KPI,
     AntiEpilepsyMedicine,
-    MedicineEntity,
+    Medicine,
     Episode,
 )
 from epilepsy12.constants import (
@@ -105,13 +105,13 @@ def test_measure_3_age_3yo(
     1) age at First Paediatric Assessment (FPA) is <= 3 && NOT seen by neurologist OR CESS referral
     """
 
-    # a child who is exactly 3 at registration_date (=FPA)
+    # a child who is exactly 3 at first_paediatric_assessment_date (=FPA)
     DATE_OF_BIRTH = date(2021, 1, 1)
-    REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(years=3)
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = DATE_OF_BIRTH + relativedelta(years=3)
 
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
         registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     )
@@ -150,12 +150,12 @@ def test_measure_3_3AEMs_seen(
     1) child is on 3 or more AEMS && NOT seen by (neurologist OR epilepsy surgery)
     """
 
-    REGISTRATION_DATE = date(
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(
         2023, 1, 1
     )  # explicit setting to ensure aems started before registration close date
 
     case = e12_case_factory(
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
         registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     )
@@ -164,7 +164,7 @@ def test_measure_3_3AEMs_seen(
     registration = Registration.objects.get(case=case)
 
     # create total of 3 AEMs related to this registration instance (already has 1 by default so only add 2)
-    aems_to_add = MedicineEntity.objects.filter(
+    aems_to_add = Medicine.objects.filter(
         medicine_name__in=["Zonisamide", "Vigabatrin"]
     )
     for aem_to_add in aems_to_add:
@@ -172,7 +172,8 @@ def test_measure_3_3AEMs_seen(
             management=registration.management,
             medicine_entity=aem_to_add,
             is_rescue_medicine=False,
-            antiepilepsy_medicine_start_date=REGISTRATION_DATE + relativedelta(days=5),
+            antiepilepsy_medicine_start_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE
+            + relativedelta(days=5),
         )
         new_aem.save()
     aems_count = AntiEpilepsyMedicine.objects.filter(
@@ -215,14 +216,14 @@ def test_measure_3_lt_4yo_myoclonic_seen(
 
     # SET UP CONSTANTS
     DATE_OF_BIRTH = date(2021, 1, 1)
-    REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = DATE_OF_BIRTH + relativedelta(
         years=3, months=11
-    )  # a child who is 3y11m at registration_date (=FPA)
+    )  # a child who is 3y11m at first_paediatric_assessment_date (=FPA)
     MYOCLONIC = GENERALISED_SEIZURE_TYPE[5][0]
 
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__assessment__paediatric_neurologist_input_date=PAEDIATRIC_NEUROLOGIST_INPUT_DATE,
         registration__assessment__childrens_epilepsy_surgical_service_referral_made=CHILDRENS_EPILEPSY_SURGICAL_SERVICE_REFERRAL_MADE,
     )
@@ -311,9 +312,9 @@ def test_measure_3_ineligible(
         not eligible for epilepsy surgery
     """
 
-    # a child who is exactly 3y1mo at registration_date (=FPA)
+    # a child who is exactly 3y1mo at first_paediatric_assessment_date (=FPA)
     DATE_OF_BIRTH = date(2021, 1, 1)
-    REGISTRATION_DATE = DATE_OF_BIRTH + relativedelta(
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = DATE_OF_BIRTH + relativedelta(
         years=4,
     )
 
@@ -324,7 +325,7 @@ def test_measure_3_ineligible(
 
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__assessment__childrens_epilepsy_surgical_service_referral_criteria_met=False,  # not eligible epilepsy surgery criteria
     )
 

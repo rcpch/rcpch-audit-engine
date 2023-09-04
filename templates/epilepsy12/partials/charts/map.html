@@ -4,24 +4,24 @@
 
     data={{abstraction_level_data|safe}}
     stroke='{{abstraction_level_border_colour}}'
-    latitude={{selected_organisation.Latitude}}
-    longitude={{selected_organisation.Longitude}}
+    latitude={{selected_organisation.latitude}}
+    longitude={{selected_organisation.longitude}}
     hospital_region_name='{{hospital_region_name}}'
 
     if ({{abstraction_level}}.id=='lhb'){
-        feature_properties_region_code = 'lhb22nm'
+        feature_properties_region_code = 'name'
         load_map(abstraction='lhb', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
     if ({{abstraction_level}}.id=='icb'){
-        feature_properties_region_code = 'icb23nm';
+        feature_properties_region_code = 'name';
         load_map(abstraction='icb', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
     if ({{abstraction_level}}.id=='nhs_region'){
-        feature_properties_region_code = 'nhser22nm'
+        feature_properties_region_code = 'name'
         load_map(abstraction='nhs_region', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
     if ({{abstraction_level}}.id=='country'){
-        feature_properties_region_code = 'ctry22nm'
+        feature_properties_region_code = 'name'
         load_map(abstraction='country', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
 

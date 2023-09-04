@@ -45,7 +45,7 @@ def cases_aggregated_by_deprivation_score(selected_organisation):
     Case = apps.get_model("epilepsy12", "Case")
 
     cases_in_selected_organisation = Case.objects.filter(
-        organisations__OrganisationName__contains=selected_organisation
+        organisations__name__contains=selected_organisation
     )
 
     cases_aggregated_by_deprivation = (
@@ -100,9 +100,7 @@ def cases_aggregated_by_ethnicity(selected_organisation):
     ethnicity_long_list = [When(ethnicity=k, then=Value(v)) for k, v in ETHNICITIES]
 
     cases_aggregated_by_ethnicity = (
-        Case.objects.filter(
-            organisations__OrganisationName__contains=selected_organisation
-        )
+        Case.objects.filter(organisations__name__contains=selected_organisation)
         .values("ethnicity")
         .annotate(
             ethnicity_display=DJANGO_CASE(
@@ -512,7 +510,9 @@ def get_all_kpi_aggregation_data_for_view(
                 organisation, f"{abstraction_relation_field_name}"
             )
             if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
-                abstraction_relation = getattr(abstraction_relation, "ctry22cd")
+                abstraction_relation = getattr(
+                    abstraction_relation, "boundary_identifier"
+                )
 
         # Get total cases for THIS organisation's abstraction
         total_cases_registered = filtered_cases.count()

@@ -106,7 +106,7 @@ def test_update_kpi_aggregation_model_all_levels(
 
     # PERFORM AGGREGATIONS AND UPDATE AGGREGATION MODEL
     for code in ods_codes:
-        organisation = Organisation.objects.get(ODSCode=code)
+        organisation = Organisation.objects.get(ods_code=code)
 
         # Get filtered cases
         filtered_cases = get_filtered_cases_queryset_for(

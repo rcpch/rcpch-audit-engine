@@ -6,7 +6,7 @@
 from django.db import migrations
 
 # RCPCH Imports
-from ..models import ComorbidityEntity
+from ..models import ComorbidityList
 from ..general_functions import (
     fetch_paediatric_neurodisability_outpatient_diagnosis_simple_reference_set,
 )
@@ -14,7 +14,7 @@ from ..general_functions import (
 
 def seed_comorbidities(apps, schema_editor):
     """
-    This function seeds the ComorbidityEntity model with SNOMED CT definitions and codes for epilepsy causes.
+    This function seeds the Comorbidity model with SNOMED CT definitions and codes for epilepsy causes.
     It should be run periodically to compare the stored value in the database and update records if there is a change.
 
     Parameters:
@@ -29,8 +29,8 @@ def seed_comorbidities(apps, schema_editor):
         "Seeding comorbidities from paediatric neurodisability reference set...",
         "\033[33m",
     )
-    if ComorbidityEntity.objects.count() > 0:
-        print("Comorbidities already exist. Skipping...")
+    if ComorbidityList.objects.count() == 1207:
+        print("1207 Comorbidities already exist. Skipping...")
         return
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
@@ -39,20 +39,14 @@ def seed_comorbidities(apps, schema_editor):
     )
 
     for index, comorbidity_choice in enumerate(comorbidity_choices):
-        new_comorbidity = ComorbidityEntity(
+        new_comorbidity = ComorbidityList(
             conceptId=comorbidity_choice["conceptId"],
             term=comorbidity_choice["term"],
             preferredTerm=comorbidity_choice["preferredTerm"],
-            description=None,
-            snomed_ct_edition=None,
-            snomed_ct_version=None,
-            icd_code=None,
-            icd_version=None,
-            dsm_code=None,
-            dsm_version=None,
         )
         try:
             new_comorbidity.save()
+            print(f"{new_comorbidity.preferredTerm} added.")
         except Exception as e:
             print(f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
     print(f"{index} comorbidities added")

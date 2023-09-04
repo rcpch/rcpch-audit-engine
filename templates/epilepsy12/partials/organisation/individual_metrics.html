@@ -6,9 +6,9 @@
             <div class='content kpi_header'>
                 <p>Real-time Individual Key Performance Indicator (KPI) Metrics</p>
                 {% if selected_organisation.trust %}
-                  <p>{{selected_organisation.OrganisationName}} ({{ selected_organisation.trust.trust_name }})</p>
+                  <p>{{selected_organisation.name}} ({{ selected_organisation.trust.trust_name }})</p>
                 {% else %}
-                  <p>{{selected_organisation.OrganisationName}} ({{ selected_organisation.local_health_board.lhb22nm }})</p>
+                  <p>{{selected_organisation.name}} ({{ selected_organisation.local_health_board.name }})</p>
                 {% endif %}
             </div>
             

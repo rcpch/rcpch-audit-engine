@@ -12,10 +12,10 @@ def seed_epilepsy_causes(apps, schema_editor):
     """
 
     # Get models
-    EpilepsyCauseEntity = apps.get_model("epilepsy12", "EpilepsyCauseEntity")
+    EpilepsyCause = apps.get_model("epilepsy12", "EpilepsyCause")
 
     print("\033[33m", "Seeding all the epilepsy causes from SNOMED...", "\033[33m")
-    if EpilepsyCauseEntity.objects.count() > 0:
+    if EpilepsyCause.objects.count() == 200:
         print("Causes already exist. Skipping this step...")
         return
     index = 0
@@ -23,17 +23,10 @@ def seed_epilepsy_causes(apps, schema_editor):
     # calls the rcpch deprivare server for a list of causes using ECL query language
     epilepsy_causes = fetch_ecl(ecl)
     for cause in epilepsy_causes:
-        new_cause = EpilepsyCauseEntity(
+        new_cause = EpilepsyCause(
             conceptId=cause["conceptId"],
             term=cause["term"],
             preferredTerm=cause["preferredTerm"],
-            description=None,
-            snomed_ct_edition=None,
-            snomed_ct_version=None,
-            icd_code=None,
-            icd_version=None,
-            dsm_code=None,
-            dsm_version=None,
         )
         try:
             new_cause.save()

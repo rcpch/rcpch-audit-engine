@@ -7,7 +7,7 @@ from datetime import timedelta
 import factory
 
 # rcpch imports
-from epilepsy12.models import Syndrome, SyndromeEntity
+from epilepsy12.models import Syndrome, Syndrome
 from epilepsy12.constants import (
     SYNDROMES,
 )
@@ -28,5 +28,7 @@ class E12SyndromeFactory(factory.django.DjangoModelFactory):
 
     class Params:
         ineligible_mri = factory.Trait(
-            syndrome=factory.LazyAttribute(lambda o: SyndromeEntity.objects.get(syndrome_name=SYNDROMES[18][1]))
+            syndrome=factory.LazyAttribute(
+                lambda o: Syndrome.objects.get(syndrome_name=SYNDROMES[18][1])
+            )
         )

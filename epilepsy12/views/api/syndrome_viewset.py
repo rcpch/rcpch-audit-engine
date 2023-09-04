@@ -13,9 +13,9 @@ from rest_framework import permissions, viewsets
 # third party
 from django_filters.rest_framework import DjangoFilterBackend
 from epilepsy12.serializers.syndrome_serializer import SyndromeSerializer
-from epilepsy12.serializers.syndrome_entity_serializer import SyndromeEntitySerializer
+from epilepsy12.serializers.syndrome_entity_serializer import SyndromeSerializer
 
-from epilepsy12.models import Case, Syndrome, SyndromeEntity
+from epilepsy12.models import Case, Syndrome, Syndrome
 from epilepsy12.permissions import CanAccessOrganisation
 
 
@@ -45,11 +45,11 @@ class SyndromeViewSet(GenericViewSet, mixins.UpdateModelMixin):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SyndromeEntityViewSet(viewsets.ReadOnlyModelViewSet):
+class SyndromeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows all selectable syndromes to be viewed.
     """
 
-    queryset = SyndromeEntity.objects.all()
-    serializer_class = SyndromeEntitySerializer
+    queryset = Syndrome.objects.all()
+    serializer_class = SyndromeSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]

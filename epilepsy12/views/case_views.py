@@ -54,9 +54,7 @@ def case_list(request, organisation_id):
             # user has requested organisation level view
             all_cases = (
                 Case.objects.filter(
-                    Q(
-                        site__organisation__OrganisationName__contains=organisation.OrganisationName
-                    )
+                    Q(site__organisation__name__contains=organisation.name)
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                     & (
@@ -122,7 +120,7 @@ def case_list(request, organisation_id):
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__OrganisationName__contains=organisation.OrganisationName,
+                organisations__name__contains=organisation.name,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
@@ -250,8 +248,8 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
-    if organisation.country.ctry22cd == "W92000004":
-        parent_trust = organisation.local_health_board.lhb22nm
+    if organisation.country.boundary_identifier == "W92000004":
+        parent_trust = organisation.local_health_board.name
     else:
         parent_trust = organisation.trust.trust_name
 
@@ -261,13 +259,13 @@ def case_list(request, organisation_id):
         or request.user.is_superuser
     ):
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.OrganisationName})"),
+            (0, f"Organisation level ({organisation.name})"),
             (1, f"Trust level ({parent_trust})"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.OrganisationName})"),
+            (0, f"Organisation level ({organisation.name})"),
             (1, f"Trust level ({parent_trust})"),
         )
 
@@ -312,7 +310,7 @@ def case_statistics(request, organisation_id):
     elif request.user.view_preference == 0:
         # user requesting Trust level - return all cases in the same organisation
         total_cases = Case.objects.filter(
-            Q(organisations__OrganisationName__contains=organisation.OrganisationName)
+            Q(organisations__name__contains=organisation.name)
         )
 
     registered_cases = total_cases.filter(
@@ -412,7 +410,7 @@ def create_case(request, organisation_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.country.ctry22cd == "W92000004":
+    if organisation.country.boundary_identifier == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (
@@ -471,7 +469,7 @@ def update_case(request, organisation_id, case_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.country.ctry22cd == "W92000004":
+    if organisation.country.boundary_identifier == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (
@@ -538,7 +536,7 @@ def unknown_postcode(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.country.ctry22cd == "W92000004":
+    if organisation.country.boundary_identifier == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (

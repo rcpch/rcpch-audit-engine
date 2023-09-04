@@ -32,7 +32,7 @@ def test_download_button_access(
     users = Epilepsy12User.objects.all()
 
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
+        ods_code="RP401",
         trust__ods_code="RP4",
     )
 

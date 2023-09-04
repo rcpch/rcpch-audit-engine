@@ -10,7 +10,7 @@ from .views.api.entity_viewsets import (
     AntiEpilepsyMedicineViewSet,
 )
 from .views.api.episode_viewset import EpisodeViewSet
-from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeEntityViewSet
+from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeViewSet
 from .views.api.comorbidity_viewset import ComorbidityViewSet, ComorbidityEntityViewSet
 from .views.api.assessment_viewset import AssessmentViewSet
 from .views.api.management_viewset import ManagementViewSet
@@ -51,9 +51,7 @@ router.register(r"keyword", viewset=KeywordViewSet)
 router.register(
     r"audit_progress", viewset=AuditProgressViewSet, basename="auditprogress"
 )
-router.register(
-    r"syndrome_entities", viewset=SyndromeEntityViewSet, basename="syndromeentity"
-)
+router.register(r"syndrome_entities", viewset=SyndromeViewSet, basename="syndromelist")
 router.register(
     r"comorbidity_entities",
     viewset=ComorbidityEntityViewSet,
@@ -84,8 +82,8 @@ user_patterns = [
     path(
         "organisation/<int:organisation_id>/full_e12user_list",
         view=all_epilepsy12_users_list,
-        name='download_e12_users',
-        ),
+        name="download_e12_users",
+    ),
     path(
         "organisation/<int:organisation_id>/epilepsy12_users/<str:user_type>/create",
         # accepts params organisation-staff or rcpch-staff
@@ -932,9 +930,9 @@ registration_patterns = [
         name="confirm_eligible",
     ),
     path(
-        "case/<int:case_id>/registration_date",
-        registration_date,
-        name="registration_date",
+        "case/<int:case_id>/first_paediatric_assessment_date",
+        first_paediatric_assessment_date,
+        name="first_paediatric_assessment_date",
     ),
     path(
         "registration/<int:registration_id>/lead_site/<int:site_id>/edit",
@@ -1069,4 +1067,3 @@ urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 
 urlpatterns += drf_routes
-

@@ -27,7 +27,7 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     Organisation,
     Keyword,
-    EpilepsyCauseEntity,
+    Comorbidity,
 )
 from epilepsy12.permissions import CanAccessOrganisation
 
@@ -52,14 +52,14 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     queryset = Organisation.objects.all()
     serializer_class = OrganisationSerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]
-    lookup_field = "ODSCode"
+    lookup_field = "ods_code"
 
-    def retrieve(self, request, ODSCode=None):
+    def retrieve(self, request, ods_code=None):
         """
         API endpoint that retrieves an organisation by ODS Code
         """
         queryset = Organisation.objects.all()
-        organisation = get_object_or_404(queryset, ODSCode=ODSCode)
+        organisation = get_object_or_404(queryset, ods_code=ods_code)
         self.check_object_permissions(self.request, organisation)
         serializer = OrganisationSerializer(organisation)
         return Response(serializer.data)
@@ -67,15 +67,15 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["get"],
-        lookup_field="ODSCode",
+        lookup_field="ods_code",
         permission_classes=[permissions.IsAuthenticated, CanAccessOrganisation],
     )
-    def cases(self, request, ODSCode=None):
+    def cases(self, request, ods_code=None):
         """
         API endpoint that allows a list of all cases associated with a given organisation (retrieved by ODS Code)
         """
         queryset = Organisation.objects.all()
-        organisation = get_object_or_404(queryset, ODSCode=ODSCode)
+        organisation = get_object_or_404(queryset, ods_code=ods_code)
         serializer = OrganisationCaseSerializer(organisation)
         return Response(serializer.data)
 
@@ -95,6 +95,6 @@ class EpilepsyCauseEntityViewSet(viewsets.ReadOnlyModelViewSet):
     API endpoint that allows all selectable epilepsy causes to be viewed.
     """
 
-    queryset = EpilepsyCauseEntity.objects.all()
+    queryset = Comorbidity.objects.all()
     serializer_class = EpilepsyCauseEntitySerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]

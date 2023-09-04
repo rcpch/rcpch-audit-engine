@@ -18,8 +18,8 @@ Administrative regions
 """
 
 integratedcareboardboundaries_mapping = {
-    "icb23cd": "ICB23CD",
-    "icb23nm": "ICB23NM",
+    "boundary_identifier": "ICB23CD",
+    "name": "ICB23NM",
     "bng_e": "BNG_E",
     "bng_n": "BNG_N",
     "long": "LONG",
@@ -29,8 +29,8 @@ integratedcareboardboundaries_mapping = {
 }
 
 localhealthboardboundaries_mapping = {
-    "lhb22cd": "LHB22CD",
-    "lhb22nm": "LHB22NM",
+    "boundary_identifier": "LHB22CD",
+    "name": "LHB22NM",
     "lhb22nmw": "LHB22NMW",
     "bng_e": "BNG_E",
     "bng_n": "BNG_N",
@@ -41,8 +41,8 @@ localhealthboardboundaries_mapping = {
 }
 
 nhsenglandregionboundaries_mapping = {
-    "nhser22cd": "NHSER22CD",
-    "nhser22nm": "NHSER22NM",
+    "boundary_identifier": "NHSER22CD",
+    "name": "NHSER22NM",
     "bng_e": "BNG_E",
     "bng_n": "BNG_N",
     "long": "LONG",
@@ -63,8 +63,8 @@ londonborough_mapping = {
 }
 
 countryboundaries_mapping = {
-    "ctry22cd": "CTRY22CD",
-    "ctry22nm": "CTRY22NM",
+    "boundary_identifier": "CTRY22CD",
+    "name": "CTRY22NM",
     "ctry22nmw": "CTRY22NMW",
     "bng_e": "BNG_E",
     "bng_n": "BNG_N",
