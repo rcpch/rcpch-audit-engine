@@ -1,17 +1,11 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-# DEPLOYS CHANGES IN THE 'DEVELOPMENT' BRANCH TO THE 'DEVELOPMENT' AZURE WEBAPP
-# epilepsy12/development
 
-name: Build and deploy Python app to Azure Web App - epilepsy12
+name: Pytest Suite
 
 on:
-  push:
-    branches:
-      - development
-  workflow_dispatch:
+    pull_request:
+      branches:
+          - "*"
 
 jobs:
   build-and-deploy:
@@ -76,23 +70,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # run migrations
-      - name: Run migrations
-        run: python manage.py migrate
-
+        
+      # Required for tests which read template content
       - name: collect static files
         run: python manage.py collectstatic --noinput
-
+      
+      # Runs tests
       - name: Pytest Suite
         run: pytest -rP
 
-      # Deploy to Azure
-      - name: "Deploy to Azure Web App"
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: "epilepsy12-development"
-          slot-name: "Production"
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F43DF2B15BBA4BC09CB85DE9AECC20D5 }}
-          package: .
+
