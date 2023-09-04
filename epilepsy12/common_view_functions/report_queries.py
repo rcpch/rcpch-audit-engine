@@ -104,10 +104,10 @@ def all_registered_cases_for_cohort_and_abstraction_level(
         if organisation_instance.nhs_england_region is not None:
             q_filter = (
                 Q(
-                    site__organisation__nhs_england_region__NHS_Region_Code=organisation_instance.nhs_england_region.region_code
+                    site__organisation__nhs_england_region__region_code=organisation_instance.nhs_england_region.region_code
                 )
                 & Q(
-                    site__organisation__country__ctry22cd=organisation_instance.country.boundary_identifier
+                    site__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
                 )
                 & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                 & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -117,7 +117,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     elif abstraction_level == "open_uk":
         q_filter = (
             Q(
-                site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.boundary_identifier
+                site__organisation__openuk_network__boundary_identifier=organisation_instance.openuk_network.boundary_identifier
             )
             & Q(site__site_is_actively_involved_in_epilepsy_care=True)
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -125,7 +125,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     elif abstraction_level == "country":
         q_filter = (
             Q(
-                site__organisation__country__ctry22cd=organisation_instance.country.boundary_identifier
+                site__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
             )
             & Q(site__site_is_actively_involved_in_epilepsy_care=True)
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)

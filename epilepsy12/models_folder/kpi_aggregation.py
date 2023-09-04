@@ -747,7 +747,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"CountryKPIAggregations (ONSCountryEntity={self.abstraction_relation})"
+        return f"CountryKPIAggregations (Country={self.abstraction_relation})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
