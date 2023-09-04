@@ -278,7 +278,7 @@
                         <h3 >NHS England Region</h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_regions.name %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}
                     </div>
                 </div>
                 {% endif %}
