@@ -1703,11 +1703,11 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     comorbidity_choices = (
         Comorbidity.objects.filter(
             pk__in=Subquery(
-                Comorbidity.objects.all().distinct("conceptId").values("pk")
+                Comorbidity.objects.all().distinct("comorbidityentity__conceptId").values("pk")
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("preferredTerm")
+        .order_by("comorbidityentity__preferredTerm")
     )
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
@@ -1763,7 +1763,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("preferredTerm")
+        .order_by("comorbidityentity__preferredTerm")
     )
 
     context = {

@@ -261,8 +261,8 @@ from epilepsy12.models import (
     Keyword,
     Comorbidity,
     MultiaxialDiagnosis,
-    Comorbidity,
-    Comorbidity,
+    ComorbidityList,
+    EpilepsyCause,
     Medicine,
 )
 from epilepsy12.tests.UserDataClasses import (
@@ -1042,8 +1042,7 @@ def test_update_multiaxial_diagnosis_cause_success(client):
         user_first_names_for_test
     ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
 
-    # Fryns macrocephaly
-    EPILEPSY_CAUSE_ENTITY = Comorbidity.objects.get(id=179)
+    EPILEPSY_CAUSE_ENTITY = EpilepsyCause.objects.first()
 
     for test_user in users:
         client.force_login(test_user)
@@ -1404,7 +1403,7 @@ def test_users_update_comorbidity_forbidden(client):
             comorbidity, created = Comorbidity.objects.update_or_create(
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
                 comorbidity_diagnosis_date=date.today(),
-                comorbidityentity=Comorbidity.objects.all().first(),
+                comorbidityentity=ComorbidityList.objects.all().first(),
             )
             comorbidity.save()
 
@@ -1478,7 +1477,7 @@ def test_users_update_comorbidity_success(client):
             comorbidity, created = Comorbidity.objects.update_or_create(
                 multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
                 comorbidity_diagnosis_date=date.today(),
-                comorbidityentity=Comorbidity.objects.all().first(),
+                comorbidityentity=ComorbidityList.objects.all().first(),
             )
             comorbidity.save()
 
