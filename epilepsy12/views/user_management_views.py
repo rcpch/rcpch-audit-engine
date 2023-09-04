@@ -273,9 +273,9 @@ def epilepsy12_user_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             if organisation.country.boundary_identifier == "W92000004":
-                parent_trust = organisation.organisation.local_health_board.name
+                parent_trust = organisation.local_health_board.name
             else:
-                parent_trust = organisation.organisation.trust.trust_name
+                parent_trust = organisation.trust.trust_name
 
             basic_filter = Q(
                 organisation_employer__trust__trust_name__contains=parent_trust
@@ -381,9 +381,9 @@ def epilepsy12_user_list(request, organisation_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("surname").all()
 
     if organisation.country.boundary_identifier == "W92000004":
-        parent_trust = organisation.organisation.local_health_board.name
+        parent_trust = organisation.local_health_board.name
     else:
-        parent_trust = organisation.organisation.trust.trust_name
+        parent_trust = organisation.trust.trust_name
 
     if (
         request.user.is_rcpch_audit_team_member
