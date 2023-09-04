@@ -44,7 +44,7 @@ def selected_organisation_summary(request, organisation_id):
     Otherwise it returns the organisation.html template
     """
 
-    nhsregion_tiles = return_tile_for_region("nhs_region")
+    nhsregion_tiles = return_tile_for_region("nhs_england_region")
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
@@ -60,11 +60,16 @@ def selected_organisation_summary(request, organisation_id):
 
     lhb_tiles = None
 
+    london_borough_tiles = None
+
     if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
         lhb_tiles = return_tile_for_region("lhb")
         abstraction_level = "local_health_board"
     else:
         abstraction_level = "trust"
+
+    if selected_organisation.city == "LONDON":
+        london_borough_tiles = return_tile_for_region("london_borough")
 
     cohort_data = get_current_cohort_data()
 
@@ -153,6 +158,7 @@ def selected_organisation_summary(request, organisation_id):
         "icb_tiles": icb_tiles,
         "country_tiles": country_tiles,
         "lhb_tiles": lhb_tiles,
+        "london_borough_tiles": london_borough_tiles,
     }
 
     return render(

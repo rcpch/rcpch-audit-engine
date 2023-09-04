@@ -16,9 +16,13 @@
         feature_properties_region_code = 'name';
         load_map(abstraction='icb', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
-    if ({{abstraction_level}}.id=='nhs_region'){
+    if ({{abstraction_level}}.id=='london_borough'){
+        feature_properties_region_code = 'name';
+        load_map(abstraction='london_borough', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
+    }
+    if ({{abstraction_level}}.id=='nhs_england_region'){
         feature_properties_region_code = 'name'
-        load_map(abstraction='nhs_region', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
+        load_map(abstraction='nhs_england_region', hospital_region_name=hospital_region_name, feature_properties_region_code = feature_properties_region_code, data=data, stroke=stroke, latitude=latitude, longitude=longitude);
     }
     if ({{abstraction_level}}.id=='country'){
         feature_properties_region_code = 'name'

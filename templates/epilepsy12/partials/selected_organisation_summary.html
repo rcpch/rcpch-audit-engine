@@ -20,12 +20,12 @@
         <div class="fluid row stackable org_view_all_buttons_wrapper">
             <div class="eight wide column">
                 <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.ParentName}} Epilepsy12 Staff
+                    View All {{selected_organisation.name}} Epilepsy12 Staff
                 </a>
             </div>
             <div class="eight wide  column">
                 <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.ParentName}} Children
+                    View All {{selected_organisation.name}} Children
                     </a>
             </div>
         </div>
@@ -39,7 +39,7 @@
                     <div class="content">
                         <div class="organisation_address_container">
                             <div class="ui centered header organisation_address">
-                                <h3>{{ selected_organisation.ParentName }}</h3>
+                                <h3>{{ selected_organisation.name }}</h3>
                             </div>
                             <h4 class="ui horizontal divider">
                                 <i class="ui  rcpch  small organisation icon "></i>Address
@@ -62,7 +62,7 @@
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon phone"></i>
                                         {%if selected_organisation.Phone%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.Phone }}</p>
+                                        <p class="rcpch_icon_text">{{ selected_organisation.phone }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find phone number</p>
                                         {%endif%}
@@ -70,7 +70,7 @@
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon envelope"></i>
                                         {%if selected_organisation.Email%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.Email }}</p>
+                                        <p class="rcpch_icon_text">{{ selected_organisation.email }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find email</p>
                                         {%endif%}
@@ -246,38 +246,51 @@
                                
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
+                        {% if selected_organisation.country.name == "Wales" %}
                         <h3 >Local Health Board</h3>
                         {% else %}
                         <h3 >Integrated Care Board</h3>
                         {% endif %}
                     </div>
                     <div>
-                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% if selected_organisation.country.name == "Wales" %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}
                         {% else %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.name %}
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="ui rcpch_light_blue card">
+                {% if selected_organisation.city == "LONDON" %}
+                <div class="ui rcpch_light_blue  card">
                     <div class="content">
-                        <h3 >NHS Region</h3>
+                        <h3 >London Borough</h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='london_borough' abstraction_level_border_colour='#66cc33' abstraction_level_data=london_borough_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.london_borough.name %}
                     </div>
                 </div>
+                {% endif %}
+
+                {% if selected_organisation.country.name == "England" %}
+                <div class="ui rcpch_light_blue card">
+                    <div class="content">
+                        <h3 >NHS England Region</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_regions.name %}
+                    </div>
+                </div>
+                {% endif %}
                 
-                <div class="ui rcpch_light_blue  card">
+                <!-- <div class="ui rcpch_light_blue  card">
                     <div class="content">
                         <h3 >Country</h3>
                     </div>
                     <div>
                         {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.ons_region.ons_country.Country_ONS_Name %}
                     </div>
-                </div>
+                </div> -->
 
             </div>
         </div>
