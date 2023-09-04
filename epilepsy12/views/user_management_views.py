@@ -24,7 +24,7 @@ from ..models import Epilepsy12User, Organisation, VisitActivity
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
-from ..decorator import user_may_view_this_organisation
+from ..decorator import user_may_view_this_organisation, user_can_access_user
 from ..constants import (
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
@@ -424,6 +424,7 @@ def epilepsy12_user_list(request, organisation_id):
 
 @login_required
 @user_may_view_this_organisation()
+@user_can_access_user()
 @permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
 def create_epilepsy12_user(request, organisation_id, user_type):
     """
@@ -498,6 +499,7 @@ def create_epilepsy12_user(request, organisation_id, user_type):
 
 @login_required
 @user_may_view_this_organisation()
+@user_can_access_user()
 @permission_required("epilepsy12.change_epilepsy12user", raise_exception=True)
 def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     """
@@ -613,6 +615,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
 @login_required
 @user_may_view_this_organisation()
+@user_can_access_user()
 @permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
 def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     try:
@@ -639,6 +642,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 
 
 @login_required
+@user_can_access_user()
 def logs(request, organisation_id, epilepsy12_user_id):
     """
     returns logs for given organisation
@@ -659,6 +663,7 @@ def logs(request, organisation_id, epilepsy12_user_id):
 
 
 @login_required
+@user_can_access_user()
 def log_list(request, organisation_id, epilepsy12_user_id):
     """
     GET request to return log table
@@ -681,13 +686,6 @@ def log_list(request, organisation_id, epilepsy12_user_id):
 @login_required
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
-    user_has_correct_group_perm = request.user.groups.filter(
-        name=EPILEPSY12_AUDIT_TEAM_FULL_ACCESS
-    ).exists()
-
-    if not user_has_correct_group_perm:
-        return HttpResponseForbidden()
-
     all_users = Epilepsy12User.objects.all().values(
         "id",
         "last_login",

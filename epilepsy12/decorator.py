@@ -14,6 +14,7 @@ from .models import (
     AntiEpilepsyMedicine,
     Comorbidity,
     Assessment,
+    Epilepsy12User,
 )
 
 
@@ -340,6 +341,45 @@ def rcpch_full_access_only():
         def wrapper(request, *args, **kwargs):
             user = request.user
             if user.groups.filter(name="epilepsy12_audit_team_full_access").exists():
+                return view(request, *args, **kwargs)
+            else:
+                raise PermissionDenied()
+
+        return wrapper
+
+    return decorator
+
+
+def user_can_access_user():
+    """
+    Only permit people from the same organisation of the user being edited to access
+    """
+
+    def decorator(view):
+        def wrapper(request, *args, **kwargs):
+            user_to_edit_id = kwargs["epilepsy12_user_id"]
+            user_to_edit = Epilepsy12User.objects.get(pk=user_to_edit_id)
+
+            if (
+                request.user.is_rcpch_audit_team_member
+                or request.user.is_rcpch_staff
+                or request.user.is_superuser
+                or (
+                    user_to_edit.organisation_employer.trust is not None
+                    and user_to_edit.organisation_employer.trust
+                    == request.user.organisation_employer.trust
+                )
+                or (
+                    user_to_edit.organisation_employer.local_health_board is not None
+                    and user_to_edit.organisation_employer.local_health_board
+                    == request.user.organisation_employer.local_health_board
+                )
+            ):
+                # allow access if user requesting acess is:
+                # 1. a superuser
+                # 2. rcpch_autdit_team_member
+                # 3. rcpch_staff
+                # 3. in the same trust as the user being accessed
                 return view(request, *args, **kwargs)
             else:
                 raise PermissionDenied()
