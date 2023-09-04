@@ -1549,7 +1549,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("preferredTerm")
+        .order_by("comorbidityentity__preferredTerm")
     )
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
