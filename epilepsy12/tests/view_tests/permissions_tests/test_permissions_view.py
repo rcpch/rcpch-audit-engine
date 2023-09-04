@@ -203,7 +203,7 @@ from epilepsy12.models import (
     Episode,
     Syndrome,
     Comorbidity,
-    Comorbidity,
+    ComorbidityList,
     AntiEpilepsyMedicine,
     Medicine,
 )
@@ -694,7 +694,12 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
 
 
 @pytest.mark.parametrize(
-    "URL", [("edit_comorbidity"), ("close_comorbidity"), ("comorbidities")]
+    "URL",
+    [
+        ("edit_comorbidity"),
+        ("close_comorbidity"),
+        ("comorbidities"),
+    ],
 )
 @pytest.mark.django_db
 def test_comborbidity_view_permissions_success(client, URL):
@@ -715,7 +720,9 @@ def test_comborbidity_view_permissions_success(client, URL):
 
     COMORBIDITY_SAME_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
-        comorbidityentity=Comorbidity.objects.filter(conceptId="1148757008").first(),
+        comorbidityentity=ComorbidityList.objects.filter(
+            conceptId="1148757008"
+        ).first(),
     )
 
     users = Epilepsy12User.objects.all()
@@ -760,7 +767,7 @@ def test_comborbidity_view_permissions_success(client, URL):
 
             comborbidity_DIFF_ORG = Comorbidity.objects.create(
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-                comorbidityentity=Comorbidity.objects.filter(
+                comorbidityentity=ComorbidityList.objects.filter(
                     conceptId="1148757008"
                 ).first(),
             )
@@ -807,7 +814,7 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
     COMORBIDITY_DIFF_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-        comorbidityentity=Comorbidity.objects.filter(conceptId="1148757008").first(),
+        comorbidityentity=ComorbidityList.objects.filter(conceptId="1148757008").first(),
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE
