@@ -29,6 +29,6 @@ class E12SyndromeFactory(factory.django.DjangoModelFactory):
     class Params:
         ineligible_mri = factory.Trait(
             syndrome=factory.LazyAttribute(
-                lambda o: Syndrome.objects.get(syndrome_name=SYNDROMES[18][1])
+                lambda o: Syndrome.objects.get(syndrome__syndrome_name=SYNDROMES[18][1])
             )
         )
