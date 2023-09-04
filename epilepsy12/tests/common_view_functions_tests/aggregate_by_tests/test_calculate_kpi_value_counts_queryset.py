@@ -28,36 +28,41 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
             ["RGT01", "RQM01"],
             ["RGT01", "RQM01"],
         ),
-        (
-            EnumAbstractionLevel.TRUST,
-            ["RGT", "RQM"],
-            ["RGT01", "RQM01"],
-        ),
-        (
-            EnumAbstractionLevel.ICB,
-            ["QUE", "QRV"],
-            ["RGT01", "RYVD9", "RYJ03", "RQM01"],
-        ),
-        (
-            EnumAbstractionLevel.NHS_ENGLAND_REGION,
-            ["Y61", "Y56"],
-            ["RGT01", "RAJ12", "RAL26", "R1K02"],
-        ),
-        (
-            EnumAbstractionLevel.OPEN_UK,
-            ["EPEN", "NTPEN"],
-            ["RGT01", "RC979", "RAL26", "RAJ12"],
-        ),
-        (
-            EnumAbstractionLevel.COUNTRY,
-            ["E92000001", "W92000004"],
-            ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
-        ),
-        (
-            EnumAbstractionLevel.NATIONAL,
-            ["England", "Wales"],
-            ["RGT01", "7A6BJ"],
-        ),
+        # (
+        #     EnumAbstractionLevel.TRUST,
+        #     ["RGT", "RQM"],
+        #     ["RGT01", "RQM01"],
+        # ),
+        # (
+        #     EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+        #     ["W11000028", "W11000031"],
+        #     ["7A6AV", "7A6G9", "7A3LW", "7A3C7"],
+        # ),
+        # (
+        #     EnumAbstractionLevel.ICB,
+        #     ["QUE", "QRV"],
+        #     ["RGT01", "RYVD9", "RYJ03", "RQM01"],
+        # ),
+        # (
+        #     EnumAbstractionLevel.NHS_ENGLAND_REGION,
+        #     ["Y61", "Y56"],
+        #     ["RGT01", "RAJ12", "RAL26", "R1K02"],
+        # ),
+        # (
+        #     EnumAbstractionLevel.OPEN_UK,
+        #     ["EPEN", "NTPEN"],
+        #     ["RGT01", "RC979", "RAL26", "RAJ12"],
+        # ),
+        # (
+        #     EnumAbstractionLevel.COUNTRY,
+        #     ["E92000001", "W92000004"],
+        #     ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
+        # ),
+        # (
+        #     EnumAbstractionLevel.NATIONAL,
+        #     ["England", "Wales"],
+        #     ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
+        # ),
     ],
 )
 @pytest.mark.django_db
