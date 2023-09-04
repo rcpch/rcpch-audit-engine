@@ -41,7 +41,7 @@ def _register_kpi_scored_cases(
         For each ods_code, num_cases will PASS metric, num_cases will FAIL metric, num_cases will be INELIGBLE for metric, num_cases will be INCOMPLETE
     """
     ORGANISATIONS = Organisation.objects.filter(
-        ODSCode__in=ods_codes,
+        ods_code__in=ods_codes,
     )
 
     # create answersets for cases to achieve the stated expected output
