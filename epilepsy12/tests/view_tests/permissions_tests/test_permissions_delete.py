@@ -571,7 +571,7 @@ def test_episode_delete_success(
 
             comorbidity = Comorbidity.objects.create(
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-                comorbidityentity=Comorbidity.objects.filter(
+                comorbidityentity=ComorbidityList.objects.filter(
                     conceptId="1148757008"
                 ).first(),
             )
