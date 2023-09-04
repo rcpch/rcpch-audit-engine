@@ -207,7 +207,7 @@ ul {
 .ui.center.aligned.segment.rcpch_masthead {
   padding: 4em 0em;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("images/blue-wallpaper-wheel.png");
+    url("images/masthead-bg.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -246,7 +246,7 @@ ul {
 div.center.aligned.image.rcpch_index_card_image {
   padding: 5em;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("images/blue-wallpaper-wheel.png");
+    url("images/masthead-bg.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
