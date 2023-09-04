@@ -80,7 +80,7 @@
 
           <div class='two fields'>
 
-            {% if user_type == 'organisation-staff' %}
+            {% if request.user.is_rcpch_audit_team_member %}
               <div class='eight wide field'>
                 <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
