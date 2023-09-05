@@ -248,7 +248,7 @@ def calculate_kpi_value_counts_queryset(
             registration__id__in=welsh_cases.values_list("registration")
         )
 
-    # WALES HAS NO LHB
+    # WALES HAS NO TRUST
     if abstraction_level is EnumAbstractionLevel.TRUST:
         Case = apps.get_model("epilepsy12", "Case")
         welsh_cases = Case.objects.filter(
