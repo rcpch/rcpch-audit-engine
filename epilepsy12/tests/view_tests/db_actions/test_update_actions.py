@@ -1386,7 +1386,7 @@ def get_model_from_model(case, model_name):
     elif model_name == "comorbidity":
         comorbidity, created = Comorbidity.objects.get_or_create(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
-            comorbidityentity=Comorbidity.objects.get(
+            comorbidityentity=ComorbidityList.objects.get(
                 pk=34
             ),  # specific learning difficulty
         )
@@ -1394,7 +1394,7 @@ def get_model_from_model(case, model_name):
     elif model_name == "syndrome":
         syndrome, created = Syndrome.objects.get_or_create(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
-            syndrome=Syndrome.objects.get(
+            syndrome=SyndromeList.objects.get(
                 pk=35
             ),  # Self-limited (familial) neonatal epilepsy
         )
