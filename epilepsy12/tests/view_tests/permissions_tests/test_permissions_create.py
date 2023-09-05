@@ -229,6 +229,7 @@ def test_user_create_diff_org_success(
             kwargs={
                 "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 "user_type": "organisation-staff",
+                "epilepsy12_user_id": test_user.id,
             },
         )
 
