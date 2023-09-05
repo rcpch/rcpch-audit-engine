@@ -35,14 +35,19 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
             ["RGT01", "RQM01"],
         ),
         (
+            EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            ["W11000028", "W11000031"],
+            ["7A6AV", "7A6G9", "7A3LW", "7A3C7"],
+        ),
+        (
             EnumAbstractionLevel.ICB,
-            ["QUE", "QRV"],
-            ["RGT01", "RYVD9", "RYJ03", "RQM01"],
+            ["E54000056", "E54000027"],
+            ["RGT01", "RGN90", "R1K02", "RQM01"],
         ),
         (
             EnumAbstractionLevel.NHS_ENGLAND_REGION,
-            ["Y61", "Y56"],
-            ["RGT01", "RAJ12", "RAL26", "R1K02"],
+            ["E40000007", "E40000003"],
+            ["RGT01", "RGN90", "R1K02", "RQM01"],
         ),
         (
             EnumAbstractionLevel.OPEN_UK,
@@ -57,7 +62,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
         (
             EnumAbstractionLevel.NATIONAL,
             ["England", "Wales"],
-            ["RGT01", "7A6BJ"],
+            ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
         ),
     ],
 )
@@ -99,7 +104,6 @@ def test_update_kpi_aggregation_model_all_levels(
         not in [
             EnumAbstractionLevel.ORGANISATION,
             EnumAbstractionLevel.TRUST,
-            EnumAbstractionLevel.NATIONAL,
         ]
         else 10,
     )
@@ -170,17 +174,11 @@ def test_update_kpi_aggregation_model_all_levels(
                 **{abstraction_relation_instance_key: abstraction_relation_code}
             ).first()
 
-            # Trust is a char field so must deal with differently
-            if abstraction_level is EnumAbstractionLevel.TRUST:
-                kpi_aggregation_model_instance = abstraction_kpi_aggregation_model.objects.get(
-                    abstraction_relation=abstraction_relation_instance.trust.ods_code
+            kpi_aggregation_model_instance = (
+                abstraction_kpi_aggregation_model.objects.get(
+                    abstraction_relation=abstraction_relation_instance
                 )
-            else:
-                kpi_aggregation_model_instance = (
-                    abstraction_kpi_aggregation_model.objects.get(
-                        abstraction_relation=abstraction_relation_instance
-                    )
-                )
+            )
 
             output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
                 kpis_tested
