@@ -554,36 +554,45 @@ def _seed_all_aggregation_models() -> None:
     OrganisationKPIAggregation = apps.get_model(
         "epilepsy12", "OrganisationKPIAggregation"
     )
+    
+    Trust = apps.get_model("epilepsy12", "Trust")
     TrustKPIAggregation = apps.get_model("epilepsy12", "TrustKPIAggregation")
-    IntegratedCareBoardEntity = apps.get_model(
-        "epilepsy12", "IntegratedCareBoardEntity"
+    
+    LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
+    LocalHealthBoardKPIAggregation = apps.get_model("epilepsy12", "LocalHealthBoardKPIAggregation")
+    
+    IntegratedCareBoard = apps.get_model(
+        "epilepsy12", "IntegratedCareBoard"
     )
     ICBKPIAggregation = apps.get_model("epilepsy12", "ICBKPIAggregation")
+    
     NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
     NHSEnglandRegionKPIAggregation = apps.get_model(
         "epilepsy12", "NHSEnglandRegionKPIAggregation"
     )
-    OPENUKNetworkEntity = apps.get_model("epilepsy12", "OPENUKNetworkEntity")
+    
+    OPENUKNetwork = apps.get_model("epilepsy12", "OPENUKNetwork")
     OpenUKKPIAggregation = apps.get_model("epilepsy12", "OpenUKKPIAggregation")
-    ONSCountryEntity = apps.get_model("epilepsy12", "ONSCountryEntity")
+    
+    Country = apps.get_model("epilepsy12", "Country")
     CountryKPIAggregation = apps.get_model("epilepsy12", "CountryKPIAggregation")
+    
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
     current_cohort = get_current_cohort_data()["cohort"]
 
     all_orgs = Organisation.objects.all().distinct()
-    all_parent_organisation_ods_codes = [
-        code[0]
-        for code in Organisation.objects.all().values_list("trust__ods_code").distinct()
-    ]
-    all_icbs = IntegratedCareBoardEntity.objects.all().distinct()
+    all_trusts = Trust.objects.all().distinct()
+    all_local_health_boards = LocalHealthBoard.objects.all()
+    all_icbs = IntegratedCareBoard.objects.all().distinct()
     all_nhs_regions = NHSEnglandRegion.objects.all().distinct()
-    all_open_uks = OPENUKNetworkEntity.objects.all().distinct()
-    all_countries = ONSCountryEntity.objects.all().distinct()
+    all_open_uks = OPENUKNetwork.objects.all().distinct()
+    all_countries = Country.objects.all().distinct()
 
     all_entities = [
         all_orgs,
-        all_parent_organisation_ods_codes,
+        all_trusts,
+        all_local_health_boards,
         all_icbs,
         all_nhs_regions,
         all_open_uks,
@@ -592,14 +601,17 @@ def _seed_all_aggregation_models() -> None:
     all_agg_models = [
         OrganisationKPIAggregation,
         TrustKPIAggregation,
+        LocalHealthBoardKPIAggregation,
         ICBKPIAggregation,
         NHSEnglandRegionKPIAggregation,
         OpenUKKPIAggregation,
         CountryKPIAggregation,
+        NationalKPIAggregation,
     ]
 
-    if len(all_entities) != len(all_agg_models):
-        raise ValueError("Incorrect lengths for entities")
+    if len(all_entities)+1 != len(all_agg_models):
+        print(f"Incorrect lengths for entities. KPIAggregations not seeded. {len(all_entities)+1=}{len(all_agg_models)=}")
+        return
 
     for entities, AggregationModel in zip(all_entities, all_agg_models):
         print(f"Creating aggregations for {AggregationModel}")
