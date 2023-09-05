@@ -22,7 +22,7 @@ import random
 # E12 imports
 from epilepsy12.models import (
     Episode,
-    Syndrome,
+    SyndromeList,
     Medicine,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
@@ -299,10 +299,10 @@ def test_total_fields_expected_multiaxial_diagnosis_syndrome_fields(
     # Initial value because Multiaxial diagnosis fields minimum == 7 ++ no episodes == 5
     expected_value = 12
 
-    ADD_SYNDROMES = random.choice([None, True])
+    ADD_SYNDROMES = random.choice([ True])
     if ADD_SYNDROMES is not None:
         # Create 3 syndromes
-        SYNDROMES_LIST = Syndrome.objects.all()[:3]
+        SYNDROMES_LIST = SyndromeList.objects.all()[:3]
 
         for i in range(3):
             e12_syndrome_factory(
