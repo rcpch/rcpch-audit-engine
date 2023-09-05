@@ -509,10 +509,6 @@ def get_all_kpi_aggregation_data_for_view(
             abstraction_relation = getattr(
                 organisation, f"{abstraction_relation_field_name}"
             )
-            if enum_abstraction_level is EnumAbstractionLevel.COUNTRY:
-                abstraction_relation = getattr(
-                    abstraction_relation, "boundary_identifier"
-                )
 
         # Get total cases for THIS organisation's abstraction
         total_cases_registered = filtered_cases.count()
@@ -528,6 +524,7 @@ def get_all_kpi_aggregation_data_for_view(
             }
             continue
         # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
+        print(f"**********{abstraction_relation=}")
         if abstraction_kpi_agg_model.objects.filter(
             abstraction_relation=abstraction_relation,
             cohort=cohort,
