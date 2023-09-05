@@ -113,7 +113,7 @@ def case_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__trust__trust_name__contains=organisation.trust.trust_name,
+                organisations__trust__name__contains=organisation.trust.name,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
@@ -251,7 +251,7 @@ def case_list(request, organisation_id):
     if organisation.country.boundary_identifier == "W92000004":
         parent_trust = organisation.local_health_board.name
     else:
-        parent_trust = organisation.trust.trust_name
+        parent_trust = organisation.trust.name
 
     if (
         request.user.is_rcpch_audit_team_member
@@ -305,7 +305,7 @@ def case_statistics(request, organisation_id):
     elif request.user.view_preference == 1:
         # user requesting Trust level - return all cases in the same trust
         total_cases = Case.objects.filter(
-            Q(organisations__trust__trust_name__contains=organisation.trust.trust_name)
+            Q(organisations__trust__name__contains=organisation.trust.name)
         )
     elif request.user.view_preference == 0:
         # user requesting Trust level - return all cases in the same organisation

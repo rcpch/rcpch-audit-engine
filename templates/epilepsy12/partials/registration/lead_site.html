@@ -7,7 +7,7 @@
 
                         <div class="ui right action left icon input">
                             {% if site.organisation.trust %}
-                                <input disabled value="{{site.organisation.name}} ({{site.organisation.trust.trust_name}})">
+                                <input disabled value="{{site.organisation.name}} ({{site.organisation.trust.name}})">
                             {% else %}
                                 <input disabled value="{{site.organisation.name}} ({{site.organisation.local_health_board.name}})">
                             {% endif %}

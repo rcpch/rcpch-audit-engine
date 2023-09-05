@@ -223,7 +223,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             if organisation.country.boundary_identifier == "W92000004":
                 parent_trust = organisation.organisation.local_health_board.name
             else:
-                parent_trust = organisation.organisation.trust.trust_name
+                parent_trust = organisation.organisation.trust.name
             basic_filter = Q(organisation_employer__name__icontains=parent_trust)
         elif request.user.view_preference == 2:
             # user has requested national level view
@@ -276,10 +276,10 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             if organisation.country.boundary_identifier == "W92000004":
                 parent_trust = organisation.local_health_board.name
             else:
-                parent_trust = organisation.trust.trust_name
+                parent_trust = organisation.trust.name
 
             basic_filter = Q(
-                organisation_employer__trust__trust_name__contains=parent_trust
+                organisation_employer__trust__name__contains=parent_trust
             )
 
         elif request.user.view_preference == 0:
@@ -384,7 +384,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
     if organisation.country.boundary_identifier == "W92000004":
         parent_trust = organisation.local_health_board.name
     else:
-        parent_trust = organisation.trust.trust_name
+        parent_trust = organisation.trust.name
 
     if (
         request.user.is_rcpch_audit_team_member

@@ -185,8 +185,8 @@ def get_all_trusts():
     """
     Trust = apps.get_model("epilepsy12", "Trust")
     return (
-        get_all_trusts.objects.order_by("trust_name")
-        .values_list("ods_code", "trust_name")
+        get_all_trusts.objects.order_by("name")
+        .values_list("ods_code", "name")
         .distinct()
     )
 

@@ -29,7 +29,7 @@ class OrganisationCaseSerializer(serializers.ModelSerializer):
             "postcode",
             "geocode_coordinates",
             "trust__ods_code",
-            "trust__trust_name",
+            "trust__name",
             "LastUpdatedDate",
             "cases",
         ]
@@ -52,6 +52,6 @@ class OrganisationSerializer(serializers.HyperlinkedModelSerializer):
             "postcode",
             "geocode_coordinates",
             "trust__ods_code",
-            "trust__trust_name",
+            "trust__name",
             "LastUpdatedDate",
         ]

@@ -140,7 +140,7 @@
                                         {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_trust denominator=count_of_all_current_cohort_registered_cases_in_this_trust title="Completed Patient Records - Trust" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
                                             {% if selected_organisation.trust %}
-                                                <p><small>{{selected_organisation.trust.trust_name}}</small></p>
+                                                <p><small>{{selected_organisation.trust.name}}</small></p>
                                             {% else %}
                                                 <p><small>{{selected_organisation.local_health_board.name}}</small></p>
                                             {% endif %}

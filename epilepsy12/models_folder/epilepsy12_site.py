@@ -78,4 +78,4 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         ]
 
     def __str__(self) -> str:
-        return self.organisation.trust.trust_name
+        return self.organisation.trust.name

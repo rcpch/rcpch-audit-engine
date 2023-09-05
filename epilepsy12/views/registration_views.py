@@ -387,7 +387,7 @@ def update_lead_site(request, registration_id, site_id, update):
         if new_organisation.organisation.country.boundary_identifier == "W92000004":
             parent_trust = new_organisation.organisation.local_health_board.name
         else:
-            parent_trust = new_organisation.organisation.trust.trust_name
+            parent_trust = new_organisation.organisation.trust.name
         messages.success(
             request,
             f"{registration.case} has been successfully updated to {parent_trust}.",
@@ -466,7 +466,7 @@ def update_lead_site(request, registration_id, site_id, update):
         if new_organisation.organisation.country.boundary_identifier == "W92000004":
             parent_trust = new_organisation.organisation.local_health_board.name
         else:
-            parent_trust = new_organisation.organisation.trust.trust_name
+            parent_trust = new_organisation.organisation.trust.name
 
         messages.success(
             request,

@@ -110,7 +110,7 @@
         <div class="header">Organisation</div>
         <p>
           <b>{% if organisation.trust %}
-              {{organisation.name}}({{organisation.trust.trust_name}})
+              {{organisation.name}}({{organisation.trust.name}})
               {% else %}
               {{organisation.name}}({{organisation.local_health_board.name}})
               {% endif %}

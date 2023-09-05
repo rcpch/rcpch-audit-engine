@@ -35,7 +35,7 @@
                                      <label>Paediatric neurology centre actively involved in care</label>
                                     <div class="ui right action input">
                                         {% if active_neurology_site.organisation.trust %}
-                                            <input disabled value="{{active_neurology_site.organisation.name}} ({{active_neurology_site.organisation.trust.trust_name}})">
+                                            <input disabled value="{{active_neurology_site.organisation.name}} ({{active_neurology_site.organisation.trust.name}})">
                                         {% else %}
                                             <input disabled value="{{active_neurology_site.organisation.name}} ({{active_neurology_site.organisation.local_health_board.name}})">
                                         {% endif %}
