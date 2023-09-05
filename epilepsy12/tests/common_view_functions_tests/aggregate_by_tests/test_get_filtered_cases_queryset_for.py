@@ -38,16 +38,17 @@ from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
     "abstraction_level, ODSCodes, expected_count",
     [
         (EnumAbstractionLevel.ORGANISATION, ("RGT01", "7A6AV"), (10, 10)),
-        (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.ICB, ("RGT01", "RYVD9", "7A6AV"), (20, 20, 0)),
+        (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 0)), # Welsh have no Trust
+        (EnumAbstractionLevel.LOCAL_HEALTH_BOARD, ("RP401", "RP416", "7A6AV"), (0, 0, 10)), # English have no LHB
+        (EnumAbstractionLevel.ICB, ("RGT01", "RGN90", "7A6AV"), (20, 20, 0)), # Welsh have no ICB
         (
             EnumAbstractionLevel.NHS_ENGLAND_REGION,
-            ("RP401", "RQM01", "7A6AV"),
-            (20, 20, 10),
-        ),
-        (EnumAbstractionLevel.OPEN_UK, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.COUNTRY, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.NATIONAL, ("RP401", "RP416", "7A6AV"), (30, 30, 30)),
+            ("RGT01", "RGN90", "7A6AV"),
+            (20, 20, 0),
+        ), # Welsh have no NHS_ENGLAND_REGION
+        (EnumAbstractionLevel.OPEN_UK, ("RGT01", "RGN90", "7A6AV"), (20, 20, 10)),
+        (EnumAbstractionLevel.COUNTRY, ("RGT01", "RGN90", "7A6AV"), (20, 20, 10)),
+        (EnumAbstractionLevel.NATIONAL, ("RGT01", "RGN90", "7A6AV"), (30, 30, 30)),
     ],
 )
 @pytest.mark.django_db
@@ -59,7 +60,7 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
 ):
     """Testing the `get_filtered_cases_queryset_for` returns the correct expected_count for filtered cases.
 
-    For each abstraction, Cases are registered in the same abstraction level (all English organisations), and 10 Cases in Wales - so should be excluded from agg counts.
+    For each abstraction, 20 Cases are registered in the same abstraction level (all English organisations, split between 2 organisations), and 10 Cases in Wales - so should be excluded from agg counts.
     """
 
     # Ensure Case db empty for this test
@@ -84,7 +85,7 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
             output == expected_count[ix]
         ), f"""get_total_cases_registered_for_abstraction_level(
             organisation={organisation},
-            abstraction_level={abstraction_level.name if not EnumAbstractionLevel.NATIONAL else 'EnumAbstractionLevel.NATIONAL'},
+            abstraction_level={abstraction_level.name},
             cohort=6,
         ) should be {expected_count[ix]}"""
 
