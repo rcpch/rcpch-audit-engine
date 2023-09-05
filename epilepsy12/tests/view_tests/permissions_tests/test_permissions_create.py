@@ -299,6 +299,7 @@ def test_user_creation_forbidden(
             kwargs={
                 "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 "user_type": "organisation-staff",
+                "epilepsy12_user_id": test_user.id,
             },
         )
 
