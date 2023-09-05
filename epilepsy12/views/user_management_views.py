@@ -426,7 +426,7 @@ def epilepsy12_user_list(request, organisation_id):
 @user_may_view_this_organisation()
 @user_can_access_user()
 @permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
-def create_epilepsy12_user(request, organisation_id, user_type):
+def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_id):
     """
     Creates an epilepsy12 user. It is called from epilepsy12 list of users
     If from the create epilepsy12 user button, the originating organisation is added to

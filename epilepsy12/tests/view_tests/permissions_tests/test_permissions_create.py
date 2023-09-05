@@ -155,6 +155,7 @@ def test_user_create_same_org_success(
             kwargs={
                 "organisation_id": TEST_USER_ORGANISATION.id,
                 "user_type": "organisation-staff",
+                "epilepsy12_user_id": test_user.id,
             },
         )
 
