@@ -481,7 +481,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
                 return HttpResponse("Invalid header found.")
 
             messages.success(request, f"{new_user.email} account created successfully.")
-            return redirect("epilepsy12_user_list", organisation_id=organisation_id)
+            return redirect("epilepsy12_user_list", organisation_id=organisation_id, epilepsy12_user_id=epilepsy12_user_id)
 
     context = {
         "form": form,
@@ -624,7 +624,7 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         messages.error(request, f"Delete User Unsuccessful: {error}")
 
     return HttpResponseClientRedirect(
-        reverse("epilepsy12_user_list", kwargs={"organisation_id": organisation_id})
+        reverse("epilepsy12_user_list", kwargs={"organisation_id": organisation_id, 'epilepsy12_user_id':epilepsy12_user_id})
     )
 
 
