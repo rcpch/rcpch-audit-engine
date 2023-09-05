@@ -246,17 +246,19 @@
                                
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        {% if selected_organisation.country.name == "Wales" %}
-                        <h3 >Local Health Board</h3>
+                        <!-- ENGLISH ORG -->
+                        {% if selected_organisation.trust %}
+                            <h3>Integrated Care Board</h3>
+                        <!-- WELSH ORG -->
                         {% else %}
-                        <h3 >Integrated Care Board</h3>
+                            <h3>Local Health Board</h3>
                         {% endif %}
                     </div>
                     <div>
-                        {% if selected_organisation.country.name == "Wales" %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}
-                        {% else %}
+                        {% if selected_organisation.trust %}
                             {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.name %}
+                        {% else %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.local_health_board.name %}
                         {% endif %}
                     </div>
                 </div>
@@ -272,7 +274,7 @@
                 </div>
                 {% endif %}
 
-                {% if selected_organisation.country.name == "England" %}
+                {% if selected_organisation.trust %}
                 <div class="ui rcpch_light_blue card">
                     <div class="content">
                         <h3 >NHS England Region</h3>
@@ -283,30 +285,34 @@
                 </div>
                 {% endif %}
                 
-                <!-- <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        <h3 >Country</h3>
+                        <h3>
+                            Country
+                        </h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.ons_region.ons_country.Country_ONS_Name %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.country.name %}
                     </div>
-                </div> -->
+                </div>
 
             </div>
         </div>
 
         
             
-        <div 
-            class="sixteen wide rcpch segment" 
-            hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}" 
-            hx-trigger="load" hx-swap='innerHTML'
-            hx-indicator='#kpis'
-            hx-target="#kpis">
-            <div id='kpis'>
-                <div class="ui active centered inline loader"></div>
-            </div>
+        <div class="sixteen wide column">
+            <div
+                class="sixteen wide rcpch segment"
+                hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}"
+                hx-trigger="load" hx-swap='innerHTML'
+                hx-indicator='#kpis'
+                hx-target="#kpis">
+                <div id='kpis'>
+                    <div class="ui active centered inline loader"></div>
+                </div>
             
+            </div>
         </div>
         
         {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk %}
