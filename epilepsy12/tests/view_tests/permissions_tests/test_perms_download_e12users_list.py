@@ -48,6 +48,8 @@ def test_download_button_access(
             )
         )
         if test_user.first_name == test_user_rcpch_audit_team_data.role_str:
+            
+            print(response)
             assert (
                 response["Content-Disposition"]
                 == 'attachment; filename="epilepsy12users.csv"'

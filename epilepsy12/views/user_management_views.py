@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail, BadHeaderError
 
 from django.urls import reverse_lazy
@@ -686,6 +687,12 @@ def log_list(request, organisation_id, epilepsy12_user_id):
 @login_required
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
+    
+    allowed_groups = [EPILEPSY12_AUDIT_TEAM_FULL_ACCESS]
+
+    if not (request.user.is_superuser or request.user.groups.filter(name__in=allowed_groups)):
+        raise PermissionDenied()
+    
     all_users = Epilepsy12User.objects.all().values(
         "id",
         "last_login",
