@@ -253,11 +253,18 @@ def test_users_and_case_list_views_permissions_success(
         # Log in Test User
         client.force_login(test_user)
 
+        kwargs = {"organisation_id": TEST_USER_ORGANISATION.id}
+
+        # if e12 user list, add "epilepsy12_user_id": test_user.id
+        if URL == "epilepsy12_user_list":
+            kwargs.update({"epilepsy12_user_id": test_user.id})
+
         # Request e12 User/Case list endpoint url of same Trust
+        print(URL)
         e12_user_list_response = client.get(
             reverse(
                 URL,
-                kwargs={"organisation_id": TEST_USER_ORGANISATION.id},
+                kwargs=kwargs,
             )
         )
 
@@ -270,11 +277,17 @@ def test_users_and_case_list_views_permissions_success(
             test_user_rcpch_audit_team_data.role_str,
             test_user_clinicial_audit_team_data.role_str,
         ]:
+            kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
+
+            # if e12 user list, add "epilepsy12_user_id": test_user.id
+            if URL == "epilepsy12_user_list":
+                kwargs.update({"epilepsy12_user_id": test_user.id})
+
             # Request e12 user/case list endpoint url diff org
             e12_user_list_response = client.get(
                 reverse(
                     URL,
-                    kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
+                    kwargs=kwargs,
                 )
             )
 
@@ -319,11 +332,17 @@ def test_users_and_cases_list_view_permissions_forbidden(
     for test_user in users:
         client.force_login(test_user)
 
+        kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
+
+        # if e12 user list, add "epilepsy12_user_id": test_user.id
+        if URL == "epilepsy12_user_list":
+            kwargs.update({"epilepsy12_user_id": test_user.id})
+                
         # Request e12 user list endpoint url diff org
         e12_user_list_response_different_organisation = client.get(
             reverse(
                 URL,
-                kwargs={"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id},
+                kwargs=kwargs,
             )
         )
 
@@ -814,7 +833,9 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
 
     COMORBIDITY_DIFF_ORG = Comorbidity.objects.create(
         multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-        comorbidityentity=ComorbidityList.objects.filter(conceptId="1148757008").first(),
+        comorbidityentity=ComorbidityList.objects.filter(
+            conceptId="1148757008"
+        ).first(),
     )
 
     # RCPCH/CLINCAL AUDIT TEAM HAVE FULL ACCESS SO DONT INCLUDE

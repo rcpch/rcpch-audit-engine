@@ -186,9 +186,9 @@ def epilepsy12_login(request):
     )
 
 
-@user_may_view_this_organisation()
 @login_required
-def epilepsy12_user_list(request, organisation_id):
+@user_may_view_this_organisation()
+def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
     """
     Returns the list of users for the selected organisations
     Currently this includes RCPCH staff who are not associated with a organisation, though this breaks the update/delete and cancel
