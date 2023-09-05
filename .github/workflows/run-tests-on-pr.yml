@@ -1,4 +1,4 @@
-
+# Runs the Pytest test suite when PRs are made against any branch
 
 name: Pytest Suite
 
@@ -57,7 +57,7 @@ jobs:
 
       - name: Install PostGIS dependencies
         run: |
-          sudo apt-get update 
+          sudo apt-get update
           sudo apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal
 
       - name: Create and start virtual environment
@@ -70,11 +70,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-        
+
       # Required for tests which read template content
       - name: collect static files
         run: python manage.py collectstatic --noinput
-      
+
       # Runs tests
       - name: Pytest Suite
         run: pytest -rP
