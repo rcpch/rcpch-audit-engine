@@ -524,7 +524,6 @@ def get_all_kpi_aggregation_data_for_view(
             }
             continue
         # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
-        print(f"**********{abstraction_relation=}")
         if abstraction_kpi_agg_model.objects.filter(
             abstraction_relation=abstraction_relation,
             cohort=cohort,
@@ -541,6 +540,8 @@ def get_all_kpi_aggregation_data_for_view(
                 "aggregation_model": None,
                 "total_cases_registered": total_cases_registered,
             }
+    
+    print(ALL_DATA)
     return ALL_DATA
 
 
