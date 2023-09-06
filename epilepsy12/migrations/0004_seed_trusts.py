@@ -25,7 +25,7 @@ def seed_trusts(apps, schema_editor):
             try:
                 Trust.objects.create(
                     ods_code=trust["ods_code"],
-                    trust_name=trust["trust_name"],
+                    name=trust["trust_name"],
                     address_line_1=trust["address_line_1"],
                     address_line_2=trust.get("address_line_2"),
                     town=trust["town"],
