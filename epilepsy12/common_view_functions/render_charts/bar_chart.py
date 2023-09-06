@@ -24,18 +24,21 @@ from epilepsy12.models import (
 
 
 ABSTRACTION_GRAPH_COLOR_MAP = {
+    EnumAbstractionLevel.LOCAL_HEALTH_BOARD: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.ICB: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.OPEN_UK: RCPCH_AQUA_GREEN,
     EnumAbstractionLevel.NHS_ENGLAND_REGION: RCPCH_STRONG_BLUE,
     EnumAbstractionLevel.COUNTRY: RCPCH_DARK_BLUE,
 }
 ABSTRACTION_CHART_HEIGHT = {
+    EnumAbstractionLevel.LOCAL_HEALTH_BOARD: "100vh",
     EnumAbstractionLevel.ICB: "100vh",
     EnumAbstractionLevel.OPEN_UK: "80vh",
     EnumAbstractionLevel.NHS_ENGLAND_REGION: "70vh",
     EnumAbstractionLevel.COUNTRY: "50vh",
 }
 ABSTRACTION_GRAPH_TITLE_SUBUNIT = {
+    EnumAbstractionLevel.LOCAL_HEALTH_BOARD: "Local Health Board",
     EnumAbstractionLevel.ICB: "Integrated Care Board",
     EnumAbstractionLevel.OPEN_UK: "OPEN UK Region",
     EnumAbstractionLevel.NHS_ENGLAND_REGION: "NHS Region",
@@ -204,7 +207,8 @@ def render_bar_pct_passed_for_kpi_agg(
     )
 
     # Calculate average, add line IF len not 0
-    pct_pass_exc_none = [num for num in pct_passed if num is not None]
+    pct_pass_exc_none = [num for num in pct_passed if ((num is not None) and (num != 0))]
+
     if len(pct_pass_exc_none):
         average_for_eligible = int(
             round(sum(pct_pass_exc_none) / len(pct_pass_exc_none), 0)

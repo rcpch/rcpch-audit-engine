@@ -45,6 +45,7 @@ def update_all_data_with_charts(
 
         # Skip loop if Organisation / Trust / National level
         if abstraction not in [
+            "LOCAL_HEALTH_BOARD_KPIS",
             "ICB_KPIS",
             "OPEN_UK_KPIS",
             "NHS_ENGLAND_REGION_KPIS",
