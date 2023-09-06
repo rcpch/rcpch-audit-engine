@@ -76,7 +76,7 @@
             {% with all_data.ICB_KPIS as KPI_DATA %}
             {% with KPI_DATA.total_cases_registered as total_cases %}
             {% with KPI_DATA.aggregation_model as aggregation_model %}
-            <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #icb_kpi_ranking">
+            <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #parent_org_kpi_ranking">
                 <div class="content summary_kpi_pie_title">
                     <h3>ICB</h3>
                 </div>
@@ -109,7 +109,7 @@
             {% with KPI_DATA.total_cases_registered as total_cases %}
             {% with KPI_DATA.aggregation_model as aggregation_model %}
 
-            <div class="ui rcpch_individual_kpi_fixed card">
+            <div class="ui rcpch_individual_kpi card clickable_card" _="on click go to the top of #parent_org_kpi_ranking">
                 <div class="content summary_kpi_pie_title">
                     <h3>Local Health Board</h3>
                 </div>
@@ -249,7 +249,7 @@
 </div>
 <div class='bar_charts_wrapper'>
     
-    <div id="icb_kpi_ranking">
+    <div id="parent_org_kpi_ranking">
         {% if all_data.ICB_KPIS.aggregation_model %}
             {% with all_data.ICB_KPIS as KPI_DATA %}
             {% with KPI_DATA.total_cases_registered as total_cases %}
@@ -281,16 +281,18 @@
         {% endwith %}
         {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
     </div>
-    <div id="nhs_region_kpi_ranking">
-        {% with all_data.NHS_ENGLAND_REGION_KPIS as KPI_DATA %}
-        {% with KPI_DATA.total_cases_registered as total_cases %}
-        {% with KPI_DATA.aggregation_model as aggregation_model %}
-            {{ KPI_DATA.charts.passed_bar.get_html|safe }}
-        {% endwith %}
-        {% endwith %}
-        {% endwith %}
-        {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
-    </div>
+    {% if all_data.NHS_ENGLAND_REGION_KPIS.aggregation_model %}
+        <div id="nhs_region_kpi_ranking">
+            {% with all_data.NHS_ENGLAND_REGION_KPIS as KPI_DATA %}
+            {% with KPI_DATA.total_cases_registered as total_cases %}
+            {% with KPI_DATA.aggregation_model as aggregation_model %}
+                {{ KPI_DATA.charts.passed_bar.get_html|safe }}
+            {% endwith %}
+            {% endwith %}
+            {% endwith %}
+            {% include 'epilepsy12/partials/organisation/navigation_buttons.html' %}
+        </div>
+    {% endif %}
     <div id="country_kpi_ranking">
         {% with all_data.COUNTRY_KPIS as KPI_DATA %}
         {% with KPI_DATA.total_cases_registered as total_cases %}
