@@ -486,12 +486,6 @@ def get_all_kpi_aggregation_data_for_view(
     """
     ALL_DATA = {}
     for enum_abstraction_level in EnumAbstractionLevel:
-        filtered_cases = get_filtered_cases_queryset_for(
-            organisation=organisation,
-            abstraction_level=enum_abstraction_level,
-            cohort=cohort,
-        )
-
         # For the given abstraction, get the {ABSTRACTION}KPIAggregation model
         abstraction_kpi_agg_model_name = get_abstraction_model_from_level(
             enum_abstraction_level
@@ -510,9 +504,6 @@ def get_all_kpi_aggregation_data_for_view(
                 organisation, f"{abstraction_relation_field_name}"
             )
 
-        # Get total cases for THIS organisation's abstraction
-        total_cases_registered = filtered_cases.count()
-
         # NationalKPIAggregation model does not have abstraction relation field, so handle differently to the rest and skip rest of loop
         NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
         if abstraction_kpi_agg_model == NationalKPIAggregation:
@@ -520,28 +511,37 @@ def get_all_kpi_aggregation_data_for_view(
                 "aggregation_model": abstraction_kpi_agg_model.objects.get(
                     cohort=cohort
                 ),
-                "total_cases_registered": total_cases_registered,
+                "total_cases_registered": abstraction_kpi_agg_model.objects.get(
+                    cohort=cohort
+                ).get_total_cases_included_in_aggregation(),
             }
             continue
+
         # Check if KPIAggregation model exists. If Organisation does not have any cases where that Organisation is primary care Site, then the KPIAgg will not exist.
         if abstraction_kpi_agg_model.objects.filter(
             abstraction_relation=abstraction_relation,
             cohort=cohort,
         ).exists():
+            aggregation_model_instance = abstraction_kpi_agg_model.objects.get(
+                abstraction_relation=abstraction_relation,
+                cohort=cohort,
+            )
             ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
-                "aggregation_model": abstraction_kpi_agg_model.objects.get(
-                    abstraction_relation=abstraction_relation,
-                    cohort=cohort,
-                ),
-                "total_cases_registered": total_cases_registered,
+                "aggregation_model": aggregation_model_instance,
+                "total_cases_registered": aggregation_model_instance.get_total_cases_included_in_aggregation(),
             }
         else:
+            filtered_cases = get_filtered_cases_queryset_for(
+                organisation=organisation,
+                abstraction_level=enum_abstraction_level,
+                cohort=cohort,
+            )
+
             ALL_DATA[f"{enum_abstraction_level.name}_KPIS"] = {
                 "aggregation_model": None,
-                "total_cases_registered": total_cases_registered,
+                "total_cases_registered": filtered_cases.count(),
             }
-    
-    print(ALL_DATA)
+
     return ALL_DATA
 
 
@@ -552,29 +552,29 @@ def _seed_all_aggregation_models() -> None:
     OrganisationKPIAggregation = apps.get_model(
         "epilepsy12", "OrganisationKPIAggregation"
     )
-    
+
     Trust = apps.get_model("epilepsy12", "Trust")
     TrustKPIAggregation = apps.get_model("epilepsy12", "TrustKPIAggregation")
-    
+
     LocalHealthBoard = apps.get_model("epilepsy12", "LocalHealthBoard")
-    LocalHealthBoardKPIAggregation = apps.get_model("epilepsy12", "LocalHealthBoardKPIAggregation")
-    
-    IntegratedCareBoard = apps.get_model(
-        "epilepsy12", "IntegratedCareBoard"
+    LocalHealthBoardKPIAggregation = apps.get_model(
+        "epilepsy12", "LocalHealthBoardKPIAggregation"
     )
+
+    IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
     ICBKPIAggregation = apps.get_model("epilepsy12", "ICBKPIAggregation")
-    
+
     NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
     NHSEnglandRegionKPIAggregation = apps.get_model(
         "epilepsy12", "NHSEnglandRegionKPIAggregation"
     )
-    
+
     OPENUKNetwork = apps.get_model("epilepsy12", "OPENUKNetwork")
     OpenUKKPIAggregation = apps.get_model("epilepsy12", "OpenUKKPIAggregation")
-    
+
     Country = apps.get_model("epilepsy12", "Country")
     CountryKPIAggregation = apps.get_model("epilepsy12", "CountryKPIAggregation")
-    
+
     NationalKPIAggregation = apps.get_model("epilepsy12", "NationalKPIAggregation")
 
     current_cohort = get_current_cohort_data()["cohort"]
@@ -607,8 +607,10 @@ def _seed_all_aggregation_models() -> None:
         NationalKPIAggregation,
     ]
 
-    if len(all_entities)+1 != len(all_agg_models):
-        print(f"Incorrect lengths for entities. KPIAggregations not seeded. {len(all_entities)+1=}{len(all_agg_models)=}")
+    if len(all_entities) + 1 != len(all_agg_models):
+        print(
+            f"Incorrect lengths for entities. KPIAggregations not seeded. {len(all_entities)+1=}{len(all_agg_models)=}"
+        )
         return
 
     for entities, AggregationModel in zip(all_entities, all_agg_models):

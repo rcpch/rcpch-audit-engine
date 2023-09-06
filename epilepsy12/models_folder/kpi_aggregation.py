@@ -525,6 +525,23 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
                 all_value_counts.update({kpi_metric: value})
         return all_value_counts
 
+    def get_total_cases_included_in_aggregation(self)->int:
+        """Total cases performed for aggregation can be found through 
+        
+        sum(
+            paediatrician_with_expertise_in_epilepsies_total_eligible, 
+            paediatrician_with_expertise_in_epilepsies_total_ineligible,
+            paediatrician_with_expertise_in_epilepsies_total_incomplete,
+            )
+        """
+        
+        kpi = 'paediatrician_with_expertise_in_epilepsies'
+        fields = ["total_eligible", "ineligible", "incomplete"]
+        
+        metric_values = [getattr(self, f'{kpi}_{field}') for field in fields]
+        
+        return sum(metric_values)
+    
     def __str__(self):
         return f"Base KPI aggregation result model"
 
