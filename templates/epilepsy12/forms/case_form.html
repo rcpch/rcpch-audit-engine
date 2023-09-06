@@ -110,7 +110,7 @@
         <div class="header">Organisation</div>
         <p>
           <b>{% if organisation.trust %}
-              {{organisation.name}}({{organisation.trust.name}})
+              {{organisation.name}}({{organisation.trust.name}}) ({{form.id}})
               {% else %}
               {{organisation.name}}({{organisation.local_health_board.name}})
               {% endif %}
@@ -136,26 +136,37 @@
     
       {% endif %} 
       {% if perms.epilepsy12.delete_case %}
-      <button
+      <input
         class="ui rcpch_danger button"
         name="delete"
         form="create_case_form"
         id="delete"
         type="submit"
         value="Delete"
-          _= "on click
-          call Swal.fire({
-            title: 'Confirmation Required',
-            text: 'This will irreversibly remove user and related dated from Epilepsy12.',
-            icon: 'warning',
-            iconColor: '#e00087',
-            showCancelButton: true,
-            confirmButtonColor: '#11a7f2',
-            cancelButtonColor: '#e60700',
-            confirmButtonText: 'Remove child from Epilepsy12'
-          })
-          if !result.isConfirmed then halt"
-      >Delete</button>
+        _= "on click
+        halt the event
+        call Swal.fire({
+          title: 'Confirmation Required',
+          text: 'This will irreversibly remove {{case}} and related dated from Epilepsy12.',
+          icon: 'warning',
+          iconColor: '#e00087',
+          showCancelButton: true,
+          confirmButtonColor: '#11a7f2',
+          cancelButtonColor: '#e60700',
+          confirmButtonText: 'Remove {{case}} from Epilepsy12'
+        })
+        if result.isConfirmed fetch {% url 'update_case' organisation_id case.pk %}
+        {
+          method: 'post',
+          headers: {
+            'X-CSRFToken': {{csrf_token}},
+            'Accept': 'network/json',
+            'Content-Type': 'network/json',
+          }
+        }
+        end
+        "
+      />
       {% endif %}
     </div>
   </div>

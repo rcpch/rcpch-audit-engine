@@ -80,7 +80,7 @@
 
           <div class='two fields'>
 
-            {% if request.user.is_rcpch_audit_team_member %}
+            {% if user.is_rcpch_audit_team_member %}
               <div class='eight wide field'>
                 <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
@@ -130,7 +130,7 @@
             {% if admin_title != 'Add Epilepsy12 User' and admin_title != "Add RCPCH Epilepsy12 staff member" %}
               <input
                 type="submit"
-                {% if perms.epilepsy12.delete_epilepsy12user %}
+                {% if perms.epilepsy12.delete_epilepsy12user and user.email != form.email.value %}
                   class="ui rcpch_danger button"
                 {% else %}
                   class="ui rcpch_danger disabled button"
