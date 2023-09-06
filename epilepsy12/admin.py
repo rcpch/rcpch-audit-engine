@@ -146,13 +146,16 @@ admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
 admin.site.register(SyndromeList, SimpleHistoryAdmin)
 admin.site.register(Syndrome, SimpleHistoryAdmin)
 admin.site.register(KPI)
+
 admin.site.register(OrganisationKPIAggregation)
 admin.site.register(TrustKPIAggregation)
+admin.site.register(LocalHealthBoardKPIAggregation)
 admin.site.register(ICBKPIAggregation)
 admin.site.register(NHSEnglandRegionKPIAggregation)
 admin.site.register(OpenUKKPIAggregation)
 admin.site.register(CountryKPIAggregation)
 admin.site.register(NationalKPIAggregation)
+
 admin.site.register(VisitActivity)
 admin.site.register(ComorbidityList)
 admin.site.register(Medicine)
@@ -164,10 +167,7 @@ admin.site.register(NHSEnglandRegion)
 admin.site.register(Trust)
 admin.site.register(LocalHealthBoard)
 
-# admin.site.register(CountryBoundaries)
-# admin.site.register(NHSEnglandRegionBoundaries)
-# admin.site.register(LocalHealthBoardBoundaries)
-# admin.site.register(IntegratedCareBoardBoundaries)
+
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"
