@@ -1866,6 +1866,55 @@ div.ui.three.stackable.cards.individual_measures {
   margin-bottom: -1em;
 }
 
+.rcpch_cards_wrapper {
+  padding: 2em 0em;
+  flex-wrap: wrap;
+}
+
+.rcpch_cards_wrapper, .rcpch_cards_wrapper>.rcpch_card {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.rcpch_card {
+  flex-direction: column;
+  flex-basis: calc(33.33% - 4em); /* 33.33% minus margin/padding */
+  border: none;
+  border-radius: 0rem;
+  box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+  transition: box-shadow .1s ease,transform .1s ease,-webkit-box-shadow .1s ease,-webkit-transform .1s ease;
+  margin: 2em;
+}
+
+.rcpch_card > .title {
+  background-color: var(--rcpch_mid_grey);
+  width: 100%;
+  text-align: center;
+}
+
+.rcpch_card > .title > h3 {
+  color: white;
+  padding: 0.7em;
+}
+
+.rcpch_card > .caption {
+  text-align: justify;
+  padding: 1.2em;
+}
+
+.rcpch_card.clickable_card {
+  cursor: pointer;
+}
+
+.rcpch_card.clickable_card > .title {
+  background-color: var(--rcpch_strong_blue);
+}
+
+.rcpch_card.clickable_card:hover > .title {
+  background-color: var(--rcpch_light_blue);
+}
+
 .summary_kpi_pie_title {
   text-align: center;
 }
@@ -1975,10 +2024,6 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .region_tooltip {
   border-radius: 0% !important;
-}
-
-.ui.card.clickable_card:hover {
-  cursor: pointer;
 }
 
 .ui.attached.tabular.menu {
