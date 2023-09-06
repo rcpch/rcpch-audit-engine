@@ -136,14 +136,26 @@
     
       {% endif %} 
       {% if perms.epilepsy12.delete_case %}
-      <input
-        type="submit"
+      <button
         class="ui rcpch_danger button"
         name="delete"
-        value="Delete"
         form="create_case_form"
-      />
-      
+        id="delete"
+        type="submit"
+        value="Delete"
+          _= "on click
+          call Swal.fire({
+            title: 'Confirmation Required',
+            text: 'This will irreversibly remove user and related dated from Epilepsy12.',
+            icon: 'warning',
+            iconColor: '#e00087',
+            showCancelButton: true,
+            confirmButtonColor: '#11a7f2',
+            cancelButtonColor: '#e60700',
+            confirmButtonText: 'Remove child from Epilepsy12'
+          })
+          if !result.isConfirmed then halt"
+      >Delete</button>
       {% endif %}
     </div>
   </div>

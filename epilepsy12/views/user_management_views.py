@@ -425,7 +425,6 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
 
 @login_required
 @user_may_view_this_organisation()
-@user_can_access_user()
 @permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
 def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_id):
     """
