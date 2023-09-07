@@ -532,7 +532,7 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
             paediatrician_with_expertise_in_epilepsies_total_eligible, 
             paediatrician_with_expertise_in_epilepsies_total_ineligible,
             paediatrician_with_expertise_in_epilepsies_total_incomplete,
-            )
+            ).
         """
         
         kpi = 'paediatrician_with_expertise_in_epilepsies'
@@ -540,7 +540,11 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         
         metric_values = [getattr(self, f'{kpi}_{field}') for field in fields]
         
-        return sum(metric_values)
+        # If no eligible Cases, all values will be None - can just check 1
+        if metric_values[0] is None:
+            return 0
+        
+        return sum (metric_values)
     
     def __str__(self):
         return f"Base KPI aggregation result model"
