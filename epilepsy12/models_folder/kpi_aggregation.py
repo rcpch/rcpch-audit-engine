@@ -568,7 +568,7 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"OrganisationKPIAggregation (ods_code={self.abstraction_relation.ods_code}) KPIAggregations"
+        return f"OrganisationKPIAggregation (ods_code={self.abstraction_relation.ods_code}, Cohort {self.cohort}) KPIAggregations"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -600,7 +600,7 @@ class TrustKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"TrustKPIAggregation (Trust={self.abstraction_relation})"
+        return f"TrustKPIAggregation (Trust={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -632,7 +632,7 @@ class LocalHealthBoardKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"LocalHealthBoardKPIAggregation (LocalHealthBoard={self.abstraction_relation})"
+        return f"LocalHealthBoardKPIAggregation (LocalHealthBoard={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -665,7 +665,7 @@ class ICBKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"ICBKPIAggregation (IntegratedCareBoard={self.abstraction_relation})"
+        return f"ICBKPIAggregation (IntegratedCareBoard={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -698,7 +698,7 @@ class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"KPIAggregations (NHSEnglandRegion={self.abstraction_relation})"
+        return f"KPIAggregations (NHSEnglandRegion={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -731,7 +731,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"OPENUKKPIAggregations (OPENUKNetwork={self.abstraction_relation})"
+        return f"OPENUKKPIAggregations (OPENUKNetwork={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
@@ -764,7 +764,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"CountryKPIAggregations (Country={self.abstraction_relation})"
+        return f"CountryKPIAggregations (Country={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
