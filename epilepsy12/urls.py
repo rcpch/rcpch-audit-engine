@@ -23,8 +23,10 @@ from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path
 from django.contrib.auth import urls as auth_urls
 
-router = routers.DefaultRouter()
+# router = routers.DefaultRouter()
 
+"""
+These are all the endpoints for the API - currently commented out but can be brought in one by one as tests are added.
 router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
 router.register(r"cases", viewset=CaseViewSet)
 router.register(r"registration", viewset=RegistrationViewSet)
@@ -57,6 +59,7 @@ router.register(
     viewset=ComorbidityEntityViewSet,
     basename="comorbidityentity",
 )
+"""
 
 
 # Auth, login, password reset
@@ -1032,14 +1035,15 @@ antiepilepsy_medicine_patterns = [
 
 urlpatterns = []
 
-drf_routes = [
-    # rest framework paths
-    path("api/v1/", include(router.urls)),
-    # returns a Token (OAuth2 key: Token) against email and password of existing user
-    path("api/v1/api-token-auth/", obtain_auth_token, name="api_token_auth"),
-    # returns the standard Django for authentication of the DRF
-    path("api/v1/api-auth/", include(urls, namespace="rest_framework")),
-]
+# This is related to the DRF
+# drf_routes = [
+#     # rest framework paths
+#     path("api/v1/", include(router.urls)),
+#     # returns a Token (OAuth2 key: Token) against email and password of existing user
+#     path("api/v1/api-token-auth/", obtain_auth_token, name="api_token_auth"),
+#     # returns the standard Django for authentication of the DRF
+#     path("api/v1/api-auth/", include(urls, namespace="rest_framework")),
+# ]
 
 
 urlpatterns += user_patterns
@@ -1061,4 +1065,5 @@ urlpatterns += comorbidities_patterns
 urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 
-urlpatterns += drf_routes
+# This is related to the DRF
+# urlpatterns += drf_routes
