@@ -1885,6 +1885,7 @@ div.ui.three.stackable.cards.individual_measures {
   box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
   transition: box-shadow .1s ease,transform .1s ease,-webkit-box-shadow .1s ease,-webkit-transform .1s ease;
   margin: 2em;
+  height: 33em;
 }
 
 .rcpch_card > .title {
