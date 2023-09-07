@@ -129,7 +129,7 @@ def render_bar_pct_passed_for_kpi_agg(
             PCT_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
             PCT_TEXT_COLOR.append(RCPCH_CHARCOAL)
             NAMES_TEXT_COLOR.append(
-                format_subunit_name_ticktext(color=RCPCH_LIGHT_GREY, text=name)
+                format_subunit_name_ticktext(color=RCPCH_DARK_GREY, text=name)
             )
         else:
             BG_BAR_COLOR.append(RCPCH_LIGHT_GREY)
