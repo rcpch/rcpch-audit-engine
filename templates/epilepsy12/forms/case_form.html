@@ -140,7 +140,8 @@
           Save
         </button>
     
-      {% endif %} 
+      {% endif %}
+
       {% if perms.epilepsy12.delete_case %}
       <input
         type="submit"
@@ -158,7 +159,7 @@
           showCancelButton: true,
           confirmButtonColor: '#11a7f2',
           cancelButtonColor: '#e60700',
-          confirmButtonText: 'Remove {{case}} from Epilepsy12'
+          confirmButtonText: 'Remove user from Epilepsy12'
         })
         if result.isConfirmed then fetch {% url 'update_case' organisation_id case.pk %}
         {

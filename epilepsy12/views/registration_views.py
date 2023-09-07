@@ -372,27 +372,28 @@ def update_lead_site(request, registration_id, site_id, update):
 
     registration = Registration.objects.get(pk=registration_id)
     previous_lead_site = Site.objects.get(pk=site_id)
+    origin_organisation = previous_lead_site.organisation
 
-    if update == "edit":
-        # no email is sent - this just updates the lead centre
-        new_trust_id = request.POST.get("edit_lead_site")
-        new_organisation = Organisation.objects.get(pk=new_trust_id)
-        Site.objects.filter(pk=site_id).update(
-            organisation=new_organisation,
-            site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-        if new_organisation.organisation.country.boundary_identifier == "W92000004":
-            parent_trust = new_organisation.organisation.local_health_board.name
-        else:
-            parent_trust = new_organisation.organisation.trust.name
-        messages.success(
-            request,
-            f"{registration.case} has been successfully updated to {parent_trust}.",
-        )
-    elif update == "transfer":
+    # if update == "edit":
+    #     # no email is sent - this just updates the lead centre
+    #     new_trust_id = request.POST.get("edit_lead_site")
+    #     new_organisation = Organisation.objects.get(pk=new_trust_id)
+    #     Site.objects.filter(pk=site_id).update(
+    #         organisation=new_organisation,
+    #         site_is_primary_centre_of_epilepsy_care=True,
+    #         site_is_actively_involved_in_epilepsy_care=True,
+    #         updated_at=timezone.now(),
+    #         updated_by=request.user,
+    #     )
+    #     if new_organisation.organisation.country.boundary_identifier == "W92000004":
+    #         parent_trust = new_organisation.organisation.local_health_board.name
+    #     else:
+    #         parent_trust = new_organisation.organisation.trust.name
+    #     messages.success(
+    #         request,
+    #         f"{registration.case} has been successfully updated to {parent_trust}.",
+    #     )
+    if update == "transfer":
         new_trust_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_trust_id)
         # update current site record to show nolonger actively involved in care
@@ -449,7 +450,7 @@ def update_lead_site(request, registration_id, site_id, update):
                 request=request,
                 user=recipient,
                 target_organisation=new_organisation,
-                child=registration.case,
+                origin_organisation=origin_organisation,
             )
             try:
                 send_mail(
@@ -463,10 +464,10 @@ def update_lead_site(request, registration_id, site_id, update):
             except BadHeaderError:
                 return HttpResponse("Invalid header found.")
 
-        if new_organisation.organisation.country.boundary_identifier == "W92000004":
-            parent_trust = new_organisation.organisation.local_health_board.name
+        if new_organisation.country.boundary_identifier == "W92000004":
+            parent_trust = new_organisation.local_health_board.name
         else:
-            parent_trust = new_organisation.organisation.trust.name
+            parent_trust = new_organisation.trust.name
 
         messages.success(
             request,
@@ -684,9 +685,7 @@ def first_paediatric_assessment_date(request, case_id):
 
     context = {"case_id": case_id, "registration": registration}
 
-    template_name = (
-        "epilepsy12/partials/registration/registration_dates.html"
-    )
+    template_name = "epilepsy12/partials/registration/registration_dates.html"
 
     response = recalculate_form_generate_response(
         model_instance=registration,

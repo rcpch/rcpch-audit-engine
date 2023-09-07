@@ -935,11 +935,6 @@ registration_patterns = [
         name="first_paediatric_assessment_date",
     ),
     path(
-        "registration/<int:registration_id>/lead_site/<int:site_id>/edit",
-        edit_lead_site,
-        name="edit_lead_site",
-    ),
-    path(
         "registration/<int:registration_id>/lead_site/<int:site_id>/transfer",
         transfer_lead_site,
         name="transfer_lead_site",

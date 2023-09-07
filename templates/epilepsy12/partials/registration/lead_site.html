@@ -17,16 +17,6 @@
                             {% if perms.epilepsy12.can_edit_epilepsy12_lead_centre or perms.epilepsy12.can_transfer_epilepsy12_lead_centre or perms.epilepsy12.can_delete_epilepsy12_lead_centre %}
 
                                 <div class="ui buttons">
-
-                                        {% if perms.epilepsy12.can_edit_epilepsy12_lead_centre %}
-                                            <button 
-                                                class="ui rcpch_primary button"
-                                                hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                                hx-target="#lead_site"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Edit</button>
-                                        {% endif %}
                                         
                                         <button
                                             {% if perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}
