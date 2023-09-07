@@ -1899,6 +1899,10 @@ div.ui.three.stackable.cards.individual_measures {
   padding: 0.7em;
 }
 
+.rcpch_card > .visualisation > h5 {
+  margin-top: 13em;
+}
+
 .rcpch_card > .caption {
   text-align: justify;
   padding: 1.2em;

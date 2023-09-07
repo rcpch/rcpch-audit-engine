@@ -23,13 +23,11 @@
                     </div>
                     <div class="caption">
                         {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                            <br>
+                            
                             {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                             {% if pct_passed_kpi is not None %}
                                 <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                             {% endif %}
-                        {% else %}
-                            {{aggregation_model.abstraction_relation.name}} has no eligible data on this measure yet.
                         {% endif %}
                     </div>
                 </div>
@@ -54,13 +52,11 @@
                     </div>
                     <div class="caption">
                         {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                            <br>
+                            
                             {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                             {% if pct_passed_kpi is not None %}
                                 <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                             {% endif %}
-                        {% else %}
-                            {{aggregation_model.get_name}} has no eligible data on this measure yet.
                         {% endif %}
                     </div>
                 </div>
@@ -84,13 +80,11 @@
                         </div>
                         <div class="caption">
                             {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                                <br>
+                                
                                 {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                                 {% if pct_passed_kpi is not None %}
                                     <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
-                                {% endif %}
-                            {% else %}
-                                {{aggregation_model.get_name}} has no eligible data on this measure yet.
+                                {% endif %} 
                             {% endif %}
                         </div>
                     </div>
@@ -115,13 +109,12 @@
                     </div>
                     <div class="caption">
                         {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                            <br>
+                            
                             {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                             {% if pct_passed_kpi is not None %}
                                 <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                             {% endif %}
-                        {% else %}
-                            {{aggregation_model.get_name}} has no eligible data on this measure yet.
+                        
                         {% endif %}
                     </div>
                 </div>
@@ -147,13 +140,12 @@
                     </div>
                     <div class="caption">
                         {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                            <br>
+                            
                             {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                             {% if pct_passed_kpi is not None %}
                                 <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                             {% endif %}
-                        {% else %}
-                            {{aggregation_model.get_name}} has no eligible data on this measure yet.
+                        
                         {% endif %}
                     </div>
                 </div>
@@ -178,13 +170,12 @@
                 </div>
                 <div class="caption">
                     {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                        <br>
+                        
                         {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                         {% if pct_passed_kpi is not None %}
                             <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                         {% endif %}
-                    {% else %}
-                        {{aggregation_model.get_name}} has no eligible data on this measure yet.
+                   
                     {% endif %}
                 </div>
             </div>
@@ -208,13 +199,12 @@
                 </div>
                 <div class="caption">
                     {% if total_cases is not None and total_cases > 0 and aggregation_model.aggregation_performed %}
-                        <br>
+                        
                         {% get_pct_passed_for_kpi_from_agg_model aggregation_model kpi_name as pct_passed_kpi %}
                         {% if pct_passed_kpi is not None %}
                             <b>{{ pct_passed_kpi }}%</b> ({% get_n_passed_and_total aggregation_model kpi_name %}) of {{CYP_TEXT}} passed this measure.
                         {% endif %}
-                    {% else %}
-                        {{aggregation_model.get_name}} has no eligible data on this measure yet.
+                    
                     {% endif %}
                 </div>
             </div>
