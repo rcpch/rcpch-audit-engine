@@ -1,8 +1,13 @@
 {% load epilepsy12_template_tags %}
+{% csrf_token %}
 
-<form class="ui rcpch form" method="POST" id="create_case_form">
-
+<form 
+  class="ui rcpch form" 
+  method="POST" 
+  name="create_case_form" 
+  action="">
   {% csrf_token %}
+  
   <div class="two fields">
     <div class="field">
       <label for="{{form.first_name_for_label}}">First Name</label>
@@ -126,9 +131,10 @@
   
   <div class="three fields">
     <div class="eight wide field case_create_buttons_wrapper">
-      <a href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button"
-        >Cancel</a
-      >
+      <a 
+        href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button">
+        Cancel
+      </a>
       {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
         <button type="submit" class="ui rcpch_primary button" name="update">
           Save
@@ -137,11 +143,10 @@
       {% endif %} 
       {% if perms.epilepsy12.delete_case %}
       <input
+        type="submit"
         class="ui rcpch_danger button"
         name="delete"
-        form="create_case_form"
         id="delete"
-        type="submit"
         value="Delete"
         _= "on click
         halt the event
@@ -155,7 +160,7 @@
           cancelButtonColor: '#e60700',
           confirmButtonText: 'Remove {{case}} from Epilepsy12'
         })
-        if result.isConfirmed fetch {% url 'update_case' organisation_id case.pk %}
+        if result.isConfirmed then fetch {% url 'update_case' organisation_id case.pk %}
         {
           method: 'post',
           headers: {

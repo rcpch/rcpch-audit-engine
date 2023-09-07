@@ -525,7 +525,7 @@ def update_case(request, organisation_id, case_id):
 
 
 @login_required
-@user_may_view_this_child()
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
 def unknown_postcode(request, organisation_id):
     """
