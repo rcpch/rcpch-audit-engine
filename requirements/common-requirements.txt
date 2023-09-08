@@ -12,6 +12,7 @@ django-simple-history
 django-widget-tweaks
 djangorestframework
 django-two-factor-auth
+phonenumbers # though not currently using phonenumbers, this is a dependency of dj-2fa
 docutils
 nhs-number
 psycopg2-binary
