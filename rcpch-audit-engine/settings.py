@@ -117,9 +117,10 @@ AUTO_LOGOUT = {
     "MESSAGE": "You have been automatically logged out as there was no activity for 30 minutes. Please login again to continue.",
 }
 
-LOGIN_REDIRECT_URL = "/organisation"
+# LOGIN_URL = "/registration/login/"
+LOGIN_URL = 'two_factor:login' # change LOGIN_URL to the 2fa one
+LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-LOGIN_URL = "/registration/login/"
 
 TEMPLATES = [
     {
