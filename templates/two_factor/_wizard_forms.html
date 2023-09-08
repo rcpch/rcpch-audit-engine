@@ -1,4 +1,17 @@
-<table class="mb-3">
-  {{ wizard.management_form }}
-  {{ wizard.form.as_table }}
-</table>
+{{ wizard.management_form }}
+
+
+
+
+{% for field in wizard.form %}
+<p>
+<h5>{{ field.label_tag }}</h5>
+{{ field }}
+{% if field.help_text %}
+<small style="color: grey">{{ field.help_text }}</small>
+{% endif %}
+{% for error in field.errors %}
+<div class='ui red message' style="color: red">{{ error }}</div>
+{% endfor %}
+</p>
+{% endfor %}

@@ -2127,3 +2127,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   text-align: left;
   margin: 10px;
 }
+
+.rcpch_signin_buttons_wrapper {
+  display: flex;
+}

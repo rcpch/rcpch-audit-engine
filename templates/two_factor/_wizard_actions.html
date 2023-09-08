@@ -1,14 +1,19 @@
 {% load i18n %}
 
-{% if cancel_url %}
-  <a href="{{ cancel_url }}"
-     class="float-right btn btn-link">{% trans "Cancel" %}</a>
-{% endif %}
-{% if wizard.steps.prev %}
-  <button name="wizard_goto_step" type="submit"
-          value="{{ wizard.steps.prev }}"
-          class="btn btn-secondary">{% trans "Back" %}</button>
-{% else %}
-  <button disabled name="" type="button" class="btn">{% trans "Back" %}</button>
-{% endif %}
-<button type="submit" class="btn btn-primary">{% trans "Next" %}</button>
+<div class="rcpch_signin_buttons_wrapper">
+  {% if wizard.steps.prev %}
+  <div class='field'>
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}"
+      class="ui rcpch_grey button">Back</button>
+  </div>
+  {% endif %}
+
+  <div class='field'>
+    <button type="submit" class="ui rcpch_primary button">{% trans "Next" %}</button>
+  </div>
+</div>
+
+
+<div class="field">
+  <a href="{% url 'password_reset' %}">Reset Password</a>
+</div>
