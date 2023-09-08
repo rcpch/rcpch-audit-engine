@@ -74,7 +74,7 @@
         'relevant_impairments_behavioural_educational',                 toggle_button
         'mental_health_screen',                                         toggle_button
         'mental_health_issue_identified',                               toggle_button
-        'mental_health_issue',                                          single_choice_multiple_toggle_button
+        'mental_health_issues',                                         multiple_choice_multiple_toggle_button
         'global_developmental_delay_or_learning_difficulties',          toggle_button
         'global_developmental_delay_or_learning_difficulties_severity', single_choice_multiple_toggle_button
         'autistic_spectrum_disorder',                                   toggle_button
@@ -876,7 +876,7 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
         "relevant_impairments_behavioural_educational",
         "mental_health_screen",
         "mental_health_issue_identified",
-        "mental_health_issue",
+        "mental_health_issues",
         "global_developmental_delay_or_learning_difficulties",
         "global_developmental_delay_or_learning_difficulties_severity",
         "autistic_spectrum_disorder",
@@ -937,7 +937,7 @@ def test_users_update_multiaxial_diagnosis_success(client):
         "relevant_impairments_behavioural_educational",
         "mental_health_screen",
         "mental_health_issue_identified",
-        "mental_health_issue",
+        "mental_health_issues",
         "global_developmental_delay_or_learning_difficulties",
         "global_developmental_delay_or_learning_difficulties_severity",
         "autistic_spectrum_disorder",
@@ -953,13 +953,15 @@ def test_users_update_multiaxial_diagnosis_success(client):
     ]
 
     single_choice_multiple_toggle_button_fields = [
-        "mental_health_issue",
         "global_developmental_delay_or_learning_difficulties_severity",
     ]
 
     # select_fields = ["epilepsy_cause"] tested in separate function
 
-    multiple_choice_multiple_toggle_button_fields = ["epilepsy_cause_categories"]
+    multiple_choice_multiple_toggle_button_fields = [
+        "epilepsy_cause_categories",
+        "mental_health_issues",
+    ]
 
     for test_user in users:
         # Log in Test User

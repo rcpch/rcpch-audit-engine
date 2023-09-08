@@ -538,9 +538,9 @@ multiaxial_diagnosis_patterns = [
         name="mental_health_issue_identified",
     ),
     path(
-        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue",
-        mental_health_issue,
-        name="mental_health_issue",
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issues",
+        mental_health_issues,
+        name="mental_health_issues",
     ),
     path(
         "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/autistic_spectrum_disorder",

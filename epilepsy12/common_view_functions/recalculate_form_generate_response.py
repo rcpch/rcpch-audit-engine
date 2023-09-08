@@ -112,6 +112,7 @@ def completed_fields(model_instance):
                 if (
                     field.name == "epilepsy_cause_categories"
                     or field.name == "description"
+                    or field.name == "mental_health_issues"
                 ):
                     if len(getattr(model_instance, field.name)) > 0:
                         counter += 1
@@ -214,7 +215,7 @@ def total_fields_expected(model_instance):
 
         if model_instance.mental_health_issue_identified:
             # essential fields increase to include
-            # mental_health_issue
+            # mental_health_issues
             cumulative_score += 1
 
         if model_instance.global_developmental_delay_or_learning_difficulties:

@@ -260,12 +260,12 @@ def download(request, model_name):
                 )
                 p["epilepsycontext__experienced_prolonged_focal_seizures"] = choice
 
-            if p.get("multiaxialdiagnosis__mental_health_issue") is not None:
-                field_value = p.get("multiaxialdiagnosis__mental_health_issue")
+            if p.get("multiaxialdiagnosis__mental_health_issues") is not None:
+                field_value = p.get("multiaxialdiagnosis__mental_health_issues")
                 choice = return_choice_for_instance_and_value(
-                    MultiaxialDiagnosis, "mental_health_issue", field_value
+                    MultiaxialDiagnosis, "mental_health_issues", [field_value]
                 )
-                p["multiaxialdiagnosis__mental_health_issue"] = choice
+                p["multiaxialdiagnosis__mental_health_issues"] = choice
 
             # write the formated data to a new row in the csv
             writer.writerow(p.values())

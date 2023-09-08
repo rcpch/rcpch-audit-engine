@@ -115,14 +115,13 @@ class MultiaxialDiagnosis(
         null=True,
     )
 
-    mental_health_issue = models.CharField(
-        choices=NEUROPSYCHIATRIC,
-        max_length=3,
+    mental_health_issues = ArrayField(
+        models.CharField(max_length=500),
         help_text={
             "label": "Add details of any known mental health problem(s)",
             "reference": "Add details of any known mental health problem(s)",
         },
-        default=None,
+        default=list,
         blank=True,
         null=True,
     )

@@ -34,7 +34,7 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
             "relevant_impairments_behavioural_educational",
             "mental_health_screen",
             "mental_health_issue_identified",
-            "mental_health_issue",
+            "mental_health_issues",
             "episodes",
             "syndromes",
             "comorbidities",
@@ -105,14 +105,14 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
                         )
         if "mental_health_issue_identified" in data:
             if data["mental_health_issue_identified"]:
-                if "mental_health_issue" not in data:
+                if "mental_health_issues" not in data:
                     raise serializers.ValidationError(
                         {
                             "mental_health_issue_identified": "Mental health issue must be supplied."
                         }
                     )
                 else:
-                    if data["mental_health_issue"] is None:
+                    if data["mental_health_issues"] is None:
                         raise serializers.ValidationError(
                             {
                                 "mental_health_issue_identified": "Mental health issue must be supplied."
@@ -120,12 +120,12 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
                         )
             else:
                 if (
-                    "mental_health_issue" in data
-                    and data["mental_health_issue"] is not None
+                    "mental_health_issues" in data
+                    and data["mental_health_issues"] is not None
                 ):
                     raise serializers.ValidationError(
                         {
-                            "mental_health_issue": "Mental health issue cannot be supplied if mental_health_issue_identified is set to false."
+                            "mental_health_issues": "Mental health issue cannot be supplied if mental_health_issue_identified is set to false."
                         }
                     )
         if (
@@ -187,8 +187,8 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
         instance.mental_health_issue_identified = validated_data.get(
             "mental_health_issue_identified", instance.mental_health_issue_identified
         )
-        instance.mental_health_issue = validated_data.get(
-            "mental_health_issue", instance.mental_health_issue
+        instance.mental_health_issues = validated_data.get(
+            "mental_health_issues", instance.mental_health_issues
         )
         instance.autistic_spectrum_disorder = validated_data.get(
             "autistic_spectrum_disorder", instance.autistic_spectrum_disorder

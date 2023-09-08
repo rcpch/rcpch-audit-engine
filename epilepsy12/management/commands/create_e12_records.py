@@ -281,7 +281,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         multiaxial_diagnosis.epilepsy_cause_categories = choices
 
     if multiaxial_diagnosis.mental_health_issue_identified:
-        multiaxial_diagnosis.mental_health_issue = choice(NEUROPSYCHIATRIC)[0]
+        multiaxial_diagnosis.mental_health_issues = [choice(NEUROPSYCHIATRIC)[0]]
 
     if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
         # add upto 5 comorbidities

@@ -1703,7 +1703,9 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     comorbidity_choices = (
         Comorbidity.objects.filter(
             pk__in=Subquery(
-                Comorbidity.objects.all().distinct("comorbidityentity__conceptId").values("pk")
+                Comorbidity.objects.all()
+                .distinct("comorbidityentity__conceptId")
+                .values("pk")
             )
         )
         .exclude(pk__in=all_selected_comorbidityentities)
@@ -1873,7 +1875,7 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
     # tidy up
     if not multiaxial_diagnosis.mental_health_issue_identified:
         # if no issue identified, remove any previously stored mental health issues
-        multiaxial_diagnosis.mental_health_issue = None
+        multiaxial_diagnosis.mental_health_issues = []
         multiaxial_diagnosis.updated_at = (timezone.now(),)
         multiaxial_diagnosis.updated_by = request.user
         multiaxial_diagnosis.save()
@@ -1898,22 +1900,32 @@ def mental_health_issue_identified(request, multiaxial_diagnosis_id):
 @login_required
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_multiaxialdiagnosis", raise_exception=True)
-def mental_health_issue(request, multiaxial_diagnosis_id):
+def mental_health_issues(request, multiaxial_diagnosis_id):
     """
-    POST callback from mental_health_issue multiple toggle
+    POST callback from mental_health_issue multiple choice multiple toggle
+    hx_name of the individual issue is mental_health_issue
     """
 
-    try:
-        error_message = None
-        validate_and_update_model(
-            request=request,
-            model=MultiaxialDiagnosis,
-            model_id=multiaxial_diagnosis_id,
-            field_name="mental_health_issue",
-            page_element="single_choice_multiple_toggle_button",
+    mental_health_issue = request.htmx.trigger_name
+    error_message = None
+
+    if mental_health_issue:
+        multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
+            pk=multiaxial_diagnosis_id
         )
-    except ValueError as error:
-        error_message = error
+        if mental_health_issue in multiaxial_diagnosis.mental_health_issues:
+            multiaxial_diagnosis.mental_health_issues.remove(mental_health_issue)
+        else:
+            multiaxial_diagnosis.mental_health_issues.append(mental_health_issue)
+        try:
+            multiaxial_diagnosis.save()
+        except Exception as error:
+            error_message = error
+
+    else:
+        raise ValueError(
+            f"Issue is {mental_health_issue}. This is an error that needs handling"
+        )
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(pk=multiaxial_diagnosis_id)
 

@@ -148,7 +148,7 @@ For each MODEL:
     
     if 'mental_health_issue_identified':
         EXPECTED_SCORE += 1
-        'mental_health_issue'
+        'mental_health_issues'
     
     if 'global_developmental_delay_or_learning_difficulties':
         EXPECTED_SCORE += 1
@@ -865,7 +865,7 @@ def test_completed_fields_multiaxial_diagnosis_all_fields(e12_case_factory, GOSH
     # CharFields
     char_fields_and_answers = {
         "global_developmental_delay_or_learning_difficulties_severity": SEVERITY[0][0],
-        "mental_health_issue": NEUROPSYCHIATRIC[0][0],
+        "mental_health_issues": [NEUROPSYCHIATRIC[0][0]],
     }
     char_fields_factory_attributes = {
         f"{BASE_KEY_NAME}{field}": answer
@@ -932,8 +932,8 @@ def test_completed_fields_multiaxial_diagnosis_random_fields(e12_case_factory, G
         EXPECTED_SCORE += 1
     factory_attributes.update({GLOBAL_DEV_DELAY_KEY_NAME: GLOBAL_DEV_DELAY_ANSWER})
 
-    MENTAL_HEALTH_ISSUE_KEY_NAME = BASE_KEY_NAME + "mental_health_issue"
-    MENTAL_HEALTH_ISSUE_ANSWER = random.choice([None, NEUROPSYCHIATRIC[0][0]])
+    MENTAL_HEALTH_ISSUE_KEY_NAME = BASE_KEY_NAME + "mental_health_issues"
+    MENTAL_HEALTH_ISSUE_ANSWER = [random.choice([None, NEUROPSYCHIATRIC[0][0]])]
     if MENTAL_HEALTH_ISSUE_ANSWER is not None:
         EXPECTED_SCORE += 1
     factory_attributes.update(

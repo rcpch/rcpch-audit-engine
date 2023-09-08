@@ -90,7 +90,7 @@
         'relevant_impairments_behavioural_educational',                 toggle_button
         'mental_health_screen',                                         toggle_button
         'mental_health_issue_identified',                               toggle_button
-        'mental_health_issue',                                          single_choice_multiple_toggle_button
+        'mental_health_issues',                                         single_choice_multiple_toggle_button
         'global_developmental_delay_or_learning_difficulties',          toggle_button
         'global_developmental_delay_or_learning_difficulties_severity', single_choice_multiple_toggle_button
         'autistic_spectrum_disorder',                                   toggle_button
@@ -103,11 +103,11 @@
     [x] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to True
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to False
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth' ('Other')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='Oth' ('Other')
     [x] Assert user can change 'mental_health_screen' to True
     [x] Assert user can change 'mental_health_screen' to False
     [x] Assert user can change 'mental_health_issue_identified' to True
@@ -422,6 +422,15 @@ from epilepsy12.constants import (
     NON_EPILEPSY_SEIZURE_TYPE,
 )
 
+MULTIPLE_CHOICE_MULTIPLE_TOGGLES = (
+    {
+        "field_name": "mental_health_issues",
+        "choices": NEUROPSYCHIATRIC,
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
+)
+
 
 SINGLE_CHOICE_MULTIPLE_TOGGLES = (
     {
@@ -465,12 +474,6 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "choices": OPT_OUT_UNCERTAIN,
         "param": "epilepsy_context_id",
         "model": "epilepsycontext",
-    },
-    {
-        "field_name": "mental_health_issue",
-        "choices": NEUROPSYCHIATRIC,
-        "param": "multiaxial_diagnosis_id",
-        "model": "multiaxialdiagnosis",
     },
     {
         "field_name": "global_developmental_delay_or_learning_difficulties_severity",
