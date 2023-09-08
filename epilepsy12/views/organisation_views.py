@@ -24,7 +24,6 @@ from ..common_view_functions import (
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
     update_all_kpi_agg_models,
-    login_and_otp_required,
 )
 from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
@@ -33,7 +32,7 @@ from ..general_functions import (
 )
 
 
-@login_and_otp_required
+@login_required
 @user_may_view_this_organisation()
 def selected_organisation_summary(request, organisation_id):
     """
@@ -169,7 +168,7 @@ def selected_organisation_summary(request, organisation_id):
     )
 
 
-@login_and_otp_required
+@login_required
 @user_may_view_this_organisation()
 def selected_trust_kpis(request, organisation_id):
     """
@@ -212,7 +211,7 @@ def selected_trust_kpis(request, organisation_id):
     )
 
 
-@login_and_otp_required
+@login_required
 @user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
@@ -294,7 +293,7 @@ def selected_trust_select_kpi(request, organisation_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_and_otp_required
+@login_required
 def aggregate_and_update_all_kpi_agg_models(request):
     """Aggregates and update all kpi aggregation models.
 
@@ -350,7 +349,7 @@ def selected_trust_kpis_open(request, organisation_id):
     return response
 
 
-@login_and_otp_required
+@login_required
 @user_may_view_this_organisation()
 def child_organisation_select(request, organisation_id, template_name):
     """
@@ -368,7 +367,7 @@ def child_organisation_select(request, organisation_id, template_name):
     )
 
 
-@login_and_otp_required
+@login_required
 @user_may_view_this_organisation()
 def view_preference(request, organisation_id, template_name):
     """
