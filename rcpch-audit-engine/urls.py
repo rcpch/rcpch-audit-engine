@@ -15,6 +15,6 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path("admin/doc/", include(urls)),
     path("admin/", admin.site.urls),
-    path("", include("epilepsy12.urls")),
     path('', include(tf_urls)),
+    path("", include("epilepsy12.urls")),
 ]
