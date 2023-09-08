@@ -2136,3 +2136,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .rcpch_signin_buttons_wrapper>.reset_pass_button {
   display: block;
 }
+
+.rcpch_blue_link {
+  color: var(--rcpch_light_blue);
+}
