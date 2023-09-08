@@ -11,6 +11,7 @@ django-semantic-admin
 django-simple-history
 django-widget-tweaks
 djangorestframework
+django-two-factor-auth
 docutils
 nhs-number
 psycopg2-binary
