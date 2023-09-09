@@ -336,12 +336,12 @@ def test_patient_delete_success(
 
         response = client.post(
             url,
-            data={"delete": "Delete"},
+            headers={"Hx-Trigger-Name": "delete", "Hx-Request": "true"},
         )
 
         assert (
-            response.status_code == HTTPStatus.FOUND
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FOUND} response status code, received {response.status_code}"
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
         # Additional test for deleting users outside of own Trust
         if test_user.first_name in [
@@ -364,12 +364,12 @@ def test_patient_delete_success(
 
             response = client.post(
                 url,
-                data={"delete": "Delete"},
+                headers={"Hx-Trigger-Name": "delete", "Hx-Request": "true"},
             )
 
             assert (
-                response.status_code == HTTPStatus.FOUND
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}`with DELETE  for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FOUND} response status code, received {response.status_code}"
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}`with DELETE  for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -440,7 +440,7 @@ def test_patient_delete_forbidden(
 
         response = client.post(
             url,
-            data={"delete": "Delete"},
+            headers={"Hx-Trigger-Name": "delete", "Hx-Request": "true"},
         )
 
         assert (

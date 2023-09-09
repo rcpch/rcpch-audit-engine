@@ -214,7 +214,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     email_confirmed = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
         initial=False,
-        required=False,
+        required=True,
     )
 
     class Meta:

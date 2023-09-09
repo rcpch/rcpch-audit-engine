@@ -113,7 +113,7 @@
               type="submit"
               value="{{admin_title}}"
               name='edit'/>
-            {% if not form.email_confirmed.value and admin_title != "Add RCPCH Epilepsy12 staff member" and admin_title != 'Add Epilepsy12 User' %}
+            {% if form.email_confirmed.value == 'False' %}
               <button
                 type="submit"
                 {% if perms.epilepsy12.change_epilepsy12user %}

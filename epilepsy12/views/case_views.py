@@ -4,7 +4,7 @@ from datetime import datetime
 # django imports
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.gis.db.models import Q
@@ -457,6 +457,7 @@ def create_case(request, organisation_id):
 
 @login_required
 @user_may_view_this_child()
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
 def update_case(request, organisation_id, case_id):
     """
@@ -478,14 +479,15 @@ def update_case(request, organisation_id, case_id):
         ("ZZ993VZ", "No fixed abode"),
     )
 
-    if request.method == "POST":
-        if ("delete") in request.POST:
-            if not request.user.has_perm("epilepsy12.delete_case"):
-                raise PermissionDenied()
-            messages.success(request, f"You successfully deleted {case}'s details")
-            case.delete()
-            return redirect("cases", organisation_id=organisation_id)
+    if request.htmx:
+        if not request.user.has_perm("epilepsy12.delete_case"):
+            raise PermissionDenied()
+        messages.success(request, f"You successfully deleted {case}'s details")
+        case.delete()
+        url = reverse("cases", kwargs={"organisation_id": organisation_id})
+        return HttpResponseClientRedirect(redirect_to=url, status=200)
 
+    if request.method == "POST":
         form = CaseForm(request.POST, instance=case)
         if form.is_valid():
             obj = form.save()
