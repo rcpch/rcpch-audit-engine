@@ -4,9 +4,6 @@ import math
 from django import template
 from django.utils.safestring import mark_safe
 
-from ..general_functions import fetch_concept
-
-
 register = template.Library()
 
 
@@ -145,14 +142,6 @@ def wait_days_and_weeks(day_number):
 
 
 @register.filter
-def snomed_concept(concept_id):
-    if concept_id is None:
-        return
-    concept = fetch_concept(concept_id)
-    return concept["preferredDescription"]["term"]
-
-
-@register.filter
 def is_in(url_name, args):
     """
     receives the request.resolver_match.url_name
@@ -184,7 +173,7 @@ def value_for_field_name(model, field_name, in_parentheses):
     """
     return_val = getattr(model, field_name, None)
     if in_parentheses:
-        return_string = f"({return_val})"
+        return_string = f"\n({return_val})"
     else:
         return_string = f"{return_val}"
 
@@ -447,7 +436,7 @@ def get_pct_passed_for_kpi_from_agg_model(aggregation_model, kpi_name: str):
         return None
 
     pct_passed = aggregation_model.get_pct_passed_kpi(kpi_name=kpi_name)
-    
+
     if pct_passed is None:
         return None
 

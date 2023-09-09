@@ -239,8 +239,6 @@ def case_list(request, organisation_id):
         & Q(site__site_is_actively_involved_in_epilepsy_care=True)
     ).all()
 
-    #     fetch_snomed(365456003, 'descendentSelfOf')
-
     paginator = Paginator(all_cases, 10)
     page_number = request.GET.get("page", 1)
     case_list = paginator.page(page_number)

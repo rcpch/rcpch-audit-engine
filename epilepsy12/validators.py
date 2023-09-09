@@ -2,19 +2,10 @@
 from datetime import date
 from django.core.exceptions import ValidationError
 
+# 3rd party imports
+import nhs_number
+
 # RCPCH imports
-from .general_functions.nhs_number import validate_nhs_number
-
-
-def nhs_number_validator(number_to_validate):
-    """
-    Validates an NHS number
-    """
-    validation = validate_nhs_number(number_to_validate=number_to_validate)
-    if validation["valid"]:
-        return number_to_validate
-    else:
-        raise ValidationError(validation["message"])
 
 
 def epilepsy12_date_validator(

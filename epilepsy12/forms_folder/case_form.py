@@ -4,7 +4,8 @@ from django import forms
 from django.forms import ValidationError
 from ..models import Case
 from ..constants import *
-from ..general_functions import is_valid_postcode, validate_nhs_number
+from ..general_functions import is_valid_postcode
+import nhs_number
 
 
 class CaseForm(forms.ModelForm):
@@ -112,24 +113,25 @@ class CaseForm(forms.ModelForm):
 
     def clean_nhs_number(self):
         # remove spaces
-        nhs_number = self.cleaned_data["nhs_number"]
-        formatted_number = int(str(nhs_number).replace(" ", ""))
+        formatted_nhs_number = (
+            str(self.cleaned_data["nhs_number"]).replace(" ", "").zfill(10)
+        )
 
         # ensure NHS number is unique in the database
         if self.existing_nhs_number is not None:
             # this form is updating an existing NHS number
-            if formatted_number != int(self.existing_nhs_number):
+            if formatted_nhs_number != str(self.existing_nhs_number):
                 # the new number does not match the one stored
-                if Case.objects.filter(nhs_number=formatted_number).exists():
+                if Case.objects.filter(nhs_number=formatted_nhs_number).exists():
                     raise ValidationError("NHS Number already taken!")
         else:
             # this is a new form - check this number is unique in the database
-            if Case.objects.filter(nhs_number=formatted_number).exists():
+            if Case.objects.filter(nhs_number=formatted_nhs_number).exists():
                 raise ValidationError("NHS Number already taken!")
 
         # check NHS number is valid
-        validity = validate_nhs_number(formatted_number)
-        if validity["valid"]:
-            return formatted_number
+        validity = nhs_number.is_valid(formatted_nhs_number)
+        if validity:
+            return formatted_nhs_number
         else:
-            raise ValidationError(validity["message"])
+            raise ValidationError(f"{formatted_nhs_number} is not a valid NHS number")
