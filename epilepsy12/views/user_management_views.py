@@ -278,9 +278,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             else:
                 parent_trust = organisation.trust.name
 
-            basic_filter = Q(
-                organisation_employer__trust__name__contains=parent_trust
-            )
+            basic_filter = Q(organisation_employer__trust__name__contains=parent_trust)
 
         elif request.user.view_preference == 0:
             # filters all primary centres at organisation level, irrespective of if active or inactive
@@ -481,7 +479,11 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
                 return HttpResponse("Invalid header found.")
 
             messages.success(request, f"{new_user.email} account created successfully.")
-            return redirect("epilepsy12_user_list", organisation_id=organisation_id, epilepsy12_user_id=epilepsy12_user_id)
+            return redirect(
+                "epilepsy12_user_list",
+                organisation_id=organisation_id,
+                epilepsy12_user_id=epilepsy12_user_id,
+            )
 
     context = {
         "form": form,
@@ -566,7 +568,11 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 f"Confirmation request sent to {epilepsy12_user_to_edit.email}.",
             )
             redirect_url = reverse(
-                "epilepsy12_user_list", kwargs={"organisation_id": organisation_id}
+                "epilepsy12_user_list",
+                kwargs={
+                    "organisation_id": organisation_id,
+                    "epilepsy12_user_id": epilepsy12_user_to_edit.pk,
+                },
             )
             return redirect(redirect_url)
 
@@ -624,7 +630,13 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
         messages.error(request, f"Delete User Unsuccessful: {error}")
 
     return HttpResponseClientRedirect(
-        reverse("epilepsy12_user_list", kwargs={"organisation_id": organisation_id, 'epilepsy12_user_id':epilepsy12_user_id})
+        reverse(
+            "epilepsy12_user_list",
+            kwargs={
+                "organisation_id": organisation_id,
+                "epilepsy12_user_id": epilepsy12_user_id,
+            },
+        )
     )
 
 
@@ -686,12 +698,13 @@ def log_list(request, organisation_id, epilepsy12_user_id):
 @login_required
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
-    
     allowed_groups = [EPILEPSY12_AUDIT_TEAM_FULL_ACCESS]
 
-    if not (request.user.is_superuser or request.user.groups.filter(name__in=allowed_groups)):
+    if not (
+        request.user.is_superuser or request.user.groups.filter(name__in=allowed_groups)
+    ):
         raise PermissionDenied()
-    
+
     all_users = Epilepsy12User.objects.all().values(
         "id",
         "last_login",
