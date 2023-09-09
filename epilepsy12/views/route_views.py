@@ -11,9 +11,7 @@ def index(request):
     here at random, but in future might be chosen based on the location of the visitor's ISP.
     """
     if getattr(request.user, "organisation_employer", None) is not None:
-        organisation = Organisation.objects.get(
-            OrganisationName=request.user.organisation_employer
-        )
+        organisation = Organisation.objects.get(name=request.user.organisation_employer)
     else:
         organisation = Organisation.objects.order_by("?").first()
     template_name = "epilepsy12/epilepsy12index.html"
@@ -35,7 +33,7 @@ def open_access(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
     context = {
         "organisation": organisation,
-        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "organisation_list": Organisation.objects.all().order_by("name"),
         "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
     }
     return render(request, template_name, context=context)

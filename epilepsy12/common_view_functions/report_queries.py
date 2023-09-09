@@ -5,23 +5,20 @@ from typing import Literal
 from django.contrib.gis.db.models import Q
 from django.apps import apps
 
-# E12 imports
-# from ..models import (
-#     Case,
-#     Organisation,
-#     NHSRegionEntity,
-#     OPENUKNetworkEntity,
-#     IntegratedCareBoardEntity,
-#     ONSCountryEntity,
-# )
-
 
 def all_registered_cases_for_cohort_and_abstraction_level(
     organisation_instance,
     cohort,
     case_complete=True,
     abstraction_level: Literal[
-        "organisation", "trust", "icb", "nhs_region", "open_uk", "country", "national"
+        "organisation",
+        "trust",
+        "local_health_board",
+        "icb",
+        "nhs_england_region",
+        "open_uk",
+        "country",
+        "national",
     ] = "organisation",
 ):
     """
@@ -65,13 +62,27 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
         )
     elif abstraction_level == "trust":
-        q_filter = (
-            Q(
-                site__organisation__ParentOrganisation_ODSCode=organisation_instance.ParentOrganisation_ODSCode
+        if organisation_instance.trust is not None:
+            q_filter = (
+                Q(
+                    site__organisation__trust__ods_code=organisation_instance.trust.ods_code
+                )
+                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
             )
-            & Q(site__site_is_actively_involved_in_epilepsy_care=True)
-            & Q(site__site_is_primary_centre_of_epilepsy_care=True)
-        )
+        else:
+            return all_cases_for_cohort
+    elif abstraction_level == "local_health_board":
+        if organisation_instance.local_health_board is not None:
+            q_filter = (
+                Q(
+                    site__organisation__local_health_board__ods_code=organisation_instance.local_health_board.ods_code
+                )
+                & Q(site__site_is_actively_involved_in_epilepsy_care=True)
+                & Q(site__site_is_primary_centre_of_epilepsy_care=True)
+            )
+        else:
+            return all_cases_for_cohort
     elif abstraction_level == "icb":
         if organisation_instance.integrated_care_board is not None:
             """
@@ -79,24 +90,24 @@ def all_registered_cases_for_cohort_and_abstraction_level(
             """
             q_filter = (
                 Q(
-                    site__organisation__integrated_care_board__ODS_ICB_Code=organisation_instance.integrated_care_board.ODS_ICB_Code
+                    site__organisation__integrated_care_board__ods_code=organisation_instance.integrated_care_board.ods_code
                 )
                 & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                 & Q(site__site_is_primary_centre_of_epilepsy_care=True)
             )
         else:
             return all_cases_for_cohort
-    elif abstraction_level == "nhs_region":
+    elif abstraction_level == "nhs_england_region":
         """
         Wales has no NHS regions
         """
-        if organisation_instance.nhs_region is not None:
+        if organisation_instance.nhs_england_region is not None:
             q_filter = (
                 Q(
-                    site__organisation__nhs_region__NHS_Region_Code=organisation_instance.nhs_region.NHS_Region_Code
+                    site__organisation__nhs_england_region__region_code=organisation_instance.nhs_england_region.region_code
                 )
                 & Q(
-                    site__organisation__ons_region__ons_country__Country_ONS_Name=organisation_instance.ons_region.ons_country.Country_ONS_Name
+                    site__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
                 )
                 & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                 & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -106,7 +117,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     elif abstraction_level == "open_uk":
         q_filter = (
             Q(
-                site__organisation__openuk_network__OPEN_UK_Network_Code=organisation_instance.openuk_network.OPEN_UK_Network_Code
+                site__organisation__openuk_network__boundary_identifier=organisation_instance.openuk_network.boundary_identifier
             )
             & Q(site__site_is_actively_involved_in_epilepsy_care=True)
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -114,7 +125,7 @@ def all_registered_cases_for_cohort_and_abstraction_level(
     elif abstraction_level == "country":
         q_filter = (
             Q(
-                site__organisation__ons_region__ons_country=organisation_instance.ons_region.ons_country
+                site__organisation__country__boundary_identifier=organisation_instance.country.boundary_identifier
             )
             & Q(site__site_is_actively_involved_in_epilepsy_care=True)
             & Q(site__site_is_primary_centre_of_epilepsy_care=True)
@@ -136,19 +147,19 @@ def get_all_countries():
     Returns a list of all Countries
 
     """
-    ONSCountryEntity = apps.get_model("epilepsy12", "ONSCountryEntity")
-    return ONSCountryEntity.objects.order_by("Country_ONS_Name")
+    Country = apps.get_model("epilepsy12", "Country")
+    return Country.objects.order_by("name")
 
 
 def get_all_nhs_regions():
     """
     Returns a list of all NHS Regions.
 
-    <QuerySet [<NHSRegionEntity: Aneurin Bevan University Health Board>, <NHSRegionEntity: Betsi Cadwaladr University Health Board>, <NHSRegionEntity: Cardiff and Vale University Health Board>, <NHSRegionEntity: Cwm Taf Morgannwg University Health Board>, <NHSRegionEntity: East of England>, <NHSRegionEntity: Hywel Dda University Health Board>, <NHSRegionEntity: London>, <NHSRegionEntity: Midlands (Y60)>, <NHSRegionEntity: North East and Yorkshire>, <NHSRegionEntity: North West>, <NHSRegionEntity: Powys Teaching Health Board>, <NHSRegionEntity: South East>, <NHSRegionEntity: South West>, <NHSRegionEntity: Swansea Bay University Health Board>]>
+    <QuerySet [<NHSEnglandRegion: Aneurin Bevan University Health Board>, <NHSEnglandRegion: Betsi Cadwaladr University Health Board>, <NHSEnglandRegion: Cardiff and Vale University Health Board>, <NHSEnglandRegion: Cwm Taf Morgannwg University Health Board>, <NHSEnglandRegion: East of England>, <NHSEnglandRegion: Hywel Dda University Health Board>, <NHSEnglandRegion: London>, <NHSEnglandRegion: Midlands (Y60)>, <NHSEnglandRegion: North East and Yorkshire>, <NHSEnglandRegion: North West>, <NHSEnglandRegion: Powys Teaching Health Board>, <NHSEnglandRegion: South East>, <NHSEnglandRegion: South West>, <NHSEnglandRegion: Swansea Bay University Health Board>]>
     """
-    NHSRegionEntity = apps.get_model("epilepsy12", "NHSRegionEntity")
+    NHSEnglandRegion = apps.get_model("epilepsy12", "NHSEnglandRegion")
 
-    return NHSRegionEntity.objects.order_by("NHS_Region", "NHS_Region_Code")
+    return NHSEnglandRegion.objects.order_by("name")
 
 
 def get_all_open_uk_regions():
@@ -156,32 +167,26 @@ def get_all_open_uk_regions():
     Returns a list of all OPEN UK Networks
     [('BRPNF', 'Birmingham Regional Paediatric Neurology Forum'), ('CEWT', "Children's Epilepsy Workstream in Trent"), ('EPEN', 'Eastern Paediatric Epilepsy Network'), ('EPIC', "Mersey and North Wales network 'Epilepsy In Childhood' interest group"), ('NTPEN', 'North Thames Paediatric Epilepsy Network'), ('NWEIG', "North West Children and Young People's Epilepsy Interest Group"), ('ORENG', 'Oxford region epilepsy interest group'), ('PENNEC', 'Paediatric Epilepsy Network for the North East and Cumbria'), ('SETPEG', 'South East Thames Paediatric Epilepsy Group'), ('SETPEG', 'SSouth East Thames Paediatric Epilepsy Group'), ('SWEP', 'South Wales Epilepsy Forum'), ('SWIPE', 'South West Interest Group Paediatric Epilepsy'), ('SWTPEG', 'South West Thames Paediatric Epilepsy Group'), ('TEN', 'Trent Epilepsy Network'), ('WPNN', 'Wessex Paediatric Neurosciences Network'), ('YPEN', 'Yorkshire Paediatric Neurology Network'), (None, None)]
     """
-    OPENUKNetworkEntity = apps.get_model("epilepsy12", "OPENUKNetworkEntity")
-    return OPENUKNetworkEntity.objects.order_by("OPEN_UK_Network_Name", "country")
+    OPENUKNetwork = apps.get_model("epilepsy12", "OPENUKNetwork")
+    return OPENUKNetwork.objects.order_by("name", "country")
 
 
 def get_all_icbs():
     """
     Returns a list of all Integrated Care Boards
     """
-    IntegratedCareBoardEntity = apps.get_model(
-        "epilepsy12", "IntegratedCareBoardEntity"
-    )
-    return IntegratedCareBoardEntity.objects.order_by("ICB_Name")
+    IntegratedCareBoard = apps.get_model("epilepsy12", "IntegratedCareBoard")
+    return IntegratedCareBoard.objects.order_by("name")
 
 
 def get_all_trusts():
     """
     Returns a list of all Trusts
     """
-    Organisation = apps.get_model("epilepsy12", "Organisation")
+    Trust = apps.get_model("epilepsy12", "Trust")
     return (
-        Organisation.objects.order_by(
-            "ParentOrganisation_OrganisationName", "ParentOrganisation_ODSCode"
-        )
-        .values_list(
-            "ParentOrganisation_ODSCode", "ParentOrganisation_OrganisationName"
-        )
+        get_all_trusts.objects.order_by("name")
+        .values_list("ods_code", "name")
         .distinct()
     )
 
@@ -192,7 +197,7 @@ def get_all_organisations():
     """
     Organisation = apps.get_model("epilepsy12", "Organisation")
     return (
-        Organisation.objects.order_by("OrganisationName", "ODSCode")
-        .values("OrganisationName", "ODSCode")
+        Organisation.objects.order_by("name", "ods_code")
+        .values("name", "ods_code")
         .distinct()
     )

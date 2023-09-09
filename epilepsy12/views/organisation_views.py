@@ -1,29 +1,20 @@
-# Python/Django imports
+# Python imports
 
+# third party libraries
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
-
-# third party libraries
 from django_htmx.http import HttpResponseClientRedirect
-from django.db.models import Sum, F, Avg, Q, When, Case as DjangoCase, FloatField, Value
+from django.http import HttpResponseForbidden, HttpResponse
 
 # E12 imports
-from django.apps import apps
 from ..decorator import user_may_view_this_organisation
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
-    EnumAbstractionLevel,
 )
 from epilepsy12.models import (
     Organisation,
-    Case,
     KPI,
-    OrganisationKPIAggregation,
-    TrustKPIAggregation,
-    NHSRegionKPIAggregation,
-    CountryKPIAggregation,
-    NationalKPIAggregation,
 )
 from ..common_view_functions import (
     cases_aggregated_by_sex,
@@ -32,13 +23,9 @@ from ..common_view_functions import (
     all_registered_cases_for_cohort_and_abstraction_level,
     return_tile_for_region,
     get_all_kpi_aggregation_data_for_view,
-    aggregate_kpis_update_models_for_all_abstractions,
+    update_all_kpi_agg_models,
 )
-from epilepsy12.common_view_functions.render_charts import (
-    render_bar_pct_passed_for_kpi_agg,
-    render_pie_pct_passed_for_kpi_agg,
-    ChartHTML,
-)
+from epilepsy12.common_view_functions.render_charts import update_all_data_with_charts
 from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
@@ -57,7 +44,7 @@ def selected_organisation_summary(request, organisation_id):
     Otherwise it returns the organisation.html template
     """
 
-    nhsregion_tiles = return_tile_for_region("nhs_region")
+    nhsregion_tiles = return_tile_for_region("nhs_england_region")
     icb_tiles = return_tile_for_region("icb")
     country_tiles = return_tile_for_region("country")
 
@@ -73,8 +60,16 @@ def selected_organisation_summary(request, organisation_id):
 
     lhb_tiles = None
 
-    if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    london_borough_tiles = None
+
+    if selected_organisation.country.boundary_identifier == "W92000004":  # Wales
         lhb_tiles = return_tile_for_region("lhb")
+        abstraction_level = "local_health_board"
+    else:
+        abstraction_level = "trust"
+
+    if selected_organisation.city == "LONDON":
+        london_borough_tiles = return_tile_for_region("london_borough")
 
     cohort_data = get_current_cohort_data()
 
@@ -87,14 +82,13 @@ def selected_organisation_summary(request, organisation_id):
             abstraction_level="organisation",
         ).count()
     )
-
     # query to return all completed E12 cases in the current cohort in this organisation trust
     count_of_current_cohort_registered_completed_cases_in_this_trust = (
         all_registered_cases_for_cohort_and_abstraction_level(
             organisation_instance=selected_organisation,
             cohort=cohort_data["cohort"],
             case_complete=True,
-            abstraction_level="trust",
+            abstraction_level=abstraction_level,
         ).count()
     )
     # query to return all cases (including incomplete) registered in the current cohort at this organisation
@@ -112,7 +106,7 @@ def selected_organisation_summary(request, organisation_id):
             organisation_instance=selected_organisation,
             cohort=cohort_data["cohort"],
             case_complete=False,
-            abstraction_level="trust",
+            abstraction_level=abstraction_level,
         ).count()
     )
 
@@ -142,7 +136,7 @@ def selected_organisation_summary(request, organisation_id):
     context = {
         "user": request.user,
         "selected_organisation": selected_organisation,
-        "organisation_list": Organisation.objects.order_by("OrganisationName").all(),
+        "organisation_list": Organisation.objects.order_by("name").all(),
         "cases_aggregated_by_ethnicity": cases_aggregated_by_ethnicity(
             selected_organisation=selected_organisation
         ),
@@ -164,6 +158,7 @@ def selected_organisation_summary(request, organisation_id):
         "icb_tiles": icb_tiles,
         "country_tiles": country_tiles,
         "lhb_tiles": lhb_tiles,
+        "london_borough_tiles": london_borough_tiles,
     }
 
     return render(
@@ -190,9 +185,7 @@ def selected_trust_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # perform aggregations and update all the KPIAggregation models
-    aggregate_kpis_update_models_for_all_abstractions(
-        organisation=organisation, cohort=cohort
-    )
+    update_all_kpi_agg_models(cohort=cohort)
 
     # Gather relevant data specific for this view
     all_data = get_all_kpi_aggregation_data_for_view(
@@ -200,7 +193,7 @@ def selected_trust_kpis(request, organisation_id):
     )
 
     # Instance of KPI to access field name help text attributes for KPI "Indicator" row values in table
-    kpi_instance = KPI(organisation=organisation, parent_trust="TEMP")
+    kpi_instance = KPI(organisation=organisation)
     kpi_names_list = list(kpi_instance.get_kpis().keys())
 
     context = {
@@ -218,6 +211,110 @@ def selected_trust_kpis(request, organisation_id):
     )
 
 
+@login_required
+@user_may_view_this_organisation()
+def selected_trust_select_kpi(request, organisation_id):
+    """
+    POST request from dropdown in selected_organisation_summary.html returning the individual kpis data and visualisations.
+
+    It takes the kpi_name parameter in the HTMX request which contains the value of the selected KPI measure from
+    the select field. This is then aggregated across the levels of abstraction.
+
+    Aggregations should already be performed.
+
+    all_data is of the format:
+    {
+    "ORGANISATION_KPIS":{
+        'aggregation_model': <OrganisationKPIAggregation: OrganisationKPIAggregation (ods_code=RGT01) KPIAggregations>,
+        'total_cases_registered': 10,
+        'charts': {
+            'passed_pie': <ORGANISATION_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>
+            }
+    },
+    "TRUST_KPIS":{
+        ...
+    },
+    "LOCAL_HEALTH_BOARD":{
+        ...
+    },
+    "ICB_KPIS":{
+        ...
+    },
+    "NHS_ENGLAND_REGION_KPIS":{
+        ...
+    },
+    "OPEN_UK_KPIS":{
+        ...
+    },
+    "COUNTRY_KPIS":{
+        'aggregation_model': <CountryKPIAggregation: CountryKPIAggregations (ONSCountryEntity=England)>,
+        'total_cases_registered': 200,
+        'charts': {
+            'passed_pie': <COUNTRY_KPIS_pct_pass_pie_paediatrician_with_expertise_in_epilepsies ChartHTML object>,
+            'passed_bar': <COUNTRY_KPIS_pct_pass_bar_paediatrician_with_expertise_in_epilepsies ChartHTML object>
+            }
+    },
+    "NATIONAL_KPIS":{
+        ...
+    },
+    }
+    """
+    # Gather data for use later
+    organisation = Organisation.objects.get(pk=organisation_id)
+    kpi_name = request.POST.get("kpi_name")
+    if kpi_name is None:
+        # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
+        kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
+    kpi_name_title_case = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
+    cohort = get_current_cohort_data()["cohort"]
+
+    all_data = get_all_kpi_aggregation_data_for_view(
+        organisation=organisation,
+        cohort=cohort,
+    )
+
+    all_data = update_all_data_with_charts(
+        all_data=all_data,
+        kpi_name=kpi_name,
+        kpi_name_title_case=kpi_name_title_case,
+        cohort=cohort,
+    )
+
+    context = {
+        "kpi_name": kpi_name,
+        "kpi_name_title_case": kpi_name_title_case,
+        "selected_organisation": organisation,
+        "all_data": all_data,
+        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
+    }
+
+    template_name = "epilepsy12/partials/organisation/metric.html"
+
+    return render(request=request, template_name=template_name, context=context)
+
+
+@login_required
+def aggregate_and_update_all_kpi_agg_models(request):
+    """Aggregates and update all kpi aggregation models.
+
+    Used by temp 'Aggregate and update' button and in future, async calls
+    """
+
+    # Only superusers allowed
+    if not request.user.is_superuser:
+        return HttpResponseForbidden
+
+    # Gather constants
+    cohort = get_current_cohort_data()["cohort"]
+
+    # Run agg fun
+    update_all_kpi_agg_models(cohort=cohort)
+
+    return HttpResponse(
+        status=204
+    )  # 204 to signify to HTMX that nothing returned, just running server-side code
+
+
 def selected_trust_kpis_open(request, organisation_id):
     """
     Open access endpoint for KPIs table
@@ -231,16 +328,16 @@ def selected_trust_kpis_open(request, organisation_id):
 
     # create an empty instance of KPI model to access the labels - this is a bit of a hack but works and
     # and has very little overhead
+
     kpis = KPI.objects.create(
         organisation=organisation,
-        parent_trust=organisation.ParentOrganisation_OrganisationName,
     )
 
     template_name = "epilepsy12/partials/kpis/kpis.html"
     context = {
         "organisation": organisation,
         "kpis": kpis,
-        "organisation_list": Organisation.objects.all().order_by("OrganisationName"),
+        "organisation_list": Organisation.objects.all().order_by("name"),
         "open_access": True,
     }
 
@@ -286,139 +383,3 @@ def view_preference(request, organisation_id, template_name):
     return HttpResponseClientRedirect(
         reverse(template_name, kwargs={"organisation_id": organisation.pk})
     )
-
-
-@login_required
-@user_may_view_this_organisation()
-def selected_trust_select_kpi(request, organisation_id):
-    """
-    POST request from dropdown in selected_organisation_summary.html
-
-    It takes the kpi_name parameter in the HTMX request which contains the value of the selected KPI measure from
-    the select field. This is then aggregated across the levels of abstraction.
-
-    Aggregations should already be performed.
-
-    all_data is of the format:
-    {
-    "ORGANISATION_KPIS":{
-        "aggregation_model":"<OrganisationKPIAggregation":OrganisationKPIAggregation (ODSCode=RGT01) KPIAggregations>,
-        "total_cases_registered":10
-    },
-    "TRUST_KPIS":{
-        "aggregation_model":"<TrustKPIAggregation":"TrustKPIAggregation (parent_organisation_ods_code=RGT)>",
-        "total_cases_registered":10
-    },
-    "ICB_KPIS":{
-        "aggregation_model":"<ICBKPIAggregation":"ICBKPIAggregation (IntegratedCareBoardEntity=NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD)>",
-        "total_cases_registered":10
-    },
-    "NHS_REGION_KPIS":{
-        "aggregation_model":"<NHSRegionKPIAggregation":"KPIAggregations (NHSRegionEntity=East of England)>",
-        "total_cases_registered":20
-    },
-    "OPEN_UK_KPIS":{
-        "aggregation_model":"<OpenUKKPIAggregation":"OPENUKKPIAggregations (OPENUKNetworkEntity=Eastern Paediatric Epilepsy Network)>",
-        "total_cases_registered":10
-    },
-    "COUNTRY_KPIS":{
-        "aggregation_model":"<CountryKPIAggregation":"CountryKPIAggregations (ONSCountryEntity=England)>",
-        "total_cases_registered":170
-    },
-    "NATIONAL_KPIS":{
-        "aggregation_model":"<NationalKPIAggregation":National KPIAggregations for England and Wales (Cohort 6)>,
-        "total_cases_registered":200
-    },
-    }
-    """
-
-    organisation = Organisation.objects.get(pk=organisation_id)
-    kpi_name = request.POST.get("kpi_name")
-    if kpi_name is None:
-        # on page load there may be no kpi_name - default to paediatrician_with_experise_in_epilepsy
-        kpi_name = INDIVIDUAL_KPI_MEASURES[0][0]
-    kpi_value = value_from_key(key=kpi_name, choices=INDIVIDUAL_KPI_MEASURES)
-    cohort = get_current_cohort_data()["cohort"]
-
-    all_data = get_all_kpi_aggregation_data_for_view(
-        organisation=organisation,
-        cohort=cohort,
-    )
-
-    # Add chart HTMLs to all_data
-    for abstraction, kpi_data in all_data.items():
-        # Skip loop if aggregation model None (when there are no data to aggregate on so no AggregationModel made)
-        if kpi_data["aggregation_model"] is None:
-            continue
-
-        # Initialise dict
-        kpi_data["charts"] = {}
-
-        # Add individual kpi passed pie chart
-        pie_html_raw = render_pie_pct_passed_for_kpi_agg(
-            kpi_data["aggregation_model"],
-            kpi_name,
-        )
-        pie_html = ChartHTML(
-            chart_html=pie_html_raw, name=f"{abstraction}_pct_pass_pie_{kpi_name}"
-        )
-        kpi_data["charts"]["passed_pie"] = pie_html
-
-        # Gather data for abstraction's sub-unit barchart
-        # ORGANISATION_KPIS do not have sublevels
-        if abstraction in [
-            "ICB_KPIS",
-            "OPEN_UK_KPIS",
-            "NHS_REGION_KPIS",
-            "COUNTRY_KPIS",
-        ]:
-            bar_data = (
-                kpi_data["aggregation_model"]
-                ._meta.model.objects.filter(cohort=cohort)
-                .annotate(
-                    pct_passed=DjangoCase(
-                        When(
-                            **{f"{kpi_name}_total_eligible": 0},
-                            then=Value(0),
-                        ),
-                        default=(
-                            100
-                            * F(f"{kpi_name}_passed")
-                            / F(f"{kpi_name}_total_eligible")
-                        ),
-                        output_field=FloatField(),
-                    ),
-                )
-                .values(
-                    "abstraction_name",
-                    "pct_passed",
-                    f"{kpi_name}_total_eligible",
-                    f"{kpi_name}_passed",
-                    f"{kpi_name}_ineligible",
-                    f"{kpi_name}_incomplete",
-                )
-            )
-
-            bar_html_raw = render_bar_pct_passed_for_kpi_agg(
-                aggregation_model=kpi_data["aggregation_model"],
-                data=bar_data,
-                kpi_name=kpi_name,
-                kpi_name_title=kpi_value,
-            )
-
-            bar_html = ChartHTML(
-                chart_html=bar_html_raw, name=f"{abstraction}_pct_pass_bar_{kpi_name}"
-            )
-            kpi_data["charts"]["passed_bar"] = bar_html
-
-    context = {
-        "kpi_name": kpi_name,
-        "kpi_name_title_case": kpi_value,
-        "selected_organisation": organisation,
-        "all_data": all_data,
-        "individual_kpi_choices": INDIVIDUAL_KPI_MEASURES,
-    }
-
-    template_name = "epilepsy12/partials/organisation/metric.html"
-
-    return render(request=request, template_name=template_name, context=context)

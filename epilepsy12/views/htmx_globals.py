@@ -129,7 +129,7 @@ def download(request, model_name):
                     else:
                         relative_field_name = f"{one_to_one_table}__{field.name}"
                         if field.name == "organisations":
-                            relative_field_name += "__OrganisationName"
+                            relative_field_name += "__name"
                     field_list.append(relative_field_name)
         model_class = Registration
     else:
@@ -260,12 +260,12 @@ def download(request, model_name):
                 )
                 p["epilepsycontext__experienced_prolonged_focal_seizures"] = choice
 
-            if p.get("multiaxialdiagnosis__mental_health_issue") is not None:
-                field_value = p.get("multiaxialdiagnosis__mental_health_issue")
+            if p.get("multiaxialdiagnosis__mental_health_issues") is not None:
+                field_value = p.get("multiaxialdiagnosis__mental_health_issues")
                 choice = return_choice_for_instance_and_value(
-                    MultiaxialDiagnosis, "mental_health_issue", field_value
+                    MultiaxialDiagnosis, "mental_health_issues", [field_value]
                 )
-                p["multiaxialdiagnosis__mental_health_issue"] = choice
+                p["multiaxialdiagnosis__mental_health_issues"] = choice
 
             # write the formated data to a new row in the csv
             writer.writerow(p.values())

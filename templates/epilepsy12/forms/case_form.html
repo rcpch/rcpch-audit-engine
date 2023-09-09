@@ -1,8 +1,13 @@
 {% load epilepsy12_template_tags %}
+{% csrf_token %}
 
-<form class="ui rcpch form" method="POST" id="create_case_form">
-
+<form 
+  class="ui rcpch form" 
+  method="POST" 
+  name="create_case_form" 
+  action="">
   {% csrf_token %}
+  
   <div class="two fields">
     <div class="field">
       <label for="{{form.first_name_for_label}}">First Name</label>
@@ -109,9 +114,12 @@
       <div class="content">
         <div class="header">Organisation</div>
         <p>
-          <b
-            >{{organisation.OrganisationName}}({{organisation.ParentOrganisation_OrganisationName}})</b
-          >
+          <b>{% if organisation.trust %}
+              {{organisation.name}}({{organisation.trust.name}}) ({{form.id}})
+              {% else %}
+              {{organisation.name}}({{organisation.local_health_board.name}})
+              {% endif %}
+          </b>
           will be allocated automatically as the lead Epilepsy12 centre on saving
           this child's information.
         </p>
@@ -123,24 +131,43 @@
   
   <div class="three fields">
     <div class="eight wide field case_create_buttons_wrapper">
-      <a href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button"
-        >Cancel</a
-      >
+      <a 
+        href="{% url 'cases' organisation_id %}" class="ui rcpch_negative button">
+        Cancel
+      </a>
       {% if perms.epilepsy12.change_case or perms.epilepsy12.add_case %}
         <button type="submit" class="ui rcpch_primary button" name="update">
           Save
         </button>
     
-      {% endif %} 
-      {% if perms.epilepsy12.delete_case %}
-      <input
-        type="submit"
-        class="ui rcpch_danger button"
-        name="delete"
-        value="Delete"
-        form="create_case_form"
-      />
+      {% endif %}
       
+      {% if case %}
+        {% if perms.epilepsy12.delete_case %}
+          <button
+            hx-post="{% url 'update_case' organisation_id case.pk %}"
+            hx-trigger="click"
+            class="ui rcpch_danger button"
+            name="delete"
+            id="delete"
+            value="Delete"
+            _= "on htmx:confirm(issueRequest)
+                halt the event
+                call Swal.fire({
+                  title: 'Confirmation Required',
+                  text: 'This will irreversibly remove {{case}} and related data from Epilepsy12.',
+                  icon: 'warning',
+                  iconColor: '#e00087',
+                  showCancelButton: true,
+                  confirmButtonColor: '#11a7f2',
+                  cancelButtonColor: '#e60700',
+                  confirmButtonText: 'Remove {{case}} from Epilepsy12'
+                })
+                if result.isConfirmed issueRequest()
+                end
+                      "
+          >Delete</button>
+        {% endif %}
       {% endif %}
     </div>
   </div>

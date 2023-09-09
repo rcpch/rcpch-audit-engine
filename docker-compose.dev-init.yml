@@ -2,7 +2,7 @@
 # syncs changes in local code folder to the E12 container
 # migrates the database
 
-version: '3.10'
+version: "3.10"
 
 services:
   # web container - runs the django app
@@ -28,7 +28,7 @@ services:
       - POSTCODES_IO_API_URL=https://api.postcodes.io
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
-      - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed 
+      - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
       - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
       # Below ENV vars are only needed for first creation of the superuser
       - DJANGO_SUPERUSER_USERNAME=e12-dev-user
@@ -42,6 +42,7 @@ services:
       - .env # env file with the token for RCPCH Census Platform, not committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
+            # python manage.py makemigrations &&
             python manage.py migrate &&
             python manage.py seed --mode=cases --cases 200 &&
             python manage.py seed --mode=seed_registrations &&

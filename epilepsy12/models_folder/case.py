@@ -61,11 +61,7 @@ class Case(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
         blank=True,
         null=True,
         max_length=10
-        # validators=[MinLengthValidator(  # should be other validation before saving - need to strip out spaces
-        #     limit_value=10,
-        #     message="The NHS number must be 10 digits long."
-        # )] #TODO #489
-    )  # TODO #13 NHS Number must be hidden - use case_uuid as proxy
+    ) 
     first_name = CharField(
         "First name",
         max_length=100,

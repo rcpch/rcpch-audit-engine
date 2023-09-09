@@ -175,7 +175,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
                         site.save()
                     else:
                         organisation = Organisation.objects.get(
-                            ODSCode=self.context["general_paediatric_centre_ods_code"]
+                            ods_code=self.context["general_paediatric_centre_ods_code"]
                         )
                         Site.objects.create(
                             case=instance.registration.case,
@@ -205,7 +205,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
                         site.save()
                     else:
                         organisation = Organisation.objects.get(
-                            ODSCode=self.context["general_paediatric_centre_ods_code"]
+                            ods_code=self.context["general_paediatric_centre_ods_code"]
                         )
                         Site.objects.create(
                             case=instance.registration.case,
@@ -235,7 +235,7 @@ class AssessmentSerializer(serializers.ModelSerializer):
                         site.save()
                     else:
                         organisation = Organisation.objects.get(
-                            ODSCode=self.context["general_paediatric_centre_ods_code"]
+                            ods_code=self.context["general_paediatric_centre_ods_code"]
                         )
                         Site.objects.create(
                             case=instance.registration.case,

@@ -16,7 +16,7 @@ from epilepsy12.serializers.comorbidity_entity_serializer import (
     ComorbidityEntitySerializer,
 )
 
-from epilepsy12.models import Comorbidity, ComorbidityEntity
+from epilepsy12.models import Comorbidity, Comorbidity
 from epilepsy12.permissions import CanAccessOrganisation
 
 
@@ -66,6 +66,6 @@ class ComorbidityEntityViewSet(viewsets.ReadOnlyModelViewSet):
     API endpoint that allows all selectable syndromes to be viewed.
     """
 
-    queryset = ComorbidityEntity.objects.all()
+    queryset = Comorbidity.objects.all()
     serializer_class = ComorbidityEntitySerializer
     permission_classes = [permissions.IsAuthenticated, CanAccessOrganisation]

@@ -123,7 +123,7 @@
               <button data-tooltip='Delete Child. This is irreversible.' class="ui rcpch_danger icon button" tabindexed="1" {% if case.locked or not perms.epilepsy12.delete_case %}disabled{% endif %}><a href="{% url 'delete_case' organisation_id=organisation_id case_id=case.id%}"><i
                 class="trash alternate outline icon"></i></a></button>
               {% endcomment %}
-              {% if case.registration.registration_date %}
+              {% if case.registration.first_paediatric_assessment_date %}
                 {% if case.locked %}
                 <button data-tooltip='Complete audit details.'class="ui rcpch_dark_purple button" tabindexed="2" 
                 disabled
@@ -158,7 +158,7 @@
               {% endif %}
             </div>
 
-            {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.registration_date %}
+            {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.first_paediatric_assessment_date %}
             {% percentage_of_total case.registration.audit_progress.total_completed_fields case.registration.audit_progress.total_expected_fields as total_percent %}
               <div class="ui bottom attached tiny rcpch progress" data-percent='{{total_percent}}' id="{{case.pk}}_audit_progress_bar" _="init js $('#{{case.pk}}_audit_progress_bar').progress(); end">
                 <div class='bar'></div>
@@ -198,7 +198,7 @@
             </td>
           {% else %}
             <td>
-              {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.registration_date %}
+              {% if not case.registration.audit_progress.audit_complete and not case.locked and case.registration.first_paediatric_assessment_date %}
                 <h6>{{total_percent}}% ({{case.registration.audit_progress.total_completed_fields}}/{{case.registration.audit_progress.total_expected_fields}})</h6>
               {% endif %}
             </td>

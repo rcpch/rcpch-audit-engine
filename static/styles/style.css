@@ -207,7 +207,7 @@ ul {
 .ui.center.aligned.segment.rcpch_masthead {
   padding: 4em 0em;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("images/blue-wallpaper-wheel.png");
+    url("images/masthead-bg.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -246,7 +246,7 @@ ul {
 div.center.aligned.image.rcpch_index_card_image {
   padding: 5em;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("images/blue-wallpaper-wheel.png");
+    url("images/masthead-bg.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
@@ -1494,6 +1494,29 @@ a.ui.button {
   background-color: var(--rcpch_dark_blue);
 }
 
+.e12_users_footer_wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.e12_users_footer_wrapper > .e12_users_footer_text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ui.message .e12_users_footer_text > p {
+  margin-top: 0.4em;
+  color: var(--rcpch_white);
+}
+
+.ui.rcpch_positive.download.button a {
+  color: white;
+}
+
+.ui.rcpch_positive.download.button:hover {
+  background-color: var(--rcpch_pink);
+}
+
 .ui.rcpch_purple_footer.message {
   color: var(--rcpch_white);
   background-color: var(--rcpch_purple);
@@ -1746,6 +1769,7 @@ div.rcpch_summary_stats > div.rcpch_summary_stats_row {
   justify-content: space-evenly;
   align-items: center;
   margin: 1em 0em;
+  text-align: center;
 }
 
 .rcpch_summary_stats > .rcpch_summary_stats_row > * {
@@ -1842,6 +1866,60 @@ div.ui.three.stackable.cards.individual_measures {
   margin-bottom: -1em;
 }
 
+.rcpch_cards_wrapper {
+  padding: 2em 0em;
+  flex-wrap: wrap;
+}
+
+.rcpch_cards_wrapper, .rcpch_cards_wrapper>.rcpch_card {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.rcpch_card {
+  flex-direction: column;
+  flex-basis: calc(33.33% - 4em); /* 33.33% minus margin/padding */
+  border: none;
+  border-radius: 0rem;
+  box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+  transition: box-shadow .1s ease,transform .1s ease,-webkit-box-shadow .1s ease,-webkit-transform .1s ease;
+  margin: 2em;
+  height: 33em;
+}
+
+.rcpch_card > .title {
+  background-color: var(--rcpch_mid_grey);
+  width: 100%;
+  text-align: center;
+}
+
+.rcpch_card > .title > h3 {
+  color: white;
+  padding: 0.7em;
+}
+
+.rcpch_card > .visualisation > h5 {
+  margin-top: 13em;
+}
+
+.rcpch_card > .caption {
+  text-align: justify;
+  padding: 1.2em;
+}
+
+.rcpch_card.clickable_card {
+  cursor: pointer;
+}
+
+.rcpch_card.clickable_card > .title {
+  background-color: var(--rcpch_strong_blue);
+}
+
+.rcpch_card.clickable_card:hover > .title {
+  background-color: var(--rcpch_light_blue);
+}
+
 .summary_kpi_pie_title {
   text-align: center;
 }
@@ -1849,7 +1927,6 @@ div.ui.three.stackable.cards.individual_measures {
 .individual_measures_pies_wrapper .chart {
   border-top: none !important;
 }
-
 
 .individual_measures_pies_wrapper .ui.rcpch_chart_container.segment {
   padding: 0em;
@@ -1876,7 +1953,6 @@ div.ui.three.stackable.cards.individual_measures .ui.card {
 .bar_charts_wrapper {
   margin: 1em 0em;
 }
-
 
 .org_view_all_buttons_wrapper a.ui.button {
   display: flex;
@@ -1955,10 +2031,6 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   border-radius: 0% !important;
 }
 
-.ui.card.clickable_card:hover {
-  cursor: pointer;
-}
-
 .ui.attached.tabular.menu {
   border-color: var(--rcpch_light_blue);
 }
@@ -2018,38 +2090,38 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
   align-content: center;
 }
 
-.ui.rcpch_individual_kpi_fixed.card .content{
+.ui.rcpch_individual_kpi_fixed.card .content {
   background-color: var(--rcpch_mid_grey);
   width: 100%;
   border-radius: 0% !important;
 }
 
-.ui.rcpch_individual_kpi.card .content{
+.ui.rcpch_individual_kpi.card .content {
   background-color: var(--rcpch_strong_blue);
   width: 100%;
   border-radius: 0% !important;
 }
 
-.ui.rcpch_individual_kpi.card:hover .content{
+.ui.rcpch_individual_kpi.card:hover .content {
   background-color: var(--rcpch_light_blue);
 }
 
-.ui.rcpch_individual_kpi.card .content.summary_kpi_pie_title h3{
+.ui.rcpch_individual_kpi.card .content.summary_kpi_pie_title h3 {
   color: white;
 }
 
-.ui.rcpch_individual_kpi_fixed.card .content.summary_kpi_pie_title h3{
+.ui.rcpch_individual_kpi_fixed.card .content.summary_kpi_pie_title h3 {
   color: white;
 }
 
-.ui.rcpch_individual_kpi.card .description{
+.ui.rcpch_individual_kpi.card .description {
   padding-top: 10px;
   color: var(--rcpch_charcoal);
   text-align: left;
   margin: 10px;
 }
 
-.ui.rcpch_individual_kpi_fixed.card .description{
+.ui.rcpch_individual_kpi_fixed.card .description {
   padding-top: 10px;
   color: var(--rcpch_charcoal);
   text-align: left;

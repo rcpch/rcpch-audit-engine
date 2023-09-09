@@ -2,15 +2,15 @@
 from django.db.models import Count
 from epilepsy12.models import Organisation
 
-a = Organisation.objects.get(ODSCode="RP401")
+a = Organisation.objects.get(ods_code="RP401")
 
 Organisation.objects.exclude(
-            # ODSCode=a.ODSCode,
-            # ParentOrganisation_ODSCode=a.ParentOrganisation_ODSCode,
+            # ods_code=a.ods_code,
+            # trust__ods_code=a.trust__ods_code,
             # integrated_care_board=a.integrated_care_board,
             # nhs_region=a.nhs_region,
             # openuk_network=a.openuk_network,
-        ).filter(openuk_network=a.openuk_network).values_list("ODSCode", "OrganisationName")
+        ).filter(openuk_network=a.openuk_network).values_list("ods_code", "name")
 """
 
 # python imports
@@ -26,8 +26,6 @@ from epilepsy12.common_view_functions import (
 )
 from epilepsy12.models import (
     Organisation,
-    Case,
-    Registration,
 )
 from epilepsy12.constants import (
     EnumAbstractionLevel,
@@ -40,12 +38,17 @@ from .helpers import _clean_cases_from_test_db, _register_cases_in_organisation
     "abstraction_level, ODSCodes, expected_count",
     [
         (EnumAbstractionLevel.ORGANISATION, ("RGT01", "7A6AV"), (10, 10)),
-        (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.ICB, ("RGT01", "RYVD9", "7A6AV"), (20, 20, 0)),
-        (EnumAbstractionLevel.NHS_REGION, ("RP401", "RQM01", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.OPEN_UK, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.COUNTRY, ("RP401", "RP416", "7A6AV"), (20, 20, 10)),
-        (EnumAbstractionLevel.NATIONAL, ("RP401", "RP416", "7A6AV"), (30, 30, 30)),
+        (EnumAbstractionLevel.TRUST, ("RP401", "RP416", "7A6AV"), (20, 20, 0)), # Welsh have no Trust
+        (EnumAbstractionLevel.LOCAL_HEALTH_BOARD, ("RP401", "RP416", "7A6AV"), (0, 0, 10)), # English have no LHB
+        (EnumAbstractionLevel.ICB, ("RGT01", "RGN90", "7A6AV"), (20, 20, 0)), # Welsh have no ICB
+        (
+            EnumAbstractionLevel.NHS_ENGLAND_REGION,
+            ("RGT01", "RGN90", "7A6AV"),
+            (20, 20, 0),
+        ), # Welsh have no NHS_ENGLAND_REGION
+        (EnumAbstractionLevel.OPEN_UK, ("RGT01", "RGN90", "7A6AV"), (20, 20, 10)),
+        (EnumAbstractionLevel.COUNTRY, ("RGT01", "RGN90", "7A6AV"), (20, 20, 10)),
+        (EnumAbstractionLevel.NATIONAL, ("RGT01", "RGN90", "7A6AV"), (30, 30, 30)),
     ],
 )
 @pytest.mark.django_db
@@ -57,20 +60,20 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
 ):
     """Testing the `get_filtered_cases_queryset_for` returns the correct expected_count for filtered cases.
 
-    For each abstraction, Cases are registered in the same abstraction level (all English organisations), and 10 Cases in Wales - so should be excluded from agg counts.
+    For each abstraction, 20 Cases are registered in the same abstraction level (all English organisations, split between 2 organisations), and 10 Cases in Wales - so should be excluded from agg counts.
     """
 
     # Ensure Case db empty for this test
     _clean_cases_from_test_db()
 
-    # Generate test cases - 10 in each ODSCode given
+    # Generate test cases - 10 in each ods_code given
     ods_codes = ODSCodes
     _register_cases_in_organisation(
         ods_codes=ods_codes, e12_case_factory=e12_case_factory
     )
 
     for ix, ods_code in enumerate(ods_codes):
-        organisation = Organisation.objects.get(ODSCode=ods_code)
+        organisation = Organisation.objects.get(ods_code=ods_code)
 
         output = get_filtered_cases_queryset_for(
             organisation=organisation,
@@ -82,7 +85,7 @@ def test_get_filtered_cases_queryset_for_returns_correct_count(
             output == expected_count[ix]
         ), f"""get_total_cases_registered_for_abstraction_level(
             organisation={organisation},
-            abstraction_level={abstraction_level.name if not EnumAbstractionLevel.NATIONAL else 'EnumAbstractionLevel.NATIONAL'},
+            abstraction_level={abstraction_level.name},
             cohort=6,
         ) should be {expected_count[ix]}"""
 
@@ -97,12 +100,12 @@ def test_get_filtered_cases_queryset_includes_only_specified_cohort(
     _clean_cases_from_test_db()
 
     # Generate test cases
-    org = Organisation.objects.get(ODSCode="RGT01")
+    org = Organisation.objects.get(ods_code="RGT01")
     e12_case_factory.create_batch(
         10,
         organisations__organisation=org,
-        first_name=f"temp_{org.OrganisationName}",
-        registration__registration_date=date(2021, 1, 1),
+        first_name=f"temp_{org.name}",
+        registration__first_paediatric_assessment_date=date(2021, 1, 1),
     )
 
     for abstraction_level in EnumAbstractionLevel:
@@ -127,22 +130,23 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
     ods_codes_where_icb_null = [
         code[0]
         for code in Organisation.objects.all()
-        .values("ODSCode", "OrganisationName", "integrated_care_board")
+        .values("ods_code", "name", "integrated_care_board")
         .annotate(count=Count("integrated_care_board"))
         .filter(count__lt=1)
-        .values_list("ODSCode")
+        .values_list("ods_code")
         .distinct()
     ]
 
-    # Generate test cases - 10 in each ODSCode given
+    # Generate test cases - 10 in each ods_code given
     _register_cases_in_organisation(
-        ods_codes=ods_codes_where_icb_null, e12_case_factory=e12_case_factory, n_cases=10
+        ods_codes=ods_codes_where_icb_null,
+        e12_case_factory=e12_case_factory,
+        n_cases=10,
     )
 
     for ods_code in ods_codes_where_icb_null:
-        
         # Community Paediatrics Org returning with the actual org so need to do filter.first()
-        organisation = Organisation.objects.filter(ODSCode=ods_code).first()
+        organisation = Organisation.objects.filter(ods_code=ods_code).first()
 
         output = get_filtered_cases_queryset_for(
             organisation=organisation,
@@ -150,7 +154,9 @@ def test_get_filtered_cases_queryset_for_orgs_with_null_ICB(
             cohort=6,
         ).count()
 
-        assert output == 0, f"""(Usually Welsh) organisations with null ICB codes should not be returned from get_filtered_cases_queryset_for(
+        assert (
+            output == 0
+        ), f"""(Usually Welsh) organisations with null ICB codes should not be returned from get_filtered_cases_queryset_for(
             organisation=organisation,
             abstraction_level=EnumAbstractionLevel.ICB,
             cohort=6,

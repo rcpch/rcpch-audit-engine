@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+{% csrf_token %}
 
 <div class='ui rcpch container'>
   <div class="rcpch_padding">
@@ -80,7 +81,7 @@
 
           <div class='two fields'>
 
-            {% if user_type == 'organisation-staff' %}
+            {% if user.is_rcpch_audit_team_member %}
               <div class='eight wide field'>
                 <label for="{{form.is_rcpch_audit_team_member.id_for_label}}">RCPCH Audit Team member</label>
                 <div class='ui toggle checkbox' id='is_staff' _="js $('.ui.toggle.checkbox').checkbox(); end">
@@ -112,7 +113,7 @@
               type="submit"
               value="{{admin_title}}"
               name='edit'/>
-            {% if not form.email_confirmed.value and admin_title != "Add RCPCH Epilepsy12 staff member" and admin_title != 'Add Epilepsy12 User' %}
+            {% if not form.email_confirmed.value and admin_title != 'Add Epilepsy12 User' %}
               <button
                 type="submit"
                 {% if perms.epilepsy12.change_epilepsy12user %}
@@ -126,11 +127,13 @@
                 Resend Email
               </button>
             {% endif %}
+            
             {{form.email_confirmed.as_hidden}}
+
             {% if admin_title != 'Add Epilepsy12 User' and admin_title != "Add RCPCH Epilepsy12 staff member" %}
               <input
                 type="submit"
-                {% if perms.epilepsy12.delete_epilepsy12user %}
+                {% if perms.epilepsy12.delete_epilepsy12user and user.email != form.email.value %}
                   class="ui rcpch_danger button"
                 {% else %}
                   class="ui rcpch_danger disabled button"
@@ -142,7 +145,7 @@
                   halt the event
                   call Swal.fire({
                     title: 'Confirmation Required',
-                    text: 'This will irreversibly remove user and related dated from Epilepsy12.',
+                    text: 'This will irreversibly remove {{epilepsy12_user}} and related dated from Epilepsy12.',
                     icon: 'warning',
                     iconColor: '#e00087',
                     showCancelButton: true,
@@ -168,11 +171,16 @@
             <a
               class="ui rcpch_negative button"
               name="cancel"
-              href="{% url 'epilepsy12_user_list' organisation_id=organisation_id %}"
+              href="{% url 'epilepsy12_user_list' organisation_id=organisation_id epilepsy12_user_id=user.id %}"
             >Cancel</a>
           </div>
 
         </form>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                {{ form.errors }}
+            </div>
+        {% endif %}
       </div>
 
     </div>

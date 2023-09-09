@@ -73,10 +73,12 @@ import random
 
 # E12 imports
 from epilepsy12.models import (
-    SyndromeEntity,
-    ComorbidityEntity,
+    Syndrome,
+    SyndromeList,
+    Comorbidity,
+    ComorbidityList,
     Site,
-    MedicineEntity,
+    Medicine,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     number_of_completed_fields_in_related_models,
@@ -126,7 +128,7 @@ def test_related_model_fields_count_all_episode_fully_completed(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
     multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
@@ -291,7 +293,7 @@ def test_related_model_fields_count_all_episode_random_answers(
 
             # Need a case to make an episode
             CASE = e12_case_factory(
-                first_name=f"temp_child_{GOSH.OrganisationName}",
+                first_name=f"temp_child_{GOSH.name}",
                 organisations__organisation=GOSH,
             )
             multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
@@ -322,7 +324,7 @@ def test_related_model_fields_count_all_syndrome_fully_completed(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
     multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
@@ -333,7 +335,7 @@ def test_related_model_fields_count_all_syndrome_fully_completed(
 
     factory_attributes = {
         "syndrome_diagnosis_date": date(2023, 1, 1),
-        "syndrome": SyndromeEntity.objects.get(syndrome_name="Rasmussen syndrome"),
+        "syndrome": SyndromeList.objects.get(syndrome_name="Rasmussen syndrome"),
     }
 
     syndrome = e12_syndrome_factory(
@@ -360,7 +362,7 @@ def test_related_model_fields_count_all_syndrome_random_answers(
     counter = 0
 
     factory_attributes_list = []
-    SYNDROME_NAMES = SyndromeEntity.objects.all()[:5]
+    SYNDROME_NAMES = SyndromeList.objects.all()[:5]
     # Create 5 randomly filled syndromes - ensures covers various different scenarios.
     for i in range(5):
         inital_answer = {
@@ -376,7 +378,7 @@ def test_related_model_fields_count_all_syndrome_random_answers(
     for factory_attributes, expected_value in factory_attributes_list:
         # Need a case to make an syndrome
         CASE = e12_case_factory(
-            first_name=f"temp_child_{GOSH.OrganisationName}",
+            first_name=f"temp_child_{GOSH.name}",
             organisations__organisation=GOSH,
         )
         multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
@@ -407,7 +409,7 @@ def test_related_model_fields_count_all_comorbidity_fully_completed(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
     multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
@@ -418,7 +420,7 @@ def test_related_model_fields_count_all_comorbidity_fully_completed(
 
     factory_attributes = {
         "comorbidity_diagnosis_date": date(2023, 1, 1),
-        "comorbidityentity": ComorbidityEntity.objects.first(),
+        "comorbidityentity": ComorbidityList.objects.first(),
     }
 
     comorbidity = e12_comorbidity_factory(
@@ -445,7 +447,7 @@ def test_related_model_fields_count_all_comorbidity_random_answers(
     counter = 0
 
     factory_attributes_list = []
-    COMORBIDITY_NAMES = ComorbidityEntity.objects.all()[:5]
+    COMORBIDITY_NAMES = ComorbidityList.objects.all()[:5]
     # Create 5 randomly filled comorbiditys - ensures covers various different scenarios.
     for i in range(len(COMORBIDITY_NAMES)):
         # Comorbidity.comorbidityentity CANNOT be None, so only have diagnosis date's random answer options include None
@@ -464,7 +466,7 @@ def test_related_model_fields_count_all_comorbidity_random_answers(
     for factory_attributes, expected_value in factory_attributes_list:
         # Need a case to make an comorbidity
         CASE = e12_case_factory(
-            first_name=f"temp_child_{GOSH.OrganisationName}",
+            first_name=f"temp_child_{GOSH.name}",
             organisations__organisation=GOSH,
         )
         multiaxial_diagnosis = CASE.registration.multiaxialdiagnosis
@@ -493,7 +495,7 @@ def test_related_model_fields_count_assessment(e12_case_factory, GOSH):
     Simulating number_of_completed_fields_in_related_models(model_instance=assessment) returns correct counter when Site fields' answers are filled.
     """
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
     assessment = CASE.registration.assessment
@@ -524,7 +526,7 @@ def test_related_model_fields_count_management(
     Simulating number_of_completed_fields_in_related_models(model_instance=management) returns correct counter when AED fields' answers are filled.
     """
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         sex=SEX_TYPE[2][0],
     )
@@ -539,7 +541,7 @@ def test_related_model_fields_count_management(
     management.save()
 
     aed_answers = {
-        "medicine_entity": MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+        "medicine_entity": Medicine.objects.get(medicine_name="Sodium valproate"),
         "antiepilepsy_medicine_start_date": date(2023, 1, 1),
         "antiepilepsy_medicine_risk_discussed": True,
         "is_a_pregnancy_prevention_programme_in_place": True,
@@ -551,7 +553,7 @@ def test_related_model_fields_count_management(
         **aed_answers,
     )
     rescue_medicine_answers = {
-        "medicine_entity": MedicineEntity.objects.get(medicine_name="Levetiracetam"),
+        "medicine_entity": Medicine.objects.get(medicine_name="Levetiracetam"),
         "antiepilepsy_medicine_start_date": date(2023, 1, 1),
         "antiepilepsy_medicine_risk_discussed": True,
     }
@@ -573,20 +575,20 @@ def test_related_model_fields_count_management(
 def test_related_model_fields_count_registration(e12_case_factory, GOSH):
     """
     Simulating number_of_completed_fields_in_related_models(model_instance=registration) returns correct counter when Site fields' answers are filled.
-    
-    NOTE: expected_value == 1 as default factory has: 
+
+    NOTE: expected_value == 1 as default factory has:
         - site_is_primary_centre_of_epilepsy_care=True
         - site_is_actively_involved_in_epilepsy_care=True
     """
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
     return_value = number_of_completed_fields_in_related_models(CASE.registration)
 
     expected_value = 1
-    
+
     assert (
         return_value == expected_value
     ), f"Site values all True for `number_of_completed_fields_in_related_models(registration)`. Expected {expected_value=} but received {return_value=}"

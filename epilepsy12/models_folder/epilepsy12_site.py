@@ -1,10 +1,17 @@
 # django
 from django.contrib.gis.db import models
+
 # 3rd party
 from simple_history.models import HistoricalRecords
+
 # rcpch
 from .time_and_user_abstract_base_classes import *
-from ..constants import CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE, CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE, CAN_EDIT_EPILEPSY12_LEAD_CENTRE, CAN_DELETE_EPILEPSY12_LEAD_CENTRE
+from ..constants import (
+    CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE,
+    CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
+    CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
+    CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
+)
 
 
 class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
@@ -12,7 +19,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     This class records information about each site that oversees the epilepsy care of each case.
     This class references the Organisation class, as one organisation trust may reference multiple sites
     One registration can have several sites
-    Each registration that has a record in sites that has 
+    Each registration that has a record in sites that has
     site_is_actively_involved_in_epilepsy_care as True will have a unique organisation trust, which can
     have more than one role (eg can be neurology and surgery lead together)
     It is possible for a registration to have two sites each with the same organisation, however,
@@ -22,25 +29,16 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     """
 
     site_is_actively_involved_in_epilepsy_care = models.BooleanField(
-        default=False,
-        null=True
+        default=False, null=True
     )
     site_is_primary_centre_of_epilepsy_care = models.BooleanField(
-        default=False,
-        null=True
+        default=False, null=True
     )
     site_is_childrens_epilepsy_surgery_centre = models.BooleanField(
-        default=False,
-        null=True
+        default=False, null=True
     )
-    site_is_paediatric_neurology_centre = models.BooleanField(
-        default=False,
-        null=True
-    )
-    site_is_general_paediatric_centre = models.BooleanField(
-        default=False,
-        null=True
-    )
+    site_is_paediatric_neurology_centre = models.BooleanField(default=False, null=True)
+    site_is_general_paediatric_centre = models.BooleanField(default=False, null=True)
 
     history = HistoricalRecords()
 
@@ -48,9 +46,7 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     # Site is a link table between Case and Organisation in a many to many relationship
 
     organisation = models.ForeignKey(
-        to='epilepsy12.Organisation',
-        related_name="site",
-        on_delete=models.PROTECT
+        to="epilepsy12.Organisation", related_name="site", on_delete=models.PROTECT
     )
 
     case = models.ForeignKey(
@@ -58,9 +54,9 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         # where site_is_actively_involved_in_epilepsy_care. However,
         # it can have multiple instances where site_is_actively_involved_in_epilepsy_care
         # is false.
-        'epilepsy12.Case',
+        "epilepsy12.Case",
         on_delete=models.CASCADE,
-        related_name='site'
+        related_name="site",
     )
 
     @property
@@ -72,14 +68,14 @@ class Site(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
         self.updated_by = value
 
     class Meta:
-        verbose_name = 'Site'
-        verbose_name_plural = 'Sites'
+        verbose_name = "Site"
+        verbose_name_plural = "Sites"
         permissions = [
             CAN_ALLOCATE_EPILEPSY12_LEAD_CENTRE,
             CAN_TRANSFER_EPILEPSY12_LEAD_CENTRE,
             CAN_EDIT_EPILEPSY12_LEAD_CENTRE,
-            CAN_DELETE_EPILEPSY12_LEAD_CENTRE
+            CAN_DELETE_EPILEPSY12_LEAD_CENTRE,
         ]
 
     def __str__(self) -> str:
-        return self.organisation.ParentOrganisation_OrganisationName
+        return self.organisation.trust.name

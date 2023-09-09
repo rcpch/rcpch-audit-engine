@@ -3,39 +3,59 @@
 NOTE: "No data" for bars denotes that KPIAggregation model's field is None. This will be because aggregations have not yet been performed - because there are no eligibile kids to perform aggregations on.
 """
 # Python imports
+from typing import Union
 
 # 3rd Party imports
 import plotly.graph_objects as go
-import numpy as np
 
 # E12 Imports
 from epilepsy12.constants.colors import *
 from epilepsy12.constants import EnumAbstractionLevel
 from .helpers import format_icb, format_pct_text, format_subunit_name_ticktext
+from epilepsy12.models import (
+    OrganisationKPIAggregation,
+    TrustKPIAggregation,
+    ICBKPIAggregation,
+    NHSEnglandRegionKPIAggregation,
+    OpenUKKPIAggregation,
+    CountryKPIAggregation,
+    NationalKPIAggregation,
+)
 
 
 ABSTRACTION_GRAPH_COLOR_MAP = {
+    EnumAbstractionLevel.LOCAL_HEALTH_BOARD: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.ICB: RCPCH_LIGHT_BLUE,
     EnumAbstractionLevel.OPEN_UK: RCPCH_AQUA_GREEN,
-    EnumAbstractionLevel.NHS_REGION: RCPCH_STRONG_BLUE,
+    EnumAbstractionLevel.NHS_ENGLAND_REGION: RCPCH_STRONG_BLUE,
     EnumAbstractionLevel.COUNTRY: RCPCH_DARK_BLUE,
 }
 ABSTRACTION_CHART_HEIGHT = {
+    EnumAbstractionLevel.LOCAL_HEALTH_BOARD: "100vh",
     EnumAbstractionLevel.ICB: "100vh",
     EnumAbstractionLevel.OPEN_UK: "80vh",
-    EnumAbstractionLevel.NHS_REGION: "70vh",
+    EnumAbstractionLevel.NHS_ENGLAND_REGION: "70vh",
     EnumAbstractionLevel.COUNTRY: "50vh",
 }
 ABSTRACTION_GRAPH_TITLE_SUBUNIT = {
+    EnumAbstractionLevel.LOCAL_HEALTH_BOARD: "Local Health Board",
     EnumAbstractionLevel.ICB: "Integrated Care Board",
     EnumAbstractionLevel.OPEN_UK: "OPEN UK Region",
-    EnumAbstractionLevel.NHS_REGION: "NHS Region",
+    EnumAbstractionLevel.NHS_ENGLAND_REGION: "NHS Region",
     EnumAbstractionLevel.COUNTRY: "Country",
 }
 
 
 def render_bar_pct_passed_for_kpi_agg(
-    aggregation_model,
+    aggregation_model: Union[
+        OrganisationKPIAggregation,
+        TrustKPIAggregation,
+        ICBKPIAggregation,
+        NHSEnglandRegionKPIAggregation,
+        OpenUKKPIAggregation,
+        CountryKPIAggregation,
+        NationalKPIAggregation,
+    ],
     data,
     kpi_name: str,
     kpi_name_title: str,
@@ -49,9 +69,7 @@ def render_bar_pct_passed_for_kpi_agg(
     names = []
     pct_passed = []
     pct_passed_text = []
-    n_passed = []
-    n_ineligible = []
-    n_incomplete = []
+
     # COLORS
     PCT_TEXT_COLOR = []
     BG_BAR_COLOR = []
@@ -69,6 +87,7 @@ def render_bar_pct_passed_for_kpi_agg(
 
     customdata_bg_bar = []
 
+    # NOTE: this could be refactored to using pandas df instead of python lists. `data` is a ValuesQuerySet, which can be directly read in using pd.from_records(data). Advantage of df is much faster.
     for item in data:
         name = item["abstraction_name"]
         if abstraction_level is EnumAbstractionLevel.ICB:
@@ -85,12 +104,24 @@ def render_bar_pct_passed_for_kpi_agg(
         # hover template for absolute counts
         kpi_passed_count = item[f"{kpi_name}_passed"]
         kpi_total_eligible_count = item[f"{kpi_name}_total_eligible"]
-        if kpi_passed_count is None or kpi_total_eligible_count is None:
-            kpi_passed_text = "No passes"
-        else:
-            kpi_passed_text = f"({kpi_passed_count} / {kpi_total_eligible_count})"
         kpi_ineglible_count = item[f"{kpi_name}_ineligible"]
         kpi_incomplete_count = item[f"{kpi_name}_incomplete"]
+
+        # Generate text from above
+        if kpi_passed_count is None:
+            kpi_passed_text = "No passes"
+        else:
+            kpi_passed_text = f"{kpi_passed_count} out of {kpi_total_eligible_count}"
+
+        if kpi_ineglible_count is None:
+            kpi_ineligible_text = f"None ineligble"
+        else:
+            kpi_ineligible_text = kpi_ineglible_count
+
+        if kpi_incomplete_count is None:
+            kpi_incomplete_text = f"None incomplete"
+        else:
+            kpi_incomplete_text = kpi_incomplete_count
 
         # Colors
         if pct_passed_item is None:
@@ -98,7 +129,7 @@ def render_bar_pct_passed_for_kpi_agg(
             PCT_BAR_COLOR.append(RCPCH_LIGHTEST_GREY)
             PCT_TEXT_COLOR.append(RCPCH_CHARCOAL)
             NAMES_TEXT_COLOR.append(
-                format_subunit_name_ticktext(color=RCPCH_CHARCOAL_DARK, text=name)
+                format_subunit_name_ticktext(color=RCPCH_DARK_GREY, text=name)
             )
         else:
             BG_BAR_COLOR.append(RCPCH_LIGHT_GREY)
@@ -109,11 +140,11 @@ def render_bar_pct_passed_for_kpi_agg(
             )
 
         customdata_bg_bar.append(
-            (kpi_passed_text, f"{kpi_ineglible_count}", f"{kpi_incomplete_count}")
+            (kpi_passed_text, kpi_ineligible_text, kpi_incomplete_text)
         )
 
     # Generate the hover bar for those passed / incomplete / inelgible. Access attributes via index order set in customdata_bg_bar
-    hovertemplate_bg_bar = "<b>%{y}</b><br>passed: %{customdata[0]}<br>incomplete: %{customdata[1]}<br>ineligible: %{customdata[2]}<extra></extra>"
+    hovertemplate_bg_bar = "<b>%{y}</b><br>For this measure:<br>Total passed: %{customdata[0]}<br>Total incomplete: %{customdata[1]}<br>Total ineligible: %{customdata[2]}<extra></extra>"
 
     # Bg Bars
     fig = go.Figure(
@@ -175,20 +206,22 @@ def render_bar_pct_passed_for_kpi_agg(
         ),
     )
 
-    # Calculate average
-    pct_pass_exc_none = [num for num in pct_passed if num is not None]
-    average_for_eligible = int(
-        round(sum(pct_pass_exc_none) / len(pct_pass_exc_none), 0)
-    )
+    # Calculate average, add line IF len not 0
+    pct_pass_exc_none = [num for num in pct_passed if ((num is not None) and (num != 0))]
 
-    # Add avg line
-    fig.add_vline(
-        x=average_for_eligible,
-        annotation_text=f"Average for those eligible: {average_for_eligible}%",
-        annotation_position="top",
-        line_color=RCPCH_PINK,
-        opacity=0.69,
-    )
+    if len(pct_pass_exc_none):
+        average_for_eligible = int(
+            round(sum(pct_pass_exc_none) / len(pct_pass_exc_none), 0)
+        )
+
+        # Add avg line
+        fig.add_vline(
+            x=average_for_eligible,
+            annotation_text=f"Average for those eligible: {average_for_eligible}%",
+            annotation_position="top",
+            line_color=RCPCH_PINK,
+            opacity=0.69,
+        )
 
     fig.update_xaxes(
         range=[0, 104.5],  # the "No data" labels require space past the end of the axes

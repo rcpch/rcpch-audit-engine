@@ -34,14 +34,19 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
             ["RGT01", "RQM01"],
         ),
         (
-            EnumAbstractionLevel.ICB,
-            ["QUE", "QRV"],
-            ["RGT01", "RYVD9", "RYJ03", "RQM01"],
+            EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            ["W11000028", "W11000031"],
+            ["7A6AV", "7A6G9", "7A3LW", "7A3C7"],
         ),
         (
-            EnumAbstractionLevel.NHS_REGION,
-            ["Y61", "Y56"],
-            ["RGT01", "RAJ12", "RAL26", "R1K02"],
+            EnumAbstractionLevel.ICB,
+            ["E54000056", "E54000027"],
+            ["RGT01", "RGN90", "R1K02", "RQM01"],
+        ),
+        (
+            EnumAbstractionLevel.NHS_ENGLAND_REGION,
+            ["E40000007", "E40000003"],
+            ["RGT01", "RGN90", "R1K02", "RQM01"],
         ),
         (
             EnumAbstractionLevel.OPEN_UK,
@@ -56,7 +61,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
         (
             EnumAbstractionLevel.NATIONAL,
             ["England", "Wales"],
-            ["RGT01", "7A6BJ"],
+            ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
         ),
     ],
 )
@@ -86,12 +91,16 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
         ods_codes=ods_codes,
         num_cases=5
         if abstraction_level
-        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.NATIONAL]
-        else 10,
+        not in [
+            # in these 3 abstraction levels, kids are split into half the number of organisations, so register double the nubmer of kids (10) instead of 5
+            EnumAbstractionLevel.ORGANISATION,
+            EnumAbstractionLevel.TRUST,
+        ]
+        else 10, 
     )
 
     for code in ods_codes:
-        organisation = Organisation.objects.get(ODSCode=code)
+        organisation = Organisation.objects.get(ods_code=code)
 
         filtered_cases = get_filtered_cases_queryset_for(
             organisation=organisation,
@@ -107,7 +116,6 @@ def test_calculate_kpi_value_counts_queryset_all_levels(
                 "mental_health_support",
             ],
         )
-        
 
         if abstraction_level is EnumAbstractionLevel.NATIONAL:
             expected_scores = {

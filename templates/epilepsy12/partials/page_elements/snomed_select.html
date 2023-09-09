@@ -60,7 +60,7 @@
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
                     {% for item in choices %}
-                        <div class="item" data-value="{{item.conceptId}}">{{item.preferredTerm}}</div>
+                        <div class="item" data-value="{{item.conceptId}}">{{item.preferredTerm}}({{item.term}})</div>
                     {% endfor %}
                 </div>
             </div>

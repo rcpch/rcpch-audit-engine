@@ -328,10 +328,7 @@ class KPI(models.Model, HelpTextMixin):
         "epilepsy12.Organisation", on_delete=models.CASCADE
     )
 
-    parent_trust = models.CharField(max_length=250)
-    
-
-    def get_kpis(self)->dict:
+    def get_kpis(self) -> dict:
         """
         Returns dictionary of KPI attributes with related scores.
         """
@@ -366,4 +363,4 @@ class KPI(models.Model, HelpTextMixin):
         verbose_name_plural = _("KPIs")
 
     def __str__(self):
-        return f"KPI for child in {self.organisation.OrganisationName}({self.parent_trust})"
+        return f"KPI for child in {self.organisation.name}({self.organisation.trust.name})"

@@ -30,7 +30,11 @@ test_positive: currently selected organisation id
                 <div class="default text">{{hx_default_text}}</div>
                 <div class="menu" >
                     {% for item in organisation_list %}
-                        <div class="item" data-value="{{item.pk}}">{{item.OrganisationName}} - {{item.City}} ({{item.ParentOrganisation_OrganisationName}})</div>
+                        {% if item.trust %}
+                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.trust.name}})</div>
+                        {% else %}
+                            <div class="item" data-value="{{item.pk}}">{{item.name}} - {{item.city}} ({{item.local_health_board.name}})</div>
+                        {% endif %}
                     {% endfor %}
                 </div>
         </div>

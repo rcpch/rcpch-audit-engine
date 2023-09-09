@@ -28,7 +28,7 @@ class Registration(
     A record is created in the Registration class every time a case is registered for the audit
     """
 
-    registration_date = models.DateField(
+    first_paediatric_assessment_date = models.DateField(
         help_text={
             "label": "First paediatric assessment",
             "reference": "Setting this date is an irreversible step. Confirmation will be requested to complete this step.",
@@ -64,8 +64,10 @@ class Registration(
         Returns:
             datetime.date: audit submission date.
         """
-        if self.registration_date:
-            registration_plus_one_year = self.registration_date + relativedelta(years=1)
+        if self.first_paediatric_assessment_date:
+            registration_plus_one_year = (
+                self.first_paediatric_assessment_date + relativedelta(years=1)
+            )
 
             second_tuesday_next_year = nth_tuesday_of_year(
                 registration_plus_one_year.year, n=2
@@ -126,18 +128,18 @@ class Registration(
         ]
 
     def save(self, *args, **kwargs) -> None:
-        if self.registration_date is not None:
-            self.registration_close_date = self.registration_date + relativedelta(
-                years=1
+        if self.first_paediatric_assessment_date is not None:
+            self.registration_close_date = (
+                self.first_paediatric_assessment_date + relativedelta(years=1)
             )
             self.audit_submission_date = self.audit_submission_date_calculation()
-            self.cohort = cohort_number_from_enrolment_date(self.registration_date)
+            self.cohort = cohort_number_from_enrolment_date(
+                self.first_paediatric_assessment_date
+            )
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        if self.registration_date:
-            return (
-                f"Epilepsy12 registration for {self.case} on {self.registration_date}"
-            )
+        if self.first_paediatric_assessment_date:
+            return f"Epilepsy12 registration for {self.case} on {self.first_paediatric_assessment_date}"
         else:
             return f"Epilepsy12 registration for {self.case} incomplete."

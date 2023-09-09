@@ -6,7 +6,7 @@
 from rest_framework import serializers
 
 # E12 imports
-from epilepsy12.models import MultiaxialDiagnosis, Registration, EpilepsyCauseEntity
+from epilepsy12.models import MultiaxialDiagnosis, Registration, Comorbidity
 from epilepsy12.serializers.episode_serializer import EpisodeSerializer
 from epilepsy12.serializers.syndrome_serializer import SyndromeSerializer
 from epilepsy12.serializers.comorbidity_serializer import ComorbiditySerializer
@@ -17,7 +17,7 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
     episodes = EpisodeSerializer(many=True)
     syndromes = SyndromeSerializer(many=True)
     epilepsy_cause = serializers.SlugRelatedField(
-        queryset=EpilepsyCauseEntity.objects.all(), slug_field="preferredTerm"
+        queryset=Comorbidity.objects.all(), slug_field="preferredTerm"
     )
     registration = serializers.PrimaryKeyRelatedField(
         queryset=Registration.objects.all()
@@ -34,7 +34,7 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
             "relevant_impairments_behavioural_educational",
             "mental_health_screen",
             "mental_health_issue_identified",
-            "mental_health_issue",
+            "mental_health_issues",
             "episodes",
             "syndromes",
             "comorbidities",
@@ -47,13 +47,13 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
     def get_epilepsy_cause(self):
         """
         This is a custom method as the user passes in an SCTID of the epilepsy cause
-        This is validated and used to look up the value in the the EpilepsyCauseEntity table
+        This is validated and used to look up the value in the the Comorbidity table
         and passed back to the epilepsy_cause field in the Multiaxial Diagnosis instance in the save()
         """
         sctid = self.context.get("sctid")
         if sctid is not None:
-            if EpilepsyCauseEntity.objects.filter(conceptId=sctid).exists():
-                self.instance.epilepsy_cause = EpilepsyCauseEntity.objects.filter(
+            if Comorbidity.objects.filter(conceptId=sctid).exists():
+                self.instance.epilepsy_cause = Comorbidity.objects.filter(
                     conceptId=sctid
                 ).first()
             else:
@@ -105,14 +105,14 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
                         )
         if "mental_health_issue_identified" in data:
             if data["mental_health_issue_identified"]:
-                if "mental_health_issue" not in data:
+                if "mental_health_issues" not in data:
                     raise serializers.ValidationError(
                         {
                             "mental_health_issue_identified": "Mental health issue must be supplied."
                         }
                     )
                 else:
-                    if data["mental_health_issue"] is None:
+                    if data["mental_health_issues"] is None:
                         raise serializers.ValidationError(
                             {
                                 "mental_health_issue_identified": "Mental health issue must be supplied."
@@ -120,12 +120,12 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
                         )
             else:
                 if (
-                    "mental_health_issue" in data
-                    and data["mental_health_issue"] is not None
+                    "mental_health_issues" in data
+                    and data["mental_health_issues"] is not None
                 ):
                     raise serializers.ValidationError(
                         {
-                            "mental_health_issue": "Mental health issue cannot be supplied if mental_health_issue_identified is set to false."
+                            "mental_health_issues": "Mental health issue cannot be supplied if mental_health_issue_identified is set to false."
                         }
                     )
         if (
@@ -187,8 +187,8 @@ class MultiaxialDiagnosisSerializer(serializers.ModelSerializer):
         instance.mental_health_issue_identified = validated_data.get(
             "mental_health_issue_identified", instance.mental_health_issue_identified
         )
-        instance.mental_health_issue = validated_data.get(
-            "mental_health_issue", instance.mental_health_issue
+        instance.mental_health_issues = validated_data.get(
+            "mental_health_issues", instance.mental_health_issues
         )
         instance.autistic_spectrum_disorder = validated_data.get(
             "autistic_spectrum_disorder", instance.autistic_spectrum_disorder

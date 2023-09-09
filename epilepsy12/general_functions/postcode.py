@@ -49,3 +49,13 @@ def return_random_postcode():
         return None
     else:
         return response.json()["result"]["postcode"]
+
+
+def call_api(postcode):
+    formatted = postcode.upper().replace(" ", "+")
+    api = f"https://findthatpostcode.uk/postcodes/{formatted}.json"
+    response = requests.get(url=api)
+    if response.status_code != 200:
+        return None
+    r = response.json()["data"]["attributes"]["laua"]
+    return r

@@ -4,7 +4,7 @@ from datetime import datetime
 # django imports
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.gis.db.models import Q
@@ -46,9 +46,7 @@ def case_list(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # get all organisations which are in the same parent trust
-    organisation_children = Organisation.objects.filter(
-        ParentOrganisation_OrganisationName=organisation.ParentOrganisation_OrganisationName
-    ).all()
+    organisation_children = Organisation.objects.filter(trust=organisation.trust).all()
 
     if filter_term:
         # filter_term is called if filtering by search box
@@ -56,9 +54,7 @@ def case_list(request, organisation_id):
             # user has requested organisation level view
             all_cases = (
                 Case.objects.filter(
-                    Q(
-                        site__organisation__OrganisationName__contains=organisation.OrganisationName
-                    )
+                    Q(site__organisation__name__contains=organisation.name)
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
                     & (
@@ -75,7 +71,7 @@ def case_list(request, organisation_id):
             all_cases = (
                 Case.objects.filter(
                     Q(
-                        site__organisation__ParentOrganisation_ODSCode__contains=organisation.ParentOrganisation_ODSCode
+                        site__organisation__trust__ods_code__contains=organisation.trust__ods_code
                     )
                     & Q(site__site_is_primary_centre_of_epilepsy_care=True)
                     & Q(site__site_is_actively_involved_in_epilepsy_care=True)
@@ -117,14 +113,14 @@ def case_list(request, organisation_id):
         elif request.user.view_preference == 1:
             # filters all primary Trust level centres, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName,
+                organisations__trust__name__contains=organisation.trust.name,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
         else:
             # filters all primary centres at organisation level, irrespective of if active or inactive
             filtered_cases = Case.objects.filter(
-                organisations__OrganisationName__contains=organisation.OrganisationName,
+                organisations__name__contains=organisation.name,
                 site__site_is_primary_centre_of_epilepsy_care=True,
                 site__site_is_actively_involved_in_epilepsy_care=True,
             )
@@ -252,20 +248,25 @@ def case_list(request, organisation_id):
     case_count = all_cases.count()
     registered_count = registered_cases.count()
 
+    if organisation.country.boundary_identifier == "W92000004":
+        parent_trust = organisation.local_health_board.name
+    else:
+        parent_trust = organisation.trust.name
+
     if (
         request.user.is_rcpch_audit_team_member
         or request.user.is_rcpch_staff
         or request.user.is_superuser
     ):
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
+            (0, f"Organisation level ({organisation.name})"),
+            (1, f"Trust level ({parent_trust})"),
             (2, "National level"),
         )
     else:
         rcpch_choices = (
-            (0, f"Organisation level ({organisation.OrganisationName})"),
-            (1, f"Trust level ({organisation.ParentOrganisation_OrganisationName})"),
+            (0, f"Organisation level ({organisation.name})"),
+            (1, f"Trust level ({parent_trust})"),
         )
 
     context = {
@@ -304,14 +305,12 @@ def case_statistics(request, organisation_id):
     elif request.user.view_preference == 1:
         # user requesting Trust level - return all cases in the same trust
         total_cases = Case.objects.filter(
-            Q(
-                organisations__ParentOrganisation_OrganisationName__contains=organisation.ParentOrganisation_OrganisationName
-            )
+            Q(organisations__trust__name__contains=organisation.trust.name)
         )
     elif request.user.view_preference == 0:
         # user requesting Trust level - return all cases in the same organisation
         total_cases = Case.objects.filter(
-            Q(organisations__OrganisationName__contains=organisation.OrganisationName)
+            Q(organisations__name__contains=organisation.name)
         )
 
     registered_cases = total_cases.filter(
@@ -411,7 +410,7 @@ def create_case(request, organisation_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if organisation.country.boundary_identifier == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (
@@ -458,6 +457,7 @@ def create_case(request, organisation_id):
 
 @login_required
 @user_may_view_this_child()
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
 def update_case(request, organisation_id, case_id):
     """
@@ -470,7 +470,7 @@ def update_case(request, organisation_id, case_id):
 
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if organisation.country.boundary_identifier == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (
@@ -479,14 +479,15 @@ def update_case(request, organisation_id, case_id):
         ("ZZ993VZ", "No fixed abode"),
     )
 
-    if request.method == "POST":
-        if ("delete") in request.POST:
-            if not request.user.has_perm("epilepsy12.delete_case"):
-                raise PermissionDenied()
-            messages.success(request, f"You successfully deleted {case}'s details")
-            case.delete()
-            return redirect("cases", organisation_id=organisation_id)
+    if request.htmx:
+        if not request.user.has_perm("epilepsy12.delete_case"):
+            raise PermissionDenied()
+        messages.success(request, f"You successfully deleted {case}'s details")
+        case.delete()
+        url = reverse("cases", kwargs={"organisation_id": organisation_id})
+        return HttpResponseClientRedirect(redirect_to=url, status=200)
 
+    if request.method == "POST":
         form = CaseForm(request.POST, instance=case)
         if form.is_valid():
             obj = form.save()
@@ -526,7 +527,7 @@ def update_case(request, organisation_id, case_id):
 
 
 @login_required
-@user_may_view_this_child()
+@user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
 def unknown_postcode(request, organisation_id):
     """
@@ -537,7 +538,7 @@ def unknown_postcode(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
     # set select boxes for situations when postcode unknown
     country_choice = ("ZZ993CZ", "Address unspecified - England")
-    if organisation.ons_region.ons_country.Country_ONS_Name == "Wales":
+    if organisation.country.boundary_identifier == "W92000004":
         country_choice = ("ZZ993GZ", "Address unspecified - Wales")
 
     choices = (

@@ -10,7 +10,7 @@ from .views.api.entity_viewsets import (
     AntiEpilepsyMedicineViewSet,
 )
 from .views.api.episode_viewset import EpisodeViewSet
-from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeEntityViewSet
+from .views.api.syndrome_viewset import SyndromeViewSet, SyndromeViewSet
 from .views.api.comorbidity_viewset import ComorbidityViewSet, ComorbidityEntityViewSet
 from .views.api.assessment_viewset import AssessmentViewSet
 from .views.api.management_viewset import ManagementViewSet
@@ -23,8 +23,10 @@ from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path
 from django.contrib.auth import urls as auth_urls
 
-router = routers.DefaultRouter()
+# router = routers.DefaultRouter()
 
+"""
+These are all the endpoints for the API - currently commented out but can be brought in one by one as tests are added.
 router.register(r"epilepsy12users", viewset=Epilepsy12UserViewSet)
 router.register(r"cases", viewset=CaseViewSet)
 router.register(r"registration", viewset=RegistrationViewSet)
@@ -51,14 +53,13 @@ router.register(r"keyword", viewset=KeywordViewSet)
 router.register(
     r"audit_progress", viewset=AuditProgressViewSet, basename="auditprogress"
 )
-router.register(
-    r"syndrome_entities", viewset=SyndromeEntityViewSet, basename="syndromeentity"
-)
+router.register(r"syndrome_entities", viewset=SyndromeViewSet, basename="syndromelist")
 router.register(
     r"comorbidity_entities",
     viewset=ComorbidityEntityViewSet,
     basename="comorbidityentity",
 )
+"""
 
 
 # Auth, login, password reset
@@ -77,12 +78,17 @@ user_patterns = [
         name="log_list",
     ),
     path(
-        "organisation/<int:organisation_id>/epilepsy12_user_list/",
+        "organisation/<int:organisation_id>/epilepsy12_user_list/<int:epilepsy12_user_id>",
         view=epilepsy12_user_list,
         name="epilepsy12_user_list",
     ),
     path(
-        "organisation/<int:organisation_id>/epilepsy12_users/<str:user_type>/create",
+        "organisation/<int:organisation_id>/full_e12user_list",
+        view=all_epilepsy12_users_list,
+        name="download_e12_users",
+    ),
+    path(
+        "organisation/<int:organisation_id>/epilepsy12_users/<int:epilepsy12_user_id>/<str:user_type>/create",
         # accepts params organisation-staff or rcpch-staff
         view=create_epilepsy12_user,
         name="create_epilepsy12_user",
@@ -308,6 +314,11 @@ organisation_patterns = [
         name="selected_trust_select_kpi",
     ),
     path(
+        "update_all_kpi_aggregation_models",
+        view=aggregate_and_update_all_kpi_agg_models,
+        name="aggregate_and_update_all_kpi_agg_models",
+    ),
+    path(
         "organisation/<int:organisation_id>/case_statistics",
         view=case_statistics,
         name="case_statistics",
@@ -527,9 +538,9 @@ multiaxial_diagnosis_patterns = [
         name="mental_health_issue_identified",
     ),
     path(
-        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issue",
-        mental_health_issue,
-        name="mental_health_issue",
+        "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/mental_health_issues",
+        mental_health_issues,
+        name="mental_health_issues",
     ),
     path(
         "multiaxial_diagnosis/<int:multiaxial_diagnosis_id>/autistic_spectrum_disorder",
@@ -922,14 +933,9 @@ registration_patterns = [
         name="confirm_eligible",
     ),
     path(
-        "case/<int:case_id>/registration_date",
-        registration_date,
-        name="registration_date",
-    ),
-    path(
-        "registration/<int:registration_id>/lead_site/<int:site_id>/edit",
-        edit_lead_site,
-        name="edit_lead_site",
+        "case/<int:case_id>/first_paediatric_assessment_date",
+        first_paediatric_assessment_date,
+        name="first_paediatric_assessment_date",
     ),
     path(
         "registration/<int:registration_id>/lead_site/<int:site_id>/transfer",
@@ -1029,14 +1035,15 @@ antiepilepsy_medicine_patterns = [
 
 urlpatterns = []
 
-drf_routes = [
-    # rest framework paths
-    path("api/v1/", include(router.urls)),
-    # returns a Token (OAuth2 key: Token) against email and password of existing user
-    path("api/v1/api-token-auth/", obtain_auth_token, name="api_token_auth"),
-    # returns the standard Django for authentication of the DRF
-    path("api/v1/api-auth/", include(urls, namespace="rest_framework")),
-]
+# This is related to the DRF
+# drf_routes = [
+#     # rest framework paths
+#     path("api/v1/", include(router.urls)),
+#     # returns a Token (OAuth2 key: Token) against email and password of existing user
+#     path("api/v1/api-token-auth/", obtain_auth_token, name="api_token_auth"),
+#     # returns the standard Django for authentication of the DRF
+#     path("api/v1/api-auth/", include(urls, namespace="rest_framework")),
+# ]
 
 
 urlpatterns += user_patterns
@@ -1058,5 +1065,5 @@ urlpatterns += comorbidities_patterns
 urlpatterns += registration_patterns
 urlpatterns += antiepilepsy_medicine_patterns
 
-urlpatterns += drf_routes
-
+# This is related to the DRF
+# urlpatterns += drf_routes

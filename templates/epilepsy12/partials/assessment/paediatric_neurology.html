@@ -34,8 +34,11 @@
                                     <i class="rcpch_pink check circle outline icon"></i>
                                      <label>Paediatric neurology centre actively involved in care</label>
                                     <div class="ui right action input">
-                                        
-                                        <input disabled value="{{active_neurology_site.organisation.OrganisationName}} ({{active_neurology_site.organisation.ParentOrganisation_OrganisationName}})">
+                                        {% if active_neurology_site.organisation.trust %}
+                                            <input disabled value="{{active_neurology_site.organisation.name}} ({{active_neurology_site.organisation.trust.name}})">
+                                        {% else %}
+                                            <input disabled value="{{active_neurology_site.organisation.name}} ({{active_neurology_site.organisation.local_health_board.name}})">
+                                        {% endif %}
 
                                         {% if not neurology_edit_active %}
 

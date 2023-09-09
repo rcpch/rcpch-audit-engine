@@ -27,8 +27,8 @@ users = [
 ]
 
 TEST_USER_ORGANISATION = Organisation.objects.get(
-    ODSCode="RP401",
-    ParentOrganisation_ODSCode="RP4",
+    ods_code="RP401",
+    trust__ods_code="RP4",
 )
 
 E12UserFactory(

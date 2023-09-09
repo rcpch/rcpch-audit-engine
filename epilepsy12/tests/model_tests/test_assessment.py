@@ -20,19 +20,19 @@ from epilepsy12.models import (
 - [x] Assessment.consultant_paediatrician_referral_date and Assessment.consultant_paediatrician_input_date are both None if Assessment.consultant_paediatrician_referral_made is False
 - [x] Assessment.consultant_paediatrician_referral_date and Assessment.consultant_paediatrician_input_date cannot be in the future
 - [x] Assessment.consultant_paediatrician_referral_date cannot be after Assessment.consultant_paediatrician_input_date
-- [x] Neither Assessment.consultant_paediatrician_referral_date nor Assessment.consultant_paediatrician_input_date can be before Registration.registration_date or Case.date_of_birth
+- [x] Neither Assessment.consultant_paediatrician_referral_date nor Assessment.consultant_paediatrician_input_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
 - [x] Assessment.paediatric_neurologist_input_date and Assessment.paediatric_neurologist_referral_date are both None if Assessment.paediatric_neurologist_referral_made is False
 - [x] Assessment.paediatric_neurologist_input_date and Assessment.paediatric_neurologist_referral_date cannot be in the future
 - [x] Assessment.paediatric_neurologist_input_date cannot be after Assessment.paediatric_neurologist_referral_date
-- [x] Neither Assessment.paediatric_neurologist_input_date nor Assessment.paediatric_neurologist_referral_date can be before Registration.registration_date or Case.date_of_birth
+- [x] Neither Assessment.paediatric_neurologist_input_date nor Assessment.paediatric_neurologist_referral_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
 - [x] Assessment.childrens_epilepsy_surgical_service_input_date and Assessment.childrens_epilepsy_surgical_service_referral_date are both None if Assessment.childrens_epilepsy_surgical_service_referral_made is False
 - [x] Assessment.childrens_epilepsy_surgical_service_input_date and Assessment.childrens_epilepsy_surgical_service_referral_date cannot be in the future
 - [x] Assessment.childrens_epilepsy_surgical_service_input_date cannot be after Assessment.childrens_epilepsy_surgical_service_referral_date
-- [x] Neither Assessment.childrens_epilepsy_surgical_service_input_date nor Assessment.childrens_epilepsy_surgical_service_referral_date can be before Registration.registration_date or Case.date_of_birth
+- [x] Neither Assessment.childrens_epilepsy_surgical_service_input_date nor Assessment.childrens_epilepsy_surgical_service_referral_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
 - [x] Assessment.epilepsy_specialist_nurse_input_date and Assessment.epilepsy_specialist_nurse_referral_date are both None if Assessment.epilepsy_specialist_nurse_referral_made is False
 - [x] Assessment.epilepsy_specialist_nurse_input_date and Assessment.epilepsy_specialist_nurse_referral_date cannot be in the future
 - [x] Assessment.epilepsy_specialist_nurse_input_date cannot be after Assessment.epilepsy_specialist_nurse_referral_date
-- [x] Neither Assessment.epilepsy_specialist_nurse_input_date nor Assessment.epilepsy_specialist_nurse_referral_date can be before Registration.registration_date or Case.date_of_birth
+- [x] Neither Assessment.epilepsy_specialist_nurse_input_date nor Assessment.epilepsy_specialist_nurse_referral_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
 """
 
 
@@ -152,51 +152,51 @@ def test_validation_consultant_paediatrician_input_date_cant_be_after_referral_d
 
 @pytest.mark.xfail
 @pytest.mark.django_db
-def test_validation_consultant_paediatrician_referral_date_nor_input_date_before_registration_date_or_dob(
+def test_validation_consultant_paediatrician_referral_date_nor_input_date_before_first_paediatric_assessment_date_or_dob(
     e12_case_factory,
 ):
     """
     Tests
-    - neither Assessment.consultant_paediatrician_referral_date nor Assessment.consultant_paediatrician_input_date can be before Registration.registration_date or Case.date_of_birth
-    - neither Assessment.paediatric_neurologist_referral_date nor Assessment.paediatric_neurologist_input_date can be before Registration.registration_date or Case.date_of_birth
-    - neither Assessment.childrens_epilepsy_surgical_service_referral_date nor Assessment.childrens_epilepsy_surgical_service_input_date can be before Registration.registration_date or Case.date_of_birth
-    - neither Assessment.epilepsy_specialist_nurse_referral_date nor Assessment.epilepsy_specialist_nurse_input_date can be before Registration.registration_date or Case.date_of_birth
+    - neither Assessment.consultant_paediatrician_referral_date nor Assessment.consultant_paediatrician_input_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
+    - neither Assessment.paediatric_neurologist_referral_date nor Assessment.paediatric_neurologist_input_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
+    - neither Assessment.childrens_epilepsy_surgical_service_referral_date nor Assessment.childrens_epilepsy_surgical_service_input_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
+    - neither Assessment.epilepsy_specialist_nurse_referral_date nor Assessment.epilepsy_specialist_nurse_input_date can be before Registration.first_paediatric_assessment_date or Case.date_of_birth
     """
 
     date_of_birth = date(2020, 1, 1)
-    registration_date = date(2022, 1, 1)
+    first_paediatric_assessment_date = date(2022, 1, 1)
     referral_date = date_of_birth - relativedelta(
         days=1
     )  # one day before date of birth
-    input_date = registration_date - relativedelta(
+    input_date = first_paediatric_assessment_date - relativedelta(
         days=1
     )  # one day before registration date
 
     with pytest.raises(ValidationError):
         assessment = e12_case_factory(
             date_of_birth=date_of_birth,
-            registration_date=registration_date,
+            first_paediatric_assessment_date=first_paediatric_assessment_date,
             registration__assessment__consultant_paediatrician_referral_date=referral_date,
             registration__assessment__consultant_paediatrician_input_date=input_date,
         ).registration.assessment
     with pytest.raises(ValidationError):
         assessment = e12_case_factory(
             date_of_birth=date_of_birth,
-            registration_date=registration_date,
+            first_paediatric_assessment_date=first_paediatric_assessment_date,
             registration__assessment__paediatric_neurologist_referral_date=referral_date,
             registration__assessment__paediatric_neurologist_input_date=input_date,
         ).registration.assessment
     with pytest.raises(ValidationError):
         assessment = e12_case_factory(
             date_of_birth=date_of_birth,
-            registration_date=registration_date,
+            first_paediatric_assessment_date=first_paediatric_assessment_date,
             registration__assessment__childrens_epilepsy_surgical_service_referral_date=referral_date,
             registration__assessment__childrens_epilepsy_surgical_service_input_date=input_date,
         ).registration.assessment
     with pytest.raises(ValidationError):
         assessment = e12_case_factory(
             date_of_birth=date_of_birth,
-            registration_date=registration_date,
+            first_paediatric_assessment_date=first_paediatric_assessment_date,
             registration__assessment__epilepsy_specialist_nurse_referral_date=referral_date,
             registration__assessment__epilepsy_specialist_nurse_input_date=input_date,
         ).registration.assessment

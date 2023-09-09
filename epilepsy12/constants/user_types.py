@@ -18,17 +18,17 @@ RCPCH_AUDIT_TEAM = 4
 RCPCH_AUDIT_PATIENT_FAMILY = 7
 
 ROLES = (
-    (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
-    (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
-    (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
+    (AUDIT_CENTRE_LEAD_CLINICIAN, "Lead Clinician"),
+    (AUDIT_CENTRE_CLINICIAN, "Clinician"),
+    (AUDIT_CENTRE_ADMINISTRATOR, "Administrator"),
     (RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),
     (RCPCH_AUDIT_PATIENT_FAMILY, "RCPCH Audit Children and Family"),
 )
 
 AUDIT_CENTRE_ROLES = (
-    (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
-    (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
-    (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
+    (AUDIT_CENTRE_LEAD_CLINICIAN, "Lead Clinician"),
+    (AUDIT_CENTRE_CLINICIAN, "Clinician"),
+    (AUDIT_CENTRE_ADMINISTRATOR, "Administrator"),
 )
 
 RCPCH_AUDIT_TEAM_ROLES = ((RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),)

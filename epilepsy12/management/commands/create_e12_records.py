@@ -22,10 +22,10 @@ from ...models import (
     Registration,
     KPI,
     Investigations,
-    SyndromeEntity,
-    EpilepsyCauseEntity,
-    ComorbidityEntity,
-    MedicineEntity,
+    SyndromeList,
+    EpilepsyCause,
+    ComorbidityList,
+    Medicine,
 )
 from ...constants import (
     OPT_OUT_UNCERTAIN,
@@ -99,7 +99,6 @@ def create_registrations(verbose=True):
             ).get()
             kpi = KPI.objects.create(
                 organisation=lead_organisation.organisation,
-                parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
                 paediatrician_with_expertise_in_epilepsies=0,
                 epilepsy_specialist_nurse=0,
                 tertiary_input=0,
@@ -187,9 +186,7 @@ def create_first_paediatric_assessment(registration_instance, verbose=True):
             first_paediatric_assessment_in_acute_or_nonacute_setting=choice(CHRONICITY)[
                 0
             ],
-            has_number_of_episodes_since_the_first_been_documented=bool(
-                getrandbits(1)
-            ),
+            has_number_of_episodes_since_the_first_been_documented=bool(getrandbits(1)),
             general_examination_performed=bool(getrandbits(1)),
             neurological_examination_performed=bool(getrandbits(1)),
             developmental_learning_or_schooling_problems=bool(getrandbits(1)),
@@ -257,12 +254,13 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
 
     if multiaxial_diagnosis.syndrome_present:
         # create a related syndrome
-        syndrome_entity = SyndromeEntity.objects.filter(
+        syndrome_entity = SyndromeList.objects.filter(
             syndrome_name=choice(SYNDROMES)[1]
         ).get()
         Syndrome.objects.create(
             syndrome_diagnosis_date=random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             ),
             syndrome=syndrome_entity,
             multiaxial_diagnosis=multiaxial_diagnosis,
@@ -271,7 +269,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
     if multiaxial_diagnosis.epilepsy_cause_known:
         ecl = "<< 363235000"
         epilepsy_causes = fetch_ecl(ecl)
-        random_cause = EpilepsyCauseEntity.objects.filter(
+        random_cause = EpilepsyCause.objects.filter(
             conceptId=epilepsy_causes[randint(0, len(epilepsy_causes) - 1)]["conceptId"]
         ).first()
 
@@ -283,7 +281,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         multiaxial_diagnosis.epilepsy_cause_categories = choices
 
     if multiaxial_diagnosis.mental_health_issue_identified:
-        multiaxial_diagnosis.mental_health_issue = choice(NEUROPSYCHIATRIC)[0]
+        multiaxial_diagnosis.mental_health_issues = [choice(NEUROPSYCHIATRIC)[0]]
 
     if multiaxial_diagnosis.relevant_impairments_behavioural_educational:
         # add upto 5 comorbidities
@@ -293,7 +291,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
             )
             random_comorbidities = choice(comorbidity_choices)
 
-            random_comorbidity = ComorbidityEntity.objects.filter(
+            random_comorbidity = ComorbidityList.objects.filter(
                 conceptId=random_comorbidities["conceptId"]
             ).first()
 
@@ -301,7 +299,7 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
                 Comorbidity.objects.create(
                     multiaxial_diagnosis=multiaxial_diagnosis,
                     comorbidity_diagnosis_date=random_date(
-                        start=registration_instance.registration_date,
+                        start=registration_instance.first_paediatric_assessment_date,
                         end=date.today(),
                     ),
                     comorbidityentity=random_comorbidity,
@@ -317,7 +315,8 @@ def create_multiaxial_diagnosis(registration_instance, verbose=True):
         episode = Episode.objects.create(
             multiaxial_diagnosis=multiaxial_diagnosis,
             seizure_onset_date=random_date(
-                start=registration_instance.registration_date - relativedelta(months=6),
+                start=registration_instance.first_paediatric_assessment_date
+                - relativedelta(months=6),
                 end=date.today(),
             ),
             seizure_onset_date_confidence=choice(DATE_ACCURACY)[0],
@@ -437,7 +436,8 @@ def create_assessment(registration_instance, verbose=True):
 
         if assessment.consultant_paediatrician_referral_made:
             assessment.consultant_paediatrician_referral_date = random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             )
             assessment.consultant_paediatrician_input_date = (
                 assessment.consultant_paediatrician_referral_date
@@ -466,7 +466,8 @@ def create_assessment(registration_instance, verbose=True):
 
         if assessment.paediatric_neurologist_referral_made:
             assessment.paediatric_neurologist_referral_date = random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             )
             assessment.paediatric_neurologist_input_date = (
                 assessment.paediatric_neurologist_referral_date
@@ -495,7 +496,8 @@ def create_assessment(registration_instance, verbose=True):
 
         if assessment.childrens_epilepsy_surgical_service_referral_made:
             assessment.childrens_epilepsy_surgical_service_referral_date = random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             )
             assessment.childrens_epilepsy_surgical_service_input_date = (
                 assessment.childrens_epilepsy_surgical_service_referral_date
@@ -524,7 +526,8 @@ def create_assessment(registration_instance, verbose=True):
 
         if assessment.epilepsy_specialist_nurse_referral_made:
             assessment.epilepsy_specialist_nurse_referral_date = random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             )
             assessment.epilepsy_specialist_nurse_input_date = (
                 assessment.epilepsy_specialist_nurse_referral_date
@@ -553,14 +556,16 @@ def create_investigations(registration_instance, verbose=True):
         )
         if investigations.eeg_indicated:
             investigations.eeg_request_date = random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             )
             investigations.eeg_performed_date = (
                 investigations.eeg_request_date + relativedelta(weeks=randint(1, 5))
             )
         if investigations.mri_indicated:
             investigations.mri_brain_requested_date = random_date(
-                start=registration_instance.registration_date, end=date.today()
+                start=registration_instance.first_paediatric_assessment_date,
+                end=date.today(),
             )
             investigations.mri_brain_reported_date = (
                 investigations.mri_brain_requested_date
@@ -590,13 +595,14 @@ def create_management(registration_instance, verbose=True):
             for count_item in range(0, randint(1, 3)):
                 # add a random number of medicines up to a total of 3
                 random_medicine = (
-                    MedicineEntity.objects.filter(is_rescue=False).order_by("?").first()
+                    Medicine.objects.filter(is_rescue=False).order_by("?").first()
                 )
                 antiepilepsy_medicine = AntiEpilepsyMedicine.objects.create(
                     management=management,
                     is_rescue_medicine=False,
                     antiepilepsy_medicine_start_date=random_date(
-                        start=registration_instance.registration_date, end=date.today()
+                        start=registration_instance.first_paediatric_assessment_date,
+                        end=date.today(),
                     ),
                     antiepilepsy_medicine_risk_discussed=bool(getrandbits(1)),
                     medicine_entity=random_medicine,
@@ -630,13 +636,14 @@ def create_management(registration_instance, verbose=True):
             for count_item in range(1, randint(2, 3)):
                 # add a random number of medicines up to a total of 3
                 random_medicine = (
-                    MedicineEntity.objects.filter(is_rescue=True).order_by("?").first()
+                    Medicine.objects.filter(is_rescue=True).order_by("?").first()
                 )
                 AntiEpilepsyMedicine.objects.create(
                     management=management,
                     is_rescue_medicine=True,
                     antiepilepsy_medicine_start_date=random_date(
-                        start=registration_instance.registration_date, end=date.today()
+                        start=registration_instance.first_paediatric_assessment_date,
+                        end=date.today(),
                     ),
                     antiepilepsy_medicine_risk_discussed=bool(getrandbits(1)),
                     medicine_entity=random_medicine,
@@ -648,7 +655,8 @@ def create_management(registration_instance, verbose=True):
 
     if management.individualised_care_plan_in_place:
         management.individualised_care_plan_date = random_date(
-            start=registration_instance.registration_date, end=date.today()
+            start=registration_instance.first_paediatric_assessment_date,
+            end=date.today(),
         )
         management.individualised_care_plan_has_parent_carer_child_agreement = bool(
             getrandbits(1)

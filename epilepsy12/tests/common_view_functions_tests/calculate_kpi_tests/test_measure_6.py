@@ -42,12 +42,12 @@ def test_measure_6_screen_mental_health(
     """
 
     DATE_OF_BIRTH = date(2018, 1, 1)
-    REGISTRATION_DATE = DATE_OF_BIRTH + age_fpa
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = DATE_OF_BIRTH + age_fpa
 
     # create case
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
     )
 
     multiaxial_diagnosis = MultiaxialDiagnosis.objects.get(
@@ -66,7 +66,9 @@ def test_measure_6_screen_mental_health(
     ).assessment_of_mental_health_issues
 
     # get age for AssertionError message
-    age = relativedelta(case.registration.registration_date, case.date_of_birth).years
+    age = relativedelta(
+        case.registration.first_paediatric_assessment_date, case.date_of_birth
+    ).years
 
     if expected_score == KPI_SCORE["PASS"]:
         assertion_message = (

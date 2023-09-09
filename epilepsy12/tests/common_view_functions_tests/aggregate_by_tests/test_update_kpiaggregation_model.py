@@ -10,20 +10,9 @@ from epilepsy12.common_view_functions import (
     update_kpi_aggregation_model,
     get_filtered_cases_queryset_for,
     get_abstraction_model_from_level,
-    get_abstraction_value_from,
 )
 from epilepsy12.models import (
     Organisation,
-    OrganisationKPIAggregation,
-    CountryKPIAggregation,
-    ONSCountryEntity,
-    OPENUKNetworkEntity,
-    NHSRegionKPIAggregation,
-    OpenUKKPIAggregation,
-    ICBKPIAggregation,
-    TrustKPIAggregation,
-    NHSRegionEntity,
-    IntegratedCareBoardEntity,
     NationalKPIAggregation,
 )
 from epilepsy12.constants import (
@@ -46,14 +35,19 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
             ["RGT01", "RQM01"],
         ),
         (
-            EnumAbstractionLevel.ICB,
-            ["QUE", "QRV"],
-            ["RGT01", "RYVD9", "RYJ03", "RQM01"],
+            EnumAbstractionLevel.LOCAL_HEALTH_BOARD,
+            ["W11000028", "W11000031"],
+            ["7A6AV", "7A6G9", "7A3LW", "7A3C7"],
         ),
         (
-            EnumAbstractionLevel.NHS_REGION,
-            ["Y61", "Y56"],
-            ["RGT01", "RAJ12", "RAL26", "R1K02"],
+            EnumAbstractionLevel.ICB,
+            ["E54000056", "E54000027"],
+            ["RGT01", "RGN90", "R1K02", "RQM01"],
+        ),
+        (
+            EnumAbstractionLevel.NHS_ENGLAND_REGION,
+            ["E40000007", "E40000003"],
+            ["RGT01", "RGN90", "R1K02", "RQM01"],
         ),
         (
             EnumAbstractionLevel.OPEN_UK,
@@ -68,7 +62,7 @@ from .helpers import _clean_cases_from_test_db, _register_kpi_scored_cases
         (
             EnumAbstractionLevel.NATIONAL,
             ["England", "Wales"],
-            ["RGT01", "7A6BJ"],
+            ["RGT01", "RCF22", "7A2AJ", "7A6BJ"],
         ),
     ],
 )
@@ -107,13 +101,16 @@ def test_update_kpi_aggregation_model_all_levels(
         ods_codes=ods_codes,
         num_cases=5
         if abstraction_level
-        not in [EnumAbstractionLevel.ORGANISATION, EnumAbstractionLevel.TRUST, EnumAbstractionLevel.NATIONAL]
+        not in [
+            EnumAbstractionLevel.ORGANISATION,
+            EnumAbstractionLevel.TRUST,
+        ]
         else 10,
     )
 
     # PERFORM AGGREGATIONS AND UPDATE AGGREGATION MODEL
     for code in ods_codes:
-        organisation = Organisation.objects.get(ODSCode=code)
+        organisation = Organisation.objects.get(ods_code=code)
 
         # Get filtered cases
         filtered_cases = get_filtered_cases_queryset_for(
@@ -138,9 +135,10 @@ def test_update_kpi_aggregation_model_all_levels(
 
     # ASSERTION
     if abstraction_level is EnumAbstractionLevel.NATIONAL:
-        
-        output = NationalKPIAggregation.objects.get(cohort=6).get_value_counts_for_kpis(kpis_tested)
-        
+        output = NationalKPIAggregation.objects.get(cohort=6).get_value_counts_for_kpis(
+            kpis_tested
+        )
+
         expected_scores = {
             "ecg_passed": 20,
             "ecg_total_eligible": 40,
@@ -151,11 +149,10 @@ def test_update_kpi_aggregation_model_all_levels(
             "mental_health_support_ineligible": 20,
             "mental_health_support_incomplete": 20,
         }
-        
+
         assert output == expected_scores
-    
+
     else:
-    
         abstraction_kpi_aggregation_model_name = get_abstraction_model_from_level(
             enum_abstraction_level=abstraction_level
         )["kpi_aggregation_model"]
@@ -171,26 +168,20 @@ def test_update_kpi_aggregation_model_all_levels(
         )
 
         for abstraction_relation_code in expected_scores:
-            
-            abstraction_relation_instance_key = abstraction_level.value.split('__')[-1]
+            abstraction_relation_instance_key = abstraction_level.value.split("__")[-1]
 
             abstraction_relation_instance = abstraction_entity_model.objects.filter(
                 **{abstraction_relation_instance_key: abstraction_relation_code}
             ).first()
 
-            # Trust is a char field so must deal with differently
-            if abstraction_level is EnumAbstractionLevel.TRUST:
-                kpi_aggregation_model_instance = abstraction_kpi_aggregation_model.objects.get(
-                    abstraction_relation=abstraction_relation_instance.ParentOrganisation_ODSCode
+            kpi_aggregation_model_instance = (
+                abstraction_kpi_aggregation_model.objects.get(
+                    abstraction_relation=abstraction_relation_instance
                 )
-            else:
-                kpi_aggregation_model_instance = (
-                    abstraction_kpi_aggregation_model.objects.get(
-                        abstraction_relation=abstraction_relation_instance
-                    )
-                )
+            )
 
-            output = kpi_aggregation_model_instance.get_value_counts_for_kpis(kpis_tested)
+            output = kpi_aggregation_model_instance.get_value_counts_for_kpis(
+                kpis_tested
+            )
 
             assert output == expected_scores[abstraction_relation_code]
-

@@ -90,7 +90,7 @@
         'relevant_impairments_behavioural_educational',                 toggle_button
         'mental_health_screen',                                         toggle_button
         'mental_health_issue_identified',                               toggle_button
-        'mental_health_issue',                                          single_choice_multiple_toggle_button
+        'mental_health_issues',                                         single_choice_multiple_toggle_button
         'global_developmental_delay_or_learning_difficulties',          toggle_button
         'global_developmental_delay_or_learning_difficulties_severity', single_choice_multiple_toggle_button
         'autistic_spectrum_disorder',                                   toggle_button
@@ -103,11 +103,11 @@
     [x] Assert user can change 'epilepsy_cause_categories' to array of EPILEPSY_CAUSES[2][0]=='Inf' and EPILEPSY_CAUSES[3][0]=='Met' and EPILEPSY_CAUSES[4][0]=='Str'
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to True
     [x] Assert user can change 'relevant_impairments_behavioural_educational' to False
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
-    [x] Assert user can change 'mental_health_issue' to NEUROPSYCHIATRIC[0][0]=='Oth' ('Other')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='AxD' ('Anxiety disorder')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='EmB' ('Emotional/ behavioural')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='MoD' ('Mood disorder')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='SHm' ('Self harm')
+    [x] Assert user can change 'mental_health_issues' to NEUROPSYCHIATRIC[0][0]=='Oth' ('Other')
     [x] Assert user can change 'mental_health_screen' to True
     [x] Assert user can change 'mental_health_screen' to False
     [x] Assert user can change 'mental_health_issue_identified' to True
@@ -184,7 +184,7 @@
 
     
     [] Assert user cannot change 'seizure_onset_date' to before Case.date_of_birth (raise ValidationError)
-    [] Assert user cannot change 'seizure_onset_date' to before Registration.registration_date (raise ValidationError)
+    [] Assert user cannot change 'seizure_onset_date' to before Registration.first_paediatric_assessment_date (raise ValidationError)
     [] Assert user cannot change 'seizure_onset_date' to future date (raise ValidationError)
     
 
@@ -396,14 +396,14 @@ from epilepsy12.models import (
     Case,
     Episode,
     Keyword,
-    EpilepsyCauseEntity,
+    EpilepsyCause,
     MultiaxialDiagnosis,
-    ComorbidityEntity,
     Comorbidity,
-    MedicineEntity,
+    ComorbidityList,
+    Medicine,
     AntiEpilepsyMedicine,
+    SyndromeList,
     Syndrome,
-    SyndromeEntity,
 )
 
 from epilepsy12.constants import (
@@ -420,6 +420,15 @@ from epilepsy12.constants import (
     EPISODE_DEFINITION,
     NON_EPILEPSY_SEIZURE_ONSET,
     NON_EPILEPSY_SEIZURE_TYPE,
+)
+
+MULTIPLE_CHOICE_MULTIPLE_TOGGLES = (
+    {
+        "field_name": "mental_health_issues",
+        "choices": NEUROPSYCHIATRIC,
+        "param": "multiaxial_diagnosis_id",
+        "model": "multiaxialdiagnosis",
+    },
 )
 
 
@@ -465,12 +474,6 @@ SINGLE_CHOICE_MULTIPLE_TOGGLES = (
         "choices": OPT_OUT_UNCERTAIN,
         "param": "epilepsy_context_id",
         "model": "epilepsycontext",
-    },
-    {
-        "field_name": "mental_health_issue",
-        "choices": NEUROPSYCHIATRIC,
-        "param": "multiaxial_diagnosis_id",
-        "model": "multiaxialdiagnosis",
     },
     {
         "field_name": "global_developmental_delay_or_learning_difficulties_severity",
@@ -756,12 +759,12 @@ def test_user_updates_single_choice_multiple_toggle_success(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -803,12 +806,12 @@ def test_user_updates_single_choice_multiple_toggle_fail(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -848,11 +851,11 @@ def test_user_updates_toggles_true_success(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -892,12 +895,12 @@ def test_user_updates_toggles_false_success(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -936,12 +939,12 @@ def test_user_updates_toggles_true_fail(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -980,12 +983,12 @@ def test_user_updates_toggles_false_fail(client):
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -1027,12 +1030,12 @@ def test_user_updates_select_success(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -1068,9 +1071,7 @@ def test_user_updates_select_success(
                 validate_select(
                     field_name=url.get("field_name"),
                     model_instance=updated_model,
-                    expected_result=EpilepsyCauseEntity.objects.get(
-                        pk=134
-                    ),  # Aicardi's sy.
+                    expected_result=Comorbidity.objects.get(pk=134),  # Aicardi's sy.
                     assert_pass=True,
                 )
         else:
@@ -1081,19 +1082,17 @@ def test_user_updates_select_success(
 
             if url.get("field_name") == "epilepsy_cause":
                 data = {"epilepsy_cause": 134}
-                expected_result = EpilepsyCauseEntity.objects.get(
-                    pk=134
-                )  # Aicardi's sy
+                expected_result = EpilepsyCause.objects.get(pk=134)  # Aicardi's sy
                 htmx_trigger = "epilepsy_cause"
             elif url.get("field_name") == "comorbidity":
                 data = {"comorbidityentity": 134}
-                expected_result = ComorbidityEntity.objects.get(
+                expected_result = ComorbidityList.objects.get(
                     pk=34
                 )  # specific learning difficulty
                 htmx_trigger = "comorbidityentity"
             elif url.get("field_name") == "syndrome_name":
                 data = {"syndrome": 35}
-                expected_result = SyndromeEntity.objects.get(
+                expected_result = SyndromeList.objects.get(
                     pk=35
                 )  # Self-limited (familial) neonatal epilepsy
                 htmx_trigger = "syndrome"
@@ -1126,12 +1125,12 @@ def test_user_updates_select_fail(
     """
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
 
@@ -1167,7 +1166,7 @@ def test_user_updates_select_fail(
                 validate_select(
                     field_name=url.get("field_name"),
                     model_instance=updated_model,
-                    expected_result=EpilepsyCauseEntity.objects.get(
+                    expected_result=ComorbidityList.objects.get(
                         pk=135
                     ),  # Dysmorphic sialidosis with renal involvement
                     assert_pass=False,
@@ -1180,19 +1179,19 @@ def test_user_updates_select_fail(
 
             if url.get("field_name") == "epilepsy_cause":
                 data = {"epilepsy_cause": 134}  # Aicardi's sy.
-                expected_result = EpilepsyCauseEntity.objects.get(
+                expected_result = EpilepsyCause.objects.get(
                     pk=135
                 )  # Dysmorphic sialidosis with renal involvement
                 htmx_trigger = "epilepsy_cause"
             elif url.get("field_name") == "comorbidity_diagnosis":
                 data = {"comorbidityentity": 134}
-                expected_result = ComorbidityEntity.objects.get(
+                expected_result = ComorbidityList.objects.get(
                     pk=35
                 )  # Meets criteria for referral to Children's Epilepsy Surgery Service
                 htmx_trigger = "comorbidityentity"
             elif url.get("field_name") == "syndrome_name":
                 data = {"syndrome": 35}
-                expected_result = SyndromeEntity.objects.get(
+                expected_result = SyndromeList.objects.get(
                     pk=34
                 )  # Self-limited (familial) neonatal epilepsy
                 htmx_trigger = "syndrome"
@@ -1217,24 +1216,24 @@ def test_user_updates_select_fail(
 
 
 @pytest.mark.django_db
-def test_age_at_registration_cannot_be_gt_24yo(
-    client, GOSH
-):
+def test_age_at_registration_cannot_be_gt_24yo(client, GOSH):
     """
     Assert date of first paediatric assessment cannot be after 24th birthday
     """
-    
-    REGISTRATION_DATE = date(2023,1,1)
-    DATE_OF_BIRTH = REGISTRATION_DATE - relativedelta.relativedelta(years=24)
-    
+
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
+    DATE_OF_BIRTH = FIRST_PAEDIATRIC_ASSESSMENT_DATE - relativedelta.relativedelta(
+        years=24
+    )
+
     # GOSH
     TEST_USER_ORGANISATION = GOSH
 
     CASE_FROM_TEST_USER_ORGANISATION = E12CaseFactory.create(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date = None,
+        registration__first_paediatric_assessment_date=None,
     )
 
     test_user = Epilepsy12User.objects.get(
@@ -1243,23 +1242,25 @@ def test_age_at_registration_cannot_be_gt_24yo(
 
     client.force_login(test_user)
 
-
     response = client.post(
-            reverse(
-                "registration_date",
-                kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
-            ),
-            headers={"Hx-Trigger-Name": "registration_date", "Hx-Request": "true"},
-            data={"registration_date": REGISTRATION_DATE},
-        )
-    
-    err_msg = response.context['error_message']
-    
-    assert isinstance(err_msg,ValueError)
-    assert str(err_msg) == 'To be included in Epilepsy12, child_GREAT ORMOND STREET HOSPITAL CENTRAL LONDON SITE Anderson cannot be over 24y at first paediatric assessment.'
+        reverse(
+            "first_paediatric_assessment_date",
+            kwargs={"case_id": CASE_FROM_TEST_USER_ORGANISATION.id},
+        ),
+        headers={
+            "Hx-Trigger-Name": "first_paediatric_assessment_date",
+            "Hx-Request": "true",
+        },
+        data={"first_paediatric_assessment_date": FIRST_PAEDIATRIC_ASSESSMENT_DATE},
+    )
 
-    
-    
+    err_msg = response.context["error_message"]
+
+    assert isinstance(err_msg, ValueError)
+    assert (
+        str(err_msg)
+        == "To be included in Epilepsy12, child_GREAT ORMOND STREET HOSPITAL CENTRAL LONDON SITE Anderson cannot be over 24y at first paediatric assessment."
+    )
 
 
 # Test helper methods - there is one for each page_element
@@ -1288,8 +1289,8 @@ def validate_date_assertions(
             date_to_test >= case.date_of_birth
         ), f"{field_name} - {date_to_test} is not before {case}'s date of birth - Expected PASS"
         assert (
-            date_to_test >= case.registration.registration_date
-        ), f"{date_to_test} is not before {case}'s first paediatric assessment date ({case.registration.registration_date}) - Expected PASS"
+            date_to_test >= case.registration.first_paediatric_assessment_date
+        ), f"{date_to_test} is not before {case}'s first paediatric assessment date ({case.registration.first_paediatric_assessment_date}) - Expected PASS"
     else:
         assert (
             date_to_test > date.today()
@@ -1298,8 +1299,8 @@ def validate_date_assertions(
             date_to_test < case.date_of_birth
         ), f"{field_name} - {date_to_test} is before {case}'s date of birth - Expected FAIL"
         assert (
-            date_to_test < case.registration.registration_date
-        ), f"{field_name} - {date_to_test} is before {case}'s first paediatric assessment date ({case.registration.registration_date}) - Expected FAIL"
+            date_to_test < case.registration.first_paediatric_assessment_date
+        ), f"{field_name} - {date_to_test} is before {case}'s first paediatric assessment date ({case.registration.first_paediatric_assessment_date}) - Expected FAIL"
 
     if second_date is not None:
         if assert_pass:
@@ -1388,7 +1389,7 @@ def get_model_from_model(case, model_name):
     elif model_name == "comorbidity":
         comorbidity, created = Comorbidity.objects.get_or_create(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
-            comorbidityentity=ComorbidityEntity.objects.get(
+            comorbidityentity=ComorbidityList.objects.get(
                 pk=34
             ),  # specific learning difficulty
         )
@@ -1396,20 +1397,18 @@ def get_model_from_model(case, model_name):
     elif model_name == "syndrome":
         syndrome, created = Syndrome.objects.get_or_create(
             multiaxial_diagnosis=case.registration.multiaxialdiagnosis,
-            syndrome=SyndromeEntity.objects.get(
+            syndrome=SyndromeList.objects.get(
                 pk=35
             ),  # Self-limited (familial) neonatal epilepsy
         )
         return syndrome
     elif model_name == "epilepsycauseentity":
-        return EpilepsyCauseEntity.objects.get(pk=135)  # Aicardi's syndrome
+        return Comorbidity.objects.get(pk=135)  # Aicardi's syndrome
     elif model_name == "antiepilepsymedicine":
         return AntiEpilepsyMedicine.objects.create(
             management=case.registration.management,
             is_rescue_medicine=False,
-            medicine_entity=MedicineEntity.objects.get(
-                medicine_name="Sodium valproate"
-            ),
+            medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
         )
     elif model_name == "multiaxialdiagnosis":
         return MultiaxialDiagnosis.objects.get(

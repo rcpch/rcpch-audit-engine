@@ -12,11 +12,30 @@ will be persisted and run as a cron job once a day.
             <div class='ui header'>
                 <div class='content kpi_header'>
                     <p>Real-time Key Performance Indicator (KPI) Metrics</p>
-                    <!-- <div class="sub header"> -->
-                    <p>{{organisation.OrganisationName}} ({{ organisation.ParentOrganisation_OrganisationName }})</p>
-                    <!-- </div>     -->
+                    
+                    
+                    <p>{{organisation.name}} 
+                        (
+                            {% if organisation.trust %}
+                                {{ organisation.trust.name }}
+                            {% else %}
+                                {{ organisation.local_health_board }}
+                            {% endif %}
+                        )
+                    </p>
+                    
                 </div>
                 {% if not open_access %}
+                    {% if user.is_superuser %}
+                        <button 
+                            class='ui right floated rcpch_primary button'
+                            hx-get="{% url 'aggregate_and_update_all_kpi_agg_models' %}" 
+                            hx-trigger="click"
+                            >
+                            Aggregate & Update
+                            <i class="htmx-indicator spinner loading icon"></i>
+                        </button>
+                    {% endif %}
                 <button 
                     class='ui right floated rcpch_primary button'
                     hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 
@@ -34,91 +53,7 @@ will be persisted and run as a cron job once a day.
 
                 <h3>Clinical Team</h3>
                 <table class='ui rcpch stackable small table kpi_table'>
-                    <thead>
-                        <tr>
-                            <th class='three wide'>Indicator</th>
-                            <th class='right aligned '>
-                                
-                                
-                                    <p>Organisation</p>
-                                    <p><i
-                                        class="info circle icon"
-                                        id='totals_organisation'
-                                        data-title='Epilepsy12 totals'
-                                        data-content="Number of children registered in this organisation ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.OrganisationName}})"
-                                        data-position='top right'
-                                        _="init js $('#totals_organisation').popup(); end"
-                                    ></i>({{all_data.ORGANISATION_KPIS.total_cases_registered}})</p>
-                                
-                            </th>
-                            <th class='right aligned'>
-                                <p>Health Board/Trust</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_trust'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Trust ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.ParentOrganisation_OrganisationName}})"
-                                    data-position='top right'
-                                    _="init js $('#totals_trust').popup(); end"
-                                ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
-                            </th>
-                            <th class='right aligned'>
-                                <p>Integrated Care Board</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_icb'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this Integrated Care Board ({% formatlabel all_data.ICB_KPIS.aggregation_model.abstraction_relation.ICB_Name %})"
-                                    data-position='top right'
-                                    _="init js $('#totals_icb').popup(); end"
-                                ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
-                            </th>
-                            <th class='right aligned'>
-                                <p>NHS Region</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_nhs'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this NHS Region ({{all_data.NHS_REGION_KPIS.aggregation_model.abstraction_relation.NHS_Region}})" 
-                                    data-position='top right'
-                                    _="init js $('#totals_nhs').popup(); end"
-                                ></i>({{all_data.NHS_REGION_KPIS.total_cases_registered}})</p>
-                            </th>
-                            <th class='right aligned'>
-                                <p>OPEN UK Region</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_open_uk'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this OPEN UK Region ({{all_data.OPEN_UK_KPIS.aggregation_model.abstraction_relation.OPEN_UK_Network_Name}})"
-                                    data-position='top right'
-                                    _="init js $('#totals_open_uk').popup(); end"
-                                ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
-                            </th>
-                            <th class='right aligned'>
-                                <p>{{all_data.COUNTRY_KPIS.aggregation_model.abstraction_relation.Country_ONS_Name}}</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_country'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered in this country."
-                                    data-position='top right'
-                                    _="init js $('#totals_country').popup(); end"
-                                ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
-                            </th>
-                            <th class='right aligned'>
-                                <p>National</p>
-                                <p><i 
-                                    class="info circle icon"
-                                    id='totals_national'
-                                    data-title='Epilepsy12 totals'
-                                    data-content="Number of children registered nationally."
-                                    data-position='top right'
-                                    _="init js $('#totals_national').popup(); end"
-                                ></i>({{all_data.NATIONAL_KPIS.total_cases_registered}})</p>
-                            </th>
-                        </tr>
-                    </thead>
+                    {% include './kpi_table_head.html' with kpi_head_id=1 %}
                     <tbody>
                     {% comment %} 
                     [
@@ -142,6 +77,8 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
+
                                 
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
@@ -176,6 +113,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                     {% endfor %}
@@ -198,6 +136,7 @@ will be persisted and run as a cron job once a day.
                         
                         </td>
                         {% for abstraction, data in all_data.items %}
+                        {% if data.aggregation_model %}
                             {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                 <td class='right aligned'>
                                     {% if kpi_data == -1 %}
@@ -230,6 +169,7 @@ will be persisted and run as a cron job once a day.
                                         </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         {% endwith %} 
                     </tr>
@@ -251,6 +191,7 @@ will be persisted and run as a cron job once a day.
                             </div>
                         </td>
                         {% for abstraction, data in all_data.items %}
+                        {% if data.aggregation_model %}
                             <td class='right aligned'>
                                 {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                 {% if kpi_data == -1 %}
@@ -283,6 +224,7 @@ will be persisted and run as a cron job once a day.
                                 </span>
                                 {% endif %}
                             </td>
+                        {% endif %}
                         {% endfor %}
                     </tr>
                     {% endfor %}
@@ -292,18 +234,7 @@ will be persisted and run as a cron job once a day.
                 <h3>Investigations</h3>
                 {% comment %} [ECG, MRI,] {% endcomment %}
                 <table class='ui rcpch small table'>
-                    <thead>
-                        <tr>
-                            <th class='three wide'>Indicator</th>
-                            <th class='right aligned'>Organisation</th>
-                            <th class='right aligned'>Trust</th>
-                            <th class='right aligned'>Integrated Care Board</th>
-                            <th class='right aligned'>NHS Region</th>
-                            <th class='right aligned'>OPEN UK Region</th>
-                            <th class='right aligned'>Country</th>
-                            <th class='right aligned'>National</th>
-                        </tr>
-                    </thead>
+                    {% include './kpi_table_head.html' with kpi_head_id=2  %}
                     <tbody>
                     
                     {% for kpi_name in kpi_names_list|slice:"4:6" %}
@@ -322,6 +253,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -354,6 +286,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                     {% endfor %}
@@ -363,18 +296,7 @@ will be persisted and run as a cron job once a day.
                 <h3>Mental Health</h3>
                 {% comment %} ['assessment_of_mental_health_issues', 'mental_health_support'] {% endcomment %}
                 <table class='ui rcpch small table'>
-                    <thead>
-                        <tr>
-                            <th class='three wide'>Indicator</th>
-                            <th class='right aligned'>Organisation</th>
-                            <th class='right aligned'>Trust</th>
-                            <th class='right aligned'>Integrated Care Board</th>
-                            <th class='right aligned'>NHS Region</th>
-                            <th class='right aligned'>OPEN UK Region</th>
-                            <th class='right aligned'>Country</th>
-                            <th class='right aligned'>National</th>
-                        </tr>
-                    </thead>
+                    {% include './kpi_table_head.html' with kpi_head_id=3  %}
                     <tbody>
                     
                     {% for kpi_name in kpi_names_list|slice:"6:8" %}
@@ -393,6 +315,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -425,6 +348,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                     {% endfor %}
@@ -434,18 +358,7 @@ will be persisted and run as a cron job once a day.
                 <h3>Medication</h3>
                 {% comment %} [Sodium valproate] {% endcomment %}
                 <table class='ui rcpch small table'>
-                    <thead>
-                        <tr>
-                            <th class='three wide'>Indicator</th>
-                            <th class='right aligned'>Organisation</th>
-                            <th class='right aligned'>Trust</th>
-                            <th class='right aligned'>Integrated Care Board</th>
-                            <th class='right aligned'>NHS Region</th>
-                            <th class='right aligned'>OPEN UK Region</th>
-                            <th class='right aligned'>Country</th>
-                            <th class='right aligned'>National</th>
-                        </tr>
-                    </thead>
+                    {% include './kpi_table_head.html' with kpi_head_id=4  %}
                     <tbody>
                     {% comment %}  {% endcomment %}
                     {% for kpi_name in kpi_names_list|slice:"8:9" %}
@@ -464,6 +377,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -496,6 +410,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                     {% endfor %}
@@ -505,18 +420,7 @@ will be persisted and run as a cron job once a day.
                 <h3>Care Planning</h3>
                 {% comment %} ['comprehensive_care_planning_agreement', 'patient_held_individualised_epilepsy_document', 'patient_carer_parent_agreement_to_the_care_planning', 'care_planning_has_been_updated_when_necessary', 'comprehensive_care_planning_content', 'parental_prolonged_seizures_care_plan', 'water_safety', 'first_aid', 'general_participation_and_risk', 'sudep', 'service_contact_details', 'school_individual_healthcare_plan'] {% endcomment %}
                 <table class='ui rcpch small table'>
-                    <thead>
-                        <tr>
-                            <th class='three wide'>Indicator</th>
-                            <th class='right aligned'>Organisation</th>
-                            <th class='right aligned'>Health Board/Trust</th>
-                            <th class='right aligned'>Integrated Care Board</th>
-                            <th class='right aligned'>NHS Region</th>
-                            <th class='right aligned'>OPEN UK Region</th>
-                            <th class='right aligned'>Country</th>
-                            <th class='right aligned'>National</th>
-                        </tr>
-                    </thead>
+                    {% include './kpi_table_head.html' with kpi_head_id=5 %}
                     <tbody>
                         {% comment %} comprehensive_care_planning_agreement {% endcomment %}
                         <tr class="subcategory-header"> 
@@ -536,6 +440,7 @@ will be persisted and run as a cron job once a day.
                             
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     <td class='right aligned'>
                                         {% if kpi_data == -1 %}
@@ -568,6 +473,7 @@ will be persisted and run as a cron job once a day.
                                             </span>
                                         {% endif %}
                                     </td>
+                                {% endif %}
                                 {% endfor %}
                             {% endwith %} 
                         </tr>
@@ -589,6 +495,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -621,6 +528,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -643,6 +551,7 @@ will be persisted and run as a cron job once a day.
                             
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     <td class='right aligned'>
                                         {% if kpi_data == -1 %}
@@ -675,6 +584,7 @@ will be persisted and run as a cron job once a day.
                                             </span>
                                         {% endif %}
                                     </td>
+                                {% endif %}
                                 {% endfor %}
                             {% endwith %} 
                         </tr>
@@ -696,6 +606,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -728,6 +639,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -749,6 +661,7 @@ will be persisted and run as a cron job once a day.
                                 </div>
                             </td>
                             {% for abstraction, data in all_data.items %}
+                            {% if data.aggregation_model %}
                                 <td class='right aligned'>
                                     {% get_pct_passed_and_total_eligible data.aggregation_model kpi_name as kpi_data %}
                                     {% if kpi_data == -1 %}
@@ -781,6 +694,7 @@ will be persisted and run as a cron job once a day.
                                     </span>
                                     {% endif %}
                                 </td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -790,7 +704,7 @@ will be persisted and run as a cron job once a day.
 
         <div class="ui bottom attached rcpch_footer info icon message">
             <i class="info circle icon"></i>
-            These are key indicators for your Health Board/Trust, compared to the percentages for your relevant ICB, NHS England Region, OPEN UK Region, Country and England and Wales combined.       
+            These are key indicators for your Organisation, alongside aggregate higher-level data related to your Organisation.       
         </div>
         
     

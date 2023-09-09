@@ -7,7 +7,7 @@
 # from .first_paediatric_assessment_serializer import FirstPaediatricAssessmentSerializer
 # from .registration_serializer import RegistrationSerializer
 # from .syndrome_serializer import SyndromeSerializer
-# from .syndrome_entity_serializer import SyndromeEntitySerializer
+# from .syndrome_entity_serializer import SyndromeSerializer
 # from .multiaxial_diagnosis_serializer import MultiaxialDiagnosisSerializer
 # from .comorbidity_serializer import ComorbiditySerializer
 # from .investigations_serializer import InvestigationsSerializer

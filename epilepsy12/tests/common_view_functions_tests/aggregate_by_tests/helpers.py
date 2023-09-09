@@ -23,23 +23,25 @@ def _register_cases_in_organisation(
 ) -> list:
     for code in ods_codes:
         # Community Paediatrics Org returning with the actual org so need to do filter.first()
-        org = Organisation.objects.filter(ODSCode=code).first()
+        org = Organisation.objects.filter(ods_code=code).first()
 
         e12_case_factory.create_batch(
             n_cases,
             organisations__organisation=org,
-            first_name=f"temp_{org.OrganisationName}",
+            first_name=f"temp_{org.name}",
         )
 
 
-def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]",num_cases:int=10):
+def _register_kpi_scored_cases(
+    e12_case_factory, ods_codes: "list[str]", num_cases: int = 10
+):
     """Helper function to return a queryset of num_cases kids with scored, known KPI scores.
-    
+
     Let metric = kpis 4 + 7:
-        For each ODSCode, num_cases will PASS metric, num_cases will FAIL metric, num_cases will be INELIGBLE for metric, num_cases will be INCOMPLETE
+        For each ods_code, num_cases will PASS metric, num_cases will FAIL metric, num_cases will be INELIGBLE for metric, num_cases will be INCOMPLETE
     """
     ORGANISATIONS = Organisation.objects.filter(
-        ODSCode__in=ods_codes,
+        ods_code__in=ods_codes,
     )
 
     # create answersets for cases to achieve the stated expected output
@@ -80,7 +82,6 @@ def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]",num_case
     filled_case_objects = []
     # iterate through answersets (pass, fail, ineligble, incomplete) for kpi, create 10 Cases per answerset
     for organisation in ORGANISATIONS:
-        
         for answer_set in [
             pass_answers,
             fail_answers,
@@ -90,11 +91,10 @@ def _register_kpi_scored_cases(e12_case_factory, ods_codes: "list[str]",num_case
             test_cases = e12_case_factory.create_batch(
                 num_cases,
                 organisations__organisation=organisation,
-                first_name=f"temp_{organisation.OrganisationName}",
+                first_name=f"temp_{organisation.name}",
                 **answer_set,
             )
             filled_case_objects += test_cases
-            
 
     for test_case in filled_case_objects:
         calculate_kpis(registration_instance=test_case.registration)

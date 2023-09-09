@@ -19,18 +19,18 @@ def seed_cases_fixture(django_db_setup, django_db_blocker):
         # prevent repeat seed
         if not Case.objects.all().exists():
             GOSH = Organisation.objects.get(
-                ODSCode="RP401",
-                ParentOrganisation_ODSCode="RP4",
+                ods_code="RP401",
+                trust__ods_code="RP4",
             )
 
             ADDENBROOKES = Organisation.objects.get(
-                ODSCode="RGT01",
-                ParentOrganisation_ODSCode="RGT",
+                ods_code="RGT01",
+                trust__ods_code="RGT",
             )
 
             for organisation in [GOSH, ADDENBROOKES]:
                 E12CaseFactory(
-                    first_name=f"child_{organisation.OrganisationName}",
+                    first_name=f"child_{organisation.name}",
                     organisations__organisation=organisation,
                 )
         else:

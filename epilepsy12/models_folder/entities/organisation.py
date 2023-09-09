@@ -17,48 +17,68 @@ class Organisation(models.Model):
     It represents a list of organisations that can be looked up
     """
 
-    ODSCode = CharField(max_length=100, null=True, blank=True, default=None)
-    OrganisationName = CharField(max_length=100, null=True, blank=True, default=None)
-    Website = CharField(max_length=100, null=True, blank=True, default=None)
-    Address1 = CharField(max_length=100, null=True, blank=True, default=None)
-    Address2 = CharField(max_length=100, null=True, blank=True, default=None)
-    Address3 = CharField(max_length=100, null=True, blank=True, default=None)
-    City = CharField(max_length=100, null=True, blank=True, default=None)
-    County = CharField(max_length=100, null=True, blank=True, default=None)
-    Latitude = FloatField(max_length=100, null=True, blank=True, default=None)
-    Longitude = FloatField(null=True, blank=True, default=None)
-    Postcode = CharField(max_length=10, null=True, blank=True, default=None)
-    Geocode_Coordinates = PointField(null=True, blank=True, default=None, srid=27700)
-    ParentOrganisation_ODSCode = CharField(
-        max_length=100, null=True, blank=True, default=None
-    )
-    ParentOrganisation_OrganisationName = CharField(
-        max_length=100, null=True, blank=True, default=None
-    )
-    LastUpdatedDate = DateTimeField(max_length=100, null=True, blank=True, default=None)
+    ods_code = CharField(max_length=100, null=True, blank=True, default=None)
+    name = CharField(max_length=100, null=True, blank=True, default=None)
+    website = CharField(max_length=100, null=True, blank=True, default=None)
+    address1 = CharField(max_length=100, null=True, blank=True, default=None)
+    address2 = CharField(max_length=100, null=True, blank=True, default=None)
+    address3 = CharField(max_length=100, null=True, blank=True, default=None)
+    city = CharField(max_length=100, null=True, blank=True, default=None)
+    county = CharField(max_length=100, null=True, blank=True, default=None)
+    latitude = FloatField(max_length=100, null=True, blank=True, default=None)
+    longitude = FloatField(null=True, blank=True, default=None)
+    postcode = CharField(max_length=10, null=True, blank=True, default=None)
+    geocode_coordinates = PointField(null=True, blank=True, default=None, srid=27700)
 
-    history = HistoricalRecords()
-
-    # relationships
-
-    nhs_region = models.ForeignKey(
-        "epilepsy12.NHSRegionEntity", on_delete=models.PROTECT
-    )
-
-    integrated_care_board = models.ForeignKey(
-        "epilepsy12.IntegratedCareBoardEntity",
+    trust = models.ForeignKey(
+        to="epilepsy12.Trust",
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
+        default=None,
+    )
+    local_health_board = models.ForeignKey(
+        to="epilepsy12.LocalHealthBoard",
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
     )
-
+    integrated_care_board = models.ForeignKey(
+        to="epilepsy12.IntegratedCareBoard",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    nhs_england_region = models.ForeignKey(
+        to="epilepsy12.NHSEnglandRegion",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
     openuk_network = models.ForeignKey(
-        "epilepsy12.OPENUKNetworkEntity", on_delete=models.PROTECT
+        to="epilepsy12.OPENUKNetwork",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    # administrative regions
+    london_borough = models.ForeignKey(
+        to="epilepsy12.LondonBorough",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
     )
 
-    ons_region = models.ForeignKey(
-        "epilepsy12.ONSRegionEntity", on_delete=models.PROTECT
+    country = models.ForeignKey(
+        to="epilepsy12.Country", on_delete=models.PROTECT, null=True, blank=True
     )
+
+    history = HistoricalRecords()
 
     @property
     def _history_user(self):
@@ -69,10 +89,10 @@ class Organisation(models.Model):
         self.updated_by = value
 
     class Meta:
-        indexes = [models.Index(fields=["OrganisationName"])]
+        indexes = [models.Index(fields=["name"])]
         verbose_name = "Organisation"
         verbose_name_plural = "Organisations"
-        ordering = ("OrganisationName",)
+        ordering = ("name",)
 
     def __str__(self) -> str:
-        return self.OrganisationName
+        return self.name

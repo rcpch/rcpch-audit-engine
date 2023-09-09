@@ -1,7 +1,7 @@
 from operator import itemgetter
 from django.contrib.auth.decorators import login_required, permission_required
 
-from ..models import Syndrome, SyndromeEntity
+from ..models import Syndrome, SyndromeList
 from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
@@ -26,7 +26,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
             model_id=syndrome_id,
             field_name="syndrome_diagnosis_date",
             page_element="date_field",
-            earliest_allowable_date=syndrome.multiaxial_diagnosis.registration.registration_date,
+            earliest_allowable_date=syndrome.multiaxial_diagnosis.registration.first_paediatric_assessment_date,
         )
     except ValueError as error:
         error_message = error
@@ -40,7 +40,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
         .exclude(pk=syndrome_id)
         .values_list("syndrome", flat=True)
     )
-    syndrome_selection = SyndromeEntity.objects.exclude(
+    syndrome_selection = SyndromeList.objects.exclude(
         pk__in=all_selected_syndromes
     ).order_by("syndrome_name")
 
@@ -89,7 +89,7 @@ def syndrome_name(request, syndrome_id):
         .exclude(pk=syndrome_id)
         .values_list("syndrome", flat=True)
     )
-    syndrome_selection = SyndromeEntity.objects.exclude(
+    syndrome_selection = SyndromeList.objects.exclude(
         pk__in=all_selected_syndromes
     ).order_by("syndrome_name")
 

@@ -5,14 +5,14 @@
 # which in turn has a one to one relationship with Case
 # The exceptions to this are:
 # - AntiEpilepsyMedicine: this has a many to one relationship with Management,
-#   and a one to many relationship with MedicineEntity
+#   and a one to many relationship with Medicine
 # - Comorbidity: this has a many to one relationship with Management,
-#   and a one to many relationship with ComorbidityEntity
+#   and a one to many relationship with Comorbidity
 # - Episode: this has a many to one relationship with MultiaxialDiagnosis,
 # - Site: this has a many to one relationship with Case,
 #   and a one to many relationship with Organisation
 # - Syndrome: this has a many to one relationship with MultiaxialDiagnosis,
-#   and a many to one relationship with SyndromeEntity
+#   and a many to one relationship with Syndrome
 
 from .antiepilepsy_medicine import AntiEpilepsyMedicine
 from .assessment import Assessment
@@ -48,10 +48,10 @@ from .help_text_mixin import HelpTextMixin
 
 # clinical entities seeded from clinical APIs (eg SNOMED CT)
 # These tables provide look ups to Epilepsy12 selects
-from .entities.syndrome_entity import SyndromeEntity
-from .entities.epilepsy_cause_entity import EpilepsyCauseEntity
-from .entities.comorbidy_entity import ComorbidityEntity
-from .entities.medicine_entity import MedicineEntity
+from .entities.syndrome_list import SyndromeList
+from .entities.epilepsy_cause import EpilepsyCause
+from .entities.comorbidity_list import ComorbidityList
+from .entities.medicine import Medicine
 from .semiology_keyword import Keyword
 
 # regional entities seeded from NHS / ONS APIs
@@ -59,17 +59,15 @@ from .semiology_keyword import Keyword
 # when calculating KPIs. NHS Structure is often subject to change, so having their
 # own model(s) abstracts away any changes that may need to be made in future.
 # Organisation has many to one relationship with OPENUKNetworkEntity, IntegratedCareBoardEntity,
-# ONSCountryEntity, ONSRegionEntity and NHSRegionEntity
-# IntegratedCareBoardEntity has a one to many relationship with NHSRegionEntity
-from .entities.open_uk_network_entity import OPENUKNetworkEntity
-from .entities.integrated_care_board_entity import IntegratedCareBoardEntity
-from .entities.ons_region_entity import ONSRegionEntity
-from .entities.ons_country_entity import ONSCountryEntity
-from .entities.nhs_region_entity import NHSRegionEntity
-from .entities.organisation import Organisation
+# ONSCountryEntity, ONSRegionEntity and NHSEnglandRegion
+# IntegratedCareBoardEntity has a one to many relationship with NHSEnglandRegion
 
-# maps
-from .entities.nhs_england_region_boundaries import NHSEnglandRegionBoundaries
-from .entities.integrated_care_board_boundaries import IntegratedCareBoardBoundaries
-from .entities.local_health_board_boundaries import LocalHealthBoardBoundaries
-from .entities.country_boundaries import CountryBoundaries
+from .entities.country import Country
+from .entities.london_borough import LondonBorough
+
+from .entities.open_uk_network import OPENUKNetwork
+from .entities.integrated_care_board import IntegratedCareBoard
+from .entities.nhs_england_region import NHSEnglandRegion
+from .entities.organisation import Organisation
+from .entities.trust import Trust
+from .entities.local_health_board import LocalHealthBoard

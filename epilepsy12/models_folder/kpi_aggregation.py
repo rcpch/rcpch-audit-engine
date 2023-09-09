@@ -7,9 +7,10 @@ from .help_text_mixin import HelpTextMixin
 from epilepsy12.constants import EnumAbstractionLevel
 from django.apps import apps
 
+
 class BaseKPIMetrics(models.Model):
     """Base class containing only the metric fields themselves."""
-    
+
     paediatrician_with_expertise_in_epilepsies_passed = models.IntegerField(
         help_text={"label": "", "reference": ""},
         null=True,
@@ -458,10 +459,11 @@ class BaseKPIMetrics(models.Model):
         default=None,
     )
 
+
 class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
     """
     KPI summary statistics base class. Handles data and logic common to all aggregation models.
-    
+
     Metric fields inherited from BaseKPIMetrics.
     """
 
@@ -485,7 +487,6 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
     cohort = models.PositiveSmallIntegerField(
         default=None,
     )
-    
 
     # At the end of cohort, this flag will be made True, indicating the final aggregation for that cohort
     final_publication = models.BooleanField(
@@ -498,23 +499,22 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
         verbose_name = _("Base KPI Aggregation Model")
         verbose_name_plural = _("Base KPI Aggregation Models")
 
-    def get_pct_passed_kpi(self, kpi_name:str)->float:
-        
+    def get_pct_passed_kpi(self, kpi_name: str) -> float:
         passed = getattr(self, f"{kpi_name}_passed")
         total = getattr(self, f"{kpi_name}_total_eligible")
-        
+
         if total == 0:
             return None
-        
+
         return passed / total
-    
-    def aggregation_performed(self)->bool:
+
+    def aggregation_performed(self) -> bool:
         """All fields should be updated at the same time. Therefore, if one field is None, all will be None -> aggregations are not performed."""
         if self.ecg_passed is None:
             return False
         else:
             return True
-    
+
     def get_value_counts_for_kpis(self, kpis: list[str]) -> dict:
         """Getter for value count values. Accepts a list of kpi names as strings. For each KPI, will return the 4 associated value count fields, in a single combined dict."""
         all_value_counts = {}
@@ -525,6 +525,27 @@ class BaseKPIAggregation(BaseKPIMetrics, HelpTextMixin):
                 all_value_counts.update({kpi_metric: value})
         return all_value_counts
 
+    def get_total_cases_included_in_aggregation(self)->int:
+        """Total cases performed for aggregation can be found through 
+        
+        sum(
+            paediatrician_with_expertise_in_epilepsies_total_eligible, 
+            paediatrician_with_expertise_in_epilepsies_total_ineligible,
+            paediatrician_with_expertise_in_epilepsies_total_incomplete,
+            ).
+        """
+        
+        kpi = 'paediatrician_with_expertise_in_epilepsies'
+        fields = ["total_eligible", "ineligible", "incomplete"]
+        
+        metric_values = [getattr(self, f'{kpi}_{field}') for field in fields]
+        
+        # If no eligible Cases, all values will be None - can just check 1
+        if metric_values[0] is None:
+            return 0
+        
+        return sum (metric_values)
+    
     def __str__(self):
         return f"Base KPI aggregation result model"
 
@@ -551,12 +572,12 @@ class OrganisationKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"OrganisationKPIAggregation (ODSCode={self.abstraction_relation.ODSCode}) KPIAggregations"
+        return f"OrganisationKPIAggregation (ods_code={self.abstraction_relation.ods_code}, Cohort {self.cohort}) KPIAggregations"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.OrganisationName
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -568,10 +589,8 @@ class TrustKPIAggregation(BaseKPIAggregation):
     """
 
     # Define relationships
-    # NOTE: parent_organisation_ods_code is not unique (multiple Organisation objects can share the same) so just store in a charfield
-    abstraction_relation = models.CharField(
-        max_length=100,
-        unique=True,
+    abstraction_relation = models.OneToOneField(
+        to="epilepsy12.Trust", on_delete=models.CASCADE
     )
 
     class Meta:
@@ -585,89 +604,114 @@ class TrustKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"TrustKPIAggregation (parent_organisation_ods_code={self.abstraction_relation})"
+        return f"TrustKPIAggregation (Trust={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            # As Trust is the only abstraction relation without a 1-2-1 model, need to search Org to get Trust name
-            Organisation = apps.get_model("epilepsy12", "Organisation")
-
-            organisation = Organisation.objects.filter(
-                ParentOrganisation_ODSCode=self.abstraction_relation
-            ).first()
-
-            self.abstraction_name = organisation.ParentOrganisation_OrganisationName
-
-        return super().save(*args, **kwargs)
-
-
-class ICBKPIAggregation(BaseKPIAggregation):
-    """
-    KPI summary statistics for IntegratedCareBoardEntity.
-    """
-
-    # Define relationships
-    abstraction_relation = models.OneToOneField(
-        to="epilepsy12.IntegratedCareBoardEntity",
-        on_delete=models.CASCADE,
-    )
-
-    class Meta:
-        verbose_name = _("IntegratedCareBoardEntity KPI Aggregation Model")
-        verbose_name_plural = _("IntegratedCareBoardEntity KPI Aggregation Models")
-
-    def get_abstraction_level(self) -> str:
-        return EnumAbstractionLevel.ICB
-    
-    def get_name(self) -> str:
-        return f"{self.abstraction_name}"
-
-    def __str__(self):
-        return (
-            f"ICBKPIAggregation (IntegratedCareBoardEntity={self.abstraction_relation})"
-        )
-    
-    def save(self, *args, **kwargs) -> None:
-        # UPDATE THE abstraction_name field
-        if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.ICB_Name
+            self.abstraction_name = self.abstraction_relation.ods_code
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
 
 
-class NHSRegionKPIAggregation(BaseKPIAggregation):
+class LocalHealthBoardKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for Trusts.
+    """
+
+    # Define relationships
+    abstraction_relation = models.OneToOneField(
+        to="epilepsy12.LocalHealthBoard", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = _("Local Health Board KPI Aggregation Model")
+        verbose_name_plural = _("Local Health Board KPI Aggregation Models")
+
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.LOCAL_HEALTH_BOARD
+
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
+
+    def __str__(self):
+        return f"LocalHealthBoardKPIAggregation (LocalHealthBoard={self.abstraction_relation}, Cohort {self.cohort})"
+
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.name
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
+
+
+class ICBKPIAggregation(BaseKPIAggregation):
+    """
+    KPI summary statistics for IntegratedCareBoard.
+    """
+
+    # Define relationships
+    abstraction_relation = models.OneToOneField(
+        to="epilepsy12.IntegratedCareBoard",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = _("IntegratedCareBoard KPI Aggregation Model")
+        verbose_name_plural = _("IntegratedCareBoard KPI Aggregation Models")
+
+    def get_abstraction_level(self) -> str:
+        return EnumAbstractionLevel.ICB
+
+    def get_name(self) -> str:
+        return f"{self.abstraction_name}"
+
+    def __str__(self):
+        return f"ICBKPIAggregation (IntegratedCareBoard={self.abstraction_relation}, Cohort {self.cohort})"
+
+    def save(self, *args, **kwargs) -> None:
+        # UPDATE THE abstraction_name field
+        if self.abstraction_relation is not None:
+            self.abstraction_name = self.abstraction_relation.name
+        else:
+            self.abstraction_name = "Name not found"
+        return super().save(*args, **kwargs)
+
+
+class NHSEnglandRegionKPIAggregation(BaseKPIAggregation):
     """
     KPI summary statistics for NHSRegion.
     """
 
     # Define relationships
     abstraction_relation = models.OneToOneField(
-        to="epilepsy12.NHSRegionEntity",
+        to="epilepsy12.NHSEnglandRegion",
         on_delete=models.CASCADE,
     )
 
     class Meta:
-        verbose_name = _("NHSRegionEntity KPI Aggregation Model")
-        verbose_name_plural = _("NHSRegionEntity KPI Aggregation Models")
+        verbose_name = _("NHSEnglandRegion KPI Aggregation Model")
+        verbose_name_plural = _("NHSEnglandRegion KPI Aggregation Models")
 
     def get_abstraction_level(self) -> str:
-        return EnumAbstractionLevel.NHS_REGION
-    
+        return EnumAbstractionLevel.NHS_ENGLAND_REGION
+
     def get_name(self) -> str:
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"KPIAggregations (NHSRegionEntity={self.abstraction_relation})"
+        return f"KPIAggregations (NHSEnglandRegion={self.abstraction_relation}, Cohort {self.cohort})"
 
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.NHS_Region
+            self.abstraction_name = self.abstraction_relation.region_code
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
+
 
 class OpenUKKPIAggregation(BaseKPIAggregation):
     """
@@ -676,7 +720,7 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
 
     # Define relationships
     abstraction_relation = models.OneToOneField(
-        to="epilepsy12.OPENUKNetworkEntity",
+        to="epilepsy12.OPENUKNetwork",
         on_delete=models.CASCADE,
     )
 
@@ -686,19 +730,17 @@ class OpenUKKPIAggregation(BaseKPIAggregation):
 
     def get_abstraction_level(self) -> str:
         return EnumAbstractionLevel.OPEN_UK
-    
+
     def get_name(self) -> str:
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return (
-            f"OPENUKKPIAggregations (OPENUKNetworkEntity={self.abstraction_relation})"
-        )
-    
+        return f"OPENUKKPIAggregations (OPENUKNetwork={self.abstraction_relation}, Cohort {self.cohort})"
+
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.OPEN_UK_Network_Name
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)
@@ -711,7 +753,7 @@ class CountryKPIAggregation(BaseKPIAggregation):
 
     # Define relationships
     abstraction_relation = models.OneToOneField(
-        to="epilepsy12.ONSCountryEntity",
+        to="epilepsy12.Country",
         on_delete=models.CASCADE,
     )
 
@@ -726,12 +768,12 @@ class CountryKPIAggregation(BaseKPIAggregation):
         return f"{self.abstraction_name}"
 
     def __str__(self):
-        return f"CountryKPIAggregations (ONSCountryEntity={self.abstraction_relation})"
-    
+        return f"CountryKPIAggregations (Country={self.abstraction_relation}, Cohort {self.cohort})"
+
     def save(self, *args, **kwargs) -> None:
         # UPDATE THE abstraction_name field
         if self.abstraction_relation is not None:
-            self.abstraction_name = self.abstraction_relation.Country_ONS_Name
+            self.abstraction_name = self.abstraction_relation.name
         else:
             self.abstraction_name = "Name not found"
         return super().save(*args, **kwargs)

@@ -70,7 +70,7 @@ class CaseViewSet(
     def create_case_in_organisation(self, request):
         # params
         nhs_number = request.POST.get("nhs_number")
-        odsCode = request.POST.get("ODSCode")
+        odsCode = request.POST.get("ods_code")
         case_params = {
             "nhs_number": request.POST.get("nhs_number"),
             "first_name": request.POST.get("first_name"),
@@ -93,10 +93,10 @@ class CaseViewSet(
                 if odsCode:
                     if serializer.is_valid(raise_exception=True):
                         if Organisation.objects.filter(
-                            ODSCode=request.POST.get("ODSCode")
+                            ods_code=request.POST.get("ods_code")
                         ).exists():
                             organisation = Organisation.objects.filter(
-                                ODSCode=request.POST.get("ODSCode")
+                                ods_code=request.POST.get("ods_code")
                             ).get()
                         else:
                             raise serializers.ValidationError(
@@ -396,7 +396,7 @@ class CaseViewSet(
             )
 
             # this is a custom field passed in as a param
-            # it is validated and converted to an EpilepsyCauseEntity object in the serializer
+            # it is validated and converted to an Comorbidity object in the serializer
             data = {"sctid": request.data.get("sctid")}
 
             serializer = MultiaxialDiagnosisSerializer(

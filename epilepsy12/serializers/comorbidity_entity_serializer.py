@@ -6,10 +6,10 @@
 from rest_framework import serializers
 
 # E12 imports
-from epilepsy12.models import ComorbidityEntity
+from epilepsy12.models import Comorbidity
 
 
 class ComorbidityEntitySerializer(serializers.ModelSerializer):
     class Meta:
-        model = ComorbidityEntity
+        model = Comorbidity
         fields = "__all__"

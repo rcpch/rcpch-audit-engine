@@ -1,3 +1,223 @@
+"""
+This constant is used for seeding the ICB table
+Contains INTEGRATED_CARE_BOARDS to seed the 42 ICBs 
+Contains INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES, matching Trusts to ICBs
+"""
+
+INTEGRATED_CARE_BOARDS = [
+    # There are 42 integrated care boards.
+    {
+        "ods_code": "QOX",
+        "gss_code": "E54000040",
+        "name": "NHS BATH AND NORTH EAST SOMERSET, SWINDON AND WILTSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QHG",
+        "gss_code": "E54000024",
+        "name": "NHS BEDFORDSHIRE, LUTON AND MILTON KEYNES INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QHL",
+        "gss_code": "E54000055",
+        "name": "NHS BIRMINGHAM AND SOLIHULL INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QUA",
+        "gss_code": "E54000062",
+        "name": "NHS BLACK COUNTRY INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QUY",
+        "gss_code": "E54000039",
+        "name": "NHS BRISTOL, NORTH SOMERSET AND SOUTH GLOUCESTERSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QU9",
+        "gss_code": "E54000044",
+        "name": "NHS BUCKINGHAMSHIRE, OXFORDSHIRE AND BERKSHIRE WEST INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QUE",
+        "gss_code": "E54000056",
+        "name": "NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QYG",
+        "gss_code": "E54000008",
+        "name": "NHS CHESHIRE AND MERSEYSIDE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QT6",
+        "gss_code": "E54000036",
+        "name": "NHS CORNWALL AND THE ISLES OF SCILLY INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QWU",
+        "gss_code": "E54000018",
+        "name": "NHS COVENTRY AND WARWICKSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QJ2",
+        "gss_code": "E54000058",
+        "name": "NHS DERBY AND DERBYSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QJK",
+        "gss_code": "E54000037",
+        "name": "NHS DEVON INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QVV",
+        "gss_code": "E54000041",
+        "name": "NHS DORSET INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QNQ",
+        "gss_code": "E54000034",
+        "name": "NHS FRIMLEY INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QR1",
+        "gss_code": "E54000043",
+        "name": "NHS GLOUCESTERSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QOP",
+        "gss_code": "E54000057",
+        "name": "NHS GREATER MANCHESTER INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QRL",
+        "gss_code": "E54000042",
+        "name": "NHS HAMPSHIRE AND ISLE OF WIGHT INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QGH",
+        "gss_code": "E54000019",
+        "name": "NHS HEREFORDSHIRE AND WORCESTERSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QM7",
+        "gss_code": "E54000025",
+        "name": "NHS HERTFORDSHIRE AND WEST ESSEX INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QOQ",
+        "gss_code": "E54000051",
+        "name": "NHS HUMBER AND NORTH YORKSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QKS",
+        "gss_code": "E54000032",
+        "name": "NHS KENT AND MEDWAY INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QE1",
+        "gss_code": "E54000048",
+        "name": "NHS LANCASHIRE AND SOUTH CUMBRIA INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QK1",
+        "gss_code": "E54000015",
+        "name": "NHS LEICESTER, LEICESTERSHIRE AND RUTLAND INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QJM",
+        "gss_code": "E54000013",
+        "name": "NHS LINCOLNSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QH8",
+        "gss_code": "E54000026",
+        "name": "NHS MID AND SOUTH ESSEX INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QMM",
+        "gss_code": "E54000022",
+        "name": "NHS NORFOLK AND WAVENEY INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QPM",
+        "gss_code": "E54000059",
+        "name": "NHS NORTHAMPTONSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QMJ",
+        "gss_code": "E54000028",
+        "name": "NHS NORTH CENTRAL LONDON INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QHM",
+        "gss_code": "E54000050",
+        "name": "NHS NORTH EAST AND NORTH CUMBRIA INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QMF",
+        "gss_code": "E54000029",
+        "name": "NHS NORTH EAST LONDON INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QRV",
+        "gss_code": "E54000027",
+        "name": "NHS NORTH WEST LONDON INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QT1",
+        "gss_code": "E54000060",
+        "name": "NHS NOTTINGHAM AND NOTTINGHAMSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QOC",
+        "gss_code": "E54000011",
+        "name": "NHS SHROPSHIRE, TELFORD AND WREKIN INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QSL",
+        "gss_code": "E54000038",
+        "name": "NHS SOMERSET INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QKK",
+        "gss_code": "E54000030",
+        "name": "NHS SOUTH EAST LONDON INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QWE",
+        "gss_code": "E54000031",
+        "name": "NHS SOUTH WEST LONDON INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QF7",
+        "gss_code": "E54000061",
+        "name": "NHS SOUTH YORKSHIRE INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QNC",
+        "gss_code": "E54000010",
+        "name": "NHS STAFFORDSHIRE AND STOKE-ON-TRENT INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QJG",
+        "gss_code": "E54000023",
+        "name": "NHS SUFFOLK AND NORTH EAST ESSEX INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QXU",
+        "gss_code": "E54000063",
+        "name": "NHS SURREY HEARTLANDS INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QNX",
+        "gss_code": "E54000064",
+        "name": "NHS SUSSEX INTEGRATED CARE BOARD",
+    },
+    {
+        "ods_code": "QWO",
+        "gss_code": "E54000054",
+        "name": "NHS WEST YORKSHIRE INTEGRATED CARE BOARD",
+    },
+]
+
 INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
     {
         "NHS England Region": "North East and Yorkshire",
@@ -10,7 +230,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Gateshead Metropolitan Borough Council",
         "ODS LA Code": "106",
         "NHS Trusts": "The Newcastle Upon Tyne Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RTD"
+        "ODS Trust Code": "RTD",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -23,7 +243,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Tyneside Council",
         "ODS LA Code": "108",
         "NHS Trusts": "Gateshead Health NHS Foundation Trust",
-        "ODS Trust Code": "RR7"
+        "ODS Trust Code": "RR7",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -36,7 +256,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Northumberland County Council",
         "ODS LA Code": "104",
         "NHS Trusts": "Northumbria Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RTF"
+        "ODS Trust Code": "RTF",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -49,7 +269,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "South Tyneside Council",
         "ODS LA Code": "109",
         "NHS Trusts": "South Tyneside and Sunderland NHS Foundation Trust",
-        "ODS Trust Code": "R0B"
+        "ODS Trust Code": "R0B",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -62,7 +282,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Sunderland City Council",
         "ODS LA Code": "110",
         "NHS Trusts": "Cumbria, Northumberland, Tyne and Wear NHS Foundation Trust",
-        "ODS Trust Code": "RX4"
+        "ODS Trust Code": "RX4",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -75,7 +295,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Newcastle-upon-Tyne City Council",
         "ODS LA Code": "107",
         "NHS Trusts": "North East Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RX6"
+        "ODS Trust Code": "RX6",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -88,7 +308,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Cumbria County Council",
         "ODS LA Code": "102",
         "NHS Trusts": "North Cumbria Integrated Care NHS Foundation Trust",
-        "ODS Trust Code": "RNN"
+        "ODS Trust Code": "RNN",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -101,7 +321,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Durham County Council",
         "ODS LA Code": "116",
         "NHS Trusts": "North West Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX7"
+        "ODS Trust Code": "RX7",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -114,7 +334,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Darlington Borough Council",
         "ODS LA Code": "117",
         "NHS Trusts": "County Durham and Darlington NHS Foundation Trust",
-        "ODS Trust Code": "RXP"
+        "ODS Trust Code": "RXP",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -127,7 +347,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Hartlepool Borough Council",
         "ODS LA Code": "111",
         "NHS Trusts": "South Tees Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RTR"
+        "ODS Trust Code": "RTR",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -140,7 +360,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Middlesborough Council",
         "ODS LA Code": "112",
         "NHS Trusts": "North Tees and Hartlepool NHS Foundation Trust",
-        "ODS Trust Code": "RVW"
+        "ODS Trust Code": "RVW",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -153,20 +373,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Redcar and Cleveland Borough Council",
         "ODS LA Code": "113",
         "NHS Trusts": "Tees, Esk and Wear Valleys NHS Foundation Trust",
-        "ODS Trust Code": "RX3"
-    },
-    {
-        "NHS England Region": "North East and Yorkshire",
-        "NHS England Region Code": "Y63",
-        "ODS ICB Code": "QHM",
-        "ONS ICB Boundary Code": "E54000050",
-        "ICB Name": "NHS NORTH EAST AND NORTH CUMBRIA INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "Stockton-on-Tees Borough Council",
-        "ODS LA Code": "114",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
+        "ODS Trust Code": "RX3",
     },
     {
         "NHS England Region": "North West",
@@ -179,7 +386,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Lancashire County Council",
         "ODS LA Code": "323",
         "NHS Trusts": "Lancashire Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RXN"
+        "ODS Trust Code": "RXN",
     },
     {
         "NHS England Region": "North West",
@@ -192,7 +399,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Blackpool Borough Council",
         "ODS LA Code": "325",
         "NHS Trusts": "Blackpool Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RXL"
+        "ODS Trust Code": "RXL",
     },
     {
         "NHS England Region": "North West",
@@ -205,7 +412,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Cumbria County Council",
         "ODS LA Code": "102",
         "NHS Trusts": "University Hospitals of Morecambe Bay NHS Foundation Trust",
-        "ODS Trust Code": "RTX"
+        "ODS Trust Code": "RTX",
     },
     {
         "NHS England Region": "North West",
@@ -218,7 +425,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Blackburn with Darwen Borough Council",
         "ODS LA Code": "324",
         "NHS Trusts": "East Lancashire Hospitals NHS Trust",
-        "ODS Trust Code": "RXR"
+        "ODS Trust Code": "RXR",
     },
     {
         "NHS England Region": "North West",
@@ -231,7 +438,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Yorkshire County Council",
         "ODS LA Code": "218",
         "NHS Trusts": "Lancashire & South Cumbria NHS Foundation Trust",
-        "ODS Trust Code": "RW5"
+        "ODS Trust Code": "RW5",
     },
     {
         "NHS England Region": "North West",
@@ -244,33 +451,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "North West Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX7"
-    },
-    {
-        "NHS England Region": "North West",
-        "NHS England Region Code": "Y62",
-        "ODS ICB Code": "QE1",
-        "ONS ICB Boundary Code": "E54000048",
-        "ICB Name": "NHS LANCASHIRE AND SOUTH CUMBRIA INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS LANCASHIRE AND SOUTH CUMBRIA ICB",
-        "ODS Sub ICB Code": "00Q",
-        "Local Authority": "",
-        "ODS LA Code": "",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
-    },
-    {
-        "NHS England Region": "North West",
-        "NHS England Region Code": "Y62",
-        "ODS ICB Code": "QE1",
-        "ONS ICB Boundary Code": "E54000048",
-        "ICB Name": "NHS LANCASHIRE AND SOUTH CUMBRIA INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS LANCASHIRE AND SOUTH CUMBRIA ICB",
-        "ODS Sub ICB Code": "01A",
-        "Local Authority": "",
-        "ODS LA Code": "",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
+        "ODS Trust Code": "RX7",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -283,21 +464,21 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Leeds City Council",
         "ODS LA Code": "212",
         "NHS Trusts": "Leeds and York Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RGD"
+        "ODS Trust Code": "RGD",
     },
-    {
-        "NHS England Region": "North East and Yorkshire",
-        "NHS England Region Code": "Y63",
-        "ODS ICB Code": "QWO",
-        "ONS ICB Boundary Code": "E54000054",
-        "ICB Name": "NHS WEST YORKSHIRE INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS WEST YORKSHIRE ICB4Y",
-        "ODS Sub ICB Code": "X2C4Y",
-        "Local Authority": "Calderdale Metropolitan Borough Council",
-        "ODS LA Code": "210",
-        "NHS Trusts": "Bradford District Care NHS Foundation Trust",
-        "ODS Trust Code": "TAD"
-    },
+    # {
+    #     "NHS England Region": "North East and Yorkshire",
+    #     "NHS England Region Code": "Y63",
+    #     "ODS ICB Code": "QWO",
+    #     "ONS ICB Boundary Code": "E54000054",
+    #     "ICB Name": "NHS WEST YORKSHIRE INTEGRATED CARE BOARD",
+    #     "Sub ICB Locations (formerly CCGs)": "NHS WEST YORKSHIRE ICB4Y",
+    #     "ODS Sub ICB Code": "X2C4Y",
+    #     "Local Authority": "Calderdale Metropolitan Borough Council",
+    #     "ODS LA Code": "210",
+    #     "NHS Trusts": "Bradford District Care NHS Foundation Trust",
+    #     "ODS Trust Code": "TAD",
+    # },
     {
         "NHS England Region": "North East and Yorkshire",
         "NHS England Region Code": "Y63",
@@ -309,7 +490,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Kirklees Council",
         "ODS LA Code": "211",
         "NHS Trusts": "South West Yorkshire Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RXG"
+        "ODS Trust Code": "RXG",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -322,7 +503,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "City of Wakefield Metropolitan District Council",
         "ODS LA Code": "213",
         "NHS Trusts": "Airedale NHS Foundation Trust",
-        "ODS Trust Code": "RCF"
+        "ODS Trust Code": "RCF",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -335,7 +516,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "City of Bradford Metropolitan District Council",
         "ODS LA Code": "209",
         "NHS Trusts": "Calderdale and Huddersfield NHS Foundation Trust",
-        "ODS Trust Code": "RWY"
+        "ODS Trust Code": "RWY",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -348,7 +529,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Yorkshire County Council",
         "ODS LA Code": "218",
         "NHS Trusts": "Harrogate and District NHS Foundation Trust",
-        "ODS Trust Code": "RCD"
+        "ODS Trust Code": "RCD",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -361,7 +542,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Mid Yorkshire Hospitals NHS Trust",
-        "ODS Trust Code": "RXF"
+        "ODS Trust Code": "RXF",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -374,7 +555,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Bradford Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RAE"
+        "ODS Trust Code": "RAE",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -387,7 +568,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Leeds Teaching Hospitals NHS Trust",
-        "ODS Trust Code": "RR8"
+        "ODS Trust Code": "RR8",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -400,7 +581,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Leeds Community Healthcare NHS Trust",
-        "ODS Trust Code": "RY6"
+        "ODS Trust Code": "RY6",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -413,7 +594,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Yorkshire Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX8"
+        "ODS Trust Code": "RX8",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -426,7 +607,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "City of York Council",
         "ODS LA Code": "219",
         "NHS Trusts": "Humber Teaching NHS Foundation Trust",
-        "ODS Trust Code": "RV9"
+        "ODS Trust Code": "RV9",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -439,7 +620,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "East Riding of Yorkshire Council",
         "ODS LA Code": "214",
         "NHS Trusts": "Northern Lincolnshire and Goole NHS Foundation Trust",
-        "ODS Trust Code": "RJL"
+        "ODS Trust Code": "RJL",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -452,7 +633,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Hull City Council",
         "ODS LA Code": "215",
         "NHS Trusts": "Tees, Esk and Wear Valleys NHS Foundation Trust",
-        "ODS Trust Code": "RX3"
+        "ODS Trust Code": "RX3",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -465,7 +646,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Lincolnshire Council",
         "ODS LA Code": "217",
         "NHS Trusts": "Hull University Teaching Hospitals NHS Trust",
-        "ODS Trust Code": "RWA"
+        "ODS Trust Code": "RWA",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -478,7 +659,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North East Lincolnshire Council",
         "ODS LA Code": "216",
         "NHS Trusts": "Rotherham Doncaster and South Humber NHS Foundation Trust",
-        "ODS Trust Code": "RXE"
+        "ODS Trust Code": "RXE",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -491,7 +672,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Yorkshire County Council",
         "ODS LA Code": "218",
         "NHS Trusts": "York and Scarborough Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RCB"
+        "ODS Trust Code": "RCB",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -504,7 +685,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Midlands Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX9"
+        "ODS Trust Code": "RX9",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -517,7 +698,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Harrogate and District NHS Foundation Trust",
-        "ODS Trust Code": "RCD"
+        "ODS Trust Code": "RCD",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -530,7 +711,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Tees Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RTR"
+        "ODS Trust Code": "RTR",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -543,7 +724,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Yorkshire Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX8"
+        "ODS Trust Code": "RX8",
     },
     {
         "NHS England Region": "North West",
@@ -556,7 +737,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Bolton Metropolitan Borough Council",
         "ODS LA Code": "304",
         "NHS Trusts": "The Christie NHS Foundation Trust",
-        "ODS Trust Code": "RBV"
+        "ODS Trust Code": "RBV",
     },
     {
         "NHS England Region": "North West",
@@ -569,7 +750,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Bury Metropolitan Borough Council",
         "ODS LA Code": "305",
         "NHS Trusts": "Manchester University NHS Foundation Trust",
-        "ODS Trust Code": "R0A"
+        "ODS Trust Code": "R0A",
     },
     {
         "NHS England Region": "North West",
@@ -582,7 +763,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Manchester City Council",
         "ODS LA Code": "306",
         "NHS Trusts": "Northern Care Alliance NHS Foundation Trust",
-        "ODS Trust Code": "RM3"
+        "ODS Trust Code": "RM3",
     },
     {
         "NHS England Region": "North West",
@@ -595,7 +776,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Oldham Metropolitan Borough Council",
         "ODS LA Code": "307",
         "NHS Trusts": "Bolton NHS Foundation Trust",
-        "ODS Trust Code": "RMC"
+        "ODS Trust Code": "RMC",
     },
     {
         "NHS England Region": "North West",
@@ -608,7 +789,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Rochdale Metropolitan Borough Council",
         "ODS LA Code": "308",
         "NHS Trusts": "Tameside and Glossop Integrated Care NHS Foundation Trust",
-        "ODS Trust Code": "RMP"
+        "ODS Trust Code": "RMP",
     },
     {
         "NHS England Region": "North West",
@@ -621,7 +802,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Salford City Council",
         "ODS LA Code": "309",
         "NHS Trusts": "Wrightington, Wigan and Leigh NHS Foundation Trust",
-        "ODS Trust Code": "RRF"
+        "ODS Trust Code": "RRF",
     },
     {
         "NHS England Region": "North West",
@@ -634,7 +815,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Stockport Metropolitan Borough Council",
         "ODS LA Code": "310",
         "NHS Trusts": "Pennine Care NHS Foundation Trust",
-        "ODS Trust Code": "RT2"
+        "ODS Trust Code": "RT2",
     },
     {
         "NHS England Region": "North West",
@@ -647,7 +828,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Tameside Metropolitan Borough Council",
         "ODS LA Code": "311",
         "NHS Trusts": "North West Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX7"
+        "ODS Trust Code": "RX7",
     },
     {
         "NHS England Region": "North West",
@@ -660,7 +841,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Trafford Metropolitan Borough Council",
         "ODS LA Code": "312",
         "NHS Trusts": "Stockport NHS Foundation Trust",
-        "ODS Trust Code": "RWJ"
+        "ODS Trust Code": "RWJ",
     },
     {
         "NHS England Region": "North West",
@@ -673,21 +854,21 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Wigan Metropolitan Borough Council",
         "ODS LA Code": "313",
         "NHS Trusts": "Greater Manchester Mental Health NHS Foundation Trust",
-        "ODS Trust Code": "RXV"
+        "ODS Trust Code": "RXV",
     },
-    {
-        "NHS England Region": "North West",
-        "NHS England Region Code": "Y62",
-        "ODS ICB Code": "QYG",
-        "ONS ICB Boundary Code": "E54000008",
-        "ICB Name": "NHS CHESHIRE AND MERSEYSIDE INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS CHESHIRE AND MERSEYSIDE ICB",
-        "ODS Sub ICB Code": "01J",
-        "Local Authority": "Knowsley Metropolitan Borough Council",
-        "ODS LA Code": "315",
-        "NHS Trusts": "Liverpool Heart and Chest Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RBQ"
-    },
+    # {
+    #     "NHS England Region": "North West",
+    #     "NHS England Region Code": "Y62",
+    #     "ODS ICB Code": "QYG",
+    #     "ONS ICB Boundary Code": "E54000008",
+    #     "ICB Name": "NHS CHESHIRE AND MERSEYSIDE INTEGRATED CARE BOARD",
+    #     "Sub ICB Locations (formerly CCGs)": "NHS CHESHIRE AND MERSEYSIDE ICB",
+    #     "ODS Sub ICB Code": "01J",
+    #     "Local Authority": "Knowsley Metropolitan Borough Council",
+    #     "ODS LA Code": "315",
+    #     "NHS Trusts": "Liverpool Heart and Chest Hospital NHS Foundation Trust",
+    #     "ODS Trust Code": "RBQ",
+    # },
     {
         "NHS England Region": "North West",
         "NHS England Region Code": "Y62",
@@ -699,7 +880,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Sefton Metropolitan Borough Council",
         "ODS LA Code": "317",
         "NHS Trusts": "Alder Hey Children's NHS Foundation Trust",
-        "ODS Trust Code": "RBS"
+        "ODS Trust Code": "RBS",
     },
     {
         "NHS England Region": "North West",
@@ -712,7 +893,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Liverpool City Council",
         "ODS LA Code": "316",
         "NHS Trusts": "Countess of Chester Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RJR"
+        "ODS Trust Code": "RJR",
     },
     {
         "NHS England Region": "North West",
@@ -725,7 +906,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Halton Borough Council",
         "ODS LA Code": "321",
         "NHS Trusts": "St Helens and Knowsley Teaching Hospitals NHS Trust",
-        "ODS Trust Code": "RBN"
+        "ODS Trust Code": "RBN",
     },
     {
         "NHS England Region": "North West",
@@ -738,7 +919,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "St Helens Council",
         "ODS LA Code": "318",
         "NHS Trusts": "The Walton Centre NHS Foundation Trust",
-        "ODS Trust Code": "RET"
+        "ODS Trust Code": "RET",
     },
     {
         "NHS England Region": "North West",
@@ -751,7 +932,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Cheshire East Council",
         "ODS LA Code": "326",
         "NHS Trusts": "Bridgewater Community Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RY2"
+        "ODS Trust Code": "RY2",
     },
     {
         "NHS England Region": "North West",
@@ -764,7 +945,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Cheshire West and Chester Council",
         "ODS LA Code": "327",
         "NHS Trusts": "Wirral University Teaching Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RBL"
+        "ODS Trust Code": "RBL",
     },
     {
         "NHS England Region": "North West",
@@ -777,7 +958,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Warrington Borough Council",
         "ODS LA Code": "322",
         "NHS Trusts": "Mersey Care NHS Foundation Trust",
-        "ODS Trust Code": "RW4"
+        "ODS Trust Code": "RW4",
     },
     {
         "NHS England Region": "North West",
@@ -790,7 +971,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Wirral Borough Council",
         "ODS LA Code": "319",
         "NHS Trusts": "East Cheshire NHS Trust",
-        "ODS Trust Code": "RJN"
+        "ODS Trust Code": "RJN",
     },
     {
         "NHS England Region": "North West",
@@ -803,7 +984,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Cheshire and Wirral Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RXA"
+        "ODS Trust Code": "RXA",
     },
     {
         "NHS England Region": "North West",
@@ -816,7 +997,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Wirral Community NHS Foundation Trust",
-        "ODS Trust Code": "RY7"
+        "ODS Trust Code": "RY7",
     },
     {
         "NHS England Region": "North West",
@@ -829,7 +1010,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Liverpool Women's NHS Foundation Trust",
-        "ODS Trust Code": "REP"
+        "ODS Trust Code": "REP",
     },
     {
         "NHS England Region": "North West",
@@ -842,7 +1023,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Warrington and Halton Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RWW"
+        "ODS Trust Code": "RWW",
     },
     {
         "NHS England Region": "North West",
@@ -855,7 +1036,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Mid Cheshire Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RBT"
+        "ODS Trust Code": "RBT",
     },
     {
         "NHS England Region": "North West",
@@ -868,7 +1049,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "North West Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX7"
+        "ODS Trust Code": "RX7",
     },
     {
         "NHS England Region": "North West",
@@ -881,7 +1062,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Liverpool University Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "REM"
+        "ODS Trust Code": "REM",
     },
     {
         "NHS England Region": "North West",
@@ -894,7 +1075,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "The Clatterbridge Cancer Centre NHS Foundation Trust",
-        "ODS Trust Code": "REN"
+        "ODS Trust Code": "REN",
     },
     {
         "NHS England Region": "North West",
@@ -907,7 +1088,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Southport and Ormskirk Hospital NHS Trust",
-        "ODS Trust Code": "RVY"
+        "ODS Trust Code": "RVY",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -920,7 +1101,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Barnsley Metropolitan Borough Council",
         "ODS LA Code": "204",
         "NHS Trusts": "Barnsley Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RFF"
+        "ODS Trust Code": "RFF",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -933,7 +1114,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Doncaster Metropolitan Borough Council",
         "ODS LA Code": "205",
         "NHS Trusts": "Doncaster and Bassetlaw Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RP5"
+        "ODS Trust Code": "RP5",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -946,21 +1127,21 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Rotherham Metropolitan Borough Council",
         "ODS LA Code": "206",
         "NHS Trusts": "Sheffield Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RHQ"
+        "ODS Trust Code": "RHQ",
     },
-    {
-        "NHS England Region": "North East and Yorkshire",
-        "NHS England Region Code": "Y63",
-        "ODS ICB Code": "QF7",
-        "ONS ICB Boundary Code": "E54000061",
-        "ICB Name": "NHS SOUTH YORKSHIRE INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS SOUTH YORKSHIRE ICB",
-        "ODS Sub ICB Code": "03N",
-        "Local Authority": "Sheffield City Council",
-        "ODS LA Code": "207",
-        "NHS Trusts": "Sheffield Health and Social Care NHS Foundation Trust",
-        "ODS Trust Code": "TAH"
-    },
+    # {
+    #     "NHS England Region": "North East and Yorkshire",
+    #     "NHS England Region Code": "Y63",
+    #     "ODS ICB Code": "QF7",
+    #     "ONS ICB Boundary Code": "E54000061",
+    #     "ICB Name": "NHS SOUTH YORKSHIRE INTEGRATED CARE BOARD",
+    #     "Sub ICB Locations (formerly CCGs)": "NHS SOUTH YORKSHIRE ICB",
+    #     "ODS Sub ICB Code": "03N",
+    #     "Local Authority": "Sheffield City Council",
+    #     "ODS LA Code": "207",
+    #     "NHS Trusts": "Sheffield Health and Social Care NHS Foundation Trust",
+    #     "ODS Trust Code": "TAH",
+    # },
     {
         "NHS England Region": "North East and Yorkshire",
         "NHS England Region Code": "Y63",
@@ -972,7 +1153,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "The Rotherham NHS Foundation Trust",
-        "ODS Trust Code": "RFR"
+        "ODS Trust Code": "RFR",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -985,7 +1166,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Rotherham Doncaster and South Humber NHS Foundation Trust",
-        "ODS Trust Code": "RXE"
+        "ODS Trust Code": "RXE",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -998,7 +1179,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Sheffield Children's NHS Foundation Trust",
-        "ODS Trust Code": "RCU"
+        "ODS Trust Code": "RCU",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -1011,7 +1192,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South West Yorkshire Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RXG"
+        "ODS Trust Code": "RXG",
     },
     {
         "NHS England Region": "North East and Yorkshire",
@@ -1024,7 +1205,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Yorkshire Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX8"
+        "ODS Trust Code": "RX8",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1037,7 +1218,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Stoke-on-Trent City Council",
         "ODS LA Code": "414",
         "NHS Trusts": "Midlands Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RRE"
+        "ODS Trust Code": "RRE",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1050,7 +1231,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Staffordshire County Council",
         "ODS LA Code": "413",
         "NHS Trusts": "North Staffordshire Combined Healthcare NHS Trust",
-        "ODS Trust Code": "RLY"
+        "ODS Trust Code": "RLY",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1063,7 +1244,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University Hospitals of North Midlands NHS Trust",
-        "ODS Trust Code": "RJE"
+        "ODS Trust Code": "RJE",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1076,7 +1257,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University Hospitals of Derby and Burton NHS Foundation Trust",
-        "ODS Trust Code": "RTG"
+        "ODS Trust Code": "RTG",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1089,20 +1270,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Midlands Ambulance Service University NHS Foundation Trust",
-        "ODS Trust Code": "RYA"
-    },
-    {
-        "NHS England Region": "Midlands (Y60)",
-        "NHS England Region Code": "Y60",
-        "ODS ICB Code": "QNC",
-        "ONS ICB Boundary Code": "E54000010",
-        "ICB Name": "NHS STAFFORDSHIRE AND STOKE-ON-TRENT INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS STAFFORDSHIRE AND STOKE-ON-TRENT ICB",
-        "ODS Sub ICB Code": "05D",
-        "Local Authority": "",
-        "ODS LA Code": "",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
+        "ODS Trust Code": "RYA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1115,7 +1283,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Shropshire Council",
         "ODS LA Code": "417",
         "NHS Trusts": "Shrewsbury and Telford Hospital NHS Trust",
-        "ODS Trust Code": "RXW"
+        "ODS Trust Code": "RXW",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1128,7 +1296,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Telford & Wrekin Council",
         "ODS LA Code": "418",
         "NHS Trusts": "The Robert Jones and Agnes Hunt Orthopaedic Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RL1"
+        "ODS Trust Code": "RL1",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1141,7 +1309,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Shropshire Community Health NHS Trust",
-        "ODS Trust Code": "R1D"
+        "ODS Trust Code": "R1D",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1154,7 +1322,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Midlands Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RRE"
+        "ODS Trust Code": "RRE",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1167,7 +1335,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Midlands Ambulance Service University NHS Foundation Trust",
-        "ODS Trust Code": "RYA"
+        "ODS Trust Code": "RYA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1180,7 +1348,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Derby City Council",
         "ODS LA Code": "507",
         "NHS Trusts": "Chesterfield Royal Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RFS"
+        "ODS Trust Code": "RFS",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1193,7 +1361,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Derbyshire County Council",
         "ODS LA Code": "506",
         "NHS Trusts": "University Hospitals of Derby and Burton NHS Foundation Trust",
-        "ODS Trust Code": "RTG"
+        "ODS Trust Code": "RTG",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1206,7 +1374,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Derbyshire Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RXM"
+        "ODS Trust Code": "RXM",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1219,7 +1387,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Derbyshire Community Health Services NHS Foundation Trust",
-        "ODS Trust Code": "RY8"
+        "ODS Trust Code": "RY8",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1232,7 +1400,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Midlands Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX9"
+        "ODS Trust Code": "RX9",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1245,7 +1413,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Lincolnshire County Council",
         "ODS LA Code": "503",
         "NHS Trusts": "Lincolnshire Community Health Services NHS Trust",
-        "ODS Trust Code": "RY5"
+        "ODS Trust Code": "RY5",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1258,7 +1426,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Lincolnshire Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RP7"
+        "ODS Trust Code": "RP7",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1271,7 +1439,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "United Lincolnshire Hospitals NHS Trust",
-        "ODS Trust Code": "RWD"
+        "ODS Trust Code": "RWD",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1284,7 +1452,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Midlands Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX9"
+        "ODS Trust Code": "RX9",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1297,7 +1465,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Nottinghamshire County Council",
         "ODS LA Code": "511",
         "NHS Trusts": "Nottinghamshire Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RHA"
+        "ODS Trust Code": "RHA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1310,7 +1478,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Nottingham City Council",
         "ODS LA Code": "512",
         "NHS Trusts": "Nottingham University Hospitals NHS Trust",
-        "ODS Trust Code": "RX1"
+        "ODS Trust Code": "RX1",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1323,7 +1491,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Sherwood Forest Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RK5"
+        "ODS Trust Code": "RK5",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1336,7 +1504,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Midlands Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX9"
+        "ODS Trust Code": "RX9",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1349,7 +1517,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Doncaster and Bassetlaw Teaching Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RP5"
+        "ODS Trust Code": "RP5",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1362,7 +1530,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Leicestershire County Council",
         "ODS LA Code": "508",
         "NHS Trusts": "University Hospitals of Leicester NHS Trust",
-        "ODS Trust Code": "RWE"
+        "ODS Trust Code": "RWE",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1375,7 +1543,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Rutland County Council",
         "ODS LA Code": "510",
         "NHS Trusts": "Leicestershire Partnership NHS Trust",
-        "ODS Trust Code": "RT5"
+        "ODS Trust Code": "RT5",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1388,7 +1556,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Leicester City Council",
         "ODS LA Code": "509",
         "NHS Trusts": "East Midlands Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX9"
+        "ODS Trust Code": "RX9",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1401,7 +1569,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Birmingham City Council",
         "ODS LA Code": "406",
         "NHS Trusts": "The Royal Wolverhampton NHS Trust",
-        "ODS Trust Code": "RL4"
+        "ODS Trust Code": "RL4",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1414,7 +1582,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Walsall Metropolitan Borough Council",
         "ODS LA Code": "411",
         "NHS Trusts": "Walsall Healthcare NHS Trust",
-        "ODS Trust Code": "RBK"
+        "ODS Trust Code": "RBK",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1427,7 +1595,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Dudley Metropolitan Borough Council",
         "ODS LA Code": "408",
         "NHS Trusts": "The Dudley Group NHS Foundation Trust",
-        "ODS Trust Code": "RNA"
+        "ODS Trust Code": "RNA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1440,21 +1608,21 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Sandwell Metropolitan Borough Council",
         "ODS LA Code": "409",
         "NHS Trusts": "Sandwell and West Birmingham Hospitals NHS Trust",
-        "ODS Trust Code": "RXK"
+        "ODS Trust Code": "RXK",
     },
-    {
-        "NHS England Region": "Midlands (Y60)",
-        "NHS England Region Code": "Y60",
-        "ODS ICB Code": "QUA",
-        "ONS ICB Boundary Code": "E54000062",
-        "ICB Name": "NHS BLACK COUNTRY INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "",
-        "ODS LA Code": "",
-        "NHS Trusts": "Black Country Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "TAJ"
-    },
+    # {
+    #     "NHS England Region": "Midlands (Y60)",
+    #     "NHS England Region Code": "Y60",
+    #     "ODS ICB Code": "QUA",
+    #     "ONS ICB Boundary Code": "E54000062",
+    #     "ICB Name": "NHS BLACK COUNTRY INTEGRATED CARE BOARD",
+    #     "Sub ICB Locations (formerly CCGs)": "",
+    #     "ODS Sub ICB Code": "",
+    #     "Local Authority": "",
+    #     "ODS LA Code": "",
+    #     "NHS Trusts": "Black Country Healthcare NHS Foundation Trust",
+    #     "ODS Trust Code": "TAJ",
+    # },
     {
         "NHS England Region": "Midlands (Y60)",
         "NHS England Region Code": "Y60",
@@ -1466,7 +1634,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Dudley Integrated Health and Care NHS Trust",
-        "ODS Trust Code": "RYK"
+        "ODS Trust Code": "RYK",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1479,7 +1647,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Midlands Ambulance Service University NHS Foundation Trust",
-        "ODS Trust Code": "RYA"
+        "ODS Trust Code": "RYA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1492,7 +1660,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Solihull Metropolitan Borough Council",
         "ODS LA Code": "410",
         "NHS Trusts": "Birmingham Women's and Children's NHS Foundation Trust",
-        "ODS Trust Code": "RQ3"
+        "ODS Trust Code": "RQ3",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1505,7 +1673,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Birmingham City Council",
         "ODS LA Code": "406",
         "NHS Trusts": "University Hospitals Birmingham NHS Foundation Trust",
-        "ODS Trust Code": "RRK"
+        "ODS Trust Code": "RRK",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1518,7 +1686,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "The Royal Orthopaedic Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RRJ"
+        "ODS Trust Code": "RRJ",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1531,7 +1699,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Birmingham and Solihull Mental Health NHS Foundation Trust",
-        "ODS Trust Code": "RXT"
+        "ODS Trust Code": "RXT",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1544,7 +1712,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Birmingham Community Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RYW"
+        "ODS Trust Code": "RYW",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1557,7 +1725,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Sandwell and West Birmingham Hospitals NHS Trust",
-        "ODS Trust Code": "RXK"
+        "ODS Trust Code": "RXK",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1570,7 +1738,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Midlands Ambulance Service University NHS Foundation Trust",
-        "ODS Trust Code": "RYA"
+        "ODS Trust Code": "RYA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1583,7 +1751,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Coventry City Council",
         "ODS LA Code": "407",
         "NHS Trusts": "Coventry and Warwickshire Partnership NHS Trust",
-        "ODS Trust Code": "RYG"
+        "ODS Trust Code": "RYG",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1596,7 +1764,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Warwickshire County Council",
         "ODS LA Code": "404",
         "NHS Trusts": "George Eliot Hospital NHS Trust",
-        "ODS Trust Code": "RLT"
+        "ODS Trust Code": "RLT",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1609,7 +1777,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Warwickshire NHS Foundation Trust",
-        "ODS Trust Code": "RJC"
+        "ODS Trust Code": "RJC",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1622,7 +1790,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University Hospitals Coventry and Warwickshire NHS Trust",
-        "ODS Trust Code": "RKB"
+        "ODS Trust Code": "RKB",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1635,7 +1803,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Midlands Ambulance Service University NHS Foundation Trust",
-        "ODS Trust Code": "RYA"
+        "ODS Trust Code": "RYA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1648,7 +1816,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Herefordshire Council",
         "ODS LA Code": "415",
         "NHS Trusts": "Wye Valley NHS Trust",
-        "ODS Trust Code": "RLQ"
+        "ODS Trust Code": "RLQ",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1661,7 +1829,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Worcestershire County Council",
         "ODS LA Code": "416",
         "NHS Trusts": "Worcestershire Acute Hospitals NHS Trust",
-        "ODS Trust Code": "RWP"
+        "ODS Trust Code": "RWP",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1674,7 +1842,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Midlands Ambulance Service University NHS Foundation Trust",
-        "ODS Trust Code": "RYA"
+        "ODS Trust Code": "RYA",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1687,7 +1855,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Herefordshire and Worcestershire Health and Care NHS Trust",
-        "ODS Trust Code": "R1A"
+        "ODS Trust Code": "R1A",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1700,7 +1868,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Northamptonshire Council",
         "ODS LA Code": "Z9D4Z",
         "NHS Trusts": "Kettering General Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RNQ"
+        "ODS Trust Code": "RNQ",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1713,7 +1881,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "West Northamptonshire Council",
         "ODS LA Code": "U6Q5Z",
         "NHS Trusts": "Northampton General Hospital NHS Trust",
-        "ODS Trust Code": "RNS"
+        "ODS Trust Code": "RNS",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1726,7 +1894,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Northamptonshire Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RP1"
+        "ODS Trust Code": "RP1",
     },
     {
         "NHS England Region": "Midlands (Y60)",
@@ -1739,7 +1907,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Midlands Ambulance Service NHS Trust",
-        "ODS Trust Code": "RX9"
+        "ODS Trust Code": "RX9",
     },
     {
         "NHS England Region": "East of England",
@@ -1752,7 +1920,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Cambridgeshire County Council",
         "ODS LA Code": "623",
         "NHS Trusts": "Cambridge University Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RGT"
+        "ODS Trust Code": "RGT",
     },
     {
         "NHS England Region": "East of England",
@@ -1765,7 +1933,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Peterborough City Council",
         "ODS LA Code": "624",
         "NHS Trusts": "Cambridgeshire and Peterborough NHS Foundation Trust",
-        "ODS Trust Code": "RT1"
+        "ODS Trust Code": "RT1",
     },
     {
         "NHS England Region": "East of England",
@@ -1778,7 +1946,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Hertfordshire County Council",
         "ODS LA Code": "606",
         "NHS Trusts": "Cambridgeshire Community Services NHS Trust",
-        "ODS Trust Code": "RYV"
+        "ODS Trust Code": "RYV",
     },
     {
         "NHS England Region": "East of England",
@@ -1791,7 +1959,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "North West Anglia NHS Foundation Trust",
-        "ODS Trust Code": "RGN"
+        "ODS Trust Code": "RGN",
     },
     {
         "NHS England Region": "East of England",
@@ -1804,7 +1972,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Royal Papworth Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RGM"
+        "ODS Trust Code": "RGM",
     },
     {
         "NHS England Region": "East of England",
@@ -1817,7 +1985,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East of England Ambulance Service NHS Trust",
-        "ODS Trust Code": "RYC"
+        "ODS Trust Code": "RYC",
     },
     {
         "NHS England Region": "East of England",
@@ -1830,7 +1998,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Norfolk County Council",
         "ODS LA Code": "607",
         "NHS Trusts": "James Paget University Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RGP"
+        "ODS Trust Code": "RGP",
     },
     {
         "NHS England Region": "East of England",
@@ -1843,7 +2011,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Suffolk County Council",
         "ODS LA Code": "609",
         "NHS Trusts": "Norfolk and Norwich University Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RM1"
+        "ODS Trust Code": "RM1",
     },
     {
         "NHS England Region": "East of England",
@@ -1856,7 +2024,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "The Queen Elizabeth Hospital, King's Lynn, NHS Foundation Trust",
-        "ODS Trust Code": "RCX"
+        "ODS Trust Code": "RCX",
     },
     {
         "NHS England Region": "East of England",
@@ -1869,7 +2037,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Norfolk Community Health and Care NHS Trust",
-        "ODS Trust Code": "RY3"
+        "ODS Trust Code": "RY3",
     },
     {
         "NHS England Region": "East of England",
@@ -1882,7 +2050,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Norfolk and Suffolk NHS Foundation Trust",
-        "ODS Trust Code": "RMY"
+        "ODS Trust Code": "RMY",
     },
     {
         "NHS England Region": "East of England",
@@ -1895,7 +2063,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East of England Ambulance Service NHS Trust",
-        "ODS Trust Code": "RYC"
+        "ODS Trust Code": "RYC",
     },
     {
         "NHS England Region": "East of England",
@@ -1908,7 +2076,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Essex County Council",
         "ODS LA Code": "620",
         "NHS Trusts": "West Suffolk NHS Foundation Trust",
-        "ODS Trust Code": "RGR"
+        "ODS Trust Code": "RGR",
     },
     {
         "NHS England Region": "East of England",
@@ -1921,7 +2089,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Suffolk County Council",
         "ODS LA Code": "609",
         "NHS Trusts": "East Suffolk and North Essex NHS Foundation Trust",
-        "ODS Trust Code": "RDE"
+        "ODS Trust Code": "RDE",
     },
     {
         "NHS England Region": "East of England",
@@ -1934,7 +2102,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Essex Partnership University NHS Foundation Trust",
-        "ODS Trust Code": "R1L"
+        "ODS Trust Code": "R1L",
     },
     {
         "NHS England Region": "East of England",
@@ -1947,7 +2115,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East of England Ambulance Service NHS Trust",
-        "ODS Trust Code": "RYC"
+        "ODS Trust Code": "RYC",
     },
     {
         "NHS England Region": "East of England",
@@ -1960,7 +2128,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Norfolk and Suffolk NHS Foundation Trust",
-        "ODS Trust Code": "RMY"
+        "ODS Trust Code": "RMY",
     },
     {
         "NHS England Region": "East of England",
@@ -1973,7 +2141,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Bedford Borough Council",
         "ODS LA Code": "625",
         "NHS Trusts": "Bedfordshire Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RC9"
+        "ODS Trust Code": "RC9",
     },
     {
         "NHS England Region": "East of England",
@@ -1986,7 +2154,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Central Bedfordshire Council",
         "ODS LA Code": "626",
         "NHS Trusts": "Milton Keynes University Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RD8"
+        "ODS Trust Code": "RD8",
     },
     {
         "NHS England Region": "East of England",
@@ -1999,7 +2167,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Luton Borough Council",
         "ODS LA Code": "611",
         "NHS Trusts": "Cambridgeshire Community Services NHS Trust",
-        "ODS Trust Code": "RYV"
+        "ODS Trust Code": "RYV",
     },
     {
         "NHS England Region": "East of England",
@@ -2012,7 +2180,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Milton Keynes Council",
         "ODS LA Code": "613",
         "NHS Trusts": "Central and North West London NHS Foundation Trust",
-        "ODS Trust Code": "RV3"
+        "ODS Trust Code": "RV3",
     },
     {
         "NHS England Region": "East of England",
@@ -2025,7 +2193,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Buckinghamshire Council",
         "ODS LA Code": "916",
         "NHS Trusts": "East of England Ambulance Service NHS Trust",
-        "ODS Trust Code": "RYC"
+        "ODS Trust Code": "RYC",
     },
     {
         "NHS England Region": "East of England",
@@ -2038,7 +2206,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East London NHS Foundation Trust",
-        "ODS Trust Code": "RWK"
+        "ODS Trust Code": "RWK",
     },
     {
         "NHS England Region": "East of England",
@@ -2051,7 +2219,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Central Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYE"
+        "ODS Trust Code": "RYE",
     },
     {
         "NHS England Region": "East of England",
@@ -2064,7 +2232,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Hertfordshire County Council",
         "ODS LA Code": "606",
         "NHS Trusts": "Hertfordshire Partnership University NHS Foundation Trust",
-        "ODS Trust Code": "RWR"
+        "ODS Trust Code": "RWR",
     },
     {
         "NHS England Region": "East of England",
@@ -2077,7 +2245,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Essex County Council",
         "ODS LA Code": "620",
         "NHS Trusts": "Essex Partnership University NHS Foundation Trust",
-        "ODS Trust Code": "R1L"
+        "ODS Trust Code": "R1L",
     },
     {
         "NHS England Region": "East of England",
@@ -2090,7 +2258,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Hertfordshire Community NHS Trust",
-        "ODS Trust Code": "RY4"
+        "ODS Trust Code": "RY4",
     },
     {
         "NHS England Region": "East of England",
@@ -2103,7 +2271,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East and North Hertfordshire NHS Trust",
-        "ODS Trust Code": "RWH"
+        "ODS Trust Code": "RWH",
     },
     {
         "NHS England Region": "East of England",
@@ -2116,7 +2284,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "The Princess Alexandra Hospital NHS Trust",
-        "ODS Trust Code": "RQW"
+        "ODS Trust Code": "RQW",
     },
     {
         "NHS England Region": "East of England",
@@ -2129,7 +2297,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "West Hertfordshire Teaching Hospitals NHS Trust",
-        "ODS Trust Code": "RWG"
+        "ODS Trust Code": "RWG",
     },
     {
         "NHS England Region": "East of England",
@@ -2142,7 +2310,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Central London Community Healthcare NHS Trust",
-        "ODS Trust Code": "RYE"
+        "ODS Trust Code": "RYE",
     },
     {
         "NHS England Region": "East of England",
@@ -2155,7 +2323,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East of England Ambulance Service NHS Trust",
-        "ODS Trust Code": "RYC"
+        "ODS Trust Code": "RYC",
     },
     {
         "NHS England Region": "East of England",
@@ -2168,7 +2336,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Southend-on-Sea Borough Council",
         "ODS LA Code": "621",
         "NHS Trusts": "Mid and South Essex NHS Foundation Trust",
-        "ODS Trust Code": "RAJ"
+        "ODS Trust Code": "RAJ",
     },
     {
         "NHS England Region": "East of England",
@@ -2181,7 +2349,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Essex County Council",
         "ODS LA Code": "620",
         "NHS Trusts": "Essex Partnership University NHS Foundation Trust",
-        "ODS Trust Code": "R1L"
+        "ODS Trust Code": "R1L",
     },
     {
         "NHS England Region": "East of England",
@@ -2194,7 +2362,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Thurrock Council",
         "ODS LA Code": "622",
         "NHS Trusts": "North East London NHS Foundation Trust",
-        "ODS Trust Code": "RAT"
+        "ODS Trust Code": "RAT",
     },
     {
         "NHS England Region": "East of England",
@@ -2207,20 +2375,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East of England Ambulance Service NHS Trust",
-        "ODS Trust Code": "RYC"
-    },
-    {
-        "NHS England Region": "East of England",
-        "NHS England Region Code": "Y61",
-        "ODS ICB Code": "QH8",
-        "ONS ICB Boundary Code": "E54000026",
-        "ICB Name": "NHS MID AND SOUTH ESSEX INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "NHS MID AND SOUTH ESSEX ICB",
-        "ODS Sub ICB Code": "99F",
-        "Local Authority": "",
-        "ODS LA Code": "",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
+        "ODS Trust Code": "RYC",
     },
     {
         "NHS England Region": "London",
@@ -2233,7 +2388,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Brent",
         "ODS LA Code": "719",
         "NHS Trusts": "West London NHS Trust",
-        "ODS Trust Code": "RKL"
+        "ODS Trust Code": "RKL",
     },
     {
         "NHS England Region": "London",
@@ -2246,7 +2401,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Harrow",
         "ODS LA Code": "725",
         "NHS Trusts": "Central and North West London NHS Foundation Trust",
-        "ODS Trust Code": "RV3"
+        "ODS Trust Code": "RV3",
     },
     {
         "NHS England Region": "London",
@@ -2259,7 +2414,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Hillingdon",
         "ODS LA Code": "727",
         "NHS Trusts": "Chelsea and Westminster Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RQM"
+        "ODS Trust Code": "RQM",
     },
     {
         "NHS England Region": "London",
@@ -2272,7 +2427,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Hounslow",
         "ODS LA Code": "728",
         "NHS Trusts": "London North West University Healthcare NHS Trust",
-        "ODS Trust Code": "R1K"
+        "ODS Trust Code": "R1K",
     },
     {
         "NHS England Region": "London",
@@ -2285,7 +2440,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Royal Borough of Kensington and Chelsea",
         "ODS LA Code": "707",
         "NHS Trusts": "The Hillingdon Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RAS"
+        "ODS Trust Code": "RAS",
     },
     {
         "NHS England Region": "London",
@@ -2298,7 +2453,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Hammersmith and Fulham",
         "ODS LA Code": "705",
         "NHS Trusts": "Imperial College Healthcare NHS Trust",
-        "ODS Trust Code": "RYJ"
+        "ODS Trust Code": "RYJ",
     },
     {
         "NHS England Region": "London",
@@ -2311,7 +2466,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Ealing",
         "ODS LA Code": "722",
         "NHS Trusts": "London Ambulance Service NHS Trust",
-        "ODS Trust Code": "RRU"
+        "ODS Trust Code": "RRU",
     },
     {
         "NHS England Region": "London",
@@ -2324,7 +2479,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Westminster City Council",
         "ODS LA Code": "713",
         "NHS Trusts": "Central London Community Healthcare NHS Trust",
-        "ODS Trust Code": "RYX"
+        "ODS Trust Code": "RYX",
     },
     {
         "NHS England Region": "London",
@@ -2337,21 +2492,21 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Barnet",
         "ODS LA Code": "717",
         "NHS Trusts": "Barnet, Enfield and Haringey Mental Health NHS Trust",
-        "ODS Trust Code": "RRP"
+        "ODS Trust Code": "RRP",
     },
-    {
-        "NHS England Region": "London",
-        "NHS England Region Code": "Y56",
-        "ODS ICB Code": "QMJ",
-        "ONS ICB Boundary Code": "E54000028",
-        "ICB Name": "NHS NORTH CENTRAL LONDON INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "London Borough of Camden",
-        "ODS LA Code": "702",
-        "NHS Trusts": "Camden and Islington NHS Foundation Trust",
-        "ODS Trust Code": "TAF"
-    },
+    # {
+    #     "NHS England Region": "London",
+    #     "NHS England Region Code": "Y56",
+    #     "ODS ICB Code": "QMJ",
+    #     "ONS ICB Boundary Code": "E54000028",
+    #     "ICB Name": "NHS NORTH CENTRAL LONDON INTEGRATED CARE BOARD",
+    #     "Sub ICB Locations (formerly CCGs)": "",
+    #     "ODS Sub ICB Code": "",
+    #     "Local Authority": "London Borough of Camden",
+    #     "ODS LA Code": "702",
+    #     "NHS Trusts": "Camden and Islington NHS Foundation Trust",
+    #     "ODS Trust Code": "TAF",
+    # },
     {
         "NHS England Region": "London",
         "NHS England Region Code": "Y56",
@@ -2363,7 +2518,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Enfield",
         "ODS LA Code": "723",
         "NHS Trusts": "Central and North West London NHS Foundation Trust",
-        "ODS Trust Code": "RV3"
+        "ODS Trust Code": "RV3",
     },
     {
         "NHS England Region": "London",
@@ -2376,7 +2531,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Haringey",
         "ODS LA Code": "724",
         "NHS Trusts": "Central London Community Healthcare NHS Trust",
-        "ODS Trust Code": "RYX"
+        "ODS Trust Code": "RYX",
     },
     {
         "NHS England Region": "London",
@@ -2389,7 +2544,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Islington",
         "ODS LA Code": "706",
         "NHS Trusts": "Moorfields Eye Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RP6"
+        "ODS Trust Code": "RP6",
     },
     {
         "NHS England Region": "London",
@@ -2402,7 +2557,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "North Middlesex University Hospital NHS Trust",
-        "ODS Trust Code": "RAP"
+        "ODS Trust Code": "RAP",
     },
     {
         "NHS England Region": "London",
@@ -2415,7 +2570,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Royal Free London NHS Foundation Trust",
-        "ODS Trust Code": "RAL"
+        "ODS Trust Code": "RAL",
     },
     {
         "NHS England Region": "London",
@@ -2428,7 +2583,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Royal National Orthopaedic Hospital NHS Trust",
-        "ODS Trust Code": "RAN"
+        "ODS Trust Code": "RAN",
     },
     {
         "NHS England Region": "London",
@@ -2441,7 +2596,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Tavistock and Portman NHS Foundation Trust",
-        "ODS Trust Code": "RNK"
+        "ODS Trust Code": "RNK",
     },
     {
         "NHS England Region": "London",
@@ -2454,7 +2609,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University College London Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RRV"
+        "ODS Trust Code": "RRV",
     },
     {
         "NHS England Region": "London",
@@ -2467,7 +2622,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "London Ambulance Service NHS Trust",
-        "ODS Trust Code": "RRU"
+        "ODS Trust Code": "RRU",
     },
     {
         "NHS England Region": "London",
@@ -2480,7 +2635,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Great Ormond Street Hospital for Children NHS Foundation Trust",
-        "ODS Trust Code": "RP4"
+        "ODS Trust Code": "RP4",
     },
     {
         "NHS England Region": "London",
@@ -2493,7 +2648,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Whittington Health NHS Trust",
-        "ODS Trust Code": "RKE"
+        "ODS Trust Code": "RKE",
     },
     {
         "NHS England Region": "London",
@@ -2506,7 +2661,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Barking and Dagenham",
         "ODS LA Code": "716",
         "NHS Trusts": "Barking, Havering and Redbridge University Hospitals NHS Trust",
-        "ODS Trust Code": "RF4"
+        "ODS Trust Code": "RF4",
     },
     {
         "NHS England Region": "London",
@@ -2519,7 +2674,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Corporation of the City of London",
         "ODS LA Code": "714",
         "NHS Trusts": "Barts Health NHS Trust",
-        "ODS Trust Code": "R1H"
+        "ODS Trust Code": "R1H",
     },
     {
         "NHS England Region": "London",
@@ -2532,7 +2687,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Hackney",
         "ODS LA Code": "704",
         "NHS Trusts": "East London NHS Foundation Trust",
-        "ODS Trust Code": "RWK"
+        "ODS Trust Code": "RWK",
     },
     {
         "NHS England Region": "London",
@@ -2545,7 +2700,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Havering",
         "ODS LA Code": "726",
         "NHS Trusts": "Homerton University Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RQX"
+        "ODS Trust Code": "RQX",
     },
     {
         "NHS England Region": "London",
@@ -2558,7 +2713,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Newham Council",
         "ODS LA Code": "731",
         "NHS Trusts": "North East London NHS Foundation Trust",
-        "ODS Trust Code": "RAT"
+        "ODS Trust Code": "RAT",
     },
     {
         "NHS England Region": "London",
@@ -2571,33 +2726,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Redbridge Council",
         "ODS LA Code": "732",
         "NHS Trusts": "London Ambulance Service NHS Trust",
-        "ODS Trust Code": "RRU"
-    },
-    {
-        "NHS England Region": "London",
-        "NHS England Region Code": "Y56",
-        "ODS ICB Code": "QMF",
-        "ONS ICB Boundary Code": "E54000029",
-        "ICB Name": "NHS NORTH EAST LONDON INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "London Borough of Tower Hamlets Council",
-        "ODS LA Code": "711",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
-    },
-    {
-        "NHS England Region": "London",
-        "NHS England Region Code": "Y56",
-        "ODS ICB Code": "QMF",
-        "ONS ICB Boundary Code": "E54000029",
-        "ICB Name": "NHS NORTH EAST LONDON INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "London Borough of Waltham Forest Council",
-        "ODS LA Code": "735",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
+        "ODS Trust Code": "RRU",
     },
     {
         "NHS England Region": "London",
@@ -2610,7 +2739,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Bexley",
         "ODS LA Code": "718",
         "NHS Trusts": "King's College Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RJZ"
+        "ODS Trust Code": "RJZ",
     },
     {
         "NHS England Region": "London",
@@ -2623,7 +2752,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Bromley",
         "ODS LA Code": "720",
         "NHS Trusts": "Guy's and St Thomas' NHS Foundation Trust",
-        "ODS Trust Code": "RJ1"
+        "ODS Trust Code": "RJ1",
     },
     {
         "NHS England Region": "London",
@@ -2636,7 +2765,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Royal Borough of Greenwich",
         "ODS LA Code": "703",
         "NHS Trusts": "Lewisham and Greenwich NHS Trust",
-        "ODS Trust Code": "RJ2"
+        "ODS Trust Code": "RJ2",
     },
     {
         "NHS England Region": "London",
@@ -2649,7 +2778,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Lambeth Council",
         "ODS LA Code": "708",
         "NHS Trusts": "South London and Maudsley NHS Foundation Trust",
-        "ODS Trust Code": "RV5"
+        "ODS Trust Code": "RV5",
     },
     {
         "NHS England Region": "London",
@@ -2662,7 +2791,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Lewisham Council",
         "ODS LA Code": "709",
         "NHS Trusts": "Oxleas NHS Foundation Trust",
-        "ODS Trust Code": "RPG"
+        "ODS Trust Code": "RPG",
     },
     {
         "NHS England Region": "London",
@@ -2675,7 +2804,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Southwark Council",
         "ODS LA Code": "710",
         "NHS Trusts": "London Ambulance Service NHS Trust",
-        "ODS Trust Code": "RRU"
+        "ODS Trust Code": "RRU",
     },
     {
         "NHS England Region": "London",
@@ -2688,7 +2817,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Croydon",
         "ODS LA Code": "721",
         "NHS Trusts": "Croydon Health Services NHS Trust",
-        "ODS Trust Code": "RJ6"
+        "ODS Trust Code": "RJ6",
     },
     {
         "NHS England Region": "London",
@@ -2701,7 +2830,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Royal Borough of Kingston-Upon-Thames Council",
         "ODS LA Code": "729",
         "NHS Trusts": "Epsom and St Helier University Hospitals NHS Trust",
-        "ODS Trust Code": "RVR"
+        "ODS Trust Code": "RVR",
     },
     {
         "NHS England Region": "London",
@@ -2714,7 +2843,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Merton Council",
         "ODS LA Code": "730",
         "NHS Trusts": "Kingston Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RAX"
+        "ODS Trust Code": "RAX",
     },
     {
         "NHS England Region": "London",
@@ -2727,7 +2856,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Richmond Upon Thames Council",
         "ODS LA Code": "733",
         "NHS Trusts": "St George's University Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RJ7"
+        "ODS Trust Code": "RJ7",
     },
     {
         "NHS England Region": "London",
@@ -2740,7 +2869,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Sutton Council",
         "ODS LA Code": "734",
         "NHS Trusts": "South West London and St George's Mental Health NHS Trust",
-        "ODS Trust Code": "RQY"
+        "ODS Trust Code": "RQY",
     },
     {
         "NHS England Region": "London",
@@ -2753,7 +2882,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "London Borough of Wandsworth",
         "ODS LA Code": "712",
         "NHS Trusts": "South London and Maudsley NHS Foundation Trust",
-        "ODS Trust Code": "RV5"
+        "ODS Trust Code": "RV5",
     },
     {
         "NHS England Region": "London",
@@ -2766,7 +2895,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Central London Community Healthcare NHS Trust",
-        "ODS Trust Code": "RYX"
+        "ODS Trust Code": "RYX",
     },
     {
         "NHS England Region": "London",
@@ -2779,7 +2908,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Hounslow and Richmond Community Healthcare NHS Trust",
-        "ODS Trust Code": "RY9"
+        "ODS Trust Code": "RY9",
     },
     {
         "NHS England Region": "London",
@@ -2792,7 +2921,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "The Royal Marsden NHS Foundation Trust",
-        "ODS Trust Code": "RPY"
+        "ODS Trust Code": "RPY",
     },
     {
         "NHS England Region": "London",
@@ -2805,7 +2934,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "London Ambulance Service NHS Trust",
-        "ODS Trust Code": "RRU"
+        "ODS Trust Code": "RRU",
     },
     {
         "NHS England Region": "South East",
@@ -2818,7 +2947,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Kent County Council",
         "ODS LA Code": "820",
         "NHS Trusts": "Maidstone and Tunbridge Wells NHS Trust",
-        "ODS Trust Code": "RWF"
+        "ODS Trust Code": "RWF",
     },
     {
         "NHS England Region": "South East",
@@ -2831,7 +2960,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Medway Council",
         "ODS LA Code": "821",
         "NHS Trusts": "Medway NHS Foundation Trust",
-        "ODS Trust Code": "RPA"
+        "ODS Trust Code": "RPA",
     },
     {
         "NHS England Region": "South East",
@@ -2844,7 +2973,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Dartford and Gravesham NHS Trust",
-        "ODS Trust Code": "RN7"
+        "ODS Trust Code": "RN7",
     },
     {
         "NHS England Region": "South East",
@@ -2857,7 +2986,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Kent Hospitals University NHS Foundation Trust",
-        "ODS Trust Code": "RVV"
+        "ODS Trust Code": "RVV",
     },
     {
         "NHS England Region": "South East",
@@ -2870,7 +2999,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Kent Community Health NHS Foundation Trust",
-        "ODS Trust Code": "RYY"
+        "ODS Trust Code": "RYY",
     },
     {
         "NHS England Region": "South East",
@@ -2883,7 +3012,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Kent and Medway NHS and Social Care Partnership Trust",
-        "ODS Trust Code": "RXY"
+        "ODS Trust Code": "RXY",
     },
     {
         "NHS England Region": "South East",
@@ -2896,7 +3025,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South East Coast Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYD"
+        "ODS Trust Code": "RYD",
     },
     {
         "NHS England Region": "South East",
@@ -2909,7 +3038,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "West Sussex County Council",
         "ODS LA Code": "807",
         "NHS Trusts": "Queen Victoria Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RPC"
+        "ODS Trust Code": "RPC",
     },
     {
         "NHS England Region": "South East",
@@ -2922,7 +3051,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Brighton and Hove City Council",
         "ODS LA Code": "816",
         "NHS Trusts": "Sussex Community NHS Foundation Trust",
-        "ODS Trust Code": "RDR"
+        "ODS Trust Code": "RDR",
     },
     {
         "NHS England Region": "South East",
@@ -2935,7 +3064,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "East Sussex County Council",
         "ODS LA Code": "815",
         "NHS Trusts": "Sussex Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RX2"
+        "ODS Trust Code": "RX2",
     },
     {
         "NHS England Region": "South East",
@@ -2948,7 +3077,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Surrey and Sussex Healthcare NHS Trust",
-        "ODS Trust Code": "RTP"
+        "ODS Trust Code": "RTP",
     },
     {
         "NHS England Region": "South East",
@@ -2961,7 +3090,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University Hospitals Sussex NHS Foundation Trust",
-        "ODS Trust Code": "RYR"
+        "ODS Trust Code": "RYR",
     },
     {
         "NHS England Region": "South East",
@@ -2974,7 +3103,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "East Sussex Healthcare NHS Trust",
-        "ODS Trust Code": "RXC"
+        "ODS Trust Code": "RXC",
     },
     {
         "NHS England Region": "South East",
@@ -2987,7 +3116,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South East Coast Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYD"
+        "ODS Trust Code": "RYD",
     },
     {
         "NHS England Region": "South East",
@@ -3000,7 +3129,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Hampshire County Council",
         "ODS LA Code": "812",
         "NHS Trusts": "Frimley Health NHS Foundation Trust",
-        "ODS Trust Code": "RDU"
+        "ODS Trust Code": "RDU",
     },
     {
         "NHS England Region": "South East",
@@ -3013,7 +3142,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Surrey County Council",
         "ODS LA Code": "805",
         "NHS Trusts": "Berkshire Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RWX"
+        "ODS Trust Code": "RWX",
     },
     {
         "NHS England Region": "South East",
@@ -3026,7 +3155,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Bracknell Forest Council",
         "ODS LA Code": "614",
         "NHS Trusts": "Surrey and Borders Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RXX"
+        "ODS Trust Code": "RXX",
     },
     {
         "NHS England Region": "South East",
@@ -3039,7 +3168,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Royal Borough of Windsor and Maidenhead",
         "ODS LA Code": "618",
         "NHS Trusts": "South Central Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYE"
+        "ODS Trust Code": "RYE",
     },
     {
         "NHS England Region": "South East",
@@ -3052,59 +3181,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Slough Borough Council",
         "ODS LA Code": "617",
         "NHS Trusts": "South East Coast Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYD"
-    },
-    {
-        "NHS England Region": "South East",
-        "NHS England Region Code": "Y59",
-        "ODS ICB Code": "QNQ",
-        "ONS ICB Boundary Code": "E54000034",
-        "ICB Name": "NHS FRIMLEY INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "Hart District Council",
-        "ODS LA Code": "225",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
-    },
-    {
-        "NHS England Region": "South East",
-        "NHS England Region Code": "Y59",
-        "ODS ICB Code": "QNQ",
-        "ONS ICB Boundary Code": "E54000034",
-        "ICB Name": "NHS FRIMLEY INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "Rushmoor Borough Council",
-        "ODS LA Code": "287",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
-    },
-    {
-        "NHS England Region": "South East",
-        "NHS England Region Code": "Y59",
-        "ODS ICB Code": "QNQ",
-        "ONS ICB Boundary Code": "E54000034",
-        "ICB Name": "NHS FRIMLEY INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "Surrey Heath Borough Council",
-        "ODS LA Code": "340",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
-    },
-    {
-        "NHS England Region": "South East",
-        "NHS England Region Code": "Y59",
-        "ODS ICB Code": "QNQ",
-        "ONS ICB Boundary Code": "E54000034",
-        "ICB Name": "NHS FRIMLEY INTEGRATED CARE BOARD",
-        "Sub ICB Locations (formerly CCGs)": "",
-        "ODS Sub ICB Code": "",
-        "Local Authority": "Waverley Borough Council",
-        "ODS LA Code": "362",
-        "NHS Trusts": "",
-        "ODS Trust Code": ""
+        "ODS Trust Code": "RYD",
     },
     {
         "NHS England Region": "South East",
@@ -3117,7 +3194,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Surrey County Council",
         "ODS LA Code": "805",
         "NHS Trusts": "Ashford and St Peter's Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RTK"
+        "ODS Trust Code": "RTK",
     },
     {
         "NHS England Region": "South East",
@@ -3130,7 +3207,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "West Sussex County Council",
         "ODS LA Code": "807",
         "NHS Trusts": "Surrey and Sussex Healthcare NHS Trust",
-        "ODS Trust Code": "RTP"
+        "ODS Trust Code": "RTP",
     },
     {
         "NHS England Region": "South East",
@@ -3143,7 +3220,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Royal Surrey County Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RA2"
+        "ODS Trust Code": "RA2",
     },
     {
         "NHS England Region": "South East",
@@ -3156,7 +3233,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Epsom and St Helier University Hospitals NHS Trust",
-        "ODS Trust Code": "RVR"
+        "ODS Trust Code": "RVR",
     },
     {
         "NHS England Region": "South East",
@@ -3169,7 +3246,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Surrey and Borders Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RXX"
+        "ODS Trust Code": "RXX",
     },
     {
         "NHS England Region": "South East",
@@ -3182,7 +3259,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Kingston Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RAX"
+        "ODS Trust Code": "RAX",
     },
     {
         "NHS England Region": "South East",
@@ -3195,7 +3272,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South East Coast Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYD"
+        "ODS Trust Code": "RYD",
     },
     {
         "NHS England Region": "South West",
@@ -3208,7 +3285,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Cornwall Council",
         "ODS LA Code": "902",
         "NHS Trusts": "Cornwall Partnership NHS Foundation Trust",
-        "ODS Trust Code": "RJ8"
+        "ODS Trust Code": "RJ8",
     },
     {
         "NHS England Region": "South West",
@@ -3221,7 +3298,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Council of the Isles of Scilly",
         "ODS LA Code": "906",
         "NHS Trusts": "Royal Cornwall Hospitals NHS Trust",
-        "ODS Trust Code": "REF"
+        "ODS Trust Code": "REF",
     },
     {
         "NHS England Region": "South West",
@@ -3234,7 +3311,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South West",
@@ -3247,7 +3324,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University Hospitals Plymouth NHS Trust",
-        "ODS Trust Code": "RK9"
+        "ODS Trust Code": "RK9",
     },
     {
         "NHS England Region": "South West",
@@ -3260,7 +3337,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Devon County Council",
         "ODS LA Code": "912",
         "NHS Trusts": "University Hospitals Plymouth NHS Trust",
-        "ODS Trust Code": "RK9"
+        "ODS Trust Code": "RK9",
     },
     {
         "NHS England Region": "South West",
@@ -3273,7 +3350,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Plymouth City Council",
         "ODS LA Code": "913",
         "NHS Trusts": "Royal Devon University Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RH8"
+        "ODS Trust Code": "RH8",
     },
     {
         "NHS England Region": "South West",
@@ -3286,7 +3363,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Torbay Council",
         "ODS LA Code": "914",
         "NHS Trusts": "Torbay and South Devon NHS Foundation Trust",
-        "ODS Trust Code": "RA9"
+        "ODS Trust Code": "RA9",
     },
     {
         "NHS England Region": "South West",
@@ -3299,7 +3376,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Devon Partnership NHS Trust",
-        "ODS Trust Code": "RWV"
+        "ODS Trust Code": "RWV",
     },
     {
         "NHS England Region": "South West",
@@ -3312,7 +3389,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South West",
@@ -3325,7 +3402,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Somerset County Council",
         "ODS LA Code": "905",
         "NHS Trusts": "Somerset NHS Foundation Trust",
-        "ODS Trust Code": "RH5"
+        "ODS Trust Code": "RH5",
     },
     {
         "NHS England Region": "South West",
@@ -3338,7 +3415,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Yeovil District Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RA4"
+        "ODS Trust Code": "RA4",
     },
     {
         "NHS England Region": "South West",
@@ -3351,7 +3428,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South West",
@@ -3364,7 +3441,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Bristol City Council",
         "ODS LA Code": "909",
         "NHS Trusts": "North Bristol NHS Trust",
-        "ODS Trust Code": "RVJ"
+        "ODS Trust Code": "RVJ",
     },
     {
         "NHS England Region": "South West",
@@ -3377,7 +3454,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "North Somerset District Council",
         "ODS LA Code": "910",
         "NHS Trusts": "University Hospitals Bristol and Weston NHS Foundation Trust",
-        "ODS Trust Code": "RA7"
+        "ODS Trust Code": "RA7",
     },
     {
         "NHS England Region": "South West",
@@ -3390,7 +3467,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "South Gloucestershire Council",
         "ODS LA Code": "911",
         "NHS Trusts": "Avon and Wiltshire Mental Health Partnership NHS Trust",
-        "ODS Trust Code": "RVN"
+        "ODS Trust Code": "RVN",
     },
     {
         "NHS England Region": "South West",
@@ -3403,7 +3480,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South West",
@@ -3416,7 +3493,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Bath & North East Somerset Council",
         "ODS LA Code": "908",
         "NHS Trusts": "Royal United Hospitals Bath NHS Foundation Trust",
-        "ODS Trust Code": "RD1"
+        "ODS Trust Code": "RD1",
     },
     {
         "NHS England Region": "South West",
@@ -3429,7 +3506,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Swindon Borough Council",
         "ODS LA Code": "819",
         "NHS Trusts": "Great Western Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RN3"
+        "ODS Trust Code": "RN3",
     },
     {
         "NHS England Region": "South West",
@@ -3442,7 +3519,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Wiltshire Council",
         "ODS LA Code": "817",
         "NHS Trusts": "Salisbury NHS Foundation Trust",
-        "ODS Trust Code": "RNZ"
+        "ODS Trust Code": "RNZ",
     },
     {
         "NHS England Region": "South West",
@@ -3455,7 +3532,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Avon and Wiltshire Mental Health Partnership NHS Trust",
-        "ODS Trust Code": "RVN"
+        "ODS Trust Code": "RVN",
     },
     {
         "NHS England Region": "South West",
@@ -3468,7 +3545,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South West",
@@ -3481,7 +3558,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Dorset County Council",
         "ODS LA Code": "809",
         "NHS Trusts": "Dorset County Hospital NHS Foundation Trust",
-        "ODS Trust Code": "RBD"
+        "ODS Trust Code": "RBD",
     },
     {
         "NHS England Region": "South West",
@@ -3494,7 +3571,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "BCP Council",
         "ODS LA Code": "738",
         "NHS Trusts": "University Hospitals Dorset NHS Foundation Trust",
-        "ODS Trust Code": "R0D"
+        "ODS Trust Code": "R0D",
     },
     {
         "NHS England Region": "South West",
@@ -3507,7 +3584,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Dorset Healthcare University NHS Foundation Trust",
-        "ODS Trust Code": "RDY"
+        "ODS Trust Code": "RDY",
     },
     {
         "NHS England Region": "South West",
@@ -3520,7 +3597,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South East",
@@ -3533,7 +3610,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Hampshire County Council",
         "ODS LA Code": "812",
         "NHS Trusts": "Hampshire Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RN5"
+        "ODS Trust Code": "RN5",
     },
     {
         "NHS England Region": "South East",
@@ -3546,7 +3623,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Southampton City Council",
         "ODS LA Code": "814",
         "NHS Trusts": "Isle of Wight NHS Trust",
-        "ODS Trust Code": "R1F"
+        "ODS Trust Code": "R1F",
     },
     {
         "NHS England Region": "South East",
@@ -3559,7 +3636,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Portsmouth City Council",
         "ODS LA Code": "813",
         "NHS Trusts": "Portsmouth Hospitals NHS Trust",
-        "ODS Trust Code": "RHU"
+        "ODS Trust Code": "RHU",
     },
     {
         "NHS England Region": "South East",
@@ -3572,7 +3649,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Isle of Wight Council",
         "ODS LA Code": "803",
         "NHS Trusts": "Solent NHS Trust",
-        "ODS Trust Code": "R1C"
+        "ODS Trust Code": "R1C",
     },
     {
         "NHS England Region": "South East",
@@ -3585,7 +3662,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Central Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYE"
+        "ODS Trust Code": "RYE",
     },
     {
         "NHS England Region": "South East",
@@ -3598,7 +3675,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Southern Health NHS Foundation Trust",
-        "ODS Trust Code": "RW1"
+        "ODS Trust Code": "RW1",
     },
     {
         "NHS England Region": "South East",
@@ -3611,7 +3688,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "University Hospital Southampton NHS Foundation Trust",
-        "ODS Trust Code": "RHM"
+        "ODS Trust Code": "RHM",
     },
     {
         "NHS England Region": "South West",
@@ -3624,7 +3701,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Gloucestershire County Council",
         "ODS LA Code": "904",
         "NHS Trusts": "Gloucestershire Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RTE"
+        "ODS Trust Code": "RTE",
     },
     {
         "NHS England Region": "South West",
@@ -3637,7 +3714,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "Gloucestershire Health and Care NHS Foundation Trust",
-        "ODS Trust Code": "RTQ"
+        "ODS Trust Code": "RTQ",
     },
     {
         "NHS England Region": "South West",
@@ -3650,7 +3727,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Western Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYF"
+        "ODS Trust Code": "RYF",
     },
     {
         "NHS England Region": "South East",
@@ -3663,7 +3740,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Buckinghamshire County Council",
         "ODS LA Code": "612",
         "NHS Trusts": "Buckinghamshire Healthcare NHS Trust",
-        "ODS Trust Code": "RXQ"
+        "ODS Trust Code": "RXQ",
     },
     {
         "NHS England Region": "South East",
@@ -3676,7 +3753,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Oxfordshire County Council",
         "ODS LA Code": "608",
         "NHS Trusts": "Oxford University Hospitals NHS Foundation Trust",
-        "ODS Trust Code": "RTH"
+        "ODS Trust Code": "RTH",
     },
     {
         "NHS England Region": "South East",
@@ -3689,7 +3766,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Reading Borough Council",
         "ODS LA Code": "616",
         "NHS Trusts": "Royal Berkshire NHS Foundation Trust",
-        "ODS Trust Code": "RHW"
+        "ODS Trust Code": "RHW",
     },
     {
         "NHS England Region": "South East",
@@ -3702,7 +3779,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "Wokingham Borough Council",
         "ODS LA Code": "619",
         "NHS Trusts": "Oxford Health NHS Foundation Trust",
-        "ODS Trust Code": "RNU"
+        "ODS Trust Code": "RNU",
     },
     {
         "NHS England Region": "South East",
@@ -3715,7 +3792,7 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "West Berkshire District Council",
         "ODS LA Code": "615",
         "NHS Trusts": "Berkshire Healthcare NHS Foundation Trust",
-        "ODS Trust Code": "RWX"
+        "ODS Trust Code": "RWX",
     },
     {
         "NHS England Region": "South East",
@@ -3728,6 +3805,6 @@ INTEGRATED_CARE_BOARDS_LOCAL_AUTHORITIES = [
         "Local Authority": "",
         "ODS LA Code": "",
         "NHS Trusts": "South Central Ambulance Service NHS Foundation Trust",
-        "ODS Trust Code": "RYE"
-    }
+        "ODS Trust Code": "RYE",
+    },
 ]

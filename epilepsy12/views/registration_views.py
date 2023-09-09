@@ -74,9 +74,9 @@ def register(request, case_id):
             site_is_primary_centre_of_epilepsy_care=True,
             site_is_actively_involved_in_epilepsy_care=True,
         ).get()
+
         kpi = KPI.objects.create(
             organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -106,7 +106,7 @@ def register(request, case_id):
     else:
         registration = Registration.objects.filter(case=case).get()
 
-    organisation_list = Organisation.objects.order_by("OrganisationName")
+    organisation_list = Organisation.objects.order_by("name")
 
     previously_registered = 0
 
@@ -130,9 +130,9 @@ def register(request, case_id):
             site_is_primary_centre_of_epilepsy_care=True,
         ).all()
 
-    # test if registration_date and lead_centre exist, and eligibility criteria met
+    # test if first_paediatric_assessment_date and lead_centre exist, and eligibility criteria met
     if (
-        registration.registration_date
+        registration.first_paediatric_assessment_date
         and lead_site
         and registration.eligibility_criteria_met
     ):
@@ -227,7 +227,7 @@ def allocate_lead_site(request, registration_id):
 
     # get the new
 
-    organisation_list = Organisation.objects.order_by("OrganisationName")
+    organisation_list = Organisation.objects.order_by("name")
 
     context = {
         "organisation_list": organisation_list,
@@ -259,7 +259,7 @@ def edit_lead_site(request, registration_id, site_id):
     """
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.order_by("OrganisationName")
+    organisation_list = Organisation.objects.order_by("name")
 
     context = {
         "organisation_list": organisation_list,
@@ -295,7 +295,7 @@ def transfer_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
 
-    organisation_list = Organisation.objects.order_by("OrganisationName").all()
+    organisation_list = Organisation.objects.order_by("name").all()
 
     context = {
         "organisation_list": organisation_list,
@@ -326,7 +326,7 @@ def transfer_lead_site(request, registration_id, site_id):
 def cancel_lead_site(request, registration_id, site_id):
     registration = Registration.objects.get(pk=registration_id)
     site = Site.objects.get(pk=site_id)
-    organisation_list = Organisation.objects.order_by("OrganisationName")
+    organisation_list = Organisation.objects.order_by("name")
 
     context = {
         "registration": registration,
@@ -372,23 +372,9 @@ def update_lead_site(request, registration_id, site_id, update):
 
     registration = Registration.objects.get(pk=registration_id)
     previous_lead_site = Site.objects.get(pk=site_id)
+    origin_organisation = previous_lead_site.organisation
 
-    if update == "edit":
-        # no email is sent - this just updates the lead centre
-        new_trust_id = request.POST.get("edit_lead_site")
-        new_organisation = Organisation.objects.get(pk=new_trust_id)
-        Site.objects.filter(pk=site_id).update(
-            organisation=new_organisation,
-            site_is_primary_centre_of_epilepsy_care=True,
-            site_is_actively_involved_in_epilepsy_care=True,
-            updated_at=timezone.now(),
-            updated_by=request.user,
-        )
-        messages.success(
-            request,
-            f"{registration.case} has been successfully updated to {new_organisation.ParentOrganisation_OrganisationName}.",
-        )
-    elif update == "transfer":
+    if update == "transfer":
         new_trust_id = request.POST.get("transfer_lead_site")
         new_organisation = Organisation.objects.get(pk=new_trust_id)
         # update current site record to show nolonger actively involved in care
@@ -444,8 +430,8 @@ def update_lead_site(request, registration_id, site_id, update):
             email = construct_transfer_epilepsy12_site_email(
                 request=request,
                 user=recipient,
-                target_organisation=new_organisation.ParentOrganisation_OrganisationName,
-                child=registration.case,
+                target_organisation=new_organisation,
+                origin_organisation=origin_organisation,
             )
             try:
                 send_mail(
@@ -459,9 +445,14 @@ def update_lead_site(request, registration_id, site_id, update):
             except BadHeaderError:
                 return HttpResponse("Invalid header found.")
 
+        if new_organisation.country.boundary_identifier == "W92000004":
+            parent_trust = new_organisation.local_health_board.name
+        else:
+            parent_trust = new_organisation.trust.name
+
         messages.success(
             request,
-            f"{registration.case} has been successfully transferred to {new_organisation.ParentOrganisation_OrganisationName}. Email notifications have been sent to RCPCH and the lead clinicians.",
+            f"{registration.case} has been successfully transferred to {parent_trust}. Email notifications have been sent to RCPCH and the lead clinicians.",
         )
 
     return HttpResponseClientRedirect(
@@ -511,7 +502,7 @@ def delete_lead_site(request, registration_id, site_id):
         site_is_actively_involved_in_epilepsy_care=True,
     ).first()
 
-    organisation_list = Organisation.objects.order_by("OrganisationName")
+    organisation_list = Organisation.objects.order_by("name")
 
     context = {
         "registration": registration,
@@ -625,7 +616,9 @@ def registration_status(request, registration_id):
 
     context = {"case_id": case.pk, "registration": registration}
 
-    template_name = "epilepsy12/partials/registration/registration_dates.html"
+    template_name = (
+        "epilepsy12/partials/registration/first_paediatric_assessment_dates.html"
+    )
 
     response = recalculate_form_generate_response(
         model_instance=registration,
@@ -642,11 +635,11 @@ def registration_status(request, registration_id):
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
 )
-def registration_date(request, case_id):
+def first_paediatric_assessment_date(request, case_id):
     """
     This defines registration in the audit and refers to the date of first paediatric assessment.
     Call back from POST request on button press of register button
-    in registration_dates partial.
+    in first_paediatric_assessment_dates partial.
     This sets the registration date, and in turn, the cohort number
     It also triggers htmx 'registration_active' to enable the steps
     """
@@ -660,7 +653,7 @@ def registration_date(request, case_id):
             request,
             registration.pk,
             Registration,
-            field_name="registration_date",
+            field_name="first_paediatric_assessment_date",
             page_element="date_field",
             earliest_allowable_date=get_current_cohort_data()["cohort_start_date"],
         )

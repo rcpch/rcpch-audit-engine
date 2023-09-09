@@ -135,7 +135,7 @@ def eeg_request_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="eeg_performed_date",
             is_earliest_date=True,
-            earliest_allowable_date=investigations.registration.registration_date,
+            earliest_allowable_date=investigations.registration.first_paediatric_assessment_date,
         )
 
     except ValueError as error:
@@ -186,7 +186,7 @@ def eeg_performed_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="eeg_request_date",
             is_earliest_date=False,
-            earliest_allowable_date=investigations.registration.registration_date,
+            earliest_allowable_date=investigations.registration.first_paediatric_assessment_date,
         )
 
     except ValueError as errors:
@@ -419,7 +419,7 @@ def mri_brain_requested_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="mri_brain_reported_date",
             is_earliest_date=True,
-            earliest_allowable_date=investigations.registration.registration_date,
+            earliest_allowable_date=investigations.registration.first_paediatric_assessment_date,
         )
 
     except ValueError as errors:
@@ -471,7 +471,7 @@ def mri_brain_reported_date(request, investigations_id):
             page_element="date_field",
             comparison_date_field_name="mri_brain_requested_date",
             is_earliest_date=False,
-            earliest_allowable_date=investigations.registration.registration_date,
+            earliest_allowable_date=investigations.registration.first_paediatric_assessment_date,
         )
 
     except ValueError as errors:

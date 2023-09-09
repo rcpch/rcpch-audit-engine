@@ -13,9 +13,9 @@ def score_kpi_2(registration_instance) -> int:
     % of children and young people with epilepsy, with input by epilepsy specialist nurse within the first year of care
 
     Calculation Method
-    
+
     Numerator= Number of children and young people [diagnosed with epilepsy] AND who had input from an Epilepsy Specialist Nurse by first year
-    
+
     Denominator = Number of children and young people [diagnosed with epilepsy] at first year
     """
 
@@ -35,7 +35,9 @@ def score_kpi_2(registration_instance) -> int:
 
     # score check
     has_seen_nurse_within_1_yr_registration = (
-        assessment.epilepsy_specialist_nurse_input_date <= registration_instance.registration_date + relativedelta(years=1)
+        assessment.epilepsy_specialist_nurse_input_date
+        <= registration_instance.first_paediatric_assessment_date
+        + relativedelta(years=1)
     )
 
     if has_seen_nurse_within_1_yr_registration:
