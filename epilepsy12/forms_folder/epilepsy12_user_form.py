@@ -1,8 +1,6 @@
 from django import forms
 from django.core import validators
 from django.contrib.auth.forms import (
-    UserCreationForm,
-    UserChangeForm,
     PasswordResetForm,
     SetPasswordForm,
     AuthenticationForm,
@@ -188,6 +186,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
             cleaned_data["organisation_employer"] = None
             cleaned_data["is_rcpch_audit_team_member"] = True
             cleaned_data["view_preference"] = 0
+
         return cleaned_data
 
 

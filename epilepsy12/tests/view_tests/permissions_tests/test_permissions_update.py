@@ -2,6 +2,8 @@
 ## Update Tests
 
 # Epilepsy12Users
+    [ ] Assert an Audit Centre Lead Clinician CANNOT make themselves is_rcpch_audit_team_member
+    [ ] Assert an Audit Centre Lead Clinician CANNOT make themselves is_rcpch_staff
     [x] Assert an Audit Centre Administrator CANNOT update users inside own Trust
     [x] Assert an Audit Centre Administrator CANNOT update users from outside own Trust 
     [x] Assert an audit centre clinician CANNOT update users inside own Trust
@@ -306,6 +308,12 @@ def test_users_update_users_forbidden(
         trust__ods_code="RGT",
     )
 
+    # GOS
+    SAME_TRUST_SAME_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
     # Seed Test user to be updated
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
@@ -316,6 +324,21 @@ def test_users_update_users_forbidden(
         is_staff=test_user_audit_centre_administrator_data.is_staff,
         is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
         is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[
+            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
+        ],
+    )
+
+    LEAD_CLINICIAN_SAME_ORG_NOT_SUPERUSER_OR_RCPCH_TEAM = E12UserFactory(
+        email=f"{SAME_TRUST_SAME_ORGANISATION}_AUDIT_CENTRE_LEAD_CLINICIAN@email.com",
+        first_name=f"{SAME_TRUST_SAME_ORGANISATION}_AUDIT_CENTRE_LEAD_CLINICIAN",
+        role=test_user_audit_centre_lead_clinician_data.role,
+        # Assign flags based on user role
+        is_active=test_user_audit_centre_lead_clinician_data.is_active,
+        is_staff=test_user_audit_centre_lead_clinician_data.is_staff,
+        is_rcpch_audit_team_member=test_user_audit_centre_lead_clinician_data.is_rcpch_audit_team_member,
+        is_rcpch_staff=test_user_audit_centre_lead_clinician_data.is_rcpch_staff,
         organisation_employer=TEST_USER_ORGANISATION,
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -369,6 +392,9 @@ def test_users_update_users_forbidden(
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
+        
+    # test if LEAD_CLINICIAN_SAME_ORG_NOT_SUPERUSER_OR_RCPCH_TEAM update is_rcpch_team_member status is forbidden
+    
 
 
 @pytest.mark.django_db

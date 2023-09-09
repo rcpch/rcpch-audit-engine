@@ -502,7 +502,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             return redirect(redirect_url)
 
         else:
-            print("creating users")
             if form.is_valid():
                 # this will not include the password which will be empty
                 new_user = form.save()

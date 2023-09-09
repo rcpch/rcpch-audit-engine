@@ -379,7 +379,7 @@ def user_can_access_user():
                 # 1. a superuser
                 # 2. rcpch_autdit_team_member
                 # 3. rcpch_staff
-                # 3. in the same trust as the user being accessed
+                # 4. not 1-3 but is in the same trust as the user being accessed
                 return view(request, *args, **kwargs)
             else:
                 raise PermissionDenied()
