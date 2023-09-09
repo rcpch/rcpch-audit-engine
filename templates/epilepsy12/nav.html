@@ -2,7 +2,8 @@
 {% load epilepsy12_template_tags %}
 
 <div class="ui text menu signin">
-  {% if user.is_superuser %}<div class="admin-data">
+  {% if request.user.is_rcpch_audit_team_member or request.user.is_rcpch_staff or request.user.is_superuser %}
+  <div class="admin-data">
       ADMIN DATA - branch: <a href="https://github.com/rcpch/rcpch-audit-engine/tree/{{active_git_branch}}" target="_blank">{{ active_git_branch }}</a>,
       commit: <a href="https://github.com/rcpch/rcpch-audit-engine/commit/{{latest_git_commit}}" target="_blank">{{ latest_git_commit | truncatechars:7 }}</a>,
       current user: {{ user.email }}</div>
