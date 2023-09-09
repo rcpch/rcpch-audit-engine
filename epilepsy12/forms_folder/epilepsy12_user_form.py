@@ -27,111 +27,6 @@ class Epilepsy12LoginForm(AuthenticationForm):
         return data.lower()
 
 
-class Epilepsy12UserCreationForm(UserCreationForm):
-    def __init__(self, *args, **kwargs):
-        super(Epilepsy12UserCreationForm, self).__init__(*args, **kwargs)
-
-    title = forms.CharField(required=False)
-
-    email = forms.EmailField(
-        max_length=255,
-        help_text="Required. Please enter a valid NHS email address.",
-        required=True,
-    )
-
-    role = forms.ChoiceField(
-        choices=ROLES,
-        widget=forms.Select(attrs={"class": "ui fluid rcpch dropdown"}),
-        required=True,
-    )
-
-    organisation_employer = forms.ModelChoiceField(
-        queryset=Organisation.objects.all(),
-        widget=forms.Select(
-            attrs={"class": "ui fluid search rcpch dropdown", "readonly": True}
-        ),
-        required=False,
-    )
-
-    first_name = forms.CharField(
-        max_length=255, help_text="Please enter your first name", required=True
-    )
-
-    surname = forms.CharField(
-        max_length=255, help_text="Please enter your surname", required=True
-    )
-
-    is_rcpch_audit_team_member = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
-    )
-
-    is_staff = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
-    )
-
-    is_rcpch_staff = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
-    )
-
-    is_child_or_carer = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}), required=True
-    )
-
-    class Meta:
-        model = Epilepsy12User
-        fields = (
-            "email",
-            "role",
-            "organisation_employer",
-            "first_name",
-            "surname",
-            "is_rcpch_audit_team_member",
-            "is_staff",
-            "is_rcpch_staff",
-            "is_active",
-            "email_confirmed",
-        )
-
-    def __init__(self, *args, **kwargs) -> None:
-        super(Epilepsy12UserCreationForm, self).__init__(*args, **kwargs)
-
-
-class Epilepsy12UserChangeForm(UserChangeForm):
-    class Meta:
-        model = Epilepsy12User
-        fields = (
-            "email",
-            "role",
-            "organisation_employer",
-            "first_name",
-            "surname",
-            "is_rcpch_audit_team_member",
-            "is_staff",
-            "is_rcpch_staff",
-            "is_active",
-            "email_confirmed",
-        )
-
-    def clean_email(self):
-        data = self.cleaned_data["email"]
-        if data is not None:
-            # this user is being updated
-            if data != data.lower():
-                # test to check this email does not exist
-                if Epilepsy12User.objects.filter(email=data.lower()).exists():
-                    raise forms.ValidationError(
-                        f"{data.lower()} is already associated with an account."
-                    )
-        else:
-            # this is a new account - check email is unique
-            if Epilepsy12User.objects.filter(email=data.lower()).exists():
-                raise forms.ValidationError(
-                    "The email is already associated with an account."
-                )
-
-        return data.lower()
-
-
 class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     """
     This is a standard Django form to be used by admin to create a user without a password
@@ -214,7 +109,7 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
     email_confirmed = forms.BooleanField(
         widget=forms.CheckboxInput(attrs={"class": "ui toggle checkbox"}),
         initial=False,
-        required=True,
+        required=False,
     )
 
     class Meta:

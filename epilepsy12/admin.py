@@ -5,12 +5,13 @@ from simple_history.admin import SimpleHistoryAdmin
 # Register your models here.
 from .models import *
 
-from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
+# from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
+from .forms import Epilepsy12UserAdminCreationForm
 
 
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
-    add_form = Epilepsy12UserCreationForm
-    form = Epilepsy12UserChangeForm
+    add_form = Epilepsy12UserAdminCreationForm
+    form = Epilepsy12UserAdminCreationForm
     ordering = ["email"]
     model = Epilepsy12User
     search_fields = (
@@ -166,7 +167,6 @@ admin.site.register(IntegratedCareBoard)
 admin.site.register(NHSEnglandRegion)
 admin.site.register(Trust)
 admin.site.register(LocalHealthBoard)
-
 
 
 admin.site.site_header = "Epilepsy12 admin"
