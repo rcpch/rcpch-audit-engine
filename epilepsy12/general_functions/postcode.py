@@ -26,19 +26,6 @@ def is_valid_postcode(postcode):
         return response.json()["result"]
 
 
-def ons_region_for_postcode(postcode):
-    # convert to upper case and remove spaces
-    formatted = postcode.upper().replace(" ", "")
-    # check against API
-    url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{formatted}"
-    response = requests.get(url=url)
-    if response.status_code == 404:
-        print("Postcode failure.")
-        return False
-    else:
-        return response.json()["result"]["region"]
-
-
 def return_random_postcode():
     # get random postcode from API
     url = f"{settings.POSTCODES_IO_API_URL}/random/postcodes"
