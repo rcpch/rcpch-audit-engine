@@ -11,8 +11,14 @@
                         <div class='header'>
                             403 - Access Denied
                         </div>
-                        <p>You are seeing this message because you are trying to access a record where you don't have
-                            the right permissions.</p>
+                        
+                        {% if user.is_verified %}
+                        <p>You are seeing this message because you are trying to access a record where you don't have the right permissions.</p>
+                        {% else %}
+                            <p>You are seeing this message because you have not enabled Two-Factor Authentication on your account, or you have not yet entered your token.</p>
+                            <p>You can enable Two-Factor Authentication from your <a href="{% url 'two_factor:profile' %}" class="rcpch_blue_link">Account</a> page.</p> 
+                            <p>If you have enabled it already, try logging out and signing in again, ensuring you complete the Token entry step.</p>
+                        {% endif %}
 
                         <p>This must be frustrating and we are sorry. Unfortunately the only way this can be resolved is
                             if you contact your local Epilepsy 12 administrator or RCPCH at {% include 'epilepsy12/partials/contact_email.html' %}.</p>
