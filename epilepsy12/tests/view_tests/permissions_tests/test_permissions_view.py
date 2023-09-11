@@ -207,6 +207,7 @@ from epilepsy12.models import (
     AntiEpilepsyMedicine,
     Medicine,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.parametrize(
@@ -253,6 +254,9 @@ def test_users_and_case_list_views_permissions_success(
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         kwargs = {"organisation_id": TEST_USER_ORGANISATION.id}
 
         # if e12 user list, add "epilepsy12_user_id": test_user.id
@@ -260,7 +264,6 @@ def test_users_and_case_list_views_permissions_success(
             kwargs.update({"epilepsy12_user_id": test_user.id})
 
         # Request e12 User/Case list endpoint url of same Trust
-        print(URL)
         e12_user_list_response = client.get(
             reverse(
                 URL,
@@ -332,6 +335,9 @@ def test_users_and_cases_list_view_permissions_forbidden(
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
 
         # if e12 user list, add "epilepsy12_user_id": test_user.id
@@ -373,6 +379,9 @@ def test_registration_view_permissions_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Get response object
         response = client.get(
@@ -436,6 +445,9 @@ def test_registration_view_permissions_forbidden(client):
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         # Get response object
         response = client.get(
             reverse(
@@ -491,6 +503,9 @@ def test_episode_syndrome_aem_view_permissions_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for page in ["episode", "syndrome", "antiepilepsy_medicine"]:
             # Create the object to search for
@@ -608,6 +623,9 @@ def test_episode_view_permissions_forbidden(client, URL):
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         # Get response object
         response = client.get(
             reverse(
@@ -651,6 +669,9 @@ def test_syndrome_view_permissions_forbidden(client, URL):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Get response object
         response = client.get(
@@ -698,6 +719,9 @@ def test_antiepilepsy_medicine_view_permissions_forbidden(client, URL):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Get response object
         response = client.get(
@@ -748,6 +772,9 @@ def test_comborbidity_view_permissions_success(client, URL):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Get response object
         if URL == "comorbidities":
@@ -850,6 +877,9 @@ def test_comborbidity_view_permissions_forbidden(client, URL):
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         # Get response object
         if URL == "comorbidities":
             response = client.get(
@@ -901,6 +931,9 @@ def test_multiple_views_permissions_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for url_name in [
             "assessment",
@@ -980,6 +1013,9 @@ def test_multiple_views_permissions_forbidden(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for url_name in [
             "assessment",
