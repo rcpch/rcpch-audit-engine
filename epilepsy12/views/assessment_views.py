@@ -1,15 +1,15 @@
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 
 from ..models import Registration, Assessment, Case, Organisation, Site
 from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child
+from ..decorator import user_may_view_this_child, login_and_otp_required
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def consultant_paediatrician_referral_made(request, assessment_id):
@@ -78,7 +78,7 @@ def consultant_paediatrician_referral_made(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def consultant_paediatrician_referral_date(request, assessment_id):
@@ -134,7 +134,7 @@ def consultant_paediatrician_referral_date(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def consultant_paediatrician_input_date(request, assessment_id):
@@ -193,7 +193,7 @@ def consultant_paediatrician_input_date(request, assessment_id):
 # centre CRUD
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def general_paediatric_centre(request, assessment_id):
@@ -263,7 +263,7 @@ def general_paediatric_centre(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def edit_general_paediatric_centre(request, assessment_id, site_id):
@@ -341,7 +341,7 @@ def edit_general_paediatric_centre(request, assessment_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def update_general_paediatric_centre_pressed(request, assessment_id, site_id, action):
@@ -385,7 +385,7 @@ def update_general_paediatric_centre_pressed(request, assessment_id, site_id, ac
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def delete_general_paediatric_centre(request, assessment_id, site_id):
@@ -453,7 +453,7 @@ def delete_general_paediatric_centre(request, assessment_id, site_id):
 """
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def paediatric_neurologist_referral_made(request, assessment_id):
@@ -526,7 +526,7 @@ def paediatric_neurologist_referral_made(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def paediatric_neurologist_referral_date(request, assessment_id):
@@ -585,7 +585,7 @@ def paediatric_neurologist_referral_date(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def paediatric_neurologist_input_date(request, assessment_id):
@@ -647,7 +647,7 @@ def paediatric_neurologist_input_date(request, assessment_id):
 # paediatric neurology centre selection
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def paediatric_neurology_centre(request, assessment_id):
@@ -714,7 +714,7 @@ def paediatric_neurology_centre(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def edit_paediatric_neurology_centre(request, assessment_id, site_id):
@@ -781,7 +781,7 @@ def edit_paediatric_neurology_centre(request, assessment_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, action):
@@ -824,7 +824,7 @@ def update_paediatric_neurology_centre_pressed(request, assessment_id, site_id, 
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def delete_paediatric_neurology_centre(request, assessment_id, site_id):
@@ -892,7 +892,7 @@ def delete_paediatric_neurology_centre(request, assessment_id, site_id):
 """
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessment_id):
@@ -938,7 +938,7 @@ def childrens_epilepsy_surgical_service_referral_criteria_met(request, assessmen
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
@@ -1018,7 +1018,7 @@ def childrens_epilepsy_surgical_service_referral_made(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
@@ -1076,7 +1076,7 @@ def childrens_epilepsy_surgical_service_referral_date(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def childrens_epilepsy_surgical_service_review_date_status(
@@ -1129,7 +1129,7 @@ def childrens_epilepsy_surgical_service_review_date_status(
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
@@ -1187,7 +1187,7 @@ def childrens_epilepsy_surgical_service_input_date(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def epilepsy_surgery_centre(request, assessment_id):
@@ -1257,7 +1257,7 @@ def epilepsy_surgery_centre(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
@@ -1329,7 +1329,7 @@ def edit_epilepsy_surgery_centre(request, assessment_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, action):
@@ -1373,7 +1373,7 @@ def update_epilepsy_surgery_centre_pressed(request, assessment_id, site_id, acti
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
@@ -1443,7 +1443,7 @@ def delete_epilepsy_surgery_centre(request, assessment_id, site_id):
 """
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def epilepsy_specialist_nurse_referral_made(request, assessment_id):
@@ -1495,7 +1495,7 @@ def epilepsy_specialist_nurse_referral_made(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def epilepsy_specialist_nurse_referral_date(request, assessment_id):
@@ -1538,7 +1538,7 @@ def epilepsy_specialist_nurse_referral_date(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.change_assessment", raise_exception=True)
 @user_may_view_this_child()
 def epilepsy_specialist_nurse_input_date(request, assessment_id):
@@ -1581,7 +1581,7 @@ def epilepsy_specialist_nurse_input_date(request, assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.view_assessment", raise_exception=True)
 @user_may_view_this_child()
 def assessment(request, case_id):

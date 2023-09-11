@@ -1,14 +1,13 @@
 # Python imports
 
 # third party libraries
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
 from django.http import HttpResponseForbidden, HttpResponse
 
 # E12 imports
-from ..decorator import user_may_view_this_organisation
+from ..decorator import user_may_view_this_organisation, login_and_otp_required
 from epilepsy12.constants import (
     INDIVIDUAL_KPI_MEASURES,
 )
@@ -32,7 +31,7 @@ from ..general_functions import (
 )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def selected_organisation_summary(request, organisation_id):
     """
@@ -168,7 +167,7 @@ def selected_organisation_summary(request, organisation_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def selected_trust_kpis(request, organisation_id):
     """
@@ -211,7 +210,7 @@ def selected_trust_kpis(request, organisation_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def selected_trust_select_kpi(request, organisation_id):
     """
@@ -293,7 +292,7 @@ def selected_trust_select_kpi(request, organisation_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 def aggregate_and_update_all_kpi_agg_models(request):
     """Aggregates and update all kpi aggregation models.
 
@@ -349,7 +348,7 @@ def selected_trust_kpis_open(request, organisation_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def child_organisation_select(request, organisation_id, template_name):
     """
@@ -367,7 +366,7 @@ def child_organisation_select(request, organisation_id, template_name):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def view_preference(request, organisation_id, template_name):
     """

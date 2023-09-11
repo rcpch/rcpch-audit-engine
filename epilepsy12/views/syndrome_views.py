@@ -1,15 +1,15 @@
 from operator import itemgetter
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 
 from ..models import Syndrome, SyndromeList
 from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child
+from ..decorator import user_may_view_this_child, login_and_otp_required
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_syndrome", raise_exception=True)
 def syndrome_diagnosis_date(request, syndrome_id):
@@ -60,7 +60,7 @@ def syndrome_diagnosis_date(request, syndrome_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_syndrome", raise_exception=True)
 def syndrome_name(request, syndrome_id):

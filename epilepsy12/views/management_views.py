@@ -1,9 +1,7 @@
 from dateutil import relativedelta
 from datetime import date
 from django.utils import timezone
-from operator import itemgetter
-from django.contrib.gis.db.models import Q
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 
 from epilepsy12.models import (
     Management,
@@ -17,10 +15,10 @@ from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child
+from ..decorator import user_may_view_this_child, login_and_otp_required
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_management", raise_exception=True)
 def management(request, case_id):
@@ -79,7 +77,7 @@ Fields relating to rescue medication begin here
 """
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def has_an_aed_been_given(request, management_id):
@@ -133,7 +131,7 @@ def has_an_aed_been_given(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.add_antiepilepsymedicine", raise_exception=True)
 def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
@@ -193,7 +191,7 @@ def add_antiepilepsy_medicine(request, management_id, is_rescue_medicine):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.delete_antiepilepsymedicine", raise_exception=True)
 def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
@@ -234,7 +232,7 @@ def remove_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_antiepilepsymedicine", raise_exception=True)
 def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
@@ -285,7 +283,7 @@ def edit_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_antiepilepsymedicine", raise_exception=True)
 def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
@@ -331,7 +329,7 @@ def close_antiepilepsy_medicine(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def medicine_id(request, antiepilepsy_medicine_id):
@@ -440,7 +438,7 @@ def medicine_id(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
@@ -509,7 +507,7 @@ def antiepilepsy_medicine_start_date(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
@@ -557,7 +555,7 @@ def antiepilepsy_medicine_add_stop_date(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
@@ -609,7 +607,7 @@ def antiepilepsy_medicine_remove_stop_date(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
@@ -673,7 +671,7 @@ def antiepilepsy_medicine_stop_date(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
@@ -736,7 +734,7 @@ def antiepilepsy_medicine_risk_discussed(request, antiepilepsy_medicine_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_id):
@@ -799,7 +797,7 @@ def is_a_pregnancy_prevention_programme_in_place(request, antiepilepsy_medicine_
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def has_a_valproate_annual_risk_acknowledgement_form_been_completed(
@@ -869,7 +867,7 @@ Fields relating to rescue medication begin here
 """
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_antiepilepsymedicine", raise_exception=True)
 def has_rescue_medication_been_prescribed(request, management_id):
@@ -931,7 +929,7 @@ Fields relating to individual care plans begin here
 """
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_in_place(request, management_id):
@@ -990,7 +988,7 @@ def individualised_care_plan_in_place(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_date(request, management_id):
@@ -1033,7 +1031,7 @@ def individualised_care_plan_date(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_has_parent_carer_child_agreement(request, management_id):
@@ -1072,7 +1070,7 @@ def individualised_care_plan_has_parent_carer_child_agreement(request, managemen
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_includes_service_contact_details(request, management_id):
@@ -1110,7 +1108,7 @@ def individualised_care_plan_includes_service_contact_details(request, managemen
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_include_first_aid(request, management_id):
@@ -1147,7 +1145,7 @@ def individualised_care_plan_include_first_aid(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_parental_prolonged_seizure_care(request, management_id):
@@ -1185,7 +1183,7 @@ def individualised_care_plan_parental_prolonged_seizure_care(request, management
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_includes_general_participation_risk(
@@ -1224,7 +1222,7 @@ def individualised_care_plan_includes_general_participation_risk(
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_addresses_water_safety(request, management_id):
@@ -1261,7 +1259,7 @@ def individualised_care_plan_addresses_water_safety(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_addresses_sudep(request, management_id):
@@ -1298,7 +1296,7 @@ def individualised_care_plan_addresses_sudep(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def individualised_care_plan_includes_ehcp(request, management_id):
@@ -1335,7 +1333,7 @@ def individualised_care_plan_includes_ehcp(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def has_individualised_care_plan_been_updated_in_the_last_year(request, management_id):
@@ -1373,7 +1371,7 @@ def has_individualised_care_plan_been_updated_in_the_last_year(request, manageme
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def has_been_referred_for_mental_health_support(request, management_id):
@@ -1411,7 +1409,7 @@ def has_been_referred_for_mental_health_support(request, management_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_management", raise_exception=True)
 def has_support_for_mental_health_support(request, management_id):

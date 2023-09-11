@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render, HttpResponseRedirect
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -20,10 +20,10 @@ from epilepsy12.models import Organisation, Site, Case, AuditProgress
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
-from ..decorator import user_may_view_this_organisation, user_may_view_this_child
+from ..decorator import user_may_view_this_organisation, user_may_view_this_child, login_and_otp_required
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def case_list(request, organisation_id):
     """
@@ -288,7 +288,7 @@ def case_list(request, organisation_id):
     return render(request, template_name, context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def case_statistics(request, organisation_id):
     """
@@ -330,7 +330,7 @@ def case_statistics(request, organisation_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_case",
@@ -359,7 +359,7 @@ def case_submit(request, organisation_id, case_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_case")
 def case_performance_summary(request, case_id):
@@ -396,7 +396,7 @@ Case function based views - class based views not chosen as need to accept organ
 """
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.add_case")
 def create_case(request, organisation_id):
@@ -453,7 +453,7 @@ def create_case(request, organisation_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
@@ -524,7 +524,7 @@ def update_case(request, organisation_id, case_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.change_case", raise_exception=True)
 def unknown_postcode(request, organisation_id):
@@ -556,7 +556,7 @@ def unknown_postcode(request, organisation_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_opt_out_child_from_inclusion_in_audit", raise_exception=True
@@ -602,7 +602,7 @@ def opt_out(request, organisation_id, case_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_consent_to_audit_participation", raise_exception=True
@@ -636,7 +636,7 @@ def consent(request, case_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_consent_to_audit_participation", raise_exception=True
