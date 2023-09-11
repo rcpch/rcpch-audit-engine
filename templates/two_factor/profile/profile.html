@@ -6,7 +6,7 @@
 <div class='ui rcpch container'>
   <div class="ui two column centered grid">
     <div class="column">
-      <h1>{% block title %}{% trans "Account Security" %}{% endblock %}</h1>
+      <h1>{% block title %}{% trans "Account Settings" %}{% endblock %}</h1>
 
       {% if default_device %}
       <p>Your method of Two-Factor Authentication is working: </p>
@@ -24,6 +24,8 @@
         </a>
       </p>
       {% endif %}
+
+      
 
       <h2>Reset Password</h2>
       <a href="{% url 'password_reset' %}" class="rcpch_blue_link">Click here to reset your password.</a>
