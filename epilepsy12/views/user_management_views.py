@@ -375,7 +375,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             user_type,
             request.POST or None,
         )
-        print(form)
+
         if form.is_valid():
             # success message - return to user list
             new_user = form.save(commit=False)
