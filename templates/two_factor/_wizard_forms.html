@@ -3,14 +3,17 @@
 {{ wizard.form.non_field_errors }}
 
 {% for field in wizard.form %}
+    {% if field.name == 'generator-token'%}
+        pgneagfsdgf
+    {% endif %}
     <p>
     <h5>{{ field.label_tag }}</h5>
-    {{ field }}
+        {{ field }}
     {% if field.help_text %}
-    <small style="color: grey">{{ field.help_text }}</small>
+        <small style="color: grey">{{ field.help_text }}</small>
     {% endif %}
     {% for error in field.errors %}
-    <div class='ui red message' style="color: red">{{ error }}</div>
+        <div class='ui red message' style="color: red">{{ error }}</div>
     {% endfor %}
     </p>
     {{ field.errors }}

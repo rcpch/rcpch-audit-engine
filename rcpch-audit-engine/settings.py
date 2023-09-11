@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     # 'django_otp.plugins.otp_email', # add back in if require email 2fa
     # 'two_factor.plugins.email',  # add back in if require email 2fa
     'two_factor',
+    'two_factor.plugins.phonenumber',  # <- if you want phone number capability.
     # application
     "epilepsy12",
 ]
@@ -119,7 +120,7 @@ AUTO_LOGOUT = {
 
 # LOGIN_URL = "/registration/login/"
 LOGIN_URL = 'two_factor:login' # change LOGIN_URL to the 2fa one
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "/"
 
 TEMPLATES = [
