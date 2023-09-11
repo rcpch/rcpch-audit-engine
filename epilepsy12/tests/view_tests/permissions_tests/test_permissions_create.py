@@ -97,10 +97,6 @@ from datetime import date
 # django imports
 from django.urls import reverse
 
-from django_otp import DEVICE_ID_SESSION_KEY
-from django_otp import devices_for_user
-from two_factor.utils import default_device
-
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -114,6 +110,7 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -157,10 +154,7 @@ def test_user_create_same_org_success(
         client.force_login(test_user)
         
         # OTP ENABLE
-        test_user.totpdevice_set.create(name='default')
-        session = client.session
-        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
-        session.save()
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
@@ -237,10 +231,7 @@ def test_user_create_diff_org_success(
         client.force_login(test_user)
         
         # OTP ENABLE
-        test_user.totpdevice_set.create(name='default')
-        session = client.session
-        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
-        session.save()
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
@@ -313,10 +304,7 @@ def test_user_creation_forbidden(
         client.force_login(test_user)
         
         # OTP ENABLE
-        test_user.totpdevice_set.create(name='default')
-        session = client.session
-        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
-        session.save()
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
@@ -402,10 +390,7 @@ def test_patient_create_success(
         client.force_login(test_user)
         
         # OTP ENABLE
-        test_user.totpdevice_set.create(name='default')
-        session = client.session
-        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
-        session.save()
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_case",
@@ -525,10 +510,7 @@ def test_patient_creation_forbidden(
         client.force_login(test_user)
         
         # OTP ENABLE
-        test_user.totpdevice_set.create(name='default')
-        session = client.session
-        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
-        session.save()
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_case",
@@ -618,6 +600,9 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         for url in URLS:
             if url == "add_antiepilepsy_medicine":
