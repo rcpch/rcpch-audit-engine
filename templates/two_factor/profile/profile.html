@@ -15,7 +15,7 @@
         </ul>
         <a href="{% url 'index' %}" class="ui rcpch_primary button">Return to Home page</a>
       {% else %}
-      <p>
+      <p class=" ui rcpch_warning message">
         {% blocktrans trimmed %}Two-factor authentication is not enabled for your
         account. You must enable this to use the Epilepsy12 platform.{% endblocktrans %}
       </p>

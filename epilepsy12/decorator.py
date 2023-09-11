@@ -200,6 +200,9 @@ def user_may_view_this_organisation():
         def wrapper(request, *args, **kwargs):
             user = request.user
 
+            if not user.is_verified():
+                raise PermissionDenied()
+
             if kwargs.get("organisation_id") is not None:
                 organisation_requested = Organisation.objects.get(
                     pk=kwargs.get("organisation_id")
