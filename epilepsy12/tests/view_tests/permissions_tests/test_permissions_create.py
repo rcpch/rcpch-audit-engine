@@ -97,6 +97,10 @@ from datetime import date
 # django imports
 from django.urls import reverse
 
+from django_otp import DEVICE_ID_SESSION_KEY
+from django_otp import devices_for_user
+from two_factor.utils import default_device
+
 # E12 Imports
 from epilepsy12.tests.UserDataClasses import (
     test_user_audit_centre_administrator_data,
@@ -148,7 +152,15 @@ def test_user_create_same_org_success(
         ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
+        
+        
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        test_user.totpdevice_set.create(name='default')
+        session = client.session
+        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
+        session.save()
 
         url = reverse(
             "create_epilepsy12_user",
@@ -223,6 +235,12 @@ def test_user_create_diff_org_success(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        test_user.totpdevice_set.create(name='default')
+        session = client.session
+        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
+        session.save()
 
         url = reverse(
             "create_epilepsy12_user",
@@ -293,6 +311,12 @@ def test_user_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        test_user.totpdevice_set.create(name='default')
+        session = client.session
+        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
+        session.save()
 
         url = reverse(
             "create_epilepsy12_user",
@@ -376,6 +400,12 @@ def test_patient_create_success(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        test_user.totpdevice_set.create(name='default')
+        session = client.session
+        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
+        session.save()
 
         url = reverse(
             "create_case",
@@ -493,6 +523,12 @@ def test_patient_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        test_user.totpdevice_set.create(name='default')
+        session = client.session
+        session[DEVICE_ID_SESSION_KEY] = default_device(test_user).persistent_id
+        session.save()
 
         url = reverse(
             "create_case",
