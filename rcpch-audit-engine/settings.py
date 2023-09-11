@@ -268,6 +268,10 @@ LOGGING = {
         }
     },
     "loggers": {
+        'two_factor': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
         "epilepsy12": {
             "handlers": ["console"],
             "level": "INFO",
