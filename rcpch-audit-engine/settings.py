@@ -73,6 +73,13 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "simple_history",
     "django_filters",
+    # 2fa
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_email', 
+    'two_factor.plugins.email',  
+    'two_factor',
     # application
     "epilepsy12",
 ]
@@ -89,6 +96,8 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "django_auto_logout.middleware.auto_logout",
+    # 2fa
+    'django_otp.middleware.OTPMiddleware',
 ]
 
 # djanog security middleware settings for HSTS support
