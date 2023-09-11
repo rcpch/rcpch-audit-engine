@@ -2130,4 +2130,9 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 
 .rcpch_signin_buttons_wrapper {
   display: flex;
+  margin-bottom: 1em;
+}
+
+.rcpch_signin_buttons_wrapper>.reset_pass_button {
+  display: block;
 }

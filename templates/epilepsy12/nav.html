@@ -12,7 +12,7 @@
       {% if user.is_authenticated %}
         <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
       {% else %}
-        <a class="item signin_button" href="{% url 'login' %}"><i class="arrow right icon"></i><span class="signin_text">Sign in</span></a>
+        <a class="item signin_button" href="{% url 'two_factor:login' %}"><i class="arrow right icon"></i><span class="signin_text">Sign in</span></a>
         {% comment %} <a class="item signin_button" href="{% url 'signup' %}"><i class="arrow right icon"></i><span class="signin_text">Sign up</span></a> {% endcomment %}
       {% endif %}
     </div>
@@ -51,6 +51,12 @@
           href="{% url 'docs' %}">
           Guidance
           </a>
+
+          <a {% if request.resolver_match.url_name|is_in:'two_factor:profile' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+          id="link"
+          href="{% url 'two_factor:profile' %}">
+          Account
+          </a> 
           
           {% if user.is_superuser %}
           <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
