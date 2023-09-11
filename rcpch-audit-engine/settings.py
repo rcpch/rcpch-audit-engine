@@ -77,8 +77,8 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
-    'django_otp.plugins.otp_email', 
-    'two_factor.plugins.email',  
+    # 'django_otp.plugins.otp_email', # add back in if require email 2fa
+    # 'two_factor.plugins.email',  # add back in if require email 2fa
     'two_factor',
     # application
     "epilepsy12",
