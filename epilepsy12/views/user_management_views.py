@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.urls import reverse
@@ -25,21 +25,11 @@ from ..models import Epilepsy12User, Organisation, VisitActivity
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
-from ..decorator import user_may_view_this_organisation, user_can_access_user
+from ..decorator import user_may_view_this_organisation, user_can_access_user, login_and_otp_required
 from ..constants import (
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
-    AUDIT_CENTRE_LEAD_CLINICIAN,
-    TRUST_AUDIT_TEAM_FULL_ACCESS,
-    AUDIT_CENTRE_CLINICIAN,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    AUDIT_CENTRE_ADMINISTRATOR,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    RCPCH_AUDIT_TEAM,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
-    RCPCH_AUDIT_PATIENT_FAMILY,
-    PATIENT_ACCESS,
-    TRUST_AUDIT_TEAM_VIEW_ONLY,
 )
 
 from epilepsy12.forms_folder.epilepsy12_user_form import (
@@ -112,7 +102,7 @@ def epilepsy12_login(request):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
     """
@@ -346,7 +336,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
 def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_id):
@@ -424,7 +414,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @user_can_access_user()
 @permission_required("epilepsy12.change_epilepsy12user", raise_exception=True)
@@ -544,7 +534,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @user_can_access_user()
 @permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
@@ -578,7 +568,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     success_url = reverse_lazy("index")
 
 
-@login_required
+@login_and_otp_required()
 @user_can_access_user()
 def logs(request, organisation_id, epilepsy12_user_id):
     """
@@ -599,7 +589,7 @@ def logs(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_can_access_user()
 def log_list(request, organisation_id, epilepsy12_user_id):
     """
@@ -620,7 +610,7 @@ def log_list(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
     allowed_groups = [EPILEPSY12_AUDIT_TEAM_FULL_ACCESS]
