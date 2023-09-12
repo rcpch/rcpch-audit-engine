@@ -471,3 +471,11 @@ def no_eligible_cases(aggregation_model, kpi_name: str):
         <b>{n_ineligible}</b> case{_plural(n_ineligible)} ineligible.<br>
         <b>{n_incomplete}</b> case{_plural(n_incomplete)} incomplete."""
     )
+
+# TWO FACTOR TAGS
+@register.filter
+def get_org_id_from_user(user):
+    if not user.organisation_employer:
+        return 1
+    
+    return user.organisation_employer.id
