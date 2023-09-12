@@ -38,68 +38,68 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
 )
 
 
-def epilepsy12_login(request):
-    """
-    Callback from the login form
-    """
-    if request.method == "POST":
-        form = Epilepsy12LoginForm(request, data=request.POST)
+# def epilepsy12_login(request):
+#     """
+#     Callback from the login form
+#     """
+#     if request.method == "POST":
+#         form = Epilepsy12LoginForm(request, data=request.POST)
 
-        if form.is_valid():
-            email = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
+#         if form.is_valid():
+#             email = form.cleaned_data.get("username")
+#             password = form.cleaned_data.get("password")
 
-            user = authenticate(request, username=email, password=password)
+#             user = authenticate(request, username=email, password=password)
 
-            if user is not None:
-                if user.organisation_employer is not None:
-                    # select the first hospital in the list if no allocated employing hospital
-                    selected_organisation = Organisation.objects.get(
-                        name=user.organisation_employer
-                    )
-                else:
-                    selected_organisation = Organisation.objects.first()
-                if user.email_confirmed == False:
-                    user.email_confirmed = True
-                    user.save()
-                login(request, user)
-                last_logged_in = VisitActivity.objects.filter(
-                    activity=1, epilepsy12user=user
-                ).order_by("-activity_datetime")[:2]
-                if last_logged_in.count() > 1:
-                    messages.info(
-                        request,
-                        f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}",
-                    )
-                else:
-                    messages.info(
-                        request,
-                        f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
-                    )
+#             if user is not None:
+#                 if user.organisation_employer is not None:
+#                     # select the first hospital in the list if no allocated employing hospital
+#                     selected_organisation = Organisation.objects.get(
+#                         name=user.organisation_employer
+#                     )
+#                 else:
+#                     selected_organisation = Organisation.objects.first()
+#                 if user.email_confirmed == False:
+#                     user.email_confirmed = True
+#                     user.save()
+#                 login(request, user)
+#                 last_logged_in = VisitActivity.objects.filter(
+#                     activity=1, epilepsy12user=user
+#                 ).order_by("-activity_datetime")[:2]
+#                 if last_logged_in.count() > 1:
+#                     messages.info(
+#                         request,
+#                         f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}",
+#                     )
+#                 else:
+#                     messages.info(
+#                         request,
+#                         f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
+#                     )
 
-                    if request.user.organisation_employer is not None:
-                        # current user is affiliated with an existing organisation - set viewable trust to this
-                        selected_organisation = Organisation.objects.get(
-                            name=request.user.organisation_employer
-                        )
-                    else:
-                        # current user is a member of the RCPCH audit team and also not affiliated with a organisation
-                        # therefore set selected organisation to first of organisation on the list
-                        selected_organisation = Organisation.objects.order_by(
-                            "name"
-                        ).first()
-                return redirect(
-                    "selected_organisation_summary",
-                    organisation_id=selected_organisation.pk,
-                )
-            else:
-                messages.error(request, "Invalid email or password.")
-        else:
-            messages.error(request, "Invalid email or password.")
-    form = Epilepsy12LoginForm()
-    return render(
-        request=request, template_name="registration/login.html", context={"form": form}
-    )
+#                     if request.user.organisation_employer is not None:
+#                         # current user is affiliated with an existing organisation - set viewable trust to this
+#                         selected_organisation = Organisation.objects.get(
+#                             name=request.user.organisation_employer
+#                         )
+#                     else:
+#                         # current user is a member of the RCPCH audit team and also not affiliated with a organisation
+#                         # therefore set selected organisation to first of organisation on the list
+#                         selected_organisation = Organisation.objects.order_by(
+#                             "name"
+#                         ).first()
+#                 return redirect(
+#                     "selected_organisation_summary",
+#                     organisation_id=selected_organisation.pk,
+#                 )
+#             else:
+#                 messages.error(request, "Invalid email or password.")
+#         else:
+#             messages.error(request, "Invalid email or password.")
+#     form = Epilepsy12LoginForm()
+#     return render(
+#         request=request, template_name="registration/login.html", context={"form": form}
+#     )
 
 
 @login_and_otp_required()
