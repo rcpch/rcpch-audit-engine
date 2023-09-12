@@ -74,13 +74,13 @@ INSTALLED_APPS = [
     "simple_history",
     "django_filters",
     # 2fa
-    'django_otp',
-    'django_otp.plugins.otp_static',
-    'django_otp.plugins.otp_totp',
-    # 'django_otp.plugins.otp_email', # add back in if require email 2fa
-    # 'two_factor.plugins.email',  # add back in if require email 2fa
-    'two_factor',
-    'two_factor.plugins.phonenumber',  # <- if you want phone number capability.
+    "django_otp",
+    "django_otp.plugins.otp_static",
+    "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_email",  # add back in if require email 2fa
+    "two_factor.plugins.email",  # add back in if require email 2fa
+    "two_factor",
+    "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
     # application
     "epilepsy12",
 ]
@@ -98,7 +98,7 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
     "django_auto_logout.middleware.auto_logout",
     # 2fa
-    'django_otp.middleware.OTPMiddleware',
+    "django_otp.middleware.OTPMiddleware",
 ]
 
 # djanog security middleware settings for HSTS support
@@ -119,7 +119,7 @@ AUTO_LOGOUT = {
 }
 
 # LOGIN_URL = "/registration/login/"
-LOGIN_URL = 'two_factor:login' # change LOGIN_URL to the 2fa one
+LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "/"
 
@@ -178,6 +178,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
 
+# EMAIL SETTINGS
+DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
+# OTP config
+OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
+OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
+OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
+OTP_EMAIL_TOKEN_VALIDITY = 60 * 5 # default N(seconds) email token valid for
 if DEBUG is True:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
@@ -187,7 +194,6 @@ else:
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = True
-    DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
@@ -268,9 +274,9 @@ LOGGING = {
         }
     },
     "loggers": {
-        'two_factor': {
-            'handlers': ['console'],
-            'level': 'INFO',
+        "two_factor": {
+            "handlers": ["console"],
+            "level": "INFO",
         },
         "epilepsy12": {
             "handlers": ["console"],
