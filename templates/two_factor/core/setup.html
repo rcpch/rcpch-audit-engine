@@ -13,6 +13,9 @@
       {% if wizard.steps.current == 'welcome' %}
         <p>{% blocktrans trimmed %}Follow the steps to enable Two-Factor Authentication.</p> 
         <p>This is a requirement to use the Epilepsy12 platform{% endblocktrans %}.</p>
+      {% elif wizard.steps.current == 'method' %}
+        <p>Please select which authentication method you would
+            like to use:</p>
       {% elif wizard.steps.current == 'generator' %}
         <p><b>To set up your Two-Factor Authentication, follow these steps:</b></p>
         <ol>
@@ -21,14 +24,11 @@
           <li>Choose <em>'Scan QR code'</em> and scan below:</li>
           <p><img src="{{ QR_URL }}" alt="QR Code" class="bg-white" /></p>
           <li>Finally, enter the 6 digit number token provided:</li>
-        </ol>
-        
-        
+        </ol> 
         
       {% elif wizard.steps.current == 'validation' %}
-        {% if challenge_succeeded %}
-        
-        {% else %}
+        <p>Please check your registered email for your OTP code.</p>
+        {% if not challenge_succeeded %}
         <p class="alert alert-warning" role="alert">{% blocktrans trimmed %}We've
           encountered an issue with the selected authentication method. Please
           go back and verify that you entered your information correctly, try
