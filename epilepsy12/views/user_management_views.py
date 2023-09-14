@@ -25,7 +25,11 @@ from ..models import Epilepsy12User, Organisation, VisitActivity
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
-from ..decorator import user_may_view_this_organisation, user_can_access_user, login_and_otp_required
+from ..decorator import (
+    user_may_view_this_organisation,
+    user_can_access_user,
+    login_and_otp_required,
+)
 from ..constants import (
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
@@ -104,7 +108,7 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
 
 @login_and_otp_required()
 @user_may_view_this_organisation()
-def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
+def epilepsy12_user_list(request, organisation_id):
     """
     Returns the list of users for the selected organisations
     Currently this includes RCPCH staff who are not associated with a organisation, though this breaks the update/delete and cancel
@@ -246,7 +250,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_name_down"
         ):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("-surname").all()
-            sort_flag = "sort_epilepsy12_users_by_role_up"
+            sort_flag = "sort_epilepsy12_users_by_name_down"
         elif (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_email_up"
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_email_up"
@@ -258,13 +262,13 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_email_down"
         ):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("-surname").all()
-            sort_flag = "sort_epilepsy12_users_by_role_up"
+            sort_flag = "sort_epilepsy12_users_by_email_down"
         elif (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_role_up"
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_role_up"
         ):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("role").all()
-            sort_flag = "sort_epilepsy12_users_by_role_down"
+            sort_flag = "sort_epilepsy12_users_by_role_up"
         elif (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_role_down"
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_role_down"
@@ -280,7 +284,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 "organisation_employer"
             ).all()
-            sort_flag = "sort_epilepsy12_users_by_organisation_employer_down"
+            sort_flag = "sort_epilepsy12_users_by_organisation_employer_up"
         elif (
             request.htmx.trigger_name
             == "sort_epilepsy12_users_by_organisation_employer_down"
