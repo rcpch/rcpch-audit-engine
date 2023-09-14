@@ -129,3 +129,5 @@ start/hermes-v0.7.5.jar
 git_hash.txt
 
 .kube/
+
+celerybeat-schedule
