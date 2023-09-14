@@ -30,7 +30,7 @@ services:
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
       - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
-      - POSTCODES_IO_API_URL=https://api.postcodes.io/postcodes
+      - POSTCODES_IO_API_URL=https://api.postcodes.io
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
       - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
@@ -88,9 +88,24 @@ services:
       - E12_POSTGRES_DB_PASSWORD=password
       - E12_POSTGRES_DB_NAME=epilepsy12db
       - E12_POSTGRES_DB_HOST=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - db
       - redis
+
+  flower:
+    image: mher/flower
+    container_name: flower
+    command: celery flower --persistent=True
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - FLOWER_PORT=8888
+    ports:
+      - 8888:8888 # docker will expose this ports
+    volumes:
+      - flower_data:/data
+    # this will let docker know that we have added a custom volume
 
   # This is for celery cron tasks
   celery-beat:
@@ -104,3 +119,4 @@ services:
 
 volumes:
   auditenginedb:
+  flower_data:

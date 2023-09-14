@@ -3,6 +3,7 @@ python-dateutil
 requests
 
 # third party imports
+celery
 dj_database_url
 django
 django-auto-logout
@@ -19,6 +20,7 @@ psycopg2-binary
 pytest-django
 pytest-factoryboy
 rapidfuzz
+redis
 whitenoise
 django-filter
 plotly

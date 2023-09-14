@@ -19,6 +19,7 @@ import datetime
 
 # third party imports
 from django.core.management.utils import get_random_secret_key
+from celery.schedules import crontab
 
 # RCPCH imports
 
@@ -123,6 +124,24 @@ LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "/"
 
+# REDIS / Celery
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Europe/London"
+
+CELERY_BEAT_SCHEDULE = {
+    "run-daily-at-six-am": {
+        "task": "epilepsy12.tasks.hello",
+        "schedule": crontab(hour="6", minute=0),
+        "options": {
+            "expires": 15.0,
+        },
+    },
+}
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -184,7 +203,7 @@ DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
 OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
 OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
 OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
-OTP_EMAIL_TOKEN_VALIDITY = 60 * 5 # default N(seconds) email token valid for
+OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
 if DEBUG is True:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:

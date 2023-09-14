@@ -3,6 +3,9 @@ from typing import Literal, Union
 
 # Django Imports
 
+# Third party imports
+from celery import shared_task
+
 # E12 Imports
 from .general_functions import get_current_cohort_data
 from epilepsy12.constants import EnumAbstractionLevel
@@ -19,3 +22,12 @@ def scheduled_aggregate_kpis_update_models_for(
 
     # By default, this will update all KPIAggregation models for all levels of abstraction
     update_all_kpi_agg_models(cohort=cohort, abstractions=abstractions)
+
+
+@shared_task
+def hello():
+    """
+    THIS IS A SCHEDULED TASK THAT IS CALLED AT 06:00 EVERY DAY
+    THE CRON DATE/FREQUENCY IS SET IN SETTING.PY
+    """
+    print("Hello Epilepsy12!")
