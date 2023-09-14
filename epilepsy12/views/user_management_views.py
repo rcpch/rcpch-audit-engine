@@ -401,7 +401,6 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             return redirect(
                 "epilepsy12_user_list",
                 organisation_id=organisation_id,
-                epilepsy12_user_id=epilepsy12_user_id,
             )
 
     context = {
@@ -490,7 +489,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 "epilepsy12_user_list",
                 kwargs={
                     "organisation_id": organisation_id,
-                    "epilepsy12_user_id": epilepsy12_user_to_edit.pk,
                 },
             )
             return redirect(redirect_url)
@@ -513,7 +511,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
                 # Save was successful, so redirect to another page
                 redirect_url = reverse(
-                    "epilepsy12_user_list", kwargs={"organisation_id": organisation_id}
+                    "epilepsy12_user_list", kwargs={"organisation_id": organisation_id, }
                 )
                 return redirect(redirect_url)
 
@@ -553,7 +551,6 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             "epilepsy12_user_list",
             kwargs={
                 "organisation_id": organisation_id,
-                "epilepsy12_user_id": epilepsy12_user_id,
             },
         )
     )

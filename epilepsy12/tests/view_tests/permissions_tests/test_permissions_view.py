@@ -259,10 +259,6 @@ def test_users_and_case_list_views_permissions_success(
 
         kwargs = {"organisation_id": TEST_USER_ORGANISATION.id}
 
-        # if e12 user list, add "epilepsy12_user_id": test_user.id
-        if URL == "epilepsy12_user_list":
-            kwargs.update({"epilepsy12_user_id": test_user.id})
-
         # Request e12 User/Case list endpoint url of same Trust
         e12_user_list_response = client.get(
             reverse(
@@ -281,10 +277,6 @@ def test_users_and_case_list_views_permissions_success(
             test_user_clinicial_audit_team_data.role_str,
         ]:
             kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
-
-            # if e12 user list, add "epilepsy12_user_id": test_user.id
-            if URL == "epilepsy12_user_list":
-                kwargs.update({"epilepsy12_user_id": test_user.id})
 
             # Request e12 user/case list endpoint url diff org
             e12_user_list_response = client.get(
@@ -339,10 +331,6 @@ def test_users_and_cases_list_view_permissions_forbidden(
         twofactor_signin(client, test_user)
 
         kwargs = {"organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id}
-
-        # if e12 user list, add "epilepsy12_user_id": test_user.id
-        if URL == "epilepsy12_user_list":
-            kwargs.update({"epilepsy12_user_id": test_user.id})
                 
         # Request e12 user list endpoint url diff org
         e12_user_list_response_different_organisation = client.get(
