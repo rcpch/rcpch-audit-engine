@@ -298,7 +298,7 @@
             {% endif %}
             {% if epilepsy12_user_list.has_next %}
             <div class="ui rcpch_primary button" name="next_button" hx-target="#epilepsy12_user_table"
-                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk epilepsy12_user_id=user.id  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
+                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk   %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Next 10</div>
             {% endif %}
             </th>
