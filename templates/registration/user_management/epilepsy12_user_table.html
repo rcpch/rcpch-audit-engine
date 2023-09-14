@@ -4,7 +4,7 @@
 
 <div 
     hx-target='#epilepsy12_user_table' 
-    hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk epilepsy12_user_id=user.id %}" 
+    hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk %}" 
     hx-trigger='epilepsy12_user_list from:body'
     hx-swap='innerHTML' 
     name='epilepsy12_user_table'>
@@ -16,21 +16,21 @@
                 <th>
                     <div class="rcpch_td_data_indicator_wrapper">
                         <p>Name</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12users_by_name_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12users_by_name_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_name_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_name_up' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_name_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12users_by_name_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_name_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_name_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -45,21 +45,21 @@
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
                     <p>Email</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12users_by_email_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12users_by_email_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_email_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_email_up' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_email_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_email_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_email_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12users_by_email_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_email_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_email_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -74,36 +74,36 @@
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
                     <p>Role</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_role_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_role_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_role_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_by_role_down"
+                                name="sort_epilepsy12_users_by_role_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% endif %}
                 </div>
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
                     <p>Organisation Employer</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
@@ -111,7 +111,7 @@
                                 hx-target="#epilepsy12_user_table"
                                 hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_organisation_employer_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
