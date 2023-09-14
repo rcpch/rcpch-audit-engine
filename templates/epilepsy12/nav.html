@@ -55,7 +55,7 @@
           <a {% if request.resolver_match.url_name|is_in:'two_factor:profile' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
           id="link"
           href="{% url 'two_factor:profile' %}">
-          Account
+          Settings
           </a> 
           
           {% if user.is_superuser %}
