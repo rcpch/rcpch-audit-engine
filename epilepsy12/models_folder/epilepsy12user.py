@@ -193,6 +193,13 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
+    
+    def save(self, *args, **kwargs) -> None:
+        
+        if self.has_usable_password():
+            self.email_confirmed = True
+        
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Epilepsy12 User"

@@ -50,7 +50,8 @@ services:
             python manage.py createsuperuser --noinput &&
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
-            python manage.py runserver 0.0.0.0:8000"
+            python manage.py runserver 0.0.0.0:8000
+            python manage.py migrate &&" # to migrate two_factor app
 
   # db container - runs postgis
   db:

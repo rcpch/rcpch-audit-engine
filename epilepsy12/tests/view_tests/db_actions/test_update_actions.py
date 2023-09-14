@@ -383,11 +383,9 @@ from epilepsy12.tests.UserDataClasses import (
     test_user_rcpch_audit_team_data,
 )
 from epilepsy12.tests.factories import (
-    E12UserFactory,
     E12CaseFactory,
-    E12SiteFactory,
-    E12AntiEpilepsyMedicineFactory,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 # E12 imports
 from epilepsy12.models import (
@@ -1241,6 +1239,9 @@ def test_age_at_registration_cannot_be_gt_24yo(client, GOSH):
     )
 
     client.force_login(test_user)
+    
+    # 2fa enable
+    twofactor_signin(client, test_user)
 
     response = client.post(
         reverse(

@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.urls import reverse
@@ -25,21 +25,15 @@ from ..models import Epilepsy12User, Organisation, VisitActivity
 from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
-from ..decorator import user_may_view_this_organisation, user_can_access_user
+from ..decorator import (
+    user_may_view_this_organisation,
+    user_can_access_user,
+    login_and_otp_required,
+)
 from ..constants import (
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
-    AUDIT_CENTRE_LEAD_CLINICIAN,
-    TRUST_AUDIT_TEAM_FULL_ACCESS,
-    AUDIT_CENTRE_CLINICIAN,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    AUDIT_CENTRE_ADMINISTRATOR,
-    TRUST_AUDIT_TEAM_EDIT_ACCESS,
-    RCPCH_AUDIT_TEAM,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
-    RCPCH_AUDIT_PATIENT_FAMILY,
-    PATIENT_ACCESS,
-    TRUST_AUDIT_TEAM_VIEW_ONLY,
 )
 
 from epilepsy12.forms_folder.epilepsy12_user_form import (
@@ -48,73 +42,73 @@ from epilepsy12.forms_folder.epilepsy12_user_form import (
 )
 
 
-def epilepsy12_login(request):
-    """
-    Callback from the login form
-    """
-    if request.method == "POST":
-        form = Epilepsy12LoginForm(request, data=request.POST)
+# def epilepsy12_login(request):
+#     """
+#     Callback from the login form
+#     """
+#     if request.method == "POST":
+#         form = Epilepsy12LoginForm(request, data=request.POST)
 
-        if form.is_valid():
-            email = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            print(email)
-            user = authenticate(request, username=email, password=password)
+#         if form.is_valid():
+#             email = form.cleaned_data.get("username")
+#             password = form.cleaned_data.get("password")
 
-            if user is not None:
-                if user.organisation_employer is not None:
-                    # select the first hospital in the list if no allocated employing hospital
-                    selected_organisation = Organisation.objects.get(
-                        name=user.organisation_employer
-                    )
-                else:
-                    selected_organisation = Organisation.objects.first()
-                if user.email_confirmed == False:
-                    user.email_confirmed = True
-                    user.save()
-                login(request, user)
-                last_logged_in = VisitActivity.objects.filter(
-                    activity=1, epilepsy12user=user
-                ).order_by("-activity_datetime")[:2]
-                if last_logged_in.count() > 1:
-                    messages.info(
-                        request,
-                        f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}",
-                    )
-                else:
-                    messages.info(
-                        request,
-                        f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
-                    )
+#             user = authenticate(request, username=email, password=password)
 
-                    if request.user.organisation_employer is not None:
-                        # current user is affiliated with an existing organisation - set viewable trust to this
-                        selected_organisation = Organisation.objects.get(
-                            name=request.user.organisation_employer
-                        )
-                    else:
-                        # current user is a member of the RCPCH audit team and also not affiliated with a organisation
-                        # therefore set selected organisation to first of organisation on the list
-                        selected_organisation = Organisation.objects.order_by(
-                            "name"
-                        ).first()
-                return redirect(
-                    "selected_organisation_summary",
-                    organisation_id=selected_organisation.pk,
-                )
-            else:
-                messages.error(request, "Invalid email or password.")
-        else:
-            messages.error(request, "Invalid email or password.")
-    form = Epilepsy12LoginForm()
-    return render(
-        request=request, template_name="registration/login.html", context={"form": form}
-    )
+#             if user is not None:
+#                 if user.organisation_employer is not None:
+#                     # select the first hospital in the list if no allocated employing hospital
+#                     selected_organisation = Organisation.objects.get(
+#                         name=user.organisation_employer
+#                     )
+#                 else:
+#                     selected_organisation = Organisation.objects.first()
+#                 if user.email_confirmed == False:
+#                     user.email_confirmed = True
+#                     user.save()
+#                 login(request, user)
+#                 last_logged_in = VisitActivity.objects.filter(
+#                     activity=1, epilepsy12user=user
+#                 ).order_by("-activity_datetime")[:2]
+#                 if last_logged_in.count() > 1:
+#                     messages.info(
+#                         request,
+#                         f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}",
+#                     )
+#                 else:
+#                     messages.info(
+#                         request,
+#                         f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
+#                     )
+
+#                     if request.user.organisation_employer is not None:
+#                         # current user is affiliated with an existing organisation - set viewable trust to this
+#                         selected_organisation = Organisation.objects.get(
+#                             name=request.user.organisation_employer
+#                         )
+#                     else:
+#                         # current user is a member of the RCPCH audit team and also not affiliated with a organisation
+#                         # therefore set selected organisation to first of organisation on the list
+#                         selected_organisation = Organisation.objects.order_by(
+#                             "name"
+#                         ).first()
+#                 return redirect(
+#                     "selected_organisation_summary",
+#                     organisation_id=selected_organisation.pk,
+#                 )
+#             else:
+#                 messages.error(request, "Invalid email or password.")
+#         else:
+#             messages.error(request, "Invalid email or password.")
+#     form = Epilepsy12LoginForm()
+#     return render(
+#         request=request, template_name="registration/login.html", context={"form": form}
+#     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
-def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
+def epilepsy12_user_list(request, organisation_id):
     """
     Returns the list of users for the selected organisations
     Currently this includes RCPCH staff who are not associated with a organisation, though this breaks the update/delete and cancel
@@ -256,7 +250,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_name_down"
         ):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("-surname").all()
-            sort_flag = "sort_epilepsy12_users_by_role_up"
+            sort_flag = "sort_epilepsy12_users_by_name_down"
         elif (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_email_up"
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_email_up"
@@ -268,13 +262,13 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_email_down"
         ):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("-surname").all()
-            sort_flag = "sort_epilepsy12_users_by_role_up"
+            sort_flag = "sort_epilepsy12_users_by_email_down"
         elif (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_role_up"
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_role_up"
         ):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by("role").all()
-            sort_flag = "sort_epilepsy12_users_by_role_down"
+            sort_flag = "sort_epilepsy12_users_by_role_up"
         elif (
             request.htmx.trigger_name == "sort_epilepsy12_users_by_role_down"
             or request.GET.get("sort_flag") == "sort_epilepsy12_users_by_role_down"
@@ -290,7 +284,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
             epilepsy12_user_list = filtered_epilepsy12_users.order_by(
                 "organisation_employer"
             ).all()
-            sort_flag = "sort_epilepsy12_users_by_organisation_employer_down"
+            sort_flag = "sort_epilepsy12_users_by_organisation_employer_up"
         elif (
             request.htmx.trigger_name
             == "sort_epilepsy12_users_by_organisation_employer_down"
@@ -346,7 +340,7 @@ def epilepsy12_user_list(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @permission_required("epilepsy12.add_epilepsy12user", raise_exception=True)
 def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_id):
@@ -375,7 +369,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             user_type,
             request.POST or None,
         )
-        print(form)
+
         if form.is_valid():
             # success message - return to user list
             new_user = form.save(commit=False)
@@ -407,7 +401,6 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
             return redirect(
                 "epilepsy12_user_list",
                 organisation_id=organisation_id,
-                epilepsy12_user_id=epilepsy12_user_id,
             )
 
     context = {
@@ -424,7 +417,7 @@ def create_epilepsy12_user(request, organisation_id, user_type, epilepsy12_user_
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @user_can_access_user()
 @permission_required("epilepsy12.change_epilepsy12user", raise_exception=True)
@@ -496,7 +489,6 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
                 "epilepsy12_user_list",
                 kwargs={
                     "organisation_id": organisation_id,
-                    "epilepsy12_user_id": epilepsy12_user_to_edit.pk,
                 },
             )
             return redirect(redirect_url)
@@ -519,7 +511,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
                 # Save was successful, so redirect to another page
                 redirect_url = reverse(
-                    "epilepsy12_user_list", kwargs={"organisation_id": organisation_id}
+                    "epilepsy12_user_list", kwargs={"organisation_id": organisation_id, }
                 )
                 return redirect(redirect_url)
 
@@ -544,7 +536,7 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 @user_can_access_user()
 @permission_required("epilepsy12.delete_epilepsy12user", raise_exception=True)
@@ -559,7 +551,6 @@ def delete_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
             "epilepsy12_user_list",
             kwargs={
                 "organisation_id": organisation_id,
-                "epilepsy12_user_id": epilepsy12_user_id,
             },
         )
     )
@@ -578,7 +569,7 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     success_url = reverse_lazy("index")
 
 
-@login_required
+@login_and_otp_required()
 @user_can_access_user()
 def logs(request, organisation_id, epilepsy12_user_id):
     """
@@ -599,7 +590,7 @@ def logs(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_can_access_user()
 def log_list(request, organisation_id, epilepsy12_user_id):
     """
@@ -620,7 +611,7 @@ def log_list(request, organisation_id, epilepsy12_user_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_organisation()
 def all_epilepsy12_users_list(request, organisation_id):
     allowed_groups = [EPILEPSY12_AUDIT_TEAM_FULL_ACCESS]

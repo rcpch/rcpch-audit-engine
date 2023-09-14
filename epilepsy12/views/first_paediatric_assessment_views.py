@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse
 from epilepsy12.constants import *
 from ..common_view_functions import (
@@ -6,10 +6,10 @@ from ..common_view_functions import (
     recalculate_form_generate_response,
 )
 from ..models import Registration, FirstPaediatricAssessment, Site
-from ..decorator import user_may_view_this_child
+from ..decorator import user_may_view_this_child, login_and_otp_required
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.view_firstpaediatricassessment", raise_exception=True)
 @user_may_view_this_child()
 def first_paediatric_assessment(request, case_id) -> HttpResponse:
@@ -57,7 +57,7 @@ def first_paediatric_assessment(request, case_id) -> HttpResponse:
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
@@ -104,7 +104,7 @@ def first_paediatric_assessment_in_acute_or_nonacute_setting(
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
@@ -149,7 +149,7 @@ def has_number_of_episodes_since_the_first_been_documented(
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
@@ -191,7 +191,7 @@ def general_examination_performed(request, first_paediatric_assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
@@ -233,7 +233,7 @@ def neurological_examination_performed(request, first_paediatric_assessment_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True
@@ -277,7 +277,7 @@ def developmental_learning_or_schooling_problems(
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.change_firstpaediatricassessment", raise_exception=True

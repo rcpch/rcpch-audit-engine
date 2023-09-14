@@ -64,8 +64,7 @@ router.register(
 
 # Auth, login, password reset
 user_patterns = [
-    path("registration/", include(auth_urls)),
-    path("registration/login", view=epilepsy12_login, name="login"),
+    path("account/", include(auth_urls)),
     path("password-reset/", view=ResetPasswordView.as_view(), name="password_reset"),
     path(
         "organisation/<int:organisation_id>/epilepsy12_users/<int:epilepsy12_user_id>/logs",
@@ -78,7 +77,7 @@ user_patterns = [
         name="log_list",
     ),
     path(
-        "organisation/<int:organisation_id>/epilepsy12_user_list/<int:epilepsy12_user_id>",
+        "organisation/<int:organisation_id>/epilepsy12_user_list/",
         view=epilepsy12_user_list,
         name="epilepsy12_user_list",
     ),

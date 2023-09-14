@@ -104,6 +104,7 @@ from epilepsy12.models import (
     Medicine,
     ComorbidityList,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -143,6 +144,9 @@ def test_user_delete_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Seed a temp User to be deleted
         temp_user_same_org = E12UserFactory(
@@ -252,6 +256,9 @@ def test_user_delete_forbidden(
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         if test_user.first_name in [
             test_user_audit_centre_lead_clinician_data.role_str,
         ]:
@@ -319,6 +326,9 @@ def test_patient_delete_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Seed a temp pt to be deleted
         temp_pt_same_org = E12CaseFactory(
@@ -418,6 +428,9 @@ def test_patient_delete_forbidden(
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         if test_user.first_name in [
             test_user_audit_centre_clinician_data.role_str,
             test_user_audit_centre_lead_clinician_data.role_str,
@@ -489,6 +502,9 @@ def test_episode_delete_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Create a Case with Episode
         CASE_FROM_SAME_ORG = E12CaseFactory(

@@ -1,0 +1,52 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+
+{% block extra_media %}
+{{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class='ui rcpch container'>
+  <div class="ui two column centered grid">
+    <div class="column">
+      <h1>{% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}</h1>
+      {% if wizard.steps.current == 'welcome' %}
+        <p>{% blocktrans trimmed %}Follow the steps to enable Two-Factor Authentication.</p> 
+        <p>This is a requirement to use the Epilepsy12 platform{% endblocktrans %}.</p>
+      {% elif wizard.steps.current == 'method' %}
+        <p>Please select which authentication method you would
+            like to use:</p>
+      {% elif wizard.steps.current == 'generator' %}
+        <p><b>To set up your Two-Factor Authentication, follow these steps:</b></p>
+        <ol>
+          <li><p>Ensure you have the <a class="rcpch_blue_link" href="https://www.microsoft.com/en-gb/security/mobile-authenticator-app">Microsoft Authenticator app</a> downloaded on your mobile device.</p></li>
+          <li>Click on the <code>+</code> button on the top right to add a <em>Work or school account</em>.</li>
+          <li>Choose <em>'Scan QR code'</em> and scan below:</li>
+          <p><img src="{{ QR_URL }}" alt="QR Code" class="bg-white" /></p>
+          <li>Finally, enter the 6 digit number token provided:</li>
+        </ol> 
+        
+      {% elif wizard.steps.current == 'validation' %}
+        <p>Please check your registered email for your OTP code.</p>
+        {% if not challenge_succeeded %}
+        <p class="alert alert-warning" role="alert">{% blocktrans trimmed %}We've
+          encountered an issue with the selected authentication method. Please
+          go back and verify that you entered your information correctly, try
+          again, or use a different authentication method instead. If the issue
+          persists, contact the site administrator.{% endblocktrans %}</p>
+        {% endif %}
+      {% endif %}
+
+      <form action="" method="post" class="ui form">{% csrf_token %}
+        {% include "two_factor/_wizard_forms.html" %}
+
+        {# hidden submit button to enable [enter] key #}
+        <input type="submit" value="" hidden />
+
+        {% include "two_factor/_wizard_actions.html" %}
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

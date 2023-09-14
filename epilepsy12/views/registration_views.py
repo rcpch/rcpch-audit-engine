@@ -1,6 +1,6 @@
 # django imports
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from django.utils import timezone
 from django.contrib.gis.db.models import Q
 from django.urls import reverse
@@ -27,14 +27,14 @@ from ..common_view_functions import (
     validate_and_update_model,
     recalculate_form_generate_response,
 )
-from ..decorator import user_may_view_this_child
+from ..decorator import user_may_view_this_child, login_and_otp_required
 from ..general_functions import (
     construct_transfer_epilepsy12_site_email,
     get_current_cohort_data,
 )
 
 
-@login_required
+@login_and_otp_required()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 @user_may_view_this_child()
 def register(request, case_id):
@@ -173,7 +173,7 @@ Lead site allocation, deletion, updating and transfer
 """
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
 def allocate_lead_site(request, registration_id):
@@ -249,7 +249,7 @@ def allocate_lead_site(request, registration_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.can_edit_epilepsy12_lead_centre", raise_exception=True)
 def edit_lead_site(request, registration_id, site_id):
@@ -281,7 +281,7 @@ def edit_lead_site(request, registration_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
@@ -320,7 +320,7 @@ def transfer_lead_site(request, registration_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 def cancel_lead_site(request, registration_id, site_id):
@@ -348,7 +348,7 @@ def cancel_lead_site(request, registration_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_transfer_epilepsy12_lead_centre", raise_exception=True
@@ -460,7 +460,7 @@ def update_lead_site(request, registration_id, site_id, update):
     )
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_delete_epilepsy12_lead_centre", raise_exception=True
@@ -524,7 +524,7 @@ def delete_lead_site(request, registration_id, site_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.view_registration", raise_exception=True)
 def previous_sites(request, registration_id):
@@ -557,7 +557,7 @@ Validation process
 """
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True
@@ -607,7 +607,7 @@ def confirm_eligible(request, registration_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required("epilepsy12.change_registration", raise_exception=True)
 def registration_status(request, registration_id):
@@ -630,7 +630,7 @@ def registration_status(request, registration_id):
     return response
 
 
-@login_required
+@login_and_otp_required()
 @user_may_view_this_child()
 @permission_required(
     "epilepsy12.can_register_child_in_epilepsy12", raise_exception=True

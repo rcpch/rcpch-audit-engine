@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
 from .models import (
     FirstPaediatricAssessment,
     MultiaxialDiagnosis,
@@ -199,7 +200,7 @@ def user_may_view_this_organisation():
     def decorator(view):
         def wrapper(request, *args, **kwargs):
             user = request.user
-
+            
             if kwargs.get("organisation_id") is not None:
                 organisation_requested = Organisation.objects.get(
                     pk=kwargs.get("organisation_id")
@@ -383,6 +384,30 @@ def user_can_access_user():
                 return view(request, *args, **kwargs)
             else:
                 raise PermissionDenied()
+
+        return wrapper
+
+    return decorator
+
+def login_and_otp_required():
+    """
+    Must have verified via 2FA
+    """
+
+    def decorator(view):
+        # First use login_required on decorator 
+        login_required(view)
+        
+        def wrapper(request, *args, **kwargs):
+            
+            # Then, ensure 2fa verified
+            user = request.user
+            
+            if not user.is_verified():
+                print(f"{user=} is unverified. Tried accessing {view}")
+                raise PermissionDenied()
+            
+            return view(request, *args, **kwargs)
 
         return wrapper
 

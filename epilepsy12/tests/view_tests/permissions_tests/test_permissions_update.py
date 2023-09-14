@@ -279,6 +279,7 @@ from epilepsy12.tests.factories import (
     E12SiteFactory,
     E12AntiEpilepsyMedicineFactory,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -359,6 +360,9 @@ def test_users_update_users_forbidden(
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         response = client.get(
             reverse(
@@ -453,6 +457,9 @@ def test_users_update_users_success(
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         response = client.get(
             reverse(
                 "edit_epilepsy12_user",
@@ -528,6 +535,9 @@ def test_users_update_cases_forbidden(
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         response = client.get(
             reverse(
                 "update_case",
@@ -577,6 +587,9 @@ def test_users_update_cases_success(
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         response = client.get(
             reverse(
@@ -637,6 +650,9 @@ def test_users_update_first_paediatric_assessment_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for url in URLS:
             response = client.get(
                 reverse(
@@ -693,6 +709,9 @@ def test_users_update_first_paediatric_assessment_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             if URL == "first_paediatric_assessment_in_acute_or_nonacute_setting":
@@ -768,6 +787,9 @@ def test_users_update_first_epilepsy_context_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             response = client.get(
                 reverse(
@@ -835,6 +857,9 @@ def test_users_update_epilepsy_context_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             if URL in single_choice_multiple_toggle_fields:
@@ -911,6 +936,9 @@ def test_users_update_first_multiaxial_diagnosis_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             response = client.get(
@@ -993,6 +1021,9 @@ def test_users_update_multiaxial_diagnosis_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             if URL in toggle_fields:
                 # all other options are toggle buttons: select True
@@ -1074,6 +1105,9 @@ def test_update_multiaxial_diagnosis_cause_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         response_epilepsy_cause_known = client.post(
             reverse(
@@ -1192,6 +1226,9 @@ def test_users_update_episode_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             if URL == "delete_description_keyword":
                 response = client.get(
@@ -1290,6 +1327,9 @@ def test_users_update_episode_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             if URL == "delete_description_keyword":
@@ -1427,6 +1467,9 @@ def test_users_update_comorbidity_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             comorbidity, created = Comorbidity.objects.update_or_create(
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
@@ -1500,6 +1543,9 @@ def test_users_update_comorbidity_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             comorbidity, created = Comorbidity.objects.update_or_create(
@@ -1616,6 +1662,9 @@ def test_users_update_assessment_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             if URL in toggle_buttons:
@@ -1806,6 +1855,9 @@ def test_users_update_assessment_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             if URL in toggle_buttons:
                 response = client.post(
@@ -1983,6 +2035,9 @@ def test_users_update_investigations_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             if URL in toggle_buttons:
                 response = client.post(
@@ -2100,6 +2155,9 @@ def test_users_update_investigations_success(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             if URL in toggle_buttons:
                 response = client.post(
@@ -2211,6 +2269,9 @@ def test_users_update_management_forbidden(client):
         # Log in Test User
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         for URL in URLS:
             if URL in date_fields:
                 response = client.post(
@@ -2293,6 +2354,9 @@ def test_users_update_management_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             if URL in date_fields:
@@ -2380,6 +2444,9 @@ def test_users_update_antiepilepsymedicine_forbidden(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             antiepilepsy_medicine = E12AntiEpilepsyMedicineFactory(
@@ -2480,6 +2547,9 @@ def test_users_update_antiepilepsymedicine_success(client):
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         for URL in URLS:
             # carbamazepine

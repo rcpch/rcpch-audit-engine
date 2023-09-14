@@ -18,6 +18,7 @@ from epilepsy12.models import (
     Epilepsy12User,
     Organisation,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -39,6 +40,9 @@ def test_download_button_access(
     for test_user in users:
         # Log in Test User
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Request download button url
         response = client.get(

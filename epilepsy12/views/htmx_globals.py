@@ -4,7 +4,6 @@ import csv
 # django
 from django.apps import apps
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 # e12
@@ -16,7 +15,7 @@ from epilepsy12.models import (
     EpilepsyContext,
     MultiaxialDiagnosis,
 )
-from epilepsy12.decorator import rcpch_full_access_only
+from epilepsy12.decorator import rcpch_full_access_only, login_and_otp_required
 
 
 # HTMX generic partials
@@ -51,7 +50,7 @@ def registration_active(request, case_id, active_template):
     )
 
 
-@login_required
+@login_and_otp_required()
 @rcpch_full_access_only()
 def download_select(request):
     """
@@ -87,7 +86,7 @@ def download_select(request):
     )
 
 
-@login_required
+@login_and_otp_required()
 @rcpch_full_access_only()
 def download(request, model_name):
     """

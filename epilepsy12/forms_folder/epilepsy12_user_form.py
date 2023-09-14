@@ -45,8 +45,16 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
         self.rcpch_organisation = rcpch_organisation
         self.fields["role"].choices = choices
+        
+        if getattr(self, 'initial', None):
+            initial = getattr(self, 'initial')
+            if initial.get('email'):
+                self.fields["email"].widget.attrs["disabled"] = True
 
     email = forms.EmailField(
+        widget=forms.TextInput(
+            attrs={"class": "ui rcpch form input"},
+        ),
         max_length=255,
         help_text="Required. Please enter a valid NHS email address.",
         required=True,
@@ -128,7 +136,11 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
     def clean_email(self):
         data = self.cleaned_data["email"]
+
         if data is not None:
+            if Epilepsy12User.objects.filter(email=data.lower()).exists():
+                return data.lower()
+
             # this user is being updated
             if data != data.lower():
                 # test to check this email does not exist

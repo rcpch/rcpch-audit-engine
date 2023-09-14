@@ -110,6 +110,7 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -148,7 +149,12 @@ def test_user_create_same_org_success(
         ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
+        
+        
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
@@ -223,6 +229,9 @@ def test_user_create_diff_org_success(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
@@ -293,6 +302,9 @@ def test_user_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
@@ -376,6 +388,9 @@ def test_patient_create_success(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_case",
@@ -493,6 +508,9 @@ def test_patient_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_case",
@@ -582,6 +600,9 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         for url in URLS:
             if url == "add_antiepilepsy_medicine":
