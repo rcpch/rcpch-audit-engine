@@ -77,7 +77,7 @@ user_patterns = [
         name="log_list",
     ),
     path(
-        "organisation/<int:organisation_id>/epilepsy12_user_list/<int:epilepsy12_user_id>",
+        "organisation/<int:organisation_id>/epilepsy12_user_list/",
         view=epilepsy12_user_list,
         name="epilepsy12_user_list",
     ),
