@@ -1,6 +1,10 @@
 # python / django imports
+import re
 from datetime import date
+
+# django imports
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 # 3rd party imports
 import nhs_number
@@ -78,3 +82,33 @@ def not_in_the_future_validator(value):
         return value
     else:
         raise ValidationError("Dates cannot be in the future.")
+
+
+class SymbolValidator(object):
+    def validate(self, password, user=None):
+        if not re.findall("[()[\]{}|\\`~!@#$%^&*_\-+=;:'\",<>./?]", password):
+            raise ValidationError(
+                _(
+                    "The password must contain at least 1 symbol: "
+                    + "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"
+                ),
+                code="password_no_symbol",
+            )
+
+    def get_help_text(self):
+        return _(
+            "Your password must contain at least 1 symbol: "
+            + "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"
+        )
+
+
+class NumberValidator(object):
+    def validate(self, password, user=None):
+        if not re.findall("\d", password):
+            raise ValidationError(
+                _("The password must contain at least 1 digit, 0-9."),
+                code="password_no_number",
+            )
+
+    def get_help_text(self):
+        return _("Your password must contain at least 1 digit, 0-9.")
