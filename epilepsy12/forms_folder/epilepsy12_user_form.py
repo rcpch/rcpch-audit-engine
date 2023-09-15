@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.core import validators
 from django.contrib.auth.forms import (
     PasswordResetForm,
@@ -260,5 +261,14 @@ class UserForgotPasswordForm(PasswordResetForm):
             user.save()
         return user
 
+# IF IN DEBUG MODE, PRE-FILL CAPTCHA VALUE
+class DebugCaptchaField(CaptchaField):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.widget.widgets[-1].attrs['value'] = 'PASSED'
+        
+        
+
 class CaptchaAuthenticationForm(AuthenticationForm):
-    captcha = CaptchaField()
+    captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField() 

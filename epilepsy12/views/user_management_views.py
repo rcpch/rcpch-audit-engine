@@ -1,4 +1,3 @@
-
 # Django
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -6,6 +5,7 @@ from django.urls import reverse
 from django.contrib.gis.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.conf import settings
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail, BadHeaderError
@@ -17,12 +17,15 @@ from django_htmx.http import HttpResponseClientRedirect
 
 
 # Other dependencies
-from two_factor.views import LoginView as TwoFactorLoginView 
+from two_factor.views import LoginView as TwoFactorLoginView
 import pandas as pd
 
 # epilepsy12
 from ..models import Epilepsy12User, Organisation, VisitActivity
-from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm, CaptchaAuthenticationForm
+from epilepsy12.forms_folder.epilepsy12_user_form import (
+    Epilepsy12UserAdminCreationForm,
+    CaptchaAuthenticationForm,
+)
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
 from ..decorator import (
@@ -442,7 +445,10 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
 
                 # Save was successful, so redirect to another page
                 redirect_url = reverse(
-                    "epilepsy12_user_list", kwargs={"organisation_id": organisation_id, }
+                    "epilepsy12_user_list",
+                    kwargs={
+                        "organisation_id": organisation_id,
+                    },
                 )
                 return redirect(redirect_url)
 
@@ -499,15 +505,36 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     )
     success_url = reverse_lazy("index")
 
+
 class RCPCHLoginView(TwoFactorLoginView):
-    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
+
         # Override original Django Auth Form with Captcha field inserted
-        self.form_list['auth'] = CaptchaAuthenticationForm
+        self.form_list["auth"] = CaptchaAuthenticationForm
     
-    
+    # Override successful login redirect to org summary page
+    def done(self, form_list, **kwargs):
+        response = super().done(form_list)
+        response_url = getattr(response, "url")
+        login_redirect_url = reverse(settings.LOGIN_REDIRECT_URL)
+
+        # Successful login, redirect to login page
+        if response_url == login_redirect_url:
+            user = self.get_user()
+            if not user.organisation_employer:
+                org_id = 1
+            else:
+                org_id = user.organisation_employer.id
+
+            return redirect(
+                reverse(
+                    "selected_organisation_summary",
+                    kwargs={"organisation_id": org_id},
+                )
+            )
+        return response
+
 
 @login_and_otp_required()
 @user_can_access_user()
