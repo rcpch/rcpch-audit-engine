@@ -81,6 +81,8 @@ INSTALLED_APPS = [
     "two_factor.plugins.email",  # add back in if require email 2fa
     "two_factor",
     "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
+    # captcha
+    "captcha",
     # application
     "epilepsy12",
 ]
@@ -184,7 +186,7 @@ DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
 OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
 OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
 OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
-OTP_EMAIL_TOKEN_VALIDITY = 60 * 5 # default N(seconds) email token valid for
+OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
 if DEBUG is True:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:

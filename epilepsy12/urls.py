@@ -64,6 +64,8 @@ router.register(
 
 # Auth, login, password reset
 user_patterns = [
+    path('custom_login', RCPCHLoginView.as_view(), name='custom_login'),
+    path('captcha/', include('captcha.urls')),
     path("account/", include(auth_urls)),
     path("password-reset/", view=ResetPasswordView.as_view(), name="password_reset"),
     path(
