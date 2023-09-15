@@ -12,17 +12,6 @@ from epilepsy12.constants.user_types import (
     TITLES,
 )
 from ..models import Epilepsy12User, Organisation
-from ..general_functions import match_in_choice_key
-
-
-class Epilepsy12LoginForm(AuthenticationForm):
-    class Meta:
-        model = Epilepsy12User
-        fields = ("username", "password")
-
-    def clean_username(self):
-        data = self.cleaned_data["username"]
-        return data.lower()
 
 
 class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
