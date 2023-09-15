@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 # standard imports
 import os
 from pathlib import Path
-import sys
 import datetime
 
 # third party imports
@@ -31,6 +30,12 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
+if DEBUG is True:
+    CAPTCHA_TEST_MODE = True # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
+
+# GENERAL CAPTCHA SETTINGS
+CAPTCHA_IMAGE_SIZE = (200, 50)
+CAPTCHA_FONT_SIZE = 40
 
 # Need to handle missing ENV var
 # Need to handle duplicates
