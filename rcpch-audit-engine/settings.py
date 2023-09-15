@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 # standard imports
 import os
 from pathlib import Path
-import sys
 import datetime
 
 # third party imports
@@ -31,6 +30,12 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
+if DEBUG is True:
+    CAPTCHA_TEST_MODE = True # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
+
+# GENERAL CAPTCHA SETTINGS
+CAPTCHA_IMAGE_SIZE = (200, 50)
+CAPTCHA_FONT_SIZE = 40
 
 # Need to handle missing ENV var
 # Need to handle duplicates
@@ -81,6 +86,8 @@ INSTALLED_APPS = [
     "two_factor.plugins.email",  # add back in if require email 2fa
     "two_factor",
     "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
+    # captcha
+    "captcha",
     # application
     "epilepsy12",
 ]
@@ -184,7 +191,7 @@ DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
 OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
 OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
 OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
-OTP_EMAIL_TOKEN_VALIDITY = 60 * 5 # default N(seconds) email token valid for
+OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
 if DEBUG is True:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:

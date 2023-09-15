@@ -1,28 +1,20 @@
 from django import forms
+from django.conf import settings
 from django.core import validators
 from django.contrib.auth.forms import (
     PasswordResetForm,
     SetPasswordForm,
     AuthenticationForm,
 )
+
+from captcha.fields import CaptchaField
+
 from epilepsy12.constants.user_types import (
-    ROLES,
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
     TITLES,
 )
 from ..models import Epilepsy12User, Organisation
-from ..general_functions import match_in_choice_key
-
-
-class Epilepsy12LoginForm(AuthenticationForm):
-    class Meta:
-        model = Epilepsy12User
-        fields = ("username", "password")
-
-    def clean_username(self):
-        data = self.cleaned_data["username"]
-        return data.lower()
 
 
 class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
@@ -268,3 +260,15 @@ class UserForgotPasswordForm(PasswordResetForm):
         if commit:
             user.save()
         return user
+
+# IF IN DEBUG MODE, PRE-FILL CAPTCHA VALUE
+class DebugCaptchaField(CaptchaField):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.widget.widgets[-1].attrs['value'] = 'PASSED'
+        
+        
+
+class CaptchaAuthenticationForm(AuthenticationForm):
+    captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField() 

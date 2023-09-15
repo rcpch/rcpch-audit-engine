@@ -64,6 +64,7 @@ router.register(
 
 # Auth, login, password reset
 user_patterns = [
+    path('captcha/', include('captcha.urls')),
     path("account/", include(auth_urls)),
     path("password-reset/", view=ResetPasswordView.as_view(), name="password_reset"),
     path(
