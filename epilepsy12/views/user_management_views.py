@@ -1,28 +1,28 @@
-from django.utils import timezone
+
+# Django
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
 from django.urls import reverse
 from django.contrib.gis.db.models import Q
 from django.core.paginator import Paginator
-from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail, BadHeaderError
-
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.html import strip_tags
-
-# 3rd party
 from django_htmx.http import HttpResponseClientRedirect
+
+
+# Other dependencies
+from two_factor.views import LoginView as TwoFactorLoginView 
 import pandas as pd
 
 # epilepsy12
 from ..models import Epilepsy12User, Organisation, VisitActivity
-from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm
+from epilepsy12.forms_folder.epilepsy12_user_form import Epilepsy12UserAdminCreationForm, CaptchaAuthenticationForm
 from ..general_functions import construct_confirm_email, match_in_choice_key
 from ..common_view_functions import group_for_role
 from ..decorator import (
@@ -35,75 +35,6 @@ from ..constants import (
     AUDIT_CENTRE_ROLES,
     EPILEPSY12_AUDIT_TEAM_FULL_ACCESS,
 )
-
-from epilepsy12.forms_folder.epilepsy12_user_form import (
-    #     Epilepsy12UserCreationForm,
-    Epilepsy12LoginForm,
-)
-
-
-# def epilepsy12_login(request):
-#     """
-#     Callback from the login form
-#     """
-#     if request.method == "POST":
-#         form = Epilepsy12LoginForm(request, data=request.POST)
-
-#         if form.is_valid():
-#             email = form.cleaned_data.get("username")
-#             password = form.cleaned_data.get("password")
-
-#             user = authenticate(request, username=email, password=password)
-
-#             if user is not None:
-#                 if user.organisation_employer is not None:
-#                     # select the first hospital in the list if no allocated employing hospital
-#                     selected_organisation = Organisation.objects.get(
-#                         name=user.organisation_employer
-#                     )
-#                 else:
-#                     selected_organisation = Organisation.objects.first()
-#                 if user.email_confirmed == False:
-#                     user.email_confirmed = True
-#                     user.save()
-#                 login(request, user)
-#                 last_logged_in = VisitActivity.objects.filter(
-#                     activity=1, epilepsy12user=user
-#                 ).order_by("-activity_datetime")[:2]
-#                 if last_logged_in.count() > 1:
-#                     messages.info(
-#                         request,
-#                         f"You are now logged in as {email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}",
-#                     )
-#                 else:
-#                     messages.info(
-#                         request,
-#                         f"You are now logged in as {email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
-#                     )
-
-#                     if request.user.organisation_employer is not None:
-#                         # current user is affiliated with an existing organisation - set viewable trust to this
-#                         selected_organisation = Organisation.objects.get(
-#                             name=request.user.organisation_employer
-#                         )
-#                     else:
-#                         # current user is a member of the RCPCH audit team and also not affiliated with a organisation
-#                         # therefore set selected organisation to first of organisation on the list
-#                         selected_organisation = Organisation.objects.order_by(
-#                             "name"
-#                         ).first()
-#                 return redirect(
-#                     "selected_organisation_summary",
-#                     organisation_id=selected_organisation.pk,
-#                 )
-#             else:
-#                 messages.error(request, "Invalid email or password.")
-#         else:
-#             messages.error(request, "Invalid email or password.")
-#     form = Epilepsy12LoginForm()
-#     return render(
-#         request=request, template_name="registration/login.html", context={"form": form}
-#     )
 
 
 @login_and_otp_required()
@@ -568,6 +499,15 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
     )
     success_url = reverse_lazy("index")
 
+class RCPCHLoginView(TwoFactorLoginView):
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        # Override original Django Auth Form with Captcha field inserted
+        self.form_list['auth'] = CaptchaAuthenticationForm
+    
+    
 
 @login_and_otp_required()
 @user_can_access_user()
