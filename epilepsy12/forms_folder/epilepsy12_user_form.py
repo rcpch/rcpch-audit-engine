@@ -6,6 +6,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
     AuthenticationForm,
 )
+from django.utils import timezone
 
 from captcha.fields import CaptchaField
 
@@ -37,10 +38,10 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
 
         self.rcpch_organisation = rcpch_organisation
         self.fields["role"].choices = choices
-        
-        if getattr(self, 'initial', None):
-            initial = getattr(self, 'initial')
-            if initial.get('email'):
+
+        if getattr(self, "initial", None):
+            initial = getattr(self, "initial")
+            if initial.get("email"):
                 self.fields["email"].widget.attrs["disabled"] = True
 
     email = forms.EmailField(
@@ -199,7 +200,7 @@ class Epilepsy12UserPasswordResetForm(SetPasswordForm):
 
     new_password1 = forms.CharField(
         label="Password",
-        help_text="<ul class='errorlist text-muted'><li>Your password can 't be too similar to your other personal information.</li><li>Your password must contain at least 8 characters.</li><li>Your password can 't be a commonly used password.</li> <li>Your password can 't be entirely numeric.<li></ul>",
+        help_text="<ul class='errorlist text-muted'><li>Your password can 't be too similar to your other personal information.</li><li>Your password must contain at least 10 characters.</li><li>Your password can 't be a commonly used password.</li> <li>Your password can't be entirely numeric.<li><li>Your password can't be a commonly used password.</li> <li>Your password must contain a symbol.<li></ul>",
         max_length=100,
         required=True,
         widget=forms.PasswordInput(
@@ -229,6 +230,7 @@ class Epilepsy12UserPasswordResetForm(SetPasswordForm):
 
     def clean(self):
         cleaned_data = super(Epilepsy12UserPasswordResetForm, self).clean()
+        cleaned_data["password_last_set"] = timezone.now()
         return cleaned_data
 
 
@@ -261,14 +263,13 @@ class UserForgotPasswordForm(PasswordResetForm):
             user.save()
         return user
 
+
 # IF IN DEBUG MODE, PRE-FILL CAPTCHA VALUE
 class DebugCaptchaField(CaptchaField):
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.widget.widgets[-1].attrs['value'] = 'PASSED'
-        
-        
+        self.widget.widgets[-1].attrs["value"] = "PASSED"
+
 
 class CaptchaAuthenticationForm(AuthenticationForm):
-    captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField() 
+    captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField()
