@@ -5,8 +5,10 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
     AuthenticationForm,
 )
+
+from captcha.fields import CaptchaField
+
 from epilepsy12.constants.user_types import (
-    ROLES,
     RCPCH_AUDIT_TEAM_ROLES,
     AUDIT_CENTRE_ROLES,
     TITLES,
@@ -257,3 +259,6 @@ class UserForgotPasswordForm(PasswordResetForm):
         if commit:
             user.save()
         return user
+
+class CaptchaAuthenticationForm(AuthenticationForm):
+    captcha = CaptchaField()
