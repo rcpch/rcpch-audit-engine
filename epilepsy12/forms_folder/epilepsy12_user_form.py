@@ -1,11 +1,10 @@
+from typing import Any
 from django import forms
 from django.conf import settings
 from django.core import validators
-from django.contrib.auth.forms import (
-    PasswordResetForm,
-    SetPasswordForm,
-    AuthenticationForm,
-)
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 from django.utils import timezone
 
 from captcha.fields import CaptchaField
@@ -18,7 +17,34 @@ from epilepsy12.constants.user_types import (
 from ..models import Epilepsy12User, Organisation
 
 
-class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
+class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
+    # form show when setting or resetting password
+    # password validation occurs here and updates the password_last_set field
+    is_admin = False
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        if (
+            self.user.is_rcpch_audit_team_member
+            or self.user.is_superuser
+            or self.user.is_rcpch_staff
+        ):
+            self.is_admin = True
+        super(SetPasswordForm, self).__init__(*args, **kwargs)
+
+    def clean(self) -> dict[str, Any]:
+        if self.is_admin and len(super().clean()["new_password1"]) < 16:
+            raise forms.ValidationError(
+                {
+                    "new_password2": _(
+                        "RCPCH audit team members must have passwords of 16 characters or more."
+                    )
+                }
+            )
+        return super().clean()
+
+
+class Epilepsy12UserAdminCreationForm(forms.ModelForm):
     """
     This is a standard Django form to be used by admin to create a user without a password
     """
@@ -193,75 +219,6 @@ class Epilepsy12UserAdminCreationForm(forms.ModelForm):  # UserCreationForm
             cleaned_data["view_preference"] = 0
 
         return cleaned_data
-
-
-class Epilepsy12UserPasswordResetForm(SetPasswordForm):
-    """Change password form."""
-
-    new_password1 = forms.CharField(
-        label="Password",
-        help_text="<ul class='errorlist text-muted'><li>Your password can 't be too similar to your other personal information.</li><li>Your password must contain at least 10 characters.</li><li>Your password can 't be a commonly used password.</li> <li>Your password can't be entirely numeric.<li><li>Your password can't be a commonly used password.</li> <li>Your password must contain a symbol.<li></ul>",
-        max_length=100,
-        required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "password",
-                "type": "password",
-                "id": "user_password",
-            }
-        ),
-    )
-
-    new_password2 = forms.CharField(
-        label="Confirm password",
-        help_text=False,
-        max_length=100,
-        required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "confirm password",
-                "type": "password",
-                "id": "user_password",
-            }
-        ),
-    )
-
-    def clean(self):
-        cleaned_data = super(Epilepsy12UserPasswordResetForm, self).clean()
-        cleaned_data["password_last_set"] = timezone.now()
-        return cleaned_data
-
-
-class UserForgotPasswordForm(PasswordResetForm):
-    """User forgot password, check via email form."""
-
-    email = forms.EmailField(
-        label="Email address",
-        max_length=254,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "email address",
-                "type": "text",
-                "id": "email_address",
-            }
-        ),
-    )
-
-    def clean(self):
-        cleaned_data = super(UserForgotPasswordForm, self).clean()
-        return cleaned_data
-
-    def save(self, commit=True):
-        # Save the provided password in hashed format
-        user = super(UserForgotPasswordForm, self).save(commit=False)
-
-        if commit:
-            user.save()
-        return user
 
 
 # IF IN DEBUG MODE, PRE-FILL CAPTCHA VALUE
