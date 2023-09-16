@@ -1,6 +1,6 @@
 # Django
 from typing import Any
-
+from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -12,7 +12,7 @@ from django.http import HttpRequest, HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail, BadHeaderError
 from django.urls import reverse_lazy
-from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
@@ -528,6 +528,33 @@ class RCPCHLoginView(TwoFactorLoginView):
                 org_id = 1
             else:
                 org_id = user.organisation_employer.id
+
+            # time since last set password
+            delta = timezone.now() - user.password_last_set
+
+            # if user has not renewed password in last 90 days, redirect to login page
+            if user.is_active and user.password_last_set >= (
+                timezone.now() + timezone.timedelta(days=90)
+            ):
+                messages.error(
+                    request=self.request,
+                    message=f"Your password has expired. Please reset it.",
+                )
+                return redirect(reverse("password_reset"))
+
+            last_logged_in = VisitActivity.objects.filter(
+                activity=1, epilepsy12user=user
+            ).order_by("-activity_datetime")[:2]
+            if last_logged_in.count() > 1:
+                messages.info(
+                    self.request,
+                    f"You are now logged in as {user.email}. You last logged in at {timezone.localtime(last_logged_in[1].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[1].ip_address}.\nYou have {90-delta.days} days remaining until your password needs resetting.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    f"You are now logged in as {user.email}. Welcome to Epilepsy12! This is your first time logging in ({timezone.localtime(last_logged_in[0].activity_datetime).strftime('%H:%M %p on %A, %d %B %Y')} from {last_logged_in[0].ip_address}).",
+                )
 
             return redirect(
                 reverse(

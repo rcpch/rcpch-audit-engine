@@ -3,7 +3,6 @@ from django import forms
 from django.conf import settings
 from django.core import validators
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.utils import timezone
 

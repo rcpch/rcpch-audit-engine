@@ -75,7 +75,7 @@ user_patterns = [
     ),
     path(
         "account/password-reset-confirm/<uidb64>/<token>",
-        view=PasswordResetConfirmView.as_view(
+        view=auth_views.PasswordResetConfirmView.as_view(
             form_class=Epilepsy12UserUpdatePasswordForm,
             template_name="registration/password_reset_confirm.html",
         ),

@@ -4,7 +4,7 @@ from datetime import datetime
 # django imports
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, redirect, render, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
 from django.contrib.gis.db.models import Q
@@ -20,7 +20,11 @@ from epilepsy12.models import Organisation, Site, Case, AuditProgress
 from ..constants import (
     UNKNOWN_POSTCODES_NO_SPACES,
 )
-from ..decorator import user_may_view_this_organisation, user_may_view_this_child, login_and_otp_required
+from ..decorator import (
+    user_may_view_this_organisation,
+    user_may_view_this_child,
+    login_and_otp_required,
+)
 
 
 @login_and_otp_required()
