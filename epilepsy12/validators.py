@@ -87,7 +87,7 @@ class CapitalAndSymbolValidator:
         self,
         number_of_capitals=1,
         number_of_symbols=1,
-        symbols="~!@#$%^&*()+\:;'[]",
+        symbols="~!@#$%^&*()+:;'[]",
     ):
         self.number_of_capitals = number_of_capitals
         self.number_of_symbols = number_of_symbols
