@@ -43,6 +43,14 @@ class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
             )
         return super().clean()
 
+    def save(self, *args, commit=True, **kwargs):
+        user = super().save(*args, commit=False, **kwargs)
+        user.password_last_set = timezone.now()
+        if commit:
+            print(f"Updating password_last_set to {timezone.now()}")
+            user.save()
+        return user
+
 
 class Epilepsy12UserAdminCreationForm(forms.ModelForm):
     """
