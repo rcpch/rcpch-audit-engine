@@ -12,7 +12,7 @@ services:
       - 8000:8000
     links:
       - redis
-      - db
+      - postgis
       - celery
     depends_on:
       - postgis
