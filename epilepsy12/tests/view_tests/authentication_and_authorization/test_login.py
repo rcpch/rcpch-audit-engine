@@ -10,7 +10,6 @@
 
 # python imports
 import pytest
-from http import HTTPStatus
 
 # 3rd party imports
 
