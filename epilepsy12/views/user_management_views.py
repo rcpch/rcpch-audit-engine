@@ -1,5 +1,6 @@
 # Django
 from typing import Any
+from django.contrib.auth import authenticate
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,12 +9,17 @@ from django.contrib.gis.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.conf import settings
-from django.http import HttpRequest, HttpResponseForbidden, HttpResponse
+from django.http import (
+    HttpResponseForbidden,
+    HttpResponse,
+)
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail, BadHeaderError
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.forms import AuthenticationForm
+from django.forms import ValidationError
 from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
 
@@ -511,7 +517,6 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
 class RCPCHLoginView(TwoFactorLoginView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
         # Override original Django Auth Form with Captcha field inserted
         self.form_list["auth"] = CaptchaAuthenticationForm
 
@@ -520,7 +525,6 @@ class RCPCHLoginView(TwoFactorLoginView):
         response = super().done(form_list)
         response_url = getattr(response, "url")
         login_redirect_url = reverse(settings.LOGIN_REDIRECT_URL)
-
         # Successful login, redirect to login page
         if response_url == login_redirect_url:
             user = self.get_user()

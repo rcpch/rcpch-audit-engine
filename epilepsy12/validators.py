@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 
 
 # 3rd party imports
-import nhs_number
 
 # RCPCH imports
 

@@ -13,7 +13,7 @@ from epilepsy12.constants.user_types import (
     AUDIT_CENTRE_ROLES,
     TITLES,
 )
-from ..models import Epilepsy12User, Organisation
+from ..models import Epilepsy12User, Organisation, VisitActivity
 
 
 class Epilepsy12UserUpdatePasswordForm(SetPasswordForm):
@@ -237,3 +237,33 @@ class DebugCaptchaField(CaptchaField):
 
 class CaptchaAuthenticationForm(AuthenticationForm):
     captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField()
+
+    def __init__(self, request: Any = ..., *args: Any, **kwargs: Any) -> None:
+        super().__init__(request, *args, **kwargs)
+
+    def clean(self) -> dict[str, Any]:
+        email = self.cleaned_data["username"]
+        if email:
+            try:
+                user = Epilepsy12User.objects.get(email=email).DoesNotExist
+            except Epilepsy12User.DoesNotExist:
+                return super().clean()
+
+            user = Epilepsy12User.objects.get(email=email)
+            visit_activities = VisitActivity.objects.filter(
+                epilepsy12user=user
+            ).order_by("-activity_datetime")[:5]
+            failed_login_activities = [
+                activity for activity in visit_activities if activity.activity == 2
+            ]
+            first_activity = failed_login_activities[-1]
+            if len(
+                failed_login_activities
+            ) >= 5 and timezone.now() <= first_activity.activity_datetime + timezone.timedelta(
+                minutes=10
+            ):
+                raise forms.ValidationError(
+                    "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
+                )
+
+        return super().clean()
