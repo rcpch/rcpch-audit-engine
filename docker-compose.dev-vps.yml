@@ -9,7 +9,7 @@ services:
   web:
     build: .
     ports:
-      - 8000:8000
+      - 80:8000 # maps external port 80 to internal port 8000
     links:
       - redis
       - postgis
@@ -26,23 +26,10 @@ services:
       - E12_POSTGRES_DB_NAME=epilepsy12db
       - E12_POSTGRES_DB_HOST=postgis
       - E12_POSTGRES_DB_PORT=5432
-      - E12_SECRET_KEY=mysecretkey
-      - DEBUG=True
-      - DJANGO_ALLOWED_HOSTS=0.0.0.0
-      - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
       - POSTCODES_IO_API_URL=https://api.postcodes.io
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
-      # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
       - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
       - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
-      # Below ENV vars are only needed for first creation of the superuser
-      - DJANGO_SUPERUSER_USERNAME=e12-dev-user
-      - DJANGO_SUPERUSER_PASSWORD=pw
-      - DJANGO_SUPERUSER_FIRST_NAME=dev
-      - DJANGO_SUPERUSER_SURNAME=dev
-      - DJANGO_SUPERUSER_EMAIL=e12-dev-user@rcpch.tech
-      - DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER=True
-      - DJANGO_SUPERUSER_ROLE=1
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
@@ -58,7 +45,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
 
-  # db container - runs postgres
+  # postgis container - runs postgres
   postgis:
     image: postgis/postgis:15-3.3
     volumes:

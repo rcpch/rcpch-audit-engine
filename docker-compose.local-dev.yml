@@ -1,6 +1,11 @@
-# runs a local version of Epilepsy12 for development on port 8000
-# syncs changes in local code folder to the E12 container
-# migrates the database
+##########################
+########  README  ########
+##########################
+
+# Runs a local version of Epilepsy12 for development on port 8000
+# Syncs changes in local code folder to the E12 container
+# Starts from empty DB, creates and migrates the database
+# Seeds the database with cases, and the RCPCH audit team user
 
 version: "3.10"
 
@@ -58,7 +63,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
 
-  # db container - runs postgres
+  # postgis container - runs postgres
   postgis:
     image: postgis/postgis:15-3.3
     volumes:
