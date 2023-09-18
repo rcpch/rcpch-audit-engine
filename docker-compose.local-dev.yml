@@ -24,7 +24,7 @@ services:
       - E12_POSTGRES_DB_USER=epilepsy12user
       - E12_POSTGRES_DB_PASSWORD=password
       - E12_POSTGRES_DB_NAME=epilepsy12db
-      - E12_POSTGRES_DB_HOST=db
+      - E12_POSTGRES_DB_HOST=postgis
       - E12_POSTGRES_DB_PORT=5432
       - E12_SECRET_KEY=mysecretkey
       - DEBUG=True
@@ -87,7 +87,7 @@ services:
       - E12_POSTGRES_DB_USER=epilepsy12user
       - E12_POSTGRES_DB_PASSWORD=password
       - E12_POSTGRES_DB_NAME=epilepsy12db
-      - E12_POSTGRES_DB_HOST=db
+      - E12_POSTGRES_DB_HOST=postgis
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
