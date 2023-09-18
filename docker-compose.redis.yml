@@ -15,7 +15,7 @@ services:
       - db
       - celery
     depends_on:
-      - db
+      - postgis
       - redis
     volumes:
       - .:/app/
@@ -46,7 +46,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
-      - .env # env file with the token for RCPCH Census Platform, not committed to Git
+      - envs/local-development.env # env file - NOT committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&
@@ -59,7 +59,7 @@ services:
             python manage.py runserver 0.0.0.0:8000"
 
   # db container - runs postgres
-  db:
+  postgis:
     image: postgis/postgis:15-3.3
     volumes:
       - "auditenginedb:/var/lib/postgresql/data"
@@ -91,7 +91,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
-      - db
+      - postgis
       - redis
 
   flower:
@@ -114,7 +114,7 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      - postgis
       - redis
 
 volumes:
