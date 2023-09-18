@@ -238,7 +238,7 @@ class DebugCaptchaField(CaptchaField):
 class CaptchaAuthenticationForm(AuthenticationForm):
     captcha = DebugCaptchaField() if settings.DEBUG else CaptchaField()
 
-    def __init__(self, request: Any = ..., *args: Any, **kwargs: Any) -> None:
+    def __init__(self, request, *args, **kwargs) -> None:
         super().__init__(request, *args, **kwargs)
 
     def clean(self) -> dict[str, Any]:

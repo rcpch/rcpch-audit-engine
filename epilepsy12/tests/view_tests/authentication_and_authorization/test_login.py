@@ -12,10 +12,11 @@
 import pytest
 
 # 3rd party imports
-
+from django.urls import reverse
+from django.forms import ValidationError
 
 # E12 imports
-from epilepsy12.forms import Epilepsy12UserUpdatePasswordForm
+from epilepsy12.forms import Epilepsy12UserUpdatePasswordForm, CaptchaAuthenticationForm
 from epilepsy12.models import Epilepsy12User
 from epilepsy12.tests.UserDataClasses import (
     test_user_rcpch_audit_team_data,
@@ -91,6 +92,38 @@ def test_pass_validation(
     assert form.is_valid() is False
 
 
-# CORRECT_RCPCH_USER_PASSWORD = (
-#         "Ep!lepsy12_Audit"  # 16 digits, 1 capital letter, one digit, one symbol
-#     )
+@pytest.mark.django_db
+def test_unsuccessful_login_lockout(client):
+    """Testing auto-lockout after 5 unsuccessful login attempts."""
+
+    rcpch_user = Epilepsy12User.objects.get(
+        first_name=test_user_rcpch_audit_team_data.role_str
+    )
+    
+    # 5 failed login attempts
+    
+    for _ in range(5):
+    
+        login_response = client.post(
+            reverse('login'),
+            data={
+                'rcpch_login_view-current_step' : 'auth',
+                'auth-username': rcpch_user.email,
+                'auth-password' : 'incorrect password',
+                'auth-captacha_1': 'PASSED',
+            }
+        )     
+    
+    # After 5 failed logins, attempt one more
+    login_response = client.post(
+            reverse('login'),
+            data={
+                'rcpch_login_view-current_step' : 'auth',
+                'auth-username': rcpch_user.email,
+                'auth-password' : 'pw',
+                'auth-captacha_1': 'PASSED',
+            }
+        )   
+    
+    # this is the item including errors
+    assert login_response.context[12]['errors'][0] == "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
