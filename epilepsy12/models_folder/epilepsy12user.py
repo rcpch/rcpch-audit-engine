@@ -68,7 +68,7 @@ class Epilepsy12UserManager(BaseUserManager):
         user.email_confirmed = False
         # set time password has been updated
         user.password_last_set = timezone.now()
-        print("user password has been updated")
+        print(f"{user} password updated")
         user.save()
 
         """
