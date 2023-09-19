@@ -13,10 +13,9 @@ import pytest
 
 # 3rd party imports
 from django.urls import reverse
-from django.forms import ValidationError
 
 # E12 imports
-from epilepsy12.forms import Epilepsy12UserUpdatePasswordForm, CaptchaAuthenticationForm
+from epilepsy12.forms import Epilepsy12UserUpdatePasswordForm
 from epilepsy12.models import Epilepsy12User
 from epilepsy12.tests.UserDataClasses import (
     test_user_rcpch_audit_team_data,
@@ -127,3 +126,5 @@ def test_unsuccessful_login_lockout(client):
     
     # this is the item including errors
     assert login_response.context[12]['errors'][0] == "You have failed to login 5 or more consecutive times. You have been locked out for 10 minutes"
+
+    
