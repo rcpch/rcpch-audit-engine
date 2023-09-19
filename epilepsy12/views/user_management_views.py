@@ -512,8 +512,15 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
     success_url = reverse_lazy("index")
+    
+    # extend form_valid to set user.password_last_set
+    def form_valid(self, form):
+        
+        self.request.user.password_last_set = timezone.now()
+        
+        return super().form_valid(form)
 
-
+# 08:38:01
 class RCPCHLoginView(TwoFactorLoginView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -535,11 +542,9 @@ class RCPCHLoginView(TwoFactorLoginView):
 
             # time since last set password
             delta = timezone.now() - user.password_last_set
-
             # if user has not renewed password in last 90 days, redirect to login page
-            if user.is_active and user.password_last_set >= (
-                timezone.now() + timezone.timedelta(days=90)
-            ):
+            password_reset_date = user.password_last_set + timezone.timedelta(days=90)
+            if user.is_active and (password_reset_date <= timezone.now()):
                 messages.error(
                     request=self.request,
                     message=f"Your password has expired. Please reset it.",
