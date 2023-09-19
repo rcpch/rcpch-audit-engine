@@ -382,11 +382,17 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     elif match_in_choice_key(RCPCH_AUDIT_TEAM_ROLES, epilepsy12_user_to_edit.role):
         user_type = "rcpch-staff"
     if can_edit:
+        
+        # EMAIL INPUT FIELD IS DISABLED SO WILL NOT BE INCLUDED IN REQUEST.POST -> ADD IN MANUALLY
+        if request.POST:
+            request.POST = request.POST.copy() # request.POST object is immutable
+            request.POST['email'] = epilepsy12_user_to_edit.email
         form = Epilepsy12UserAdminCreationForm(
             user_type,
             request.POST or None,
             instance=epilepsy12_user_to_edit,
         )
+
     else:
         return HttpResponseForbidden()
 
@@ -512,13 +518,13 @@ class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
         "please make sure you've entered the address you registered with, and check your spam folder."
     )
     success_url = reverse_lazy("index")
-    
+
     # extend form_valid to set user.password_last_set
     def form_valid(self, form):
-        
         self.request.user.password_last_set = timezone.now()
-        
+
         return super().form_valid(form)
+
 
 # 08:38:01
 class RCPCHLoginView(TwoFactorLoginView):
