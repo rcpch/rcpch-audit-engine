@@ -1,4 +1,5 @@
 from datetime import date
+from random import randint 
 
 from django import forms
 from django.conf import settings
@@ -7,7 +8,7 @@ import nhs_number
 
 from ..models import Case
 from ..constants import *
-from ..general_functions import is_valid_postcode
+from ..general_functions import is_valid_postcode, return_random_postcode
 
 
 class CaseForm(forms.ModelForm):
@@ -86,6 +87,10 @@ class CaseForm(forms.ModelForm):
         
         # Check if DEBUG is True and set the initial value conditionally
         if settings.DEBUG:
+            self.fields['first_name'].initial  = 'Bob'
+            self.fields['surname'].initial = 'Dylan'
+            self.fields['date_of_birth'].initial = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
+            self.fields['postcode'].initial = return_random_postcode(country_boundary_identifier='E01000001')
             self.fields['nhs_number'].initial = nhs_number.generate()[0]
 
     class Meta:
