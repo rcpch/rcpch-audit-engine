@@ -49,8 +49,8 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + [
 RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
 RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 
-# this is the url for api.postcodes.io, a free service reporting postcode data off a postcode
-POSTCODES_IO_API_URL = os.getenv("POSTCODES_IO_API_URL")
+# Postcode API
+POSTCODE_API_BASE_URL = os.getenv('POSTCODE_API_BASE_URL')
 
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
