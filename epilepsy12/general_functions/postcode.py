@@ -3,10 +3,9 @@ from django.conf import settings
 from ..constants import UNKNOWN_POSTCODES_NO_SPACES
 
 
-def is_valid_postcode(postcode):
+def is_valid_postcode(postcode:str)->bool:
     """
-    Test if valid postcode using api.postcodes.io
-    Allow any no fixed abode etc standard codes
+    Returns True if postcode valid.
     """
 
     # convert to upper case and remove spaces
@@ -16,14 +15,17 @@ def is_valid_postcode(postcode):
         return True
 
     # check against API
-    url = f"{settings.POSTCODES_IO_API_URL}/postcodes/{postcode}/validate"
+    url = f"{settings.POSTCODE_API_BASE_URL}/postcodes/{postcode}"
 
     response = requests.get(url=url)
-    if response.status_code == 404:
-        print("Postcode validation failure. Could not validate postcode.")
-        return False
-    else:
-        return response.json()["result"]
+    
+    if response.status_code == 200:
+        return True
+    
+    # Only other possibility should be 404, but handle any other status code
+    print(f"Postcode validation failure. Could not validate postcode at {url}. {response.status_code=}")
+    return False
+        
 
 
 def return_random_postcode():
