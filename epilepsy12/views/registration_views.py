@@ -617,7 +617,7 @@ def registration_status(request, registration_id):
     context = {"case_id": case.pk, "registration": registration}
 
     template_name = (
-        "epilepsy12/partials/registration/first_paediatric_assessment_dates.html"
+        "epilepsy12/partials/registration/registration_dates.html"
     )
 
     response = recalculate_form_generate_response(
