@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 if DEBUG is True:
-    CAPTCHA_TEST_MODE = True # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
+    CAPTCHA_TEST_MODE = True  # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
 
 # GENERAL CAPTCHA SETTINGS
 CAPTCHA_IMAGE_SIZE = (200, 50)
@@ -174,12 +174,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 10},
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+    {
+        "NAME": "epilepsy12.validators.CapitalAndSymbolValidator",
+        "OPTIONS": {
+            "symbols": "!@£$%^&*()_-+=|~",
+            "number_of_symbols": 1,
+            "number_of_capitals": 1,
+        },
     },
 ]
 

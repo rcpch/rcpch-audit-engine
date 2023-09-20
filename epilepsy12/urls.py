@@ -22,6 +22,8 @@ from rest_framework import routers, urls
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path
 from django.contrib.auth import urls as auth_urls
+from django.contrib.auth import views as auth_views
+from .forms import Epilepsy12UserUpdatePasswordForm
 
 # router = routers.DefaultRouter()
 
@@ -64,9 +66,21 @@ router.register(
 
 # Auth, login, password reset
 user_patterns = [
-    path('captcha/', include('captcha.urls')),
+    path("captcha/", include("captcha.urls")),
     path("account/", include(auth_urls)),
-    path("password-reset/", view=ResetPasswordView.as_view(), name="password_reset"),
+    path(
+        "account/password-reset/",
+        view=ResetPasswordView.as_view(),
+        name="password_reset",
+    ),
+    path(
+        "account/password-reset-confirm/<uidb64>/<token>",
+        view=auth_views.PasswordResetConfirmView.as_view(
+            form_class=Epilepsy12UserUpdatePasswordForm,
+            template_name="registration/password_reset_confirm.html",
+        ),
+        name="password_reset_confirm",
+    ),
     path(
         "organisation/<int:organisation_id>/epilepsy12_users/<int:epilepsy12_user_id>/logs",
         view=logs,
