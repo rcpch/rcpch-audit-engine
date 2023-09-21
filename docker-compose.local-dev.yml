@@ -2,6 +2,9 @@
 ########  README  ########
 ##########################
 
+
+# DOCKER COMPOSE FILE FOR LOCAL DEVELOPMENT
+
 # Runs a local version of Epilepsy12 for development on port 8000
 # Syncs changes in local code folder to the E12 container
 # Starts from empty DB, creates and migrates the database
@@ -51,7 +54,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
-      - envs/local-development.env # env file - NOT committed to Git
+      - envs/local-dev.env # env file - NOT committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&

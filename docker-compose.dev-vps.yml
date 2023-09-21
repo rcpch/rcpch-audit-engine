@@ -1,15 +1,37 @@
-# runs a local version of Epilepsy12 for development on port 8000
-# syncs changes in local code folder to the E12 container
-# migrates the database
+##########################
+########  README  ########
+##########################
+
+
+# DOCKER COMPOSE FILE FOR DEV VPS DEPLOYMENT
+
+# Runs Epilepsy12 for development on port 8000
+# Syncs changes in local code folder to the E12 container
+# Starts from empty DB, creates and migrates the database
+# Seeds the database with cases, and the RCPCH audit team user
+
+# TODO: remove Volume
+
 
 version: "3.10"
 
 services:
-  # web container - runs the django app
-  web:
+
+  caddy:
+    image: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/data/:/data/
+      - ./caddy/config/:/config/
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+
+  # django application
+  django:
     build: .
     ports:
-      - 80:8000 # maps external port 80 to internal port 8000
+      - 8000:8000 # maps external port 80 to internal port 8000
     links:
       - redis
       - postgis
@@ -33,7 +55,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
-      - envs/development-vps.env # env file - NOT committed to Git
+      - envs/dev-vps.env # env file - NOT committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&
@@ -45,7 +67,7 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
 
-  # postgis container - runs postgres
+  # postgres with postgis extension
   postgis:
     image: postgis/postgis:15-3.3
     volumes:
@@ -56,13 +78,13 @@ services:
       - POSTGRES_DB=epilepsy12db
       - TZ="Europe/London"
 
-  # this is the redis backend for celery to run async/caching/cron tasks
+  # redis backend for celery
   redis:
     image: redis:alpine
     expose:
       - 6379
 
-  # This is the celery worker
+  # celery worker
   celery:
     restart: always
     build:
@@ -81,6 +103,7 @@ services:
       - postgis
       - redis
 
+  # flower UI for celery tasks
   flower:
     image: mher/flower
     container_name: flower
@@ -94,7 +117,7 @@ services:
       - flower_data:/data
     # this will let docker know that we have added a custom volume
 
-  # This is for celery cron tasks
+  # This is for celery scheduled tasks
   celery-beat:
     build: .
     command: celery -A rcpch-audit-engine beat -l info
@@ -104,6 +127,8 @@ services:
       - postgis
       - redis
 
+# data volumes
 volumes:
   auditenginedb:
   flower_data:
+
