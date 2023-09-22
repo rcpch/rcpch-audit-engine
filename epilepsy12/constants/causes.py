@@ -8,7 +8,6 @@ EPILEPSY_CAUSES = (
     ("Inf", "Infectious"),
     ("Met", "Metabolic"),
     ("Str", "Structural"),
-    ("NK", "Not known")
 )
 
 EPILEPSY_STRUCTURAL_CAUSE_TYPES = (
