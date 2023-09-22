@@ -60,9 +60,7 @@ services:
             python manage.py seed --mode=seed_registrations &&
             python manage.py seed --mode=seed_groups_and_permissions &&
             python manage.py createsuperuser --noinput || true &&
-            echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
-            echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
-            python manage.py runserver 0.0.0.0:8000"
+            gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi"
     restart: always
 
   # PostgreSQL with PostGIS extension
@@ -93,6 +91,7 @@ services:
   flower:
     <<: *django # this will inherit all the settings from the django service
     environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
       - FLOWER_PORT=8888
     ports:
       - 8888:8888
