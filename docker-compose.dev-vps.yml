@@ -17,8 +17,11 @@ version: "3.10"
 
 services:
 
+  # Caddy reverse proxy - web-facing SSL server
   caddy:
     image: caddy
+    depends_on:
+      - django
     ports:
       - "80:80"
       - "443:443"
@@ -27,15 +30,9 @@ services:
       - ./caddy/config/:/config/
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
 
-  # django application
-  django:
+  # Django web application
+  django: &django
     build: .
-    ports:
-      - 8000:8000 # maps external port 80 to internal port 8000
-    links:
-      - redis
-      - postgis
-      - celery
     depends_on:
       - postgis
       - redis
@@ -66,8 +63,9 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
+    restart: always
 
-  # postgres with postgis extension
+  # PostgreSQL with PostGIS extension
   postgis:
     image: postgis/postgis:15-3.3
     volumes:
@@ -77,56 +75,37 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=epilepsy12db
       - TZ="Europe/London"
+    restart: always
 
-  # redis backend for celery
+  # Redis backend for Celery task scheduler
   redis:
     image: redis:alpine
     expose:
       - 6379
-
-  # celery worker
-  celery:
     restart: always
-    build:
-      context: .
-    command: celery -A rcpch-audit-engine worker -l info
-    volumes:
-      - .:/app
-    environment:
-      - E12_POSTGRES_DB_USER=epilepsy12user
-      - E12_POSTGRES_DB_PASSWORD=password
-      - E12_POSTGRES_DB_NAME=epilepsy12db
-      - E12_POSTGRES_DB_HOST=postgis
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    depends_on:
-      - postgis
-      - redis
 
-  # flower UI for celery tasks
+  # Celery worker
+  celeryworker:
+    <<: *django # this will inherit all the settings from the django service
+    command: celery -A rcpch-audit-engine worker -l info
+
+  # Flower UI for Celery tasks
   flower:
-    image: mher/flower
-    command: celery flower --persistent=True
+    <<: *django # this will inherit all the settings from the django service
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
       - FLOWER_PORT=8888
     ports:
-      - 8888:8888 # docker will expose this ports
+      - 8888:8888
     volumes:
       - flower_data:/data
-    # this will let docker know that we have added a custom volume
+    command: celery -A rcpch-audit-engine flower --persistent=True
 
-  # This is for celery scheduled tasks
-  celery-beat:
-    build: .
+  # Celery scheduled tasks/cron
+  celerybeat:
+    <<: *django # this will inherit all the settings from the django service
     command: celery -A rcpch-audit-engine beat -l info
-    volumes:
-      - .:/app
-    depends_on:
-      - postgis
-      - redis
 
-# data volumes
+# Data volumes
 volumes:
   auditenginedb:
   flower_data:
