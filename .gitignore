@@ -131,4 +131,10 @@ git_hash.txt
 
 .kube/
 
+# exclude celerybeat-schedule
 celerybeat-schedule
+
+# exclude caddy files but include the Caddyfile
+caddy/config
+caddy/data
+
