@@ -1,0 +1,50 @@
+# Python standard library imports
+python-dateutil
+requests
+
+# third party imports
+## django and misc
+dj_database_url
+django
+django-auto-logout
+django-filter
+django-htmx
+django-semantic-admin
+django-simple-history
+django-two-factor-auth
+django-widget-tweaks
+djangorestframework
+docutils
+pandas
+phonenumbers # though not currently using phonenumbers, this is a dependency of dj-2fa
+psycopg2-binary
+whitenoise
+
+## scheduled tasks
+celery
+django-celery-beat
+flower
+redis
+
+## graphing
+plotly
+
+# NHS number
+nhs-number
+
+# live application server
+gunicorn
+
+# code linting and formatting
+autopep8
+black
+
+# testing and code analysis
+coverage
+pytest-django
+pytest-factoryboy
+rapidfuzz
+
+# versioning
+bump2version
+
