@@ -9,9 +9,10 @@ from django.contrib.gis.db.models import (
 
 # 3rd party
 from simple_history.models import HistoricalRecords
+from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 
-class Organisation(models.Model):
+class Organisation(TimeStampAbstractBaseClass):
     """
     This class details information about organisations.
     It represents a list of organisations that can be looked up
