@@ -29,7 +29,7 @@ services:
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
       - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
-      - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
+      - NHS_ODS_API_URL=https://directory.spineservices.nhs.uk/ORD/2-0-0
       # Below ENV vars are only needed for first creation of the superuser
       - DJANGO_SUPERUSER_USERNAME=e12-dev-user
       - DJANGO_SUPERUSER_PASSWORD=pw
