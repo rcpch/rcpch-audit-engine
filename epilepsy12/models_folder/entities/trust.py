@@ -14,6 +14,7 @@ class Trust(TimeStampAbstractBaseClass):
     country = models.CharField(max_length=50, null=True, blank=True, default=None)
     telephone = models.CharField(max_length=100, null=True, blank=True, default=None)
     website = models.CharField(max_length=100, null=True, blank=True, default=None)
+    active = models.BooleanField(default=True)
 
     class Meta:
         indexes = [models.Index(fields=["ods_code"])]

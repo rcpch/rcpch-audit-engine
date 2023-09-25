@@ -4,7 +4,7 @@ from django.contrib.gis.db.models import (
     PointField,
     CharField,
     FloatField,
-    DateTimeField,
+    BooleanField,
 )
 
 # 3rd party
@@ -31,6 +31,7 @@ class Organisation(TimeStampAbstractBaseClass):
     longitude = FloatField(null=True, blank=True, default=None)
     postcode = CharField(max_length=10, null=True, blank=True, default=None)
     geocode_coordinates = PointField(null=True, blank=True, default=None, srid=27700)
+    active = BooleanField(default=True)
 
     trust = models.ForeignKey(
         to="epilepsy12.Trust",
