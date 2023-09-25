@@ -14,7 +14,12 @@ class Trust(TimeStampAbstractBaseClass):
     country = models.CharField(max_length=50, null=True, blank=True, default=None)
     telephone = models.CharField(max_length=100, null=True, blank=True, default=None)
     website = models.CharField(max_length=100, null=True, blank=True, default=None)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(
+        default=True
+    )  # a boolean representing if this Trust is still operational
+    published_at = models.DateField(
+        null=True, blank=True, default=None
+    )  # date this Trust was last amended according to the ORD
 
     class Meta:
         indexes = [models.Index(fields=["ods_code"])]

@@ -8222,6 +8222,7 @@ RCPCH_ORGANISATIONS = [
         "Longitude": "-3.233903238440721",
         "ParentODSCode": "7A6",
         "ParentName": "ANEURIN BEVAN UNIVERSITY LHB",
+        "Phone": "",
         "Website": "",
         "LocalAuthority": "W06000018",
     },
