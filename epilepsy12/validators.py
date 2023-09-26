@@ -120,3 +120,11 @@ class CapitalAndSymbolValidator:
                 "number_of_symbols": self.number_of_symbols,
             }
         )
+
+class NumberValidator(object):
+    def validate(self, password, user=None):
+        if not re.findall("\d", password):
+            raise ValidationError(
+                _("The password must contain at least 1 digit, 0-9."),
+                code="password_no_number",
+            )

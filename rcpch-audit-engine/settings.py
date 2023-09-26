@@ -51,7 +51,7 @@ RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
 RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 
 # Postcode API
-POSTCODE_API_BASE_URL = os.getenv('POSTCODE_API_BASE_URL')
+POSTCODE_API_BASE_URL = os.getenv("POSTCODE_API_BASE_URL")
 
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
@@ -208,6 +208,9 @@ AUTH_PASSWORD_VALIDATORS = [
             "number_of_symbols": 1,
             "number_of_capitals": 1,
         },
+    },
+    {
+        "NAME": "epilepsy12.validators.NumberValidator",  # must have one number
     },
 ]
 
