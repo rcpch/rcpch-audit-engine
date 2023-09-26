@@ -10,6 +10,7 @@ django-auto-logout
 django-filter
 django-htmx
 django-semantic-admin
+django-simple-captcha
 django-simple-history
 django-two-factor-auth
 django-widget-tweaks
