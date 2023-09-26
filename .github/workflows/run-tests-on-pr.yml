@@ -24,7 +24,7 @@ jobs:
       E12_POSTGRES_DB_PASSWORD: postgis
       E12_POSTGRES_DB_PORT: 5432
       E12_POSTGRES_DB_USER: postgis
-      POSTCODES_IO_API_URL: https://api.postcodes.io
+      POSTCODE_API_BASE_URL: https://findthatpostcode.uk
       RCPCH_CENSUS_PLATFORM_TOKEN: ${{ secrets.RCPCH_CENSUS_PLATFORM_TOKEN }}
       RCPCH_CENSUS_PLATFORM_URL: https://api.rcpch.ac.uk/deprivation/v1
       RCPCH_HERMES_SERVER_URL: http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed

@@ -25,7 +25,7 @@ services:
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=0.0.0.0
       - DJANGO_CSRF_TRUSTED_ORIGINS=https://localhost,https://0.0.0.0
-      - POSTCODES_IO_API_URL=https://api.postcodes.io
+      - POSTCODE_API_BASE_URL=https://findthatpostcode.uk
       - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
       - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
@@ -50,8 +50,8 @@ services:
             python manage.py createsuperuser --noinput &&
             echo 'DEV SETUP SCRIPT: Development superuser email: e12-dev-user@rcpch.tech' &&
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
-            python manage.py runserver 0.0.0.0:8000
-            python manage.py migrate &&" # to migrate two_factor app
+            python manage.py runserver 0.0.0.0:8000 &&
+            python manage.py migrate " # to migrate external apps
 
   # db container - runs postgis
   db:

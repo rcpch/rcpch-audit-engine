@@ -279,7 +279,9 @@ from epilepsy12.tests.factories import (
     E12SiteFactory,
     E12AntiEpilepsyMedicineFactory,
 )
-from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import (
+    twofactor_signin,
+)
 
 
 @pytest.mark.django_db
@@ -309,12 +311,6 @@ def test_users_update_users_forbidden(
         trust__ods_code="RGT",
     )
 
-    # GOS
-    SAME_TRUST_SAME_ORGANISATION = Organisation.objects.get(
-        ods_code="RP401",
-        trust__ods_code="RP4",
-    )
-
     # Seed Test user to be updated
     USER_FROM_DIFFERENT_ORG = E12UserFactory(
         email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
@@ -325,21 +321,6 @@ def test_users_update_users_forbidden(
         is_staff=test_user_audit_centre_administrator_data.is_staff,
         is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
         is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
-        organisation_employer=TEST_USER_ORGANISATION,
-        groups=[
-            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
-        ],
-    )
-
-    LEAD_CLINICIAN_SAME_ORG_NOT_SUPERUSER_OR_RCPCH_TEAM = E12UserFactory(
-        email=f"{SAME_TRUST_SAME_ORGANISATION}_AUDIT_CENTRE_LEAD_CLINICIAN@email.com",
-        first_name=f"{SAME_TRUST_SAME_ORGANISATION}_AUDIT_CENTRE_LEAD_CLINICIAN",
-        role=test_user_audit_centre_lead_clinician_data.role,
-        # Assign flags based on user role
-        is_active=test_user_audit_centre_lead_clinician_data.is_active,
-        is_staff=test_user_audit_centre_lead_clinician_data.is_staff,
-        is_rcpch_audit_team_member=test_user_audit_centre_lead_clinician_data.is_rcpch_audit_team_member,
-        is_rcpch_staff=test_user_audit_centre_lead_clinician_data.is_rcpch_staff,
         organisation_employer=TEST_USER_ORGANISATION,
         groups=[
             Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
@@ -396,10 +377,169 @@ def test_users_update_users_forbidden(
             assert (
                 response.status_code == HTTPStatus.FORBIDDEN
             ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested update user {test_user} in {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()} Expected {HTTPStatus.FORBIDDEN} response status code, received {response.status_code}"
-        
-    # test if LEAD_CLINICIAN_SAME_ORG_NOT_SUPERUSER_OR_RCPCH_TEAM update is_rcpch_team_member status is forbidden
-    
 
+@pytest.mark.django_db
+def test_user_cant_change_rcpch_or_superuser_flag(
+    client,
+):
+    """
+    Ensuring non-RCPCH users / non-superusers CANNOT send POST request to change rcpch/superuser flags.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    # Seed Test user to be updated
+    USER_FROM_DIFFERENT_ORG = E12UserFactory(
+        email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
+        first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
+        role=test_user_audit_centre_administrator_data.role,
+        # Assign flags based on user role
+        is_active=test_user_audit_centre_administrator_data.is_active,
+        is_staff=test_user_audit_centre_administrator_data.is_staff,
+        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
+        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[
+            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
+        ],
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
+        url = reverse(
+            "edit_epilepsy12_user",
+            kwargs={
+                "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                "epilepsy12_user_id": USER_FROM_DIFFERENT_ORG.id,
+            },
+        )
+
+        # Attempt to change rcpch_audit_team_member
+        r = client.post(
+            url,
+            {
+                "first_name": USER_FROM_DIFFERENT_ORG.first_name,
+                "surname": USER_FROM_DIFFERENT_ORG.surname,
+                "role": USER_FROM_DIFFERENT_ORG.role,
+                "is_rcpch_audit_team_member": True,
+                "is_superuser": False,
+                'email':USER_FROM_DIFFERENT_ORG.email,
+            },
+        )
+        
+        assert r.status_code == HTTPStatus.FORBIDDEN
+        
+        # Attempt to change is_superuser
+        r = client.post(
+            url,
+            {
+                "first_name": USER_FROM_DIFFERENT_ORG.first_name,
+                "surname": USER_FROM_DIFFERENT_ORG.surname,
+                "role": USER_FROM_DIFFERENT_ORG.role,
+                "is_rcpch_audit_team_member": False,
+                "is_superuser": True,
+                'email':USER_FROM_DIFFERENT_ORG.email,
+            },
+        )
+        
+        assert r.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_user_cannot_see_rcpch_or_superuser_flag_in_template(
+    client,
+):
+    """
+    Ensuring non-RCPCH users / non-superusers CANNOT see account flags in template.
+    """
+
+    # set up constants
+
+    # GOSH
+    TEST_USER_ORGANISATION = Organisation.objects.get(
+        ods_code="RP401",
+        trust__ods_code="RP4",
+    )
+
+    # ADDENBROOKE'S
+    DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
+        ods_code="RGT01",
+        trust__ods_code="RGT",
+    )
+
+    # Seed Test user to be updated
+    USER_FROM_DIFFERENT_ORG = E12UserFactory(
+        email=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR@email.com",
+        first_name=f"{DIFF_TRUST_DIFF_ORGANISATION}_ADMINISTRATOR",
+        role=test_user_audit_centre_administrator_data.role,
+        # Assign flags based on user role
+        is_active=test_user_audit_centre_administrator_data.is_active,
+        is_staff=test_user_audit_centre_administrator_data.is_staff,
+        is_rcpch_audit_team_member=test_user_audit_centre_administrator_data.is_rcpch_audit_team_member,
+        is_rcpch_staff=test_user_audit_centre_administrator_data.is_rcpch_staff,
+        organisation_employer=TEST_USER_ORGANISATION,
+        groups=[
+            Group.objects.get(name=test_user_audit_centre_administrator_data.group_name)
+        ],
+    )
+
+    user_first_names_for_test = [
+        test_user_audit_centre_administrator_data.role_str,
+        test_user_audit_centre_clinician_data.role_str,
+        test_user_audit_centre_lead_clinician_data.role_str,
+    ]
+    users = Epilepsy12User.objects.filter(first_name__in=user_first_names_for_test)
+
+    assert len(users) == len(
+        user_first_names_for_test
+    ), f"Incorrect queryset of test users. Requested {len(user_first_names_for_test)} users, queryset includes {len(users)}: {users}"
+
+    for test_user in users:
+        # Log in Test User
+        client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
+        url = reverse(
+            "edit_epilepsy12_user",
+            kwargs={
+                "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
+                "epilepsy12_user_id": USER_FROM_DIFFERENT_ORG.id,
+            },
+        )
+        r = client.get(url)
+        
+        for flag in ['id_is_rcpch_audit_team_member', 'id_is_superuser']:
+            assert flag.encode() not in r.content, f'{test_user} should not be able to see {flag} in template'
 
 @pytest.mark.django_db
 def test_users_update_users_success(

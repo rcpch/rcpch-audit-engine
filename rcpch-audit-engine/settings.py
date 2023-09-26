@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 # standard imports
 import os
 from pathlib import Path
-import sys
 import datetime
 
 # third party imports
@@ -32,6 +31,12 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
+if DEBUG is True:
+    CAPTCHA_TEST_MODE = True  # if in debug mode, can just type 'PASSED' and captcha validates. Default value is False
+
+# GENERAL CAPTCHA SETTINGS
+CAPTCHA_IMAGE_SIZE = (200, 50)
+CAPTCHA_FONT_SIZE = 40
 
 # Need to handle missing ENV var
 # Need to handle duplicates
@@ -45,8 +50,8 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + [
 RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
 RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 
-# this is the url for api.postcodes.io, a free service reporting postcode data off a postcode
-POSTCODES_IO_API_URL = os.getenv("POSTCODES_IO_API_URL")
+# Postcode API
+POSTCODE_API_BASE_URL = os.getenv('POSTCODE_API_BASE_URL')
 
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
@@ -82,6 +87,8 @@ INSTALLED_APPS = [
     "two_factor.plugins.email",  # add back in if require email 2fa
     "two_factor",
     "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
+    # captcha
+    "captcha",
     # application
     "epilepsy12",
 ]
@@ -186,9 +193,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 10,
-        },
+        "OPTIONS": {"min_length": 10},
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -197,10 +202,12 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
     {
-        "NAME": "epilepsy12.validators.SymbolValidator",  # must have one symbol
-    },
-    {
-        "NAME": "epilepsy12.validators.NumberValidator",  # must have one number
+        "NAME": "epilepsy12.validators.CapitalAndSymbolValidator",
+        "OPTIONS": {
+            "symbols": "!@£$%^&*()_-+=|~",
+            "number_of_symbols": 1,
+            "number_of_capitals": 1,
+        },
     },
 ]
 

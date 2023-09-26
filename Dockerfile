@@ -5,9 +5,10 @@ FROM python:3.10
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Setup GDAL
+# Setup GDAL + PILLOW required for CAPTCHA
 RUN apt-get update &&\
-    apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal
+    apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal &&\
+    apt-get install -y  libz-dev libjpeg-dev libfreetype6-dev 
 
 # Add requirements
 COPY requirements/requirements.txt /app/requirements/requirements.txt

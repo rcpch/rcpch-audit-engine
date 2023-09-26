@@ -105,7 +105,7 @@ def run_dummy_cases_seed(verbose=True, cases=50):
         seed_female = True if sex == 2 else False
         random_ethnicity = randint(0, len(choice(ETHNICITIES)))
         ethnicity = ETHNICITIES[random_ethnicity][0]
-        postcode = return_random_postcode()
+        postcode = return_random_postcode(country_boundary_identifier=org.country.boundary_identifier)
 
         E12CaseFactory.create_batch(
             num_cases_to_seed_in_org,

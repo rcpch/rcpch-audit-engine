@@ -2140,3 +2140,7 @@ div.sixteen.wide.column.search_field_wrapper > .ui.rcpch.icon.input {
 .rcpch_blue_link {
   color: var(--rcpch_light_blue);
 }
+
+.captcha {
+  height: 3em;
+}

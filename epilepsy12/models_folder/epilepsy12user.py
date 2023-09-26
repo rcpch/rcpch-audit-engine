@@ -64,8 +64,11 @@ class Epilepsy12UserManager(BaseUserManager):
             user.is_superuser = False
         if not extra_fields.get("is_active"):
             user.is_active = False
-        user.email_confirmed = False
         # user not active until has confirmed by email
+        user.email_confirmed = False
+        # set time password has been updated
+        user.password_last_set = timezone.now()
+        print(f"{user} password updated")
         user.save()
 
         """
@@ -88,6 +91,7 @@ class Epilepsy12UserManager(BaseUserManager):
         extra_fields.setdefault("is_rcpch_audit_team_member", True)
         extra_fields.setdefault("is_rcpch_staff", True)
         extra_fields.setdefault("email_confirmed", True)
+        extra_fields.setdefault("password_last_set", timezone.now())
         # National level preference
         extra_fields.setdefault("view_preference", 2)
 
@@ -162,6 +166,7 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     role = models.PositiveSmallIntegerField(choices=ROLES, blank=True, null=True)
     email_confirmed = models.BooleanField(default=False)
+    password_last_set = models.DateTimeField(default=timezone.now)
 
     history = HistoricalRecords()
 
@@ -193,12 +198,11 @@ class Epilepsy12User(AbstractUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
-    
+
     def save(self, *args, **kwargs) -> None:
-        
         if self.has_usable_password():
             self.email_confirmed = True
-        
+
         return super().save(*args, **kwargs)
 
     class Meta:
