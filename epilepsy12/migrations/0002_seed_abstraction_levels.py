@@ -31,7 +31,7 @@ integratedcareboardboundaries_mapping = {
 localhealthboardboundaries_mapping = {
     "boundary_identifier": "LHB22CD",
     "name": "LHB22NM",
-    "lhb22nmw": "LHB22NMW",
+    "welsh_name": "LHB22NMW",
     "bng_e": "BNG_E",
     "bng_n": "BNG_N",
     "long": "LONG",
@@ -65,7 +65,7 @@ londonborough_mapping = {
 countryboundaries_mapping = {
     "boundary_identifier": "CTRY22CD",
     "name": "CTRY22NM",
-    "ctry22nmw": "CTRY22NMW",
+    "welsh_name": "CTRY22NMW",
     "bng_e": "BNG_E",
     "bng_n": "BNG_N",
     "long": "LONG",

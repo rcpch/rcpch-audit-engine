@@ -3,7 +3,7 @@
 localhealthboardboundaries_mapping = {
     'boundary_identifier': 'LHB22CD',
     'name': 'LHB22NM',
-    'lhb22nmw': 'LHB22NMW',
+    'welsh_name': 'LHB22NMW',
     'bng_e': 'BNG_E',
     'bng_n': 'BNG_N',
     'long': 'LONG',
@@ -20,7 +20,7 @@ from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 class LocalHealthBoardBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
     name = models.CharField(max_length=41)
-    lhb22nmw = models.CharField(max_length=40)
+    welsh_name = models.CharField(max_length=40)
     bng_e = models.FloatField()
     bng_n = models.FloatField()
     long = models.FloatField()

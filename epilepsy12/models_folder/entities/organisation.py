@@ -61,14 +61,14 @@ class Organisation(TimeStampAbstractBaseClass):
     )
     nhs_england_region = models.ForeignKey(
         to="epilepsy12.NHSEnglandRegion",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         default=None,
     )
     openuk_network = models.ForeignKey(
         to="epilepsy12.OPENUKNetwork",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         default=None,
@@ -76,7 +76,7 @@ class Organisation(TimeStampAbstractBaseClass):
     # administrative regions
     london_borough = models.ForeignKey(
         to="epilepsy12.LondonBorough",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         default=None,
