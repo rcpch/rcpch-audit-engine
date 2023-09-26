@@ -1,0 +1,11 @@
+{
+    email incubator@rcpch.ac.uk
+}
+
+e12-dev.uksouth.cloudapp.azure.com {
+    reverse_proxy http://django:8000
+}
+
+e12-dev.uksouth.cloudapp.azure.com/flower {
+    reverse_proxy http://flower:8888
+}

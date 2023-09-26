@@ -18,6 +18,7 @@ import datetime
 
 # third party imports
 from django.core.management.utils import get_random_secret_key
+from celery.schedules import crontab
 
 # RCPCH imports
 
@@ -50,7 +51,7 @@ RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
 RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 
 # Postcode API
-POSTCODE_API_BASE_URL = os.getenv('POSTCODE_API_BASE_URL')
+POSTCODE_API_BASE_URL = os.getenv("POSTCODE_API_BASE_URL")
 
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
@@ -130,6 +131,24 @@ LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "/"
 
+# REDIS / Celery
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Europe/London"
+
+CELERY_BEAT_SCHEDULE = {
+    "run-daily-at-six-am": {
+        "task": "epilepsy12.tasks.hello",
+        "schedule": crontab(hour="6", minute=0),
+        "options": {
+            "expires": 15.0,
+        },
+    },
+}
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -189,6 +208,9 @@ AUTH_PASSWORD_VALIDATORS = [
             "number_of_symbols": 1,
             "number_of_capitals": 1,
         },
+    },
+    {
+        "NAME": "epilepsy12.validators.NumberValidator",  # must have one number
     },
 ]
 
