@@ -26,9 +26,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./caddy/data/:/data/
-      - ./caddy/config/:/config/
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data/
+      - caddy_data:/config/
+      - ./Caddyfile:/etc/caddy/Caddyfile
 
   # Django web application
   django: &django
@@ -67,7 +67,7 @@ services:
   postgis:
     image: postgis/postgis:15-3.3
     volumes:
-      - "auditenginedb:/var/lib/postgresql/data"
+      - auditenginedb:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=epilepsy12user
       - POSTGRES_PASSWORD=password
@@ -108,4 +108,5 @@ services:
 volumes:
   auditenginedb:
   flower_data:
+  caddy_data:
 

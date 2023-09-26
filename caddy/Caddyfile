@@ -1,7 +1,0 @@
-{
-    email marcusbaw@gmail.com
-}
-
-e12-dev.uksouth.cloudapp.azure.com {
-    reverse_proxy http://django:8000
-}
