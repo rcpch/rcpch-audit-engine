@@ -5,7 +5,7 @@
 version: '3.9'
 
 services:
-  
+
   # web container - runs the django app
   web:
     build: .
@@ -31,6 +31,8 @@ services:
       # - RCPCH_CENSUS_PLATFORM_URL=http://0.0.0.0:8001 # development
       - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
       - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
+      # To output emails to console, set SMTP_EMAIL_ENABLED=False
+      - SMTP_EMAIL_ENABLED=True
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
     # ensures that docker compose always displays log output
@@ -38,7 +40,7 @@ services:
     stdin_open: true
     env_file:
       - .env # env file with the token for RCPCH Census Platform, not committed to Git
-  
+
   # db container - runs postgres
   db:
     image: postgis/postgis:15-3.3
