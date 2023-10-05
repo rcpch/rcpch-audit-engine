@@ -12,16 +12,19 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 
 # standard imports
+import datetime
+import logging
 import os
 from pathlib import Path
-import datetime
 
 # third party imports
-from django.core.management.utils import get_random_secret_key
 from celery.schedules import crontab
+from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -225,7 +228,7 @@ OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
 # EMAIL SETTINGS (SMTP)
 DEFAULT_FROM_EMAIL = "admin@epilepsy12.rcpch.tech"
 SMTP_EMAIL_ENABLED = os.getenv("SMTP_EMAIL_ENABLED", "False") == "True"
-print("SMTP_EMAIL_ENABLED: ", SMTP_EMAIL_ENABLED)
+logger.info("SMTP_EMAIL_ENABLED: ", SMTP_EMAIL_ENABLED)
 if SMTP_EMAIL_ENABLED is True:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ.get("EMAIL_HOST_SERVER")
@@ -235,6 +238,7 @@ if SMTP_EMAIL_ENABLED is True:
     EMAIL_USE_TLS = True
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+logger.info("EMAIL_BACKEND: ", EMAIL_BACKEND)
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
