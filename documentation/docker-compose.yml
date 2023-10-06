@@ -1,0 +1,17 @@
+# DOCKER COMPOSE FILE FOR LOCAL DEVELOPMENT
+
+# Runs a local version of Epilepsy12 Documentation Mkdocs site for development on port 8001
+# Syncs changes in local code folder to the mkdocs container
+
+version: "3.10"
+
+services:
+  # docs container
+  mkdocs:
+    build: .
+    env_file:
+      - ../envs/local-dev.env # required just for the mkdocs insiders auth key
+    ports:
+      - 8001:8001 # bind container port 8000 to local machine port 8001
+    volumes:
+      - ".:/app/"
