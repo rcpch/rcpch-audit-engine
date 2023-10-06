@@ -137,3 +137,6 @@ celerybeat-schedule
 caddy/config
 caddy/data
 
+# exclude site/ and .cache/ folders anywhere (MkDocs)
+*/site/
+*/.cache/
