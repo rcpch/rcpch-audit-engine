@@ -13,7 +13,7 @@ repo_name: rcpch/epilepsy12-documentation
 edit_uri: blob/live/docs
 
 # `mkdocs serve` serves the documentation at custom port (to avoid clashing with other services we commonly run)
-dev_addr: "127.0.0.1:8001"
+dev_addr: "0.0.0.0:8001"
 
 # theme settings, fonts, colours
 theme:
@@ -53,8 +53,8 @@ plugins:
       repository: rcpch/epilepsy12-documentation
       branch: live
       enabled: !ENV [ENABLE_GIT_COMMITTERS, false] # makes Git Committers optional
-  - git-revision-date-localized:
-      enable_creation_date: true
+  # - git-revision-date-localized:
+  #     enable_creation_date: true
   - search
   - with-pdf:
       back_cover: false

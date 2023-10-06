@@ -34,9 +34,9 @@ This means you don't need to worry about conflicts of Python versions, Python li
 
 1. Obtain a `.env` file containing the required environment files.
 
-    These files contain credentials and secrets and therefore the `.env` files themselves are **never** committed to version control. All `*.env` files are `.gitignore`d.
+    These files contain credentials and secrets and therefore the `.env` files themselves are **never** committed to version control. All `*.env` files are `.gitignore`'d.
 
-    If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed local-dev.env file.
+    If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed `local-dev.env` file.
 
     For anyone else, there is a template environment file in the repository root which you can rename to `local-dev.env` and use as a starting point.
 
