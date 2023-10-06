@@ -1,0 +1,34 @@
+# ENVIRONMENT VARIABLES FOR DEVELOPMENT VPS ONLY
+# THIS FILE MUST NEVER BE ADDED TO VERSION CONTROL
+
+# DJANGO
+DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
+DJANGO_ALLOWED_HOSTS= # this should contain the hosts which you are serving the site from
+DJANGO_CSRF_TRUSTED_ORIGINS= # this should contain the https:// domains which you are serving the site from
+E12_SECRET_KEY= # secret key for Django
+
+# EMAIL
+# Below ENV vars are only needed when DEBUG=False, for SMTP email testing
+EMAIL_HOST_SERVER= # hostname of SMTP service
+EMAIL_HOST_PORT= # port of SMTP service
+EMAIL_HOST_USER= # username for SMTP service
+EMAIL_HOST_PASSWORD= # password for SMTP service
+SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
+
+# POSTCODES API
+POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
+
+# CENSUS PLATFORM (Deprivation Scores)
+RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
+RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
+
+# HERMES (SNOMED CT)
+RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
+
+# SUPERUSER (will be created on first run of docker-compose up)
+DJANGO_SUPERUSER_USERNAME= # superuser username
+DJANGO_SUPERUSER_PASSWORD= # superuser password
+DJANGO_SUPERUSER_FIRST_NAME= # superuser first name
+DJANGO_SUPERUSER_SURNAME= # superuser surname
+DJANGO_SUPERUSER_EMAIL= # superuser email
+DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER= # superuser is RCPCH Audit Team member (True/False)

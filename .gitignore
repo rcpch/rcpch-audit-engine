@@ -95,7 +95,6 @@ ipython_config.py
 env/
 venv/
 ENV/
-envs/
 env.bak/
 venv.bak/
 *live.env
