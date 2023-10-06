@@ -1,6 +1,14 @@
-# runs a local version of Epilepsy12 for development on port 8000
-# syncs changes in local code folder to the E12 container
-# migrates the database
+##########################
+########  README  ########
+##########################
+
+
+# DOCKER COMPOSE FILE FOR LOCAL DEVELOPMENT
+
+# Runs a local version of Epilepsy12 for development on port 8000
+# Syncs changes in local code folder to the E12 container
+# Starts from empty DB, creates and migrates the database
+# Seeds the database with cases, and the RCPCH audit team user
 
 version: "3.10"
 
@@ -12,10 +20,10 @@ services:
       - 8000:8000
     links:
       - redis
-      - db
+      - postgis
       - celery
     depends_on:
-      - db
+      - postgis
       - redis
     volumes:
       - .:/app/
@@ -24,7 +32,7 @@ services:
       - E12_POSTGRES_DB_USER=epilepsy12user
       - E12_POSTGRES_DB_PASSWORD=password
       - E12_POSTGRES_DB_NAME=epilepsy12db
-      - E12_POSTGRES_DB_HOST=db
+      - E12_POSTGRES_DB_HOST=postgis
       - E12_POSTGRES_DB_PORT=5432
       - E12_SECRET_KEY=mysecretkey
       - DEBUG=True
@@ -46,11 +54,11 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
-      - .env # env file with the token for RCPCH Census Platform, not committed to Git
+      - envs/local-dev.env # env file - NOT committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&
-            python manage.py seed --mode=seed_dummy_cases &&
+            python manage.py seed --mode=cases --cases 200 &&
             python manage.py seed --mode=seed_registrations &&
             python manage.py seed --mode=seed_groups_and_permissions &&
             python manage.py createsuperuser --noinput || true &&
@@ -58,8 +66,8 @@ services:
             echo 'DEV SETUP SCRIPT: Development superuser password: pw' &&
             python manage.py runserver 0.0.0.0:8000"
 
-  # db container - runs postgres
-  db:
+  # postgis container - runs postgres
+  postgis:
     image: postgis/postgis:15-3.3
     volumes:
       - "auditenginedb:/var/lib/postgresql/data"
@@ -87,10 +95,25 @@ services:
       - E12_POSTGRES_DB_USER=epilepsy12user
       - E12_POSTGRES_DB_PASSWORD=password
       - E12_POSTGRES_DB_NAME=epilepsy12db
-      - E12_POSTGRES_DB_HOST=db
+      - E12_POSTGRES_DB_HOST=postgis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
-      - db
+      - postgis
       - redis
+
+  flower:
+    image: mher/flower
+    container_name: flower
+    command: celery flower --persistent=True
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - FLOWER_PORT=8888
+    ports:
+      - 8888:8888 # docker will expose this ports
+    volumes:
+      - flower_data:/data
+    # this will let docker know that we have added a custom volume
 
   # This is for celery cron tasks
   celery-beat:
@@ -99,8 +122,9 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      - postgis
       - redis
 
 volumes:
   auditenginedb:
+  flower_data:

@@ -1,8 +1,10 @@
 # python / django imports
+import re
 from datetime import date
+
+# django imports
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
-
 
 # 3rd party imports
 
@@ -112,9 +114,21 @@ class CapitalAndSymbolValidator:
 
     def get_help_text(self):
         return _(
-            "Your password must contain at least %(number_of_capitals)d capital letters and %(number_of_symbols) symbols."
+            "Your password must contain at least %(number_of_capitals)d capital letters and %(number_of_symbols)d symbols."
             % {
                 "number_of_capitals": self.number_of_capitals,
                 "number_of_symbols": self.number_of_symbols,
             }
         )
+
+
+class NumberValidator(object):
+    def validate(self, password, user=None):
+        if not re.findall("\d", password):
+            raise ValidationError(
+                _("The password must contain at least 1 digit, 0-9."),
+                code="password_no_number",
+            )
+
+    def get_help_text(self):
+        return _("Your password must contain at least one number.")

@@ -129,3 +129,11 @@ start/hermes-v0.7.5.jar
 git_hash.txt
 
 .kube/
+
+# exclude celerybeat-schedule
+celerybeat-schedule
+
+# exclude caddy files but include the Caddyfile
+caddy/config
+caddy/data
+

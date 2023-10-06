@@ -12,15 +12,19 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 
 # standard imports
+import datetime
+import logging
 import os
 from pathlib import Path
-import datetime
 
 # third party imports
+from celery.schedules import crontab
 from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,7 +54,7 @@ RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
 RCPCH_CENSUS_PLATFORM_TOKEN = os.getenv("RCPCH_CENSUS_PLATFORM_TOKEN")
 
 # Postcode API
-POSTCODE_API_BASE_URL = os.getenv('POSTCODE_API_BASE_URL')
+POSTCODE_API_BASE_URL = os.getenv("POSTCODE_API_BASE_URL")
 
 NHS_ODS_API_URL = os.getenv("NHS_ODS_API_URL")
 NHS_ODS_API_KEY = os.getenv("NHS_ODS_API_KEY")
@@ -82,8 +86,8 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
-    "django_otp.plugins.otp_email",  # add back in if require email 2fa
-    "two_factor.plugins.email",  # add back in if require email 2fa
+    "django_otp.plugins.otp_email",
+    "two_factor.plugins.email",
     "two_factor",
     "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
     # captcha
@@ -129,6 +133,24 @@ AUTO_LOGOUT = {
 LOGIN_URL = "two_factor:login"  # change LOGIN_URL to the 2fa one
 LOGIN_REDIRECT_URL = "two_factor:profile"
 LOGOUT_REDIRECT_URL = "/"
+
+# REDIS / Celery
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Europe/London"
+
+CELERY_BEAT_SCHEDULE = {
+    "run-daily-at-six-am": {
+        "task": "epilepsy12.tasks.hello",
+        "schedule": crontab(hour="6", minute=0),
+        "options": {
+            "expires": 15.0,
+        },
+    },
+}
 
 TEMPLATES = [
     {
@@ -190,26 +212,33 @@ AUTH_PASSWORD_VALIDATORS = [
             "number_of_capitals": 1,
         },
     },
+    {
+        "NAME": "epilepsy12.validators.NumberValidator",  # must have one number
+    },
 ]
 
 AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
 
-# EMAIL SETTINGS
-DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
-# OTP config
+# Two Factor Authentication / One Time Password Settings (2FA / OTP)
 OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
 OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
 OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
 OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
-if DEBUG is True:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
+
+# EMAIL SETTINGS (SMTP)
+DEFAULT_FROM_EMAIL = "admin@epilepsy12.rcpch.tech"
+SMTP_EMAIL_ENABLED = os.getenv("SMTP_EMAIL_ENABLED", "False") == "True"
+logger.info("SMTP_EMAIL_ENABLED: ", SMTP_EMAIL_ENABLED)
+if SMTP_EMAIL_ENABLED is True:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ.get("EMAIL_HOST_SERVER")
-    EMAIL_PORT = 587
+    EMAIL_PORT = os.environ.get("EMAIL_HOST_PORT")
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = True
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+logger.info("EMAIL_BACKEND: ", EMAIL_BACKEND)
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
