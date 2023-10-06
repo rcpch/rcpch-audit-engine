@@ -12,16 +12,19 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 
 # standard imports
+import datetime
+import logging
 import os
 from pathlib import Path
-import datetime
 
 # third party imports
-from django.core.management.utils import get_random_secret_key
 from celery.schedules import crontab
+from django.core.management.utils import get_random_secret_key
 
 # RCPCH imports
 
+# Logging setup
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,8 +86,8 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
-    "django_otp.plugins.otp_email",  # add back in if require email 2fa
-    "two_factor.plugins.email",  # add back in if require email 2fa
+    "django_otp.plugins.otp_email",
+    "two_factor.plugins.email",
     "two_factor",
     "two_factor.plugins.phonenumber",  # we don't use phones currently but required for app to work
     # captcha
@@ -216,22 +219,26 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "epilepsy12.Epilepsy12User"
 
-# EMAIL SETTINGS
-DEFAULT_FROM_EMAIL = "admin@epilepsy12.tech"
-# OTP config
+# Two Factor Authentication / One Time Password Settings (2FA / OTP)
 OTP_EMAIL_SUBJECT = "Epilepsy12 OTP Code"
 OTP_EMAIL_BODY_TEMPLATE_PATH = "../templates/two_factor/email_token.txt"
 OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
 OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
-if DEBUG is True:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
+
+# EMAIL SETTINGS (SMTP)
+DEFAULT_FROM_EMAIL = "admin@epilepsy12.rcpch.tech"
+SMTP_EMAIL_ENABLED = os.getenv("SMTP_EMAIL_ENABLED", "False") == "True"
+logger.info("SMTP_EMAIL_ENABLED: ", SMTP_EMAIL_ENABLED)
+if SMTP_EMAIL_ENABLED is True:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ.get("EMAIL_HOST_SERVER")
-    EMAIL_PORT = 587
+    EMAIL_PORT = os.environ.get("EMAIL_HOST_PORT")
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = True
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+logger.info("EMAIL_BACKEND: ", EMAIL_BACKEND)
 
 PASSWORD_RESET_TIMEOUT = 259200  # Default: 259200 (3 days, in seconds)
 
