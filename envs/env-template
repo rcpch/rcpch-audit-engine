@@ -1,5 +1,15 @@
 # ENVIRONMENT VARIABLES FOR DEVELOPMENT VPS ONLY
 # THIS FILE MUST NEVER BE ADDED TO VERSION CONTROL
+# SECTIONS IN ALPHABETICAL ORDER ASCENDING
+# VARIABLES WITHIN SECTIONS IN ALPHABETICAL ORDER ASCENDING
+
+# CELERY
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+# CENSUS PLATFORM (Deprivation Scores)
+RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
+RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
 
 # DJANGO
 DEBUG="True" # Set DEBUG=True for Local dev and Development, not Staging or Live
@@ -7,28 +17,42 @@ DJANGO_ALLOWED_HOSTS= # this should contain the hosts which you are serving the 
 DJANGO_CSRF_TRUSTED_ORIGINS= # this should contain the https:// domains which you are serving the site from
 E12_SECRET_KEY= # secret key for Django
 
+# DJANGO POSTGRES DATABASE CONNECTION
+E12_POSTGRES_DB_HOST=postgis
+E12_POSTGRES_DB_NAME=epilepsy12db
+E12_POSTGRES_DB_PASSWORD=password
+E12_POSTGRES_DB_PORT=5432
+E12_POSTGRES_DB_USER=epilepsy12user
+
 # EMAIL
-# Below ENV vars are only needed when DEBUG=False, for SMTP email testing
-EMAIL_HOST_SERVER= # hostname of SMTP service
-EMAIL_HOST_PORT= # port of SMTP service
-EMAIL_HOST_USER= # username for SMTP service
+# To output emails to console, set SMTP_EMAIL_ENABLED=False
 EMAIL_HOST_PASSWORD= # password for SMTP service
+EMAIL_HOST_PORT= # port of SMTP service
+EMAIL_HOST_SERVER= # hostname of SMTP service
+EMAIL_HOST_USER= # username for SMTP service
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
 
-# POSTCODES API
-POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
-
-# CENSUS PLATFORM (Deprivation Scores)
-RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
-RCPCH_CENSUS_PLATFORM_URL="https://api.rcpch.ac.uk/deprivation/v1"
+# FLOWER
+FLOWER_PORT=8888
 
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
 
+# POSTCODES API
+POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
+
+# POSTGRES SETUP
+POSTGRES_DB=epilepsy12db
+POSTGRES_PASSWORD=password
+POSTGRES_USER=epilepsy12user
+
 # SUPERUSER (will be created on first run of docker-compose up)
-DJANGO_SUPERUSER_USERNAME= # superuser username
-DJANGO_SUPERUSER_PASSWORD= # superuser password
-DJANGO_SUPERUSER_FIRST_NAME= # superuser first name
-DJANGO_SUPERUSER_SURNAME= # superuser surname
 DJANGO_SUPERUSER_EMAIL= # superuser email
+DJANGO_SUPERUSER_FIRST_NAME= # superuser first name
 DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER= # superuser is RCPCH Audit Team member (True/False)
+DJANGO_SUPERUSER_PASSWORD= # superuser password
+DJANGO_SUPERUSER_SURNAME= # superuser surname
+DJANGO_SUPERUSER_USERNAME= # superuser username
+
+# TIMEZONE
+TZ="Europe/London"
