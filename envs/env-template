@@ -32,6 +32,9 @@ EMAIL_HOST_SERVER= # hostname of SMTP service
 EMAIL_HOST_USER= # username for SMTP service
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
 
+# FLOWER
+FLOWER_PORT=8888
+
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
 
