@@ -30,6 +30,7 @@ class IntegratedCareBoardBoundaries(models.Model):
 
 class IntegratedCareBoard(IntegratedCareBoardBoundaries):
     ods_code = models.CharField()
+    publication_date = models.DateField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Integrated Care Board"
@@ -41,3 +42,6 @@ class IntegratedCareBoard(IntegratedCareBoardBoundaries):
 
     def get_ods_code(self) -> str:
         return self.ods_code
+
+    def get_publication_date(self) -> str:
+        return self.publication_date

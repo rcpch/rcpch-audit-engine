@@ -13,9 +13,10 @@ londonborough_mapping = {
 """
 
 from django.contrib.gis.db import models
+from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 
-class LondonBoroughBoundaries(models.Model):
+class LondonBoroughBoundaries(TimeStampAbstractBaseClass):
     name = models.CharField(max_length=22)
     gss_code = models.CharField(max_length=9)
     hectares = models.FloatField()

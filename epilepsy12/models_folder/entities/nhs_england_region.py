@@ -12,9 +12,10 @@ nhsenglandregionboundaries_mapping = {
 }
 """
 from django.contrib.gis.db import models
+from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 
-class NHSEnglandRegionBoundaries(models.Model):
+class NHSEnglandRegionBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
     name = models.CharField(max_length=24)
     bng_e = models.BigIntegerField()
@@ -30,6 +31,7 @@ class NHSEnglandRegionBoundaries(models.Model):
 
 class NHSEnglandRegion(NHSEnglandRegionBoundaries):
     region_code = models.CharField(unique=True, blank=True, null=True)
+    publication_date = models.DateField(blank=True, null=True)
 
     class Meta:
         verbose_name = "NHS England Region"
@@ -38,3 +40,9 @@ class NHSEnglandRegion(NHSEnglandRegionBoundaries):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_publication_date(self) -> str:
+        return self.publication_date
+
+    def get_region_code(self) -> str:
+        return self.region_code

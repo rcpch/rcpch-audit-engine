@@ -49,7 +49,17 @@ def seed_comorbidities(apps, schema_editor):
             print(f"{new_comorbidity.preferredTerm} added.")
         except Exception as e:
             print(f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
-    print(f"{index} comorbidities added")
+    
+    # Add 'Other' into ComorbidityList
+    ComorbidityList.objects.create(
+        conceptId='-1',
+        term='Other',
+        preferredTerm='Other'
+    )
+    print(f"Added 'Other' to ComorbidityList.")
+    
+    # 'Other' adds one more to list
+    print(f"{index+1} comorbidities added")
 
 
 class Migration(migrations.Migration):

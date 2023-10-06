@@ -77,6 +77,7 @@ def seed_organisations(apps, schema_editor):
                     longitude=longitude,
                     postcode=rcpch_organisation["Postcode"],
                     geocode_coordinates=new_point,
+                    telephone=rcpch_organisation["Phone"],
                 )
                 # add trust or local health board
                 if (
