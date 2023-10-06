@@ -1,6 +1,4 @@
 # Django
-from typing import Any
-from django.contrib.auth import authenticate
 from django.utils import timezone
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect, get_object_or_404

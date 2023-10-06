@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import migrations
 from ..constants import (
     INTEGRATED_CARE_BOARDS,
@@ -30,7 +31,7 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
             # should already exist in the database
             IntegratedCareBoard.objects.filter(
                 boundary_identifier=icb["gss_code"]
-            ).update(ods_code=icb["ods_code"])
+            ).update(ods_code=icb["ods_code"], publication_date=date(2023, 3, 15))
             print(f"Updated {icb['name']} to include ODS code")
         else:
             raise Exception(
@@ -55,6 +56,7 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
             nhs_england_region_object.region_code = nhs_england_region[
                 "NHS_ENGLAND_REGION_CODE"
             ]
+            nhs_england_region_object.publication_date = date(2022, 7, 30)
             nhs_england_region_object.save()
             print(
                 f"Updated {nhs_england_region['NHS_ENGLAND_REGION_NAME']} to include ODS code"
@@ -76,7 +78,10 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
             # should already exist in the database
             LocalHealthBoard.objects.filter(
                 boundary_identifier=local_health_board["gss_code"]
-            ).update(ods_code=local_health_board["ods_code"])
+            ).update(
+                ods_code=local_health_board["ods_code"],
+                publication_date=date(2022, 4, 14),
+            )
             print(f"Updated {local_health_board['health_board']} to include ODS code")
         else:
             raise Exception("Seeding error. No Local Health Board entity to seed.")
@@ -100,6 +105,7 @@ def ods_codes_to_abstraction_levels(apps, schema_editor):
                 name=open_uk_network["OPEN_UK_Network_Name"],
                 boundary_identifier=open_uk_network["OPEN_UK_Network_Code"],
                 country=open_uk_network["country"],
+                publication_date=date(2022, 12, 8),
             ).save()
             print(f"Created {open_uk_network['OPEN_UK_Network_Name']}.")
 

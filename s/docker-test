@@ -7,4 +7,4 @@
 # by default the --verbose flag is passed to pytest for more detailed output
 # all arguments passed to this script are passed to pytest
 
-docker compose -f docker-compose.local-dev.yml exec web pytest -v $*
+docker compose exec web pytest -v $*

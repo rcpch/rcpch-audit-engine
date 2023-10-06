@@ -38,19 +38,6 @@ services:
       - redis
     volumes:
       - .:/app/
-    environment:
-      # these env vars are ONLY for development
-      - E12_POSTGRES_DB_USER=epilepsy12user
-      - E12_POSTGRES_DB_PASSWORD=password
-      - E12_POSTGRES_DB_NAME=epilepsy12db
-      - E12_POSTGRES_DB_HOST=postgis
-      - E12_POSTGRES_DB_PORT=5432
-      - POSTCODES_IO_API_URL=https://api.postcodes.io
-      - RCPCH_CENSUS_PLATFORM_URL=https://api.rcpch.ac.uk/deprivation/v1 # live
-      - RCPCH_HERMES_SERVER_URL=http://rcpch-hermes.uksouth.azurecontainer.io:8080/v1/snomed
-      - NHS_ODS_API_URL=https://api.nhs.uk/service-search?api-version=2
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
       - envs/dev-vps.env # env file - NOT committed to Git
     command: >
@@ -68,11 +55,8 @@ services:
     image: postgis/postgis:15-3.3
     volumes:
       - auditenginedb:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=epilepsy12user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=epilepsy12db
-      - TZ="Europe/London"
+    env_file:
+      - envs/dev-vps.env # env file - NOT committed to Git
     restart: always
 
   # Redis backend for Celery task scheduler
@@ -86,23 +70,23 @@ services:
   celeryworker:
     <<: *django # this will inherit all the settings from the django service
     command: celery -A rcpch-audit-engine worker -l info
+    restart: always
 
   # Flower UI for Celery tasks
   flower:
     <<: *django # this will inherit all the settings from the django service
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - FLOWER_PORT=8888
     ports:
       - 8888:8888
     volumes:
       - flower_data:/data
     command: celery -A rcpch-audit-engine flower --persistent=True
+    restart: always
 
   # Celery scheduled tasks/cron
   celerybeat:
     <<: *django # this will inherit all the settings from the django service
     command: celery -A rcpch-audit-engine beat -l info
+    restart: always
 
 # Data volumes
 volumes:

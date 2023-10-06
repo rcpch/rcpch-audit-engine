@@ -3,7 +3,7 @@
 localhealthboardboundaries_mapping = {
     'boundary_identifier': 'LHB22CD',
     'name': 'LHB22NM',
-    'lhb22nmw': 'LHB22NMW',
+    'welsh_name': 'LHB22NMW',
     'bng_e': 'BNG_E',
     'bng_n': 'BNG_N',
     'long': 'LONG',
@@ -14,12 +14,13 @@ localhealthboardboundaries_mapping = {
 """
 
 from django.contrib.gis.db import models
+from ..time_and_user_abstract_base_classes import TimeStampAbstractBaseClass
 
 
-class LocalHealthBoardBoundaries(models.Model):
+class LocalHealthBoardBoundaries(TimeStampAbstractBaseClass):
     boundary_identifier = models.CharField(max_length=9)
     name = models.CharField(max_length=41)
-    lhb22nmw = models.CharField(max_length=40)
+    welsh_name = models.CharField(max_length=40)
     bng_e = models.FloatField()
     bng_n = models.FloatField()
     long = models.FloatField()
@@ -33,6 +34,7 @@ class LocalHealthBoardBoundaries(models.Model):
 
 class LocalHealthBoard(LocalHealthBoardBoundaries):
     ods_code = models.CharField(max_length=3)
+    publication_date = models.DateField(blank=True, null=True)
 
     class Meta:
         indexes = [models.Index(fields=["ods_code"])]
@@ -45,3 +47,6 @@ class LocalHealthBoard(LocalHealthBoardBoundaries):
 
     def get_ods_code(self) -> str:
         return self.ods_code
+
+    def get_publication_date(self) -> str:
+        return self.publication_date

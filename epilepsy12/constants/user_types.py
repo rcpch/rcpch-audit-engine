@@ -1,10 +1,3 @@
-# LEAD_CLINICIAN = 1
-# CENTRE_ADMINISTRATOR = 2
-# PAEDIATRIC_NEUROLOGIST = 3
-# GENERAL_PAEDIATRICIAN_WITH_EPILEPSY_INTEREST = 4
-# AUDIT_ANALYST = 5
-# AUDIT_ADMINISTRATOR = 6
-
 VIEW_PREFERENCES = (
     (0, "organisation"),
     (1, "trust"),
@@ -45,9 +38,9 @@ TITLES = ((MR, "Mr"), (MRS, "Mrs"), (MS, "Ms"), (DR, "Dr"), (PROFESSOR, "Profess
 Groups
 These map to the roles
 Role                                Group
-Audit Centre Lead Clinician         trust_audit_team_view_only
+Audit Centre Lead Clinician         trust_audit_team_full_access
 Audit Centre Clinician              trust_audit_team_edit_access
-Audit Centre Administrator          trust_audit_team_full_access
+Audit Centre Administrator          trust_audit_team_view_only
 RCPCH Audit Team                    epilepsy12_audit_team_full_access
 RCPCH Audit Children and Family     patient_access
 """
