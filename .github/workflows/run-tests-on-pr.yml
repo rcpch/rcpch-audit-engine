@@ -1,6 +1,6 @@
 # Runs the Pytest test suite when PRs are made against any branch
 
-name: Pytest Suite
+name: Run Pytest on all PRs
 
 on:
     pull_request:
@@ -8,7 +8,7 @@ on:
           - "*"
 
 jobs:
-  build-and-deploy:
+  build-and-run-pytest-suite:
     runs-on: ubuntu-latest
 
     # this 'env' refers to environment variables
