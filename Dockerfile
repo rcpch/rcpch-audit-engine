@@ -10,6 +10,9 @@ RUN apt-get update &&\
     apt-get install -y binutils libproj-dev gdal-bin libgdal-dev python3-gdal &&\
     apt-get install -y  libz-dev libjpeg-dev libfreetype6-dev
 
+# Extra packages required for Material for MkDocs plugins (dependency for git and pdf plugins)
+RUN apt install -y git python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0
+
 # Add requirements
 COPY requirements/requirements.txt /app/requirements/requirements.txt
 
@@ -19,6 +22,9 @@ WORKDIR /app/requirements/
 # Run installation of requirements
 RUN pip install --upgrade pip
 RUN pip install -r /app/requirements/requirements.txt
+
+# Set safe working directory for git
+RUN git config --global --add safe.directory /app
 
 # Set working directory back to main app
 WORKDIR /app/
