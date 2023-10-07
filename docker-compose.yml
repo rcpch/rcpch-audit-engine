@@ -39,7 +39,7 @@ services:
     volumes:
       - .:/app/
     env_file:
-      - envs/dev-vps.env # env file - NOT committed to Git
+      - envs/local-dev.env # env file - NOT committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&
@@ -87,6 +87,12 @@ services:
     <<: *django # this will inherit all the settings from the django service
     command: celery -A rcpch-audit-engine beat -l info
     restart: always
+
+  mkdocs:
+    <<: *django # this will inherit all the settings from the django service
+    ports:
+      - 8001:8001
+    command: mkdocs serve --config-file documentation/mkdocs.yml
 
 # Data volumes
 volumes:
