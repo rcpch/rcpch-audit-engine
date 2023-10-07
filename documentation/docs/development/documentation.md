@@ -7,6 +7,13 @@ reviewers: Dr Marcus Baw
 
 The RCPCH Audit Engine / Epilepsy12 documentation site is made with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), which is a framework, separate from Django, which takes Markdown source files from `docs` and compiles them into a static HTML site. These static files are then served from our hosting resources.
 
+## Docker development setup
+
+As part of our standard Docker and Docker Compose development setup, we have a `docker-compose.yml` file in the root of the repo which will build a `mkdocs` Docker image with all the dependencies needed to run the documentation site locally.
+
+By default this image is running in a container at `localhost:8001` when you run the Docker dev setup using `s/docker-up` and it will auto-reload when you make changes to the source files in `documentation/docs`.
+
+
 ## Setting up a Python and Pyenv development environment for the E12 documentation site
 
 Create a virtualenv for the Python modules:
