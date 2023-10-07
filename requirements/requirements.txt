@@ -49,3 +49,17 @@ rapidfuzz
 # versioning
 bump2version
 
+# DOCUMENTATION - MATERIAL FOR MKDOCS INSIDERS
+# IMPORTANT: This project uses Material for MkDocs **INSIDERS** Edition.
+# To install this you will need a GitHub token which is available (for RCPCH team only)
+# in our .env files
+
+# git+https://${MATERIAL_FOR_MKDOCS_INSIDERS_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
+
+# Further information is at https://squidfunk.github.io/mkdocs-material/insiders/getting-started/
+
+mkdocs-material
+mkdocs-git-committers-plugin-2 # displays authors at the bottom of the page
+mkdocs-git-revision-date-localized-plugin # displays last edit date at the bottom of the page
+mkdocs-macros-plugin # enables 'foldable' admonition text (used for large code blocks)
+mkdocs-with-pdf # PDF export feature
