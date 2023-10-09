@@ -4,13 +4,13 @@
 # VARIABLES WITHIN SECTIONS IN ALPHABETICAL ORDER ASCENDING
 
 # CADDY (WEB SERVER & HTTPS)
-SITE_DOMAIN= # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
-LETSENCRYPT_EMAIL_ADDRESS= # the email address to send LetsEncrypt notifications to
-LETSENCRYPT_ENDPOINT= # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory) - default is set in Caddyfile to the live endpoint
+SITE_DOMAIN="example.com" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
+LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send LetsEncrypt notifications to
+LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory) - default is set in Caddyfile to the live endpoint
 
 # CELERY
-CELERY_BROKER_URL=redis://redis:6379/0
-CELERY_RESULT_BACKEND=redis://redis:6379/0
+CELERY_BROKER_URL="redis://redis:6379/0"
+CELERY_RESULT_BACKEND="redis://redis:6379/0"
 
 # CENSUS PLATFORM (Deprivation Scores)
 RCPCH_CENSUS_PLATFORM_TOKEN= # API key for RCPCH Census Platform (Deprivation scoring service API)
@@ -23,11 +23,11 @@ DJANGO_CSRF_TRUSTED_ORIGINS= # this should contain the https:// domains which yo
 E12_SECRET_KEY= # secret key for Django
 
 # DJANGO POSTGRES DATABASE CONNECTION
-E12_POSTGRES_DB_HOST=postgis
-E12_POSTGRES_DB_NAME=epilepsy12db
-E12_POSTGRES_DB_PASSWORD=password
-E12_POSTGRES_DB_PORT=5432
-E12_POSTGRES_DB_USER=epilepsy12user
+E12_POSTGRES_DB_HOST="postgis"
+E12_POSTGRES_DB_NAME="epilepsy12db"
+E12_POSTGRES_DB_PASSWORD="password"
+E12_POSTGRES_DB_PORT="5432"
+E12_POSTGRES_DB_USER="epilepsy12user"
 
 # EMAIL
 # To output emails to console, set SMTP_EMAIL_ENABLED=False
