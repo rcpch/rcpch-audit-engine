@@ -10,3 +10,15 @@
 {$SITE_DOMAIN}/flower {
     reverse_proxy http://flower:8888
 }
+
+{$SITE_DOMAIN}/tasks {
+    reverse_proxy http://flower:8888
+}
+
+{$SITE_DOMAIN}/broker {
+    reverse_proxy http://flower:8888
+}
+
+{$SITE_DOMAIN}/workers {
+    reverse_proxy http://flower:8888
+}
