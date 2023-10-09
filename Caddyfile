@@ -1,11 +1,12 @@
 {
-    email incubator@rcpch.ac.uk
+    email {$LETSENCRYPT_EMAIL_ADDRESS}
+    acme_ca {$LETSENCRYPT_ENDPOINT:https://acme-v02.api.letsencrypt.org/directory}
 }
 
-e12-dev.uksouth.cloudapp.azure.com {
+{$SITE_DOMAIN} {
     reverse_proxy http://django:8000
 }
 
-e12-dev.uksouth.cloudapp.azure.com/flower {
+{$SITE_DOMAIN}/flower {
     reverse_proxy http://flower:8888
 }
