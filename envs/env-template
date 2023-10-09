@@ -3,6 +3,11 @@
 # SECTIONS IN ALPHABETICAL ORDER ASCENDING
 # VARIABLES WITHIN SECTIONS IN ALPHABETICAL ORDER ASCENDING
 
+# CADDY (WEB SERVER & HTTPS)
+SITE_DOMAIN= # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
+LETSENCRYPT_EMAIL_ADDRESS= # the email address to send LetsEncrypt notifications to
+LETSENCRYPT_ENDPOINT= # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory) - default is set in Caddyfile to the live endpoint
+
 # CELERY
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -40,6 +45,10 @@ RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
 
 # NHS ODS API
 NHS_ODS_API_URL="https://directory.spineservices.nhs.uk/ORD/2-0-0"
+
+# MATERIAL FOR MKDOCS INSIDERS
+ENABLE_GIT_COMMITTERS="True" # Disables git committer extension
+ENABLE_PDF_EXPORT=1 # Disables automatic PDF generation
 
 # POSTCODES API
 POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
