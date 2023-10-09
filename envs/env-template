@@ -38,6 +38,9 @@ FLOWER_PORT=8888
 # HERMES (SNOMED CT)
 RCPCH_HERMES_SERVER_URL= # SNOMED server API URL
 
+# NHS ODS API
+NHS_ODS_API_URL="https://directory.spineservices.nhs.uk/ORD/2-0-0"
+
 # POSTCODES API
 POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
 
