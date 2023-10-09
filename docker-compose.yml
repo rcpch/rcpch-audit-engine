@@ -19,12 +19,15 @@ services:
 
   # Caddy reverse proxy - web-facing SSL server
   caddy:
-    image: caddy
     depends_on:
       - django
+    env_file:
+      - envs/local-dev.env # env file - NOT committed to Git
+    image: caddy
     ports:
       - "80:80"
       - "443:443"
+    restart: always
     volumes:
       - caddy_data:/data/
       - caddy_data:/config/
@@ -56,7 +59,7 @@ services:
     volumes:
       - auditenginedb:/var/lib/postgresql/data
     env_file:
-      - envs/dev-vps.env # env file - NOT committed to Git
+      - envs/local-dev.env # env file - NOT committed to Git
     restart: always
 
   # Redis backend for Celery task scheduler
@@ -93,6 +96,7 @@ services:
     ports:
       - 8001:8001
     command: mkdocs serve --config-file documentation/mkdocs.yml
+    restart: always
 
 # Data volumes
 volumes:
