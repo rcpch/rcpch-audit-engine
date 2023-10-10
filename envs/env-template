@@ -6,7 +6,7 @@
 # CADDY (WEB SERVER & HTTPS)
 SITE_DOMAIN="example.com" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
 LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send LetsEncrypt notifications to
-LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory) - default is set in Caddyfile to the live endpoint
+LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory)
 
 # CELERY
 CELERY_BROKER_URL="redis://redis:6379/0"
