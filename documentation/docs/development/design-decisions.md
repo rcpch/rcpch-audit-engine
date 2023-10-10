@@ -76,20 +76,33 @@ This is a subfolder of ```partials``` and needs extra explanation, as this conta
 These are all Semantic UI elements, but have been customized to RCPCH design standards. Incomplete fields are rendered as blue round target icon next to the incomplete field, with a tooltip messaging this on hover, whilst completed fields are shown as pink ticks.
 
 The parameters for the elements are not all the same but follow the same broad pattern:
+
 *hx_post*: the url posted to including parameters
+
 *hx_target*: the id of the html element to target the server response
+
 *hx_trigger*: usually 'change' but can be any event
+
 *label*: this is the label text (accessed from the help text in the model)
+
 *reference*: this is the reference text (accessed from the help text in the model)
+
 *date_value*: date value
+
 *data_position*: this is the position of the popup label (js independent) ['top left', 'top center', 'top right', 'bottom left', 'bottom center', 'bottom right', 'right center', 'left center']
+
 *input_date_field_name*: **date_field only** the name of the input element for the date_field - should match the field name being updated
+
 *disabled*: a flag to reflect if the element is enabled or not
 *hospital_list*: **hospital_select only** a filtered list of hospitals
+
 *test_positive*: common to most of the elements. It is usually the name of the field in the model to be updated
 *hx_field_list*: **check_box_group only** list of radiobutton options
+
 *hx_field_list_name*: **check_box_group only** the name of the list of options
+
 *hx_model*: **check_box_group only** model instance to update on selection
+
 *tooltip_id*: **multiple_choice_multiple_toggle** id of the element for tooltip text
 
 #### Other elements

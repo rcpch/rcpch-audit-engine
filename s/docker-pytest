@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# scripts may need to be made executable on some platforms before they can be run
+# chmod +x <filename> is the command to do this on unixy systems
+
+# Runs pytest suite
+
+
+sudo docker compose -f docker-compose.yml exec django pytest
