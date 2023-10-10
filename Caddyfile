@@ -1,6 +1,6 @@
 {
     email {$LETSENCRYPT_EMAIL_ADDRESS}
-    acme_ca {$LETSENCRYPT_ENDPOINT:https://acme-v02.api.letsencrypt.org/directory}
+    acme_ca {$LETSENCRYPT_ENDPOINT}
 }
 
 {$SITE_DOMAIN} {
