@@ -63,6 +63,7 @@ DJANGO_SUPERUSER_EMAIL= # superuser email
 DJANGO_SUPERUSER_FIRST_NAME= # superuser first name
 DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER= # superuser is RCPCH Audit Team member (True/False)
 DJANGO_SUPERUSER_PASSWORD= # superuser password
+DJANGO_SUPERUSER_ROLE=1 # Clinician role (see epilepsy12.constants.user_types.ROLES for details)
 DJANGO_SUPERUSER_SURNAME= # superuser surname
 DJANGO_SUPERUSER_USERNAME= # superuser username
 
