@@ -3,7 +3,7 @@ title: Docker development
 reviewers: Dr Marcus Baw, Dr Simon Chapman, Dr Anchit Chandran
 ---
 
-To simplify the development environment setup and provide greater consistency between development and production environments, the application is built as a Docker image and `docker compose` sets up the other necessary containers in development.
+To simplify the development environment setup and provide greater consistency between development and production environments, the application is built as a Docker image and Docker Compose sets up the other necessary containers in development.
 
 This means you don't need to worry about conflicts of Python versions, Python library versions, or Python virtual environments. Everything is specified and isolated inside the Docker containers.
 
@@ -36,12 +36,12 @@ This means you don't need to worry about conflicts of Python versions, Python li
 
     These files contain credentials and secrets and therefore the `.env` files themselves are **never** committed to version control. All `*.env` files are `.gitignore`'d.
 
-    If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed `local-dev.env` file.
+    If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed `.env` file.
 
-    For anyone else, there is a template environment file in the repository root which you can rename to `local-dev.env` and use as a starting point.
+    For anyone else, there is a template environment file in the repository root which you can rename to `.env` and use as a starting point. **Be extremely careful to make sure it is named `.env` so that it is ignored by Git. Do not ever commit `.env` files to version control!**
 
     ```console
-    mv envs/env-template envs/local-dev.env
+    cp envs/env-template envs/.env
     ```
 
 1. Start the development environment for the first time using our startup script
@@ -125,7 +125,7 @@ This Docker setup is quite new so please do open an issue if there is anything t
 
 ## Executing commands in the context of the `django` container
 
-You can run commands in the context of any of the containers using `docker compose`.
+You can run commands in the context of any of the containers using Docker Compose.
 
 The below command will execute `<command>` inside the `django` container.
 
@@ -140,7 +140,7 @@ sudo docker compose -f docker-compose.yml exec django python manage.py createsup
 ```
 
 !!! warning "Inactive Terminal"
-    If you have successfully opened a Docker container for the engine, your Terminal will no longer show an interactive prompt, which is means you cannot run commands in that Terminal. To resolve this, simply **open another Terminal window**
+    If you have successfully run the Docker Compose deployment, your terminal will be showing the logging output for all the containers and will no longer show an interactive prompt, which is means you can not run commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory.
 
 
 ## Running the test suite
@@ -161,4 +161,4 @@ s/docker-down
 
 ## Tips and Tricks
 
-* Although the `docker compose` setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment.
+* Although the Docker Compose setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment using `pyenv`.

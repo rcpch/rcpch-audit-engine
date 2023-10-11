@@ -11,9 +11,8 @@ Using the `coverage` tool, we can get some code analysis, including the total te
     coverage report
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web coverage run -m pytest
-    sudo docker compose -f docker-compose.dev-init.yml exec web coverage report
+    docker compose -f docker-compose.yml exec web coverage run -m pytest
+    docker compose -f docker-compose.yml exec web coverage report
     ```
-    

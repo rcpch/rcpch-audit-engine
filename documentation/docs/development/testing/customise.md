@@ -73,9 +73,9 @@ For example, the following commands will collect and run tests starting with `te
     pytest -k "test_measure_1"
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest -k "test_measure_1"
+    docker compose -f docker-compose.yml exec web pytest -k "test_measure_1"
     ```
 
 ## Skipping or selecting tests
@@ -87,9 +87,9 @@ Some of the more time-consuming tests can be skipped for convenience using the [
     pytest -k "not examples"
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest -k "not examples"
+    docker compose -f docker-compose.yml exec web pytest -k "not examples"
     ```
 
 ## Verbosity
@@ -101,9 +101,9 @@ You can increase the [verbosity of the Pytest output](https://docs.pytest.org/en
     pytest -vv
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest -vv
+    docker compose -f docker-compose.yml exec web pytest -vv
     ```
 
 ## Running a single test
@@ -115,9 +115,9 @@ Pytest allows a specific test to be run by specifying the path to the test file.
     pytest epilepsy12/tests/model_tests/test_antiepilepsy_medicine.py
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest epilepsy12/tests/model_tests/test_antiepilepsy_medicine.py
+    docker compose -f docker-compose.yml exec web pytest epilepsy12/tests/model_tests/test_antiepilepsy_medicine.py
     ```
 
 To run **one specific test** within this file, use the `PATH_TO_TEST_FILE::TESTNAME` notation:
@@ -127,9 +127,9 @@ To run **one specific test** within this file, use the `PATH_TO_TEST_FILE::TESTN
     pytest epilepsy12/tests/model_tests/test_antiepilepsy_medicine.py::test_length_of_treatment
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest epilepsy12/tests/model_tests/test_antiepilepsy_medicine.py::test_length_of_treatment
+    docker compose -f docker-compose.yml exec web pytest epilepsy12/tests/model_tests/test_antiepilepsy_medicine.py::test_length_of_treatment
     ```
 
 ## Capturing `stdout` and `stderr`
@@ -145,9 +145,9 @@ The `-rP` flag defines how Pytest shows the "short test summary info" content. I
     pytest -rP
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest -rP
+    docker compose -f docker-compose.yml exec web pytest -rP
     ```
 
 The `-s` flag will tell Pytest to not capture the stdout and instead prints it straight to the console:
@@ -157,9 +157,9 @@ The `-s` flag will tell Pytest to not capture the stdout and instead prints it s
     pytest -s
     ```
 
-=== "Using docker compose"
+=== "Using Docker Compose"
     ```console
-    sudo docker compose -f docker-compose.dev-init.yml exec web pytest -s
+    docker compose -f docker-compose.yml exec web pytest -s
     ```
 
 !!! tip "`pytest -h` for help"
