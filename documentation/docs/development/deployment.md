@@ -19,26 +19,17 @@ sudo echo "alias doupdates='sudo apt update && sudo apt dist-upgrade && sudo apt
 doupdates
 ```
 
+### Automatically `cd` to the E12 folder when you log in
+
+```bash
+echo "cd /var/epilepsy12/" >> /etc/profile;source /etc/profile
+```
+
 ### Add other SSH users using their public keys from GitHub
 
 ```bash
 ssh-import-id gh:eatyourpeas
 ssh-import-id gh:pacharanero
-```
-
-### Clone the Epilepsy12 repository
-
-```bash
-sudo git clone --single-branch --branch development https://github.com/rcpch/rcpch-audit-engine.git /var/rcpch-audit-engine
-```
-
-This command clones only the branch `development` and not the whole repository, which saves time and disk space.
-It also clones it into the `/var/rcpch-audit-engine` folder, which we have chosen as the standard location for the E12 application.
-
-`cd` into the new folder
-
-```bash
-cd rcpch-audit-engine/
 ```
 
 ### Install :fontawesome-brands-docker: Docker
@@ -47,43 +38,73 @@ cd rcpch-audit-engine/
 curl -fsSL get.docker.com | bash
 ```
 
-### Install Zsh and Oh My Zsh
+!!! info "Optional: Install Zsh and Oh-my-zsh"
 
-Two tools I find quite nice when spending a lot of time in the terminal are [Zsh](https://www.zsh.org/) and [oh-my-zsh](https://ohmyz.sh/)
+    ### Install Zsh and Oh-my-zsh
 
-These give you additional features in the terminal, such as better tab completion and a terminal prompt which includes the Git branch you are currently using.
+    Two tools I find quite nice when spending a lot of time in the terminal are [Zsh](https://www.zsh.org/) and [oh-my-zsh](https://ohmyz.sh/). These give you additional features in the terminal, such as better tab completion and a terminal prompt which includes the Git branch you are currently using.
 
-> Note that if you escalate your privileges to `root` using `sudo su` or similar then the new root shell will not have Zsh set up, so you may need to install Zsh into both your userspace and the root userspace.
+    > Note that if you escalate your privileges to `root` using `sudo su` or similar then the new root shell will not have Zsh set up, so you may need to install Zsh/Oh-my-zsh for both your user ***and*** the root user.
 
-Install Zsh
+    Install Zsh
 
-```console
-sudo apt install zsh
+    ```console
+    sudo apt install zsh
+    ```
+
+    Install oh-my-zsh
+
+    ```console
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    ```
+
+    **Optional**: Change the ZSH_THEME from the default to my preferred "bira"
+
+    ```console
+    sed -i '/ZSH_THEME="robbyrussell"/c\ZSH_THEME="bira"' ~/.zshrc
+    ```
+
+    **Optional**: Add some useful plugins for Git, Docker etc
+
+    ```console
+    sed -i '/plugins=(git)/c\plugins=(git git-extras wd docker docker-compose)' ~/.zshrc
+    ```
+
+    You can also edit `~/.zshrc` to customise
+
+    ```console
+    nano ~/.zshrc
+    ```
+
+### Clone the Epilepsy12 repository
+
+This command clones the repo into the `/var/epilepsy12` folder, which we have chosen as the standard location for the E12 application.
+
+```bash
+git clone https://github.com/rcpch/rcpch-audit-engine.git /var/epilepsy12
 ```
 
-Install oh-my-zsh
+`cd` into the new folder
 
-```console
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```bash
+cd epilepsy12/
 ```
 
-**Optional**: Change the ZSH_THEME from the default to my preferred "bira"
+`git checkout` the branch you want to deploy
 
-```console
-sed -i '/ZSH_THEME="robbyrussell"/c\ZSH_THEME="bira"' ~/.zshrc
-```
+=== "development"
+    ```bash
+    git checkout development
+    ```
+=== "staging"
+    ```
+    git checkout staging
+    ```
+=== "live"
+    ```
+    git checkout live
+    ```
 
-**Optional**: Add some useful plugins for Git, Docker etc
-
-```console
-sed -i '/plugins=(git)/c\plugins=(git git-extras wd docker docker-compose)' ~/.zshrc
-```
-
-You can also edit `~/.zshrc` to customise
-
-```console
-nano ~/.zshrc
-```
 
 ### Useful commands
 
