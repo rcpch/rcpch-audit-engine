@@ -7,9 +7,9 @@ reviewers: Dr Marcus Baw
 
 Copyright is asserted over all RCPCH intellectual property outputs by the Royal College of Paediatrics and Child Health. We will defend this copyright in all territories.
 
-## Open Source license
+## Open Source Licenses
 
-The RCPCH Audit Engine is licensed under the GNU Affero General Public License v3.0
+The RCPCH Audit Engine software is licensed under the GNU Affero General Public License v3.0
 
 All documentation and textual work (such as this documentation site) is licensed under a Creative Commons Attribution-ShareAlike 4.0 International license. See the [license](license.md) page for more detail.
 
@@ -21,6 +21,12 @@ _see_ [Privacy Notice](../privacy-notice)
 
 ## Information Governance
 
+A Privacy Impact Assessment has been conducted and is available on request.
+
 ## Clinical Safety
 
+The Epilepsy12 audit engine does not have any role in the clinical management of patients, it is solely for recording the milestones in childrens' care for the purposes of national audit. It does not require a clinical safety case.
+
 ## Medical Device Registration
+
+The Epilepsy12 audit engine does not have any role in the clinical management of patients, it is solely for recording the milestones in childrens' care for the purposes of national audit. It is not a medical device.
