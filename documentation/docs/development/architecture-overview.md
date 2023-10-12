@@ -45,7 +45,7 @@ Passwords must be 10 characters long for regular users, 16 characters for superu
 
 ### Authorisation
 
-User accounts are limited to a single role, which determines what they can do within the application. The exact roles and capabilities are detailed in the [admin user guide](/admin-users/admin-user-guide.md).
+User accounts are limited to a single role, which determines what they can do within the application. The exact roles and capabilities are detailed in the [admin user guide](../admin-users/admin-user-guide.md).
 
 ### Access constraints
 
