@@ -76,7 +76,7 @@ When a push is made to either the `prerelease` or `live` branches, or a pull req
 
 Create a virtualenv for the Python modules:
 
-* For info on setting up Pyenv see [Python setup](../developer/api-python.md)
+* For info on setting up Pyenv see [Python setup](../api-python.md)
 * Any recent Python version works, we tend to use 3.11
 * Calling it `mkdocs` will enable Pyenv to automatically select it when you navigate to the directory, because this will match the contents of the `.python-version` file in the root of the project.
 
