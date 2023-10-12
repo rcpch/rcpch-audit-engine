@@ -46,9 +46,9 @@ Both functions accept a registration instance, from which all models can be acce
 
 This function loops through all fields in a given model instance counting up all the fields that are not None (since all fields are None until scored). Several fields in each model have to be excluded, since they are not storing information about the audit. These include fields such as the primary key. This stripping of fields occurs in ```fields_to_avoid()```.
 
-Some other fields are not included - ```epilepsy_cause_categories``` and ```description``` in multiaxial diagnosis are not included. The boolean fields describing features present or absent in a focal epilepsy are exlcuded - only focality (left or right) count to the total.
+Some other fields are not included - ```epilepsy_cause_categories``` and ```description``` in multiaxial diagnosis are not included. The boolean fields describing features present or absent in a focal epilepsy are excluded - only focality (left or right) count to the total.
 
-```number_of_completed_fields_in_related_models``` performs this same process for all fields in related models. For example, a single multiaxial description of a child's epilepsy comprises multiple episodes, all of which are different. 
+```number_of_completed_fields_in_related_models``` performs this same process for all fields in related models. For example, a single multiaxial description of a child's epilepsy comprises multiple episodes, all of which are different.
 
 This function steps through the audit questions one by one, calculating the minimum number of fields that can be expected to be completed, based on the selections the user has already made. As with the other functions it accepts an instance of the ```Registration``` model that relates to the child in question. It draws on two other helper functions:
 

@@ -15,7 +15,7 @@ On a monthly basis the NHS ODS API is polled with any changes to organisational 
 
 ### Integrated Care Boards
 
-These were introduced in 2022 and superceded Clinical Commissioning Groups (CCGs) as the geographical commissioning areas within the NHS. The are 42 ICBs, and trust and their organisations fit neatly inside them like Russian dolls. Each ICB has its own ODS code and The ICB model is taken directly from NHS Digital with the its boundary shapes for mapping, and is versioned. Currently there is no automated process to check for changes to boundaries or ICB membership and update the records. Note there are no ICBs in Wales.
+These were introduced in 2022 and superceded Clinical Commissioning Groups (CCGs) as the geographical commissioning areas within the NHS. The are 42 ICBs and trusts and their organisations fit neatly inside them like Russian dolls. Each ICB has its own ODS code and the ICB model is taken directly from NHS Digital with its boundary shapes for mapping, and is versioned. Currently there is no automated process to check for changes to boundaries or ICB membership and update the records. Note there are no ICBs in Wales.
 
 ### Local Health Boards
 

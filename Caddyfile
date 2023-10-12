@@ -1,11 +1,24 @@
 {
-    email incubator@rcpch.ac.uk
+    email {$LETSENCRYPT_EMAIL_ADDRESS}
+    acme_ca {$LETSENCRYPT_ENDPOINT}
 }
 
-e12-dev.uksouth.cloudapp.azure.com {
+{$SITE_DOMAIN} {
     reverse_proxy http://django:8000
 }
 
-e12-dev.uksouth.cloudapp.azure.com/flower {
+{$SITE_DOMAIN}/flower {
+    reverse_proxy http://flower:8888
+}
+
+{$SITE_DOMAIN}/tasks {
+    reverse_proxy http://flower:8888
+}
+
+{$SITE_DOMAIN}/broker {
+    reverse_proxy http://flower:8888
+}
+
+{$SITE_DOMAIN}/workers {
     reverse_proxy http://flower:8888
 }

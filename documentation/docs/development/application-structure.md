@@ -17,7 +17,7 @@ Within the rcpch-audit-engine platform, currently epilepsy12 is the only applica
 
 ## Application Structure
 
-An application folder sits within the ```rcpch-audit-engine``` folder and is named after the application name (```AppName```).
+An application folder sits within the ```rcpch-audit-engine``` folder and is named after the application name (```epilepsy12```).
 
 ### The key files are
 
@@ -33,7 +33,7 @@ An application folder sits within the ```rcpch-audit-engine``` folder and is nam
 
 ### The folders are:
 
-- ```constants```: This contants multiple files each containing constant values used in the models and elsewhere. The follow the standard that uppercase is used to denote its immutable nature.
+- ```constants```: This contains multiple files each containing constant values used in the models and elsewhere. The follow the standard that uppercase is used to denote its immutable nature.
 - ```coverage_tests```: Tests are found here and collected automatically by the Coverage package and executed on the command line with the command: ```coverage run```.
 - ```forms_folder```: see ```forms.py``` above.
 - ```general_functions```: this folder contains files for functions that can be called across the application. It contains functions particularly for external API calls (for example to the SNOMED server), but also houses the logic behind fuzzy matching for the description words in the DESSCRIBE tool.

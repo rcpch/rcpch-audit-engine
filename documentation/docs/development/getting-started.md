@@ -39,4 +39,4 @@ Security is a very important aspect of managing projects such as these, and we u
 
 ## Legal
 
-Details of Information Governance, Clinical Safety and Medical Device registration can be viewed in the [Legal](../../legal/legal/) section.
+Details of Information Governance, Clinical Safety and Medical Device registration can be viewed in the [Legal](../legal/legal.md) section.

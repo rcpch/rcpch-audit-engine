@@ -3,7 +3,7 @@ title: Docker development
 reviewers: Dr Marcus Baw, Dr Simon Chapman, Dr Anchit Chandran
 ---
 
-To simplify the development environment setup and provide greater consistency between development and production environments, the application is built as a Docker image and `docker compose` sets up the other necessary containers in development.
+To simplify the development environment setup and provide greater consistency between development and production environments, the application is built as a Docker image and Docker Compose sets up the other necessary containers in development.
 
 This means you don't need to worry about conflicts of Python versions, Python library versions, or Python virtual environments. Everything is specified and isolated inside the Docker containers.
 
@@ -29,19 +29,19 @@ This means you don't need to worry about conflicts of Python versions, Python li
 1. Ensure you are on the default `development` branch
 
     ```console
-    git checkout development
+    git checkout post-documentation-combine-tidying
     ```
 
 1. Obtain a `.env` file containing the required environment files.
 
     These files contain credentials and secrets and therefore the `.env` files themselves are **never** committed to version control. All `*.env` files are `.gitignore`'d.
 
-    If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed `local-dev.env` file.
+    If you work with the RCPCH Incubator team, another member of the team may be able to supply you with a completed `.env` file.
 
-    For anyone else, there is a template environment file in the repository root which you can rename to `local-dev.env` and use as a starting point.
+    For anyone else, there is a template environment file in the repository root which you can rename to `.env` and use as a starting point. **Be extremely careful to make sure it is named `.env` so that it is ignored by Git. Do not ever commit `.env` files to version control!**
 
     ```console
-    mv envs/env-template envs/local-dev.env
+    cp envs/env-template envs/.env
     ```
 
 1. Start the development environment for the first time using our startup script
@@ -101,7 +101,7 @@ sh s/docker-up
 !!! info "Setup errors"
     Sometimes, the easiest fix for many headaches, relating to installation and setup, is to simply restart your computer and try again!
 
-### What does `s/docker-init` do?
+### What does `s/docker-up` do?
 
 This script automates all the setup steps including:
 
@@ -115,7 +115,7 @@ This script automates all the setup steps including:
 > <br> **Note these insecure default credentials are ONLY ever used in development for simplicity and ease of use and NEVER used in testing/staging or live.**
 
 
-The web container is built with the correct Python version, all development dependencies are automatically installed, the database connection is created, migrations applied and seed data added to the database. The entire process takes less than 30 seconds.
+The django container is built with the correct Python version, all development dependencies are automatically installed, the database connection is created, migrations applied and seed data added to the database. The entire process takes less than 30 seconds.
 
 View the application in a browser at <http://localhost:8000/> and login using the credentials above.
 
@@ -123,21 +123,25 @@ Changes you make in your development folder are automatically synced to inside t
 
 This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
 
-## Executing commands in the context of the `web` container
+## Executing commands in the context of the `django` container
 
-You can run commands in the context of any of the containers using `docker compose`.
+You can run commands in the context of any of the containers using Docker Compose.
 
-The below command will execute `<command>` inside the `web` container.
+The below command will execute `<command>` inside the `django` container.
 
 ```console
-docker compose exec django <command>
+docker compose -f docker-compose.yml exec django <command>
 ```
 
 For example, to create a superuser
 
 ```console
-sudo docker compose exec django python manage.py createsuperuser
+sudo docker compose -f docker-compose.yml exec django python manage.py createsuperuser
 ```
+
+!!! warning "Inactive Terminal"
+    If you have successfully run the Docker Compose deployment, your terminal will be showing the logging output for all the containers and will no longer show an interactive prompt, which is means you can not run commands in that terminal. To resolve this, simply **open another Terminal window** in the same working directory.
+
 
 ## Running the test suite
 
@@ -147,7 +151,7 @@ s/docker-test
 
 ## Shutting down the Docker Compose environment
 
-++ctrl+c++ will shut down the containers but will leave them built. You can restart them rapidly with `docker compose up`.
+++ctrl+c++ will shut down the containers but will leave them built. You can restart them rapidly with `s/docker-up`.
 
 To shut down and destroy the containers so that you can start again from scratch (for example if you want to rebuild and re-seed the database) then use
 
@@ -157,4 +161,4 @@ s/docker-down
 
 ## Tips and Tricks
 
-* Although the `docker compose` setup is very convenient, and it installs all the runtime development dependencies _inside_ the `web` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment.
+* Although the Docker Compose setup is very convenient, and it installs all the runtime development dependencies _inside_ the `django` container, one thing it can't do is install any _local_ Python packages which are required for text editing, linting, and similar utilities _outside_ the container. Examples are `pylint`, `pylint_django`, etc. You will still need to install these locally, ideally in a virtual environment using `pyenv`.

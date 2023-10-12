@@ -15,16 +15,23 @@
 
 version: "3.10"
 
+x-global-environment: &global
+    env_file:
+      - envs/.env # env file - NOT committed to Git
+
+
 services:
 
   # Caddy reverse proxy - web-facing SSL server
   caddy:
-    image: caddy
+    <<: *global # this will inherit all the envs from x-global-environment
     depends_on:
       - django
+    image: caddy
     ports:
       - "80:80"
       - "443:443"
+    restart: always
     volumes:
       - caddy_data:/data/
       - caddy_data:/config/
@@ -32,14 +39,13 @@ services:
 
   # Django web application
   django: &django
+    <<: *global # this will inherit all the envs from x-global-environment
     build: .
     depends_on:
       - postgis
       - redis
     volumes:
       - .:/app/
-    env_file:
-      - envs/dev-vps.env # env file - NOT committed to Git
     command: >
       sh -c "python manage.py collectstatic --noinput &&
             python manage.py migrate &&
@@ -52,11 +58,10 @@ services:
 
   # PostgreSQL with PostGIS extension
   postgis:
+    <<: *global # this will inherit all the envs from x-global-environment
     image: postgis/postgis:15-3.3
     volumes:
       - auditenginedb:/var/lib/postgresql/data
-    env_file:
-      - envs/dev-vps.env # env file - NOT committed to Git
     restart: always
 
   # Redis backend for Celery task scheduler
@@ -86,6 +91,13 @@ services:
   celerybeat:
     <<: *django # this will inherit all the settings from the django service
     command: celery -A rcpch-audit-engine beat -l info
+    restart: always
+
+  mkdocs:
+    <<: *django # this will inherit all the settings from the django service
+    ports:
+      - 8001:8001
+    command: mkdocs serve --config-file documentation/mkdocs.yml
     restart: always
 
 # Data volumes
