@@ -17,7 +17,7 @@ dev_addr: "0.0.0.0:8001"
 
 # theme settings, fonts, colours
 theme:
-  favicon: _assets/_images/epilepsy12-logo-1.png
+  favicon: ../_assets/_images/epilepsy12-logo-1.png
   name: material
   #custom_dir: rcpch-theme
   features:
@@ -129,6 +129,14 @@ nav:
     - 'parents/introduction.md'
   - Clinician Guide:
     - 'clinician-users/clinician-user-guide.md'
+    - 'clinician-users/user-group-permissions.md'
+    - 'clinician-users/getting-started.md'
+    - 'clinician-users/views.md'
+    - 'clinician-users/creating-editing-and-deleting-users.md'
+    - 'clinician-users/entering-patient-data.md'
+    - 'clinician-users/audit-dataset.md'
+    - 'clinician-users/organisational-audit.md'
+    - 'clinician-users/contact-us.md'
   - Administrator Guide:
     - 'admin-users/admin-user-guide.md'
     - 'admin-users/download.md'
