@@ -30,11 +30,12 @@ E12_POSTGRES_DB_PORT="5432"
 E12_POSTGRES_DB_USER="epilepsy12user"
 
 # EMAIL
-# To output emails to console, set SMTP_EMAIL_ENABLED=False
+EMAIL_DEFAULT_FROM_EMAIL="admin-email@example.com"
 EMAIL_HOST_PASSWORD= # password for SMTP service
 EMAIL_HOST_PORT= # port of SMTP service
 EMAIL_HOST_SERVER= # hostname of SMTP service
 EMAIL_HOST_USER= # username for SMTP service
+# To output emails to console, set SMTP_EMAIL_ENABLED=False
 SMTP_EMAIL_ENABLED=True # To output emails to console, set SMTP_EMAIL_ENABLED=False
 
 # FLOWER
