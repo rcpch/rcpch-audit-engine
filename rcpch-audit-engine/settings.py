@@ -226,7 +226,7 @@ OTP_EMAIL_BODY_HTML_TEMPLATE_PATH = "../templates/two_factor/email_token.html"
 OTP_EMAIL_TOKEN_VALIDITY = 60 * 5  # default N(seconds) email token valid for
 
 # EMAIL SETTINGS (SMTP)
-DEFAULT_FROM_EMAIL = "admin@epilepsy12.rcpch.tech"
+DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_DEFAULT_FROM_EMAIL")
 SMTP_EMAIL_ENABLED = os.getenv("SMTP_EMAIL_ENABLED", "False") == "True"
 logger.info("SMTP_EMAIL_ENABLED: ", SMTP_EMAIL_ENABLED)
 if SMTP_EMAIL_ENABLED is True:
@@ -236,6 +236,7 @@ if SMTP_EMAIL_ENABLED is True:
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = True
+    EMAIL_TIMEOUT = 10
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 logger.info("EMAIL_BACKEND: ", EMAIL_BACKEND)
