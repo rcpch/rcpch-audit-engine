@@ -87,7 +87,7 @@ git clone https://github.com/rcpch/rcpch-audit-engine.git /var/epilepsy12
 `cd` into the new folder
 
 ```bash
-cd epilepsy12/
+cd /var/epilepsy12/
 ```
 
 `git checkout` the branch you want to deploy
