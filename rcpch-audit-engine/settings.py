@@ -48,6 +48,9 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") + [
     "localhost",
     "0.0.0.0",
 ]
+# Enables Django to use the X-Forwarded-Host header in preference to the Host header.
+# Fixes CSRF errors when using Caddy to forward requests to Django.
+USE_X_FORWARDED_HOST = True
 
 # This is the token required for getting deprivation quintiles from the RCPCH Census Platform
 RCPCH_CENSUS_PLATFORM_URL = os.getenv("RCPCH_CENSUS_PLATFORM_URL")
@@ -112,7 +115,7 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
 ]
 
-# djanog security middleware settings for HSTS support
+# Django security middleware settings for HSTS support
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_PRELOAD = True
