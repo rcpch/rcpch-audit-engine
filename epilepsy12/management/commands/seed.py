@@ -193,6 +193,7 @@ def insert_old_pt_data():
         )
 
         try:
+            # only supplied parent Organisation, so find the first Organisation belonging to that Parent, and assign it as the default_organisation
             if record_ods_code in lhb_ods_codes:
                 record_parent_org = LocalHealthBoard.objects.get(
                     ods_code=record_ods_code
@@ -213,10 +214,41 @@ def insert_old_pt_data():
             )
 
         if not default_organisation:
-                    print(
-                        f"cant find any registered Organisations inside Parent Organisation {record_parent_org} ({record_ods_code=}) for {record['nhs_number']=}. Skipping..."
-                    )
-        # print(default_organisation)
+            print(
+                f"cant find any registered Organisations inside Parent Organisation {record_parent_org} ({record_ods_code=}) for {record['nhs_number']=}. Skipping..."
+            )
+            continue
+        
+        # NOTE TODO: remove TEMP!!!
+        if Case.objects.filter(nhs_number=record['nhs_number']).exists():
+            print(f'{Case.objects.get(nhs_number=record["nhs_number"]).nhs_number} already exists. Deleting for debug...')
+            Case.objects.get(nhs_number=record['nhs_number']).delete()
+        
+        inserted_patient = Case.objects.create(
+            locked=False,
+            nhs_number=record['nhs_number'],
+            first_name=record['first_name'],
+            surname=record['surname'],
+            sex=record["sex"],
+            date_of_birth=record["date_of_birth"],
+            postcode=record["postcode"],
+            ethnicity=record["ethnicity"],
+        )
+        
+        # NOTE TODO: remove TEMP!!!
+        if Site.objects.filter(case=inserted_patient).exists():
+            print(f'{Site.objects.get(case=inserted_patient)} already exists. Deleting for debug...')
+            Site.objects.get(case=inserted_patient).delete()
+        
+        # allocate the child to the organisation supplied as primary E12 centre
+        Site.objects.create(
+            site_is_actively_involved_in_epilepsy_care=True,
+            site_is_primary_centre_of_epilepsy_care=True,
+            organisation=default_organisation,
+            case=inserted_patient,
+        )
+
+        print(f'Successfully inserted {inserted_patient.first_name} {inserted_patient.surname}')
 
 
 def image():
