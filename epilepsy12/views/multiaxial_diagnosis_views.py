@@ -1536,14 +1536,6 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
     # get a list of comorbidityentities for select, excluding that already chosen
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    # all_selected_comorbidityentities = Comorbidity.objects.filter(
-    #     multiaxial_diagnosis=multiaxial_diagnosis
-    # ).values_list("comorbidityentity", flat=True)
-
-    # comorbidity_choices = (
-    #     ComorbidityList.objects.all().exclude(pk__in=all_selected_comorbidityentities)
-    #     .order_by("preferredTerm")
-    # )
     comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis)
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
@@ -1568,15 +1560,6 @@ def edit_comorbidity(request, comorbidity_id):
     # get a list of comorbidityentities for select, excluding those already chosen
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    # all_selected_comorbidityentities = (
-    #     Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-    #     .exclude(pk=comorbidity_id)
-    #     .values_list("comorbidityentity", flat=True)
-    # )
-    # comorbidity_choices = (
-    #     ComorbidityList.objects.all().exclude(pk__in=all_selected_comorbidityentities)
-    #     .order_by("preferredTerm")
-    # )
     comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
@@ -1682,16 +1665,6 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     # except current comorbidity selection
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    # all_selected_comorbidityentities = (
-    #     Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-    #     .exclude(pk=comorbidity_id)
-    #     .values_list("comorbidityentity", flat=True)
-    # )
-    
-    # comorbidity_choices = (
-    #     ComorbidityList.objects.all().exclude(pk__in=all_selected_comorbidityentities)
-    #     .order_by("preferredTerm")
-    # )
     comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
@@ -1734,15 +1707,7 @@ def comorbidity_diagnosis(request, comorbidity_id):
     # except current comorbidity selection
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    # all_selected_comorbidityentities = (
-    #     Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-    #     .exclude(pk=comorbidity_id)
-    #     .values_list("comorbidityentity", flat=True)
-    # )
-    # comorbidity_choices = (
-    #     ComorbidityList.objects.all().exclude(pk__in=all_selected_comorbidityentities)
-    #     .order_by("preferredTerm")
-    # )
+    
     comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
 
     context = {
