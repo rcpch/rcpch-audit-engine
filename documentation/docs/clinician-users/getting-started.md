@@ -25,4 +25,4 @@ Click the ‘Sign in’ button on the home page to log in.
 
 If you have forgotten your password, click ‘Reset Password’ and a link to create a new password will be sent to your email address, and this will remain active for 72 hours.
 
-![Sign in page](../_assets/_images/Sign in page.png)
+![Sign in page](../_assets/_images/sign-in-page.png)
