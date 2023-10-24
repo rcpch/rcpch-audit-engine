@@ -6,4 +6,4 @@
 # starts the postgres and application containers (does not do any setup)
 # runs the django development server
 
-docker compose down -v --rmi local # removes the container and the volume and local images
+docker compose down --rmi local # removes the container and local images
