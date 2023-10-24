@@ -142,3 +142,4 @@ root.crt
 # exclude site/ and .cache/ folders anywhere (MkDocs)
 */site/
 */.cache/
+staticdocs
