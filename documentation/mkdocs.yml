@@ -2,7 +2,7 @@
 site_name: RCPCH Epilepsy12 - Documentation
 site_description: RCPCH Epilepsy12 - Documentation Site
 site_author: The Royal College of Paediatrics and Child Health
-site_url: https://docs.epilepsy12.rcpch.ac.uk
+site_url: !ENV DOCS_URL
 
 # copyright information which is shown in the footer
 copyright: Copyright &copy; 2022-23 Royal College of Paediatrics and Child Health (RCPCH)

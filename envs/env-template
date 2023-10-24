@@ -7,6 +7,7 @@
 SITE_DOMAIN="example.com" # the domain the site is being served from - this configures Caddy. This should also be in DJANGO_ALLOWED_HOSTS and DJANGO_CSRF_TRUSTED_ORIGINS
 LETSENCRYPT_EMAIL_ADDRESS="letsencrypt@example.com" # the email address to send LetsEncrypt notifications to
 LETSENCRYPT_ENDPOINT="https://acme-staging-v02.api.letsencrypt.org/directory" # Optionally set to Letsencrypt staging endpoint for testing (https://acme-staging-v02.api.letsencrypt.org/directory)
+TLS_SOURCE="internal" # for localhost with SSL, or use "acme" for LetsEncrypt in production
 
 # CELERY
 CELERY_BROKER_URL="redis://redis:6379/0"
@@ -50,6 +51,7 @@ NHS_ODS_API_URL="https://directory.spineservices.nhs.uk/ORD/2-0-0"
 # MATERIAL FOR MKDOCS INSIDERS
 ENABLE_GIT_COMMITTERS="True" # Disables git committer extension
 ENABLE_PDF_EXPORT=1 # Disables automatic PDF generation
+DOCS_URL="https://${SITE_DOMAIN}/docs" # URL of the documentation site
 
 # POSTCODES API
 POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
@@ -58,15 +60,6 @@ POSTCODE_API_BASE_URL="https://findthatpostcode.uk"
 POSTGRES_DB=epilepsy12db
 POSTGRES_PASSWORD=password
 POSTGRES_USER=epilepsy12user
-
-# SUPERUSER (will be created on first run of docker-compose up)
-DJANGO_SUPERUSER_EMAIL= # superuser email
-DJANGO_SUPERUSER_FIRST_NAME= # superuser first name
-DJANGO_SUPERUSER_IS_RCPCH_AUDIT_TEAM_MEMBER= # superuser is RCPCH Audit Team member (True/False)
-DJANGO_SUPERUSER_PASSWORD= # superuser password
-DJANGO_SUPERUSER_ROLE=1 # Clinician role (see epilepsy12.constants.user_types.ROLES for details)
-DJANGO_SUPERUSER_SURNAME= # superuser surname
-DJANGO_SUPERUSER_USERNAME= # superuser username
 
 # TIMEZONE
 TZ="Europe/London"

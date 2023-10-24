@@ -17,7 +17,7 @@ Our licensing arrangements do not affect the licenses of any underlying technolo
 
 ## Privacy Notice
 
-_see_ [Privacy Notice](../privacy-notice)
+[Privacy Notice](privacy.md)
 
 ## Information Governance
 

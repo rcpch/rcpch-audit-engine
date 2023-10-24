@@ -1,18 +1,3 @@
-##########################
-########  README  ########
-##########################
-
-
-# DOCKER COMPOSE FILE FOR DEV VPS DEPLOYMENT
-
-# Runs Epilepsy12 for development on port 8000
-# Syncs changes in local code folder to the E12 container
-# Starts from empty DB, creates and migrates the database
-# Seeds the database with cases, and the RCPCH audit team user
-
-# TODO: remove Volume
-
-
 version: "3.10"
 
 x-global-environment: &global
