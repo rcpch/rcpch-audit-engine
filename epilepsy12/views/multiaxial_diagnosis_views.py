@@ -2,7 +2,6 @@ from django.utils import timezone
 from operator import itemgetter
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required
-from django.contrib.gis.db.models import Subquery
 
 from epilepsy12.constants.comorbidities import NEUROPSYCHIATRIC
 
@@ -24,7 +23,8 @@ from epilepsy12.constants import (
 # from epilepsy12.constants.syndromes import SYNDROMES
 from epilepsy12.constants.epilepsy_types import EPILEPSY_DIAGNOSIS_STATUS
 from ..constants import DATE_ACCURACY, EPISODE_DEFINITION
-from ..general_functions import fuzzy_scan_for_keywords, fetch_ecl
+from ..general_functions import fuzzy_scan_for_keywords
+from ..common_view_functions import get_comorbidity_choices
 
 from ..models import (
     Registration,
@@ -114,9 +114,7 @@ def multiaxial_diagnosis(request, case_id):
 
     keyword_choices = Keyword.objects.all()
 
-    # ecl = '<< 363235000'
-    # epilepsy_causes = fetch_ecl(ecl)
-    epilepsy_causes = ComorbidityList.objects.all().order_by("preferredTerm")
+    epilepsy_causes = EpilepsyCause.objects.all().order_by("preferredTerm")
 
     site = Site.objects.filter(
         site_is_actively_involved_in_epilepsy_care=True,
@@ -1385,7 +1383,7 @@ def epilepsy_cause_known(request, multiaxial_diagnosis_id):
 def epilepsy_cause(request, multiaxial_diagnosis_id):
     """
     POST request on change select from epilepsy_causes partial
-    Choices for causes come from Comorbidity table
+    Choices for causes come from EpilepsyCause table
     """
 
     try:
@@ -1538,19 +1536,7 @@ def add_comorbidity(request, multiaxial_diagnosis_id):
 
     # get a list of comorbidityentities for select, excluding that already chosen
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    all_selected_comorbidityentities = Comorbidity.objects.filter(
-        multiaxial_diagnosis=multiaxial_diagnosis
-    ).values_list("comorbidityentity", flat=True)
-
-    comorbidity_choices = (
-        Comorbidity.objects.filter(
-            pk__in=Subquery(
-                ComorbidityList.objects.all().distinct("conceptId").values("pk")
-            )
-        )
-        .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("comorbidityentity__preferredTerm")
-    )
+    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis)
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
@@ -1574,22 +1560,7 @@ def edit_comorbidity(request, comorbidity_id):
     # get a list of comorbidityentities for select, excluding those already chosen
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    all_selected_comorbidityentities = (
-        Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-        .exclude(pk=comorbidity_id)
-        .values_list("comorbidityentity", flat=True)
-    )
-
-    comorbidity_choices = (
-        Comorbidity.objects.filter(
-            pk__in=Subquery(
-                ComorbidityList.objects.all().distinct("conceptId").values("pk")
-            )
-        )
-        .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("comorbidityentity__preferredTerm")
-    )
-
+    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
     response = recalculate_form_generate_response(
@@ -1694,23 +1665,7 @@ def comorbidity_diagnosis_date(request, comorbidity_id):
     # except current comorbidity selection
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    all_selected_comorbidityentities = (
-        Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-        .exclude(pk=comorbidity_id)
-        .values_list("comorbidityentity", flat=True)
-    )
-
-    comorbidity_choices = (
-        Comorbidity.objects.filter(
-            pk__in=Subquery(
-                Comorbidity.objects.all()
-                .distinct("comorbidityentity__conceptId")
-                .values("pk")
-            )
-        )
-        .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("comorbidityentity__preferredTerm")
-    )
+    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
 
     context = {"comorbidity": comorbidity, "comorbidity_choices": comorbidity_choices}
 
@@ -1752,21 +1707,8 @@ def comorbidity_diagnosis(request, comorbidity_id):
     # except current comorbidity selection
     comorbidity = Comorbidity.objects.get(pk=comorbidity_id)
     multiaxial_diagnosis = comorbidity.multiaxial_diagnosis
-    all_selected_comorbidityentities = (
-        Comorbidity.objects.filter(multiaxial_diagnosis=multiaxial_diagnosis)
-        .exclude(pk=comorbidity_id)
-        .values_list("comorbidityentity", flat=True)
-    )
-
-    comorbidity_choices = (
-        Comorbidity.objects.filter(
-            pk__in=Subquery(
-                ComorbidityList.objects.all().distinct("conceptId").values("pk")
-            )
-        )
-        .exclude(pk__in=all_selected_comorbidityentities)
-        .order_by("comorbidityentity__preferredTerm")
-    )
+    
+    comorbidity_choices = get_comorbidity_choices(multiaxial_diagnosis=multiaxial_diagnosis, comorbidity_id=comorbidity_id)
 
     context = {
         "comorbidity_choices": comorbidity_choices,

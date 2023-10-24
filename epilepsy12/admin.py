@@ -142,6 +142,7 @@ admin.site.register(Keyword, SimpleHistoryAdmin)
 admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
 admin.site.register(SyndromeList, SimpleHistoryAdmin)
 admin.site.register(Syndrome, SimpleHistoryAdmin)
+admin.site.register(EpilepsyCause, SimpleHistoryAdmin)
 admin.site.register(KPI)
 
 admin.site.register(OrganisationKPIAggregation)

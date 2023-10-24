@@ -15,7 +15,7 @@ class EpilepsyCause(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     Date of update is stored by the mixin in updated_at
     """
 
-    conceptId = models.CharField(default=None, null=True, blank=True)
+    conceptId = models.CharField(default=None, null=True, blank=True, unique=True)
     term = models.CharField(default=None, null=True, blank=True)
     preferredTerm = models.CharField(default=None, null=True, blank=True)
 

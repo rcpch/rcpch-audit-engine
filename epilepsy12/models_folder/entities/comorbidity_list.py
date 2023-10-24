@@ -14,7 +14,7 @@ class ComorbidityList(TimeStampAbstractBaseClass, UserStampAbstractBaseClass):
     It is a lookup table for the Comorbidity table
     """
 
-    conceptId = models.CharField(default=None, null=True, blank=True)
+    conceptId = models.CharField(default=None, null=True, blank=True, unique=True)
     term = models.CharField(default=None, null=True, blank=True)
     preferredTerm = models.CharField(default=None, null=True, blank=True)
 

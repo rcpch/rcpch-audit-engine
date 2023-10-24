@@ -1200,7 +1200,7 @@ def test_users_update_multiaxial_diagnosis_success(client):
                         },
                     ),
                     headers={"Hx-Trigger-Name": "epilepsy_cause", "Hx-Request": "true"},
-                    data={"epilepsy_cause": "179"},
+                    data={"epilepsy_cause": "142"}, # Saldino-Mainzer dysplasia
                 )
 
             assert (

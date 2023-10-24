@@ -29,8 +29,8 @@ def seed_comorbidities(apps, schema_editor):
         "Seeding comorbidities from paediatric neurodisability reference set...",
         "\033[33m",
     )
-    if ComorbidityList.objects.count() == 1207:
-        print("1207 Comorbidities already exist. Skipping...")
+    if ComorbidityList.objects.count() > 312:
+        print(f"{ComorbidityList.objects.count()} Comorbidities already exist. Skipping...")
         return
     # ecl = '<< 35919005'
     # comorbidity_choices = fetch_ecl(ecl)
@@ -39,16 +39,20 @@ def seed_comorbidities(apps, schema_editor):
     )
 
     for index, comorbidity_choice in enumerate(comorbidity_choices):
-        new_comorbidity = ComorbidityList(
-            conceptId=comorbidity_choice["conceptId"],
-            term=comorbidity_choice["term"],
-            preferredTerm=comorbidity_choice["preferredTerm"],
-        )
-        try:
-            new_comorbidity.save()
-            print(f"{new_comorbidity.preferredTerm} added.")
-        except Exception as e:
-            print(f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
+        if ComorbidityList.objects.filter(conceptId=comorbidity_choice["conceptId"]).exists():
+            # duplicate conceptId
+            pass
+        else:
+            new_comorbidity = ComorbidityList(
+                conceptId=comorbidity_choice["conceptId"],
+                term=comorbidity_choice["term"],
+                preferredTerm=comorbidity_choice["preferredTerm"],
+            )
+            try:
+                new_comorbidity.save()
+                print(f"{new_comorbidity.preferredTerm} added.")
+            except Exception as e:
+                print(f"Comorbidity {comorbidity_choice.preferredTerm} not added. {e}")
     
     # Add 'Other' into ComorbidityList
     ComorbidityList.objects.create(
