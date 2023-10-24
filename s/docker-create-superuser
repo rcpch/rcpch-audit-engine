@@ -4,5 +4,5 @@
 # chmod +x <filename> is the command to do this on unixy systems
 
 # creates a superuser interactively
-docker compose exec django python manage.py createsuperuser --username epilepsy12admin --email incubator@rcpch.ac.uk
+docker compose exec django python manage.py createsuperuser
 
