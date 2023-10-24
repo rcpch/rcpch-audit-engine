@@ -16,7 +16,7 @@ edit_uri: blob/live/docs
 dev_addr: "0.0.0.0:8001"
 
 # Specifies the destination directory in which to build the static site
-site_dir: static/site
+site_dir: ../staticdocs
 
 # theme settings, fonts, colours
 theme:
