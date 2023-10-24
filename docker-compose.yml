@@ -37,6 +37,7 @@ services:
       - ./data/caddy:/config/
       - ./root.crt:/data/caddy/pki/authorities/local/root.crt # copies the SSL root CA certificate for convenience
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./staticdocs:/srv/staticdocs
 
   # Django web application
   django: &django
@@ -49,9 +50,9 @@ services:
       - .:/app/
     command: >
       sh -c "python manage.py collectstatic --noinput &&
-            python manage.py migrate &&
-            python manage.py seed --mode=seed_groups_and_permissions &&
-            gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi"
+        python manage.py migrate &&
+        python manage.py seed --mode=seed_groups_and_permissions &&
+        gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi"
     restart: always
 
   # PostgreSQL with PostGIS extension
@@ -82,7 +83,7 @@ services:
       - 8888:8888
     volumes:
       - ./data/flower:/data
-    command: celery -A rcpch-audit-engine flower --persistent=True
+    command: celery -A rcpch-audit-engine flower --persistent=True -url_prefix=/flower
     restart: always
 
   # Celery scheduled tasks/cron
@@ -95,5 +96,7 @@ services:
     <<: *django # this will inherit all the settings from the django service
     ports:
       - 8001:8001
-    command: mkdocs serve --config-file documentation/mkdocs.yml
+    command: >
+      sh -c "mkdocs build --config-file documentation/mkdocs.yml &&
+        mkdocs serve --config-file documentation/mkdocs.yml"
     restart: always
