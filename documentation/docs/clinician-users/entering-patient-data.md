@@ -46,10 +46,10 @@ A blue dot next to a question indicates that it is incomplete. A pink tick will 
 
 This is the final tab of the audit form. Here you can see if the patient has successfully met each of the key performance indicator metrics. A pink tick signals they have met the indicator already and a blue triangle means that they have not yet met the indicator. A grey stop sign means that this performance indicator is not applicable for this patient, and this may appear if the patient does not meet the criteria for inclusion within the metric.
 
-![Performance summary](performance-summary.png)
+![Performance summary](../_assets/_images/performance-summary.png)
 
 ### Delete a patient
 
-Only lead clinician and clinician users can delete patient records.If a patient was erroneously added to the audit, or has opted-out, you can delete their record.
+Only lead clinician and clinician users can delete patient records. If a patient was erroneously added to the audit, or has opted-out, you can delete their record.
 
 Enter the cohort view and find the patient’s record. Click the **edit** button, which will take you to the patient details page. Scroll down and click the **Delete** button.

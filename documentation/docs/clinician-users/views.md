@@ -27,4 +27,4 @@ Here you will see a list of all the platform user accounts for your Trust/Health
 
 You can navigate between organisations in the same Trust/Health Board using the dropdown menu.
 
-![Organisation dropdown](organisation-dropdown.png)
+![Organisation dropdown](../_assets/_images/organisation-dropdown.png)
