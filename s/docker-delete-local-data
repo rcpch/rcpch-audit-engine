@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# scripts may need to be made executable on some platforms before they can be run
+# chmod +x <filename> is the command to do this on unixy systems
+
+#!/bin/bash
+
+echo "WARNING: This will delete all Epilepsy12 data in the ./data directory."
+echo "Are you sure you want to continue? (yes/no)"
+read -r response
+
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    if [[ -d "./data" ]]; then
+        echo "Deleting local data..."
+        sudo rm -rf "./data"
+        echo "Local data has been deleted."
+    else
+        echo "Error: The ./data directory does not exist."
+    fi
+else
+    echo "Aborting. No data has been deleted."
+fi
+
+
+
