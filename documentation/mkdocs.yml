@@ -15,6 +15,9 @@ edit_uri: blob/live/docs
 # `mkdocs serve` serves the documentation at custom port (to avoid clashing with other services we commonly run)
 dev_addr: "0.0.0.0:8001"
 
+# Specifies the destination directory in which to build the static site
+site_dir: static/site
+
 # theme settings, fonts, colours
 theme:
   favicon: ../_assets/_images/epilepsy12-logo-1.png
