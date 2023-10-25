@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# scripts may need to be made executable on some platforms before they can be run
+# chmod +x <filename> is the command to do this on unixy systems
+
+# copies the Caddy root CA file into a local trust store
+# See https://caddyserver.com/docs/running#local-https-with-docker
+
+# Select OS
+echo "Select your operating system:"
+echo "1. Windows"
+echo "2. Linux"
+echo "3. macOS"
+
+# Read user's choice
+read -p "Enter the number of your choice: " choice
+
+# Check the user's choice and execute code accordingly
+case $choice in
+1)
+  echo "You chose Windows."
+  docker compose cp \
+    caddy:/data/caddy/pki/authorities/local/root.crt \
+    %TEMP%/root.crt &&
+    certutil -addstore -f "ROOT" %TEMP%/root.crt
+  ;;
+2)
+  echo "You chose Linux."
+  sudo docker compose cp \
+    caddy:/data/caddy/pki/authorities/local/root.crt \
+    /usr/local/share/ca-certificates/root.crt &&
+    sudo update-ca-certificates
+  ;;
+3)
+  echo "You chose macOS."
+  docker compose cp \
+    caddy:/data/caddy/pki/authorities/local/root.crt \
+    /tmp/root.crt &&
+    sudo security add-trusted-cert -d -r trustRoot \
+      -k /Library/Keychains/System.keychain /tmp/root.crt
+  ;;
+*)
+  echo "Invalid choice. Please select a valid option (1, 2, or 3)."
+  ;;
+esac
