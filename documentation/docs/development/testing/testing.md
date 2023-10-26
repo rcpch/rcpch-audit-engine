@@ -1,6 +1,6 @@
 ---
 title: Testing
-reviewers: Dr Marcus Baw, Dr Anchit Chandran, Dr Baribefe Vite
+reviewers: Dr Marcus Baw, Dr Anchit Chandran, Dr Baribefe O Vite
 ---
 
 Tests for the Epilepsy12-specific parts of the platform are organised in an `epilepsy12/tests/` folder inside the epilepsy12 app. We have opted to use Pytest, which is well-regarded in the Django community.
