@@ -18,9 +18,8 @@ services:
       - "443:443"
     restart: always
     volumes:
-      - ./data/caddy:/data/
-      - ./data/caddy:/config/
-      - ./root.crt:/data/caddy/pki/authorities/local/root.crt # copies the SSL root CA certificate for convenience
+      - caddy-data:/data/
+      - caddy-data:/config/
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./staticdocs:/srv/staticdocs
 
@@ -45,7 +44,7 @@ services:
     <<: *global # this will inherit all the envs from x-global-environment
     image: postgis/postgis:15-3.3
     volumes:
-      - ./data/postgis:/var/lib/postgresql/data
+      - postgis-data:/var/lib/postgresql/data
     restart: always
 
   # Redis backend for Celery task scheduler
@@ -67,7 +66,7 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - ./data/flower:/data
+      - flower-data:/data
     command: celery -A rcpch-audit-engine flower --persistent=True -url_prefix=/flower
     restart: always
 
@@ -85,3 +84,8 @@ services:
       sh -c "mkdocs build --config-file documentation/mkdocs.yml &&
         mkdocs serve --config-file documentation/mkdocs.yml"
     restart: always
+
+volumes:
+  caddy-data:
+  flower-data:
+  postgis-data:

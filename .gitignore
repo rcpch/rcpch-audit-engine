@@ -134,11 +134,6 @@ git_hash.txt
 # exclude celerybeat-schedule
 celerybeat-schedule
 
-# exclude caddy files but include the Caddyfile
-caddy/config
-caddy/data
-root.crt
-
 # exclude site/ and .cache/ folders anywhere (MkDocs)
 */site/
 */.cache/
