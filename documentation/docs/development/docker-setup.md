@@ -79,39 +79,6 @@ Changes you make in your development folder are **automatically synced to inside
 
 This Docker setup is quite new so please do open an issue if there is anything that doesn't seem to work properly. Suggestions and feature requests welcome.
 
-## (Windows) Setup for development using Docker Compose
-
-You should have already [downloaded Docker](https://docs.docker.com/get-docker/) and cloned the repository.
-
-### Enabling the WSL Terminal within VS Code
-
-There are scripts in the `s/` which streamline the setup for the development process. Unfortunately, Windows does not natively support running these through the Command Prompt. Instead, we must first install the **Windows Subsystem for Linux (WSL)** to run the scripts.
-
-VS Code has a helpful extension to do just this!
-
-Follow this guide ([Windows Subsystem for Linux VSCode Extension](https://code.visualstudio.com/docs/remote/wsl-tutorial)) to enable usage of a *Ubuntu (WSL)* terminal within VS Code.
-
-### Running Scripts
-
-Open a new WSL terminal by selecting it:
-
-![Screenshot of WSL Terminal in VS Code](../_assets/_images/windev_wsl_terminal.png)
-
-If you haven't already, `cd` into the root folder
-
-```console
-cd rcpch-audit-engine/
-```
-
-Finally, you should be able to run the setup script by typing:
-
-```console
-sh s/docker-up
-```
-
-!!! info "Setup errors"
-    Sometimes, the easiest fix for many headaches, relating to installation and setup, is to simply restart your computer and try again!
-
 ### What does `s/docker-up` do?
 
 This script automates all the setup steps including:
