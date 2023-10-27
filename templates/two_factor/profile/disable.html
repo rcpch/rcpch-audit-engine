@@ -1,0 +1,21 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class='ui rcpch container'>
+  <div class="ui two column centered grid">
+    <div class="column">
+      <h1>{% block title %}{% trans "Reset Two-factor Authentication" %}{% endblock %}</h1>
+      <p>{% blocktrans trimmed %}You are about to disable Two-factor authentication. This will need to be reset to access the Epilepsy12 platform.{% endblocktrans %}</p>
+
+      <p>Are you sure?</p>
+      <form method="post" class="ui rcpch form">
+        {% csrf_token %}
+        <table>{{ form.as_table }}</table>
+        <button class="ui rcpch_primary button"
+                type="submit">{% trans "Disable" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

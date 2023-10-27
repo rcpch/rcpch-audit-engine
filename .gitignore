@@ -99,6 +99,7 @@ env.bak/
 venv.bak/
 *live.env
 *development.env
+envs/
 
 # mypy
 .mypy_cache/
@@ -127,3 +128,14 @@ start/hermes-v0.7.5.jar
 # exclude dev data files
 .data
 git_hash.txt
+root.crt
+
+.kube/
+
+# exclude celerybeat-schedule
+celerybeat-schedule
+
+# exclude site/ and .cache/ folders anywhere (MkDocs)
+*/site/
+*/.cache/
+staticdocs

@@ -1,13 +1,20 @@
 from datetime import date
-from dateutil.relativedelta import relativedelta
+from random import randint 
+
 from django import forms
+from django.conf import settings
 from django.forms import ValidationError
+import nhs_number
+
 from ..models import Case
 from ..constants import *
-from ..general_functions import is_valid_postcode, validate_nhs_number
+from ..general_functions import is_valid_postcode, return_random_postcode
 
 
 class CaseForm(forms.ModelForm):
+    
+    
+    
     unknown_postcode = forms.CharField(required=False)
 
     first_name = forms.CharField(
@@ -51,6 +58,7 @@ class CaseForm(forms.ModelForm):
         ),
         required=True,
     )
+
     postcode = forms.CharField(
         help_text="Enter the postcode.",
         widget=forms.TextInput(
@@ -71,10 +79,19 @@ class CaseForm(forms.ModelForm):
     locked_by = forms.CharField(help_text="User who locked the record", required=False)
 
     def __init__(self, *args, **kwargs) -> None:
+        
         super(CaseForm, self).__init__(*args, **kwargs)
         self.fields["ethnicity"].widget.attrs.update({"class": "ui rcpch dropdown"})
 
         self.existing_nhs_number = self.instance.nhs_number
+        
+        # Check if DEBUG is True and set the initial value conditionally
+        if settings.DEBUG:
+            self.fields['first_name'].initial  = 'Bob'
+            self.fields['surname'].initial = 'Dylan'
+            self.fields['date_of_birth'].initial = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
+            self.fields['postcode'].initial = return_random_postcode(country_boundary_identifier='E01000001')
+            self.fields['nhs_number'].initial = nhs_number.generate()[0]
 
     class Meta:
         model = Case
@@ -90,17 +107,12 @@ class CaseForm(forms.ModelForm):
         ]
 
     def clean_postcode(self):
-        # remove spaces
-        postcode = str(self.cleaned_data["postcode"]).replace(" ", "")
-        try:
-            validated_postcode = is_valid_postcode(postcode=postcode)
-        except ValueError as error:
-            raise ValidationError(f"Could not validate postcode: {error}")
+        postcode = self.cleaned_data["postcode"]
 
-        if validated_postcode:
+        if is_valid_postcode(postcode=postcode):
             return postcode
-        else:
-            raise ValidationError("Invalid postcode")
+
+        raise ValidationError("Invalid postcode")
 
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data["date_of_birth"]
@@ -112,24 +124,25 @@ class CaseForm(forms.ModelForm):
 
     def clean_nhs_number(self):
         # remove spaces
-        nhs_number = self.cleaned_data["nhs_number"]
-        formatted_number = int(str(nhs_number).replace(" ", ""))
+        formatted_nhs_number = (
+            str(self.cleaned_data["nhs_number"]).replace(" ", "").zfill(10)
+        )
 
         # ensure NHS number is unique in the database
         if self.existing_nhs_number is not None:
             # this form is updating an existing NHS number
-            if formatted_number != int(self.existing_nhs_number):
+            if formatted_nhs_number != str(self.existing_nhs_number):
                 # the new number does not match the one stored
-                if Case.objects.filter(nhs_number=formatted_number).exists():
+                if Case.objects.filter(nhs_number=formatted_nhs_number).exists():
                     raise ValidationError("NHS Number already taken!")
         else:
             # this is a new form - check this number is unique in the database
-            if Case.objects.filter(nhs_number=formatted_number).exists():
+            if Case.objects.filter(nhs_number=formatted_nhs_number).exists():
                 raise ValidationError("NHS Number already taken!")
 
         # check NHS number is valid
-        validity = validate_nhs_number(formatted_number)
-        if validity["valid"]:
-            return formatted_number
+        validity = nhs_number.is_valid(formatted_nhs_number)
+        if validity:
+            return formatted_nhs_number
         else:
-            raise ValidationError(validity["message"])
+            raise ValidationError(f"{formatted_nhs_number} is not a valid NHS number")

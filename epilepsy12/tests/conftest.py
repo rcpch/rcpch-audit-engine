@@ -55,27 +55,27 @@ register(E12UserFactory)  # => e12_user_factory
 @pytest.mark.django_db
 def GOSH():
     return Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def CASE_GOSH():
-    return Case.objects.get(first_name=f"child_{GOSH.OrganisationName}")
+    return Case.objects.get(first_name=f"child_{GOSH.name}")
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def ADDENBROOKES():
     Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def CASE_ADDENBROOKES():
-    Case.objects.get(first_name=f"child_{ADDENBROOKES.OrganisationName}")
+    Case.objects.get(first_name=f"child_{ADDENBROOKES.name}")

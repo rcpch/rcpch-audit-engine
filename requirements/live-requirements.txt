@@ -1,8 +1,0 @@
--r common-requirements.txt
-
-# standard imports
-
-# third party imports
-gunicorn
-
-# RCPCH imports

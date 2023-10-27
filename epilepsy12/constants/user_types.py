@@ -1,10 +1,3 @@
-# LEAD_CLINICIAN = 1
-# CENTRE_ADMINISTRATOR = 2
-# PAEDIATRIC_NEUROLOGIST = 3
-# GENERAL_PAEDIATRICIAN_WITH_EPILEPSY_INTEREST = 4
-# AUDIT_ANALYST = 5
-# AUDIT_ADMINISTRATOR = 6
-
 VIEW_PREFERENCES = (
     (0, "organisation"),
     (1, "trust"),
@@ -18,17 +11,17 @@ RCPCH_AUDIT_TEAM = 4
 RCPCH_AUDIT_PATIENT_FAMILY = 7
 
 ROLES = (
-    (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
-    (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
-    (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
+    (AUDIT_CENTRE_LEAD_CLINICIAN, "Lead Clinician"),
+    (AUDIT_CENTRE_CLINICIAN, "Clinician"),
+    (AUDIT_CENTRE_ADMINISTRATOR, "Administrator"),
     (RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),
     (RCPCH_AUDIT_PATIENT_FAMILY, "RCPCH Audit Children and Family"),
 )
 
 AUDIT_CENTRE_ROLES = (
-    (AUDIT_CENTRE_LEAD_CLINICIAN, "Audit Centre Lead Clinician"),
-    (AUDIT_CENTRE_CLINICIAN, "Audit Centre Clinician"),
-    (AUDIT_CENTRE_ADMINISTRATOR, "Audit Centre Administrator"),
+    (AUDIT_CENTRE_LEAD_CLINICIAN, "Lead Clinician"),
+    (AUDIT_CENTRE_CLINICIAN, "Clinician"),
+    (AUDIT_CENTRE_ADMINISTRATOR, "Administrator"),
 )
 
 RCPCH_AUDIT_TEAM_ROLES = ((RCPCH_AUDIT_TEAM, "RCPCH Audit Team"),)
@@ -45,9 +38,9 @@ TITLES = ((MR, "Mr"), (MRS, "Mrs"), (MS, "Ms"), (DR, "Dr"), (PROFESSOR, "Profess
 Groups
 These map to the roles
 Role                                Group
-Audit Centre Lead Clinician         trust_audit_team_view_only
+Audit Centre Lead Clinician         trust_audit_team_full_access
 Audit Centre Clinician              trust_audit_team_edit_access
-Audit Centre Administrator          trust_audit_team_full_access
+Audit Centre Administrator          trust_audit_team_view_only
 RCPCH Audit Team                    epilepsy12_audit_team_full_access
 RCPCH Audit Children and Family     patient_access
 """

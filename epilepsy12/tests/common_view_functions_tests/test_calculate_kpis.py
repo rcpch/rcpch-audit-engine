@@ -2,7 +2,7 @@
 Tests for the calculate_kpi function.
 
 Tests
-- [x] return None if child not registered in audit (registration.registration_date is None, or registration_eligibility_criteria_met is None or False, Site.site_is_primary_centre_of_epilepsy_care is None)
+- [x] return None if child not registered in audit (registration.first_paediatric_assessment_date is None, or registration_eligibility_criteria_met is None or False, Site.site_is_primary_centre_of_epilepsy_care is None)
 
 
 Measure 8
@@ -122,8 +122,8 @@ def test_child_not_registered_in_audit_returns_none(e12_case_factory):
     # creates an case with all audit values filled with default values
     case = e12_case_factory()
 
-    # overwrite registration_date and eligibility criteria
-    case.registration.registration_date = None
+    # overwrite first_paediatric_assessment_date and eligibility criteria
+    case.registration.first_paediatric_assessment_date = None
     case.registration.eligibility_criteria_met = None
     case.save()
 
@@ -132,7 +132,7 @@ def test_child_not_registered_in_audit_returns_none(e12_case_factory):
     assert calculate_kpis(registration) is None
 
     # repeat with eligibility_criteria_met = False
-    case.registration.registration_date = None
+    case.registration.first_paediatric_assessment_date = None
     case.registration.eligibility_criteria_met = False
     case.save()
 
@@ -140,8 +140,3 @@ def test_child_not_registered_in_audit_returns_none(e12_case_factory):
     registration = Registration.objects.get(case=case)
 
     assert calculate_kpis(registration) is None
-
-
-
-
-

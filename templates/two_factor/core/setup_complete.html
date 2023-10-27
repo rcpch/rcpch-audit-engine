@@ -1,0 +1,18 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class='ui rcpch container'>
+  <div class="ui two column centered grid">
+    <div class="column">
+      <h1>{% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}</h1>
+
+      <p>{% blocktrans trimmed %}Congratulations, you've successfully enabled two-factor
+        authentication.{% endblocktrans %}</p>
+
+      <p><a href="{% url 'two_factor:profile' %}" class="ui rcpch_primary button">{% trans "Back to Account Settings" %}</a></p>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

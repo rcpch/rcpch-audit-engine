@@ -9,7 +9,9 @@ from .help_text_mixin import HelpTextMixin
 from .time_and_user_abstract_base_classes import *
 
 
-class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin):
+class Comorbidity(
+    TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextMixin
+):
     """
     This class records information on all mental health, behavioural and developmental comorbidities
     [This class replaces the MentalHealth and Neurodevelopmental tables, conflating options into one list]
@@ -20,12 +22,12 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
 
     comorbidity_diagnosis_date = models.DateField(
         help_text={
-            'label': 'What is the date of diagnosis?',
-            'reference': 'What is the date of diagnosis?',
+            "label": "What is the date of diagnosis?",
+            "reference": "What is the date of diagnosis?",
         },
         max_length=50,
         default=None,
-        null=True
+        null=True,
     )
 
     history = HistoricalRecords()
@@ -40,21 +42,21 @@ class Comorbidity(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTe
 
     # relationships
     multiaxial_diagnosis = models.ForeignKey(
-        'epilepsy12.MultiaxialDiagnosis',
+        "epilepsy12.MultiaxialDiagnosis",
         on_delete=models.CASCADE,
         null=False,
         blank=False,
-        related_name='multiaxial_diagnosis'
+        related_name="comorbidities",
     )
 
     comorbidityentity = models.ForeignKey(
-        to='epilepsy12.ComorbidityEntity',
+        to="epilepsy12.ComorbidityList",
         on_delete=models.PROTECT,
         help_text={
-            'label': 'What is the comorbidity?',
-            'reference': 'Paediatric neurodisability outpatient diagnosis simple reference set (999001751000000105), SNOMED-CT',
+            "label": "What is the comorbidity?",
+            "reference": "Paediatric neurodisability outpatient diagnosis simple reference set (999001751000000105), SNOMED-CT",
         },
-        default=None
+        default=None,
     )
 
     class Meta:

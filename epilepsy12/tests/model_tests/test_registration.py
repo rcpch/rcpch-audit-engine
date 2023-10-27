@@ -37,7 +37,7 @@ def test_registration_custom_method_audit_submission_date_calculation(
     If registration date + 1 year IS the 2nd Tues of Jan, the submission date is the same as registration + 1 year.
     """
 
-    registration_dates = [
+    first_paediatric_assessment_dates = [
         # (registration date, expected audit submission date)
         (date(2022, 11, 1), date(2024, 1, 9)),
         (date(2022, 12, 31), date(2024, 1, 9)),
@@ -46,22 +46,22 @@ def test_registration_custom_method_audit_submission_date_calculation(
         (date(2022, 1, 11), date(2024, 1, 9)),
     ]
 
-    for expected_input_output in registration_dates:
+    for expected_input_output in first_paediatric_assessment_dates:
         registration = e12_case_factory(
-            registration__registration_date=expected_input_output[0]
+            registration__first_paediatric_assessment_date=expected_input_output[0]
         ).registration
 
         assert registration.audit_submission_date == expected_input_output[1]
 
 
 @pytest.mark.django_db
-def test_registration_custom_method_registration_date_one_year_on(
+def test_registration_custom_method_first_paediatric_assessment_date_one_year_on(
     e12_case_factory,
 ):
     """
-    Tests the `registration_date_one_year_on` accurately calculates one year on (registration close date).
+    Tests the `first_paediatric_assessment_date_one_year_on` accurately calculates one year on (registration close date).
 
-    This is always 1 year after `registration_date`.
+    This is always 1 year after `first_paediatric_assessment_date`.
     """
 
     expected_inputs_outputs = [
@@ -75,7 +75,7 @@ def test_registration_custom_method_registration_date_one_year_on(
 
     for expected_input_output in expected_inputs_outputs:
         registration = e12_case_factory(
-            registration__registration_date=expected_input_output[0]
+            registration__first_paediatric_assessment_date=expected_input_output[0]
         ).registration
 
         assert registration.registration_close_date == expected_input_output[1]
@@ -86,7 +86,7 @@ def test_registration_cohort(
     e12_case_factory,
 ):
     """
-    Tests cohort number is set accurately, dependent on registration_date.
+    Tests cohort number is set accurately, dependent on first_paediatric_assessment_date.
 
     Cohorts are defined between 1st December year and 30th November in the subsequent year.
 
@@ -110,7 +110,7 @@ def test_registration_cohort(
 
     for expected_input_output in expected_inputs_outputs:
         registration = e12_case_factory(
-            registration__registration_date=expected_input_output[0]
+            registration__first_paediatric_assessment_date=expected_input_output[0]
         ).registration
 
         assert registration.cohort == expected_input_output[1]
@@ -134,13 +134,13 @@ def test_registration_days_remaining_before_submission(
 
     # submission date = 2023-01-10, 41 days after today
     registration = e12_case_factory(
-        registration__registration_date=date(2022, 1, 10)
+        registration__first_paediatric_assessment_date=date(2022, 1, 10)
     ).registration
     assert registration.days_remaining_before_submission == 41
 
     # submission date = 2023-01-10, 41 days after today
     registration = e12_case_factory(
-        registration__registration_date=date(2021, 1, 1)
+        registration__first_paediatric_assessment_date=date(2021, 1, 1)
     ).registration
     assert registration.days_remaining_before_submission == 0
 
@@ -155,16 +155,16 @@ def test_registration_validate_dofpa_not_future(
     """
     # TODO - add validation
 
-    Test related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
+    Test related to ensuring model-level validation of inputted Date of First Paediatric Assessment (first_paediatric_assessment_date).
 
     Patches Registration's .get_current_date() method to always be 1 Jan 2023.
 
     """
 
-    # Tests that dofpa (registration_date) can't be in the future (relative to today). Tries to create and save a Registration which is 30 days ahead of today.
+    # Tests that dofpa (first_paediatric_assessment_date) can't be in the future (relative to today). Tries to create and save a Registration which is 30 days ahead of today.
     future_date = Registration.get_current_date() + relativedelta(days=30)
     with pytest.raises(ValidationError):
-        e12_case_factory(registration__registration_date=future_date)
+        e12_case_factory(registration__first_paediatric_assessment_date=future_date)
 
 
 @pytest.mark.xfail
@@ -173,13 +173,15 @@ def test_registration_validate_dofpa_not_before_2009(e12_case_factory):
     """
     # TODO - add validation
 
-    Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
+    Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (first_paediatric_assessment_date).
 
     """
 
-    # Tests that dofpa (registration_date) can't be before E12 began in 2009.
+    # Tests that dofpa (first_paediatric_assessment_date) can't be before E12 began in 2009.
     with pytest.raises(ValidationError):
-        e12_case_factory(registration__registration_date=date(2007, 8, 9))
+        e12_case_factory(
+            registration__first_paediatric_assessment_date=date(2007, 8, 9)
+        )
 
 
 @pytest.mark.xfail
@@ -188,15 +190,15 @@ def test_registration_validate_dofpa_not_before_child_dob(e12_case_factory):
     """
     # TODO - add validation
 
-    Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (registration_date).
+    Tests related to ensuring model-level validation of inputted Date of First Paediatric Assessment (first_paediatric_assessment_date).
 
     """
     date_of_birth = date(2023, 1, 1)
-    registration_date = date_of_birth + relativedelta(days=10)
+    first_paediatric_assessment_date = date_of_birth + relativedelta(days=10)
 
-    # Tests that dofpa (registration_date) can't be before the child's DoB
+    # Tests that dofpa (first_paediatric_assessment_date) can't be before the child's DoB
     with pytest.raises(ValidationError):
         case = e12_case_factory(
             date_of_birth=date_of_birth,
-            registration__registration_date=registration_date,
+            registration__first_paediatric_assessment_date=first_paediatric_assessment_date,
         )

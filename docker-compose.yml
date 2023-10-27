@@ -1,0 +1,91 @@
+version: "3.10"
+
+x-global-environment: &global
+    env_file:
+      - envs/.env # env file - NOT committed to Git
+
+
+services:
+
+  # Caddy reverse proxy - web-facing SSL server
+  caddy:
+    <<: *global # this will inherit all the envs from x-global-environment
+    depends_on:
+      - django
+    image: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - caddy-data:/data/
+      - caddy-data:/config/
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./staticdocs:/srv/staticdocs
+
+  # Django web application
+  django: &django
+    <<: *global # this will inherit all the envs from x-global-environment
+    build: .
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - .:/app/
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+        python manage.py migrate &&
+        python manage.py seed --mode=seed_groups_and_permissions &&
+        gunicorn --bind=0.0.0.0:8000 --timeout 600 rcpch-audit-engine.wsgi"
+    restart: always
+
+  # PostgreSQL with PostGIS extension
+  postgis:
+    <<: *global # this will inherit all the envs from x-global-environment
+    image: postgis/postgis:15-3.3
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+    restart: always
+
+  # Redis backend for Celery task scheduler
+  redis:
+    image: redis:alpine
+    expose:
+      - 6379
+    restart: always
+
+  # Celery worker
+  celeryworker:
+    <<: *django # this will inherit all the settings from the django service
+    command: celery -A rcpch-audit-engine worker -l info
+    restart: always
+
+  # Flower UI for Celery tasks
+  flower:
+    <<: *django # this will inherit all the settings from the django service
+    ports:
+      - 8888:8888
+    volumes:
+      - flower-data:/data
+    command: celery -A rcpch-audit-engine flower --persistent=True -url_prefix=/flower
+    restart: always
+
+  # Celery scheduled tasks/cron
+  celerybeat:
+    <<: *django # this will inherit all the settings from the django service
+    command: celery -A rcpch-audit-engine beat -l info
+    restart: always
+
+  mkdocs:
+    <<: *django # this will inherit all the settings from the django service
+    ports:
+      - 8001:8001
+    command: >
+      sh -c "mkdocs build --config-file documentation/mkdocs.yml &&
+        mkdocs serve --config-file documentation/mkdocs.yml"
+    restart: always
+
+volumes:
+  caddy-data:
+  flower-data:
+  postgis-data:

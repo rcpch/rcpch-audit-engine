@@ -13,7 +13,11 @@
                 </h5>
                 <ul>
                     {% for previously_registered_site in previously_registered_sites %}
-                        <li>{{previously_registered_site.organisation.ParentOrganisation_OrganisationName}} ({{previously_registered_site.organisation.OrganisationName}})</li>
+                        {% if previously_registered_site.organisation.trust %}
+                            <li>{{previously_registered_site.organisation.trust.name}} ({{previously_registered_site.organisation.name}})</li>
+                        {% else %}
+                            <li>{{previously_registered_site.organisation.local_health_board.name}} ({{previously_registered_site.organisation.name}})</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
                     

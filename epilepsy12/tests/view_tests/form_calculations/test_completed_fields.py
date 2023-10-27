@@ -148,7 +148,7 @@ For each MODEL:
     
     if 'mental_health_issue_identified':
         EXPECTED_SCORE += 1
-        'mental_health_issue'
+        'mental_health_issues'
     
     if 'global_developmental_delay_or_learning_difficulties':
         EXPECTED_SCORE += 1
@@ -199,9 +199,9 @@ def test_completed_fields_registration_all_fields(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
-        registration__registration_date=None,
+        registration__first_paediatric_assessment_date=None,
         registration__eligibility_criteria_met=None,
     )
 
@@ -211,7 +211,7 @@ def test_completed_fields_registration_all_fields(e12_case_factory, GOSH):
         completed_fields(registration) == 0
     ), f"Empty registration, `completed_fields(registration)` should return 0. Instead returned {completed_fields(registration)}"
 
-    registration.registration_date = date(2023, 1, 1)
+    registration.first_paediatric_assessment_date = date(2023, 1, 1)
     registration.eligibility_criteria_met = True
     registration.save()
 
@@ -227,8 +227,8 @@ def test_completed_fields_registration_random_fields(e12_case_factory, GOSH):
     """
     EXPECTED_SCORE = 0
 
-    REGISTRATION_DATE = random.choice([None, date(2023, 1, 1)])
-    if REGISTRATION_DATE is not None:
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = random.choice([None, date(2023, 1, 1)])
+    if FIRST_PAEDIATRIC_ASSESSMENT_DATE is not None:
         EXPECTED_SCORE += 1
 
     ELIGIBILITY_CRITERIA_MET = random.choice([None, True])
@@ -236,9 +236,9 @@ def test_completed_fields_registration_random_fields(e12_case_factory, GOSH):
         EXPECTED_SCORE += 1
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__eligibility_criteria_met=ELIGIBILITY_CRITERIA_MET,
     )
 
@@ -258,7 +258,7 @@ def test_completed_fields_first_paediatric_assessment_all_fields(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -284,7 +284,7 @@ def test_completed_fields_first_paediatric_assessment_all_fields(
     }
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -329,7 +329,7 @@ def test_completed_fields_first_paediatric_assessment_random_fields(
     }
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -350,7 +350,7 @@ def test_completed_fields_epilepsy_context_all_fields(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -380,7 +380,7 @@ def test_completed_fields_epilepsy_context_all_fields(e12_case_factory, GOSH):
     }
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -434,7 +434,7 @@ def test_completed_fields_epilepsy_context_random_fields(e12_case_factory, GOSH)
         factory_attributes.update({BASE_KEY_NAME: answer})
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -453,7 +453,7 @@ def test_completed_fields_assessment_all_fields(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -473,7 +473,9 @@ def test_completed_fields_assessment_all_fields(e12_case_factory, GOSH):
         "paediatric_neurologist_input_date": date(2023, 1, 2),
         "childrens_epilepsy_surgical_service_referral_made": True,
         "childrens_epilepsy_surgical_service_referral_date": date(2023, 1, 1),
-        "childrens_epilepsy_surgical_service_input_date": date(2023, 1, 2),
+        "childrens_epilepsy_surgical_service_input_date": date(
+            2023, 1, 2
+        ),  # not a mandatory field
         "epilepsy_specialist_nurse_referral_made": True,
         "epilepsy_specialist_nurse_referral_date": date(2023, 1, 1),
         "epilepsy_specialist_nurse_input_date": date(2023, 1, 2),
@@ -485,16 +487,18 @@ def test_completed_fields_assessment_all_fields(e12_case_factory, GOSH):
     }
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
 
     assessment = Assessment.objects.get(registration=CASE.registration)
 
-    assert completed_fields(assessment) == len(
-        fields_and_answers
-    ), f"Completed assessment, `completed_fields(assessment)` should return {len(fields_and_answers)}. Instead returned {completed_fields(assessment)}"
+    assert (
+        completed_fields(assessment)
+        == len(fields_and_answers)
+        - 1  # childrens_epilepsy_surgical_service_input_date is not scored
+    ), f"Completed assessment, `completed_fields(assessment)` should return {len(fields_and_answers)-1}. Instead returned {completed_fields(assessment)}"
 
 
 @pytest.mark.django_db
@@ -548,10 +552,15 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
         if REFERRAL_ANSWER is not None:
             EXPECTED_SCORE += 1
 
-        INPUT_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_input_date"
-        INPUT_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
-        if INPUT_ANSWER is not None:
-            EXPECTED_SCORE += 1
+        # E12 updated kpi scoring - CESS just needs referral, actual input does not matter
+        if bool_field != "childrens_epilepsy_surgical_service":
+            INPUT_KEY_NAME = BASE_KEY_NAME + f"{bool_field}_input_date"
+            INPUT_ANSWER = random.choice(DATE_2_ANSWER_OPTIONS)
+            if (
+                INPUT_ANSWER is not None
+                and INPUT_KEY_NAME != "childrens_epilepsy_surgical_service_input_date"
+            ):
+                EXPECTED_SCORE += 1
 
         date_answers = {
             REFERRAL_KEY_NAME: REFERRAL_ANSWER,
@@ -560,7 +569,7 @@ def test_completed_fields_assessment_random_fields(e12_case_factory, GOSH):
         factory_attributes.update(date_answers)
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -579,7 +588,7 @@ def test_completed_fields_investigations_all_fields(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -609,7 +618,7 @@ def test_completed_fields_investigations_all_fields(e12_case_factory, GOSH):
     }
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -696,7 +705,7 @@ def test_completed_fields_investigations_random_fields(e12_case_factory, GOSH):
         factory_attributes.update(date_answers)
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -715,7 +724,7 @@ def test_completed_fields_management_all_fields(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -750,7 +759,7 @@ def test_completed_fields_management_all_fields(e12_case_factory, GOSH):
     factory_attributes.update({f"registration__management__{DATE_FIELD}": DATE_1})
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -804,7 +813,7 @@ def test_completed_fields_management_random_fields(e12_case_factory, GOSH):
     factory_attributes.update({DATE_KEY_NAME: DATE_ANSWER})
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -823,7 +832,7 @@ def test_completed_fields_multiaxial_diagnosis_all_fields(e12_case_factory, GOSH
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -856,7 +865,7 @@ def test_completed_fields_multiaxial_diagnosis_all_fields(e12_case_factory, GOSH
     # CharFields
     char_fields_and_answers = {
         "global_developmental_delay_or_learning_difficulties_severity": SEVERITY[0][0],
-        "mental_health_issue": NEUROPSYCHIATRIC[0][0],
+        "mental_health_issues": [NEUROPSYCHIATRIC[0][0]],
     }
     char_fields_factory_attributes = {
         f"{BASE_KEY_NAME}{field}": answer
@@ -865,7 +874,7 @@ def test_completed_fields_multiaxial_diagnosis_all_fields(e12_case_factory, GOSH
     factory_attributes.update(char_fields_factory_attributes)
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )
@@ -923,8 +932,8 @@ def test_completed_fields_multiaxial_diagnosis_random_fields(e12_case_factory, G
         EXPECTED_SCORE += 1
     factory_attributes.update({GLOBAL_DEV_DELAY_KEY_NAME: GLOBAL_DEV_DELAY_ANSWER})
 
-    MENTAL_HEALTH_ISSUE_KEY_NAME = BASE_KEY_NAME + "mental_health_issue"
-    MENTAL_HEALTH_ISSUE_ANSWER = random.choice([None, NEUROPSYCHIATRIC[0][0]])
+    MENTAL_HEALTH_ISSUE_KEY_NAME = BASE_KEY_NAME + "mental_health_issues"
+    MENTAL_HEALTH_ISSUE_ANSWER = [random.choice([None, NEUROPSYCHIATRIC[0][0]])]
     if MENTAL_HEALTH_ISSUE_ANSWER is not None:
         EXPECTED_SCORE += 1
     factory_attributes.update(
@@ -932,7 +941,7 @@ def test_completed_fields_multiaxial_diagnosis_random_fields(e12_case_factory, G
     )
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **factory_attributes,
     )

@@ -38,13 +38,13 @@ def test_measure_10_school_individual_healthcare_plan(
     individualised_care_plan_includes_ehcp,
     expected_score,
 ):
-    REGISTRATION_DATE = date(2023, 1, 1)
-    DATE_OF_BIRTH = REGISTRATION_DATE - age
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
+    DATE_OF_BIRTH = FIRST_PAEDIATRIC_ASSESSMENT_DATE - age
 
     # create case
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__management__individualised_care_plan_includes_ehcp=individualised_care_plan_includes_ehcp,
     )
 

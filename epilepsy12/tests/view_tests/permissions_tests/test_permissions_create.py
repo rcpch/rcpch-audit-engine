@@ -110,6 +110,7 @@ from epilepsy12.models import (
     Organisation,
     Case,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -128,8 +129,8 @@ def test_user_create_same_org_success(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
@@ -148,13 +149,19 @@ def test_user_create_same_org_success(
         ), f"Incorrect number of users selected. Requested {len(selected_users)} but queryset contains {len(users)}: {users}"
 
     for test_user in users:
+        
+        
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
             kwargs={
                 "organisation_id": TEST_USER_ORGANISATION.id,
                 "user_type": "organisation-staff",
+                "epilepsy12_user_id": test_user.id,
             },
         )
 
@@ -202,8 +209,8 @@ def test_user_create_diff_org_success(
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
@@ -222,12 +229,16 @@ def test_user_create_diff_org_success(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
             kwargs={
                 "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 "user_type": "organisation-staff",
+                "epilepsy12_user_id": test_user.id,
             },
         )
 
@@ -271,8 +282,8 @@ def test_user_creation_forbidden(
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     TEMP_CREATED_USER_FIRST_NAME = "TEMP_CREATED_USER_FIRST_NAME"
@@ -291,12 +302,16 @@ def test_user_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_epilepsy12_user",
             kwargs={
                 "organisation_id": DIFF_TRUST_DIFF_ORGANISATION.id,
                 "user_type": "organisation-staff",
+                "epilepsy12_user_id": test_user.id,
             },
         )
 
@@ -344,14 +359,14 @@ def test_patient_create_success(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     TEST_FIRST_NAME = "TEST_FIRST_NAME"
@@ -373,6 +388,9 @@ def test_patient_create_success(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_case",
@@ -469,8 +487,8 @@ def test_patient_creation_forbidden(
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     TEST_FIRST_NAME = "TEST_FIRST_NAME"
@@ -490,6 +508,9 @@ def test_patient_creation_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         url = reverse(
             "create_case",
@@ -542,18 +563,18 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+        first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
     URLS = [
@@ -579,6 +600,9 @@ def test_add_episode_comorbidity_syndrome_aem_success(client):
 
     for test_user in users:
         client.force_login(test_user)
+        
+        # OTP ENABLE
+        twofactor_signin(client, test_user)
 
         for url in URLS:
             if url == "add_antiepilepsy_medicine":
@@ -636,22 +660,22 @@ def test_add_episode_comorbidity_syndrome_aem_forbidden(client):
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
 
     # ADDENBROOKE'S
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     CASE_FROM_SAME_ORG = Case.objects.get(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}"
+        first_name=f"child_{TEST_USER_ORGANISATION.name}"
     )
 
     CASE_FROM_DIFF_ORG = Case.objects.get(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}"
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}"
     )
 
     selected_users = [

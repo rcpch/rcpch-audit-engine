@@ -32,7 +32,7 @@ from epilepsy12.models import (
     Registration,
     KPI,
     Syndrome,
-    SyndromeEntity,
+    SyndromeList,
     MultiaxialDiagnosis,
 )
 from epilepsy12.constants import (
@@ -42,7 +42,7 @@ from epilepsy12.constants import (
 
 
 @pytest.mark.parametrize(
-    "DATE_OF_BIRTH,REGISTRATION_DATE,TIMELY_MRI,EXPECTED_SCORE",
+    "DATE_OF_BIRTH,FIRST_PAEDIATRIC_ASSESSMENT_DATE,TIMELY_MRI,EXPECTED_SCORE",
     [
         (
             # <2yo, MRI done within 6 weeks of refer
@@ -56,12 +56,16 @@ from epilepsy12.constants import (
             date(2023, 12, 31),
             False,
             KPI_SCORE["FAIL"],
-        )
+        ),
     ],
 )
 @pytest.mark.django_db
 def test_measure_5_mri_under2yo(
-    e12_case_factory, DATE_OF_BIRTH, REGISTRATION_DATE, TIMELY_MRI, EXPECTED_SCORE
+    e12_case_factory,
+    DATE_OF_BIRTH,
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE,
+    TIMELY_MRI,
+    EXPECTED_SCORE,
 ):
     """
     *PASS*
@@ -69,7 +73,7 @@ def test_measure_5_mri_under2yo(
     *FAIL*
     1) MRI NOT done in 6 weeks post-referral and are under 2y@FPA
     """
-    MRI_REQUESTED_DATE = REGISTRATION_DATE + relativedelta(days=1)
+    MRI_REQUESTED_DATE = FIRST_PAEDIATRIC_ASSESSMENT_DATE + relativedelta(days=1)
 
     MRI_REPORTED_DATE = MRI_REQUESTED_DATE + relativedelta(weeks=6)
     if not TIMELY_MRI:
@@ -77,7 +81,7 @@ def test_measure_5_mri_under2yo(
 
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__investigations__mri_brain_requested_date=MRI_REQUESTED_DATE,
         registration__investigations__mri_brain_reported_date=MRI_REPORTED_DATE,
     )
@@ -123,16 +127,16 @@ def test_measure_5_mri_syndromes_pass_fail(
     *FAIL*
     1) MRI NOT done in 6 weeks post-referral and are NOT (JME or JAE or CAE or CECTS/Rolandic)
     """
-    REGISTRATION_DATE = date(2023, 1, 1)
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
 
-    MRI_REQUESTED_DATE = REGISTRATION_DATE + relativedelta(days=1)
+    MRI_REQUESTED_DATE = FIRST_PAEDIATRIC_ASSESSMENT_DATE + relativedelta(days=1)
 
     MRI_REPORTED_DATE = MRI_REQUESTED_DATE + relativedelta(weeks=6)
     if not TIMELY_MRI:
         MRI_REPORTED_DATE += relativedelta(days=1)
 
     case = e12_case_factory(
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
         registration__investigations__mri_brain_requested_date=MRI_REQUESTED_DATE,
         registration__investigations__mri_brain_reported_date=MRI_REPORTED_DATE,
     )
@@ -201,12 +205,12 @@ def test_measure_5_mri_syndromes_ineligible(
         age_at_first_paediatric_assessment >= 2 (testing using age at fpa = 2y exactly)
     """
 
-    REGISTRATION_DATE = date(2023, 1, 1)
-    DATE_OF_BIRTH = REGISTRATION_DATE - relativedelta(years=2)
+    FIRST_PAEDIATRIC_ASSESSMENT_DATE = date(2023, 1, 1)
+    DATE_OF_BIRTH = FIRST_PAEDIATRIC_ASSESSMENT_DATE - relativedelta(years=2)
 
     case = e12_case_factory(
         date_of_birth=DATE_OF_BIRTH,
-        registration__registration_date=REGISTRATION_DATE,
+        registration__first_paediatric_assessment_date=FIRST_PAEDIATRIC_ASSESSMENT_DATE,
     )
 
     # set syndrome present to True
@@ -218,14 +222,16 @@ def test_measure_5_mri_syndromes_ineligible(
 
     # get registration for the saved case model
     registration = Registration.objects.get(case=case)
-    
+
     # ensure starting with no default syndromes
-    Syndrome.objects.filter(multiaxial_diagnosis=registration.multiaxialdiagnosis).delete()
-    
+    Syndrome.objects.filter(
+        multiaxial_diagnosis=registration.multiaxialdiagnosis
+    ).delete()
+
     # save the ineligible syndrome type
     new_syndrome = e12_syndrome_factory(
         multiaxial_diagnosis=registration.multiaxialdiagnosis,
-        syndrome=SyndromeEntity.objects.get(syndrome_name=SYNDROME_TYPE_PRESENT),
+        syndrome=SyndromeList.objects.get(syndrome_name=SYNDROME_TYPE_PRESENT),
     )
     new_syndrome.save()
 

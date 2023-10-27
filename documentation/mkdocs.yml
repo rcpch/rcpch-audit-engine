@@ -1,0 +1,187 @@
+# main site metadata and titles
+site_name: RCPCH Epilepsy12 - Documentation
+site_description: RCPCH Epilepsy12 - Documentation Site
+site_author: The Royal College of Paediatrics and Child Health
+site_url: !ENV DOCS_URL
+
+# copyright information which is shown in the footer
+copyright: Copyright &copy; 2022-23 Royal College of Paediatrics and Child Health (RCPCH)
+
+# these lines configure the 'GitHub repo' widget on the top right
+repo_url: https://github.com/rcpch/rcpch-audit-engine
+repo_name: rcpch/rcpch-audit-engine
+edit_uri: blob/development/documentation/docs
+
+# `mkdocs serve` serves the documentation at custom port (to avoid clashing with other services we commonly run)
+dev_addr: "0.0.0.0:8001"
+
+# Specifies the destination directory in which to build the static site
+site_dir: ../staticdocs
+
+# theme settings, fonts, colours
+theme:
+  favicon: ../_assets/_images/epilepsy12-logo-1.png
+  name: material
+  #custom_dir: rcpch-theme
+  features:
+    - content.action.edit # explicitly adds edit button (Material4MkDocs9.0)
+    - content.action.view # explicitly adds view button (Material4MkDocs9.0)
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tabs.link # enables the content tabs to all change in a linked way, on selection
+    - navigation.expand
+    - navigation.footer # explicitly adds footer prev/next (Material4MkDocs9.0)
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+
+  palette:
+    # Light mode only for now
+      scheme: default
+
+  font:
+    text: Montserrat
+    code: Roboto Mono
+
+  # favicon: _assets/_images/dynamic-child-favicon.png
+  logo: _assets/_images/rcpch_logo.png
+
+# mkdocs plugins
+plugins:
+  - git-committers:
+      repository: rcpch/epilepsy12-documentation
+      branch: live
+      enabled: !ENV [ENABLE_GIT_COMMITTERS, false] # makes Git Committers optional
+  # - git-revision-date-localized:
+  #     enable_creation_date: true
+  - search
+  - with-pdf:
+      back_cover: false
+      cover_title: RCPCH Epilepsy12 Documentation
+      cover_subtitle: User, Clinician, Admin and Developer Manual
+      #custom_template_path: TEMPLATES PATH
+      #toc_title: TOC TITLE TEXT
+      #heading_shift: false
+      #toc_level: 3
+      #ordered_chapter_level: 2
+      #excludes_children:
+      exclude_pages:
+        - 'home/download/'
+      #convert_iframe:
+      #    - src: IFRAME SRC
+      #      img: POSTER IMAGE URL
+      #      text: ALTERNATE TEXT
+      #    - src: ...
+      #two_columns_level: 3
+      #render_js: true
+      #headless_chrome_path: headless-chromium
+      output_path: pdf/rcpch-epilepsy12-full-documentation.pdf
+      enabled_if_env: ENABLE_PDF_EXPORT
+      #debug_html: true
+      #show_anchors: true
+      #verbose: true
+
+# additional markdown features
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - pymdownx.highlight
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.snippets:
+      check_paths: true
+      base_path:
+        - "documentation"
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+
+# set extra CSS file
+extra_css:
+  - _assets/_stylesheets/extra.css
+
+# footer links and variables
+extra:
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/rcpchtweets
+    - icon: fontawesome/brands/github
+      link: https://github.com/rcpch
+
+nav:
+  - Home:
+    - 'index.md'
+    - 'home/aims-and-kpis.md'
+    - 'home/citation.md'
+  - Parent Guide:
+    - 'parents/introduction.md'
+  - Clinician Guide:
+    - 'clinician-users/clinician-user-guide.md'
+    - 'clinician-users/user-group-permissions.md'
+    - 'clinician-users/getting-started.md'
+    - 'clinician-users/views.md'
+    - 'clinician-users/creating-editing-and-deleting-users.md'
+    - 'clinician-users/entering-patient-data.md'
+    - 'clinician-users/audit-dataset.md'
+    - 'clinician-users/organisational-audit.md'
+    - 'clinician-users/contact-us.md'
+  - Administrator Guide:
+    - 'admin-users/admin-user-guide.md'
+    - 'admin-users/download.md'
+    - 'admin-users/how-to-edit-docs.md'
+  - Developer Guide:
+    - Getting Started: 'development/getting-started.md'
+    - Architecture Overview: 'development/architecture-overview.md'
+    - Docker setup:
+      - Docker setup: 'development/docker-setup.md'
+      - 'development/docker-setup-windows.md'
+    - Manual setup: 'development/manual-setup.md'
+    - Testing:
+      - Running Tests: 'development/testing/testing.md'
+      - Customisation and Useful Flags: 'development/testing/customise.md'
+      - Test Structure: 'development/testing/test-structure.md'
+      - Test Database: 'development/testing/test-db.md'
+      - Factories and Fixtures: 'development/testing/factory-fixtures.md'
+      - Faking Values: 'development/testing/patch.md'
+      - Writing Tests: 'development/testing/writing-tests.md'
+      - Best Practices: 'development/testing/test-practices.md'
+      - Coverage: 'development/testing/coverage.md'
+    - Code Style: 'development/code-style.md'
+    - RCPCH Branding: 'development/branding.md'
+    - Application Structure:
+      - Overall structure: 'development/application-structure.md'
+      - Design Rationale: 'development/design-decisions.md'
+      - Database: 'development/database.md'
+      - Audit Forms: 'development/audit-forms.md'
+      - Form Scoring: 'development/form-scoring.md'
+      - KPIs: 'development/key-performance-indicators.md'
+      - Organisations, Trusts and Regions: 'development/organisations.md'
+      - Reporting: 'development/reporting.md'
+      - User Groups: 'development/user-groups.md'
+      - Users: 'development/user-workflow.md'
+      - Views: 'development/views.md'
+    - API: 'development/api.md'
+    - Deployment: 'development/deployment.md'
+    - Documentation: 'development/documentation.md'
+  - Contact:
+    - 'contact/contact-rcpch.md'
+  - Legal:
+    - 'legal/legal.md'
+    - 'legal/license.md'
+    - 'legal/privacy.md'
+    - 'legal/terms-of-service.md'

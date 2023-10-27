@@ -1,1 +1,1 @@
--r requirements/live-requirements.txt
+-r requirements/requirements.txt

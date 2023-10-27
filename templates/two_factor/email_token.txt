@@ -1,0 +1,6 @@
+Your OTP code is: {{ token }}
+
+If you have any questions, please contact the RCPCH Epilepsy12 team.
+
+Yours Sincerely,
+The RCPCH Epilepsy12 team

@@ -38,7 +38,11 @@ hx_confirm: if present, the text to confirm continue
         <div class="default text">{{hx_default_text}}</div>
             <div class="menu" >
                 {% for item in organisation_list %}
-                    <div class="item" data-value="{{item.pk}}" >{{item.OrganisationName}} ({{item.ParentOrganisation_OrganisationName}})</div>
+                    {% if item.trust %}
+                        <div class="item" data-value="{{item.pk}}" >{{item.name}} ({{item.trust.name}})</div>
+                    {% else %}
+                        <div class="item" data-value="{{item.pk}}" >{{item.name}} ({{item.local_health_board.name}})</div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>

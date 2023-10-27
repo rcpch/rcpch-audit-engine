@@ -9,10 +9,10 @@ FOCAL_EPILEPSY_MOTOR_MANIFESTATIONS = [
     {'name': 'focal_onset_hyperkinetic', 'text': 'Hyperkinetic'},
     {'name': 'focal_onset_myoclonic', 'text': 'Myoclonic'},
     {'name': 'focal_onset_tonic', 'text': 'Tonic'},
-    {'name': 'focal_onset_focal_to_bilateral_tonic_clonic', 'text': 'Tonic-Clonic'},
+    {'name': 'focal_onset_focal_to_bilateral_tonic_clonic', 'text': 'Focal to Bilateral Tonic-Clonic'},
+    {'name': 'focal_onset_automatisms', 'text': 'Automatisms'},
 ]
 FOCAL_EPILEPSY_NONMOTOR_MANIFESTATIONS = [
-    {'name': 'focal_onset_automatisms', 'text': 'Automatisms'},
     {'name': 'focal_onset_impaired_awareness', 'text': 'Impaired Awareness'},
     {'name': 'focal_onset_gelastic', 'text': 'Gelastic'},
     {'name': 'focal_onset_autonomic', 'text': 'Autonomic'},
