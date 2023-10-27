@@ -147,7 +147,9 @@ nav:
   - Developer Guide:
     - Getting Started: 'development/getting-started.md'
     - Architecture Overview: 'development/architecture-overview.md'
-    - Docker setup: 'development/docker-setup.md'
+    - Docker setup:
+      - Docker setup: 'development/docker-setup.md'
+      - 'development/docker-setup-windows.md'
     - Manual setup: 'development/manual-setup.md'
     - Testing:
       - Running Tests: 'development/testing/testing.md'
