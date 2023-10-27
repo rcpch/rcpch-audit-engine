@@ -26,6 +26,7 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Case
+        skip_postgeneration_save=True
 
     class Params:
         # helper eligibility flags to set age
@@ -57,6 +58,16 @@ class E12CaseFactory(factory.django.DjangoModelFactory):
         )
         fail_school_individual_healthcare_plan = factory.Trait(
             pass_school_individual_healthcare_plan=True,
+        )
+        seed_male = factory.Trait(
+            first_name = 'Agent',
+            surname = factory.Sequence(lambda n: f'Smith-{n}'),
+            registration=None
+        )
+        seed_female = factory.Trait(
+            first_name = 'Dolly',
+            surname = factory.Sequence(lambda n: f'Shepard-{n}'),
+            registration=None
         )
 
     @factory.lazy_attribute

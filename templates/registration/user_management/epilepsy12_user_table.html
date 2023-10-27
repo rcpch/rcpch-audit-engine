@@ -16,21 +16,21 @@
                 <th>
                     <div class="rcpch_td_data_indicator_wrapper">
                         <p>Name</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12users_by_name_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_name_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_name_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_name_up' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_name_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_name_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_epilepsy12users_by_name_down"
+                                name="sort_epilepsy12_users_by_name_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_name_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_name_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -45,21 +45,21 @@
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
                     <p>Email</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12users_by_email_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_email_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_email_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_email_up' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_email_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_email_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_email_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_epilepsy12users_by_email_down"
+                                name="sort_epilepsy12_users_by_email_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_by_email_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_email_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
@@ -74,29 +74,29 @@
                 </th>
                 <th><div class="rcpch_td_data_indicator_wrapper">
                     <p>Role</p>
-                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_role_up" %}
+                        {% if sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_role_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
-                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_down" %}
+                        {% elif sort_flag and sort_flag == "sort_epilepsy12_users_by_role_up" %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
                                 name="sort_epilepsy12_users_by_role_down"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% else %}
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_by_role_down"
+                                name="sort_epilepsy12_users_by_role_up"
                                 hx-target="#epilepsy12_user_table"
-                                hx-get="{% url 'sort_epilepsy12_users_by_role_down' organisation_id=organisation.pk %}"
+                                hx-get="{% url 'sort_epilepsy12_users_by_role_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
                         {% endif %}
                 </div>
@@ -107,7 +107,7 @@
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_epilepsy12_users_by_organisation_employer_up"
+                                name="sort_epilepsy12_users_by_organisation_employer_down"
                                 hx-target="#epilepsy12_user_table"
                                 hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
@@ -115,7 +115,7 @@
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_epilepsy12_users_by_organisation_employer_down"
+                                name="sort_epilepsy12_users_by_organisation_employer_up"
                                 hx-target="#epilepsy12_user_table"
                                 hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_up' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
@@ -123,7 +123,7 @@
                             <i
                                 class="sort icon"
                                 id="sort_button"
-                                name="sort_by_organisation_employer_down"
+                                name="sort_epilepsy12_users_by_organisation_employer_down"
                                 hx-target="#epilepsy12_user_table"
                                 hx-get="{% url 'sort_epilepsy12_users_by_organisation_employer_down' organisation_id=organisation.pk %}"
                                 hx-trigger="click"></i>
@@ -221,7 +221,7 @@
                 <div class='ui buttons'>
                     
                     <button 
-                        data-tooltip='Edit Epilepsy12 User details.'
+                        data-tooltip="Edit {{epilepsy12_user}}'s details."
                         {% if perms.epilepsy12.change_epilepsy12user %}
                             class="ui rcpch_primary icon button" 
                         {% else %}
@@ -234,8 +234,8 @@
                     </button>
                     
                     <button 
-                        data-tooltip='Delete Epilepsy12 User. This is irreversible.' 
-                        {% if perms.epilepsy12.delete_epilepsy12user %}
+                        data-tooltip='Delete {{epilepsy12_user}}. This is irreversible.' 
+                        {% if perms.epilepsy12.delete_epilepsy12user and epilepsy12_user.email != user.email %}
                             class="ui rcpch_danger icon button" 
                         {% else %}
                             class="ui rcpch_danger icon disabled button" 
@@ -258,7 +258,7 @@
                             })
                             if result.isConfirmed issueRequest()"
                     >
-                        <i class="trash alternate outline icon"></i>   
+                        <i class="trash alternate outline icon"></i>
                     </button>
                     
                     <button
@@ -293,12 +293,12 @@
             <th colspan="10" class="right aligned">
             {% if epilepsy12_user_list.has_previous %}
             <div class="ui rcpch_primary button" hx-target="#epilepsy12_user_table"
-                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
+                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk epilepsy12_user_id=user.id %}?page={{epilepsy12_user_list.previous_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Previous 10</div>
             {% endif %}
             {% if epilepsy12_user_list.has_next %}
             <div class="ui rcpch_primary button" name="next_button" hx-target="#epilepsy12_user_table"
-                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk  %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
+                hx-get="{% url 'epilepsy12_user_list' organisation_id=organisation.pk   %}?page={{epilepsy12_user_list.next_page_number}}&sort_flag={{sort_flag}}"
                 hx-swap="innerHTML">Next 10</div>
             {% endif %}
             </th>

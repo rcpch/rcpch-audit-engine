@@ -11,9 +11,9 @@ def score_kpi_7(registration_instance) -> int:
     Percentage of children with epilepsy and a mental health problem who have evidence of mental health support
 
     Calculation Method
-
+    
     Numerator =  Number of children and young people diagnosed with epilepsy AND had a mental health issue identified AND had evidence of mental health support received
-
+    
     Denominator= Number of children and young people diagnosed with epilepsy AND had a mental health issue identified
     """
 

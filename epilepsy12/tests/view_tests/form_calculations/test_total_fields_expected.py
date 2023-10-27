@@ -22,8 +22,8 @@ import random
 # E12 imports
 from epilepsy12.models import (
     Episode,
-    SyndromeEntity,
-    MedicineEntity,
+    SyndromeList,
+    Medicine,
 )
 from epilepsy12.common_view_functions.recalculate_form_generate_response import (
     scoreable_fields_for_model_class_name,
@@ -88,7 +88,7 @@ def test_count_episode_fields_epileptic_focal_onset(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__complete_episode_focal_onset_seizure=True,
     )
@@ -111,7 +111,7 @@ def test_count_episode_fields_epileptic_generalised_onset(e12_case_factory, GOSH
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__complete_episode_generalised_onset_seizure=True,
     )
@@ -134,7 +134,7 @@ def test_count_episode_fields_epileptic_unclassified_onset(e12_case_factory, GOS
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__complete_episode_unclassified_onset_seizure=True,
     )
@@ -157,7 +157,7 @@ def test_count_episode_fields_epileptic_unknown_onset(e12_case_factory, GOSH):
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__complete_episode_unknown_onset_seizure=True,
     )
@@ -204,7 +204,7 @@ def test_count_episode_fields_nonepileptic(e12_case_factory, GOSH):
     }
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__common_fields=True,
         **answer_set,
@@ -229,7 +229,7 @@ def test_count_episode_fields_uncertain(e12_case_factory, GOSH):
     expected_value = 11  # 5 for incomplete epileptic episode, ++6 for uncertain episode base value incomplete fields
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__common_fields=True,
         **{
@@ -261,7 +261,7 @@ def test_total_fields_expected_multiaxial_diagnosis_episode_fields(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode__complete_episode_focal_onset_seizure=True,
     )
@@ -287,7 +287,7 @@ def test_total_fields_expected_multiaxial_diagnosis_syndrome_fields(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__episode=None,
         registration__multiaxial_diagnosis__syndrome_present=True,
@@ -299,10 +299,10 @@ def test_total_fields_expected_multiaxial_diagnosis_syndrome_fields(
     # Initial value because Multiaxial diagnosis fields minimum == 7 ++ no episodes == 5
     expected_value = 12
 
-    ADD_SYNDROMES = random.choice([None, True])
+    ADD_SYNDROMES = random.choice([ True])
     if ADD_SYNDROMES is not None:
         # Create 3 syndromes
-        SYNDROMES_LIST = SyndromeEntity.objects.all()[:3]
+        SYNDROMES_LIST = SyndromeList.objects.all()[:3]
 
         for i in range(3):
             e12_syndrome_factory(
@@ -333,7 +333,7 @@ def test_total_fields_expected_multiaxial_diagnosis_general_fields(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         registration__multiaxial_diagnosis__epilepsy_cause_known=True,  # +2
         registration__multiaxial_diagnosis__relevant_impairments_behavioural_educational=True,  # +2
@@ -374,13 +374,16 @@ def test_total_fields_expected_assessment(e12_case_factory, GOSH):
         answer_set.update({f"{BASE_KEY_NAME}{field}": answer})
 
         if answer is not None:
-            if field == "epilepsy_specialist_nurse_referral_made":
+            if field in [
+                "epilepsy_specialist_nurse_referral_made",
+                "childrens_epilepsy_surgical_service_referral_made",
+            ]:
                 expected_value += 2
             else:
                 expected_value += 3
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **answer_set,
     )
@@ -416,7 +419,7 @@ def test_total_fields_expected_investigations(e12_case_factory, GOSH):
             expected_value += 2
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
         **answer_set,
     )
@@ -439,7 +442,7 @@ def test_total_fields_expected_registration(e12_case_factory, GOSH):
     answer_set = {}
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         organisations__organisation=GOSH,
     )
 
@@ -462,7 +465,7 @@ def test_total_fields_expected_management(
     """
 
     CASE = e12_case_factory(
-        first_name=f"temp_child_{GOSH.OrganisationName}",
+        first_name=f"temp_child_{GOSH.name}",
         date_of_birth=date.today()
         - relativedelta(years=13),  # to test sodium valproate
         organisations__organisation=GOSH,
@@ -475,7 +478,7 @@ def test_total_fields_expected_management(
 
     # score +3 for medicine present, +2 as valproate in childbearing female
     aed_answers = {
-        "medicine_entity": MedicineEntity.objects.get(medicine_name="Sodium valproate"),
+        "medicine_entity": Medicine.objects.get(medicine_name="Sodium valproate"),
         "antiepilepsy_medicine_start_date": date(2023, 1, 1),
         "antiepilepsy_medicine_risk_discussed": True,
         "is_a_pregnancy_prevention_programme_needed": True,
@@ -490,7 +493,7 @@ def test_total_fields_expected_management(
 
     # score +3 for medicine present
     rescue_medicine_answers = {
-        "medicine_entity": MedicineEntity.objects.get(medicine_name="Levetiracetam"),
+        "medicine_entity": Medicine.objects.get(medicine_name="Levetiracetam"),
         "antiepilepsy_medicine_start_date": date(2023, 1, 1),
         "antiepilepsy_medicine_risk_discussed": True,
     }

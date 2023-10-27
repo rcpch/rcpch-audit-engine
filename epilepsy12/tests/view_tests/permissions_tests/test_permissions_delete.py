@@ -101,9 +101,10 @@ from epilepsy12.models import (
     Syndrome,
     Comorbidity,
     AntiEpilepsyMedicine,
-    MedicineEntity,
-    ComorbidityEntity,
+    Medicine,
+    ComorbidityList,
 )
+from epilepsy12.tests.view_tests.permissions_tests.perm_tests_utils import twofactor_signin
 
 
 @pytest.mark.django_db
@@ -122,12 +123,12 @@ def test_user_delete_success(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -143,6 +144,9 @@ def test_user_delete_success(
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         # Seed a temp User to be deleted
         temp_user_same_org = E12UserFactory(
@@ -211,12 +215,12 @@ def test_user_delete_forbidden(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -251,6 +255,9 @@ def test_user_delete_forbidden(
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         if test_user.first_name in [
             test_user_audit_centre_lead_clinician_data.role_str,
@@ -298,12 +305,12 @@ def test_patient_delete_success(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -320,9 +327,12 @@ def test_patient_delete_success(
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         # Seed a temp pt to be deleted
         temp_pt_same_org = E12CaseFactory(
-            first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+            first_name=f"child_{TEST_USER_ORGANISATION.name}",
             organisations__organisation=TEST_USER_ORGANISATION,
         )
 
@@ -336,12 +346,12 @@ def test_patient_delete_success(
 
         response = client.post(
             url,
-            data={"delete": "Delete"},
+            headers={"Hx-Trigger-Name": "delete", "Hx-Request": "true"},
         )
 
         assert (
-            response.status_code == HTTPStatus.FOUND
-        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FOUND} response status code, received {response.status_code}"
+            response.status_code == HTTPStatus.OK
+        ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}` with DELETE for Case from {TEST_USER_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
         # Additional test for deleting users outside of own Trust
         if test_user.first_name in [
@@ -350,7 +360,7 @@ def test_patient_delete_success(
         ]:
             # Seed a temp pt to be deleted
             temp_pt_diff_org = E12CaseFactory(
-                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+                first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
                 organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
             )
 
@@ -364,12 +374,12 @@ def test_patient_delete_success(
 
             response = client.post(
                 url,
-                data={"delete": "Delete"},
+                headers={"Hx-Trigger-Name": "delete", "Hx-Request": "true"},
             )
 
             assert (
-                response.status_code == HTTPStatus.FOUND
-            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}`with DELETE  for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.FOUND} response status code, received {response.status_code}"
+                response.status_code == HTTPStatus.OK
+            ), f"{test_user.first_name} (from {test_user.organisation_employer}) requested `{url}`with DELETE  for Case from {DIFF_TRUST_DIFF_ORGANISATION}. Has groups: {test_user.groups.all()}. Expected {HTTPStatus.OK} response status code, received {response.status_code}"
 
 
 @pytest.mark.django_db
@@ -385,12 +395,12 @@ def test_patient_delete_forbidden(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -406,17 +416,20 @@ def test_patient_delete_forbidden(
 
     # Seed a temp pt to be deleted
     temp_pt_same_org = E12CaseFactory(
-        first_name=f"child_{TEST_USER_ORGANISATION.OrganisationName}",
+        first_name=f"child_{TEST_USER_ORGANISATION.name}",
         organisations__organisation=TEST_USER_ORGANISATION,
     )
     # Seed a temp pt to be deleted
     temp_pt_diff_org = E12CaseFactory(
-        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.OrganisationName}",
+        first_name=f"child_{DIFF_TRUST_DIFF_ORGANISATION.name}",
         organisations__organisation=DIFF_TRUST_DIFF_ORGANISATION,
     )
 
     for test_user in users:
         client.force_login(test_user)
+
+        # 2fa enable
+        twofactor_signin(client, test_user)
 
         if test_user.first_name in [
             test_user_audit_centre_clinician_data.role_str,
@@ -440,7 +453,7 @@ def test_patient_delete_forbidden(
 
         response = client.post(
             url,
-            data={"delete": "Delete"},
+            headers={"Hx-Trigger-Name": "delete", "Hx-Request": "true"},
         )
 
         assert (
@@ -461,12 +474,12 @@ def test_episode_delete_success(
 
     # GOSH
     TEST_USER_ORGANISATION = Organisation.objects.get(
-        ODSCode="RP401",
-        ParentOrganisation_ODSCode="RP4",
+        ods_code="RP401",
+        trust__ods_code="RP4",
     )
     DIFF_TRUST_DIFF_ORGANISATION = Organisation.objects.get(
-        ODSCode="RGT01",
-        ParentOrganisation_ODSCode="RGT",
+        ods_code="RGT01",
+        trust__ods_code="RGT",
     )
 
     user_first_names_for_test = [
@@ -490,6 +503,9 @@ def test_episode_delete_success(
     for test_user in users:
         client.force_login(test_user)
 
+        # 2fa enable
+        twofactor_signin(client, test_user)
+
         # Create a Case with Episode
         CASE_FROM_SAME_ORG = E12CaseFactory(
             first_name=f"temp_{TEST_USER_ORGANISATION}",
@@ -510,16 +526,14 @@ def test_episode_delete_success(
 
         comorbidity = Comorbidity.objects.create(
             multiaxial_diagnosis=CASE_FROM_SAME_ORG.registration.multiaxialdiagnosis,
-            comorbidityentity=ComorbidityEntity.objects.filter(
+            comorbidityentity=ComorbidityList.objects.filter(
                 conceptId="1148757008"
             ).first(),
         )
 
         aem = AntiEpilepsyMedicine.objects.create(
             management=CASE_FROM_SAME_ORG.registration.management,
-            medicine_entity=MedicineEntity.objects.get(
-                medicine_name="Sodium valproate"
-            ),
+            medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
         )
 
         for url in URLS:
@@ -573,16 +587,14 @@ def test_episode_delete_success(
 
             comorbidity = Comorbidity.objects.create(
                 multiaxial_diagnosis=CASE_FROM_DIFF_ORG.registration.multiaxialdiagnosis,
-                comorbidityentity=ComorbidityEntity.objects.filter(
+                comorbidityentity=ComorbidityList.objects.filter(
                     conceptId="1148757008"
                 ).first(),
             )
 
             aem = AntiEpilepsyMedicine.objects.create(
                 management=CASE_FROM_DIFF_ORG.registration.management,
-                medicine_entity=MedicineEntity.objects.get(
-                    medicine_name="Sodium valproate"
-                ),
+                medicine_entity=Medicine.objects.get(medicine_name="Sodium valproate"),
             )
 
             for url in URLS:

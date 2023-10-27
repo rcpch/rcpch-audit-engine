@@ -1,0 +1,34 @@
+{% load epilepsy12_template_tags %}
+
+<div class="rcpch_padded">
+  <canvas id="{{ data_id }}"
+    width="auto"></canvas>
+</div>
+<script>
+
+  var kpi_data = [{% for region_data in data %} {% get_kpi_pct_passed region_data %},{% endfor %}];
+  var kpi_labels = [{% for region_data in data %} "{% get_region_name region_data %}",{% endfor %}];
+  console.log(kpi_data);
+  console.log(kpi_labels);
+
+  var myChart = new Chart(document.getElementById('{{data_id}}'), {
+    type: 'bar',
+    data: {
+      labels: kpi_labels,
+      datasets: [
+        {
+          label: '% achieving measure',
+          data: kpi_data,
+          borderWidth: 1,
+          backgroundColor: ['{{ abstraction_color }}'],
+          maxBarThickness: 25,
+        },
+      ]
+    },
+  });
+
+  // UPDATE CHART TITLE WITH AVG
+  var chrt_title = myChart.options.plugins.title.text
+  myChart.options.plugins.title.text = `${chrt_title} - Average {{avg_pct}}%`
+
+</script>

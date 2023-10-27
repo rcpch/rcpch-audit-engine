@@ -11,9 +11,9 @@ def score_kpi_4(registration_instance) -> int:
     % of children and young people with convulsive seizures and epilepsy, with an ECG at first year
 
     Calculation Method
-
+    
     Numerator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year AND who have [12 lead ECG obtained]
-
+    
     Denominator = Number of children and young people diagnosed with epilepsy at first year AND with convulsive episodes at first year
     """
     epilepsy_context = registration_instance.epilepsycontext

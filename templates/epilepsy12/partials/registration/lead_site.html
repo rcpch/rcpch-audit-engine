@@ -6,23 +6,17 @@
                         <label>Current Secondary NHS Trust/Health Board</label>
 
                         <div class="ui right action left icon input">
-                            <input disabled value="{{site.organisation.OrganisationName}} ({{site.organisation.ParentOrganisation_OrganisationName}})">
+                            {% if site.organisation.trust %}
+                                <input disabled value="{{site.organisation.name}} ({{site.organisation.trust.name}})">
+                            {% else %}
+                                <input disabled value="{{site.organisation.name}} ({{site.organisation.local_health_board.name}})">
+                            {% endif %}
                             
                             <i class="rcpch_pink check circle outline icon"></i>
 
                             {% if perms.epilepsy12.can_edit_epilepsy12_lead_centre or perms.epilepsy12.can_transfer_epilepsy12_lead_centre or perms.epilepsy12.can_delete_epilepsy12_lead_centre %}
 
                                 <div class="ui buttons">
-
-                                        {% if perms.epilepsy12.can_edit_epilepsy12_lead_centre %}
-                                            <button 
-                                                class="ui rcpch_primary button"
-                                                hx-post="{% url 'edit_lead_site' registration_id=registration.pk site_id=site.pk %}"
-                                                hx-target="#lead_site"
-                                                hx-swap="innerHTML"
-                                                hx-trigger="click"
-                                            >Edit</button>
-                                        {% endif %}
                                         
                                         <button
                                             {% if perms.epilepsy12.can_transfer_epilepsy12_lead_centre %}

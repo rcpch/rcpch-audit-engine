@@ -9,7 +9,7 @@ import factory
 # rcpch imports
 from epilepsy12.models import (
     AntiEpilepsyMedicine,
-    MedicineEntity,
+    Medicine,
 )
 
 
@@ -24,6 +24,3 @@ class E12AntiEpilepsyMedicineFactory(factory.django.DjangoModelFactory):
 
     # Once Management instance made, it will attach to this instance
     management = None
-
-    
-

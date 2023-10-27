@@ -11,7 +11,7 @@ from epilepsy12.models import Management
 from .E12AntiEpilepsyMedicineFactory import E12AntiEpilepsyMedicineFactory
 
 from epilepsy12.models import (
-    MedicineEntity,
+    Medicine,
 )
 
 
@@ -26,6 +26,7 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Management
+        skip_postgeneration_save = True
 
     class Params:
         pass_mental_health_support = factory.Trait(
@@ -59,12 +60,12 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
             individualised_care_plan_includes_general_participation_risk=False,
             individualised_care_plan_addresses_sudep=False,
         )
-        
+
         pass_school_individual_healthcare_plan = factory.Trait(
-            individualised_care_plan_includes_ehcp = True,
+            individualised_care_plan_includes_ehcp=True,
         )
         fail_school_individual_healthcare_plan = factory.Trait(
-            individualised_care_plan_includes_ehcp = False,
+            individualised_care_plan_includes_ehcp=False,
         )
 
     # Once Registration instance made, it will attach to this instance
@@ -77,16 +78,16 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
             return
 
         if kwargs:
-            if  kwargs.get("sodium_valproate"):
+            if kwargs.get("sodium_valproate"):
                 # create a related Valproate AEM instance, with pregnancy prevention fields set depending on sodium_valproate flag.
-                
+
                 self.has_an_aed_been_given = True
 
                 if kwargs["sodium_valproate"] == "pass":
-                    E12AntiEpilepsyMedicineFactory(
+                    E12AntiEpilepsyMedicineFactory.create(
                         management=self,
                         is_rescue_medicine=False,
-                        medicine_entity=MedicineEntity.objects.get(
+                        medicine_entity=Medicine.objects.get(
                             medicine_name="Sodium valproate"
                         ),
                         antiepilepsy_medicine_risk_discussed=True,
@@ -94,13 +95,15 @@ class E12ManagementFactory(factory.django.DjangoModelFactory):
                         has_a_valproate_annual_risk_acknowledgement_form_been_completed=True,
                     )
                 elif kwargs["sodium_valproate"] == "fail":
-                    E12AntiEpilepsyMedicineFactory(
+                    E12AntiEpilepsyMedicineFactory.create(
                         management=self,
                         is_rescue_medicine=False,
-                        medicine_entity=MedicineEntity.objects.get(
+                        medicine_entity=Medicine.objects.get(
                             medicine_name="Sodium valproate"
                         ),
                         antiepilepsy_medicine_risk_discussed=False,
                         is_a_pregnancy_prevention_programme_needed=False,
                         has_a_valproate_annual_risk_acknowledgement_form_been_completed=False,
                     )
+
+                self.save()

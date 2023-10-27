@@ -20,12 +20,12 @@
         <div class="fluid row stackable org_view_all_buttons_wrapper">
             <div class="eight wide column">
                 <a class="ui rcpch_grey fluid button" href="{% url 'epilepsy12_user_list' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.ParentName}} Epilepsy12 Staff
+                    View All {{selected_organisation.name}} Epilepsy12 Staff
                 </a>
             </div>
             <div class="eight wide  column">
                 <a class="ui rcpch_primary fluid button" href="{% url 'cases' organisation_id=selected_organisation.pk %}">
-                    View All {{selected_organisation.ParentName}} Children
+                    View All {{selected_organisation.name}} Children
                     </a>
             </div>
         </div>
@@ -39,7 +39,7 @@
                     <div class="content">
                         <div class="organisation_address_container">
                             <div class="ui centered header organisation_address">
-                                <h3>{{ selected_organisation.ParentName }}</h3>
+                                <h3>{{ selected_organisation.name }}</h3>
                             </div>
                             <h4 class="ui horizontal divider">
                                 <i class="ui  rcpch  small organisation icon "></i>Address
@@ -47,11 +47,11 @@
                                 <div class="organisation_details ">
                                     <div class="organisation_address">
                                         <div class="item">
-                                            {%if selected_organisation.Address1%}<p>{{ selected_organisation.Address1 }}</p>{%endif%}
-                                            {%if selected_organisation.Address2%}<p>{{ selected_organisation.Address2 }}</p>{%endif%}
-                                            {%if selected_organisation.Address3%}<p>{{ selected_organisation.Address3 }}</p>{%endif%}
-                                            {%if selected_organisation.City%}<p>{{ selected_organisation.City }}</p>{%endif%}
-                                            {%if selected_organisation.Postcode%}<p>{{ selected_organisation.Postcode }}</p>{%endif%}
+                                            {%if selected_organisation.address1%}<p>{{ selected_organisation.address1 }}</p>{%endif%}
+                                            {%if selected_organisation.address2%}<p>{{ selected_organisation.address2 }}</p>{%endif%}
+                                            {%if selected_organisation.address3%}<p>{{ selected_organisation.address3 }}</p>{%endif%}
+                                            {%if selected_organisation.city%}<p>{{ selected_organisation.city }}</p>{%endif%}
+                                            {%if selected_organisation.postcode%}<p>{{ selected_organisation.postcode }}</p>{%endif%}
                                         </div>
                                     </div>
                                 </div>
@@ -62,7 +62,7 @@
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon phone"></i>
                                         {%if selected_organisation.Phone%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.Phone }}</p>
+                                        <p class="rcpch_icon_text">{{ selected_organisation.phone }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find phone number</p>
                                         {%endif%}
@@ -70,15 +70,15 @@
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon envelope"></i>
                                         {%if selected_organisation.Email%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.Email }}</p>
+                                        <p class="rcpch_icon_text">{{ selected_organisation.email }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find email</p>
                                         {%endif%}
                                     </div>
                                     <div class="item middle aligned rcpch_icon_text_group">
                                         <i class="ui icon linkify"></i>
-                                        {%if selected_organisation.Website%}
-                                        <p class="rcpch_icon_text">{{ selected_organisation.Website }}</p>
+                                        {%if selected_organisation.website%}
+                                        <p class="rcpch_icon_text">{{ selected_organisation.website }}</p>
                                         {%else%}
                                         <p class="rcpch_icon_text">Can't find website</p>
                                         {%endif%}
@@ -98,7 +98,7 @@
                                     <h1 class="">{{cohort_data.cohort}}</h1>
                                     <h2>Current Cohort</h2>
                                     <h3>
-                                        {% if cohort_data.days_remaining == 0 %}
+                                        {% if cohort_data.days_remaining > 0 %}
                                             Actively recruiting
                                         {% else %}
                                             Recruitment closed
@@ -108,15 +108,11 @@
                                 </div>
 
                                 <div class="rcpch_summary_stats_row">
-                                    <h1>{{cohort_data.days_remaining}}</h1>
+                                    <h1>{{cohort_data.days_remaining_until_latest_submission}}</h1>
                                     <h2>Days remaining</h2>
-                                    {% if cohort_data.days_remaining == 0 %}
-                                        <h3>Submission date passed</h3>
+                                    <h3>until latest submission date</h3>
                                     <h4>({{cohort_data.submission_date}})</h4>
-                                                                {% endif %}
                                 </div>
-        
-                         
                         </div>
                     </div>
                 </div>
@@ -134,7 +130,7 @@
                                     <div class="four wide stackable column">
                                         {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_organisation numerator=count_of_current_cohort_registered_completed_cases_in_this_organisation denominator=count_of_all_current_cohort_registered_cases_in_this_organisation title="Completed Patient Records - Organisation" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
-                                            <p><small>{{selected_organisation.OrganisationName}}</small></p>
+                                            <p><small>{{selected_organisation.name}}</small></p>
                                         </div>
                                     </div>
             
@@ -143,7 +139,11 @@
                                     <div class="four wide stackable column">
                                         {% include 'epilepsy12/partials/charts/progress.html' with percentage=percent_completed_trust numerator=count_of_current_cohort_registered_completed_cases_in_this_trust denominator=count_of_all_current_cohort_registered_cases_in_this_trust title="Completed Patient Records - Trust" pie_size='med' %}
                                         <div class='rcpch_centred_text'>
-                                            <p><small>{{selected_organisation.ParentOrganisation_OrganisationName}}</small></p>
+                                            {% if selected_organisation.trust %}
+                                                <p><small>{{selected_organisation.trust.name}}</small></p>
+                                            {% else %}
+                                                <p><small>{{selected_organisation.local_health_board.name}}</small></p>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     
@@ -167,7 +167,7 @@
             
             <div class="ui three stackable cards">
                                
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         
                         <h3 >Distribution by Ethnicity</h3>
@@ -186,7 +186,7 @@
                     </div>
                 </div>
                 
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         
                             <h3>Distribution by Sex</h3>
@@ -205,7 +205,7 @@
                     </div>
                 </div>
 
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
                         
                             <h3>
@@ -244,69 +244,83 @@
         <div class="sixteen wide right fluid column">
             <div class="ui three stackable cards">
                                
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
-                        <h3 >Local Health Board</h3>
+                        <!-- ENGLISH ORG -->
+                        {% if selected_organisation.trust %}
+                            <h3>Integrated Care Board</h3>
+                        <!-- WELSH ORG -->
                         {% else %}
-                        <h3 >Integrated Care Board</h3>
+                            <h3>Local Health Board</h3>
                         {% endif %}
                     </div>
                     <div>
-                        {% if selected_organisation.ons_region.ons_country.Country_ONS_Name == "Wales" %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% if selected_organisation.trust %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.name %}
                         {% else %}
-                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='icb' abstraction_level_border_colour='#ff8000' abstraction_level_data=icb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.integrated_care_board.ICB_Name %}
+                            {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='lhb' abstraction_level_border_colour='#ff8000' abstraction_level_data=lhb_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.local_health_board.name %}
                         {% endif %}
                     </div>
                 </div>
 
+                {% if selected_organisation.city == "LONDON" %}
                 <div class="ui rcpch_light_blue  card">
                     <div class="content">
-                        <h3 >NHS Region</h3>
+                        <h3 >London Borough</h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_region.NHS_Region %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='london_borough' abstraction_level_border_colour='#66cc33' abstraction_level_data=london_borough_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.london_borough.name %}
                     </div>
                 </div>
+                {% endif %}
+
+                {% if selected_organisation.trust %}
+                <div class="ui rcpch_light_blue card">
+                    <div class="content">
+                        <h3 >NHS England Region</h3>
+                    </div>
+                    <div>
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='nhs_england_region' abstraction_level_border_colour='#ffd200' abstraction_level_data=nhsregion_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.nhs_england_region.name %}
+                    </div>
+                </div>
+                {% endif %}
                 
-                <div class="ui rcpch_light_blue  card">
+                <div class="ui rcpch_light_blue card">
                     <div class="content">
-                        <h3 >Country</h3>
+                        <h3>
+                            Country
+                        </h3>
                     </div>
                     <div>
-                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.ons_region.ons_country.Country_ONS_Name %}
+                        {% include 'epilepsy12/partials/charts/map.html' with abstraction_level='country' abstraction_level_border_colour='#66cc33' abstraction_level_data=country_tiles selected_organisation=selected_organisation hospital_region_name=selected_organisation.country.name %}
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <div class='sixteen wide right fluid column'>
-
-            <div class="ui top attached tabular rcpch menu" _="init js $('.menu .item').tab();">
-                <a class="active item" data-tab="first">Overview</a>
-                <a class="item" data-tab="second">Individual Measures</a>
-            </div>
-
-            <div class="ui bottom attached active tab segment" data-tab="first">
-                <div 
-                    class="sixteen wide stackable column" 
-                    hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}" 
-                    hx-trigger="load" hx-swap='innerHTML'
-                    hx_indicator='#kpis'
-                    hx-target="#kpis">
-                    <div id='kpis'>
-                        <div class="ui active centered inline loader"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ui bottom attached tab segment" data-tab="second">
-                {% include 'epilepsy12/partials/organisation/individual_metrics.html' with individual_kpi_choices=individual_kpi_choices %}
-            </div>
         
+            
+        <div class="sixteen wide column">
+            <div
+                class="sixteen wide rcpch segment"
+                hx-get="{% url 'selected_trust_kpis' organisation_id=selected_organisation.pk %}"
+                hx-trigger="load" hx-swap='innerHTML'
+                hx-indicator='#kpis'
+                hx-target="#kpis">
+                <div id='kpis'>
+                    <div class="ui active centered inline loader"></div>
+                </div>
+            
+            </div>
         </div>
+        
+        {% include 'epilepsy12/partials/organisation/individual_metrics.html' with organisation_id=selected_organisation.pk %}
+            
+        </div>
+                
+            
+            
 
     
 </div>

@@ -44,9 +44,9 @@ def validate_and_update_model(
     """
 
     # initialize models
-    SyndromeEntity = apps.get_model("epilepsy12", "SyndromeEntity")
-    EpilepsyCauseEntity = apps.get_model("epilepsy12", "EpilepsyCauseEntity")
-    MedicineEntity = apps.get_model("epilepsy12", "MedicineEntity")
+    Syndrome = apps.get_model("epilepsy12", "Syndrome")
+    EpilepsyCause = apps.get_model("epilepsy12", "EpilepsyCause")
+    Medicine = apps.get_model("epilepsy12", "Medicine")
     Registration = apps.get_model("epilepsy12", "Registration")
 
     if page_element == "toggle_button":
@@ -70,19 +70,22 @@ def validate_and_update_model(
 
     elif page_element == "select" or page_element == "snomed_select":
         if request.htmx.trigger_name == "syndrome_name":
-            syndrome_entity = SyndromeEntity.objects.get(
+            syndrome_entity = Syndrome.objects.get(
                 pk=request.POST.get(request.htmx.trigger_name)
             )
             field_value = syndrome_entity  # note field name here is syndrome
         elif request.htmx.trigger_name == "epilepsy_cause":
-            epilepsy_cause_entity = EpilepsyCauseEntity.objects.get(
-                pk=request.POST.get(request.htmx.trigger_name)
-            )
+            try:
+                epilepsy_cause_entity = EpilepsyCause.objects.get(
+                    pk=request.POST.get(request.htmx.trigger_name)
+                )
+            except Exception as e:
+                raise Exception("Unable to save epilepsy cause. ", e)
             field_value = (
                 epilepsy_cause_entity  # note field name here is epilepsy_cause
             )
         elif request.htmx.trigger_name == "medicine_id":
-            medicine_entity = MedicineEntity.objects.get(
+            medicine_entity = Medicine.objects.get(
                 pk=request.POST.get(request.htmx.trigger_name)
             )
             field_value = medicine_entity
@@ -98,7 +101,7 @@ def validate_and_update_model(
         # If a comparison date field is supplied, the date itself might not yet have been set.
         # The earlier of the two dates cannot be in the future and cannot be later than the second if supplied.
         # The later of the two dates CAN be in the future but cannot be earlier than the first if supplied.
-        # If there is no comparison date (eg registration_date) the only stipulation is that it not be in the future.
+        # If there is no comparison date (eg first_paediatric_assessment_date) the only stipulation is that it not be in the future.
         # This validation step happens in validators.py
         field_value = datetime.strptime(
             request.POST.get(request.htmx.trigger_name), "%Y-%m-%d"
@@ -124,11 +127,11 @@ def validate_and_update_model(
 
     # update the model
 
-    # if saving a registration_date, this has to trigger the save() method to generate a cohort
+    # if saving a first_paediatric_assessment_date, this has to trigger the save() method to generate a cohort
     # so update() cannot be used
     # This feels like a bit of a hack so very open to suggestions on more Django way of doing this
-    if field_name == "registration_date":
-        # registration_date cannot be before date of birth
+    if field_name == "first_paediatric_assessment_date":
+        # first_paediatric_assessment_date cannot be before date of birth
         registration = Registration.objects.get(pk=model_id)
         if relativedelta(field_value, registration.case.date_of_birth).years >= 24:
             errors = f"To be included in Epilepsy12, {registration.case} cannot be over 24y at first paediatric assessment."
@@ -150,7 +153,7 @@ def validate_and_update_model(
 
         else:
             registration = Registration.objects.get(pk=model_id)
-            registration.registration_date = field_value
+            registration.first_paediatric_assessment_date = field_value
             registration.updated_at = timezone.now()
             registration.updated_by = request.user
             registration.save()

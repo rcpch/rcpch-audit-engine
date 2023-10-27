@@ -27,8 +27,8 @@ users = [
 ]
 
 TEST_USER_ORGANISATION = Organisation.objects.get(
-    ODSCode="RP401",
-    ParentOrganisation_ODSCode="RP4",
+    ods_code="RP401",
+    trust__ods_code="RP4",
 )
 
 E12UserFactory(
@@ -42,6 +42,18 @@ E12UserFactory(
     organisation_employer=TEST_USER_ORGANISATION,
     groups=[test_user_audit_centre_administrator_data.group_name],
 )
+E12UserFactory(
+    first_name=test_user_audit_centre_clinician_data.role_str,
+    role=test_user_audit_centre_clinician_data.role,
+    # Assign flags based on user role
+    is_active=True,
+    is_staff=False,
+    is_rcpch_audit_team_member=False,
+    is_rcpch_staff=False,
+    organisation_employer=TEST_USER_ORGANISATION,
+    groups=[test_user_audit_centre_clinician_data.group_name],
+)
+
 E12UserFactory(
     first_name=test_user_rcpch_audit_team_data.role_str,
     role=test_user_rcpch_audit_team_data.role,

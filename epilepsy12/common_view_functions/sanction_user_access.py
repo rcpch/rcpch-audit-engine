@@ -14,13 +14,13 @@ def return_selected_organisation(user):
 
     if user.organisation_employer is not None:
         # current user is affiliated with an existing organisation - set viewable trust to this
-        return Organisation.objects.get(OrganisationName=user.organisation_employer)
+        return Organisation.objects.get(name=user.organisation_employer)
     else:
         # current user is NOT affiliated with an existing organisation
         if user.is_rcpch_staff or user.is_superuser or user.is_superuser:
             # current user is a member of the RCPCH audit team and also not affiliated with a organisation
             # therefore set selected organisation to first of organisation on the list
-            return Organisation.objects.order_by("OrganisationName").first()
+            return Organisation.objects.order_by("name").first()
         else:
             # Imposter! You shall not pass!
             raise PermissionDenied()

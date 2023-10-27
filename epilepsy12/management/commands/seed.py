@@ -3,14 +3,14 @@ from random import randint, choice
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from random import randint
+
 from django.core.management.base import BaseCommand
+
 from ...general_functions import (
     get_current_cohort_data,
-    generate_nhs_number,
     return_random_postcode,
+    random_date,
 )
-
-
 from ...constants import (
     ETHNICITIES,
 )
@@ -20,12 +20,9 @@ from ...models import (
     Site,
     Registration,
 )
-
-from ...general_functions import (
-    random_date,
-)
 from .create_groups import groups_seeder
 from .create_e12_records import create_epilepsy12_record, create_registrations
+from epilepsy12.tests.factories import E12CaseFactory
 
 
 class Command(BaseCommand):
@@ -73,9 +70,8 @@ class Command(BaseCommand):
 
 
 def run_dummy_cases_seed(verbose=True, cases=50):
-    added = 0
     if verbose:
-        print("\033[33m", "Seeding fictional cases...", "\033[33m")
+        print("\033[33m", f"Seeding {cases} fictional cases...", "\033[33m")
     # there should not be any cases yet, but sometimes seed gets run more than once
     if Case.objects.all().exists():
         if verbose:
@@ -85,69 +81,45 @@ def run_dummy_cases_seed(verbose=True, cases=50):
     if cases is None or cases == 0:
         cases = 50
 
-    # for index in range(len(DUMMY_NAMES) - 1): # commented out line populates all the names, not just first 20
-    for index in range(0, cases):  # first 20 names
+    different_organisations = [
+        "RGT01",
+        "RBS25",
+        "RQM01",
+        "RCF22",
+        "7A2AJ",
+        "7A6BJ",
+        "7A6AV",
+    ]
+    organisations_list = Organisation.objects.filter(
+        ods_code__in=different_organisations
+    ).order_by("name")
+    for org in organisations_list:
+        num_cases_to_seed_in_org = int(cases / len(different_organisations))
+        print(f"Creating {num_cases_to_seed_in_org} Cases in {org}")
+
+        # Create random attributes
         random_date = date(randint(2005, 2021), randint(1, 12), randint(1, 28))
-        nhs_number = generate_nhs_number()
-        sex = randint(1, 2)
-        random_ethnicity = randint(0, len(choice(ETHNICITIES)))
-        if sex == 2:
-            first_name = "Dolly"
-            surname = f"Shepherd-{index}"
-        else:
-            first_name = "Agent"
-            surname = f"Smith-{index}"
-
         date_of_birth = random_date
-        postcode = return_random_postcode()
+        sex = randint(1, 2)
+        seed_male = True if sex == 1 else False
+        seed_female = True if sex == 2 else False
+        random_ethnicity = randint(0, len(choice(ETHNICITIES)))
         ethnicity = ETHNICITIES[random_ethnicity][0]
+        postcode = return_random_postcode(country_boundary_identifier=org.country.boundary_identifier)
 
-        # get a random organisation
-        if index < 50:
-            organisation = Organisation.objects.get(ODSCode="RGT01")  # King's Mill
-        else:
-            organisation = Organisation.objects.order_by(
-                "?"
-            ).first()  # random organisation
-
-        case_has_error = False
-
-        try:
-            new_case = Case(
-                locked=False,
-                nhs_number=nhs_number,
-                first_name=first_name,
-                surname=surname,
-                sex=sex,
-                date_of_birth=date_of_birth,
-                postcode=postcode,
-                ethnicity=ethnicity,
-            )
-            new_case.save()
-        except Exception as e:
-            if verbose:
-                print(f"Error saving case: {e}")
-            case_has_error = True
-
-        if not case_has_error:
-            try:
-                new_site = Site.objects.create(
-                    organisation=organisation,
-                    site_is_actively_involved_in_epilepsy_care=True,
-                    site_is_primary_centre_of_epilepsy_care=True,
-                    case=new_case,
-                )
-                new_site.save()
-            except Exception as e:
-                if verbose:
-                    print(f"Error saving site: {e}")
-
-            added += 1
-            if verbose:
-                print(
-                    f"{new_case.first_name} {new_case.surname} at {new_site.organisation.OrganisationName} ({new_site.organisation.ParentOrganisation_OrganisationName})..."
-                )
-    print(f"Saved {added} cases.")
+        E12CaseFactory.create_batch(
+            num_cases_to_seed_in_org,
+            locked=False,
+            sex=sex,
+            date_of_birth=date_of_birth,
+            postcode=postcode,
+            ethnicity=ethnicity,
+            organisations__organisation=org,
+            **{
+                "seed_male": seed_male,
+                "seed_female": seed_female,
+            },
+        )
 
 
 def run_registrations(verbose=True):
@@ -179,7 +151,7 @@ def complete_registrations(verbose=True):
         )
     current_cohort = get_current_cohort_data()
     for registration in Registration.objects.all():
-        registration.registration_date = random_date(
+        registration.first_paediatric_assessment_date = random_date(
             start=current_cohort["cohort_start_date"], end=date.today()
         )
         registration.eligibility_criteria_met = True

@@ -1,9 +1,12 @@
 # python
 from operator import itemgetter
+
 # django
 from django.contrib.gis.db import models
+
 # 3rd party
 from simple_history.models import HistoricalRecords
+
 # rcpch
 from .help_text_mixin import HelpTextMixin
 from ..constants import SYNDROMES
@@ -18,24 +21,24 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
 
     syndrome_diagnosis_date = models.DateField(
         help_text={
-            'label': "The date the syndrome diagnosis was made.",
-            'reference': "The date the syndrome diagnosis was made.",
+            "label": "The date the syndrome diagnosis was made.",
+            "reference": "The date the syndrome diagnosis was made.",
         },
         blank=True,
         default=None,
-        null=True
+        null=True,
     )
 
     syndrome = models.ForeignKey(
-        'epilepsy12.SyndromeEntity',
+        "epilepsy12.SyndromeList",
         help_text={
-            'label': "The syndrome name.",
-            'reference': "Methodology for classification and definition of epilepsy syndromes with list of syndromes: Report of the ILAE Task Force on Nosology and Definitions, Epilepsia 2017",
+            "label": "The syndrome name.",
+            "reference": "Methodology for classification and definition of epilepsy syndromes with list of syndromes: Report of the ILAE Task Force on Nosology and Definitions, Epilepsia 2017",
         },
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        default=None
+        default=None,
     )
 
     history = HistoricalRecords()
@@ -51,13 +54,18 @@ class Syndrome(TimeStampAbstractBaseClass, UserStampAbstractBaseClass, HelpTextM
     # relationships
 
     multiaxial_diagnosis = models.ForeignKey(
-        'epilepsy12.MultiaxialDiagnosis',
-        on_delete=models.CASCADE
+        "epilepsy12.MultiaxialDiagnosis",
+        on_delete=models.CASCADE,
+        related_name="syndromes",
     )
 
     def __str__(self) -> str:
-        return f'{self.syndrome.syndrome_name} on {self.syndrome_diagnosis_date}' if self.syndrome else f"Empty syndrome"
+        return (
+            f"{self.syndrome.syndrome_name} on {self.syndrome_diagnosis_date}"
+            if self.syndrome
+            else f"Empty syndrome"
+        )
 
     class Meta:
-        verbose_name = 'Syndrome'
-        verbose_name_plural = 'Syndromes'
+        verbose_name = "Syndrome"
+        verbose_name_plural = "Syndromes"

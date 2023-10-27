@@ -1,0 +1,101 @@
+{% load epilepsy12_template_tags %}
+
+<thead>
+    <tr>
+        <th class='three wide'>Indicator</th>
+        <th class='right aligned '>
+            
+            
+                <p>Organisation</p>
+                <p><i
+                    class="info circle icon"
+                    id='totals_organisation_{{kpi_head_id}}'
+                    data-title='Epilepsy12 totals'
+                    data-content="Number of children registered in this Organisation ({{all_data.ORGANISATION_KPIS.aggregation_model.abstraction_relation.name}})"
+                    data-position='top right'
+                    _="init js $('#totals_organisation_{{kpi_head_id}}').popup(); end"
+                ></i>({{all_data.ORGANISATION_KPIS.total_cases_registered}})</p>
+            
+        </th>
+        {% if all_data.TRUST_KPIS.aggregation_model %}
+        <th class='right aligned'>
+            <p>Trust</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_trust_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered in this Trust ({{all_data.TRUST_KPIS.aggregation_model.abstraction_relation.name}})"
+                data-position='top right'
+                _="init js $('#totals_trust_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.TRUST_KPIS.total_cases_registered}})</p>
+        </th>
+        <th class='right aligned'>
+            <p>Integrated Care Board</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_icb_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered in this Integrated Care Board ({% formatlabel all_data.ICB_KPIS.aggregation_model.abstraction_relation.name %})"
+                data-position='top right'
+                _="init js $('#totals_icb_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.ICB_KPIS.total_cases_registered}})</p>
+        </th>
+        <th class='right aligned'>
+            <p>NHS Region</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_nhs_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered in this NHS Region ({{all_data.NHS_ENGLAND_REGION_KPIS.aggregation_model.abstraction_relation.name}})" 
+                data-position='top right'
+                _="init js $('#totals_nhs_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.NHS_ENGLAND_REGION_KPIS.total_cases_registered}})</p>
+        </th>
+        {% else %}
+        <th class='right aligned'>
+            <p>Local Health Board</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_trust_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered in this Local Health Board ({{all_data.LOCAL_HEALTH_BOARD_KPIS.aggregation_model.abstraction_relation.name}})"
+                data-position='top right'
+                _="init js $('#totals_trust_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.LOCAL_HEALTH_BOARD_KPIS.total_cases_registered}})</p>
+        </th>
+        {% endif %}
+        <th class='right aligned'>
+            <p>OPEN UK Region</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_open_uk_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered in this OPEN UK Region ({{all_data.OPEN_UK_KPIS.aggregation_model.abstraction_relation.name}})"
+                data-position='top right'
+                _="init js $('#totals_open_uk_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.OPEN_UK_KPIS.total_cases_registered}})</p>
+        </th>
+        <th class='right aligned'>
+            <p>{{all_data.COUNTRY_KPIS.aggregation_model.abstraction_relation.name}}</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_country_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered in this country."
+                data-position='top right'
+                _="init js $('#totals_country_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.COUNTRY_KPIS.total_cases_registered}})</p>
+        </th>
+        <th class='right aligned'>
+            <p>National</p>
+            <p><i 
+                class="info circle icon"
+                id='totals_national_{{kpi_head_id}}'
+                data-title='Epilepsy12 totals'
+                data-content="Number of children registered nationally."
+                data-position='top right'
+                _="init js $('#totals_national_{{kpi_head_id}}').popup(); end"
+            ></i>({{all_data.NATIONAL_KPIS.total_cases_registered}})</p>
+        </th>
+    </tr>
+</thead>

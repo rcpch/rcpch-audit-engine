@@ -2,7 +2,7 @@ import pytest
 
 from django.contrib.auth.models import Group
 
-from epilepsy12.models import Epilepsy12User, Case, EpilepsyCauseEntity
+from epilepsy12.models import Epilepsy12User, Case, ComorbidityList
 
 
 @pytest.mark.django_db
@@ -14,4 +14,4 @@ def test__seed_test_db(
     assert Group.objects.all().exists()
     assert Case.objects.all().exists()
     assert Epilepsy12User.objects.all().exists()
-    assert EpilepsyCauseEntity.objects.all().exists()
+    assert ComorbidityList.objects.all().exists()

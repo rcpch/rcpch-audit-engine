@@ -1,13 +1,12 @@
 """Factory fn to create new E12 Syndromes, related to a multiaxial diagnosis.
 """
 # standard imports
-from datetime import timedelta
 
 # third-party imports
 import factory
 
 # rcpch imports
-from epilepsy12.models import Syndrome, SyndromeEntity
+from epilepsy12.models import Syndrome, SyndromeList
 from epilepsy12.constants import (
     SYNDROMES,
 )
@@ -28,5 +27,7 @@ class E12SyndromeFactory(factory.django.DjangoModelFactory):
 
     class Params:
         ineligible_mri = factory.Trait(
-            syndrome=factory.LazyAttribute(lambda o: SyndromeEntity.objects.get(syndrome_name=SYNDROMES[18][1]))
+            syndrome=factory.LazyAttribute(
+                lambda o: SyndromeList.objects.get(syndrome_name=SYNDROMES[18][1])
+            )
         )

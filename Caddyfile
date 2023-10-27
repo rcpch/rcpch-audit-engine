@@ -1,0 +1,30 @@
+# GLOBALS
+{
+    email {$LETSENCRYPT_EMAIL_ADDRESS}
+    acme_ca {$LETSENCRYPT_ENDPOINT}
+}
+
+# DJANGO
+{$SITE_DOMAIN} {
+    tls {$TLS_SOURCE}
+
+    # DJANGO
+    reverse_proxy http://django:8000
+
+    # MKDOCS static files are served from a /docs path
+    handle_path /docs* {
+        root * /srv/staticdocs
+        file_server {
+            index index.html
+        }
+    }
+
+    # FLOWER monitoring is served from a /flower path
+    handle /flower* {
+        reverse_proxy http://flower:8888
+    }
+
+    log {
+        level INFO # switch to DEBUG for more verbose logging
+    }
+}

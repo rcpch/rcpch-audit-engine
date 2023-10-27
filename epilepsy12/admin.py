@@ -1,17 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from semantic_admin import SemanticModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import *
 
-from .forms import Epilepsy12UserChangeForm, Epilepsy12UserCreationForm
-
 
 class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
-    add_form = Epilepsy12UserCreationForm
-    form = Epilepsy12UserChangeForm
     ordering = ["email"]
     model = Epilepsy12User
     search_fields = (
@@ -71,6 +66,7 @@ class Epilepsy12UserAdmin(UserAdmin, SimpleHistoryAdmin):
                 "fields": (
                     "last_login",
                     "date_joined",
+                    "password_last_set",
                 )
             },
         ),
@@ -138,24 +134,37 @@ admin.site.register(Organisation, SimpleHistoryAdmin)
 admin.site.register(FirstPaediatricAssessment, SimpleHistoryAdmin)
 admin.site.register(Management, SimpleHistoryAdmin)
 admin.site.register(Registration, SimpleHistoryAdmin)
-admin.site.register(Keyword, SimpleHistoryAdmin)
 admin.site.register(Site, SimpleHistoryAdmin)
 admin.site.register(AuditProgress)
 admin.site.register(Episode, SimpleHistoryAdmin)
-admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
-admin.site.register(Syndrome, SimpleHistoryAdmin)
-admin.site.register(SyndromeEntity, SimpleHistoryAdmin)
-admin.site.register(KPI)
-admin.site.register(KPIAggregation)
-admin.site.register(VisitActivity)
-admin.site.register(EpilepsyCauseEntity)
-admin.site.register(ComorbidityEntity)
-admin.site.register(MedicineEntity)
 
-admin.site.register(CountryBoundaries)
-admin.site.register(NHSEnglandRegionBoundaries)
-admin.site.register(LocalHealthBoardBoundaries)
-admin.site.register(IntegratedCareBoardBoundaries)
+admin.site.register(Keyword, SimpleHistoryAdmin)
+admin.site.register(MultiaxialDiagnosis, SimpleHistoryAdmin)
+admin.site.register(SyndromeList, SimpleHistoryAdmin)
+admin.site.register(Syndrome, SimpleHistoryAdmin)
+admin.site.register(EpilepsyCause, SimpleHistoryAdmin)
+admin.site.register(KPI)
+
+admin.site.register(OrganisationKPIAggregation)
+admin.site.register(TrustKPIAggregation)
+admin.site.register(LocalHealthBoardKPIAggregation)
+admin.site.register(ICBKPIAggregation)
+admin.site.register(NHSEnglandRegionKPIAggregation)
+admin.site.register(OpenUKKPIAggregation)
+admin.site.register(CountryKPIAggregation)
+admin.site.register(NationalKPIAggregation)
+
+admin.site.register(VisitActivity)
+admin.site.register(ComorbidityList)
+admin.site.register(Medicine)
+
+admin.site.register(Country)
+admin.site.register(LondonBorough)
+admin.site.register(IntegratedCareBoard)
+admin.site.register(NHSEnglandRegion)
+admin.site.register(Trust)
+admin.site.register(LocalHealthBoard)
+
 
 admin.site.site_header = "Epilepsy12 admin"
 admin.site.site_title = "Epilepsy12 admin"

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# DEPRECATED script - we have now moved to using Docker Compose in dev
-# This script left in the codebase just in case it is ever needed
-
-# Starts the development audit engine with reload on port 8080
-python manage.py runserver

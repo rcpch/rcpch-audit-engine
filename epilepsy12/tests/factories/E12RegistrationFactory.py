@@ -24,12 +24,13 @@ from .E12EpilepsyContextFactory import E12EpilepsyContextFactory
 class E12RegistrationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Registration
+        skip_postgeneration_save = True
 
     # Once Case instance made, it will attach to this instance
     case = None
 
     # Sets the minimal 'required' fields for a registration to be valid
-    registration_date = date(2023, 1, 1)
+    first_paediatric_assessment_date = date(2023, 1, 1)
     eligibility_criteria_met = True
     audit_progress = factory.SubFactory(E12AuditProgressFactory)
 
@@ -43,7 +44,6 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         ).get()
         return KPI.objects.create(
             organisation=lead_organisation.organisation,
-            parent_trust=lead_organisation.organisation.ParentOrganisation_OrganisationName,
             paediatrician_with_expertise_in_epilepsies=0,
             epilepsy_specialist_nurse=0,
             tertiary_input=0,
@@ -91,16 +91,20 @@ class E12RegistrationFactory(factory.django.DjangoModelFactory):
         if not create:
             return None
 
-        sodium_valproate = kwargs.pop('sodium_valproate', None)
+        sodium_valproate = kwargs.pop("sodium_valproate", None)
 
-        E12ManagementFactory(
-                registration=self, 
-                antiepilepsymedicine__sodium_valproate=sodium_valproate if sodium_valproate else None,
-                **kwargs,
-            )
+        E12ManagementFactory.create(
+            registration=self,
+            antiepilepsymedicine__sodium_valproate=sodium_valproate
+            if sodium_valproate
+            else None,
+            **kwargs,
+        )
 
     class Params:
-        ineligible_mri = factory.Trait(registration_date=date(2023, 1, 1))
+        ineligible_mri = factory.Trait(
+            first_paediatric_assessment_date=date(2023, 1, 1)
+        )
 
         pass_assessment_of_mental_health_issues = factory.Trait(ineligible_mri=True)
         fail_assessment_of_mental_health_issues = factory.Trait(

@@ -26,6 +26,7 @@ from epilepsy12.models import (
 class E12UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Epilepsy12User  # returns the Epilepsy12User object
+        skip_postgeneration_save = True
 
     email = factory.Sequence(lambda n: f"e12_test_user_{n}@nhs.net")
     first_name = "Mandel"
@@ -34,7 +35,7 @@ class E12UserFactory(factory.django.DjangoModelFactory):
     is_superuser = False
     email_confirmed = True
     organisation_employer = factory.LazyFunction(
-        lambda: Organisation.objects.filter(ODSCode="RP401").first()
+        lambda: Organisation.objects.filter(ods_code="RP401").first()
     )
 
     # Add Groups
@@ -44,10 +45,10 @@ class E12UserFactory(factory.django.DjangoModelFactory):
             return
 
         # hook into post gen hook to set pass
-        self.set_password('pw')
-        
+        self.set_password("pw")
+
         if extracted:
             for group in extracted:
                 self.groups.add(group)
-            
+
             self.save()

@@ -29,6 +29,7 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Assessment
+        skip_postgeneration_save = True
 
     # Once Registration instance made, it will attach to this instance
     registration = None
@@ -49,7 +50,6 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
             site.save()
 
     class Params:
-        
         # KPI 1
         pass_paediatrician_with_expertise_in_epilepsies = factory.Trait(
             consultant_paediatrician_referral_made=True,
@@ -70,31 +70,31 @@ class E12AssessmentFactory(factory.django.DjangoModelFactory):
         pass_epilepsy_specialist_nurse = factory.Trait(
             epilepsy_specialist_nurse_referral_made=True,
             epilepsy_specialist_nurse_referral_date=factory.LazyAttribute(
-                lambda o: o.registration.registration_date + relativedelta(days=5)
+                lambda o: o.registration.first_paediatric_assessment_date
+                + relativedelta(days=5)
             ),
             epilepsy_specialist_nurse_input_date=factory.LazyAttribute(
-                lambda o: o.epilepsy_specialist_nurse_referral_date + relativedelta(days=5)
+                lambda o: o.epilepsy_specialist_nurse_referral_date
+                + relativedelta(days=5)
             ),
         )
 
         fail_epilepsy_specialist_nurse = factory.Trait(
             epilepsy_specialist_nurse_referral_made=False,
         )
-        
+
         # KPI 3 and 3b
         pass_tertiary_input_AND_epilepsy_surgery_referral = factory.Trait(
-            childrens_epilepsy_surgical_service_referral_criteria_met = True,
-            paediatric_neurologist_referral_made = True,
-            childrens_epilepsy_surgical_service_referral_made = True,
+            childrens_epilepsy_surgical_service_referral_criteria_met=True,
+            childrens_epilepsy_surgical_service_referral_made=True,
         )
 
         fail_tertiary_input_AND_epilepsy_surgery_referral = factory.Trait(
-            childrens_epilepsy_surgical_service_referral_criteria_met = True,
-            paediatric_neurologist_referral_made = False,
-            childrens_epilepsy_surgical_service_referral_made = False,
+            childrens_epilepsy_surgical_service_referral_criteria_met=True,
+            paediatric_neurologist_input_date=None,
+            childrens_epilepsy_surgical_service_referral_made=False,
         )
-        
+
         ineligible_tertiary_input_AND_epilepsy_surgery_referral = factory.Trait(
-            childrens_epilepsy_surgical_service_referral_criteria_met = False,
+            childrens_epilepsy_surgical_service_referral_criteria_met=False,
         )
-        

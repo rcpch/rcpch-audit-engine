@@ -112,6 +112,7 @@ def completed_fields(model_instance):
                 if (
                     field.name == "epilepsy_cause_categories"
                     or field.name == "description"
+                    or field.name == "mental_health_issues"
                 ):
                     if len(getattr(model_instance, field.name)) > 0:
                         counter += 1
@@ -214,7 +215,7 @@ def total_fields_expected(model_instance):
 
         if model_instance.mental_health_issue_identified:
             # essential fields increase to include
-            # mental_health_issue
+            # mental_health_issues
             cumulative_score += 1
 
         if model_instance.global_developmental_delay_or_learning_difficulties:
@@ -230,8 +231,8 @@ def total_fields_expected(model_instance):
             # add essential fields: date referred, date seen, centre
             cumulative_score += 3
         if model_instance.childrens_epilepsy_surgical_service_referral_made:
-            # add essential fields: date referred, date seen, centre
-            cumulative_score += 3
+            # add essential fields: date referred, centre
+            cumulative_score += 2
         if model_instance.epilepsy_specialist_nurse_referral_made:
             # add essential fields: date referred, date seen
             cumulative_score += 2
@@ -341,24 +342,29 @@ def avoid_fields(model_instance):
     if model_class_name in [
         "FirstPaediatricAssessment",
         "EpilepsyContext",
-        "Assessment",
         "Investigations",
     ]:
         return META_VARIABLES + ["registration"]
+
+    elif model_class_name == "Assessment":
+        return META_VARIABLES + [
+            "registration",
+            "childrens_epilepsy_surgical_service_input_date",
+        ]
 
     elif model_class_name == "MultiaxialDiagnosis":
         return META_VARIABLES + [
             "registration",
             "multiaxial_diagnosis",
-            "episode",
-            "syndrome",
-            "comorbidity",
+            "episodes",
+            "syndromes",
+            "comorbidities",
         ]
 
     elif model_class_name == "Management":
         return META_VARIABLES + ["registration", "antiepilepsymedicine"]
 
-    elif model_class_name in ["Syndrome", "Comorbidity", "ComorbidityEntity"]:
+    elif model_class_name in ["Syndrome", "Comorbidity", "Comorbidity"]:
         return META_VARIABLES + ["multiaxial_diagnosis"]
 
     elif model_class_name == "Episode":
@@ -395,7 +401,7 @@ def avoid_fields(model_instance):
             "kpi",
         ]
 
-    elif model_class_name == "MedicineEntity":
+    elif model_class_name == "Medicine":
         return [
             "id",
             "conceptId",
