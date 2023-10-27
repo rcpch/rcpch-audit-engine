@@ -5,17 +5,16 @@
 
 #!/bin/bash
 
-echo "WARNING: This will delete all Epilepsy12 data in the ./data directory."
+echo "WARNING: This will delete all Epilepsy12 data in Docker volumes."
 echo "Are you sure you want to continue? (yes/no)"
 read -r response
 
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     if [[ -d "./data" ]]; then
         echo "Deleting local data..."
-        sudo rm -rf "./data"
+        # shuts down the Docker Compose setup and remove containers and images
+        docker compose down -v --rmi local # removes the volumes, container and local images
         echo "Local data has been deleted."
-    else
-        echo "Error: The ./data directory does not exist."
     fi
 else
     echo "Aborting. No data has been deleted."

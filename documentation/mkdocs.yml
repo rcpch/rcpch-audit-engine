@@ -10,7 +10,7 @@ copyright: Copyright &copy; 2022-23 Royal College of Paediatrics and Child Healt
 # these lines configure the 'GitHub repo' widget on the top right
 repo_url: https://github.com/rcpch/rcpch-audit-engine
 repo_name: rcpch/rcpch-audit-engine
-edit_uri: blob/live/docs
+edit_uri: blob/development/documentation/docs
 
 # `mkdocs serve` serves the documentation at custom port (to avoid clashing with other services we commonly run)
 dev_addr: "0.0.0.0:8001"

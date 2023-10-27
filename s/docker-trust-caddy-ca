@@ -29,7 +29,9 @@ case $choice in
   sudo docker compose cp \
     caddy:/data/caddy/pki/authorities/local/root.crt \
     /usr/local/share/ca-certificates/root.crt &&
-    sudo update-ca-certificates
+  sudo update-ca-certificates &&
+  sudo cp /usr/local/share/ca-certificates/root.crt . &&
+  sudo chown $USER:$USER root.crt
   ;;
 3)
   echo "You chose macOS."
