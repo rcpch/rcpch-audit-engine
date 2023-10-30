@@ -20,7 +20,7 @@ site_dir: ../staticdocs
 
 # theme settings, fonts, colours
 theme:
-  favicon: ../_assets/_images/epilepsy12-logo-1.png
+  favicon: _assets/_images/epilepsy12-logo-1.png
   name: material
   #custom_dir: rcpch-theme
   features:
