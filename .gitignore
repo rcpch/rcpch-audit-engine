@@ -139,3 +139,5 @@ celerybeat-schedule
 */site/
 */.cache/
 staticdocs
+
+data/*
