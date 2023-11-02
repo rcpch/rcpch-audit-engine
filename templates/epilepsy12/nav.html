@@ -10,10 +10,22 @@
   {% endif %}
     <div class="right menu">
       {% if user.is_authenticated %}
-        <a class="item signin_button" href="{% url 'logout' %}"><span class="signin_text">Log out {{ user.get_full_name }}</span></a>
+      <div class="ui buttons">
+        <!-- <div class="item signin_button" > </div> -->
+          <div class="rcpch_logged_in">
+            <h5><i class="id badge icon"></i>{{ user.get_full_name }}</h5>
+          </div>
+          <div class="ui button" onclick="location.href='{% url 'logout' %}'">Log out</div>
+          <div class="ui floating dropdown icon button">
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <div class="item" onclick="location.href='{% url 'two_factor:profile' %}'"><i class="id badge outline icon"></i> Account settings</div>
+          </div>
+        </div>
+      </div>
       {% else %}
-        <a class="item signin_button" href="{% url 'two_factor:login' %}"><i class="arrow right icon"></i><span class="signin_text">Sign in</span></a>
-        {% comment %} <a class="item signin_button" href="{% url 'signup' %}"><i class="arrow right icon"></i><span class="signin_text">Sign up</span></a> {% endcomment %}
+        <a class="ui rcpch_light_blue button" href="{% url 'two_factor:login' %}"><i class="arrow right icon"></i><span class="signin_text">&nbsp;Sign in</span></a>
+        {% comment %} <a class="item signin_button" href="{% url 'signup' %}"><i class="arrow right icon"></i><span class="signin_text">&nbsp;Sign up</span></a> {% endcomment %}
       {% endif %}
     </div>
   </div>
@@ -52,11 +64,11 @@
           Guidance
           </a>
 
-          <a {% if request.resolver_match.url_name|is_in:'two_factor:profile' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
+          <!-- <a {% if request.resolver_match.url_name|is_in:'two_factor:profile' %}class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
           id="link"
-          href="{% url 'two_factor:profile' %}">
+          >
           Settings
-          </a> 
+          </a>  -->
           
           {% if user.is_superuser %}
           <a {% if request.resolver_match.url_name|is_in:'admin:index'  %} class="active item" id="active_menu_item" {% else %} class="item" {% endif %}
