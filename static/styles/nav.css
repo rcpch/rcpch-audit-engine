@@ -58,6 +58,11 @@
   font-weight: 700;
 }
 
+/* login icon on hover */
+.ui.rcpch_light_blue.button i:hover{
+  color: var(--rcpch_white);
+}
+
 /* NAV */
 
 
