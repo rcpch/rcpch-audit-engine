@@ -16,8 +16,6 @@ from django.core.mail import send_mail, BadHeaderError
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.forms import AuthenticationForm
-from django.forms import ValidationError
 from django.utils.html import strip_tags
 from django_htmx.http import HttpResponseClientRedirect
 
@@ -380,11 +378,10 @@ def edit_epilepsy12_user(request, organisation_id, epilepsy12_user_id):
     elif match_in_choice_key(RCPCH_AUDIT_TEAM_ROLES, epilepsy12_user_to_edit.role):
         user_type = "rcpch-staff"
     if can_edit:
-        
         # EMAIL INPUT FIELD IS DISABLED SO WILL NOT BE INCLUDED IN REQUEST.POST -> ADD IN MANUALLY
         if request.POST:
-            request.POST = request.POST.copy() # request.POST object is immutable
-            request.POST['email'] = epilepsy12_user_to_edit.email
+            request.POST = request.POST.copy()  # request.POST object is immutable
+            request.POST["email"] = epilepsy12_user_to_edit.email
         form = Epilepsy12UserAdminCreationForm(
             user_type,
             request.POST or None,
