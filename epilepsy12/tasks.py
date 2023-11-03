@@ -16,6 +16,10 @@ def scheduled_aggregate_kpis_update_models_for(
     cohort: int = None,
     abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
 ):
+    """This scheduled task will run through all Cases for the Cohort, for all abstraction levels, aggregate KPI scores and update each abstraction's KPIAggregation model.
+    
+    `cohort` and `abstractions` parameters are optional.
+    """
     # If no cohort supplied, automatically get cohort from current datetime
     if cohort is None:
         cohort = get_current_cohort_data()["cohort"]
