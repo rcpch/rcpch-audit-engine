@@ -29,6 +29,7 @@ from ..general_functions import (
     get_current_cohort_data,
     value_from_key,
 )
+from ..tasks import asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level, hello
 
 
 @login_and_otp_required()
@@ -307,7 +308,8 @@ def aggregate_and_update_all_kpi_agg_models(request):
     cohort = get_current_cohort_data()["cohort"]
 
     # Run agg fun
-    update_all_kpi_agg_models(cohort=cohort)
+    # update_all_kpi_agg_models(cohort=cohort)
+    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort)
 
     return HttpResponse(
         status=204
