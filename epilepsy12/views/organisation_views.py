@@ -4,7 +4,6 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django_htmx.http import HttpResponseClientRedirect
-from django.http import HttpResponseForbidden, HttpResponse
 
 # E12 imports
 from ..decorator import user_may_view_this_organisation, login_and_otp_required
@@ -174,18 +173,28 @@ def selected_trust_kpis(request, organisation_id):
     """
     HTMX get request returning kpis.html 'Real-time Key Performance Indicator (KPI) Metrics' table.
 
-    This aggregates all KPI measures at different levels of abstraction related to the selected organisation
+    This aggregates all KPI measures asynchronously at different levels of abstraction related to the selected organisation
     Organisation level, Trust level, ICB level, NHS Region, OPEN UK level, country level and national level.
 
     It then presents each abstraction level's KPIAggregation model.
+
+    It is called by htmx get request from the kpi table, either on page load, or on click of the 
+    refresh or publish buttons in the header. If the publish button is pressed, aggregations are run and the 
+    open_access flag is set to true, making that data viewable to the general public
+    Otherwise, aggregations are run updating existing data but without setting the open_access flag to True
     """
 
     # Get all relevant data for this cohort
     cohort = get_current_cohort_data()["cohort"]
     organisation = Organisation.objects.get(pk=organisation_id)
 
+    open_access = False
+
+    if request.htmx.trigger_name == 'publish':
+        open_access=True
+
     # perform aggregations and update all the KPIAggregation models
-    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort)
+    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort, open_access=open_access)
 
     # Gather relevant data specific for this view
     all_data = get_all_kpi_aggregation_data_for_view(

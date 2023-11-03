@@ -29,7 +29,8 @@ will be persisted and run as a cron job once a day.
                     <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
                     <button 
                         class='ui right floated rcpch_primary button'
-                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 
+                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}"
+                        name="refresh" 
                         hx-trigger="click"
                         >
                         Refresh
@@ -37,7 +38,11 @@ will be persisted and run as a cron job once a day.
                     </button>
                         {% if user.is_rcpch_audit_team_member or user.is_superuser %}
                         <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
-                            <button class='ui right floated rcpch_primary button'>
+                            <button 
+                                class='ui right floated rcpch_danger button'
+                                hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}"
+                                name="publish"
+                                hx-trigger="click">
                                 <!-- TODO needs implementing POST call back to update KPIAggregation model open_access=True -->
                                 Publish
                                 <i class="htmx-indicator spinner loading icon"></i>

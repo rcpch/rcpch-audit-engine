@@ -15,6 +15,7 @@ from epilepsy12.common_view_functions.aggregate_by import update_all_kpi_agg_mod
 def asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level(
     cohort: int = None,
     abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all",
+    open_access=False
 ):
     """This scheduled task will run through all Cases for the Cohort, for all abstraction levels, aggregate KPI scores and update each abstraction's KPIAggregation model.
     
@@ -25,7 +26,7 @@ def asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_l
         cohort = get_current_cohort_data()["cohort"]
 
     # By default, this will update all KPIAggregation models for all levels of abstraction
-    update_all_kpi_agg_models(cohort=cohort, abstractions=abstractions)
+    update_all_kpi_agg_models(cohort=cohort, abstractions=abstractions, open_access=open_access)
 
 @shared_task
 def hello():
