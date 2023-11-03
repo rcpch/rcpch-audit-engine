@@ -185,7 +185,7 @@ def selected_trust_kpis(request, organisation_id):
     organisation = Organisation.objects.get(pk=organisation_id)
 
     # perform aggregations and update all the KPIAggregation models
-    update_all_kpi_agg_models(cohort=cohort)
+    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort)
 
     # Gather relevant data specific for this view
     all_data = get_all_kpi_aggregation_data_for_view(
@@ -293,27 +293,43 @@ def selected_trust_select_kpi(request, organisation_id):
     return render(request=request, template_name=template_name, context=context)
 
 
-@login_and_otp_required()
-def aggregate_and_update_all_kpi_agg_models(request):
-    """Aggregates and update all kpi aggregation models.
+# @login_and_otp_required()
+# def aggregate_and_update_all_kpi_agg_models(request, organisation_id):
+#     """Aggregates and update all kpi aggregation models.
 
-    Used by temp 'Aggregate and update' button and in future, async calls
-    """
+#     Call back from 'Refresh' button - runs aggregations, updates table. Returns kpis template
+#     """
 
-    # Only superusers allowed
-    if not request.user.is_superuser:
-        return HttpResponseForbidden
+#     # Gather constants
+#     cohort = get_current_cohort_data()["cohort"]
 
-    # Gather constants
-    cohort = get_current_cohort_data()["cohort"]
+#     # Run agg fun
+#     # update_all_kpi_agg_models(cohort=cohort)
+#     asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort)
 
-    # Run agg fun
-    # update_all_kpi_agg_models(cohort=cohort)
-    asynchronously_aggregate_kpis_and_update_models_for_cohort_and_abstraction_level.delay(cohort=cohort)
+#     # return HttpResponse(
+#     #     status=204
+#     # )  # 204 to signify to HTMX that nothing returned, just running server-side code
+#     organisation=Organisation.objects.get(pk=organisation_id)
 
-    return HttpResponse(
-        status=204
-    )  # 204 to signify to HTMX that nothing returned, just running server-side code
+#     kpis = KPI.objects.create(
+#         organisation=organisation,
+#     )
+
+#     template_name = "epilepsy12/partials/kpis/kpis.html"
+#     context = {
+#         "organisation": organisation,
+#         "kpis": kpis,
+#         "organisation_list": Organisation.objects.all().order_by("name"),
+#         "open_access": True,
+#     }
+
+#     # remove the temporary instance as otherwise would contribute to totals
+#     kpis.delete()
+
+#     response = render(request=request, template_name=template_name, context=context)
+
+#     return response
 
 
 def selected_trust_kpis_open(request, organisation_id):

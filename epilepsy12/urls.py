@@ -328,11 +328,6 @@ organisation_patterns = [
         name="selected_trust_select_kpi",
     ),
     path(
-        "update_all_kpi_aggregation_models",
-        view=aggregate_and_update_all_kpi_agg_models,
-        name="aggregate_and_update_all_kpi_agg_models",
-    ),
-    path(
         "organisation/<int:organisation_id>/case_statistics",
         view=case_statistics,
         name="case_statistics",

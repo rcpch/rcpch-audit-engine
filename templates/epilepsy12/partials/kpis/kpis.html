@@ -26,25 +26,23 @@ will be persisted and run as a cron job once a day.
                     
                 </div>
                 {% if not open_access %}
-                    {% if user.is_superuser %}
-                        <button 
-                            class='ui right floated rcpch_primary button'
-                            hx-get="{% url 'aggregate_and_update_all_kpi_agg_models' %}" 
-                            hx-trigger="click"
-                            >
-                            Aggregate & Update
-                            <i class="htmx-indicator spinner loading icon"></i>
-                        </button>
-                    {% endif %}
-                <button 
-                    class='ui right floated rcpch_primary button'
-                    hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 
-                    hx-trigger="click" hx-swap='innerHTML'
-                    hx_indicator='#kpis'
-                    hx-target="#kpis">
-                    Refresh
-                    <i class="htmx-indicator spinner loading icon" id="spinner"></i>
-                </button>
+                    <!-- anyone can refresh and rerun aggregations that is not a member of the public  -->
+                    <button 
+                        class='ui right floated rcpch_primary button'
+                        hx-get="{% url 'selected_trust_kpis' organisation_id=organisation.pk %}" 
+                        hx-trigger="click"
+                        >
+                        Refresh
+                        <i class="htmx-indicator spinner loading icon"></i>
+                    </button>
+                        {% if user.is_rcpch_audit_team_member or user.is_superuser %}
+                        <!-- Only RCPCH Audit team members and superusers can publish aggregations to the open access page -->
+                            <button class='ui right floated rcpch_primary button'>
+                                <!-- TODO needs implementing POST call back to update KPIAggregation model open_access=True -->
+                                Publish
+                                <i class="htmx-indicator spinner loading icon"></i>
+                            </button>
+                        {% endif %}
                 {% endif %}
             </div>
         </div>
