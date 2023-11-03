@@ -326,6 +326,7 @@ def update_kpi_aggregation_model(
     abstraction_level: EnumAbstractionLevel,
     kpi_value_counts,
     cohort: int,
+    open_access=False
 ) -> None:
     """Updates the relevant KPI Aggregation model, chosen via the `abstraction_level`. Takes output of `calculate_kpi_value_counts_queryset` to update model.
 
@@ -333,6 +334,7 @@ def update_kpi_aggregation_model(
         abstraction_level (EnumAbstractionLevel): chosen abstraction level
         kpi_value_counts (ValuesQuerySet[Model, Dict[str, Any]]): value counts of KPI scorings, grouped by abstraction
         cohort (int): cohort of aggregation
+        open_access: boolean - whether publicly viewable or not. Defaults to False
     """
 
     abstraction_level_models = get_abstraction_model_from_level(abstraction_level)
@@ -352,6 +354,7 @@ def update_kpi_aggregation_model(
                 **kpi_value_counts,
             },
             cohort=cohort,
+            open_access=open_access
         )
 
         if created:
@@ -382,10 +385,12 @@ def update_kpi_aggregation_model(
                 defaults={
                     "abstraction_relation": abstraction_relation_instance,
                     "cohort": cohort,
+
                     **value_count,
                 },
                 abstraction_relation=abstraction_relation_instance,
                 cohort=cohort,
+                open_access=open_access
             )
         except Exception as error:
             print(
@@ -429,7 +434,7 @@ def aggregate_kpis_update_models_all_abstractions_for_organisation(
 
 
 def update_all_kpi_agg_models(
-    cohort: int, abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all"
+    cohort: int, abstractions: Union[Literal["all"], list[EnumAbstractionLevel]] = "all", open_access=False
 ) -> None:
     """
     Using all cases in a given cohort,
@@ -473,6 +478,7 @@ def update_all_kpi_agg_models(
             abstraction_level=ABSTRACTION_LEVEL,
             kpi_value_counts=kpi_value_counts,
             cohort=cohort,
+            open_access=open_access
         )
 
 
